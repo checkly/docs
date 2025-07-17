@@ -1,15 +1,251 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Checkly Documentation",
   "colors": {
-    "primary": "#16A34A",
+    "primary": "#0075FF",
     "light": "#07C983",
-    "dark": "#15803D"
+    "dark": "#0075FF"
   },
   "favicon": "/favicon.svg",
+  "integrations": {
+    "ga4": {
+      "measurementId": "G-XXXXXXXXXX"
+    },
+    "koala": {
+      "publicApiKey": "pk_example_key_123"
+    },
+    "telemetry": {
+      "enabled": true
+    },
+    "cookies": {
+      "key": "example_cookie_key",
+      "value": "example_cookie_value"
+    }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity"
+    ]
+  },
   "navigation": {
     "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "docs/getting-started/why-checkly",
+              "docs/getting-started/quickstart",
+              {
+                "group": "Platform",
+                "pages": [
+                  {
+                    "group": "Private Locations",
+                    "pages": [
+                      "docs/getting-started/platform/private-locations/overview"
+                    ]
+                  },
+                  {
+                    "group": "Admin",
+                    "pages": [
+                      "docs/getting-started/platform/admin/overview"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Concepts",
+                "pages": [
+                  "docs/concepts/checks",
+                  "docs/concepts/results",
+                  "docs/concepts/locations",
+                  "docs/concepts/environments",
+                  "docs/concepts/organization",
+                  "docs/concepts/secrets",
+                  "docs/concepts/data-storage"
+                  
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Detect",
+            "pages": [
+              {
+                "group": "Testing",
+                "pages": [
+                  "docs/detect/testing/overview",
+                  "docs/detect/testing/creating-your-first-test",
+                  "docs/detect/testing/test-results"
+                ]
+              },
+              {
+                "group": "Uptime Monitoring",
+                "pages": [
+                  "docs/detect/uptime-monitoring/overview"
+                ]
+              },
+              {
+                "group": "Synthetic Monitoring",
+                "pages": [
+                  "docs/detect/synthetic-monitoring/overview"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Communicate",
+            "pages": [
+              {
+                "group": "Alerts",
+                "pages": [
+                  "docs/communicate/alerts/index"
+                ]
+              },
+              {
+                "group": "Status Pages",
+                "pages": [
+                  "docs/communicate/status-pages/index"
+                ]
+              },
+              {
+                "group": "Dashboards",
+                "pages": [
+                  "docs/communicate/dashboards/index"
+                ]
+              },
+              {
+                "group": "Maintenance Windows",
+                "pages": [
+                  "docs/communicate/maintenance-windows/index"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Resolve",
+            "pages": [
+              {
+                "group": "Traces",
+                "pages": [
+                  "docs/resolve/traces/getting-started",
+                  {
+                    "group": "Importing",
+                    "pages": [
+                      "docs/resolve/traces/import/open-telemetry",
+                      "docs/resolve/traces/import/https-grpc",
+                      "docs/resolve/traces/import/missing-spans"
+                    ]
+                  },
+                  {
+                    "group": "Exporting",
+                    "pages": [
+                      "docs/resolve/traces/export/to-grafana-tempo",
+                      "docs/resolve/traces/export/to-honeycomb",
+                      "docs/resolve/traces/export/to-new-relic",
+                       "docs/resolve/traces/export/to-dash0"
+                    ]
+                  },
+                  {
+                    "group": "Instrumentation",
+                    "pages": [
+                      "docs/resolve/traces/instrumentation/nextjs",
+                      "docs/resolve/traces/instrumentation/django",
+                      "docs/resolve/traces/instrumentation/python",
+                      "docs/resolve/traces/instrumentation/nodejs",
+                      "docs/resolve/traces/instrumentation/ruby",
+                      "docs/resolve/traces/instrumentation/php",
+                      "docs/resolve/traces/instrumentation/java"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Rocky AI",
+                "pages": [
+                  "docs/resolve/rocky-ai/index"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              {
+                "group": "Alerts",
+                "pages": [
+                  "docs/integrations/alerts/overview"
+                ]
+              },
+              {
+                "group": "CI/CD",
+                "pages": [
+                  "docs/integrations/ci-cd/overview"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "CLI Reference",
+        "groups": [
+          {
+            "group": "CLI",
+            "pages": [
+              "/cli-reference/overview",
+              "/cli-reference/environment-variables",
+              "/cli-reference/using-git",
+              "/cli-reference/including-checks",
+              "/cli-reference/importing"
+            ]
+          },
+          {
+            "group": "CLI Commands",
+            "pages": [
+              "/cli-reference/test",
+              "/cli-reference/deploy",
+              "/cli-reference/destroy",
+              "/cli-reference/trigger",
+              "/cli-reference/login",
+              "/cli-reference/logout",
+              "/cli-reference/whoami",
+              "/cli-reference/switch",
+              "/cli-reference/runtimes",
+              "/cli-reference/env",
+              "/cli-reference/sync-playwright",
+              "/cli-reference/importing"
+
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "API Documentation",
+            "pages": [
+              "api-reference/introduction"
+            ]
+          },
+          {
+            "group": "Endpoint Examples",
+            "pages": [
+              "api-reference/endpoint/get",
+              "api-reference/endpoint/create",
+              "api-reference/endpoint/delete",
+              "api-reference/endpoint/webhook"
+            ]
+          }
+        ]
+      },
       {
         "tab": "Guides",
         "groups": [
@@ -35,45 +271,28 @@
         ]
       },
       {
-        "tab": "API Reference",
+        "tab": "Learn",
         "groups": [
           {
-            "group": "API Documentation",
+            "group": "Learn",
             "pages": [
-              "api-reference/introduction"
+              "learn/overview"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "tab": "Comparisons",
+        "groups": [
           {
-            "group": "Endpoint Examples",
+            "group": "Comparisons",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "comparisons/overview"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/light.svg",
@@ -99,4 +318,5 @@
       "linkedin": "https://linkedin.com/company/mintlify"
     }
   }
+  
 }

@@ -1,0 +1,428 @@
+---
+title: 'List Analytics Metrics'
+openapi: 'GET /v1/analytics/metrics'
+description: 'Retrieve all available reporting metrics and their definitions for analytics endpoints'
+---
+
+## Overview
+
+This endpoint returns a comprehensive list of all available metrics that can be used in analytics and reporting endpoints. It provides metric definitions, data types, calculation methods, and availability across different check types.
+
+## Response Example
+
+```json
+{
+  "data": {
+    "responseTimeMetrics": [
+      {
+        "name": "averageResponseTime",
+        "displayName": "Average Response Time",
+        "description": "Mean response time across all check executions",
+        "unit": "milliseconds",
+        "dataType": "number",
+        "availableFor": ["api", "browser", "heartbeat", "tcp", "multistep", "url"],
+        "calculationMethod": "arithmetic_mean",
+        "precision": 2
+      },
+      {
+        "name": "p95ResponseTime",
+        "displayName": "95th Percentile Response Time",
+        "description": "Response time value below which 95% of requests fall",
+        "unit": "milliseconds",
+        "dataType": "number",
+        "availableFor": ["api", "browser", "heartbeat", "tcp", "multistep", "url"],
+        "calculationMethod": "percentile_95",
+        "precision": 2
+      }
+    ],
+    "successMetrics": [
+      {
+        "name": "successRate",
+        "displayName": "Success Rate",
+        "description": "Percentage of successful check executions",
+        "unit": "percentage",
+        "dataType": "number",
+        "availableFor": ["api", "browser", "heartbeat", "tcp", "multistep", "url"],
+        "calculationMethod": "percentage",
+        "precision": 2,
+        "range": {
+          "min": 0,
+          "max": 100
+        }
+      },
+      {
+        "name": "errorRate",
+        "displayName": "Error Rate",
+        "description": "Percentage of failed check executions",
+        "unit": "percentage",
+        "dataType": "number",
+        "availableFor": ["api", "browser", "heartbeat", "tcp", "multistep", "url"],
+        "calculationMethod": "percentage",
+        "precision": 2
+      }
+    ],
+    "volumeMetrics": [
+      {
+        "name": "totalRequests",
+        "displayName": "Total Requests",
+        "description": "Total number of check executions",
+        "unit": "count",
+        "dataType": "integer",
+        "availableFor": ["api", "browser", "heartbeat", "tcp", "multistep", "url"],
+        "calculationMethod": "sum"
+      }
+    ],
+    "browserSpecificMetrics": [
+      {
+        "name": "firstContentfulPaint",
+        "displayName": "First Contentful Paint",
+        "description": "Time until the first content is painted on the screen",
+        "unit": "seconds",
+        "dataType": "number",
+        "availableFor": ["browser", "multistep"],
+        "calculationMethod": "arithmetic_mean",
+        "precision": 3,
+        "category": "core_web_vitals"
+      },
+      {
+        "name": "largestContentfulPaint",
+        "displayName": "Largest Contentful Paint",
+        "description": "Time until the largest content element is painted",
+        "unit": "seconds",
+        "dataType": "number",
+        "availableFor": ["browser", "multistep"],
+        "calculationMethod": "arithmetic_mean",
+        "precision": 3,
+        "category": "core_web_vitals"
+      },
+      {
+        "name": "cumulativeLayoutShift",
+        "displayName": "Cumulative Layout Shift",
+        "description": "Visual stability metric measuring unexpected layout shifts",
+        "unit": "score",
+        "dataType": "number",
+        "availableFor": ["browser", "multistep"],
+        "calculationMethod": "arithmetic_mean",
+        "precision": 4,
+        "category": "core_web_vitals",
+        "goodThreshold": 0.1,
+        "needsImprovementThreshold": 0.25
+      }
+    ],
+    "heartbeatSpecificMetrics": [
+      {
+        "name": "uptimePercentage",
+        "displayName": "Uptime Percentage",
+        "description": "Percentage of time the heartbeat was active",
+        "unit": "percentage",
+        "dataType": "number",
+        "availableFor": ["heartbeat"],
+        "calculationMethod": "uptime_percentage",
+        "precision": 3
+      },
+      {
+        "name": "missedHeartbeats",
+        "displayName": "Missed Heartbeats",
+        "description": "Number of expected heartbeats that were not received",
+        "unit": "count",
+        "dataType": "integer",
+        "availableFor": ["heartbeat"],
+        "calculationMethod": "sum"
+      }
+    ]
+  },
+  "meta": {
+    "totalMetrics": 15,
+    "categories": [
+      "response_time",
+      "success_rate",
+      "volume",
+      "core_web_vitals",
+      "heartbeat",
+      "performance"
+    ],
+    "checkTypes": [
+      "api",
+      "browser", 
+      "heartbeat",
+      "tcp",
+      "multistep",
+      "url"
+    ]
+  }
+}
+```
+
+## Metric Categories
+
+<AccordionGroup>
+
+<Accordion title="Response Time Metrics">
+**Available for all check types**
+- `averageResponseTime` - Mean response time
+- `medianResponseTime` - Median (50th percentile) response time
+- `p95ResponseTime` - 95th percentile response time
+- `p99ResponseTime` - 99th percentile response time
+- `minResponseTime` - Fastest response time recorded
+- `maxResponseTime` - Slowest response time recorded
+
+All response time metrics are measured in milliseconds with 2 decimal precision.
+</Accordion>
+
+<Accordion title="Success Rate Metrics">
+**Available for all check types**
+- `successRate` - Percentage of successful executions (0-100%)
+- `errorRate` - Percentage of failed executions (0-100%)
+- `totalRequests` - Total number of check executions
+- `successfulRequests` - Number of successful executions
+- `failedRequests` - Number of failed executions
+
+Success is determined by HTTP status codes and check-specific success criteria.
+</Accordion>
+
+<Accordion title="Core Web Vitals (Browser Only)">
+**Available for browser and multistep checks**
+- `firstContentfulPaint` - Time to first content render (seconds)
+- `largestContentfulPaint` - Time to largest element render (seconds)
+- `cumulativeLayoutShift` - Visual stability score (0-1+)
+- `firstInputDelay` - Interactivity delay (milliseconds)
+- `timeToInteractive` - Time until page is fully interactive
+
+These metrics align with Google's Core Web Vitals standards.
+</Accordion>
+
+<Accordion title="Heartbeat Specific Metrics">
+**Available for heartbeat checks only**
+- `uptimePercentage` - Percentage of expected heartbeats received
+- `missedHeartbeats` - Count of missed heartbeat signals
+- `averageHeartbeatInterval` - Average time between heartbeats
+- `longestGap` - Longest period without a heartbeat
+- `heartbeatConsistency` - Consistency score for heartbeat timing
+</Accordion>
+
+</AccordionGroup>
+
+## Metric Thresholds
+
+<CardGroup cols={2}>
+
+<Card title="Core Web Vitals Thresholds" icon="gauge">
+**Good Performance:**
+- FCP: ≤ 1.8 seconds
+- LCP: ≤ 2.5 seconds  
+- CLS: ≤ 0.1
+- FID: ≤ 100 milliseconds
+
+**Needs Improvement:**
+- FCP: 1.8 - 3.0 seconds
+- LCP: 2.5 - 4.0 seconds
+- CLS: 0.1 - 0.25
+- FID: 100 - 300 milliseconds
+</Card>
+
+<Card title="Response Time Benchmarks" icon="clock">
+**Excellent:** < 200ms
+**Good:** 200ms - 500ms
+**Fair:** 500ms - 1000ms
+**Poor:** > 1000ms
+
+These are general guidelines; thresholds should be set based on your specific SLA requirements.
+</Card>
+
+<Card title="Success Rate Standards" icon="check">
+**Excellent:** ≥ 99.9%
+**Good:** 99.0% - 99.9%
+**Fair:** 95.0% - 99.0%
+**Poor:** < 95.0%
+
+Success rate targets should align with your SLA commitments.
+</Card>
+
+<Card title="Heartbeat Reliability" icon="heartbeat">
+**Excellent:** ≥ 99.9% uptime
+**Good:** 99.0% - 99.9% uptime
+**Fair:** 95.0% - 99.0% uptime
+**Poor:** < 95.0% uptime
+
+Missed heartbeats should be minimal for critical services.
+</Card>
+
+</CardGroup>
+
+## Query Parameters
+
+<AccordionGroup>
+
+<Accordion title="Filtering Options">
+- `checkType` (string): Filter metrics by check type (api, browser, heartbeat, tcp, multistep, url)
+- `category` (string): Filter by metric category (response_time, success_rate, core_web_vitals, etc.)
+- `includeThresholds` (boolean): Include performance thresholds and benchmarks
+
+**Example:**
+```
+?checkType=browser&category=core_web_vitals&includeThresholds=true
+```
+</Accordion>
+
+<Accordion title="Response Format">
+- `format` (string): Response format (detailed, summary)
+- `includeExamples` (boolean): Include example values and use cases
+- `includeCalculations` (boolean): Include calculation method details
+
+**Default:** Detailed format with all information
+</Accordion>
+
+</AccordionGroup>
+
+## Use Cases
+
+<AccordionGroup>
+
+<Accordion title="Dashboard Configuration">
+Use metrics list to build custom dashboards:
+- Discover available metrics for specific check types
+- Understand metric calculations and units
+- Configure dashboard widgets with appropriate metrics
+- Set up performance thresholds and alerts
+</Accordion>
+
+<Accordion title="Reporting Automation">
+Build automated reporting systems:
+- Get metric definitions for report generation
+- Understand data types for proper formatting
+- Use thresholds for automated status determination
+- Create consistent metric naming across reports
+</Accordion>
+
+<Accordion title="Performance Analysis">
+Understand what metrics are available for analysis:
+- Identify relevant metrics for performance investigations
+- Compare metrics across different check types
+- Understand calculation methods for accurate interpretation
+- Use precision information for proper data presentation
+</Accordion>
+
+<Accordion title="API Integration">
+Integrate metrics into external systems:
+- Get metric schemas for data validation
+- Understand units for proper unit conversions
+- Use availability information for check-type specific logic
+- Implement consistent metric handling across systems
+</Accordion>
+
+</AccordionGroup>
+
+## Code Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.checklyhq.com/v1/analytics/metrics?checkType=browser&includeThresholds=true" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+
+```javascript Node.js
+const response = await fetch('https://api.checklyhq.com/v1/analytics/metrics?includeThresholds=true', {
+  headers: {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+  }
+});
+
+const metrics = await response.json();
+
+// Build a metrics registry for dashboard configuration
+const metricsRegistry = {};
+Object.values(metrics.data).flat().forEach(metric => {
+  metricsRegistry[metric.name] = {
+    displayName: metric.displayName,
+    unit: metric.unit,
+    checkTypes: metric.availableFor,
+    thresholds: metric.goodThreshold ? {
+      good: metric.goodThreshold,
+      needsImprovement: metric.needsImprovementThreshold
+    } : null
+  };
+});
+
+console.log('Available metrics:', Object.keys(metricsRegistry));
+
+// Filter metrics for Core Web Vitals
+const coreWebVitals = Object.values(metrics.data).flat()
+  .filter(metric => metric.category === 'core_web_vitals');
+
+console.log('Core Web Vitals metrics:', coreWebVitals.map(m => m.name));
+```
+
+```python Python
+import requests
+
+headers = {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+}
+
+params = {
+    'includeThresholds': True,
+    'includeExamples': True
+}
+
+response = requests.get(
+    'https://api.checklyhq.com/v1/analytics/metrics',
+    headers=headers,
+    params=params
+)
+
+if response.status_code == 200:
+    metrics_data = response.json()
+    
+    # Create a lookup table for metrics
+    metrics_lookup = {}
+    for category, metrics in metrics_data['data'].items():
+        for metric in metrics:
+            metrics_lookup[metric['name']] = metric
+    
+    # Function to get metric info
+    def get_metric_info(metric_name):
+        if metric_name in metrics_lookup:
+            metric = metrics_lookup[metric_name]
+            return {
+                'display_name': metric['displayName'],
+                'description': metric['description'],
+                'unit': metric['unit'],
+                'available_for': metric['availableFor'],
+                'precision': metric.get('precision', 0)
+            }
+        return None
+    
+    # Example: Get Core Web Vitals metrics for browser checks
+    browser_metrics = [
+        metric for metric in metrics_lookup.values()
+        if 'browser' in metric['availableFor']
+    ]
+    
+    print("Browser Check Metrics:")
+    for metric in browser_metrics:
+        print(f"- {metric['displayName']} ({metric['unit']})")
+        if 'goodThreshold' in metric:
+            print(f"  Good: ≤ {metric['goodThreshold']} {metric['unit']}")
+    
+    # Check what metrics are available for specific check types
+    check_types = metrics_data['meta']['checkTypes']
+    for check_type in check_types:
+        available_metrics = [
+            metric['name'] for metric in metrics_lookup.values()
+            if check_type in metric['availableFor']
+        ]
+        print(f"\n{check_type.upper()} checks support {len(available_metrics)} metrics")
+        
+else:
+    print(f"Error: {response.status_code} - {response.text}")
+```
+
+</CodeGroup>
+
+<Note>
+This endpoint provides the schema and definitions for all metrics available across Checkly's analytics endpoints. Use it to understand what data is available for your specific check types and build dynamic reporting interfaces.
+</Note>

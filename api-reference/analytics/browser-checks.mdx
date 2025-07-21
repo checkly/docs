@@ -1,0 +1,295 @@
+---
+title: 'Browser Checks Analytics'
+openapi: 'GET /v1/analytics/browser-checks/{id}'
+description: 'Get analytics data for browser checks including page load times, script execution performance, and user experience metrics'
+---
+
+## Overview
+
+This endpoint provides comprehensive analytics for browser checks, including page load times, script execution performance, Core Web Vitals, and other user experience metrics. Essential for monitoring web application performance from the end-user perspective.
+
+## Response Example
+
+```json
+{
+  "data": {
+    "checkId": "browser_check_789123",
+    "checkName": "E-commerce Checkout Flow",
+    "timeframe": {
+      "from": "2024-01-01T00:00:00.000Z",
+      "to": "2024-01-31T23:59:59.999Z"
+    },
+    "metrics": {
+      "averagePageLoadTime": 2.8,
+      "averageScriptDuration": 15.6,
+      "successRate": 98.5,
+      "errorRate": 1.5,
+      "totalRuns": 4320,
+      "successfulRuns": 4255,
+      "failedRuns": 65,
+      "coreWebVitals": {
+        "firstContentfulPaint": 1.2,
+        "largestContentfulPaint": 2.4,
+        "cumulativeLayoutShift": 0.05,
+        "firstInputDelay": 12.3
+      },
+      "performanceScore": 87.5
+    },
+    "timeline": [
+      {
+        "timestamp": "2024-01-01T00:00:00.000Z",
+        "pageLoadTime": 2.6,
+        "scriptDuration": 14.8,
+        "status": "success",
+        "coreWebVitals": {
+          "firstContentfulPaint": 1.1,
+          "largestContentfulPaint": 2.3,
+          "cumulativeLayoutShift": 0.04
+        }
+      }
+    ],
+    "locationBreakdown": [
+      {
+        "location": "us-east-1",
+        "locationName": "N. Virginia, USA",
+        "averagePageLoadTime": 2.5,
+        "averageScriptDuration": 14.2,
+        "successRate": 99.1,
+        "runCount": 1440
+      }
+    ],
+    "stepBreakdown": [
+      {
+        "stepName": "Navigate to homepage",
+        "averageDuration": 2.1,
+        "successRate": 99.8,
+        "errorCount": 3
+      },
+      {
+        "stepName": "Add item to cart",
+        "averageDuration": 1.2,
+        "successRate": 99.5,
+        "errorCount": 8
+      },
+      {
+        "stepName": "Complete checkout",
+        "averageDuration": 3.8,
+        "successRate": 97.9,
+        "errorCount": 54
+      }
+    ]
+  }
+}
+```
+
+## Query Parameters
+
+<AccordionGroup>
+
+<Accordion title="Time Range Filters">
+- `from` (string): Start date for analytics data (ISO 8601 format)
+- `to` (string): End date for analytics data (ISO 8601 format)
+- `period` (string): Predefined time period (24h, 7d, 30d, 90d)
+
+**Default:** Last 30 days if no parameters provided
+</Accordion>
+
+<Accordion title="Analysis Options">
+- `granularity` (string): Data point granularity (5m, 15m, 1h, 1d)
+- `locations` (array): Filter by specific monitoring locations
+- `includeSteps` (boolean): Include individual step performance data
+- `includeCoreWebVitals` (boolean): Include Core Web Vitals metrics
+
+**Example:**
+```
+?from=2024-01-01T00:00:00Z&to=2024-01-31T23:59:59Z&includeSteps=true&includeCoreWebVitals=true
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Metrics Explained
+
+<CardGroup cols={2}>
+
+<Card title="Page Performance" icon="browser">
+- **Page Load Time**: Time to fully load the page
+- **Script Duration**: Total time for script execution
+- **Performance Score**: Overall performance rating (0-100)
+</Card>
+
+<Card title="Core Web Vitals" icon="gauge">
+- **FCP**: First Contentful Paint - time to first content render
+- **LCP**: Largest Contentful Paint - time to largest element render
+- **CLS**: Cumulative Layout Shift - visual stability score
+- **FID**: First Input Delay - interactivity responsiveness
+</Card>
+
+<Card title="User Experience" icon="user">
+- **Success Rate**: Percentage of successful browser check runs
+- **Error Breakdown**: Failed steps and error categories
+- **Step Performance**: Individual step execution times
+</Card>
+
+<Card title="Geographic Analysis" icon="globe">
+- **Location Performance**: Performance metrics by region
+- **Network Conditions**: Simulated network performance
+- **Device Simulation**: Mobile vs desktop performance
+</Card>
+
+</CardGroup>
+
+## Use Cases
+
+<AccordionGroup>
+
+<Accordion title="Core Web Vitals Monitoring">
+Track Google's Core Web Vitals for SEO and user experience:
+- Monitor FCP, LCP, CLS, and FID metrics
+- Ensure Core Web Vitals meet Google's "Good" thresholds
+- Track performance impact of code changes
+- Optimize for search rankings and user experience
+</Accordion>
+
+<Accordion title="User Journey Analysis">
+Analyze end-to-end user workflows:
+- Track multi-step processes like checkout flows
+- Identify bottlenecks in user journeys
+- Monitor conversion funnel performance
+- Detect step-specific failures and optimization opportunities
+</Accordion>
+
+<Accordion title="Performance Regression Detection">
+Detect performance regressions after deployments:
+- Compare performance before and after releases
+- Set up alerts for performance degradation
+- Track script execution time changes
+- Monitor impact of new features on performance
+</Accordion>
+
+<Accordion title="Geographic Performance Optimization">
+Optimize performance across different regions:
+- Compare page load times across locations
+- Identify regions with poor performance
+- Make CDN and infrastructure decisions
+- Optimize for global user experience
+</Accordion>
+
+</AccordionGroup>
+
+## Code Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.checklyhq.com/v1/analytics/browser-checks/browser_check_789123?period=7d&includeSteps=true&includeCoreWebVitals=true" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+
+```javascript Node.js
+const checkId = 'browser_check_789123';
+const params = new URLSearchParams({
+  period: '30d',
+  granularity: '1h',
+  includeSteps: 'true',
+  includeCoreWebVitals: 'true'
+});
+
+const response = await fetch(`https://api.checklyhq.com/v1/analytics/browser-checks/${checkId}?${params}`, {
+  headers: {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+  }
+});
+
+const analytics = await response.json();
+const metrics = analytics.data.metrics;
+
+console.log(`Check: ${analytics.data.checkName}`);
+console.log(`Average Page Load Time: ${metrics.averagePageLoadTime}s`);
+console.log(`Performance Score: ${metrics.performanceScore}/100`);
+
+// Check Core Web Vitals against Google's thresholds
+const cwv = metrics.coreWebVitals;
+const goodThresholds = {
+  firstContentfulPaint: 1.8,
+  largestContentfulPaint: 2.5,
+  cumulativeLayoutShift: 0.1,
+  firstInputDelay: 100
+};
+
+console.log('Core Web Vitals Status:');
+console.log(`FCP: ${cwv.firstContentfulPaint}s ${cwv.firstContentfulPaint <= goodThresholds.firstContentfulPaint ? '✅' : '❌'}`);
+console.log(`LCP: ${cwv.largestContentfulPaint}s ${cwv.largestContentfulPaint <= goodThresholds.largestContentfulPaint ? '✅' : '❌'}`);
+console.log(`CLS: ${cwv.cumulativeLayoutShift} ${cwv.cumulativeLayoutShift <= goodThresholds.cumulativeLayoutShift ? '✅' : '❌'}`);
+
+// Analyze step performance
+if (analytics.data.stepBreakdown) {
+  console.log('\nStep Performance:');
+  analytics.data.stepBreakdown.forEach(step => {
+    console.log(`${step.stepName}: ${step.averageDuration}s (${step.successRate}% success)`);
+  });
+}
+```
+
+```python Python
+import requests
+
+check_id = 'browser_check_789123'
+headers = {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+}
+
+params = {
+    'period': '30d',
+    'includeSteps': True,
+    'includeCoreWebVitals': True
+}
+
+response = requests.get(
+    f'https://api.checklyhq.com/v1/analytics/browser-checks/{check_id}',
+    headers=headers,
+    params=params
+)
+
+if response.status_code == 200:
+    analytics = response.json()
+    data = analytics['data']
+    metrics = data['metrics']
+    
+    print(f"Check: {data['checkName']}")
+    print(f"Success Rate: {metrics['successRate']}%")
+    print(f"Average Page Load Time: {metrics['averagePageLoadTime']}s")
+    print(f"Performance Score: {metrics['performanceScore']}/100")
+    
+    # Core Web Vitals analysis
+    cwv = metrics['coreWebVitals']
+    print(f"\nCore Web Vitals:")
+    print(f"First Contentful Paint: {cwv['firstContentfulPaint']}s")
+    print(f"Largest Contentful Paint: {cwv['largestContentfulPaint']}s")
+    print(f"Cumulative Layout Shift: {cwv['cumulativeLayoutShift']}")
+    print(f"First Input Delay: {cwv['firstInputDelay']}ms")
+    
+    # Performance by location
+    print(f"\nPerformance by Location:")
+    for location in data['locationBreakdown']:
+        print(f"{location['locationName']}: {location['averagePageLoadTime']}s")
+    
+    # Step breakdown analysis
+    if 'stepBreakdown' in data:
+        print(f"\nStep Performance:")
+        for step in data['stepBreakdown']:
+            print(f"{step['stepName']}: {step['averageDuration']}s ({step['successRate']}% success)")
+            if step['errorCount'] > 0:
+                print(f"  ⚠️ {step['errorCount']} errors detected")
+else:
+    print(f"Error: {response.status_code} - {response.text}")
+```
+
+</CodeGroup>
+
+<Note>
+Browser check analytics include detailed Core Web Vitals metrics that align with Google's performance standards for SEO and user experience optimization.
+</Note>

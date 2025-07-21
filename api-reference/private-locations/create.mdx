@@ -1,0 +1,372 @@
+---
+title: 'Create Private Location'
+openapi: 'POST /v1/private-locations'
+description: 'Create a new private location for running checks from your infrastructure'
+---
+
+## Overview
+
+Create a new private location to run checks from your own infrastructure. Private locations allow you to monitor internal services, comply with regulatory requirements, or test from specific geographic locations.
+
+<Warning>
+After creating a private location, you'll need to install and configure the Checkly Agent in your infrastructure for it to become active.
+</Warning>
+
+## Request Example
+
+```json
+{
+  "name": "AWS Production Data Center",
+  "slugName": "aws-prod-dc",
+  "region": "us-east-1",
+  "tags": ["aws", "production", "primary"],
+  "icon": "aws"
+}
+```
+
+## Response Example
+
+```json
+{
+  "id": "pl_789123456",
+  "name": "AWS Production Data Center",
+  "slugName": "aws-prod-dc",
+  "status": "INACTIVE",
+  "region": "us-east-1",
+  "tags": ["aws", "production", "primary"],
+  "icon": "aws",
+  "agentVersion": null,
+  "lastHeartbeat": null,
+  "checksCount": 0,
+  "apiKeys": [
+    {
+      "id": "key_123456",
+      "name": "Default API Key",
+      "keyHash": "ck_live_***masked***",
+      "createdAt": "2024-01-25T10:30:00.000Z"
+    }
+  ],
+  "createdAt": "2024-01-25T10:30:00.000Z",
+  "updatedAt": "2024-01-25T10:30:00.000Z"
+}
+```
+
+## Configuration Options
+
+<AccordionGroup>
+
+<Accordion title="Basic Settings">
+**Required Fields:**
+- `name` (string): Human-readable name for the private location
+- `slugName` (string): URL-safe identifier (lowercase, hyphens allowed)
+
+**Optional Fields:**
+- `region` (string): AWS region identifier for geographic reference
+- `tags` (array): Tags for organization and filtering
+- `icon` (string): Icon identifier for the UI (aws, gcp, azure, docker, kubernetes, etc.)
+</Accordion>
+
+<Accordion title="Naming Guidelines">
+**Name Requirements:**
+- Must be unique within your account
+- Can contain letters, numbers, spaces, and common punctuation
+- Maximum 255 characters
+- Should be descriptive and meaningful
+
+**Slug Name Requirements:**
+- Must be unique within your account
+- Lowercase letters, numbers, and hyphens only
+- Cannot start or end with a hyphen
+- Maximum 63 characters
+- Used in API calls and URLs
+
+**Examples:**
+```json
+{
+  "name": "Production Data Center US-East",
+  "slugName": "prod-dc-us-east"
+}
+```
+</Accordion>
+
+<Accordion title="Supported Icons">
+Choose an icon that represents your infrastructure:
+- `aws` - Amazon Web Services
+- `gcp` - Google Cloud Platform
+- `azure` - Microsoft Azure
+- `docker` - Docker containers
+- `kubernetes` - Kubernetes clusters
+- `server` - Generic server
+- `cloud` - Generic cloud
+- `datacenter` - Data center
+- `office` - Office location
+</Accordion>
+
+<Accordion title="Regional Reference">
+Use standard AWS region identifiers for consistency:
+- `us-east-1` - US East (N. Virginia)
+- `us-west-2` - US West (Oregon)
+- `eu-west-1` - Europe (Ireland)
+- `ap-southeast-1` - Asia Pacific (Singapore)
+- Or use custom identifiers for your locations
+</Accordion>
+
+</AccordionGroup>
+
+## API Key Management
+
+<AccordionGroup>
+
+<Accordion title="Automatic API Key Creation">
+When you create a private location, Checkly automatically generates:
+- A default API key for agent authentication
+- Secure key with appropriate permissions
+- Initial key named "Default API Key"
+
+The API key is used by the Checkly Agent to authenticate with Checkly services.
+</Accordion>
+
+<Accordion title="Key Security">
+- API keys are shown only once during creation
+- Keys are hashed and masked in subsequent API responses
+- Store keys securely in your infrastructure
+- Rotate keys regularly for security
+</Accordion>
+
+<Accordion title="Multiple Keys">
+You can create multiple API keys for:
+- Different environments (staging, production)
+- Key rotation without downtime
+- Team or service separation
+- Backup authentication methods
+</Accordion>
+
+</AccordionGroup>
+
+## Code Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.checklyhq.com/v1/private-locations" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "On-Premise European Office",
+    "slugName": "onprem-eu-office",
+    "region": "eu-west-1",
+    "tags": ["on-premise", "europe", "office"],
+    "icon": "office"
+  }'
+```
+
+```javascript Node.js
+const privateLocationData = {
+  name: 'Kubernetes Production Cluster',
+  slugName: 'k8s-prod-cluster',
+  region: 'us-west-2',
+  tags: ['kubernetes', 'production', 'cluster'],
+  icon: 'kubernetes'
+};
+
+const response = await fetch('https://api.checklyhq.com/v1/private-locations', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(privateLocationData)
+});
+
+const privateLocation = await response.json();
+console.log('Created private location:', privateLocation.id);
+console.log('API Key:', privateLocation.apiKeys[0].keyHash);
+
+// Save the API key securely - it won't be shown again!
+const apiKey = privateLocation.apiKeys[0].keyHash;
+console.log('Save this API key for agent configuration:', apiKey);
+```
+
+```python Python
+import requests
+import json
+
+data = {
+    'name': 'Docker Swarm Staging',
+    'slugName': 'docker-swarm-staging',
+    'region': 'us-east-1',
+    'tags': ['docker', 'staging', 'swarm'],
+    'icon': 'docker'
+}
+
+headers = {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000',
+    'Content-Type': 'application/json'
+}
+
+response = requests.post(
+    'https://api.checklyhq.com/v1/private-locations',
+    headers=headers,
+    json=data
+)
+
+if response.status_code == 201:
+    private_location = response.json()
+    print(f"Created private location: {private_location['name']}")
+    print(f"ID: {private_location['id']}")
+    print(f"Slug: {private_location['slugName']}")
+    
+    # Important: Save the API key immediately!
+    api_key = private_location['apiKeys'][0]['keyHash']
+    print(f"API Key (save securely): {api_key}")
+    
+    # You might want to save this to a secure configuration
+    with open('private-location-config.json', 'w') as f:
+        json.dump({
+            'location_id': private_location['id'],
+            'api_key': api_key,
+            'slug_name': private_location['slugName']
+        }, f, indent=2)
+else:
+    print(f"Error: {response.status_code} - {response.text}")
+```
+
+</CodeGroup>
+
+## Next Steps After Creation
+
+<AccordionGroup>
+
+<Accordion title="1. Save the API Key">
+**Critical:** Save the API key immediately after creation:
+- The key is only shown once in the creation response
+- Store it securely in your secrets management system
+- You'll need it to configure the Checkly Agent
+
+```bash
+# Example: Save to environment variable
+export CHECKLY_API_KEY="ck_live_your_actual_key_here"
+```
+</Accordion>
+
+<Accordion title="2. Install the Checkly Agent">
+**Download and install the agent in your infrastructure:**
+
+```bash
+# Example Docker installation
+docker run -d \
+  --name checkly-agent \
+  --restart unless-stopped \
+  -e CHECKLY_API_KEY="ck_live_your_actual_key_here" \
+  -e CHECKLY_PRIVATE_LOCATION_SLUG="your-location-slug" \
+  checkly/agent:latest
+```
+
+**Or using Kubernetes:**
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkly-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: checkly-agent
+  template:
+    metadata:
+      labels:
+        app: checkly-agent
+    spec:
+      containers:
+      - name: agent
+        image: checkly/agent:latest
+        env:
+        - name: CHECKLY_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: checkly-secret
+              key: api-key
+        - name: CHECKLY_PRIVATE_LOCATION_SLUG
+          value: "your-location-slug"
+```
+</Accordion>
+
+<Accordion title="3. Verify Connection">
+**Check that the agent connects successfully:**
+
+1. Wait a few minutes for the agent to start
+2. Check the private location status via API
+3. Look for `status: "ACTIVE"` and recent `lastHeartbeat`
+4. Monitor agent logs for any connection issues
+
+```bash
+# Check status
+curl -X GET "https://api.checklyhq.com/v1/private-locations/pl_your_id" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+</Accordion>
+
+<Accordion title="4. Assign Checks">
+**Configure checks to use your private location:**
+
+- Update existing checks to include your private location
+- Create new checks that target your private location
+- Use check groups to apply the location to multiple checks
+
+```json
+{
+  "privateLocations": ["your-location-slug"]
+}
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Best Practices
+
+<AccordionGroup>
+
+<Accordion title="Naming Strategy">
+Use consistent naming conventions:
+- **Environment**: Include environment (prod, staging, dev)
+- **Technology**: Specify platform (aws, k8s, docker)
+- **Location**: Include geographic or logical location
+- **Purpose**: Indicate the purpose or team
+
+**Examples:**
+- "Production AWS US-East"
+- "Staging Kubernetes EU"
+- "Dev Docker Local"
+</Accordion>
+
+<Accordion title="Security Considerations">
+- **API Key Storage**: Use secure secrets management
+- **Network Access**: Restrict outbound access to required endpoints
+- **Agent Updates**: Keep agent versions current
+- **Monitoring**: Monitor agent health and connectivity
+</Accordion>
+
+<Accordion title="Infrastructure Planning">
+- **Resource Requirements**: Ensure adequate CPU and memory
+- **Network Connectivity**: Plan for outbound HTTPS access
+- **High Availability**: Consider running multiple agents
+- **Scaling**: Plan for check volume and concurrent execution
+</Accordion>
+
+<Accordion title="Organization">
+- **Tagging**: Use consistent tags for filtering and organization
+- **Documentation**: Document the purpose and configuration
+- **Access Control**: Limit who can create and manage private locations
+- **Monitoring**: Set up alerts for private location health
+</Accordion>
+
+</AccordionGroup>
+
+<Note>
+Remember to save the API key immediately after creation - it's only shown once! You'll need this key to configure the Checkly Agent in your infrastructure.
+</Note>

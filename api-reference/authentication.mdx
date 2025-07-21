@@ -1,0 +1,561 @@
+---
+title: 'Authentication'
+description: 'Learn how to authenticate with the Checkly API'
+openapi: 'AUTH Authentication'
+---
+
+## Overview
+
+The Checkly API uses Bearer token authentication to secure all endpoints. Every request requires both an API key and your Account ID to authenticate and authorize access to your monitoring data.
+
+<Info>
+API authentication is required for all endpoints except public status pages. All requests must include both Authorization and X-Checkly-Account headers.
+</Info>
+
+## Common Use Cases
+
+<CardGroup cols={2}>
+
+<Card title="Quick API Testing" icon="flask">
+Test your API credentials and connection quickly
+```bash
+curl -I https://api.checklyhq.com/v1/checks
+```
+</Card>
+
+<Card title="SDK Configuration" icon="code">
+Set up authentication for JavaScript/Python SDKs
+```javascript
+const client = new ChecklyAPI(apiKey, accountId)
+```
+</Card>
+
+<Card title="CI/CD Integration" icon="cogs">
+Authenticate in automated workflows and deployments
+```bash
+export CHECKLY_API_KEY=${{ secrets.CHECKLY_API_KEY }}
+```
+</Card>
+
+<Card title="Secure Environment Setup" icon="shield">
+Manage credentials securely across environments
+```bash
+echo "CHECKLY_API_KEY=cu_xxx" >> .env.production
+```
+</Card>
+
+</CardGroup>
+
+## Authentication Response Example
+
+```json
+{
+  "success": true,
+  "user": {
+    "id": "user_123456789",
+    "email": "user@example.com",
+    "name": "John Developer",
+    "role": "owner",
+    "permissions": [
+      "checks:read",
+      "checks:write",
+      "alerts:read", 
+      "alerts:write",
+      "analytics:read",
+      "account:admin"
+    ]
+  },
+  "account": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Acme Corp",
+    "plan": "team",
+    "limits": {
+      "checks": 100,
+      "checkRuns": 50000,
+      "alertChannels": 20,
+      "teammates": 10
+    },
+    "usage": {
+      "checksUsed": 67,
+      "checkRunsUsed": 23450,
+      "alertChannelsUsed": 8,
+      "teammatesUsed": 5
+    }
+  },
+  "apiKey": {
+    "id": "key_abc123def456",
+    "name": "Production API Access",
+    "scopes": ["checks", "alerts", "analytics"],
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "lastUsedAt": "2024-01-25T14:30:00.000Z",
+    "expiresAt": null,
+    "rateLimit": {
+      "requestsPerMinute": 100,
+      "requestsPerHour": 5000
+    }
+  }
+}
+```
+
+## Authentication Headers
+
+All API requests must include these two headers:
+
+| Header | Description | Example |
+|--------|-------------|---------|
+| `Authorization` | Bearer token with your API key | `Bearer cu_1234567890abcdef` |
+| `X-Checkly-Account` | Your Checkly Account ID | `550e8400-e29b-41d4-a716-446655440000` |
+
+## Getting Your Credentials
+
+<AccordionGroup>
+
+<Accordion title="API Key Setup">
+1. Navigate to [API Keys Settings](https://app.checklyhq.com/settings/user/api-keys) in your Checkly dashboard
+2. Click "Create API Key" 
+3. Provide a descriptive name for your key (e.g., "Production Monitoring", "CI/CD Pipeline")
+4. Select appropriate scopes for your use case:
+   - **Full Access**: Complete read/write access to all resources
+   - **Read Only**: View checks, results, and analytics
+   - **Custom**: Specific permissions for checks, alerts, or analytics
+5. Copy the generated API key immediately and store it securely
+
+<Warning>
+API keys are only shown once during creation. Store them securely in environment variables or credential management systems.
+</Warning>
+</Accordion>
+
+<Accordion title="Account ID Location">
+Your Account ID can be found in multiple places:
+
+**Dashboard URL**: Look for the UUID in your dashboard URL
+```
+https://app.checklyhq.com/dashboard/550e8400-e29b-41d4-a716-446655440000
+```
+
+**Account Settings**: Navigate to Settings → Account → Account Details
+
+**API Response**: Make any authenticated request and the account ID is included in error messages
+
+**Format**: Always a UUID like `550e8400-e29b-41d4-a716-446655440000`
+</Accordion>
+
+<Accordion title="Environment Variables">
+Set up authentication credentials securely using environment variables:
+
+```bash
+# .env file
+CHECKLY_API_KEY=cu_1234567890abcdef
+CHECKLY_ACCOUNT_ID=550e8400-e29b-41d4-a716-446655440000
+
+# Export in shell
+export CHECKLY_API_KEY="cu_1234567890abcdef"
+export CHECKLY_ACCOUNT_ID="550e8400-e29b-41d4-a716-446655440000"
+```
+
+**Security Best Practices**:
+- Never commit credentials to version control
+- Use different API keys for different environments
+- Set appropriate scopes for each key
+- Rotate keys regularly (every 90 days recommended)
+</Accordion>
+
+</AccordionGroup>
+
+## Testing & Validation
+
+<AccordionGroup>
+
+<Accordion title="Quick Authentication Test">
+Validate your credentials with a simple health check:
+
+```bash
+# Test authentication
+curl -I https://api.checklyhq.com/v1/checks \
+  -H "Authorization: Bearer $CHECKLY_API_KEY" \
+  -H "X-Checkly-Account: $CHECKLY_ACCOUNT_ID"
+
+# Expected response headers
+HTTP/2 200
+X-Request-ID: req_abc123def456
+X-RateLimit-Remaining: 99
+X-RateLimit-Reset: 1706192400
+```
+
+**Response Codes**:
+- `200 OK`: Authentication successful
+- `401 Unauthorized`: Invalid API key or missing auth
+- `403 Forbidden`: Valid key but insufficient permissions
+- `400 Bad Request`: Missing Account ID header
+</Accordion>
+
+<Accordion title="Permission Validation">
+Test specific permissions for your API key:
+
+```javascript
+// Test different permission levels
+const permissions = [
+  { endpoint: '/v1/checks', method: 'GET', permission: 'checks:read' },
+  { endpoint: '/v1/checks', method: 'POST', permission: 'checks:write' },
+  { endpoint: '/v1/check-alerts', method: 'GET', permission: 'alerts:read' },
+  { endpoint: '/v1/analytics/metrics', method: 'GET', permission: 'analytics:read' }
+];
+
+for (const test of permissions) {
+  try {
+    const response = await fetch(`https://api.checklyhq.com${test.endpoint}`, {
+      method: test.method,
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'X-Checkly-Account': accountId
+      }
+    });
+    
+    console.log(`${test.permission}: ${response.ok ? '✅ Allowed' : '❌ Denied'}`);
+  } catch (error) {
+    console.log(`${test.permission}: ❌ Error - ${error.message}`);
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Connection Diagnostics">
+Diagnose common connection issues:
+
+```python
+import requests
+import os
+from urllib.parse import urlparse
+
+def diagnose_checkly_connection():
+    api_key = os.getenv('CHECKLY_API_KEY')
+    account_id = os.getenv('CHECKLY_ACCOUNT_ID')
+    
+    print("🔍 Checkly API Connection Diagnostics")
+    print("=" * 50)
+    
+    # Check environment variables
+    if not api_key:
+        print("❌ CHECKLY_API_KEY environment variable not set")
+        return
+    if not account_id:
+        print("❌ CHECKLY_ACCOUNT_ID environment variable not set")
+        return
+        
+    print(f"✅ API Key: {api_key[:8]}...{api_key[-4:]}")
+    print(f"✅ Account ID: {account_id}")
+    
+    # Check API key format
+    if not api_key.startswith('cu_'):
+        print("⚠️ API key doesn't start with 'cu_' - check format")
+    
+    # Test connectivity
+    try:
+        response = requests.get(
+            'https://api.checklyhq.com/v1/checks',
+            headers={
+                'Authorization': f'Bearer {api_key}',
+                'X-Checkly-Account': account_id
+            },
+            timeout=10
+        )
+        
+        print(f"📡 Response Status: {response.status_code}")
+        print(f"📊 Rate Limit Remaining: {response.headers.get('X-RateLimit-Remaining', 'N/A')}")
+        print(f"🆔 Request ID: {response.headers.get('X-Request-ID', 'N/A')}")
+        
+        if response.ok:
+            data = response.json()
+            print(f"✅ Successfully authenticated!")
+            print(f"📈 Account has {len(data.get('data', []))} checks")
+        else:
+            error_data = response.json()
+            print(f"❌ Authentication failed: {error_data.get('message', 'Unknown error')}")
+            
+    except requests.exceptions.Timeout:
+        print("❌ Request timed out - check network connectivity")
+    except requests.exceptions.ConnectionError:
+        print("❌ Connection error - check internet connectivity")
+    except Exception as e:
+        print(f"❌ Unexpected error: {e}")
+
+# Run diagnostics
+diagnose_checkly_connection()
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Additional Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET https://api.checklyhq.com/v1/checks \
+  -H "Authorization: Bearer cu_1234567efse890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-44efs6655440000" \
+  -H "Content-Type: application/json"
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.checklyhq.com/v1/checks', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer cu_1234sda567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41dddwada4-a716-446655440000',
+    'Content-Type': 'application/json'
+  }
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+headers = {
+    'Authorization': 'Bearer cu_123456dwawdwa7890abcdef',
+    'X-Checkly-Account': '550e8wadawd400-e29b-41d4-a716-446655440000',
+    'Content-Type': 'application/json'
+}
+
+response = requests.get('https://api.checklyhq.com/v1/checks', headers=headers)
+data = response.json()
+```
+
+```go Go
+package main
+
+import (
+    "fmt"
+    "net/http"
+    "io/ioutil"
+)
+
+func main() {
+    client := &http.Client{}
+    
+    req, err := http.NewRequest("GET", "https://api.checklyhq.com/v1/checks", nil)
+    if err != nil {
+        panic(err)
+    }
+    
+    req.Header.Add("Authorization", "Bearer cu_123dwda4567890abcdef")
+    req.Header.Add("X-Checkly-Account", "550e8400-e29b-wadawd41d4-a716-446655440000")
+    req.Header.Add("Content-Type", "application/json")
+    
+    resp, err := client.Do(req)
+    if err != nil {
+        panic(err)
+    }
+    defer resp.Body.Close()
+    
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        panic(err)
+    }
+    
+    fmt.Println(string(body))
+}
+```
+
+</CodeGroup>
+
+## Authentication Errors
+
+<CardGroup cols={2}>
+
+<Card title="Missing Authentication" icon="exclamation-triangle">
+**HTTP 401 Unauthorized**
+```json
+{
+  "error": "Unauthorized",
+  "message": "Missing or invalid authentication credentials",
+  "statusCode": 401,
+  "details": {
+    "code": "MISSING_AUTH_HEADER",
+    "hint": "Include Authorization header with Bearer token"
+  }
+}
+```
+</Card>
+
+<Card title="Invalid API Key" icon="key">
+**HTTP 401 Unauthorized**
+```json
+{
+  "error": "Unauthorized", 
+  "message": "Invalid API key",
+  "statusCode": 401,
+  "details": {
+    "code": "INVALID_API_KEY",
+    "hint": "Check your API key format and validity"
+  }
+}
+```
+</Card>
+
+<Card title="Missing Account ID" icon="building">
+**HTTP 400 Bad Request**
+```json
+{
+  "error": "Bad Request",
+  "message": "X-Checkly-Account header is required",
+  "statusCode": 400,
+  "details": {
+    "code": "MISSING_ACCOUNT_HEADER",
+    "hint": "Include X-Checkly-Account header with your account ID"
+  }
+}
+```
+</Card>
+
+<Card title="Access Denied" icon="ban">
+**HTTP 403 Forbidden**
+```json
+{
+  "error": "Forbidden",
+  "message": "Access denied for the specified account",
+  "statusCode": 403,
+  "details": {
+    "code": "INSUFFICIENT_PERMISSIONS",
+    "hint": "API key lacks required permissions for this resource"
+  }
+}
+```
+</Card>
+
+</CardGroup>
+
+## Security & Best Practices
+
+<AccordionGroup>
+
+<Accordion title="Secure Credential Management">
+**Environment Variables**:
+```bash
+# Production
+export CHECKLY_API_KEY="cu_prod_1234567890abcdef"
+export CHECKLY_ACCOUNT_ID="550e8400-e29b-41d4-a716-446655440000"
+
+# Development
+export CHECKLY_API_KEY="cu_dev_0987654321fedcba"
+export CHECKLY_ACCOUNT_ID="550e8400-e29b-41d4-a716-446655440000"
+```
+
+**Secure Storage Options**:
+- AWS Secrets Manager, Azure Key Vault, Google Secret Manager
+- HashiCorp Vault, Kubernetes Secrets
+- CI/CD platform secret management (GitHub Secrets, GitLab Variables)
+- Never commit to version control or expose in client-side code
+</Accordion>
+
+<Accordion title="API Key Lifecycle Management">
+**Rotation Schedule**:
+- Rotate keys every 90 days minimum
+- Generate new keys before revoking old ones
+- Use overlapping validity periods during rotation
+
+**Monitoring Usage**:
+```javascript
+// Monitor API key usage
+const keyUsage = await checkly.apiKeys.getUsage('key_abc123def456');
+console.log(`Requests this month: ${keyUsage.requestsThisMonth}`);
+console.log(`Last used: ${keyUsage.lastUsedAt}`);
+console.log(`Rate limit: ${keyUsage.rateLimit.remaining}/${keyUsage.rateLimit.limit}`);
+```
+
+**Scope Management**:
+- Use principle of least privilege
+- Create specific keys for specific purposes
+- Read-only keys for monitoring dashboards
+- Full access keys only for administrative tasks
+</Accordion>
+
+<Accordion title="Rate Limiting & Performance">
+**Default Limits**:
+- 100 requests per minute per API key
+- 5,000 requests per hour per API key
+- Burst allowance of 200 requests
+
+**Implementing Backoff**:
+```python
+import time
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+def create_checkly_session():
+    session = requests.Session()
+    retry_strategy = Retry(
+        total=3,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504]
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("https://", adapter)
+    return session
+
+# Handle rate limiting
+if response.status_code == 429:
+    retry_after = int(response.headers.get('Retry-After', 60))
+    time.sleep(retry_after)
+```
+
+**Caching Strategies**:
+- Cache check configurations (TTL: 5 minutes)
+- Cache location data (TTL: 1 hour)
+- Cache account information (TTL: 15 minutes)
+</Accordion>
+
+<Accordion title="Error Handling & Debugging">
+**Comprehensive Error Handling**:
+```javascript
+class ChecklyAPIError extends Error {
+  constructor(response, requestId) {
+    super(response.message);
+    this.name = 'ChecklyAPIError';
+    this.statusCode = response.statusCode;
+    this.code = response.details?.code;
+    this.requestId = requestId;
+  }
+}
+
+async function makeChecklyRequest(endpoint, options = {}) {
+  try {
+    const response = await fetch(`https://api.checklyhq.com/v1${endpoint}`, {
+      ...options,
+      headers: {
+        'Authorization': `Bearer ${process.env.CHECKLY_API_KEY}`,
+        'X-Checkly-Account': process.env.CHECKLY_ACCOUNT_ID,
+        'Content-Type': 'application/json',
+        ...options.headers
+      }
+    });
+    
+    const requestId = response.headers.get('X-Request-ID');
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new ChecklyAPIError(errorData, requestId);
+    }
+    
+    return response.json();
+  } catch (error) {
+    if (error instanceof ChecklyAPIError) {
+      console.error(`Checkly API Error [${error.requestId}]:`, error.message);
+      // Don't log the actual API key
+      console.error('Status:', error.statusCode, 'Code:', error.code);
+    }
+    throw error;
+  }
+}
+```
+
+**Debug Headers**:
+- `X-Request-ID`: Unique identifier for request tracing
+- `X-RateLimit-Remaining`: Remaining requests in current window
+- `X-RateLimit-Reset`: When rate limit window resets
+</Accordion>
+
+</AccordionGroup>

@@ -1,0 +1,203 @@
+---
+title: 'List Dashboards'
+openapi: 'GET /v1/dashboards'
+description: 'Retrieve all public dashboards in your account'
+---
+
+## Overview
+
+Public dashboards provide a way to share monitoring status with stakeholders, customers, or team members without requiring access to your Checkly account. This endpoint returns all public dashboards configured in your account.
+
+## Response Example
+
+```json
+{
+  "data": [
+    {
+      "id": "dash_123456789",
+      "name": "Production Services Status",
+      "description": "Live status of all production services",
+      "isPrivate": false,
+      "customDomain": "status.example.com",
+      "customUrl": "production-status",
+      "tags": ["api", "frontend", "public", "status"],
+      "checkIds": [
+        "check_api_health",
+        "check_website_uptime",
+        "check_database_connection"
+      ],
+      "checkGroupIds": [
+        "group_production_services",
+        "group_critical_apis"
+      ],
+      "configuration": {
+        "theme": "light",
+        "logo": "https://example.com/logo.png",
+        "refreshInterval": 30,
+        "showCheckResults": true,
+        "showIncidents": true,
+        "customCSS": ".dashboard { font-family: 'Inter'; }"
+      },
+      "widgets": [
+        {
+          "type": "status_overview",
+          "position": 1,
+          "title": "System Status",
+          "settings": {
+            "showPercentage": true,
+            "timeRange": "24h"
+          }
+        },
+        {
+          "type": "check_list",
+          "position": 2,
+          "title": "Service Health",
+          "settings": {
+            "groupByType": true,
+            "showLastResult": true
+          }
+        }
+      ],
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-20T14:45:00.000Z"
+    },
+    {
+      "id": "dash_987654321",
+      "name": "Team Engineering Dashboard",
+      "description": "Internal monitoring dashboard for engineering team",
+      "isPrivate": true,
+      "customDomain": null,
+      "customUrl": "engineering-internal",
+      "tags": ["team", "internal", "engineering"],
+      "checkIds": [
+        "check_dev_api",
+        "check_staging_frontend",
+        "check_test_db"
+      ],
+      "checkGroupIds": [
+        "group_development_services"
+      ],
+      "configuration": {
+        "theme": "dark",
+        "logo": null,
+        "refreshInterval": 15,
+        "showCheckResults": true,
+        "showIncidents": false,
+        "customCSS": null
+      },
+      "widgets": [
+        {
+          "type": "metrics_chart",
+          "position": 1,
+          "title": "Response Times",
+          "settings": {
+            "metric": "response_time",
+            "timeRange": "7d"
+          }
+        }
+      ],
+      "createdAt": "2024-01-10T08:15:00.000Z",
+      "updatedAt": "2024-01-18T16:20:00.000Z"
+    }
+  ],
+  "meta": {
+    "currentPage": 1,
+    "totalPages": 1,
+    "totalItems": 2,
+    "limit": 10
+  }
+}
+```
+
+## Common Use Cases
+
+<CardGroup cols={2}>
+
+<Card title="Status Pages" icon="chart-line">
+Share service status with customers and stakeholders
+```bash
+GET /v1/dashboards?tags=public,status
+```
+</Card>
+
+<Card title="Team Dashboards" icon="users">
+Provide team-specific monitoring views for different teams
+```bash
+GET /v1/dashboards?tags=team,internal
+```
+</Card>
+
+<Card title="Executive Reports" icon="presentation">
+High-level overview dashboards for management reporting
+```bash
+GET /v1/dashboards?tags=executive,summary
+```
+</Card>
+
+<Card title="Customer Communication" icon="megaphone">
+Transparent communication during incidents and maintenance
+```bash
+GET /v1/dashboards?isPrivate=false
+```
+</Card>
+
+</CardGroup>
+
+## Additional Examples
+
+<CodeGroup>
+
+```bash Get Public Status Dashboards
+curl -X GET "https://api.checklyhq.com/v1/dashboards?isPrivate=false" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+
+```javascript Filter by Tags
+const response = await fetch('https://api.checklyhq.com/v1/dashboards?tags=production,status', {
+  headers: {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+  }
+});
+
+const data = await response.json();
+data.data.forEach(dashboard => {
+  console.log(`${dashboard.name}: ${dashboard.customUrl || dashboard.id}`);
+  console.log(`  Custom Domain: ${dashboard.customDomain || 'None'}`);
+  console.log(`  Checks: ${dashboard.checkIds.length}`);
+  console.log(`  Groups: ${dashboard.checkGroupIds.length}`);
+});
+```
+
+```python Paginated Dashboard Access
+import requests
+
+headers = {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+}
+
+# Get team dashboards with pagination
+response = requests.get(
+    'https://api.checklyhq.com/v1/dashboards?tags=team&page=1&limit=5',
+    headers=headers
+)
+
+data = response.json()
+print(f"Page {data['meta']['currentPage']} of {data['meta']['totalPages']}")
+print(f"Total dashboards: {data['meta']['totalItems']}")
+
+for dashboard in data['data']:
+    print(f"\nDashboard: {dashboard['name']}")
+    print(f"  URL: {dashboard['customUrl']}")
+    print(f"  Theme: {dashboard['configuration']['theme']}")
+    print(f"  Refresh: {dashboard['configuration']['refreshInterval']}s")
+    print(f"  Widgets: {len(dashboard['widgets'])}")
+```
+
+</CodeGroup>
+
+<Note>
+Public dashboards can be accessed without authentication using their custom URLs or domains. Private dashboards require appropriate account access.
+</Note>

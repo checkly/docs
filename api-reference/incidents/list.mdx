@@ -1,0 +1,980 @@
+---
+title: 'List Incidents'
+openapi: 'GET /v1/incidents'
+description: 'Retrieve incident history and active outages across your monitoring infrastructure with detailed timeline and impact analysis'
+---
+
+## Overview
+
+This endpoint provides comprehensive incident data including active outages, resolved incidents, and detailed incident timelines. Use this data to understand service reliability patterns, incident response effectiveness, and system behavior during failures.
+
+## Response Example
+
+```json
+{
+  "data": [
+    {
+      "id": "incident_789123456",
+      "title": "Homepage Loading Slowly",
+      "description": "Multiple browser checks failing due to increased page load times exceeding 8 seconds",
+      "status": "active",
+      "severity": "major",
+      "impact": {
+        "level": "high",
+        "description": "Critical user-facing functionality affected",
+        "affectedChecks": 15,
+        "affectedUsers": "estimated 2000+ users"
+      },
+      "startedAt": "2024-01-25T12:15:00.000Z",
+      "resolvedAt": null,
+      "duration": {
+        "current": "PT2H45M",
+        "formatted": "2 hours 45 minutes"
+      },
+      "checks": [
+        {
+          "checkId": "check_website_home",
+          "checkName": "Homepage Browser Check",
+          "checkType": "browser",
+          "firstFailure": "2024-01-25T12:15:00.000Z",
+          "lastSuccess": "2024-01-25T12:10:00.000Z",
+          "failureCount": 22,
+          "locations": ["us-east-1", "eu-west-1", "ap-southeast-1"]
+        },
+        {
+          "checkId": "check_api_auth",
+          "checkName": "Authentication API",
+          "checkType": "api",
+          "firstFailure": "2024-01-25T12:18:00.000Z",
+          "lastSuccess": "2024-01-25T12:15:00.000Z",
+          "failureCount": 18,
+          "locations": ["us-east-1", "eu-west-1"]
+        }
+      ],
+      "timeline": [
+        {
+          "timestamp": "2024-01-25T12:15:00.000Z",
+          "type": "detection",
+          "message": "Initial failure detected: Homepage Browser Check",
+          "source": "automated_detection"
+        },
+        {
+          "timestamp": "2024-01-25T12:17:30.000Z",
+          "type": "escalation",
+          "message": "Additional checks failing - incident severity upgraded to major",
+          "source": "automated_escalation"
+        },
+        {
+          "timestamp": "2024-01-25T12:20:00.000Z",
+          "type": "notification",
+          "message": "Engineering team notified via PagerDuty",
+          "source": "alert_channel"
+        },
+        {
+          "timestamp": "2024-01-25T12:35:00.000Z",
+          "type": "investigation",
+          "message": "Team investigating CDN performance issues",
+          "source": "manual_update",
+          "author": "john.doe@company.com"
+        }
+      ],
+      "alerts": {
+        "total": 45,
+        "acknowledged": 12,
+        "channels": ["slack", "pagerduty", "email", "webhook"]
+      },
+      "metadata": {
+        "tags": ["frontend", "performance", "user-facing"],
+        "assignedTo": "incident-response-team",
+        "priority": "P1",
+        "businessImpact": "revenue_affecting"
+      },
+      "acknowledgment": {
+        "acknowledged": true,
+        "acknowledgedBy": "jane.smith@company.com",
+        "acknowledgedAt": "2024-01-25T12:25:00.000Z"
+      },
+      "createdAt": "2024-01-25T12:15:00.000Z",
+      "updatedAt": "2024-01-25T14:35:00.000Z"
+    },
+    {
+      "id": "incident_789123455",
+      "title": "Database Connection Timeout",
+      "description": "API checks experiencing intermittent connection timeouts to primary database",
+      "status": "resolved",
+      "severity": "minor", 
+      "impact": {
+        "level": "low",
+        "description": "Limited API functionality degraded",
+        "affectedChecks": 3,
+        "affectedUsers": "estimated 100-200 users"
+      },
+      "startedAt": "2024-01-25T09:30:00.000Z",
+      "resolvedAt": "2024-01-25T10:15:00.000Z",
+      "duration": {
+        "total": "PT45M",
+        "formatted": "45 minutes"
+      },
+      "checks": [
+        {
+          "checkId": "check_api_users",
+          "checkName": "User API Endpoint",
+          "checkType": "api",
+          "firstFailure": "2024-01-25T09:30:00.000Z",
+          "lastSuccess": "2024-01-25T10:12:00.000Z",
+          "failureCount": 8,
+          "locations": ["us-east-1"]
+        }
+      ],
+      "timeline": [
+        {
+          "timestamp": "2024-01-25T09:30:00.000Z",
+          "type": "detection",
+          "message": "Connection timeout detected: User API Endpoint",
+          "source": "automated_detection"
+        },
+        {
+          "timestamp": "2024-01-25T09:45:00.000Z",
+          "type": "investigation",
+          "message": "Database connection pool exhaustion identified",
+          "source": "manual_update",
+          "author": "ops-team@company.com"
+        },
+        {
+          "timestamp": "2024-01-25T10:12:00.000Z",
+          "type": "mitigation",
+          "message": "Connection pool size increased from 20 to 50",
+          "source": "manual_update",
+          "author": "ops-team@company.com"
+        },
+        {
+          "timestamp": "2024-01-25T10:15:00.000Z",
+          "type": "resolution",
+          "message": "All checks passing - incident resolved",
+          "source": "automated_resolution"
+        }
+      ],
+      "alerts": {
+        "total": 12,
+        "acknowledged": 12,
+        "channels": ["slack", "email"]
+      },
+      "metadata": {
+        "tags": ["database", "api", "connection-pool"],
+        "assignedTo": "backend-team",
+        "priority": "P3",
+        "businessImpact": "minimal"
+      },
+      "acknowledgment": {
+        "acknowledged": true,
+        "acknowledgedBy": "ops-team@company.com",
+        "acknowledgedAt": "2024-01-25T09:35:00.000Z"
+      },
+      "resolution": {
+        "rootCause": "Database connection pool exhaustion under load",
+        "solution": "Increased connection pool size and implemented connection monitoring",
+        "preventiveMeasures": [
+          "Added connection pool monitoring alerts",
+          "Implemented circuit breaker pattern",
+          "Scheduled regular connection pool analysis"
+        ]
+      },
+      "createdAt": "2024-01-25T09:30:00.000Z",
+      "updatedAt": "2024-01-25T10:15:00.000Z"
+    }
+  ],
+  "meta": {
+    "currentPage": 1,
+    "totalPages": 12,
+    "totalItems": 58,
+    "limit": 10,
+    "summary": {
+      "active": 3,
+      "resolved": 55,
+      "totalIncidents": 58,
+      "averageResolutionTime": "PT1H23M",
+      "mttr": {
+        "current": "1h 23m",
+        "lastWeek": "1h 45m",
+        "trend": "improving"
+      },
+      "severityDistribution": {
+        "critical": 2,
+        "major": 8,
+        "minor": 35,
+        "warning": 13
+      }
+    }
+  }
+}
+```
+
+## Query Parameters
+
+<AccordionGroup>
+
+<Accordion title="Status Filtering">
+- `status` (string): Filter by incident status (active, resolved, investigating)
+- `severity` (string): Filter by severity level (critical, major, minor, warning)
+- `startDate` (string): ISO 8601 date - incidents started after this date
+- `endDate` (string): ISO 8601 date - incidents started before this date
+- `tags` (array): Filter by incident tags (comma-separated)
+
+**Example:**
+```
+?status=active&severity=critical,major&tags=frontend,user-facing
+```
+</Accordion>
+
+<Accordion title="Check-Based Filtering">
+- `checkId` (string): Filter incidents affecting specific check
+- `checkType` (string): Filter by check types involved (api, browser, heartbeat)
+- `location` (string): Filter incidents affecting specific monitoring location
+- `checkGroup` (string): Filter incidents affecting specific check group
+
+**Example:**
+```
+?checkType=browser&location=us-east-1&checkGroup=production-critical
+```
+</Accordion>
+
+<Accordion title="Impact and Assignment">
+- `impactLevel` (string): Filter by business impact (high, medium, low)
+- `assignedTo` (string): Filter by assigned team or individual
+- `acknowledged` (boolean): Filter by acknowledgment status
+- `businessImpact` (string): Filter by business impact type (revenue_affecting, user_affecting, minimal)
+
+**Example:**
+```
+?impactLevel=high&acknowledged=false&businessImpact=revenue_affecting
+```
+</Accordion>
+
+<Accordion title="Pagination & Sorting">
+- `page` (integer): Page number (default: 1)
+- `limit` (integer): Number of items per page (default: 10, max: 100)
+- `sortBy` (string): Sort field (startedAt, duration, severity, status)
+- `sortOrder` (string): Sort order (asc, desc, default: desc for dates)
+- `includeTimeline` (boolean): Include detailed timeline data (default: true)
+
+**Default:** Returns first 10 incidents sorted by most recent start time
+</Accordion>
+
+</AccordionGroup>
+
+## Incident Statuses
+
+<CardGroup cols={2}>
+
+<Card title="Active" icon="exclamation-circle">
+**Indicates:**
+- Incident currently ongoing
+- Checks still failing
+- Response team engaged
+- Business impact continuing
+
+**Next actions:**
+- Monitor response progress
+- Update stakeholders
+- Track resolution efforts
+</Card>
+
+<Card title="Investigating" icon="search">
+**Indicates:**
+- Incident acknowledged
+- Team actively diagnosing
+- Root cause analysis underway
+- Mitigation strategies being evaluated
+
+**Duration:**
+- Typically 15-60 minutes
+- Depends on complexity
+- May escalate if unresolved
+</Card>
+
+<Card title="Resolved" icon="check-circle">
+**Indicates:**
+- All affected checks passing
+- Root cause identified
+- Fix implemented and verified
+- Business impact eliminated
+
+**Follow-up:**
+- Post-incident review
+- Documentation updates
+- Preventive measures
+</Card>
+
+<Card title="Monitoring" icon="eye">
+**Indicates:**
+- Fix deployed and monitoring
+- Verifying sustained resolution
+- Watching for regression
+- Confidence building phase
+
+**Duration:**
+- Usually 30-60 minutes
+- Depends on incident severity
+- Auto-resolves when stable
+</Card>
+
+</CardGroup>
+
+## Severity Levels
+
+<AccordionGroup>
+
+<Accordion title="Critical Incidents">
+**Business Impact**: Complete service outage or major revenue loss
+**Response Time**: Immediate (< 5 minutes)
+**Escalation**: Automatic executive notification
+
+**Characteristics**:
+- Multiple critical checks failing across locations
+- Core business functionality unavailable
+- Significant user impact (>50% of user base)
+- Revenue directly affected
+
+**Example scenarios**:
+- Website completely down
+- Payment processing failures
+- Authentication system outage
+- Data corruption or loss
+</Accordion>
+
+<Accordion title="Major Incidents">
+**Business Impact**: Significant functionality degraded
+**Response Time**: < 15 minutes
+**Escalation**: Engineering leadership notified
+
+**Characteristics**:
+- Important features unavailable or severely degraded
+- Moderate user impact (10-50% of user base)
+- Performance significantly below SLA
+- Multiple related systems affected
+
+**Example scenarios**:
+- Slow page load times affecting conversions
+- API rate limiting causing service degradation
+- Regional outage affecting subset of users
+- Database performance issues
+</Accordion>
+
+<Accordion title="Minor Incidents">
+**Business Impact**: Limited functionality affected
+**Response Time**: < 60 minutes
+**Escalation**: Team notification only
+
+**Characteristics**:
+- Non-critical features affected
+- Limited user impact (&lt;10% of user base)
+- Workarounds available
+- Single system or component affected
+
+**Example scenarios**:
+- Admin dashboard issues
+- Non-critical API endpoints failing
+- Performance degradation in off-peak hours
+- Monitoring or logging issues
+</Accordion>
+
+<Accordion title="Warning Level">
+**Business Impact**: Potential issues detected
+**Response Time**: < 4 hours
+**Escalation**: Team awareness
+
+**Characteristics**:
+- Early warning indicators
+- No current user impact
+- Trending toward potential problems
+- Preventive action recommended
+
+**Example scenarios**:
+- Resource utilization approaching limits
+- Increased error rates but within tolerance
+- Dependency issues that might cascade
+- Performance metrics trending poorly
+</Accordion>
+
+</AccordionGroup>
+
+## Timeline Event Types
+
+<AccordionGroup>
+
+<Accordion title="System Events">
+**Detection**: Automated identification of incident start
+**Escalation**: Severity level changes or team escalations
+**Resolution**: Automated detection of incident resolution
+**Notification**: Alert deliveries to various channels
+
+**Source**: `automated_detection`, `automated_escalation`, `automated_resolution`
+</Accordion>
+
+<Accordion title="Human Actions">
+**Investigation**: Team updates on diagnosis progress
+**Mitigation**: Actions taken to reduce impact
+**Communication**: Status updates to stakeholders
+**Assignment**: Incident ownership changes
+
+**Source**: `manual_update`, `team_update`, `stakeholder_communication`
+**Author**: Email or username of person taking action
+</Accordion>
+
+<Accordion title="Process Events">
+**Acknowledgment**: When incident is acknowledged by responder
+**Status Changes**: Updates to incident status or severity
+**Task Assignment**: Specific action items assigned
+**Review Scheduled**: Post-incident review planning
+
+**Source**: `process_update`, `workflow_automation`
+</Accordion>
+
+</AccordionGroup>
+
+## Use Cases
+
+<AccordionGroup>
+
+<Accordion title="Incident Dashboard">
+Build real-time incident monitoring displays:
+- Show active incidents by severity
+- Track resolution progress and timelines
+- Display team assignments and acknowledgments
+- Monitor business impact metrics
+
+```javascript
+// Build incident dashboard
+const response = await fetch('/api/v1/incidents?status=active&limit=50');
+const { data: incidents, meta } = await response.json();
+
+const dashboard = {
+  overview: {
+    active: meta.summary.active,
+    mttr: meta.summary.mttr.current,
+    trend: meta.summary.mttr.trend
+  },
+  criticalIncidents: incidents.filter(i => i.severity === 'critical'),
+  teamWorkload: incidents.reduce((acc, incident) => {
+    const team = incident.metadata.assignedTo;
+    acc[team] = (acc[team] || 0) + 1;
+    return acc;
+  }, {}),
+  businessImpact: incidents.reduce((total, incident) => {
+    return total + incident.impact.affectedChecks;
+  }, 0)
+};
+```
+</Accordion>
+
+<Accordion title="Reliability Reporting">
+Generate reliability and incident metrics:
+- Calculate MTTR trends over time
+- Analyze incident frequency patterns
+- Track resolution effectiveness
+- Identify recurring failure patterns
+
+```python
+# Generate reliability metrics
+import requests
+from datetime import datetime, timedelta
+
+def generate_reliability_report(days=30):
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=days)
+    
+    # Get incidents from past 30 days
+    params = {
+        'startDate': start_date.isoformat(),
+        'endDate': end_date.isoformat(),
+        'status': 'resolved',
+        'limit': 100
+    }
+    
+    response = requests.get('/api/v1/incidents', params=params)
+    incidents = response.json()['data']
+    
+    # Calculate metrics
+    total_incidents = len(incidents)
+    total_downtime = sum([
+        parse_duration(incident['duration']['total']) 
+        for incident in incidents
+    ])
+    
+    severity_breakdown = {}
+    for incident in incidents:
+        severity = incident['severity']
+        severity_breakdown[severity] = severity_breakdown.get(severity, 0) + 1
+    
+    avg_mttr = total_downtime / total_incidents if total_incidents > 0 else 0
+    
+    return {
+        'period': f'{days} days',
+        'total_incidents': total_incidents,
+        'average_mttr_minutes': avg_mttr,
+        'severity_breakdown': severity_breakdown,
+        'uptime_percentage': calculate_uptime(incidents, days)
+    }
+```
+</Accordion>
+
+<Accordion title="Alert Integration">
+Integrate incident data with alerting systems:
+- Suppress duplicate alerts during active incidents
+- Automatically acknowledge related alerts
+- Route incidents to appropriate teams
+- Escalate unacknowledged incidents
+
+```bash
+# Check for active incidents before alerting
+curl -s "/api/v1/incidents?status=active&checkId=$CHECK_ID" | \
+  jq -r '.meta.totalItems' | {
+    read incident_count
+    if [ "$incident_count" -gt 0 ]; then
+      echo "Incident already active for check $CHECK_ID - suppressing alert"
+      exit 0
+    else
+      echo "No active incident - proceeding with alert"
+      send_alert.sh
+    fi
+  }
+```
+</Accordion>
+
+<Accordion title="Post-Incident Analysis">
+Conduct post-incident reviews and analysis:
+- Extract lessons learned
+- Identify improvement opportunities
+- Track preventive measure effectiveness
+- Generate incident reports
+
+```javascript
+// Generate post-incident report
+async function generateIncidentReport(incidentId) {
+  const response = await fetch(`/api/v1/incidents?id=${incidentId}`);
+  const incident = (await response.json()).data[0];
+  
+  return {
+    summary: {
+      title: incident.title,
+      duration: incident.duration.total,
+      severity: incident.severity,
+      impact: incident.impact.description
+    },
+    timeline: incident.timeline.map(event => ({
+      time: event.timestamp,
+      action: event.message,
+      source: event.source === 'manual_update' ? event.author : 'System'
+    })),
+    affectedSystems: incident.checks.map(check => ({
+      name: check.checkName,
+      type: check.checkType,
+      failures: check.failureCount,
+      firstImpact: check.firstFailure
+    })),
+    resolution: incident.resolution,
+    recommendations: [
+      'Review check configurations for faster detection',
+      'Implement automated rollback procedures',
+      'Update runbooks based on lessons learned'
+    ]
+  };
+}
+```
+</Accordion>
+
+</AccordionGroup>
+
+## MTTR Analysis
+
+<AccordionGroup>
+
+<Accordion title="Understanding MTTR Metrics">
+**Mean Time To Resolution (MTTR)** measures incident response effectiveness:
+
+**Components of MTTR**:
+- **Detection Time**: How quickly incidents are identified
+- **Response Time**: Time from detection to team engagement  
+- **Investigation Time**: Diagnosis and root cause analysis
+- **Resolution Time**: Fix implementation and verification
+
+**Calculation**:
+```
+MTTR = Total Resolution Time ÷ Number of Incidents
+```
+
+**Industry benchmarks**:
+- Critical incidents: < 1 hour
+- Major incidents: < 4 hours
+- Minor incidents: < 24 hours
+</Accordion>
+
+<Accordion title="Improving MTTR">
+**Strategies for faster resolution**:
+
+1. **Faster Detection**: Reduce false positives, optimize alerting
+2. **Better Runbooks**: Document common issues and solutions
+3. **Automated Recovery**: Implement self-healing where possible
+4. **Team Training**: Regular incident response drills
+5. **Tooling**: Improve debugging and deployment tools
+
+**Tracking improvements**:
+```python
+# Monitor MTTR trends
+def analyze_mttr_trends(months=6):
+    trends = []
+    
+    for month in range(months):
+        incidents = get_incidents_for_month(month)
+        monthly_mttr = sum(i['duration_minutes'] for i in incidents) / len(incidents)
+        trends.append({
+            'month': month,
+            'mttr_minutes': monthly_mttr,
+            'incident_count': len(incidents)
+        })
+    
+    return trends
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Code Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.checklyhq.com/v1/incidents?status=active&severity=critical,major" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+
+```javascript Node.js
+const params = new URLSearchParams({
+  status: 'active',
+  severity: 'critical,major',
+  limit: '25',
+  includeTimeline: 'true'
+});
+
+const response = await fetch(`https://api.checklyhq.com/v1/incidents?${params}`, {
+  headers: {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+  }
+});
+
+const incidentData = await response.json();
+const { data: incidents, meta } = incidentData;
+
+// Monitor active incidents
+console.log(`Active incidents: ${meta.summary.active}`);
+console.log(`Current MTTR: ${meta.summary.mttr.current}`);
+
+// Process critical incidents
+const criticalIncidents = incidents.filter(incident => 
+  incident.severity === 'critical' && incident.status === 'active'
+);
+
+if (criticalIncidents.length > 0) {
+  console.log('\n🚨 CRITICAL INCIDENTS REQUIRING IMMEDIATE ATTENTION:');
+  criticalIncidents.forEach(incident => {
+    console.log(`\n- ${incident.title}`);
+    console.log(`  Duration: ${incident.duration.formatted}`);
+    console.log(`  Affected checks: ${incident.impact.affectedChecks}`);
+    console.log(`  Business impact: ${incident.impact.description}`);
+    
+    if (!incident.acknowledgment.acknowledged) {
+      console.log(`  ⚠️  UNACKNOWLEDGED - requires immediate response`);
+    }
+    
+    // Show latest timeline event
+    const latestUpdate = incident.timeline[incident.timeline.length - 1];
+    console.log(`  Last update: ${latestUpdate.message} (${latestUpdate.timestamp})`);
+  });
+}
+
+// Generate team workload summary
+const teamWorkload = incidents.reduce((acc, incident) => {
+  const team = incident.metadata.assignedTo;
+  if (!acc[team]) {
+    acc[team] = { count: 0, critical: 0, major: 0 };
+  }
+  acc[team].count++;
+  acc[team][incident.severity]++;
+  return acc;
+}, {});
+
+console.log('\n📊 TEAM WORKLOAD DISTRIBUTION:');
+Object.entries(teamWorkload).forEach(([team, load]) => {
+  console.log(`${team}: ${load.count} incidents (${load.critical} critical, ${load.major} major)`);
+});
+```
+
+```python Python
+import requests
+from datetime import datetime, timedelta
+import statistics
+
+class IncidentMonitor:
+    def __init__(self, api_key, account_id):
+        self.api_key = api_key
+        self.account_id = account_id
+        self.base_url = 'https://api.checklyhq.com/v1'
+        self.headers = {
+            'Authorization': f'Bearer {api_key}',
+            'X-Checkly-Account': account_id
+        }
+    
+    def get_incidents(self, **filters):
+        """Get incidents with optional filters"""
+        params = {k: v for k, v in filters.items() if v is not None}
+        
+        response = requests.get(
+            f'{self.base_url}/incidents',
+            headers=self.headers,
+            params=params
+        )
+        response.raise_for_status()
+        return response.json()
+    
+    def get_active_incidents(self):
+        """Get all currently active incidents"""
+        return self.get_incidents(status='active', limit=100)
+    
+    def get_critical_incidents(self):
+        """Get active critical incidents requiring immediate attention"""
+        data = self.get_incidents(
+            status='active',
+            severity='critical',
+            acknowledged='false'
+        )
+        return data['data']
+    
+    def calculate_mttr_trends(self, days=30):
+        """Calculate MTTR trends over specified period"""
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=days)
+        
+        incidents = self.get_incidents(
+            status='resolved',
+            startDate=start_date.isoformat(),
+            endDate=end_date.isoformat(),
+            limit=500
+        )['data']
+        
+        # Parse durations and calculate statistics
+        durations = []
+        for incident in incidents:
+            duration_str = incident['duration']['total']
+            # Convert ISO 8601 duration to minutes
+            duration_minutes = self._parse_duration_to_minutes(duration_str)
+            durations.append(duration_minutes)
+        
+        if not durations:
+            return None
+            
+        return {
+            'period_days': days,
+            'total_incidents': len(durations),
+            'mean_mttr_minutes': statistics.mean(durations),
+            'median_mttr_minutes': statistics.median(durations),
+            'p95_mttr_minutes': self._percentile(durations, 95),
+            'fastest_resolution_minutes': min(durations),
+            'slowest_resolution_minutes': max(durations)
+        }
+    
+    def monitor_incident_health(self):
+        """Real-time incident monitoring and alerting"""
+        data = self.get_active_incidents()
+        incidents = data['data']
+        summary = data['meta']['summary']
+        
+        print(f"\n📊 INCIDENT HEALTH DASHBOARD")
+        print(f"{'='*50}")
+        print(f"Active incidents: {summary['active']}")
+        print(f"Current MTTR: {summary['mttr']['current']}")
+        print(f"MTTR trend: {summary['mttr']['trend']}")
+        
+        # Alert on critical conditions
+        critical_incidents = [i for i in incidents if i['severity'] == 'critical']
+        if critical_incidents:
+            print(f"\n🚨 {len(critical_incidents)} CRITICAL INCIDENTS:")
+            for incident in critical_incidents:
+                print(f"  - {incident['title']}")
+                print(f"    Duration: {incident['duration']['formatted']}")
+                print(f"    Impact: {incident['impact']['description']}")
+                
+                if not incident['acknowledgment']['acknowledged']:
+                    print(f"    ⚠️  UNACKNOWLEDGED - Alert escalation needed!")
+        
+        # Check for incidents approaching SLA breach
+        long_running = [
+            i for i in incidents 
+            if self._parse_duration_to_minutes(i['duration']['current']) > 240  # 4 hours
+        ]
+        
+        if long_running:
+            print(f"\n⏰ {len(long_running)} INCIDENTS EXCEEDING 4 HOURS:")
+            for incident in long_running:
+                duration = incident['duration']['formatted']
+                print(f"  - {incident['title']} ({duration})")
+        
+        # Team workload analysis
+        team_workload = {}
+        for incident in incidents:
+            team = incident['metadata']['assignedTo']
+            if team not in team_workload:
+                team_workload[team] = {'total': 0, 'critical': 0, 'major': 0}
+            team_workload[team]['total'] += 1
+            if incident['severity'] in ['critical', 'major']:
+                team_workload[team][incident['severity']] += 1
+        
+        if team_workload:
+            print(f"\n👥 TEAM WORKLOAD:")
+            for team, load in team_workload.items():
+                print(f"  {team}: {load['total']} incidents "
+                      f"({load['critical']} critical, {load['major']} major)")
+    
+    def generate_incident_report(self, days=7):
+        """Generate comprehensive incident report"""
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=days)
+        
+        incidents = self.get_incidents(
+            startDate=start_date.isoformat(),
+            endDate=end_date.isoformat(),
+            limit=200
+        )['data']
+        
+        if not incidents:
+            return "No incidents in specified period"
+        
+        # Analyze patterns
+        severity_counts = {}
+        total_affected_checks = 0
+        total_downtime_minutes = 0
+        
+        for incident in incidents:
+            severity = incident['severity']
+            severity_counts[severity] = severity_counts.get(severity, 0) + 1
+            total_affected_checks += incident['impact']['affectedChecks']
+            
+            if incident['status'] == 'resolved':
+                duration = incident['duration']['total']
+                total_downtime_minutes += self._parse_duration_to_minutes(duration)
+        
+        resolved_count = len([i for i in incidents if i['status'] == 'resolved'])
+        avg_mttr = total_downtime_minutes / resolved_count if resolved_count > 0 else 0
+        
+        return {
+            'period': f"{days} days",
+            'summary': {
+                'total_incidents': len(incidents),
+                'by_severity': severity_counts,
+                'total_affected_checks': total_affected_checks,
+                'average_mttr_minutes': round(avg_mttr, 1),
+                'total_downtime_hours': round(total_downtime_minutes / 60, 1)
+            },
+            'trends': self._analyze_incident_trends(incidents),
+            'recommendations': self._generate_recommendations(incidents)
+        }
+    
+    def _parse_duration_to_minutes(self, iso_duration):
+        """Parse ISO 8601 duration to minutes"""
+        import re
+        
+        # Simple parser for PT1H23M format
+        pattern = r'PT(?:(\d+)H)?(?:(\d+)M)?'
+        match = re.match(pattern, iso_duration)
+        
+        if match:
+            hours = int(match.group(1) or 0)
+            minutes = int(match.group(2) or 0)
+            return hours * 60 + minutes
+        return 0
+    
+    def _percentile(self, data, percentile):
+        """Calculate percentile of dataset"""
+        data.sort()
+        index = int(len(data) * percentile / 100)
+        return data[min(index, len(data) - 1)]
+    
+    def _analyze_incident_trends(self, incidents):
+        """Analyze incident patterns and trends"""
+        # Group by day to see frequency trends
+        daily_counts = {}
+        for incident in incidents:
+            date = incident['startedAt'][:10]  # Extract date part
+            daily_counts[date] = daily_counts.get(date, 0) + 1
+        
+        avg_per_day = sum(daily_counts.values()) / len(daily_counts) if daily_counts else 0
+        
+        return {
+            'average_incidents_per_day': round(avg_per_day, 1),
+            'busiest_day': max(daily_counts.items(), key=lambda x: x[1]) if daily_counts else None,
+            'incident_frequency': 'high' if avg_per_day > 2 else 'normal' if avg_per_day > 0.5 else 'low'
+        }
+    
+    def _generate_recommendations(self, incidents):
+        """Generate actionable recommendations based on incident patterns"""
+        recommendations = []
+        
+        # Check for repeated failures
+        check_failures = {}
+        for incident in incidents:
+            for check in incident['checks']:
+                check_id = check['checkId']
+                check_failures[check_id] = check_failures.get(check_id, 0) + 1
+        
+        frequent_failures = [check for check, count in check_failures.items() if count > 2]
+        if frequent_failures:
+            recommendations.append(
+                f"Review configuration for frequently failing checks: {', '.join(frequent_failures[:3])}"
+            )
+        
+        # Check for long resolution times
+        long_incidents = [i for i in incidents if i.get('duration', {}).get('total', 'PT0M') and 
+                         self._parse_duration_to_minutes(i['duration']['total']) > 120]
+        if len(long_incidents) > len(incidents) * 0.3:  # More than 30% are long
+            recommendations.append(
+                "Consider improving incident response procedures - many incidents exceed 2 hour resolution time"
+            )
+        
+        # Check severity distribution
+        critical_count = len([i for i in incidents if i['severity'] == 'critical'])
+        if critical_count > len(incidents) * 0.2:  # More than 20% critical
+            recommendations.append(
+                "High percentage of critical incidents - review detection thresholds and escalation procedures"
+            )
+        
+        return recommendations if recommendations else ["Continue current monitoring practices"]
+
+# Usage
+monitor = IncidentMonitor('cu_1234567890abcdef', '550e8400-e29b-41d4-a716-446655440000')
+
+# Real-time monitoring
+monitor.monitor_incident_health()
+
+# Generate weekly report
+weekly_report = monitor.generate_incident_report(days=7)
+print(f"\n📈 WEEKLY INCIDENT REPORT")
+print(f"Period: {weekly_report['period']}")
+print(f"Total incidents: {weekly_report['summary']['total_incidents']}")
+print(f"Average MTTR: {weekly_report['summary']['average_mttr_minutes']} minutes")
+print(f"Total downtime: {weekly_report['summary']['total_downtime_hours']} hours")
+
+# Calculate MTTR trends
+mttr_trends = monitor.calculate_mttr_trends(days=30)
+if mttr_trends:
+    print(f"\n📊 30-DAY MTTR ANALYSIS")
+    print(f"Mean MTTR: {mttr_trends['mean_mttr_minutes']:.1f} minutes")
+    print(f"Median MTTR: {mttr_trends['median_mttr_minutes']:.1f} minutes") 
+    print(f"95th percentile: {mttr_trends['p95_mttr_minutes']:.1f} minutes")
+```
+
+</CodeGroup>
+
+<Note>
+Incident data provides critical insights into system reliability and response effectiveness. Use this information to improve monitoring strategies, optimize alert configurations, and enhance incident response procedures.
+</Note>

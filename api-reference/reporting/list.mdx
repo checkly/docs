@@ -1,0 +1,1165 @@
+---
+title: 'List Reports'
+openapi: 'GET /v1/reports'
+description: 'Retrieve scheduled reports, compliance summaries, and automated monitoring reports with customizable metrics and delivery options'
+---
+
+## Overview
+
+This endpoint provides access to your monitoring reports including scheduled summaries, compliance reports, SLA reports, and custom analytics dashboards. Use this to automate report distribution, track compliance metrics, and generate executive summaries.
+
+## Response Example
+
+```json
+{
+  "data": [
+    {
+      "id": "report_weekly_exec_summary",
+      "name": "Weekly Executive Summary",
+      "description": "High-level monitoring overview for executive team with key metrics and incidents",
+      "type": "executive_summary",
+      "status": "active",
+      "schedule": {
+        "frequency": "weekly",
+        "dayOfWeek": "monday",
+        "time": "09:00",
+        "timezone": "America/New_York",
+        "nextRun": "2024-01-29T14:00:00.000Z"
+      },
+      "scope": {
+        "checks": "all",
+        "checkGroups": ["production", "critical"],
+        "locations": ["us-east-1", "eu-west-1", "ap-southeast-1"],
+        "tags": ["critical", "user-facing"]
+      },
+      "metrics": {
+        "included": [
+          "overall_availability",
+          "incident_summary",
+          "mttr_trends",
+          "sla_compliance",
+          "top_failures"
+        ],
+        "period": "7_days",
+        "thresholds": {
+          "availability_target": 99.9,
+          "mttr_target_minutes": 60,
+          "sla_breach_threshold": 95.0
+        }
+      },
+      "format": {
+        "type": "pdf",
+        "template": "executive",
+        "branding": {
+          "logo": true,
+          "colors": "#0075FF",
+          "companyName": "Acme Corp"
+        },
+        "sections": [
+          "executive_summary",
+          "availability_overview",
+          "incident_analysis",
+          "performance_trends",
+          "recommendations"
+        ]
+      },
+      "delivery": {
+        "method": "email",
+        "recipients": [
+          "cto@company.com",
+          "engineering-leads@company.com",
+          "ops-team@company.com"
+        ],
+        "subject": "Weekly Monitoring Report - Week of {date}",
+        "includeRawData": false,
+        "attachments": ["csv_summary"]
+      },
+      "lastRun": {
+        "timestamp": "2024-01-22T14:00:00.000Z",
+        "status": "success",
+        "duration": "PT2M15S",
+        "recipients": 8,
+        "fileSize": "2.4MB",
+        "url": "https://reports.checklyhq.com/download/report_weekly_exec_summary_20240122.pdf"
+      },
+      "createdAt": "2024-01-01T10:00:00.000Z",
+      "updatedAt": "2024-01-20T15:30:00.000Z",
+      "createdBy": "admin@company.com"
+    },
+    {
+      "id": "report_sla_compliance_monthly",
+      "name": "Monthly SLA Compliance Report",
+      "description": "Detailed SLA compliance analysis for customer-facing services with breach analysis",
+      "type": "sla_compliance",
+      "status": "active",
+      "schedule": {
+        "frequency": "monthly",
+        "dayOfMonth": 1,
+        "time": "08:00",
+        "timezone": "UTC",
+        "nextRun": "2024-02-01T08:00:00.000Z"
+      },
+      "scope": {
+        "checks": "tagged",
+        "checkGroups": ["customer-facing", "api-endpoints"],
+        "locations": "all",
+        "tags": ["sla-critical", "customer-impact"]
+      },
+      "metrics": {
+        "included": [
+          "uptime_percentage",
+          "response_time_p95",
+          "error_rate",
+          "sla_breaches",
+          "downtime_analysis"
+        ],
+        "period": "30_days",
+        "thresholds": {
+          "availability_target": 99.95,
+          "response_time_target_ms": 500,
+          "error_rate_target": 0.1
+        }
+      },
+      "format": {
+        "type": "json",
+        "template": "compliance",
+        "includeCharts": true,
+        "chartTypes": ["availability_timeline", "response_time_trends", "error_distribution"],
+        "dataGranularity": "daily"
+      },
+      "delivery": {
+        "method": "webhook",
+        "webhookUrl": "https://company.com/api/reports/sla-compliance",
+        "headers": {
+          "Authorization": "Bearer webhook_token_123",
+          "Content-Type": "application/json"
+        },
+        "retryPolicy": {
+          "maxRetries": 3,
+          "backoffMultiplier": 2
+        }
+      },
+      "lastRun": {
+        "timestamp": "2024-01-01T08:00:00.000Z",
+        "status": "success",
+        "duration": "PT45S",
+        "dataPoints": 2847,
+        "slaBreaches": 2,
+        "overallCompliance": 99.92
+      },
+      "createdAt": "2023-12-01T12:00:00.000Z",
+      "updatedAt": "2024-01-15T09:15:00.000Z",
+      "createdBy": "ops-manager@company.com"
+    },
+    {
+      "id": "report_incident_postmortem",
+      "name": "Incident Analysis Report",
+      "description": "Automated post-incident reports with timeline analysis and improvement recommendations",
+      "type": "incident_analysis",
+      "status": "active",
+      "schedule": {
+        "frequency": "triggered",
+        "trigger": "incident_resolved",
+        "conditions": {
+          "severity": ["critical", "major"],
+          "duration_minutes": "> 30"
+        }
+      },
+      "scope": {
+        "checks": "incident_affected",
+        "includeRelated": true,
+        "timeWindow": "incident_duration_plus_1h"
+      },
+      "metrics": {
+        "included": [
+          "incident_timeline",
+          "affected_systems",
+          "business_impact",
+          "response_metrics",
+          "root_cause_analysis"
+        ],
+        "analysisDepth": "detailed",
+        "includeRecommendations": true
+      },
+      "format": {
+        "type": "markdown",
+        "template": "postmortem",
+        "sections": [
+          "incident_summary",
+          "timeline",
+          "impact_analysis",
+          "response_analysis",
+          "lessons_learned",
+          "action_items"
+        ]
+      },
+      "delivery": {
+        "method": "slack",
+        "slackChannel": "#incidents",
+        "mentionTeam": "@incident-response",
+        "threadNotifications": true
+      },
+      "lastRun": {
+        "timestamp": "2024-01-24T16:30:00.000Z",
+        "status": "success",
+        "incidentId": "incident_789123456",
+        "incidentSeverity": "major",
+        "generatedRecommendations": 5
+      },
+      "createdAt": "2024-01-10T14:00:00.000Z",
+      "updatedAt": "2024-01-24T16:35:00.000Z",
+      "createdBy": "incident-manager@company.com"
+    }
+  ],
+  "meta": {
+    "currentPage": 1,
+    "totalPages": 3,
+    "totalItems": 12,
+    "limit": 10,
+    "summary": {
+      "active": 10,
+      "paused": 2,
+      "totalReports": 12,
+      "scheduledThisWeek": 15,
+      "lastWeekDeliveries": 28,
+      "reportTypes": {
+        "executive_summary": 3,
+        "sla_compliance": 4,
+        "incident_analysis": 2,
+        "custom_analytics": 3
+      }
+    }
+  }
+}
+```
+
+## Query Parameters
+
+<AccordionGroup>
+
+<Accordion title="Report Filtering">
+- `type` (string): Filter by report type (executive_summary, sla_compliance, incident_analysis, custom_analytics)
+- `status` (string): Filter by report status (active, paused, archived)
+- `frequency` (string): Filter by schedule frequency (daily, weekly, monthly, triggered)
+- `tags` (array): Filter reports by associated tags
+- `createdBy` (string): Filter by report creator
+
+**Example:**
+```
+?type=sla_compliance&status=active&frequency=monthly
+```
+</Accordion>
+
+<Accordion title="Scope Filtering">
+- `checkGroup` (string): Reports affecting specific check groups
+- `location` (string): Reports for specific monitoring locations
+- `hasWebhook` (boolean): Filter reports with webhook delivery
+- `deliveryMethod` (string): Filter by delivery method (email, webhook, slack, api)
+
+**Example:**
+```
+?checkGroup=production&deliveryMethod=email,webhook
+```
+</Accordion>
+
+<Accordion title="Time-Based Filtering">
+- `nextRunBefore` (string): Reports scheduled before this time
+- `nextRunAfter` (string): Reports scheduled after this time
+- `lastRunBefore` (string): Reports last run before this time
+- `lastRunAfter` (string): Reports last run after this time
+
+**Example:**
+```
+?nextRunAfter=2024-01-25T00:00:00Z&status=active
+```
+</Accordion>
+
+<Accordion title="Pagination & Sorting">
+- `page` (integer): Page number (default: 1)
+- `limit` (integer): Number of items per page (default: 10, max: 50)
+- `sortBy` (string): Sort field (name, nextRun, lastRun, createdAt, type)
+- `sortOrder` (string): Sort order (asc, desc, default: desc for dates)
+- `includeLastRun` (boolean): Include last run details (default: true)
+
+**Default:** Returns first 10 reports sorted by next scheduled run
+</Accordion>
+
+</AccordionGroup>
+
+## Report Types
+
+<CardGroup cols={2}>
+
+<Card title="Executive Summary" icon="chart-line">
+**Purpose:** High-level overview for leadership
+**Frequency:** Weekly or monthly
+**Content:** Key metrics, trends, incidents
+**Audience:** Executives, management
+
+**Key metrics:**
+- Overall system availability
+- Incident summary and MTTR
+- Performance trends
+- Business impact analysis
+</Card>
+
+<Card title="SLA Compliance" icon="shield-check">
+**Purpose:** Track service level agreements
+**Frequency:** Monthly or quarterly
+**Content:** Uptime, performance, breach analysis
+**Audience:** Operations, customer success
+
+**Key metrics:**
+- Availability percentages
+- Response time compliance
+- Error rate tracking
+- Customer impact assessment
+</Card>
+
+<Card title="Incident Analysis" icon="exclamation-triangle">
+**Purpose:** Post-incident learning and improvement
+**Frequency:** Triggered by incidents
+**Content:** Timeline, impact, recommendations
+**Audience:** Engineering, operations
+
+**Key metrics:**
+- Incident duration and severity
+- Response time metrics
+- Root cause analysis
+- Improvement opportunities
+</Card>
+
+<Card title="Custom Analytics" icon="chart-bar">
+**Purpose:** Tailored monitoring insights
+**Frequency:** Flexible scheduling
+**Content:** Custom metrics and visualizations
+**Audience:** Teams, stakeholders
+
+**Key metrics:**
+- Custom KPIs
+- Trend analysis
+- Comparative metrics
+- Goal tracking
+</Card>
+
+</CardGroup>
+
+## Report Status
+
+<AccordionGroup>
+
+<Accordion title="Active Reports">
+**Status:** `active`
+**Behavior:** Reports run according to schedule
+**Next run:** Automatically calculated based on frequency
+**Modifications:** Can be edited, paused, or archived
+
+**Characteristics:**
+- Automatic execution on schedule
+- Delivery to configured recipients
+- Failure notifications sent
+- Performance metrics tracked
+</Accordion>
+
+<Accordion title="Paused Reports">
+**Status:** `paused`
+**Behavior:** Schedule suspended, no automatic runs
+**Next run:** Not calculated until resumed
+**Modifications:** Can be resumed, edited, or archived
+
+**Use cases:**
+- Temporary suspension during maintenance
+- Recipient unavailability
+- Report content under review
+- System troubleshooting
+</Accordion>
+
+<Accordion title="Archived Reports">
+**Status:** `archived`
+**Behavior:** No longer active, kept for historical reference
+**Next run:** Never
+**Modifications:** Read-only, can be restored
+
+**Retention:**
+- Report configurations preserved
+- Historical run data maintained
+- Can be restored to active status
+- Used for auditing and compliance
+</Accordion>
+
+</AccordionGroup>
+
+## Delivery Methods
+
+<AccordionGroup>
+
+<Accordion title="Email Delivery">
+**Method:** `email`
+**Configuration:** Recipients list, subject template, format options
+**Features:** Multiple recipients, attachments, custom branding
+
+**Example configuration:**
+```json
+{
+  "delivery": {
+    "method": "email",
+    "recipients": ["team@company.com"],
+    "subject": "Weekly Report - {date}",
+    "includeRawData": true,
+    "attachments": ["csv_summary", "detailed_metrics"]
+  }
+}
+```
+
+**Supported formats:** PDF, HTML, CSV attachments
+**Delivery tracking:** Open rates, delivery status, bounce handling
+</Accordion>
+
+<Accordion title="Webhook Delivery">
+**Method:** `webhook`
+**Configuration:** URL, headers, retry policy, authentication
+**Features:** Real-time delivery, custom integrations, retry logic
+
+**Example configuration:**
+```json
+{
+  "delivery": {
+    "method": "webhook",
+    "webhookUrl": "https://api.company.com/reports",
+    "headers": {
+      "Authorization": "Bearer token123",
+      "Content-Type": "application/json"
+    },
+    "retryPolicy": {
+      "maxRetries": 3,
+      "backoffMultiplier": 2
+    }
+  }
+}
+```
+
+**Payload format:** JSON with report data and metadata
+**Security:** HTTPS required, signature verification available
+</Accordion>
+
+<Accordion title="Slack Integration">
+**Method:** `slack`
+**Configuration:** Channel, mentions, threading, formatting
+**Features:** Team notifications, interactive elements, file uploads
+
+**Example configuration:**
+```json
+{
+  "delivery": {
+    "method": "slack",
+    "slackChannel": "#monitoring",
+    "mentionTeam": "@ops-team",
+    "threadNotifications": true,
+    "includeCharts": true
+  }
+}
+```
+
+**Message format:** Rich text with charts, summaries, action buttons
+**Threading:** Organize related notifications in threads
+</Accordion>
+
+<Accordion title="API Access">
+**Method:** `api`
+**Configuration:** Access tokens, data format, retention period
+**Features:** Programmatic access, custom processing, data export
+
+**Access pattern:**
+```bash
+# Retrieve report data via API
+curl -H "Authorization: Bearer token" \
+  "https://api.checklyhq.com/v1/reports/{reportId}/data?date=2024-01-22"
+```
+
+**Data formats:** JSON, CSV, custom schemas
+**Retention:** Configurable data retention periods
+</Accordion>
+
+</AccordionGroup>
+
+## Report Metrics
+
+<AccordionGroup>
+
+<Accordion title="Availability Metrics">
+**Overall Availability:** System-wide uptime percentage
+**Service Availability:** Per-service uptime tracking
+**Location Availability:** Regional performance breakdown
+**Trend Analysis:** Week-over-week and month-over-month changes
+
+**Calculation methods:**
+- Time-based availability (uptime minutes / total minutes)
+- Check-based availability (successful checks / total checks)
+- Weighted availability (business-critical services prioritized)
+
+**Visualization:** Availability heatmaps, trend charts, SLA compliance gauges
+</Accordion>
+
+<Accordion title="Performance Metrics">
+**Response Times:** Average, median, P95, P99 response times
+**Performance Trends:** Improvement or degradation analysis
+**Geographic Performance:** Response times by monitoring location
+**Performance Distribution:** Histograms and percentile analysis
+
+**Benchmark comparisons:**
+- Internal SLA targets
+- Industry benchmarks
+- Historical performance baselines
+- Competitor analysis (where available)
+
+**Alerting thresholds:** Configurable performance degradation alerts
+</Accordion>
+
+<Accordion title="Incident Metrics">
+**MTTR (Mean Time To Resolution):** Average incident resolution time
+**MTTD (Mean Time To Detection):** Average detection time
+**Incident Frequency:** Number of incidents per time period
+**Severity Distribution:** Breakdown by incident severity levels
+
+**Business impact:**
+- Estimated downtime costs
+- Affected user counts
+- Revenue impact calculations
+- Customer satisfaction correlation
+
+**Response effectiveness:** Team response times, escalation patterns
+</Accordion>
+
+<Accordion title="Quality Metrics">
+**Error Rates:** Application and infrastructure error percentages
+**Success Rates:** Transaction and API success percentages
+**Reliability Score:** Composite reliability index
+**Quality Trends:** Improvement or regression tracking
+
+**Custom metrics:**
+- Business-specific KPIs
+- User experience metrics
+- Conversion rate correlation
+- Performance budget tracking
+
+**Benchmarking:** Against previous periods and industry standards
+</Accordion>
+
+</AccordionGroup>
+
+## Use Cases
+
+<AccordionGroup>
+
+<Accordion title="Executive Reporting">
+Create high-level summaries for leadership teams:
+- Weekly system health overviews
+- Monthly reliability trends
+- Quarterly SLA compliance summaries
+- Annual performance reviews
+
+```javascript
+// Schedule executive weekly report
+const executiveReport = {
+  name: "Executive Weekly Summary",
+  type: "executive_summary",
+  schedule: {
+    frequency: "weekly",
+    dayOfWeek: "monday",
+    time: "09:00"
+  },
+  metrics: {
+    included: [
+      "overall_availability",
+      "incident_summary",
+      "performance_trends",
+      "sla_compliance"
+    ],
+    period: "7_days"
+  },
+  format: {
+    type: "pdf",
+    template: "executive",
+    branding: true
+  },
+  delivery: {
+    method: "email",
+    recipients: ["cto@company.com", "vp-engineering@company.com"]
+  }
+};
+```
+</Accordion>
+
+<Accordion title="SLA Compliance Tracking">
+Monitor and report on service level agreements:
+- Customer SLA compliance
+- Internal SLA tracking
+- Breach analysis and remediation
+- Compliance audit trails
+
+```python
+# Generate SLA compliance report
+def create_sla_report():
+    report_config = {
+        "name": "Monthly SLA Compliance",
+        "type": "sla_compliance",
+        "schedule": {
+            "frequency": "monthly",
+            "dayOfMonth": 1
+        },
+        "scope": {
+            "tags": ["customer-facing", "sla-critical"]
+        },
+        "metrics": {
+            "thresholds": {
+                "availability_target": 99.9,
+                "response_time_target_ms": 200,
+                "error_rate_target": 0.1
+            }
+        },
+        "delivery": {
+            "method": "webhook",
+            "webhookUrl": "https://sla-dashboard.company.com/api/reports"
+        }
+    }
+    
+    return requests.post('/api/v1/reports', json=report_config)
+```
+</Accordion>
+
+<Accordion title="Automated Incident Reports">
+Generate post-incident analysis automatically:
+- Timeline reconstruction
+- Impact assessment
+- Response time analysis
+- Improvement recommendations
+
+```bash
+# Trigger incident report creation
+curl -X POST "/api/v1/reports" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Incident Analysis - Database Outage",
+    "type": "incident_analysis",
+    "schedule": {
+      "frequency": "triggered",
+      "trigger": "incident_resolved"
+    },
+    "scope": {
+      "incidentId": "incident_789123456"
+    },
+    "delivery": {
+      "method": "slack",
+      "slackChannel": "#incidents"
+    }
+  }'
+```
+</Accordion>
+
+<Accordion title="Performance Benchmarking">
+Track performance against goals and benchmarks:
+- Response time trends
+- Availability improvements
+- Performance regression detection
+- Capacity planning insights
+
+```python
+# Performance benchmark report
+def setup_performance_benchmarks():
+    benchmarks = {
+        "api_response_times": {
+            "target_p95_ms": 500,
+            "warning_threshold_ms": 400,
+            "critical_threshold_ms": 800
+        },
+        "availability_targets": {
+            "overall": 99.9,
+            "critical_services": 99.95,
+            "internal_tools": 99.5
+        }
+    }
+    
+    report = {
+        "name": "Performance Benchmark Report",
+        "metrics": {
+            "benchmarks": benchmarks,
+            "includeComparisons": True,
+            "trendAnalysis": True
+        }
+    }
+    
+    return create_report(report)
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Scheduling Options
+
+<AccordionGroup>
+
+<Accordion title="Fixed Schedules">
+**Daily:** Every day at specified time
+**Weekly:** Specific day of week at specified time
+**Monthly:** Specific day of month at specified time
+**Quarterly:** First day of quarter
+
+**Configuration examples:**
+```json
+// Daily at 6 AM UTC
+{
+  "frequency": "daily",
+  "time": "06:00",
+  "timezone": "UTC"
+}
+
+// Weekly on Mondays at 9 AM Eastern
+{
+  "frequency": "weekly", 
+  "dayOfWeek": "monday",
+  "time": "09:00",
+  "timezone": "America/New_York"
+}
+
+// Monthly on the 1st at 8 AM
+{
+  "frequency": "monthly",
+  "dayOfMonth": 1,
+  "time": "08:00",
+  "timezone": "UTC"
+}
+```
+</Accordion>
+
+<Accordion title="Event-Triggered Reports">
+**Incident Resolution:** Automatically generate after incidents
+**Threshold Breaches:** Trigger on SLA or performance violations
+**Custom Events:** Based on webhook or API events
+
+**Trigger conditions:**
+```json
+{
+  "frequency": "triggered",
+  "trigger": "incident_resolved",
+  "conditions": {
+    "severity": ["critical", "major"],
+    "duration_minutes": "> 30",
+    "tags": ["customer-facing"]
+  }
+}
+```
+
+**Event types:**
+- `incident_resolved`: After incident resolution
+- `sla_breach`: When SLA thresholds are exceeded
+- `performance_degradation`: Performance drops below thresholds
+- `custom_webhook`: External system triggers
+</Accordion>
+
+<Accordion title="Advanced Scheduling">
+**Business Hours Only:** Skip weekends and holidays
+**Custom Intervals:** Every N days/weeks/months
+**Multiple Recipients:** Different schedules for different audiences
+
+**Business hours example:**
+```json
+{
+  "frequency": "daily",
+  "time": "08:00",
+  "timezone": "America/New_York",
+  "businessHoursOnly": true,
+  "excludeHolidays": ["US"],
+  "skipWeekends": true
+}
+```
+
+**Multi-audience scheduling:**
+```json
+{
+  "schedules": [
+    {
+      "audience": "executives",
+      "frequency": "weekly",
+      "format": "pdf"
+    },
+    {
+      "audience": "operations",
+      "frequency": "daily", 
+      "format": "json"
+    }
+  ]
+}
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Code Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.checklyhq.com/v1/reports?type=sla_compliance&status=active" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+
+```javascript Node.js
+const params = new URLSearchParams({
+  type: 'executive_summary',
+  status: 'active',
+  frequency: 'weekly',
+  includeLastRun: 'true'
+});
+
+const response = await fetch(`https://api.checklyhq.com/v1/reports?${params}`, {
+  headers: {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+  }
+});
+
+const reportData = await response.json();
+const { data: reports, meta } = reportData;
+
+// Monitor report health
+console.log(`Active reports: ${meta.summary.active}`);
+console.log(`Scheduled this week: ${meta.summary.scheduledThisWeek}`);
+
+// Process executive reports
+const executiveReports = reports.filter(report => 
+  report.type === 'executive_summary'
+);
+
+if (executiveReports.length > 0) {
+  console.log('\n📊 EXECUTIVE REPORTS:');
+  executiveReports.forEach(report => {
+    console.log(`\n- ${report.name}`);
+    console.log(`  Next run: ${report.schedule.nextRun}`);
+    console.log(`  Recipients: ${report.delivery.recipients?.length || 'N/A'}`);
+    
+    if (report.lastRun) {
+      console.log(`  Last run: ${report.lastRun.status} (${report.lastRun.timestamp})`);
+      if (report.lastRun.status === 'success') {
+        console.log(`    Duration: ${report.lastRun.duration}`);
+        console.log(`    File size: ${report.lastRun.fileSize}`);
+      }
+    }
+  });
+}
+
+// Check for failed deliveries
+const failedReports = reports.filter(report => 
+  report.lastRun?.status === 'failed'
+);
+
+if (failedReports.length > 0) {
+  console.log('\n❌ REPORTS WITH FAILED DELIVERIES:');
+  failedReports.forEach(report => {
+    console.log(`- ${report.name}: ${report.lastRun.error || 'Unknown error'}`);
+  });
+}
+
+// Upcoming reports in next 24 hours
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
+
+const upcomingReports = reports.filter(report => {
+  const nextRun = new Date(report.schedule.nextRun);
+  return nextRun <= tomorrow && report.status === 'active';
+});
+
+console.log(`\n⏰ REPORTS SCHEDULED IN NEXT 24 HOURS: ${upcomingReports.length}`);
+upcomingReports.forEach(report => {
+  console.log(`- ${report.name}: ${report.schedule.nextRun}`);
+});
+```
+
+```python Python
+import requests
+from datetime import datetime, timedelta
+
+class ReportManager:
+    def __init__(self, api_key, account_id):
+        self.api_key = api_key
+        self.account_id = account_id
+        self.base_url = 'https://api.checklyhq.com/v1'
+        self.headers = {
+            'Authorization': f'Bearer {api_key}',
+            'X-Checkly-Account': account_id
+        }
+    
+    def get_reports(self, **filters):
+        """Get reports with optional filters"""
+        params = {k: v for k, v in filters.items() if v is not None}
+        
+        response = requests.get(
+            f'{self.base_url}/reports',
+            headers=self.headers,
+            params=params
+        )
+        response.raise_for_status()
+        return response.json()
+    
+    def get_executive_reports(self):
+        """Get all executive summary reports"""
+        return self.get_reports(type='executive_summary', status='active')
+    
+    def get_sla_reports(self):
+        """Get SLA compliance reports"""
+        return self.get_reports(type='sla_compliance', status='active')
+    
+    def monitor_report_health(self):
+        """Monitor overall report system health"""
+        data = self.get_reports(limit=100)
+        reports = data['data']
+        summary = data['meta']['summary']
+        
+        print(f"📊 REPORT SYSTEM HEALTH")
+        print(f"{'='*50}")
+        print(f"Total reports: {summary['totalReports']}")
+        print(f"Active: {summary['active']}")
+        print(f"Paused: {summary['paused']}")
+        print(f"Scheduled this week: {summary['scheduledThisWeek']}")
+        print(f"Deliveries last week: {summary['lastWeekDeliveries']}")
+        
+        # Check for failed reports
+        failed_reports = [r for r in reports if r.get('lastRun', {}).get('status') == 'failed']
+        if failed_reports:
+            print(f"\n❌ {len(failed_reports)} REPORTS WITH RECENT FAILURES:")
+            for report in failed_reports:
+                print(f"  - {report['name']}: {report['lastRun'].get('error', 'Unknown error')}")
+        
+        # Check upcoming reports
+        now = datetime.now()
+        next_24h = now + timedelta(hours=24)
+        
+        upcoming = []
+        for report in reports:
+            if report['status'] == 'active' and report['schedule'].get('nextRun'):
+                next_run = datetime.fromisoformat(report['schedule']['nextRun'].replace('Z', '+00:00'))
+                if now <= next_run <= next_24h:
+                    upcoming.append(report)
+        
+        if upcoming:
+            print(f"\n⏰ REPORTS SCHEDULED IN NEXT 24 HOURS:")
+            for report in sorted(upcoming, key=lambda x: x['schedule']['nextRun']):
+                next_run = report['schedule']['nextRun']
+                print(f"  - {report['name']}: {next_run}")
+        
+        # Delivery method distribution
+        delivery_methods = {}
+        for report in reports:
+            method = report['delivery']['method']
+            delivery_methods[method] = delivery_methods.get(method, 0) + 1
+        
+        print(f"\n📬 DELIVERY METHOD DISTRIBUTION:")
+        for method, count in delivery_methods.items():
+            print(f"  {method}: {count} reports")
+    
+    def create_executive_report(self, name, recipients, check_groups=None):
+        """Create a new executive summary report"""
+        report_config = {
+            "name": name,
+            "description": f"Executive summary report for {name}",
+            "type": "executive_summary",
+            "status": "active",
+            "schedule": {
+                "frequency": "weekly",
+                "dayOfWeek": "monday",
+                "time": "09:00",
+                "timezone": "UTC"
+            },
+            "scope": {
+                "checks": "all" if not check_groups else "tagged",
+                "checkGroups": check_groups or [],
+                "tags": ["critical", "user-facing"]
+            },
+            "metrics": {
+                "included": [
+                    "overall_availability",
+                    "incident_summary", 
+                    "mttr_trends",
+                    "sla_compliance",
+                    "top_failures"
+                ],
+                "period": "7_days",
+                "thresholds": {
+                    "availability_target": 99.9,
+                    "mttr_target_minutes": 60
+                }
+            },
+            "format": {
+                "type": "pdf",
+                "template": "executive",
+                "branding": {"logo": True}
+            },
+            "delivery": {
+                "method": "email",
+                "recipients": recipients,
+                "subject": f"{name} - Week of {{date}}",
+                "includeRawData": False
+            }
+        }
+        
+        response = requests.post(
+            f'{self.base_url}/reports',
+            headers=self.headers,
+            json=report_config
+        )
+        response.raise_for_status()
+        return response.json()
+    
+    def create_sla_report(self, name, webhook_url, check_groups):
+        """Create an SLA compliance report with webhook delivery"""
+        report_config = {
+            "name": name,
+            "description": f"SLA compliance monitoring for {name}",
+            "type": "sla_compliance",
+            "status": "active",
+            "schedule": {
+                "frequency": "monthly",
+                "dayOfMonth": 1,
+                "time": "08:00",
+                "timezone": "UTC"
+            },
+            "scope": {
+                "checkGroups": check_groups,
+                "tags": ["sla-critical"]
+            },
+            "metrics": {
+                "included": [
+                    "uptime_percentage",
+                    "response_time_p95",
+                    "error_rate",
+                    "sla_breaches"
+                ],
+                "period": "30_days",
+                "thresholds": {
+                    "availability_target": 99.95,
+                    "response_time_target_ms": 500,
+                    "error_rate_target": 0.1
+                }
+            },
+            "format": {
+                "type": "json",
+                "includeCharts": True,
+                "dataGranularity": "daily"
+            },
+            "delivery": {
+                "method": "webhook",
+                "webhookUrl": webhook_url,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "retryPolicy": {
+                    "maxRetries": 3,
+                    "backoffMultiplier": 2
+                }
+            }
+        }
+        
+        response = requests.post(
+            f'{self.base_url}/reports',
+            headers=self.headers,
+            json=report_config
+        )
+        response.raise_for_status()
+        return response.json()
+    
+    def analyze_report_performance(self, days=30):
+        """Analyze report delivery performance over time"""
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=days)
+        
+        # Get all reports
+        all_reports = self.get_reports(limit=100)['data']
+        
+        # Filter reports with recent runs
+        recent_runs = []
+        for report in all_reports:
+            if report.get('lastRun'):
+                last_run_time = datetime.fromisoformat(
+                    report['lastRun']['timestamp'].replace('Z', '+00:00')
+                )
+                if start_date <= last_run_time <= end_date:
+                    recent_runs.append({
+                        'name': report['name'],
+                        'type': report['type'],
+                        'status': report['lastRun']['status'],
+                        'duration': report['lastRun'].get('duration', 'N/A'),
+                        'timestamp': last_run_time,
+                        'delivery_method': report['delivery']['method']
+                    })
+        
+        if not recent_runs:
+            return "No recent report runs found"
+        
+        # Calculate statistics
+        total_runs = len(recent_runs)
+        successful_runs = len([r for r in recent_runs if r['status'] == 'success'])
+        success_rate = (successful_runs / total_runs) * 100
+        
+        # Group by type
+        type_stats = {}
+        for run in recent_runs:
+            report_type = run['type']
+            if report_type not in type_stats:
+                type_stats[report_type] = {'total': 0, 'successful': 0}
+            type_stats[report_type]['total'] += 1
+            if run['status'] == 'success':
+                type_stats[report_type]['successful'] += 1
+        
+        return {
+            'period_days': days,
+            'total_runs': total_runs,
+            'successful_runs': successful_runs,
+            'success_rate_percent': round(success_rate, 2),
+            'by_type': {
+                rtype: {
+                    'total': stats['total'],
+                    'success_rate': round((stats['successful'] / stats['total']) * 100, 2)
+                }
+                for rtype, stats in type_stats.items()
+            },
+            'delivery_methods': {
+                method: len([r for r in recent_runs if r['delivery_method'] == method])
+                for method in set(r['delivery_method'] for r in recent_runs)
+            }
+        }
+
+# Usage
+manager = ReportManager('cu_1234567890abcdef', '550e8400-e29b-41d4-a716-446655440000')
+
+# Monitor overall system health
+manager.monitor_report_health()
+
+# Create executive report
+exec_report = manager.create_executive_report(
+    name="Weekly Executive Summary",
+    recipients=["cto@company.com", "vp-eng@company.com"],
+    check_groups=["production", "critical"]
+)
+print(f"Created executive report: {exec_report['id']}")
+
+# Create SLA compliance report
+sla_report = manager.create_sla_report(
+    name="Customer SLA Compliance",
+    webhook_url="https://dashboard.company.com/api/sla-reports",
+    check_groups=["customer-facing", "api-endpoints"]
+)
+print(f"Created SLA report: {sla_report['id']}")
+
+# Analyze performance
+performance = manager.analyze_report_performance(days=30)
+print(f"\n📈 REPORT PERFORMANCE (30 DAYS)")
+print(f"Total runs: {performance['total_runs']}")
+print(f"Success rate: {performance['success_rate_percent']}%")
+print(f"By type: {performance['by_type']}")
+```
+
+</CodeGroup>
+
+<Note>
+Reports provide comprehensive monitoring insights and automated delivery of key metrics. Use scheduling and delivery options to ensure stakeholders receive timely, relevant monitoring information.
+</Note>

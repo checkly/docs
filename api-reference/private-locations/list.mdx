@@ -1,0 +1,298 @@
+---
+title: 'List Private Locations'
+openapi: 'GET /v1/private-locations'
+description: 'Retrieve all private locations in your account'
+---
+
+## Overview
+
+Private locations allow you to run checks from your own infrastructure, providing monitoring from behind firewalls, in specific geographic regions, or from custom network environments. This endpoint returns all private locations configured in your account.
+
+<Info>
+Private locations require running the Checkly Agent in your infrastructure to execute checks from your own network.
+</Info>
+
+## Response Example
+
+```json
+{
+  "data": [
+    {
+      "id": "pl_123456789",
+      "name": "AWS US-East Data Center",
+      "slugName": "aws-us-east-dc",
+      "status": "ACTIVE",
+      "region": "us-east-1",
+      "tags": ["aws", "production", "us-east"],
+      "agentVersion": "1.2.3",
+      "lastHeartbeat": "2024-01-25T10:25:00.000Z",
+      "checksCount": 15,
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-25T10:25:00.000Z"
+    },
+    {
+      "id": "pl_987654321",
+      "name": "On-Premise European Office",
+      "slugName": "onprem-eu-office",
+      "status": "INACTIVE",
+      "region": "eu-west-1",
+      "tags": ["on-premise", "europe"],
+      "agentVersion": "1.1.8",
+      "lastHeartbeat": "2024-01-24T15:30:00.000Z",
+      "checksCount": 8,
+      "createdAt": "2024-01-10T08:15:00.000Z",
+      "updatedAt": "2024-01-24T15:30:00.000Z"
+    }
+  ],
+  "meta": {
+    "currentPage": 1,
+    "totalPages": 1,
+    "totalItems": 2,
+    "limit": 10
+  }
+}
+```
+
+## Private Location Status
+
+<AccordionGroup>
+
+<Accordion title="ACTIVE">
+The private location is healthy and accepting checks:
+- Agent is connected and responding
+- Recent heartbeat within expected interval
+- Ready to execute checks
+- All systems operational
+</Accordion>
+
+<Accordion title="INACTIVE">
+The private location is not responding:
+- Agent may be disconnected
+- No recent heartbeat received
+- Checks will fail or be skipped
+- Requires investigation
+</Accordion>
+
+<Accordion title="DEGRADED">
+The private location has issues but is partially functional:
+- Intermittent connectivity
+- Performance issues detected
+- Some checks may fail
+- Monitoring recommended
+</Accordion>
+
+<Accordion title="MAINTENANCE">
+The private location is temporarily disabled for maintenance:
+- Manually disabled by user
+- Checks are suspended
+- Agent may be running but not accepting work
+- Planned maintenance mode
+</Accordion>
+
+</AccordionGroup>
+
+## Use Cases
+
+<CardGroup cols={2}>
+
+<Card title="Internal Network Monitoring" icon="network-wired">
+Monitor internal services behind firewalls or in private networks
+</Card>
+
+<Card title="Geographic Coverage" icon="globe">
+Run checks from specific geographic locations not covered by public locations
+</Card>
+
+<Card title="Compliance Requirements" icon="shield-check">
+Meet regulatory requirements for monitoring from specific jurisdictions
+</Card>
+
+<Card title="Performance Testing" icon="clock">
+Test performance from your actual user locations or network paths
+</Card>
+
+</CardGroup>
+
+## Code Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.checklyhq.com/v1/private-locations" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+
+```javascript Node.js
+const response = await fetch('https://api.checklyhq.com/v1/private-locations', {
+  headers: {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+  }
+});
+
+const data = await response.json();
+console.log(`Found ${data.meta.totalItems} private locations`);
+
+data.data.forEach(location => {
+  const lastSeen = new Date(location.lastHeartbeat);
+  const isRecent = (Date.now() - lastSeen.getTime()) < 5 * 60 * 1000; // 5 minutes
+  
+  console.log(`${location.name}:`);
+  console.log(`  Status: ${location.status}`);
+  console.log(`  Agent Version: ${location.agentVersion}`);
+  console.log(`  Last Heartbeat: ${isRecent ? 'Recent' : 'Stale'}`);
+  console.log(`  Active Checks: ${location.checksCount}`);
+  console.log('---');
+});
+```
+
+```python Python
+import requests
+from datetime import datetime, timedelta
+
+headers = {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+}
+
+response = requests.get(
+    'https://api.checklyhq.com/v1/private-locations',
+    headers=headers
+)
+
+data = response.json()
+now = datetime.utcnow()
+
+for location in data['data']:
+    last_heartbeat = datetime.fromisoformat(
+        location['lastHeartbeat'].replace('Z', '+00:00')
+    )
+    time_since_heartbeat = now - last_heartbeat.replace(tzinfo=None)
+    
+    print(f"Name: {location['name']}")
+    print(f"Status: {location['status']}")
+    print(f"Region: {location['region']}")
+    print(f"Agent Version: {location['agentVersion']}")
+    print(f"Last Heartbeat: {time_since_heartbeat} ago")
+    print(f"Active Checks: {location['checksCount']}")
+    print("---")
+```
+
+</CodeGroup>
+
+## Filtering and Monitoring
+
+<AccordionGroup>
+
+<Accordion title="Query Parameters">
+Filter private locations by various criteria:
+
+- `limit` (integer): Number of results per page (max 100)
+- `page` (integer): Page number (1-based)
+- `status` (string): Filter by status (ACTIVE, INACTIVE, DEGRADED, MAINTENANCE)
+- `region` (string): Filter by region
+- `tag` (string): Filter by tag
+</Accordion>
+
+<Accordion title="Health Monitoring">
+Monitor private location health:
+
+```javascript
+// Check if private location is healthy
+function isLocationHealthy(location) {
+  const lastHeartbeat = new Date(location.lastHeartbeat);
+  const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+  
+  return location.status === 'ACTIVE' && lastHeartbeat > fiveMinutesAgo;
+}
+
+// Get stale private locations
+function getStaleLocations(locations) {
+  return locations.filter(location => !isLocationHealthy(location));
+}
+```
+</Accordion>
+
+<Accordion title="Agent Version Tracking">
+Track agent versions across your private locations:
+
+```python
+def check_agent_versions(locations):
+    versions = {}
+    for location in locations:
+        version = location['agentVersion']
+        if version not in versions:
+            versions[version] = []
+        versions[version].append(location['name'])
+    
+    return versions
+
+# Example usage
+version_report = check_agent_versions(data['data'])
+for version, location_names in version_report.items():
+    print(f"Agent v{version}: {', '.join(location_names)}")
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Private Location Management
+
+<AccordionGroup>
+
+<Accordion title="Agent Installation">
+To set up a private location:
+
+1. **Create the Private Location**: Use the API or web interface
+2. **Generate API Keys**: Get authentication credentials
+3. **Install the Agent**: Deploy the Checkly Agent in your infrastructure
+4. **Configure Connectivity**: Ensure network access to Checkly services
+5. **Verify Status**: Check that the location shows as ACTIVE
+</Accordion>
+
+<Accordion title="Network Requirements">
+Private locations require:
+- **Outbound HTTPS (443)**: To Checkly's API endpoints
+- **WebSocket Connection**: For real-time communication
+- **DNS Resolution**: Access to public DNS or custom resolvers
+- **Resource Requirements**: Sufficient CPU and memory for check execution
+</Accordion>
+
+<Accordion title="Maintenance and Updates">
+Regular maintenance tasks:
+- **Agent Updates**: Keep agents updated to latest versions
+- **Health Monitoring**: Monitor heartbeat and status
+- **Performance Tracking**: Monitor check execution times
+- **Log Review**: Check agent logs for errors or warnings
+</Accordion>
+
+</AccordionGroup>
+
+## Example Filtered Requests
+
+<CodeGroup>
+
+```bash Active Locations Only
+curl -X GET "https://api.checklyhq.com/v1/private-locations?status=ACTIVE" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+
+```bash Locations by Region
+curl -X GET "https://api.checklyhq.com/v1/private-locations?region=us-east-1" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+
+```bash Locations with Production Tag
+curl -X GET "https://api.checklyhq.com/v1/private-locations?tag=production" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+
+</CodeGroup>
+
+<Note>
+Private locations require the Checkly Agent to be installed and running in your infrastructure. The agent handles check execution and communicates results back to Checkly's platform.
+</Note>

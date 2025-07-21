@@ -1,58 +1,299 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
+    "title": "Checkly Public API",
+    "version": "v1",
+    "description": "The Checkly Public API allows you to programmatically manage your monitoring checks, alerts, and more. If you have any questions, please do not hesitate to get in touch with us.",
+    "contact": {
+      "name": "Checkly Support",
+      "url": "https://checklyhq.com/support"
+    },
     "license": {
       "name": "MIT"
-    },
-    "version": "1.0.0"
+    }
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.checklyhq.com",
+      "description": "Production server"
     }
   ],
   "security": [
     {
-      "bearerAuth": []
+      "bearerAuth": [],
+      "accountId": []
     }
   ],
   "paths": {
-    "/plants": {
+    "/v1/accounts": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "summary": "List Accounts",
+        "description": "Fetch user accounts based on supplied API key",
+        "operationId": "listAccounts",
         "parameters": [
           {
             "name": "limit",
             "in": "query",
-            "description": "The maximum number of results to return",
+            "description": "Limit the number of results",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "List of accounts",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
+                  "$ref": "#/components/schemas/AccountList"
                 }
               }
             }
-          },
-          "400": {
-            "description": "Unexpected error",
+          }
+        }
+      }
+    },
+    "/v1/accounts/{accountId}": {
+      "get": {
+        "summary": "Get Account",
+        "description": "Get details from a specific account",
+        "operationId": "getAccount",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "description": "The account ID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account details",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/Account"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/api-checks/{id}": {
+      "get": {
+        "summary": "Get API Check Analytics",
+        "description": "Get analytics data for API checks",
+        "operationId": "getApiCheckAnalytics",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The check ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API check analytics data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiCheckAnalytics"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/browser-checks/{id}": {
+      "get": {
+        "summary": "Get Browser Check Analytics",
+        "description": "Get analytics data for browser checks",
+        "operationId": "getBrowserCheckAnalytics",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The check ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Browser check analytics data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrowserCheckAnalytics"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analytics/metrics": {
+      "get": {
+        "summary": "Get Analytics Metrics",
+        "description": "Get comprehensive analytics metrics",
+        "operationId": "getAnalyticsMetrics",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Start date",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "End date",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Analytics metrics data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyticsMetrics"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/check-alerts": {
+      "get": {
+        "summary": "List Check Alerts",
+        "description": "Retrieve all alerts triggered by checks",
+        "operationId": "listCheckAlerts",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of results",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of check alerts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckAlertList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/check-alerts/{checkId}": {
+      "get": {
+        "summary": "Get Check Alerts",
+        "description": "List all alerts for a specific check",
+        "operationId": "getCheckAlerts",
+        "parameters": [
+          {
+            "name": "checkId",
+            "in": "path",
+            "required": true,
+            "description": "The check ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Check alerts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckAlertList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/check-groups": {
+      "get": {
+        "summary": "List Check Groups",
+        "description": "Retrieve all check groups",
+        "operationId": "listCheckGroups",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of results",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of check groups",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckGroupList"
                 }
               }
             }
@@ -60,35 +301,26 @@
         }
       },
       "post": {
-        "description": "Creates a new plant in the store",
+        "summary": "Create Check Group",
+        "description": "Create a new check group",
+        "operationId": "createCheckGroup",
         "requestBody": {
-          "description": "Plant to add to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/CheckGroupCreate"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
-          "200": {
-            "description": "plant response",
+          "201": {
+            "description": "Check group created",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/CheckGroup"
                 }
               }
             }
@@ -96,28 +328,177 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/v1/check-results/{checkId}": {
+      "get": {
+        "summary": "List Check Results",
+        "description": "Retrieve all execution results for a specific check",
+        "operationId": "listCheckResults",
         "parameters": [
           {
-            "name": "id",
+            "name": "checkId",
             "in": "path",
-            "description": "ID of plant to delete",
             "required": true,
+            "description": "The check ID",
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
             }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "List of check results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckResultList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/check-results/{checkId}/{checkResultId}": {
+      "get": {
+        "summary": "Get Check Result",
+        "description": "Retrieve detailed information about a specific check execution result",
+        "operationId": "getCheckResult",
+        "parameters": [
+          {
+            "name": "checkId",
+            "in": "path",
+            "required": true,
+            "description": "The check ID",
+            "schema": {
+              "type": "string"
+            }
           },
-          "400": {
-            "description": "unexpected error",
+          {
+            "name": "checkResultId",
+            "in": "path",
+            "required": true,
+            "description": "The check result ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Check result details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/check-statuses": {
+      "get": {
+        "summary": "List Check Statuses",
+        "description": "Retrieve current health status for all checks",
+        "operationId": "listCheckStatuses",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of results",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of check statuses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckStatusList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/checks": {
+      "get": {
+        "summary": "List all checks",
+        "description": "Lists all current checks in your account.",
+        "operationId": "listChecks",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of results",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "apiCheckUrlFilterPattern",
+            "in": "query",
+            "description": "Filters the results by a string contained in the URL of an API check, for instance a domain like \"www.myapp.com\". Only returns API checks.",
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of checks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
             "content": {
               "application/json": {
                 "schema": {
@@ -126,27 +507,552 @@
               }
             }
           }
-        }
+        },
+        "tags": ["Checks"]
       }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
+    },
+    "/v1/alert-channels": {
+      "get": {
+        "summary": "List all alert channels",
+        "description": "Lists all alert channels in your account.",
+        "operationId": "listAlertChannels",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of results",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of alert channels",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertChannelList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Alert Channels"]
+      },
       "post": {
-        "description": "Information about a new plant added to the store",
+        "summary": "Create an alert channel",
+        "description": "Creates a new alert channel in your account.",
+        "operationId": "createAlertChannel",
         "requestBody": {
-          "description": "Plant added to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/AlertChannelCreate"
               }
             }
           }
         },
         "responses": {
+          "201": {
+            "description": "Alert channel created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertChannel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Alert Channels"]
+      }
+    },
+    "/v1/alert-channels/{id}": {
+      "get": {
+        "summary": "Retrieve an alert channel",
+        "description": "Gets a specific alert channel by ID.",
+        "operationId": "getAlertChannel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The alert channel ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
           "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+            "description": "Alert channel details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertChannel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Alert Channels"]
+      }
+    },
+    "/v1/dashboards": {
+      "get": {
+        "summary": "List Dashboards",
+        "description": "Retrieve all public dashboards",
+        "operationId": "listDashboards",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of results",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of dashboards",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/heartbeats": {
+      "get": {
+        "summary": "List Heartbeats",
+        "description": "Retrieve all heartbeat monitors",
+        "operationId": "listHeartbeats",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of results",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of heartbeats",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HeartbeatList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Heartbeat",
+        "description": "Create a new heartbeat monitor",
+        "operationId": "createHeartbeat",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HeartbeatCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Heartbeat created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Heartbeat"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/incidents": {
+      "get": {
+        "summary": "List Incidents",
+        "description": "Retrieve all incidents",
+        "operationId": "listIncidents",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of results",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of incidents",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/locations": {
+      "get": {
+        "summary": "List Locations",
+        "description": "Retrieve all available monitoring locations",
+        "operationId": "listLocations",
+        "responses": {
+          "200": {
+            "description": "List of locations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/maintenance-windows": {
+      "get": {
+        "summary": "List Maintenance Windows",
+        "description": "Retrieve all maintenance windows",
+        "operationId": "listMaintenanceWindows",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of results",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of maintenance windows",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaintenanceWindowList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Maintenance Window",
+        "description": "Create a new maintenance window",
+        "operationId": "createMaintenanceWindow",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MaintenanceWindowCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Maintenance window created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaintenanceWindow"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/private-locations": {
+      "get": {
+        "summary": "List Private Locations",
+        "description": "Retrieve all private locations",
+        "operationId": "listPrivateLocations",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of results",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of private locations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrivateLocationList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Private Location",
+        "description": "Create a new private location",
+        "operationId": "createPrivateLocation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrivateLocationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Private location created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrivateLocation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/reports": {
+      "get": {
+        "summary": "List Reports",
+        "description": "Retrieve all reports",
+        "operationId": "listReports",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of results",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of reports",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportList"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/variables": {
+      "get": {
+        "summary": "List Environment Variables",
+        "description": "Retrieve all environment variables",
+        "operationId": "listVariables",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit the number of results",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of environment variables",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariableList"
+                }
+              }
+            }
           }
         }
       }
@@ -154,55 +1060,903 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "CheckList": {
         "type": "object",
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Check"
+            }
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+      "AccountList": {
         "type": "object",
         "properties": {
-          "error": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Account"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        }
+      },
+      "Account": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the account",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the account",
+            "example": "Acme Corp Production"
+          },
+          "plan": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Plan name",
+                "example": "Team"
+              },
+              "type": {
+                "type": "string",
+                "description": "Plan type",
+                "example": "subscription"
+              },
+              "features": {
+                "type": "object",
+                "properties": {
+                  "maxChecks": {
+                    "type": "integer",
+                    "description": "Maximum number of checks allowed",
+                    "example": 100
+                  },
+                  "maxAlertChannels": {
+                    "type": "integer",
+                    "description": "Maximum number of alert channels allowed",
+                    "example": 50
+                  },
+                  "maxPrivateLocations": {
+                    "type": "integer",
+                    "description": "Maximum number of private locations allowed",
+                    "example": 10
+                  },
+                  "supportLevel": {
+                    "type": "string",
+                    "description": "Support level",
+                    "example": "standard"
+                  }
+                }
+              }
+            }
+          },
+          "settings": {
+            "type": "object",
+            "properties": {
+              "timezone": {
+                "type": "string",
+                "description": "Account timezone",
+                "example": "America/New_York"
+              },
+              "dateFormat": {
+                "type": "string",
+                "description": "Preferred date format",
+                "example": "MM/DD/YYYY"
+              },
+              "defaultCheckFrequency": {
+                "type": "integer",
+                "description": "Default frequency for new checks in minutes",
+                "example": 10
+              }
+            }
+          },
+          "usage": {
+            "type": "object",
+            "properties": {
+              "checksUsed": {
+                "type": "integer",
+                "description": "Number of checks currently in use",
+                "example": 45
+              },
+              "alertChannelsUsed": {
+                "type": "integer",
+                "description": "Number of alert channels currently in use",
+                "example": 12
+              },
+              "privateLocationsUsed": {
+                "type": "integer",
+                "description": "Number of private locations currently in use",
+                "example": 2
+              }
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Account creation timestamp",
+            "example": "2024-01-15T10:30:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Account last update timestamp",
+            "example": "2024-01-20T14:45:00.000Z"
+          }
+        }
+      },
+      "Check": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the check",
+            "example": "73208bf5-2b42-4ab3-b18c-7ac505b7d7b4"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the check",
+            "example": "Homepage Load Test"
+          },
+          "checkType": {
+            "type": "string",
+            "enum": ["BROWSER", "API", "HEARTBEAT", "TCP", "URL"],
+            "description": "Type of monitoring check"
+          },
+          "frequency": {
             "type": "integer",
-            "format": "int32"
+            "description": "How often the check runs (in minutes)",
+            "example": 5
+          },
+          "activated": {
+            "type": "boolean",
+            "description": "Whether the check is currently active"
+          },
+          "muted": {
+            "type": "boolean",
+            "description": "Whether alerts are muted for this check"
+          },
+          "shouldFail": {
+            "type": "boolean",
+            "description": "Whether the check should fail (for testing purposes)"
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of monitoring locations",
+            "example": ["us-east-1", "eu-west-1", "ap-southeast-1"]
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of tags assigned to the check",
+            "example": ["production", "critical", "homepage"]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp when the check was created"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp when the check was last updated"
+          },
+          "script": {
+            "type": "string",
+            "description": "The check script content (for browser and API checks)"
+          },
+          "environmentVariables": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EnvironmentVariable"
+            },
+            "description": "Environment variables available to the check"
+          }
+        }
+      },
+      "EnvironmentVariable": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Variable name"
+          },
+          "value": {
+            "type": "string",
+            "description": "Variable value (may be masked for security)"
+          },
+          "locked": {
+            "type": "boolean",
+            "description": "Whether the variable is locked/encrypted"
+          }
+        }
+      },
+      "AlertChannelList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AlertChannel"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        }
+      },
+      "AlertChannel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier for the alert channel"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["EMAIL", "WEBHOOK", "SLACK", "SMS", "PHONE"],
+            "description": "Type of alert channel"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the alert channel"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp when the alert channel was created"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp when the alert channel was last updated"
+          }
+        }
+      },
+      "AlertChannelCreate": {
+        "type": "object",
+        "required": ["type", "name"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["EMAIL", "WEBHOOK", "SLACK", "SMS", "PHONE"],
+            "description": "Type of alert channel"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the alert channel"
+          },
+          "config": {
+            "type": "object",
+            "description": "Configuration specific to the alert channel type"
+          }
+        }
+      },
+      "PaginationMeta": {
+        "type": "object",
+        "properties": {
+          "currentPage": {
+            "type": "integer",
+            "description": "Current page number"
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages"
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total number of items"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Items per page"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["error", "message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error type"
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "Error message"
+          },
+          "statusCode": {
+            "type": "integer",
+            "description": "HTTP status code"
+          }
+        }
+      },
+      "ApiCheckAnalytics": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Check ID"
+          },
+          "averageResponseTime": {
+            "type": "number",
+            "description": "Average response time in milliseconds"
+          },
+          "successRate": {
+            "type": "number",
+            "description": "Success rate percentage"
+          },
+          "totalRequests": {
+            "type": "integer",
+            "description": "Total number of requests"
+          }
+        }
+      },
+      "BrowserCheckAnalytics": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Check ID"
+          },
+          "averageLoadTime": {
+            "type": "number",
+            "description": "Average page load time in milliseconds"
+          },
+          "successRate": {
+            "type": "number",
+            "description": "Success rate percentage"
+          },
+          "totalRuns": {
+            "type": "integer",
+            "description": "Total number of runs"
+          }
+        }
+      },
+      "AnalyticsMetrics": {
+        "type": "object",
+        "properties": {
+          "totalChecks": {
+            "type": "integer",
+            "description": "Total number of checks"
+          },
+          "totalRuns": {
+            "type": "integer",
+            "description": "Total number of runs"
+          },
+          "overallSuccessRate": {
+            "type": "number",
+            "description": "Overall success rate percentage"
+          }
+        }
+      },
+      "CheckAlertList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CheckAlert"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        }
+      },
+      "CheckAlert": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Alert ID"
+          },
+          "checkId": {
+            "type": "string",
+            "description": "Check ID"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["triggered", "resolved"],
+            "description": "Alert status"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Alert creation timestamp"
+          }
+        }
+      },
+      "CheckGroupList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CheckGroup"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        }
+      },
+      "CheckGroup": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Check group ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Check group name"
+          },
+          "activated": {
+            "type": "boolean",
+            "description": "Whether the check group is active"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          }
+        }
+      },
+      "CheckGroupCreate": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Check group name"
+          },
+          "activated": {
+            "type": "boolean",
+            "description": "Whether the check group should be active"
+          }
+        }
+      },
+      "CheckResultList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CheckResult"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        }
+      },
+      "CheckResult": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Check result ID"
+          },
+          "checkId": {
+            "type": "string",
+            "description": "Check ID"
+          },
+          "hasFailures": {
+            "type": "boolean",
+            "description": "Whether the check had failures"
+          },
+          "responseTime": {
+            "type": "number",
+            "description": "Response time in milliseconds"
+          },
+          "runLocation": {
+            "type": "string",
+            "description": "Location where the check was run"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Check start timestamp"
+          },
+          "stoppedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Check stop timestamp"
+          }
+        }
+      },
+      "CheckStatusList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CheckStatus"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        }
+      },
+      "CheckStatus": {
+        "type": "object",
+        "properties": {
+          "checkId": {
+            "type": "string",
+            "description": "Check ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Check name"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["passing", "failing", "degraded"],
+            "description": "Current status"
+          },
+          "lastRunAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last run timestamp"
+          }
+        }
+      },
+      "DashboardList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Dashboard"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        }
+      },
+      "Dashboard": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Dashboard ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Dashboard name"
+          },
+          "url": {
+            "type": "string",
+            "description": "Public dashboard URL"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          }
+        }
+      },
+      "HeartbeatList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Heartbeat"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        }
+      },
+      "Heartbeat": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Heartbeat ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Heartbeat name"
+          },
+          "period": {
+            "type": "integer",
+            "description": "Expected heartbeat period in seconds"
+          },
+          "grace": {
+            "type": "integer",
+            "description": "Grace period in seconds"
+          },
+          "lastPingAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last ping timestamp"
+          }
+        }
+      },
+      "HeartbeatCreate": {
+        "type": "object",
+        "required": ["name", "period"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Heartbeat name"
+          },
+          "period": {
+            "type": "integer",
+            "description": "Expected heartbeat period in seconds"
+          },
+          "grace": {
+            "type": "integer",
+            "description": "Grace period in seconds"
+          }
+        }
+      },
+      "IncidentList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Incident"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        }
+      },
+      "Incident": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Incident ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Incident name"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["open", "resolved"],
+            "description": "Incident status"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Incident start timestamp"
+          },
+          "resolvedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Incident resolution timestamp"
+          }
+        }
+      },
+      "LocationList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Location"
+            }
+          }
+        }
+      },
+      "Location": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Location name"
+          },
+          "region": {
+            "type": "string",
+            "description": "Geographic region"
+          },
+          "available": {
+            "type": "boolean",
+            "description": "Whether the location is available"
+          }
+        }
+      },
+      "MaintenanceWindowList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MaintenanceWindow"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        }
+      },
+      "MaintenanceWindow": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Maintenance window ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Maintenance window name"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Start timestamp"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "End timestamp"
+          }
+        }
+      },
+      "MaintenanceWindowCreate": {
+        "type": "object",
+        "required": ["name", "startsAt", "endsAt"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Maintenance window name"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Start timestamp"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "End timestamp"
+          }
+        }
+      },
+      "PrivateLocationList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrivateLocation"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        }
+      },
+      "PrivateLocation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Private location ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Private location name"
+          },
+          "slugName": {
+            "type": "string",
+            "description": "URL-friendly name"
+          },
+          "icon": {
+            "type": "string",
+            "description": "Location icon"
+          }
+        }
+      },
+      "PrivateLocationCreate": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Private location name"
+          },
+          "slugName": {
+            "type": "string",
+            "description": "URL-friendly name"
+          },
+          "icon": {
+            "type": "string",
+            "description": "Location icon"
+          }
+        }
+      },
+      "ReportList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Report"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        }
+      },
+      "Report": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Report ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Report name"
+          },
+          "type": {
+            "type": "string",
+            "description": "Report type"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          }
+        }
+      },
+      "VariableList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Variable"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          }
+        }
+      },
+      "Variable": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Variable name"
+          },
+          "value": {
+            "type": "string",
+            "description": "Variable value"
+          },
+          "locked": {
+            "type": "boolean",
+            "description": "Whether the variable is locked"
           }
         }
       }
@@ -210,7 +1964,14 @@
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
-        "scheme": "bearer"
+        "scheme": "bearer",
+        "description": "API Key authentication for Checkly API. You can get your API key at https://app.checklyhq.com/settings/user/api-keys"
+      },
+      "accountId": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Checkly-Account",
+        "description": "Your Checkly account ID. You can find it at https://app.checklyhq.com/settings/account/general"
       }
     }
   }

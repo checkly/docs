@@ -40,25 +40,8 @@
           {
             "group": "Getting Started",
             "pages": [
-              "docs/getting-started/why-checkly",
+              "docs/getting-started/what-is-checkly",
               "docs/getting-started/quickstart",
-              {
-                "group": "Platform",
-                "pages": [
-                  {
-                    "group": "Private Locations",
-                    "pages": [
-                      "docs/getting-started/platform/private-locations/overview"
-                    ]
-                  },
-                  {
-                    "group": "Admin",
-                    "pages": [
-                      "docs/getting-started/platform/admin/overview"
-                    ]
-                  }
-                ]
-              },
               {
                 "group": "Concepts",
                 "pages": [
@@ -71,7 +54,29 @@
                   "docs/concepts/data-storage"
                   
                 ]
+              },
+              {
+                "group": "Platform",
+                "pages": [
+                  {
+                    "group": "Private Locations",
+                    "pages": [
+                      "docs/getting-started/platform/private-locations/overview",
+                      "docs/getting-started/platform/private-locations/agent-configuration",
+                      "docs/getting-started/platform/private-locations/kubernetes-deployment",
+                      "docs/getting-started/platform/private-locations/proxy-setup",
+                      "docs/getting-started/platform/private-locations/scaling-redundancy"
+                    ]
+                  },
+                  {
+                    "group": "Admin",
+                    "pages": [
+                      "docs/getting-started/platform/admin/overview"
+                    ]
+                  }
+                ]
               }
+              
             ]
           },
           {
@@ -82,19 +87,46 @@
                 "pages": [
                   "docs/detect/testing/overview",
                   "docs/detect/testing/creating-your-first-test",
-                  "docs/detect/testing/test-results"
+                  "docs/detect/testing/test-results",
+                  "docs/detect/testing/using-env-variables",
+                  "docs/detect/testing/alerting"
                 ]
               },
               {
                 "group": "Uptime Monitoring",
                 "pages": [
-                  "docs/detect/uptime-monitoring/overview"
+                  "docs/detect/uptime-monitoring/overview",
+                  {
+                    "group": "Heartbeat Monitors",
+                    "pages": [
+                      "docs/detect/uptime-monitoring/heartbeat-monitors/overview",
+                      "docs/detect/uptime-monitoring/heartbeat-monitors/ping-examples"
+                    ]
+                  }
                 ]
               },
               {
                 "group": "Synthetic Monitoring",
-                "pages": [
-                  "docs/detect/synthetic-monitoring/overview"
+                "pages":  [
+                  "/docs/detect/synthetic-monitoring/overview",
+                  {
+                    "group": "API Checks",
+                    "pages": [
+                      "docs/detect/synthetic-monitoring/api-checks/creating-your-first-api-check"
+                    ]
+                  },
+                  {
+                    "group": "Browser Checks",
+                    "pages": [
+                      "docs/detect/synthetic-monitoring/browser-checks/creating-your-first-browser-check"
+                    ]
+                  },
+                  {
+                    "group": "Multistep Checks",
+                    "pages": [
+                      "docs/detect/synthetic-monitoring/mutlistep-checks/creating-your-first-multistep-check"
+                    ]
+                  }
                 ]
               }
             ]
@@ -194,7 +226,7 @@
         ]
       },
       {
-        "tab": "CLI Reference",
+        "tab": "CLI",
         "groups": [
           {
             "group": "CLI",
@@ -230,18 +262,114 @@
         "tab": "API Reference",
         "groups": [
           {
-            "group": "API Documentation",
+            "group": "Introduction",
             "pages": [
-              "api-reference/introduction"
+              "api-reference/introduction",
+              "api-reference/authentication"
             ]
           },
           {
-            "group": "Endpoint Examples",
+            "group": "Platform",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              {
+                "group": "Accounts",
+                "pages": [
+                  "api-reference/accounts/list",
+                  "api-reference/accounts/get"
+                ]
+              },
+              {
+                "group": "Analytics",
+                "pages": [
+                  "api-reference/analytics/metrics",
+                  "api-reference/analytics/api-checks",
+                  "api-reference/analytics/browser-checks"
+                ]
+              },
+              {
+                "group": "Environment Variables",
+                "pages": [
+                  "api-reference/environment-variables/list"
+                ]
+              },
+              {
+                "group": "Locations",
+                "pages": [
+                  "api-reference/locations/list"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Detect",
+            "pages": [
+              {
+                "group": "Checks",
+                "pages": [
+                  "api-reference/checks/list",
+                  "api-reference/check-groups/list",
+                  "api-reference/check-groups/create"
+                ]
+              },
+              {
+                "group": "Check Results",
+                "pages": [
+                  "api-reference/check-results/list",
+                  "api-reference/check-results/get"
+                ]
+              },
+              {
+                "group": "Check Alerts",
+                "pages": [
+                  "api-reference/check-alerts/list",
+                  "api-reference/check-alerts/get"
+                ]
+              },
+              {
+                "group": "Heartbeats",
+                "pages": [
+                  "api-reference/heartbeats/list",
+                  "api-reference/heartbeats/create"
+                ]
+              },
+              {
+                "group": "Private Locations",
+                "pages": [
+                  "api-reference/private-locations/list",
+                  "api-reference/private-locations/create"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Communicate",
+            "pages": [
+              {
+                "group": "Alert Channels",
+                "pages": [
+                  "api-reference/alert-channels/list",
+                  "api-reference/alert-channels/create",
+                  "api-reference/alert-channels/get"
+                ]
+              },
+              {
+                "group": "Dashboards",
+                "pages": [
+                  "api-reference/dashboards/list"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Resolve",
+            "pages": [
+              {
+                "group": "Maintenance Windows",
+                "pages": [
+                  "api-reference/maintenance-windows/list",
+                  "api-reference/maintenance-windows/create"
+                ]
+              }
             ]
           }
         ]

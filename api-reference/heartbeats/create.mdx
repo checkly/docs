@@ -1,0 +1,371 @@
+---
+title: 'Create Heartbeat'
+openapi: 'POST /v1/heartbeats'
+description: 'Create a new heartbeat monitor for uptime checking'
+---
+
+## Overview
+
+Create a new heartbeat monitor to track the uptime and response time of HTTP endpoints. Heartbeat monitors are perfect for simple uptime checks without requiring complex scripts.
+
+## Request Examples
+
+<CodeGroup>
+
+```json Simple Website Check
+{
+  "name": "Website Uptime",
+  "url": "https://www.example.com",
+  "method": "GET",
+  "frequency": 5,
+  "locations": ["us-east-1", "eu-west-1"],
+  "alertAfter": 3,
+  "alertTimeUnit": "MINUTES",
+  "expectStatus": 200,
+  "responseTimeLimit": 10000,
+  "tags": ["website", "uptime"]
+}
+```
+
+```json API Health Check
+{
+  "name": "API Health Endpoint",
+  "url": "https://api.example.com/health",
+  "method": "GET",
+  "frequency": 1,
+  "locations": ["us-east-1", "eu-west-1", "ap-southeast-1"],
+  "headers": [
+    {
+      "key": "Authorization",
+      "value": "Bearer your-api-token"
+    },
+    {
+      "key": "User-Agent",
+      "value": "Checkly-Monitor/1.0"
+    }
+  ],
+  "queryParameters": [
+    {
+      "key": "version",
+      "value": "v2"
+    },
+    {
+      "key": "format",
+      "value": "json"
+    }
+  ],
+  "alertAfter": 2,
+  "alertTimeUnit": "MINUTES",
+  "expectStatus": 200,
+  "expectText": "healthy",
+  "responseTimeLimit": 5000,
+  "followRedirects": false,
+  "tags": ["api", "health", "critical"]
+}
+```
+
+```json POST Request Monitor
+{
+  "name": "API Login Endpoint",
+  "url": "https://api.example.com/auth/login",
+  "method": "POST",
+  "frequency": 10,
+  "locations": ["us-east-1"],
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "body": "{\"username\":\"test\",\"password\":\"test123\"}",
+  "bodyType": "JSON",
+  "alertAfter": 5,
+  "alertTimeUnit": "MINUTES",
+  "expectStatus": 200,
+  "expectText": "token",
+  "responseTimeLimit": 3000,
+  "tags": ["api", "auth"]
+}
+```
+
+</CodeGroup>
+
+## Response Example
+
+```json
+{
+  "id": "hb_789123456",
+  "name": "API Health Endpoint",
+  "url": "https://api.example.com/health",
+  "method": "GET",
+  "activated": true,
+  "muted": false,
+  "frequency": 1,
+  "locations": ["us-east-1", "eu-west-1", "ap-southeast-1"],
+  "headers": [
+    {
+      "key": "Authorization",
+      "value": "***masked***"
+    },
+    {
+      "key": "User-Agent",
+      "value": "Checkly-Monitor/1.0"
+    }
+  ],
+  "queryParameters": [
+    {
+      "key": "version",
+      "value": "v2"
+    }
+  ],
+  "alertAfter": 2,
+  "alertTimeUnit": "MINUTES",
+  "expectStatus": 200,
+  "expectText": "healthy",
+  "responseTimeLimit": 5000,
+  "followRedirects": false,
+  "tags": ["api", "health", "critical"],
+  "createdAt": "2024-01-25T10:30:00.000Z",
+  "updatedAt": "2024-01-25T10:30:00.000Z"
+}
+```
+
+## Configuration Options
+
+<AccordionGroup>
+
+<Accordion title="Basic Settings">
+**Required Fields:**
+- `name` (string): Display name for the heartbeat
+- `url` (string): Target URL to monitor
+- `method` (string): HTTP method (GET, POST, PUT, DELETE, HEAD, PATCH)
+
+**Optional Fields:**
+- `activated` (boolean): Whether the heartbeat is active (default: true)
+- `muted` (boolean): Whether alerts are muted (default: false)
+- `frequency` (integer): Check frequency in minutes (1-1440)
+- `locations` (array): Monitoring locations
+- `tags` (array): Tags for organization
+</Accordion>
+
+<Accordion title="Request Configuration">
+**Headers:**
+```json
+{
+  "headers": [
+    {
+      "key": "Authorization",
+      "value": "Bearer token123"
+    },
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ]
+}
+```
+
+**Query Parameters:**
+```json
+{
+  "queryParameters": [
+    {
+      "key": "api_key",
+      "value": "your-key"
+    },
+    {
+      "key": "format",
+      "value": "json"
+    }
+  ]
+}
+```
+
+**Request Body (for POST/PUT):**
+- `body` (string): Request body content
+- `bodyType` (string): FORM_DATA, JSON, or RAW
+</Accordion>
+
+<Accordion title="Response Validation">
+**Status Code:**
+- `expectStatus` (integer): Expected HTTP status code (default: 200)
+
+**Response Time:**
+- `responseTimeLimit` (integer): Maximum response time in milliseconds
+
+**Text Content:**
+- `expectText` (string): Text that must be present in response body
+
+**Redirects:**
+- `followRedirects` (boolean): Whether to follow HTTP redirects (default: true)
+</Accordion>
+
+<Accordion title="Alert Settings">
+**Alert Timing:**
+- `alertAfter` (integer): Number of time units to wait before alerting
+- `alertTimeUnit` (string): MINUTES, HOURS, or RUNS
+
+**SSL Certificates:**
+- `sslCheckEnabled` (boolean): Monitor SSL certificate expiration
+- `sslAlertThreshold` (integer): Days before expiration to alert
+
+**Example:**
+```json
+{
+  "alertAfter": 3,
+  "alertTimeUnit": "MINUTES",
+  "sslCheckEnabled": true,
+  "sslAlertThreshold": 30
+}
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Code Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.checklyhq.com/v1/heartbeats" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Production API Health",
+    "url": "https://api.example.com/health",
+    "method": "GET",
+    "frequency": 1,
+    "locations": ["us-east-1", "eu-west-1"],
+    "alertAfter": 2,
+    "alertTimeUnit": "MINUTES",
+    "expectStatus": 200,
+    "expectText": "ok",
+    "responseTimeLimit": 5000,
+    "tags": ["production", "api"]
+  }'
+```
+
+```javascript Node.js
+const heartbeatData = {
+  name: 'E-commerce Store Uptime',
+  url: 'https://store.example.com',
+  method: 'GET',
+  frequency: 5,
+  locations: ['us-east-1', 'us-west-2'],
+  alertAfter: 3,
+  alertTimeUnit: 'MINUTES',
+  expectStatus: 200,
+  responseTimeLimit: 8000,
+  followRedirects: true,
+  tags: ['ecommerce', 'frontend'],
+  headers: [
+    {
+      key: 'User-Agent',
+      value: 'Checkly-Uptime-Monitor'
+    }
+  ]
+};
+
+const response = await fetch('https://api.checklyhq.com/v1/heartbeats', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(heartbeatData)
+});
+
+const heartbeat = await response.json();
+console.log('Created heartbeat:', heartbeat.id);
+```
+
+```python Python
+import requests
+
+data = {
+    'name': 'Microservice Health Check',
+    'url': 'https://microservice.example.com/health',
+    'method': 'GET',
+    'frequency': 2,
+    'locations': ['us-east-1', 'eu-west-1'],
+    'headers': [
+        {
+            'key': 'Authorization',
+            'value': 'Bearer microservice-token'
+        }
+    ],
+    'queryParameters': [
+        {
+            'key': 'detailed',
+            'value': 'true'
+        }
+    ],
+    'alertAfter': 1,
+    'alertTimeUnit': 'MINUTES',
+    'expectStatus': 200,
+    'expectText': 'healthy',
+    'responseTimeLimit': 3000,
+    'tags': ['microservice', 'critical']
+}
+
+headers = {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000',
+    'Content-Type': 'application/json'
+}
+
+response = requests.post(
+    'https://api.checklyhq.com/v1/heartbeats',
+    headers=headers,
+    json=data
+)
+
+if response.status_code == 201:
+    heartbeat = response.json()
+    print(f"Created heartbeat: {heartbeat['name']} (ID: {heartbeat['id']})")
+else:
+    print(f"Error: {response.status_code} - {response.text}")
+```
+
+</CodeGroup>
+
+## Best Practices
+
+<AccordionGroup>
+
+<Accordion title="Frequency Selection">
+Choose appropriate check frequencies based on criticality:
+- **Critical services**: 1-2 minutes
+- **Important services**: 5-10 minutes
+- **Non-critical services**: 15-30 minutes
+- **Development/staging**: 30+ minutes
+</Accordion>
+
+<Accordion title="Response Validation">
+- Use status code validation for basic uptime
+- Add text validation for health endpoints
+- Set realistic response time limits
+- Consider geographic latency in limits
+</Accordion>
+
+<Accordion title="Alert Configuration">
+- Set alertAfter based on acceptable downtime
+- Use MINUTES for critical services
+- Use RUNS for flaky services
+- Enable SSL monitoring for HTTPS endpoints
+</Accordion>
+
+<Accordion title="Request Headers">
+- Include User-Agent for identification
+- Add authentication headers for protected endpoints
+- Use appropriate Content-Type for POST requests
+- Consider rate limiting headers if needed
+</Accordion>
+
+</AccordionGroup>
+
+<Note>
+Heartbeat monitors are ideal for simple uptime checking. For more complex scenarios involving user interactions or multi-step workflows, consider using browser checks instead.
+</Note>

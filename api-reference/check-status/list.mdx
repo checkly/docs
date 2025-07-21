@@ -1,0 +1,708 @@
+---
+title: 'List Check Statuses'
+openapi: 'GET /v1/check-statuses'
+description: 'Retrieve current health status for all checks in your account with real-time availability and performance data'
+---
+
+## Overview
+
+This endpoint provides real-time status information for all checks in your account. Check statuses give you an immediate overview of system health, availability, and performance trends without diving into detailed execution results.
+
+## Response Example
+
+```json
+{
+  "data": [
+    {
+      "checkId": "check_api_health",
+      "checkName": "Production API Health Check",
+      "checkType": "api",
+      "status": "passing",
+      "availability": {
+        "percentage": 99.2,
+        "period": "24h"
+      },
+      "performance": {
+        "averageResponseTime": 245,
+        "p95ResponseTime": 380,
+        "trend": "stable"
+      },
+      "lastExecution": {
+        "timestamp": "2024-01-25T14:30:00.000Z",
+        "status": "success",
+        "responseTime": 234,
+        "location": "us-east-1"
+      },
+      "currentIncident": null,
+      "alerts": {
+        "active": 0,
+        "acknowledged": 0,
+        "total24h": 2
+      },
+      "schedule": {
+        "frequency": "5m",
+        "nextRun": "2024-01-25T14:35:00.000Z",
+        "enabled": true
+      },
+      "locations": [
+        {
+          "id": "us-east-1",
+          "name": "N. Virginia, USA",
+          "status": "passing",
+          "lastSuccess": "2024-01-25T14:30:00.000Z"
+        },
+        {
+          "id": "eu-west-1", 
+          "name": "Ireland, Europe",
+          "status": "passing",
+          "lastSuccess": "2024-01-25T14:29:45.000Z"
+        }
+      ],
+      "tags": ["api", "production", "critical"],
+      "group": {
+        "id": "group_production_apis",
+        "name": "Production APIs"
+      }
+    },
+    {
+      "checkId": "check_website_home",
+      "checkName": "Homepage Browser Check",
+      "checkType": "browser",
+      "status": "failing",
+      "availability": {
+        "percentage": 87.3,
+        "period": "24h"
+      },
+      "performance": {
+        "averageResponseTime": 3240,
+        "p95ResponseTime": 5200,
+        "trend": "degrading"
+      },
+      "lastExecution": {
+        "timestamp": "2024-01-25T14:28:00.000Z",
+        "status": "failed",
+        "responseTime": 8500,
+        "location": "us-east-1",
+        "error": "Page load timeout after 8 seconds"
+      },
+      "currentIncident": {
+        "id": "incident_789123",
+        "severity": "major",
+        "startedAt": "2024-01-25T12:15:00.000Z",
+        "title": "Homepage loading slowly"
+      },
+      "alerts": {
+        "active": 2,
+        "acknowledged": 1,
+        "total24h": 15
+      },
+      "schedule": {
+        "frequency": "2m",
+        "nextRun": "2024-01-25T14:30:00.000Z",
+        "enabled": true
+      },
+      "locations": [
+        {
+          "id": "us-east-1",
+          "name": "N. Virginia, USA", 
+          "status": "failing",
+          "lastSuccess": "2024-01-25T12:10:00.000Z"
+        },
+        {
+          "id": "eu-west-1",
+          "name": "Ireland, Europe",
+          "status": "degraded",
+          "lastSuccess": "2024-01-25T14:25:00.000Z"
+        }
+      ],
+      "tags": ["frontend", "homepage", "user-facing"],
+      "group": {
+        "id": "group_frontend_checks",
+        "name": "Frontend Monitoring"
+      }
+    }
+  ],
+  "meta": {
+    "currentPage": 1,
+    "totalPages": 8,
+    "totalItems": 76,
+    "limit": 10,
+    "summary": {
+      "totalChecks": 76,
+      "passing": 68,
+      "failing": 6,
+      "degraded": 2,
+      "averageAvailability": 98.7,
+      "activeIncidents": 3,
+      "activeAlerts": 8
+    }
+  }
+}
+```
+
+## Common Use Cases
+
+<CardGroup cols={2}>
+
+<Card title="System Health Dashboard" icon="tachometer-alt">
+Build real-time system health overviews and status pages
+```bash
+GET /v1/check-statuses?includeSummary=true
+```
+</Card>
+
+<Card title="Incident Detection" icon="exclamation-triangle">
+Identify and respond to incidents quickly
+```bash
+GET /v1/check-statuses?status=failing&hasIncident=false
+```
+</Card>
+
+<Card title="Performance Monitoring" icon="chart-line">
+Track system performance trends and degradation
+```bash
+GET /v1/check-statuses?trend=degrading&sortBy=responseTime
+```
+</Card>
+
+<Card title="SLA Reporting" icon="clipboard-check">
+Generate SLA compliance reports and uptime metrics
+```bash
+GET /v1/check-statuses?availabilityMin=99&period=30d
+```
+</Card>
+
+</CardGroup>
+
+## Query Parameters
+
+<AccordionGroup>
+
+<Accordion title="Filtering Options">
+- `status` (string): Filter by check status (passing, failing, degraded)
+- `checkType` (string): Filter by check type (api, browser, heartbeat, tcp, multistep)
+- `group` (string): Filter by check group ID
+- `tags` (array): Filter by tags (comma-separated)
+- `location` (string): Filter by monitoring location
+- `hasIncident` (boolean): Filter checks with active incidents
+
+**Example:**
+```
+?status=failing&checkType=browser&tags=critical,production
+```
+</Accordion>
+
+<Accordion title="Performance Filters">
+- `availabilityMin` (number): Minimum availability percentage (0-100)
+- `availabilityMax` (number): Maximum availability percentage (0-100)
+- `responseTimeMin` (number): Minimum average response time (ms)
+- `responseTimeMax` (number): Maximum average response time (ms)
+- `trend` (string): Performance trend (improving, stable, degrading)
+
+**Example:**
+```
+?availabilityMin=95&responseTimeMax=1000&trend=degrading
+```
+</Accordion>
+
+<Accordion title="Pagination & Sorting">
+- `page` (integer): Page number (default: 1)
+- `limit` (integer): Number of items per page (default: 10, max: 100)
+- `sortBy` (string): Sort field (name, status, availability, responseTime, lastExecution)
+- `sortOrder` (string): Sort order (asc, desc, default: desc for timestamps)
+- `includeSummary` (boolean): Include account-wide summary statistics (default: true)
+
+**Default:** Returns first 10 checks sorted by most recent execution
+</Accordion>
+
+</AccordionGroup>
+
+## Status Types
+
+<CardGroup cols={2}>
+
+<Card title="Passing" icon="check-circle">
+**Indicates:**
+- Recent executions successful
+- Availability within acceptable range
+- No active alerts or incidents
+- Performance meeting SLA targets
+
+**Criteria:**
+- Last 3 executions successful
+- Availability > 95% (24h)
+- No active critical alerts
+</Card>
+
+<Card title="Failing" icon="x-circle">
+**Indicates:**
+- Recent executions failed
+- Service unavailable or unreachable
+- Critical functionality broken
+- Active incident likely
+
+**Criteria:**
+- Last 2+ executions failed
+- Multiple location failures
+- Active critical alerts
+</Card>
+
+<Card title="Degraded" icon="exclamation-triangle">
+**Indicates:**
+- Intermittent failures
+- Performance below targets
+- Partial functionality available
+- Requires monitoring
+
+**Criteria:**
+- Mixed success/failure results
+- Availability 85-95% (24h)
+- Response times above thresholds
+</Card>
+
+<Card title="Unknown" icon="question-circle">
+**Indicates:**
+- Insufficient data to determine status
+- Check recently created
+- Execution suspended
+- Configuration issues
+
+**Criteria:**
+- No recent execution data
+- Check disabled or paused
+- Location unavailable
+</Card>
+
+</CardGroup>
+
+## Performance Trends
+
+<AccordionGroup>
+
+<Accordion title="Trend Analysis">
+**Improving**: Performance metrics getting better over time
+- Response times decreasing
+- Availability increasing
+- Error rates reducing
+
+**Stable**: Consistent performance within normal ranges
+- Response times within ±10% of baseline
+- Availability maintained
+- No significant pattern changes
+
+**Degrading**: Performance metrics getting worse over time
+- Response times increasing
+- Availability decreasing
+- Error rates rising
+
+**Calculation Period**: Trends calculated over 24-hour rolling window
+</Accordion>
+
+<Accordion title="Performance Thresholds">
+**Response Time Evaluation**:
+- Excellent: < 200ms
+- Good: 200-500ms
+- Fair: 500-1000ms
+- Poor: > 1000ms
+
+**Availability Targets**:
+- Excellent: ≥ 99.9%
+- Good: 99.0-99.9%
+- Fair: 95.0-99.0%
+- Poor: < 95.0%
+
+Thresholds can be customized per check based on SLA requirements.
+</Accordion>
+
+</AccordionGroup>
+
+## Use Cases
+
+<AccordionGroup>
+
+<Accordion title="System Health Dashboard">
+Build real-time system health overviews:
+- Display overall system availability
+- Highlight failing or degraded services
+- Show performance trends at a glance
+- Track SLA compliance across services
+
+```javascript
+// Build health dashboard
+const response = await fetch('/api/v1/check-statuses?includeSummary=true');
+const { data: checks, meta } = await response.json();
+
+const dashboard = {
+  overall: {
+    health: meta.summary.averageAvailability,
+    status: meta.summary.failing > 0 ? 'degraded' : 'healthy',
+    incidents: meta.summary.activeIncidents
+  },
+  services: checks.map(check => ({
+    name: check.checkName,
+    status: check.status,
+    availability: check.availability.percentage,
+    trend: check.performance.trend
+  }))
+};
+```
+</Accordion>
+
+<Accordion title="Incident Detection">
+Identify and respond to incidents quickly:
+- Detect patterns indicating incidents
+- Correlate failures across related checks
+- Prioritize response based on severity
+- Track incident resolution progress
+
+```python
+# Detect potential incidents
+import requests
+
+response = requests.get('/api/v1/check-statuses?status=failing&hasIncident=false')
+failing_checks = response.json()['data']
+
+# Look for patterns
+location_failures = {}
+for check in failing_checks:
+    for location in check['locations']:
+        if location['status'] == 'failing':
+            loc_name = location['name']
+            location_failures[loc_name] = location_failures.get(loc_name, 0) + 1
+
+# Alert on widespread failures
+for location, count in location_failures.items():
+    if count >= 3:
+        print(f"Potential infrastructure issue in {location}: {count} checks failing")
+```
+</Accordion>
+
+<Accordion title="Performance Monitoring">
+Track system performance trends:
+- Monitor response time trends
+- Identify degrading services
+- Plan capacity based on performance data
+- Set up predictive alerting
+
+```bash
+# Get degrading services for investigation
+curl -X GET "/api/v1/check-statuses?trend=degrading&sortBy=responseTime&sortOrder=desc" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "X-Checkly-Account: $ACCOUNT_ID" | \
+  jq '.data[] | {name: .checkName, responseTime: .performance.averageResponseTime, availability: .availability.percentage}'
+```
+</Accordion>
+
+<Accordion title="SLA Reporting">
+Generate SLA compliance reports:
+- Calculate uptime percentages
+- Track SLA violations
+- Generate executive summaries
+- Export compliance data
+
+```javascript
+// Generate SLA compliance report
+const slaTarget = 99.9;
+const checks = await getCheckStatuses();
+
+const report = checks.map(check => {
+  const compliant = check.availability.percentage >= slaTarget;
+  const deficit = compliant ? 0 : slaTarget - check.availability.percentage;
+  
+  return {
+    service: check.checkName,
+    availability: check.availability.percentage,
+    slaTarget: slaTarget,
+    compliant: compliant,
+    deficit: deficit,
+    trend: check.performance.trend
+  };
+});
+
+const overallCompliance = report.filter(r => r.compliant).length / report.length * 100;
+console.log(`Overall SLA compliance: ${overallCompliance.toFixed(1)}%`);
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Location-Specific Status
+
+<AccordionGroup>
+
+<Accordion title="Understanding Location Status">
+Each check execution location has its own status:
+
+**Per-Location Status**:
+- `passing`: Recent executions successful from this location
+- `failing`: Recent executions failed from this location  
+- `degraded`: Mixed results or performance issues
+- `unknown`: No recent data or location unavailable
+
+**Use Cases**:
+- Identify regional performance issues
+- Plan infrastructure improvements
+- Route traffic away from problematic regions
+- Understand global service health
+</Accordion>
+
+<Accordion title="Regional Performance Analysis">
+```python
+# Analyze performance by region
+def analyze_regional_performance(checks):
+    regional_stats = {}
+    
+    for check in checks:
+        for location in check['locations']:
+            region = location['name']
+            if region not in regional_stats:
+                regional_stats[region] = {
+                    'total_checks': 0,
+                    'passing': 0,
+                    'failing': 0,
+                    'degraded': 0
+                }
+            
+            regional_stats[region]['total_checks'] += 1
+            regional_stats[region][location['status']] += 1
+    
+    # Calculate regional health scores
+    for region, stats in regional_stats.items():
+        health_score = stats['passing'] / stats['total_checks'] * 100
+        print(f"{region}: {health_score:.1f}% healthy ({stats['passing']}/{stats['total_checks']})")
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Real-Time Updates
+
+<AccordionGroup>
+
+<Accordion title="Polling Strategy">
+**Update Frequencies**:
+- Critical systems: Poll every 30 seconds
+- Standard monitoring: Poll every 2-5 minutes
+- Executive dashboards: Poll every 5-10 minutes
+
+**Efficient polling**:
+```javascript
+// Efficient status polling with change detection
+let lastUpdateHash = null;
+
+async function pollCheckStatuses() {
+  const response = await fetch('/api/v1/check-statuses', {
+    headers: {
+      'If-None-Match': lastUpdateHash,
+      'Authorization': 'Bearer token',
+      'X-Checkly-Account': 'account-id'
+    }
+  });
+  
+  if (response.status === 304) {
+    // No changes since last poll
+    return null;
+  }
+  
+  lastUpdateHash = response.headers.get('ETag');
+  return response.json();
+}
+```
+</Accordion>
+
+<Accordion title="Change Detection">
+Track specific changes in check status:
+
+```python
+# Track status changes over time
+previous_statuses = {}
+
+def detect_status_changes(current_checks):
+    changes = []
+    
+    for check in current_checks:
+        check_id = check['checkId']
+        current_status = check['status']
+        
+        if check_id in previous_statuses:
+            previous_status = previous_statuses[check_id]
+            if current_status != previous_status:
+                changes.append({
+                    'checkId': check_id,
+                    'checkName': check['checkName'],
+                    'previousStatus': previous_status,
+                    'currentStatus': current_status,
+                    'timestamp': check['lastExecution']['timestamp']
+                })
+        
+        previous_statuses[check_id] = current_status
+    
+    return changes
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Additional Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.checklyhq.com/v1/check-statuses?status=failing&limit=50" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+
+```javascript Node.js
+const params = new URLSearchParams({
+  checkType: 'api',
+  availabilityMin: '95',
+  sortBy: 'availability',
+  sortOrder: 'asc',
+  limit: '50'
+});
+
+const response = await fetch(`https://api.checklyhq.com/v1/check-statuses?${params}`, {
+  headers: {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+  }
+});
+
+const statusData = await response.json();
+const { data: checks, meta } = statusData;
+
+console.log(`System Health: ${meta.summary.averageAvailability}% availability`);
+console.log(`Active Issues: ${meta.summary.failing} failing, ${meta.summary.activeIncidents} incidents`);
+
+// Identify services needing attention
+const needsAttention = checks.filter(check => 
+  check.status !== 'passing' || 
+  check.performance.trend === 'degrading' ||
+  check.availability.percentage < 99
+);
+
+console.log(`Services needing attention: ${needsAttention.length}`);
+needsAttention.forEach(check => {
+  console.log(`- ${check.checkName}: ${check.status} (${check.availability.percentage}% available)`);
+});
+
+// Build health summary by check type
+const healthByType = checks.reduce((acc, check) => {
+  const type = check.checkType;
+  if (!acc[type]) {
+    acc[type] = { total: 0, passing: 0, failing: 0, degraded: 0 };
+  }
+  acc[type].total++;
+  acc[type][check.status]++;
+  return acc;
+}, {});
+
+Object.entries(healthByType).forEach(([type, stats]) => {
+  const healthPercent = (stats.passing / stats.total * 100).toFixed(1);
+  console.log(`${type.toUpperCase()}: ${healthPercent}% healthy (${stats.passing}/${stats.total})`);
+});
+```
+
+```python Python
+import requests
+import time
+from datetime import datetime
+
+class CheckStatusMonitor:
+    def __init__(self, api_key, account_id):
+        self.api_key = api_key
+        self.account_id = account_id
+        self.base_url = 'https://api.checklyhq.com/v1'
+        self.headers = {
+            'Authorization': f'Bearer {api_key}',
+            'X-Checkly-Account': account_id
+        }
+    
+    def get_check_statuses(self, **filters):
+        """Get check statuses with optional filters"""
+        params = {k: v for k, v in filters.items() if v is not None}
+        
+        response = requests.get(
+            f'{self.base_url}/check-statuses',
+            headers=self.headers,
+            params=params
+        )
+        response.raise_for_status()
+        return response.json()
+    
+    def get_health_summary(self):
+        """Get overall system health summary"""
+        data = self.get_check_statuses(includeSummary=True)
+        return data['meta']['summary']
+    
+    def find_failing_checks(self):
+        """Get all currently failing checks"""
+        data = self.get_check_statuses(status='failing', limit=100)
+        return data['data']
+    
+    def monitor_system_health(self, interval=300):
+        """Continuously monitor system health"""
+        print("Starting system health monitoring...")
+        
+        while True:
+            try:
+                summary = self.get_health_summary()
+                timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                
+                print(f"\n[{timestamp}] System Health Report:")
+                print(f"  Overall Availability: {summary['averageAvailability']}%")
+                print(f"  Checks: {summary['passing']} passing, {summary['failing']} failing, {summary['degraded']} degraded")
+                print(f"  Active Incidents: {summary['activeIncidents']}")
+                print(f"  Active Alerts: {summary['activeAlerts']}")
+                
+                # Alert on critical issues
+                if summary['failing'] > 0:
+                    failing_checks = self.find_failing_checks()
+                    print(f"\n  🚨 FAILING CHECKS:")
+                    for check in failing_checks[:5]:  # Show first 5
+                        print(f"    - {check['checkName']}: {check['lastExecution'].get('error', 'Unknown error')}")
+                
+                if summary['averageAvailability'] < 95:
+                    print(f"  ⚠️  LOW AVAILABILITY WARNING: {summary['averageAvailability']}%")
+                
+                time.sleep(interval)
+                
+            except KeyboardInterrupt:
+                print("\nMonitoring stopped.")
+                break
+            except Exception as e:
+                print(f"Error monitoring health: {e}")
+                time.sleep(60)  # Wait before retry
+
+# Usage
+monitor = CheckStatusMonitor('cu_1234567890abcdef', '550e8400-e29b-41d4-a716-446655440000')
+
+# Get current status
+summary = monitor.get_health_summary()
+print(f"Current system availability: {summary['averageAvailability']}%")
+
+# Find performance issues
+degraded_checks = monitor.get_check_statuses(
+    trend='degrading',
+    availabilityMax=98,
+    sortBy='availability',
+    sortOrder='asc'
+)
+
+if degraded_checks['data']:
+    print("\nChecks with degrading performance:")
+    for check in degraded_checks['data']:
+        print(f"  {check['checkName']}: {check['availability']['percentage']}% available")
+        print(f"    Average response time: {check['performance']['averageResponseTime']}ms")
+        print(f"    Trend: {check['performance']['trend']}")
+
+# Start continuous monitoring
+# monitor.monitor_system_health(interval=180)  # Every 3 minutes
+```
+
+</CodeGroup>
+
+<Note>
+Check statuses provide real-time health insights perfect for building monitoring dashboards, setting up alerting systems, and maintaining situational awareness of your service health.
+</Note>

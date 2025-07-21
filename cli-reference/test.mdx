@@ -1,62 +1,114 @@
 ---
-title: 'Test Command'
+title: checkly test
 description: 'Run checks in your project using the Checkly CLI.'
-sidebarTitle: 'Checkly Test'
-
-
+sidebarTitle: 'checkly test'
 ---
 
-## `npx checkly test`
+The `checkly test` command executes all checks in your project on the Checkly cloud infrastructure. This command provides a dry-run capability for testing your monitoring setup before deployment, with support for different environments and configurations.
 
-Executes all the checks in the scope of your project on the Checkly cloud infrastructure. You can specify files to run by appending a pattern, e.g. `npx checkly test home.spec.js api`.
-
-### Usage Examples
-
-Dry run all checks in your repo:
+## Usage
 
 ```bash
 npx checkly test
 ```
 
-Dry run checks that have `product` and `api` in the file name:
+Run all checks in your project as a dry run.
+
+## Extended Usage
 
 ```bash
 npx checkly test product api
 ```
-
-Record a test session in Checkly with git branch info, full logging, videos and traces:
-
-```bash
-npx checkly test --record
-```
-
-Dry run all checks against a specific location:
+Run only checks that contain `product` and `api` in their file names.
 
 ```bash
-npx checkly test --location eu-west-1
+npx checkly test --record --location eu-west-1
 ```
-
-Dry run checks while passing a specific URL and a password. These variables are available on `process.env`:
+Record a test session with full logging, videos, and traces in the EU West region.
 
 ```bash
-npx checkly test --env ENVIRONMENT_URL="https://preview.acme.com" --env PASSWORD=doremiabc123
+npx checkly test --env ENVIRONMENT_URL="https://staging.acme.com" --env PASSWORD=secret123
+```
+Run checks with specific environment variables for testing against staging environments.
+
+```bash
+npx checkly test --grep "homepage|checkout" --tags production,critical
+```
+Run checks matching regex patterns and containing specific tags.
+
+## Unique Options
+
+### `--list`
+Display all checks in your project without executing them.
+
+```bash
+npx checkly test --list
 ```
 
-This is very powerful when combined with passing environment variables using one of the flags `--env` or `--env-file` as you can target staging, test and preview environment with specific URLs, credentials and other common variables that differ between environments.
+Useful for verifying which checks would be included in a test run.
 
-### Flags
+### `--grep <pattern>` or `-g`
+Run only checks where the check name matches a JavaScript regular expression.
 
-- `--config` or `-c`: Specify a particular configuration file, e.g. `--config="./checkly.staging.config.ts"`
-- `--env <key=value>` or `-e`: Pass environment variables to the check execution runtime. Passed variables overwrite any existing variables stored in your Checkly account.
-- `--env-file`: Read variables from a `.env` file by passing the file path, e.g. `--env-file="./.env"`
-- `--grep <pattern>` or `-g`: Only run checks where the check name matches a regular expression.
-- `--list`: Just list the checks in your project, but don't run them.
-- `--location <location>` or `-l`: Run checks against a specified location, e.g. `eu-west-1`. Defaults to `us-east-1`.
-- `--private-location <private location ID>`: Run checks against the specified private location.
-- `--record`: Record tests results in Checkly as a test session.
-- `--reporter` or `-r`: One or more reporters for the test output. Options are: `list|dot|ci|github|json`. You can use multiple reporters by specifying the flag multiple times, e.g. `--reporter=list --reporter=json`.
-- `--tags` or `-t`: Filter the checks using a comma separated list of tags. Checks will only be run if they contain all the specified tags. Multiple `--tags` flags can be passed, in which case checks will be run if they match any of the `--tags` filters, i.e. `--tags production,webapp --tags staging,backend` will run checks with tags (production AND webapp) OR (staging AND backend).
-- `--retries`: How many times to retry a failing check run. 0 by default and maximum 3.
-- `--timeout`: A fallback timeout (in seconds) to wait for checks to complete. 600 seconds by default.
-- `--update-snapshots` or `-u`: Update the golden images / reference snapshots of your visual comparison and snapshot tests.
-- `--verbose` or `-v`: Always show the full logs of the checks. 
+```bash
+npx checkly test --grep "api.*test"
+npx checkly test -g "homepage|checkout"
+```
+
+### `--update-snapshots` or `-u`
+Update the golden images and reference snapshots for visual comparison and snapshot tests.
+
+```bash
+npx checkly test --update-snapshots
+```
+
+**Warning**: Only use this when you've verified that visual changes are intentional.
+
+### File Pattern Matching
+You can specify file patterns as arguments to run specific subsets of checks:
+
+```bash
+npx checkly test home.spec.js          # Run specific file
+npx checkly test api                   # Run files containing 'api'
+npx checkly test product checkout      # Run files containing 'product' OR 'checkout'
+```
+
+## Global Options
+
+This command supports the following [global options](/cli-reference/global-options):
+
+- [`--config`](/cli-reference/global-options#config-or-c) - Specify a configuration file
+- [`--env`](/cli-reference/global-options#env-keyvalue-or-e) - Pass environment variables
+- [`--env-file`](/cli-reference/global-options#env-file) - Load variables from file
+- [`--location`](/cli-reference/global-options#location-location-or-l) - Run checks in specific location
+- [`--private-location`](/cli-reference/global-options#private-location-private-location-id) - Use private location
+- [`--record`](/cli-reference/global-options#record) - Record test session
+- [`--reporter`](/cli-reference/global-options#reporter-or-r) - Specify output format
+- [`--tags`](/cli-reference/global-options#tags-or-t) - Filter by tags
+- [`--retries`](/cli-reference/global-options#retries) - Set retry attempts
+- [`--timeout`](/cli-reference/global-options#timeout) - Set execution timeout
+- [`--verbose`](/cli-reference/global-options#verbose-or-v) - Show detailed output
+
+## Environment Variable Targeting
+
+The `test` command is particularly powerful when combined with environment variables, allowing you to target different environments with specific configurations:
+
+### Staging Environment
+```bash
+npx checkly test \
+  --env ENVIRONMENT_URL="https://staging.acme.com" \
+  --env API_KEY="staging_key_123" \
+  --env DATABASE_URL="postgres://staging-db"
+```
+
+### Using Environment Files
+```bash
+# .env.staging
+ENVIRONMENT_URL=https://staging.acme.com
+API_KEY=staging_key_123
+DATABASE_URL=postgres://staging-db
+
+npx checkly test --env-file .env.staging
+```
+
+Variables passed via `--env` will override those from `--env-file` and any variables stored in your Checkly account. 

@@ -1,0 +1,52 @@
+<svg id="ai-diagram" width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Cursor Icon -->
+  <circle id="icon-cursor" cx="100" cy="300" r="40" fill="#ccc" />
+  <!-- Claude Icon -->
+  <circle id="icon-claude" cx="400" cy="100" r="40" fill="#ccc" />
+  <!-- Windsurf Icon -->
+  <circle id="icon-windsurf" cx="700" cy="300" r="40" fill="#ccc" />
+
+  <!-- Prompt Window -->
+  <rect id="prompt-window" x="300" y="250" width="200" height="100" rx="10" fill="#f5f5f5" stroke="#aaa" />
+
+  <!-- Prompt Text -->
+  <text id="prompt-text" x="400" y="305" font-size="16" text-anchor="middle" fill="#333">Prompt goes here</text>
+
+  <!-- Lines to Checkly Icon -->
+  <line id="line-cursor" x1="100" y1="300" x2="400" y2="300" stroke="#aaa" stroke-width="2"/>
+  <line id="line-claude" x1="400" y1="100" x2="400" y2="300" stroke="#aaa" stroke-width="2"/>
+  <line id="line-windsurf" x1="700" y1="300" x2="400" y2="300" stroke="#aaa" stroke-width="2"/>
+
+  <!-- Checkly Icon -->
+  <circle id="icon-checkly" cx="400" cy="500" r="30" fill="#00b894" />
+</svg>
+
+<script>
+  const icons = ["cursor", "claude", "windsurf"];
+  const prompts = {
+    cursor: "Run browser checks with Playwright",
+    claude: "Generate test cases from documentation",
+    windsurf: "Debug flaky tests in production",
+  };
+
+  let current = 0;
+
+  function highlight(index) {
+    icons.forEach((name, i) => {
+      const icon = document.getElementById(`icon-${name}`);
+      const line = document.getElementById(`line-${name}`);
+      icon.setAttribute("fill", i === index ? "#ffd700" : "#ccc");
+      line.setAttribute("stroke", i === index ? "#ffd700" : "#aaa");
+    });
+
+    const prompt = document.getElementById("prompt-text");
+    prompt.textContent = prompts[icons[index]];
+  }
+
+  setInterval(() => {
+    highlight(current);
+    current = (current + 1) % icons.length;
+  }, 5000);
+
+  highlight(0);
+</script>

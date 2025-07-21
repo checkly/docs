@@ -1,0 +1,470 @@
+---
+title: 'List Check Alerts'
+openapi: 'GET /v1/check-alerts'
+description: 'Retrieve all alerts triggered by checks in your account'
+---
+
+## Overview
+
+This endpoint returns all alerts that have been triggered by checks in your account. Check alerts are generated when checks fail, recover, or meet specific conditions defined in your alert configurations.
+
+## Response Example
+
+```json
+{
+  "data": [
+    {
+      "id": "alert_789123456",
+      "checkId": "check_api_health",
+      "checkName": "Production API Health Check",
+      "checkType": "api",
+      "alertType": "check_failure",
+      "severity": "high",
+      "status": "triggered",
+      "message": "Check failed: HTTP 500 Internal Server Error",
+      "triggeredAt": "2024-01-25T14:30:00.000Z",
+      "resolvedAt": null,
+      "duration": null,
+      "location": {
+        "id": "us-east-1",
+        "name": "N. Virginia, USA"
+      },
+      "checkResult": {
+        "id": "result_123456789",
+        "responseTime": 5240,
+        "statusCode": 500,
+        "error": "Internal Server Error",
+        "url": "https://api.production.com/health"
+      },
+      "alertChannel": {
+        "id": "channel_email_prod",
+        "name": "Production Team Email",
+        "type": "email"
+      },
+      "escalationLevel": 1,
+      "acknowledgedBy": null,
+      "acknowledgedAt": null,
+      "tags": ["api", "production", "critical"]
+    },
+    {
+      "id": "alert_987654321",
+      "checkId": "check_website_home",
+      "checkName": "Homepage Browser Check",
+      "checkType": "browser",
+      "alertType": "check_recovery",
+      "severity": "medium",
+      "status": "resolved",
+      "message": "Check recovered: Page load successful",
+      "triggeredAt": "2024-01-25T13:15:00.000Z",
+      "resolvedAt": "2024-01-25T13:17:30.000Z",
+      "duration": 150000,
+      "location": {
+        "id": "eu-west-1",
+        "name": "Ireland, Europe"
+      },
+      "checkResult": {
+        "id": "result_987654321",
+        "responseTime": 1850,
+        "statusCode": 200,
+        "pageLoadTime": 2.3,
+        "url": "https://www.example.com"
+      },
+      "alertChannel": {
+        "id": "channel_slack_dev",
+        "name": "Development Team Slack",
+        "type": "slack"
+      },
+      "escalationLevel": 0,
+      "acknowledgedBy": {
+        "id": "user_123",
+        "name": "John Developer",
+        "email": "john@example.com"
+      },
+      "acknowledgedAt": "2024-01-25T13:16:00.000Z",
+      "tags": ["frontend", "homepage"]
+    }
+  ],
+  "meta": {
+    "currentPage": 1,
+    "totalPages": 15,
+    "totalItems": 147,
+    "limit": 10,
+    "hasMore": true
+  }
+}
+```
+
+## Common Use Cases
+
+<CardGroup cols={2}>
+
+<Card title="Incident Response" icon="exclamation-triangle">
+Monitor and respond to active incidents in real-time
+```bash
+GET /v1/check-alerts?status=triggered&severity=high
+```
+</Card>
+
+<Card title="SLA Monitoring" icon="shield-check">
+Track service level agreement compliance and uptime
+```bash
+GET /v1/check-alerts?period=30d&status=resolved
+```
+</Card>
+
+<Card title="Performance Analysis" icon="chart-line">
+Analyze system performance trends and degradation patterns
+```bash
+GET /v1/check-alerts?alertType=performance_degradation
+```
+</Card>
+
+<Card title="Alert Management" icon="bell">
+Manage alert lifecycle and team coordination
+```bash
+GET /v1/check-alerts?acknowledgedBy=null&severity=critical
+```
+</Card>
+
+</CardGroup>
+
+## Query Parameters
+
+<AccordionGroup>
+
+<Accordion title="Filtering Options">
+- `checkId` (string): Filter alerts for a specific check
+- `checkType` (string): Filter by check type (api, browser, heartbeat, tcp, multistep)
+- `alertType` (string): Filter by alert type (check_failure, check_recovery, performance_degradation)
+- `severity` (string): Filter by severity level (low, medium, high, critical)
+- `status` (string): Filter by alert status (triggered, acknowledged, resolved)
+- `location` (string): Filter by monitoring location
+
+**Example:**
+```
+?checkType=api&severity=high&status=triggered&limit=20
+```
+</Accordion>
+
+<Accordion title="Time Range Filters">
+- `from` (string): Start date for alerts (ISO 8601 format)
+- `to` (string): End date for alerts (ISO 8601 format)
+- `period` (string): Predefined time period (24h, 7d, 30d)
+
+**Example:**
+```
+?from=2024-01-01T00:00:00Z&to=2024-01-31T23:59:59Z
+```
+</Accordion>
+
+<Accordion title="Pagination">
+- `page` (integer): Page number (default: 1)
+- `limit` (integer): Number of alerts per page (default: 10, max: 100)
+- `sortBy` (string): Sort field (triggeredAt, severity, duration)
+- `sortOrder` (string): Sort order (asc, desc, default: desc)
+
+**Default:** Returns first 10 alerts sorted by most recent
+</Accordion>
+
+</AccordionGroup>
+
+## Alert Types
+
+<CardGroup cols={2}>
+
+<Card title="Check Failure" icon="exclamation-triangle">
+**Triggered when:**
+- HTTP status codes indicate failure (4xx, 5xx)
+- Network timeouts or connection errors
+- Browser check script failures
+- Assertion failures in API checks
+
+**Common scenarios:**
+- API endpoints returning 500 errors
+- Website pages failing to load
+- Database connection timeouts
+</Card>
+
+<Card title="Check Recovery" icon="check-circle">
+**Triggered when:**
+- Previously failing check returns to success
+- Performance returns to acceptable levels
+- Services come back online
+
+**Indicates:**
+- System has self-recovered
+- Manual intervention was successful
+- Temporary issues have resolved
+</Card>
+
+<Card title="Performance Degradation" icon="chart-line-down">
+**Triggered when:**
+- Response times exceed thresholds
+- Success rates drop below limits
+- Core Web Vitals degrade
+
+**Examples:**
+- API response time > 2 seconds
+- Page load time > 5 seconds
+- Success rate < 95%
+</Card>
+
+<Card title="Heartbeat Missing" icon="heartbeat">
+**Triggered when:**
+- Expected heartbeat signals not received
+- Service health checks fail
+- Cron jobs or scheduled tasks miss
+
+**Indicates:**
+- Service may be down
+- Scheduled process failed
+- Network connectivity issues
+</Card>
+
+</CardGroup>
+
+## Alert Severity Levels
+
+<AccordionGroup>
+
+<Accordion title="Critical Alerts">
+**Characteristics:**
+- Immediate attention required
+- Service completely unavailable
+- Business-critical functionality affected
+- Customer-facing impact
+
+**Examples:**
+- Payment processing API down
+- Login system failure
+- Complete website outage
+- Database connectivity lost
+</Accordion>
+
+<Accordion title="High Severity">
+**Characteristics:**
+- Significant service degradation
+- Major functionality impacted
+- Customer experience affected
+- SLA potentially breached
+
+**Examples:**
+- Search functionality slow
+- File upload failures
+- Partial API outages
+- Major performance degradation
+</Accordion>
+
+<Accordion title="Medium Severity">
+**Characteristics:**
+- Minor service degradation
+- Non-critical features affected
+- Backup systems available
+- Limited customer impact
+
+**Examples:**
+- Slow loading times
+- Non-essential API errors
+- Secondary feature failures
+- Performance warnings
+</Accordion>
+
+<Accordion title="Low Severity">
+**Characteristics:**
+- Minimal impact
+- Information or warnings
+- Proactive notifications
+- Future potential issues
+
+**Examples:**
+- SSL certificate expiring soon
+- Cache hit rate declining
+- Non-critical service restarts
+- Performance trending concerns
+</Accordion>
+
+</AccordionGroup>
+
+## Use Cases
+
+<AccordionGroup>
+
+<Accordion title="Incident Response">
+Monitor and respond to active incidents:
+- Get real-time alerts for failing checks
+- Track alert resolution times
+- Identify patterns in alert frequency
+- Coordinate team response efforts
+</Accordion>
+
+<Accordion title="SLA Monitoring">
+Track service level agreement compliance:
+- Monitor uptime and availability alerts
+- Calculate MTTR (Mean Time To Recovery)
+- Generate SLA compliance reports
+- Identify SLA breach patterns
+</Accordion>
+
+<Accordion title="Performance Analysis">
+Analyze system performance trends:
+- Track performance degradation alerts
+- Identify recurring performance issues
+- Monitor seasonal performance patterns
+- Optimize based on alert frequency
+</Accordion>
+
+<Accordion title="Alert Management">
+Manage alert lifecycle and team coordination:
+- Acknowledge alerts to prevent duplicates
+- Track who is handling incidents
+- Monitor alert resolution times
+- Optimize alert configurations
+</Accordion>
+
+</AccordionGroup>
+
+## Additional Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.checklyhq.com/v1/check-alerts?status=triggered&severity=high&limit=20" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+
+```javascript Node.js
+const params = new URLSearchParams({
+  checkType: 'api',
+  status: 'triggered',
+  severity: 'high',
+  limit: '50',
+  sortBy: 'triggeredAt',
+  sortOrder: 'desc'
+});
+
+const response = await fetch(`https://api.checklyhq.com/v1/check-alerts?${params}`, {
+  headers: {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+  }
+});
+
+const alerts = await response.json();
+
+console.log(`Found ${alerts.meta.totalItems} alerts`);
+
+// Process active alerts
+const activeAlerts = alerts.data.filter(alert => alert.status === 'triggered');
+console.log(`${activeAlerts.length} active alerts requiring attention`);
+
+// Group alerts by check type
+const alertsByType = alerts.data.reduce((acc, alert) => {
+  acc[alert.checkType] = (acc[alert.checkType] || 0) + 1;
+  return acc;
+}, {});
+
+console.log('Alerts by check type:', alertsByType);
+
+// Find long-running alerts (>30 minutes)
+const longRunningAlerts = alerts.data.filter(alert => {
+  if (alert.status !== 'triggered') return false;
+  const now = new Date();
+  const triggeredAt = new Date(alert.triggeredAt);
+  const durationMinutes = (now - triggeredAt) / (1000 * 60);
+  return durationMinutes > 30;
+});
+
+if (longRunningAlerts.length > 0) {
+  console.log(`⚠️ ${longRunningAlerts.length} alerts have been active for >30 minutes`);
+  longRunningAlerts.forEach(alert => {
+    console.log(`- ${alert.checkName}: ${alert.message}`);
+  });
+}
+```
+
+```python Python
+import requests
+from datetime import datetime, timedelta
+
+headers = {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+}
+
+# Get all triggered alerts from the last 24 hours
+now = datetime.utcnow()
+yesterday = now - timedelta(days=1)
+
+params = {
+    'status': 'triggered',
+    'from': yesterday.isoformat() + 'Z',
+    'to': now.isoformat() + 'Z',
+    'limit': 100
+}
+
+response = requests.get(
+    'https://api.checklyhq.com/v1/check-alerts',
+    headers=headers,
+    params=params
+)
+
+if response.status_code == 200:
+    alerts_data = response.json()
+    alerts = alerts_data['data']
+    
+    print(f"Found {len(alerts)} triggered alerts in the last 24 hours")
+    
+    # Analyze alerts by severity
+    severity_counts = {}
+    for alert in alerts:
+        severity = alert['severity']
+        severity_counts[severity] = severity_counts.get(severity, 0) + 1
+    
+    print(f"Alert breakdown by severity:")
+    for severity, count in sorted(severity_counts.items()):
+        print(f"  {severity.capitalize()}: {count}")
+    
+    # Find unacknowledged critical alerts
+    critical_unack = [
+        alert for alert in alerts 
+        if alert['severity'] == 'critical' and alert['acknowledgedAt'] is None
+    ]
+    
+    if critical_unack:
+        print(f"\n🚨 {len(critical_unack)} CRITICAL unacknowledged alerts:")
+        for alert in critical_unack:
+            print(f"  - {alert['checkName']}: {alert['message']}")
+            print(f"    Triggered: {alert['triggeredAt']}")
+            print(f"    Location: {alert['location']['name']}")
+    
+    # Calculate average resolution time for resolved alerts
+    resolved_alerts = [alert for alert in alerts if alert['status'] == 'resolved']
+    if resolved_alerts:
+        total_resolution_time = sum(alert['duration'] for alert in resolved_alerts if alert['duration'])
+        avg_resolution_time = total_resolution_time / len(resolved_alerts) / 1000 / 60  # Convert to minutes
+        print(f"\nAverage resolution time: {avg_resolution_time:.1f} minutes")
+    
+    # Identify checks with multiple alerts (potential issues)
+    check_alert_counts = {}
+    for alert in alerts:
+        check_id = alert['checkId']
+        check_alert_counts[check_id] = check_alert_counts.get(check_id, 0) + 1
+    
+    problematic_checks = {k: v for k, v in check_alert_counts.items() if v > 3}
+    if problematic_checks:
+        print(f"\nChecks with >3 alerts (may need attention):")
+        for check_id, count in problematic_checks.items():
+            # Find the check name from the alerts
+            check_name = next(alert['checkName'] for alert in alerts if alert['checkId'] == check_id)
+            print(f"  {check_name}: {count} alerts")
+
+else:
+    print(f"Error: {response.status_code} - {response.text}")
+```
+
+</CodeGroup>
+
+<Note>
+Check alerts provide real-time visibility into the health and performance of your monitored services. Use this endpoint to build incident response dashboards and automated alert management systems.
+</Note>

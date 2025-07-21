@@ -1,0 +1,646 @@
+---
+title: 'Get Check Result'
+openapi: 'GET /v1/check-results/{checkId}/{checkResultId}'
+description: 'Retrieve detailed information about a specific check execution result'
+---
+
+## Overview
+
+This endpoint returns comprehensive details about a single check execution result. This is useful for debugging specific failures, analyzing detailed performance metrics, or examining the exact request/response data for a particular check run.
+
+## Response Example
+
+```json
+{
+  "id": "result_789123456",
+  "checkId": "check_api_health",
+  "checkName": "Production API Health Check",
+  "checkType": "api",
+  "runId": "run_456789123",
+  "status": "failed",
+  "startedAt": "2024-01-25T14:30:00.000Z",
+  "finishedAt": "2024-01-25T14:30:05.240Z",
+  "duration": 5240,
+  "location": {
+    "id": "us-east-1",
+    "name": "N. Virginia, USA",
+    "region": "us-east-1",
+    "provider": "AWS",
+    "coordinates": {
+      "latitude": 39.0458,
+      "longitude": -77.5081
+    }
+  },
+  "environment": {
+    "runtimeVersion": "16.x",
+    "browserVersion": null,
+    "userAgent": "Checkly/1.0 Node.js/16.14.0"
+  },
+  "request": {
+    "method": "GET",
+    "url": "https://api.production.com/health",
+    "headers": {
+      "User-Agent": "Checkly/1.0 Node.js/16.14.0",
+      "Accept": "application/json",
+      "X-Request-ID": "req_789123456"
+    },
+    "body": null,
+    "bodySize": 0
+  },
+  "response": {
+    "statusCode": 500,
+    "statusText": "Internal Server Error",
+    "headers": {
+      "content-type": "application/json; charset=utf-8",
+      "content-length": "67",
+      "server": "nginx/1.18.0",
+      "date": "Thu, 25 Jan 2024 14:30:05 GMT",
+      "connection": "keep-alive",
+      "x-response-time": "4832ms"
+    },
+    "body": "{\"error\": \"Database connection failed\", \"code\": \"DB_CONNECTION_ERROR\"}",
+    "bodySize": 67,
+    "responseTime": 4832,
+    "redirectCount": 0,
+    "redirects": []
+  },
+  "error": {
+    "name": "AssertionError",
+    "message": "Expected status code 200 but got 500",
+    "stack": "AssertionError: Expected status code 200 but got 500\n    at checkAssertion (file:///tmp/check.js:45:12)\n    at runCheck (file:///tmp/check.js:120:8)",
+    "type": "assertion_error",
+    "code": "ASSERTION_FAILED"
+  },
+  "assertions": [
+    {
+      "id": "assertion_1",
+      "source": "STATUS_CODE",
+      "property": "",
+      "comparison": "EQUALS",
+      "target": "200",
+      "actual": "500",
+      "passed": false,
+      "message": "Expected status code to equal 200, but got 500"
+    },
+    {
+      "id": "assertion_2",
+      "source": "RESPONSE_TIME",
+      "property": "",
+      "comparison": "LESS_THAN",
+      "target": "2000",
+      "actual": "4832",
+      "passed": false,
+      "message": "Expected response time to be less than 2000ms, but got 4832ms"
+    },
+    {
+      "id": "assertion_3",
+      "source": "JSON_BODY",
+      "property": "$.status",
+      "comparison": "EQUALS",
+      "target": "healthy",
+      "actual": null,
+      "passed": false,
+      "message": "Property $.status not found in response body"
+    }
+  ],
+  "timing": {
+    "dns": 18,
+    "tcp": 34,
+    "tls": 67,
+    "firstByte": 4689,
+    "download": 24,
+    "total": 4832,
+    "phases": {
+      "blocked": 0,
+      "connecting": 119,
+      "sending": 0,
+      "waiting": 4689,
+      "receiving": 24
+    }
+  },
+  "network": {
+    "ip": "54.239.28.85",
+    "port": 443,
+    "protocol": "HTTP/1.1",
+    "remoteAddress": "54.239.28.85:443"
+  },
+  "certificate": {
+    "subject": "CN=api.production.com",
+    "issuer": "CN=Amazon RSA 2048 M01, O=Amazon, C=US",
+    "validFrom": "2023-11-01T00:00:00.000Z",
+    "validTo": "2024-11-30T23:59:59.000Z",
+    "serialNumber": "0a1b2c3d4e5f6789",
+    "fingerprint": "sha256:1a2b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890"
+  },
+  "tags": ["api", "production", "health"],
+  "triggeredBy": "schedule",
+  "triggeredAt": "2024-01-25T14:30:00.000Z",
+  "metadata": {
+    "checkVersion": "1.2.3",
+    "accountId": "550e8400-e29b-41d4-a716-446655440000",
+    "groupId": "group_production_apis",
+    "environmentVariables": {
+      "API_BASE_URL": "https://api.production.com",
+      "TIMEOUT_MS": "5000"
+    }
+  },
+  "performance": {
+    "resourcesLoaded": 1,
+    "transferSize": 67,
+    "resourceSize": 67,
+    "compressionRatio": 1.0
+  }
+}
+```
+
+## Common Use Cases
+
+<CardGroup cols={2}>
+
+<Card title="Debugging Failed Checks" icon="bug">
+Investigate specific check failures with detailed error analysis
+```bash
+GET /v1/check-results/{checkId}/{resultId}
+```
+</Card>
+
+<Card title="Performance Analysis" icon="chart-line">
+Analyze performance bottlenecks and timing breakdowns
+```bash
+GET /v1/check-results/{checkId}/{resultId}
+```
+</Card>
+
+<Card title="Security Analysis" icon="shield">
+Examine SSL certificates and security headers
+```bash
+GET /v1/check-results/{checkId}/{resultId}
+```
+</Card>
+
+<Card title="Compliance Reporting" icon="clipboard-check">
+Generate detailed audit trails and compliance documentation
+```bash
+GET /v1/check-results/{checkId}/{resultId}
+```
+</Card>
+
+</CardGroup>
+
+## Detailed Information Sections
+
+<AccordionGroup>
+
+<Accordion title="Execution Context">
+**Environment Information:**
+- Runtime version (Node.js, browser version)
+- User agent string used for requests
+- Geographic location where check executed
+- Network provider information
+
+**Timing Details:**
+- Precise start and finish timestamps
+- Total execution duration
+- Detailed timing breakdown by phase
+- Network protocol information
+
+**Metadata:**
+- Check configuration version
+- Account and group associations
+- Environment variables used
+- Trigger source (schedule, API, manual)
+</Accordion>
+
+<Accordion title="Request/Response Details">
+**Complete Request Information:**
+- HTTP method and full URL
+- All request headers sent
+- Request body content and size
+- Request ID for tracing
+
+**Complete Response Information:**
+- Status code and status text
+- All response headers received
+- Response body content and size
+- Redirect information if applicable
+- Compression details
+
+**Network-Level Details:**
+- Resolved IP address and port
+- Protocol version used
+- SSL/TLS certificate information
+- Connection reuse information
+</Accordion>
+
+<Accordion title="Performance Metrics">
+**Timing Breakdown:**
+- DNS resolution time
+- TCP connection establishment
+- TLS handshake duration
+- Time to first byte
+- Content download time
+
+**Network Performance:**
+- Total transfer size
+- Compression ratios
+- Resource loading metrics
+- Connection efficiency
+
+**Bottleneck Identification:**
+Use timing data to identify where delays occur in the request lifecycle.
+</Accordion>
+
+<Accordion title="Error Analysis">
+**Error Information:**
+- Error type and classification
+- Detailed error messages
+- Stack traces for debugging
+- Error codes for categorization
+
+**Assertion Details:**
+- Each assertion that was evaluated
+- Expected vs actual values
+- Specific failure reasons
+- Assertion source (status code, headers, body)
+
+**Debug Context:**
+- Environment variables used
+- Check configuration applied
+- Runtime environment details
+</Accordion>
+
+</AccordionGroup>
+
+## Use Cases
+
+<AccordionGroup>
+
+<Accordion title="Debugging Failed Checks">
+Investigate specific check failures in detail:
+- Examine exact error messages and stack traces
+- Review all assertion failures
+- Analyze request/response headers
+- Check timing for timeout issues
+
+```javascript
+// Example: Debug a failed check result
+if (result.status === 'failed') {
+  console.log(`Failed check: ${result.checkName}`);
+  console.log(`Error: ${result.error.message}`);
+  
+  // Analyze failed assertions
+  const failedAssertions = result.assertions.filter(a => !a.passed);
+  failedAssertions.forEach(assertion => {
+    console.log(`Failed assertion: ${assertion.message}`);
+    console.log(`Expected: ${assertion.target}, Got: ${assertion.actual}`);
+  });
+  
+  // Check for timing issues
+  if (result.timing.total > 5000) {
+    console.log(`Slow response detected: ${result.timing.total}ms`);
+    console.log(`Time to first byte: ${result.timing.firstByte}ms`);
+  }
+}
+```
+</Accordion>
+
+<Accordion title="Performance Analysis">
+Analyze performance bottlenecks:
+- Identify slow network components
+- Examine server processing times
+- Analyze compression effectiveness
+- Review certificate validation times
+
+```python
+# Example: Analyze performance bottlenecks
+timing = result['timing']
+total_time = timing['total']
+
+print(f"Performance Analysis for {result['checkName']}:")
+print(f"Total time: {total_time}ms")
+
+# Calculate percentage breakdown
+dns_pct = (timing['dns'] / total_time) * 100
+tcp_pct = (timing['tcp'] / total_time) * 100
+tls_pct = (timing['tls'] / total_time) * 100
+server_pct = (timing['firstByte'] / total_time) * 100
+download_pct = (timing['download'] / total_time) * 100
+
+print(f"DNS resolution: {timing['dns']}ms ({dns_pct:.1f}%)")
+print(f"TCP connection: {timing['tcp']}ms ({tcp_pct:.1f}%)")
+print(f"TLS handshake: {timing['tls']}ms ({tls_pct:.1f}%)")
+print(f"Server processing: {timing['firstByte']}ms ({server_pct:.1f}%)")
+print(f"Download: {timing['download']}ms ({download_pct:.1f}%)")
+
+# Identify the slowest component
+phases = {
+    'DNS': timing['dns'],
+    'TCP': timing['tcp'], 
+    'TLS': timing['tls'],
+    'Server': timing['firstByte'],
+    'Download': timing['download']
+}
+slowest = max(phases, key=phases.get)
+print(f"Slowest component: {slowest} ({phases[slowest]}ms)")
+```
+</Accordion>
+
+<Accordion title="Security Analysis">
+Examine security-related information:
+- SSL/TLS certificate details
+- Security headers analysis
+- Protocol version verification
+- Certificate validity checking
+
+```bash
+# Example: Extract security information
+curl -X GET "https://api.checklyhq.com/v1/check-results/check_api_health/result_789123456" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000" \
+  | jq '.certificate, .network.protocol, .response.headers'
+```
+</Accordion>
+
+<Accordion title="Compliance Reporting">
+Generate detailed compliance documentation:
+- Document exact response times
+- Record security configurations
+- Track assertion compliance
+- Generate audit trails
+
+```javascript
+// Example: Generate compliance report
+const complianceReport = {
+  checkName: result.checkName,
+  executionTime: result.startedAt,
+  location: result.location.name,
+  duration: result.duration,
+  status: result.status,
+  sslValid: new Date(result.certificate.validTo) > new Date(),
+  responseTime: result.response.responseTime,
+  statusCode: result.response.statusCode,
+  assertionsPassed: result.assertions.every(a => a.passed),
+  securityHeaders: {
+    hasHSTS: 'strict-transport-security' in result.response.headers,
+    hasCSP: 'content-security-policy' in result.response.headers,
+    hasXFrame: 'x-frame-options' in result.response.headers
+  }
+};
+
+console.log('Compliance Report:', JSON.stringify(complianceReport, null, 2));
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Additional Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.checklyhq.com/v1/check-results/check_api_health/result_789123456" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+
+```javascript Node.js
+const checkId = 'check_api_health';
+const resultId = 'result_789123456';
+
+const response = await fetch(`https://api.checklyhq.com/v1/check-results/${checkId}/${resultId}`, {
+  headers: {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+  }
+});
+
+const result = await response.json();
+
+console.log(`Check: ${result.checkName}`);
+console.log(`Status: ${result.status}`);
+console.log(`Duration: ${result.duration}ms`);
+console.log(`Location: ${result.location.name}`);
+
+// Detailed timing analysis
+const timing = result.timing;
+console.log('\nTiming Breakdown:');
+console.log(`  DNS: ${timing.dns}ms`);
+console.log(`  TCP: ${timing.tcp}ms`);
+console.log(`  TLS: ${timing.tls}ms`);
+console.log(`  First Byte: ${timing.firstByte}ms`);
+console.log(`  Download: ${timing.download}ms`);
+console.log(`  Total: ${timing.total}ms`);
+
+// Network information
+console.log(`\nNetwork Details:`);
+console.log(`  IP: ${result.network.ip}`);
+console.log(`  Protocol: ${result.network.protocol}`);
+console.log(`  Port: ${result.network.port}`);
+
+// SSL Certificate info (if available)
+if (result.certificate) {
+  console.log(`\nSSL Certificate:`);
+  console.log(`  Subject: ${result.certificate.subject}`);
+  console.log(`  Issuer: ${result.certificate.issuer}`);
+  console.log(`  Valid until: ${result.certificate.validTo}`);
+  
+  // Check if certificate is expiring soon (30 days)
+  const expiryDate = new Date(result.certificate.validTo);
+  const thirtyDaysFromNow = new Date();
+  thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+  
+  if (expiryDate < thirtyDaysFromNow) {
+    console.log(`  ⚠️ Certificate expires in less than 30 days!`);
+  }
+}
+
+// Response analysis
+console.log(`\nResponse Details:`);
+console.log(`  Status: ${result.response.statusCode} ${result.response.statusText}`);
+console.log(`  Size: ${result.response.bodySize} bytes`);
+console.log(`  Response Time: ${result.response.responseTime}ms`);
+
+// Headers analysis
+const headers = result.response.headers;
+const securityHeaders = {
+  'strict-transport-security': 'HSTS',
+  'content-security-policy': 'CSP',
+  'x-frame-options': 'X-Frame-Options',
+  'x-content-type-options': 'X-Content-Type-Options',
+  'referrer-policy': 'Referrer Policy'
+};
+
+console.log(`\nSecurity Headers:`);
+Object.entries(securityHeaders).forEach(([header, name]) => {
+  const present = header.toLowerCase() in Object.fromEntries(
+    Object.keys(headers).map(k => [k.toLowerCase(), headers[k]])
+  );
+  console.log(`  ${name}: ${present ? '✅' : '❌'}`);
+});
+
+// Assertion analysis
+if (result.assertions && result.assertions.length > 0) {
+  console.log(`\nAssertions (${result.assertions.length}):`);
+  result.assertions.forEach((assertion, index) => {
+    const status = assertion.passed ? '✅' : '❌';
+    console.log(`  ${index + 1}. ${status} ${assertion.message}`);
+    if (!assertion.passed) {
+      console.log(`     Expected: ${assertion.target}, Got: ${assertion.actual}`);
+    }
+  });
+}
+
+// Error details (if failed)
+if (result.status === 'failed' && result.error) {
+  console.log(`\nError Details:`);
+  console.log(`  Type: ${result.error.type || result.error.name}`);
+  console.log(`  Message: ${result.error.message}`);
+  if (result.error.code) {
+    console.log(`  Code: ${result.error.code}`);
+  }
+  
+  // Stack trace (first few lines)
+  if (result.error.stack) {
+    const stackLines = result.error.stack.split('\n').slice(0, 3);
+    console.log(`  Stack trace:`);
+    stackLines.forEach(line => console.log(`    ${line}`));
+  }
+}
+```
+
+```python Python
+import requests
+from datetime import datetime, timedelta
+
+check_id = 'check_api_health'
+result_id = 'result_789123456'
+
+headers = {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+}
+
+response = requests.get(
+    f'https://api.checklyhq.com/v1/check-results/{check_id}/{result_id}',
+    headers=headers
+)
+
+if response.status_code == 200:
+    result = response.json()
+    
+    print(f"Check Result Analysis")
+    print(f"=" * 50)
+    print(f"Check: {result['checkName']}")
+    print(f"Status: {result['status'].upper()}")
+    print(f"Executed: {result['startedAt']}")
+    print(f"Location: {result['location']['name']}")
+    print(f"Duration: {result['duration']}ms")
+    
+    # Performance analysis
+    timing = result['timing']
+    response_time = result['response']['responseTime']
+    
+    print(f"\nPerformance Breakdown:")
+    print(f"  Network Setup: {timing['dns'] + timing['tcp'] + timing['tls']}ms")
+    print(f"    - DNS Resolution: {timing['dns']}ms")
+    print(f"    - TCP Connection: {timing['tcp']}ms")
+    print(f"    - TLS Handshake: {timing['tls']}ms")
+    print(f"  Server Processing: {timing['firstByte'] - timing['dns'] - timing['tcp'] - timing['tls']}ms")
+    print(f"  Content Download: {timing['download']}ms")
+    print(f"  Total Response Time: {response_time}ms")
+    
+    # Response analysis
+    response_data = result['response']
+    print(f"\nResponse Analysis:")
+    print(f"  Status Code: {response_data['statusCode']} {response_data['statusText']}")
+    print(f"  Body Size: {response_data['bodySize']} bytes")
+    print(f"  Redirects: {response_data.get('redirectCount', 0)}")
+    
+    # Security analysis
+    if 'certificate' in result:
+        cert = result['certificate']
+        valid_to = datetime.fromisoformat(cert['validTo'].replace('Z', '+00:00'))
+        days_until_expiry = (valid_to - datetime.now()).days
+        
+        print(f"\nSSL Certificate:")
+        print(f"  Subject: {cert['subject']}")
+        print(f"  Issuer: {cert['issuer']}")
+        print(f"  Valid until: {cert['validTo']}")
+        print(f"  Days until expiry: {days_until_expiry}")
+        
+        if days_until_expiry < 30:
+            print(f"  ⚠️ Certificate expires in {days_until_expiry} days!")
+    
+    # Security headers check
+    headers_received = result['response']['headers']
+    security_headers = {
+        'strict-transport-security': 'HSTS',
+        'content-security-policy': 'Content Security Policy',
+        'x-frame-options': 'X-Frame-Options',
+        'x-content-type-options': 'X-Content-Type-Options'
+    }
+    
+    print(f"\nSecurity Headers:")
+    for header, description in security_headers.items():
+        present = any(h.lower() == header for h in headers_received.keys())
+        status = "✅" if present else "❌"
+        print(f"  {status} {description}")
+    
+    # Assertion analysis
+    if 'assertions' in result and result['assertions']:
+        passed_assertions = sum(1 for a in result['assertions'] if a['passed'])
+        total_assertions = len(result['assertions'])
+        
+        print(f"\nAssertions: {passed_assertions}/{total_assertions} passed")
+        
+        failed_assertions = [a for a in result['assertions'] if not a['passed']]
+        if failed_assertions:
+            print(f"Failed assertions:")
+            for assertion in failed_assertions:
+                print(f"  ❌ {assertion['message']}")
+                print(f"     Expected: {assertion['target']}")
+                print(f"     Actual: {assertion['actual']}")
+    
+    # Error analysis
+    if result['status'] == 'failed' and 'error' in result:
+        error = result['error']
+        print(f"\nError Analysis:")
+        print(f"  Type: {error.get('type', error.get('name', 'Unknown'))}")
+        print(f"  Message: {error['message']}")
+        
+        if 'code' in error:
+            print(f"  Error Code: {error['code']}")
+        
+        # Categorize error type
+        error_msg = error['message'].lower()
+        if 'timeout' in error_msg:
+            print(f"  Category: Timeout Error")
+        elif 'connection' in error_msg:
+            print(f"  Category: Connection Error")
+        elif 'assertion' in error_msg:
+            print(f"  Category: Assertion Failure")
+        elif any(code in str(response_data.get('statusCode', '')) for code in ['4', '5']):
+            print(f"  Category: HTTP Error Response")
+    
+    # Generate summary
+    print(f"\nSummary:")
+    if result['status'] == 'success':
+        print(f"✅ Check executed successfully")
+        if response_time > 2000:
+            print(f"⚠️ Response time is slower than 2 seconds")
+    else:
+        print(f"❌ Check failed - requires investigation")
+        
+    print(f"Response time: {response_time}ms")
+    print(f"Location: {result['location']['name']}")
+    print(f"Triggered by: {result['triggeredBy']}")
+
+else:
+    print(f"Error retrieving result: {response.status_code} - {response.text}")
+```
+
+</CodeGroup>
+
+<Note>
+Individual check results provide the most detailed information available about check executions, including complete request/response data, timing breakdowns, and error details for comprehensive debugging and analysis.
+</Note>

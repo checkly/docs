@@ -1,0 +1,362 @@
+---
+title: 'Create Maintenance Window'
+openapi: 'POST /v1/maintenance-windows'
+description: 'Create a new maintenance window to suppress alerts during planned downtime'
+---
+
+## Overview
+
+Create a maintenance window to suppress alerts during planned maintenance periods. Maintenance windows can be one-time events or recurring schedules, and can target specific checks or entire check groups.
+
+## Request Examples
+
+<CodeGroup>
+
+```json One-time Deployment
+{
+  "name": "Production API Deployment",
+  "startsAt": "2024-02-15T20:00:00.000Z",
+  "endsAt": "2024-02-15T22:00:00.000Z",
+  "repeatInterval": "NONE",
+  "tags": ["deployment", "api", "production"],
+  "checkIds": [
+    "check_api_health",
+    "check_api_auth",
+    "check_api_users"
+  ],
+  "checkGroupIds": [
+    "group_production_api"
+  ]
+}
+```
+
+```json Weekly Maintenance
+{
+  "name": "Weekly Server Maintenance",
+  "startsAt": "2024-01-28T02:00:00.000Z",
+  "endsAt": "2024-01-28T04:00:00.000Z",
+  "repeatInterval": "WEEKLY",
+  "repeatEndsAt": "2024-12-31T23:59:59.000Z",
+  "tags": ["server", "weekly", "maintenance"],
+  "checkGroupIds": [
+    "group_server_monitoring"
+  ]
+}
+```
+
+```json Daily Backup Window
+{
+  "name": "Nightly Database Backup",
+  "startsAt": "2024-01-20T01:00:00.000Z",
+  "endsAt": "2024-01-20T03:00:00.000Z",
+  "repeatInterval": "DAILY",
+  "repeatEndsAt": "2024-06-30T23:59:59.000Z",
+  "tags": ["backup", "database", "nightly"],
+  "checkIds": [
+    "check_db_primary",
+    "check_db_replica"
+  ]
+}
+```
+
+```json Monthly Patch Window
+{
+  "name": "Monthly Security Patches",
+  "startsAt": "2024-02-01T18:00:00.000Z",
+  "endsAt": "2024-02-01T20:00:00.000Z",
+  "repeatInterval": "MONTHLY",
+  "repeatEndsAt": "2024-12-31T23:59:59.000Z",
+  "tags": ["security", "patches", "monthly"],
+  "checkGroupIds": [
+    "group_all_servers"
+  ]
+}
+```
+
+</CodeGroup>
+
+## Response Example
+
+```json
+{
+  "id": "mw_789123456",
+  "name": "Production API Deployment",
+  "startsAt": "2024-02-15T20:00:00.000Z",
+  "endsAt": "2024-02-15T22:00:00.000Z",
+  "repeatInterval": "NONE",
+  "repeatEndsAt": null,
+  "tags": ["deployment", "api", "production"],
+  "checkIds": [
+    "check_api_health",
+    "check_api_auth",
+    "check_api_users"
+  ],
+  "checkGroupIds": [
+    "group_production_api"
+  ],
+  "createdAt": "2024-01-25T10:30:00.000Z",
+  "updatedAt": "2024-01-25T10:30:00.000Z"
+}
+```
+
+## Configuration Options
+
+<AccordionGroup>
+
+<Accordion title="Basic Settings">
+**Required Fields:**
+- `name` (string): Descriptive name for the maintenance window
+- `startsAt` (string): ISO 8601 timestamp when maintenance begins
+- `endsAt` (string): ISO 8601 timestamp when maintenance ends
+- `repeatInterval` (string): NONE, DAILY, WEEKLY, or MONTHLY
+
+**Optional Fields:**
+- `repeatEndsAt` (string): When recurring maintenance should stop (required for recurring windows)
+- `tags` (array): Tags for organization and filtering
+</Accordion>
+
+<Accordion title="Repeat Intervals">
+**NONE (One-time):**
+- Single maintenance window
+- No repeat configuration needed
+
+**DAILY:**
+- Repeats every day at the same time
+- Requires `repeatEndsAt` to define when to stop
+
+**WEEKLY:**
+- Repeats on the same day of the week
+- Based on the day of `startsAt`
+- Requires `repeatEndsAt`
+
+**MONTHLY:**
+- Repeats on the same date each month
+- Based on the date of `startsAt`
+- Requires `repeatEndsAt`
+
+**Important:** For recurring windows, the duration is calculated from the initial `startsAt` and `endsAt`, then applied to each recurrence.
+</Accordion>
+
+<Accordion title="Resource Targeting">
+**Individual Checks:**
+```json
+{
+  "checkIds": [
+    "check_api_health",
+    "check_database_ping",
+    "check_frontend_load"
+  ]
+}
+```
+
+**Check Groups:**
+```json
+{
+  "checkGroupIds": [
+    "group_production_api",
+    "group_database_cluster"
+  ]
+}
+```
+
+**Combined Targeting:**
+```json
+{
+  "checkIds": ["check_special_case"],
+  "checkGroupIds": ["group_main_services"]
+}
+```
+
+**Note:** You can target specific checks, entire check groups, or both in the same maintenance window.
+</Accordion>
+
+<Accordion title="Timezone Considerations">
+All timestamps should be in UTC (ISO 8601 format with Z suffix). Consider these factors:
+
+- **Server Timezones**: Convert local maintenance times to UTC
+- **Daylight Saving**: UTC avoids DST complications
+- **Global Teams**: UTC provides consistent scheduling across regions
+
+**Example Conversion:**
+```javascript
+// Convert local time to UTC
+const localTime = new Date('2024-02-15 20:00:00'); // Local time
+const utcTime = localTime.toISOString(); // "2024-02-15T20:00:00.000Z"
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Code Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://api.checklyhq.com/v1/maintenance-windows" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Emergency Database Maintenance",
+    "startsAt": "2024-02-20T02:00:00.000Z",
+    "endsAt": "2024-02-20T04:00:00.000Z",
+    "repeatInterval": "NONE",
+    "tags": ["emergency", "database"],
+    "checkGroupIds": ["group_database_monitoring"]
+  }'
+```
+
+```javascript Node.js
+const maintenanceData = {
+  name: 'Weekly Infrastructure Maintenance',
+  startsAt: '2024-01-28T02:00:00.000Z',
+  endsAt: '2024-01-28T04:00:00.000Z',
+  repeatInterval: 'WEEKLY',
+  repeatEndsAt: '2024-12-31T23:59:59.000Z',
+  tags: ['infrastructure', 'weekly'],
+  checkGroupIds: ['group_infrastructure'],
+  checkIds: ['check_load_balancer']
+};
+
+const response = await fetch('https://api.checklyhq.com/v1/maintenance-windows', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(maintenanceData)
+});
+
+const maintenance = await response.json();
+console.log('Created maintenance window:', maintenance.id);
+
+// Helper function to convert local time to UTC
+function toUTC(localDateString) {
+  return new Date(localDateString).toISOString();
+}
+
+// Example usage
+const maintenanceStart = toUTC('2024-02-15 20:00:00');
+const maintenanceEnd = toUTC('2024-02-15 22:00:00');
+```
+
+```python Python
+import requests
+from datetime import datetime, timezone
+
+def create_maintenance_window(name, start_local, end_local, repeat='NONE', **kwargs):
+    # Convert local datetime to UTC
+    start_utc = start_local.astimezone(timezone.utc).isoformat()
+    end_utc = end_local.astimezone(timezone.utc).isoformat()
+    
+    data = {
+        'name': name,
+        'startsAt': start_utc,
+        'endsAt': end_utc,
+        'repeatInterval': repeat,
+        **kwargs
+    }
+    
+    headers = {
+        'Authorization': 'Bearer cu_1234567890abcdef',
+        'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000',
+        'Content-Type': 'application/json'
+    }
+    
+    response = requests.post(
+        'https://api.checklyhq.com/v1/maintenance-windows',
+        headers=headers,
+        json=data
+    )
+    
+    return response.json()
+
+# Example: Create a one-time maintenance window
+start = datetime(2024, 2, 15, 20, 0)  # 8 PM local time
+end = datetime(2024, 2, 15, 22, 0)    # 10 PM local time
+
+maintenance = create_maintenance_window(
+    name='Production Deployment Window',
+    start_local=start,
+    end_local=end,
+    tags=['deployment', 'production'],
+    checkGroupIds=['group_production_services']
+)
+
+print(f"Created maintenance window: {maintenance['id']}")
+```
+
+</CodeGroup>
+
+## Validation Rules
+
+<AccordionGroup>
+
+<Accordion title="Time Validation">
+- `endsAt` must be after `startsAt`
+- `repeatEndsAt` must be after `startsAt` (for recurring windows)
+- Minimum duration: 1 minute
+- Maximum duration: 7 days per window
+- Cannot create windows that started in the past
+</Accordion>
+
+<Accordion title="Resource Validation">
+- At least one `checkId` or `checkGroupId` must be specified
+- Check IDs must exist and belong to your account
+- Check Group IDs must exist and belong to your account
+- Cannot exceed 100 checks per maintenance window
+</Accordion>
+
+<Accordion title="Repeat Validation">
+- `repeatEndsAt` is required for DAILY, WEEKLY, and MONTHLY intervals
+- `repeatEndsAt` is ignored for NONE interval
+- Maximum repeat duration: 1 year
+- Recurring windows cannot exceed 1000 occurrences
+</Accordion>
+
+</AccordionGroup>
+
+## Best Practices
+
+<AccordionGroup>
+
+<Accordion title="Naming Conventions">
+Use descriptive names that include:
+- **Purpose**: What maintenance is being performed
+- **Frequency**: One-time, weekly, monthly, etc.
+- **Scope**: Which systems are affected
+
+**Examples:**
+- "Monthly Security Patch Tuesday"
+- "Weekly Database Backup Window"
+- "Q1 Infrastructure Upgrade"
+- "Emergency API Hotfix Deployment"
+</Accordion>
+
+<Accordion title="Scheduling Strategy">
+- **Buffer Time**: Add 15-30 minutes buffer before and after expected maintenance
+- **Timezone Awareness**: Use UTC to avoid DST issues
+- **Overlap Prevention**: Avoid overlapping maintenance windows
+- **Communication**: Coordinate with team schedules and business hours
+</Accordion>
+
+<Accordion title="Resource Targeting">
+- **Group-Based**: Use check groups for easier management
+- **Granular Control**: Target specific checks only when necessary
+- **Impact Assessment**: Consider downstream dependencies
+- **Testing**: Test maintenance windows in non-production first
+</Accordion>
+
+<Accordion title="Recurring Maintenance">
+- **End Dates**: Always set appropriate `repeatEndsAt` dates
+- **Review Schedule**: Regularly review and update recurring windows
+- **Seasonal Adjustments**: Account for holidays and business cycles
+- **Cleanup**: Remove expired recurring maintenance windows
+</Accordion>
+
+</AccordionGroup>
+
+<Note>
+Maintenance windows are crucial for preventing alert fatigue during planned downtime. They ensure your team focuses on real issues rather than expected maintenance notifications.
+</Note>

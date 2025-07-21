@@ -1,0 +1,189 @@
+---
+title: Creating your First API Check
+description: Step-by-step guide to creating your first API check in Checkly.
+---
+
+API checks in Checkly are powerful tools that allow you to monitor your APIs for correctness, uptime, and performance. In this guide, you’ll create your first API check using the Checkly web UI—step by step.
+
+---
+
+<Step title="1. Start a new API check">
+To begin, go to the **Checks** section in the Checkly dashboard and click **Create Check → API Check**.
+
+You'll be prompted to name your check, apply optional tags, and assign it to a group (if applicable). Tags and groups help with organizing and applying defaults across checks.
+</Step>
+
+---
+
+<Step title="2. Configure the request">
+Set up the HTTP request that Checkly will send on a schedule.
+
+<CodeBlock language="json">
+{`{
+  "method": "POST",
+  "url": "https://api.example.com/login",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "email": "user@example.com",
+    "password": "hunter2"
+  }
+}`}
+</CodeBlock>
+
+You can customize:
+- **HTTP method**: GET, POST, PUT, DELETE, etc.
+- **URL**: The full request path
+- **Headers**: Auth tokens, content type, etc.
+- **Body**: JSON, GraphQL, form-encoded, or raw
+- **Authentication**: Basic Auth, bearer token, or custom header
+- You can also import from **cURL** or **OpenAPI** spec
+
+</Step>
+
+---
+
+<Step title="3. Add setup and teardown scripts (optional)">
+Need to fetch a token before sending the request? Use a setup script.
+
+<CodeBlock language="javascript">
+{`const res = await fetch('https://api.example.com/token', {
+  method: 'POST',
+  body: JSON.stringify({ user: 'admin', pass: 'secret' }),
+  headers: { 'Content-Type': 'application/json' }
+})
+const data = await res.json()
+token = data.access_token`}
+</CodeBlock>
+
+You can reference `token` later in your request as an environment variable or directly in the header.
+
+Teardown scripts are useful to clean up data or scrub sensitive information from logs.
+
+</Step>
+
+---
+
+<Step title="4. Add assertions">
+Assertions are how Checkly verifies the response from your API.
+
+Common examples include:
+- `Status code equals 200`
+- `Response time is below 1s`
+- `JSON at path data.success is true`
+- `Header content-type includes application/json`
+
+<CodeBlock language="javascript">
+{`expect(response.status).to.equal(200)
+expect(JSON.parse(response.body).success).to.be.true`}
+</CodeBlock>
+
+You can add multiple assertions and combine them across status, headers, and body.
+
+</Step>
+
+---
+
+<Step title="5. Set response time thresholds">
+You can set two types of thresholds:
+- **Degraded**: Check passes, but is slower than expected (e.g., >1000ms)
+- **Failed**: Check fails if time exceeds critical limit (e.g., >3000ms)
+
+This helps you track performance regressions over time and fine-tune alerting.
+
+</Step>
+
+---
+
+<Step title="6. Choose locations and schedule">
+Now choose where and how often to run your check:
+
+- **Frequency**: As fast as every 10 seconds
+- **Locations**: Select from global AWS/GCP regions or private locations
+
+This enables multi-region coverage and performance comparison.
+
+</Step>
+
+---
+
+<Step title="7. Configure retries and alerting">
+Set your retry policy: e.g. retry once before failing.
+
+Then configure alerting:
+- Slack
+- Webhook
+- PagerDuty
+- Email
+- Custom alert channels
+
+Checks can inherit alert settings from their group or have custom configs.
+
+</Step>
+
+---
+
+<Step title="8. Test the check manually">
+Before saving, hit **Run request** to preview the response and assertion output.
+
+You’ll see the live HTTP response and whether your assertions pass.
+
+This is great for debugging before putting the check into production.
+
+</Step>
+
+---
+
+<Step title="9. Save and deploy the check">
+Once everything looks good, click **Save Check**.
+
+Checkly will begin running your API check on the defined schedule and alert you to any failures.
+
+Your check now appears in the **Dashboard**, where you can view results, trends, and history.
+
+</Step>
+
+---
+
+<Step title="10. (Optional) Define in code with Checkly CLI">
+Want to manage your checks as code? Use the Checkly CLI:
+
+<CodeBlock language="ts">
+{`import { ApiCheck, AssertionBuilder, Frequency } from 'checkly/constructs'
+
+new ApiCheck('check-api-health', {
+  name: 'API Health Check',
+  frequency: Frequency.EVERY_1M,
+  request: {
+    method: 'GET',
+    url: 'https://api.example.com/health',
+    assertions: [
+      AssertionBuilder.statusCode().equals(200)
+    ]
+  }
+})`}
+</CodeBlock>
+
+This is especially useful for teams using Git workflows and CI/CD pipelines.
+
+</Step>
+
+---
+
+## ✅ What’s next?
+
+Now that your first API Check is up and running, consider:
+- Grouping checks together for better defaults and alerting
+- Using environment variables and secrets for auth tokens
+- Chaining requests using setup and teardown scripts
+- Exploring **Browser Checks** and **Multistep Checks**
+
+For more advanced workflows, check out:
+- [Checkly CLI](https://www.checklyhq.com/docs/cli/)
+- [Managing checks with Terraform](https://www.checklyhq.com/docs/terraform/)
+- [Running in CI/CD](https://www.checklyhq.com/docs/cli/integrations/)
+
+---
+
+Happy monitoring!

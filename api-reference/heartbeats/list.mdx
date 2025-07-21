@@ -1,0 +1,270 @@
+---
+title: 'List Heartbeats'
+openapi: 'GET /v1/heartbeats'
+description: 'Retrieve all heartbeat monitors in your account'
+---
+
+## Overview
+
+Heartbeat monitors (also known as uptime monitors or ping checks) are simple HTTP-based checks that verify if your services are responding. This endpoint returns all heartbeat monitors configured in your account.
+
+<Info>
+Heartbeat monitors are perfect for monitoring service availability, API endpoints, and basic uptime without complex scripting.
+</Info>
+
+## Response Example
+
+```json
+{
+  "data": [
+    {
+      "id": "hb_123456789",
+      "name": "API Health Check",
+      "url": "https://api.example.com/health",
+      "method": "GET",
+      "activated": true,
+      "muted": false,
+      "tags": ["api", "health", "production"],
+      "frequency": 1,
+      "locations": ["us-east-1", "eu-west-1"],
+      "headers": [
+        {
+          "key": "Authorization",
+          "value": "***masked***"
+        }
+      ],
+      "queryParameters": [
+        {
+          "key": "version",
+          "value": "v1"
+        }
+      ],
+      "alertAfter": 3,
+      "alertTimeUnit": "MINUTES",
+      "responseTimeLimit": 5000,
+      "expectStatus": 200,
+      "expectText": "healthy",
+      "followRedirects": true,
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-20T14:45:00.000Z"
+    },
+    {
+      "id": "hb_987654321",
+      "name": "Website Uptime",
+      "url": "https://www.example.com",
+      "method": "GET",
+      "activated": true,
+      "muted": false,
+      "tags": ["website", "uptime"],
+      "frequency": 5,
+      "locations": ["us-east-1", "us-west-2"],
+      "alertAfter": 5,
+      "alertTimeUnit": "MINUTES",
+      "responseTimeLimit": 10000,
+      "expectStatus": 200,
+      "followRedirects": true,
+      "createdAt": "2024-01-10T08:15:00.000Z",
+      "updatedAt": "2024-01-18T16:20:00.000Z"
+    }
+  ],
+  "meta": {
+    "currentPage": 1,
+    "totalPages": 1,
+    "totalItems": 2,
+    "limit": 10
+  }
+}
+```
+
+## Heartbeat Features
+
+<AccordionGroup>
+
+<Accordion title="HTTP Methods">
+Support for various HTTP methods:
+- **GET**: Simple uptime checks
+- **POST**: API endpoint validation
+- **PUT**: Resource update verification
+- **HEAD**: Header-only checks
+- **DELETE**: Cleanup endpoint testing
+</Accordion>
+
+<Accordion title="Response Validation">
+Multiple validation options:
+- **Status Code**: Expect specific HTTP status codes
+- **Response Time**: Set maximum acceptable response time
+- **Text Content**: Check for specific text in response body
+- **Headers**: Validate response headers
+</Accordion>
+
+<Accordion title="Alert Configuration">
+Flexible alerting options:
+- **Alert After**: Time to wait before alerting
+- **Time Units**: Minutes, hours, or runs
+- **Location-based**: Alert only if failing from multiple locations
+- **SSL Monitoring**: Certificate expiration alerts
+</Accordion>
+
+<Accordion title="Request Customization">
+Customize the HTTP request:
+- **Headers**: Add authentication or custom headers
+- **Query Parameters**: Include URL parameters
+- **Request Body**: Send data with POST/PUT requests
+- **Follow Redirects**: Handle 3xx redirects automatically
+</Accordion>
+
+</AccordionGroup>
+
+## Additional Examples
+
+<CodeGroup>
+
+```bash Get Active Heartbeat Monitors
+curl -X GET "https://api.checklyhq.com/v1/heartbeats?activated=true" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+
+```javascript Filter by Tags and Analyze Performance
+const response = await fetch('https://api.checklyhq.com/v1/heartbeats?tags=production,api', {
+  headers: {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+  }
+});
+
+const data = await response.json();
+console.log(`Found ${data.meta.totalItems} production heartbeat monitors`);
+
+// Analyze response time limits
+const performanceAnalysis = data.data.map(heartbeat => ({
+  name: heartbeat.name,
+  url: heartbeat.url,
+  frequency: heartbeat.frequency,
+  responseTimeLimit: heartbeat.responseTimeLimit,
+  locations: heartbeat.locations.length,
+  alertThreshold: `${heartbeat.alertAfter} ${heartbeat.alertTimeUnit.toLowerCase()}`
+}));
+
+// Sort by response time requirements
+performanceAnalysis
+  .sort((a, b) => a.responseTimeLimit - b.responseTimeLimit)
+  .forEach(monitor => {
+    console.log(`${monitor.name}: ${monitor.responseTimeLimit}ms limit`);
+    console.log(`  URL: ${monitor.url}`);
+    console.log(`  Frequency: ${monitor.frequency}min, Locations: ${monitor.locations}`);
+    console.log(`  Alert after: ${monitor.alertThreshold}`);
+    console.log('---');
+  });
+```
+
+```python Monitor Health and Configuration Audit
+import requests
+from collections import defaultdict
+
+headers = {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+}
+
+# Get all heartbeats with pagination
+all_heartbeats = []
+page = 1
+while True:
+    response = requests.get(
+        f'https://api.checklyhq.com/v1/heartbeats?page={page}&limit=50',
+        headers=headers
+    )
+    data = response.json()
+    all_heartbeats.extend(data['data'])
+    
+    if page >= data['meta']['totalPages']:
+        break
+    page += 1
+
+print(f"Total heartbeat monitors: {len(all_heartbeats)}")
+
+# Analyze configuration patterns
+methods = defaultdict(int)
+frequencies = defaultdict(int)
+locations_usage = defaultdict(int)
+response_limits = []
+
+for heartbeat in all_heartbeats:
+    methods[heartbeat['method']] += 1
+    frequencies[heartbeat['frequency']] += 1
+    response_limits.append(heartbeat['responseTimeLimit'])
+    
+    for location in heartbeat['locations']:
+        locations_usage[location] += 1
+
+print("\nConfiguration Analysis:")
+print("HTTP Methods:", dict(methods))
+print("Check Frequencies (minutes):", dict(frequencies))
+print("Most used locations:")
+for location, count in sorted(locations_usage.items(), key=lambda x: x[1], reverse=True)[:5]:
+    print(f"  {location}: {count} heartbeats")
+
+print(f"\nResponse Time Limits:")
+print(f"  Average: {sum(response_limits) / len(response_limits):.0f}ms")
+print(f"  Min: {min(response_limits)}ms")
+print(f"  Max: {max(response_limits)}ms")
+
+# Find potential issues
+inactive_heartbeats = [h for h in all_heartbeats if not h['activated']]
+if inactive_heartbeats:
+    print(f"\n⚠️  Found {len(inactive_heartbeats)} inactive heartbeat monitors")
+    for hb in inactive_heartbeats:
+        print(f"  - {hb['name']}: {hb['url']}")
+```
+
+</CodeGroup>
+
+## Use Cases
+
+<CardGroup cols={2}>
+
+<Card title="API Health Monitoring" icon="heartbeat">
+Monitor API endpoints for availability and response time
+</Card>
+
+<Card title="Website Uptime" icon="globe">
+Track website availability and performance
+</Card>
+
+<Card title="Service Discovery" icon="search">
+Monitor service discovery endpoints and load balancers
+</Card>
+
+<Card title="Third-party Dependencies" icon="link">
+Monitor external services your application depends on
+</Card>
+
+</CardGroup>
+
+## Filtering and Pagination
+
+<AccordionGroup>
+
+<Accordion title="Query Parameters">
+Filter and paginate heartbeat results:
+
+- `limit` (integer): Number of results per page (max 100)
+- `page` (integer): Page number (1-based)
+- `tag` (string): Filter by tag
+- `activated` (boolean): Filter by activation status
+</Accordion>
+
+<Accordion title="Example Filtered Request">
+```bash
+curl -X GET "https://api.checklyhq.com/v1/heartbeats?activated=true&tag=production&limit=20" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+</Accordion>
+
+</AccordionGroup>
+
+<Note>
+Heartbeat monitors are the simplest form of monitoring in Checkly. They're perfect for basic uptime monitoring and can be set up quickly for any HTTP endpoint.
+</Note>

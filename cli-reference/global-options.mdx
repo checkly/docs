@@ -1,0 +1,169 @@
+---
+title: global options
+description: 'Common CLI flags available across Checkly commands.'
+sidebarTitle: 'global options'
+---
+
+The following options are available across multiple Checkly CLI commands and provide consistent functionality for configuration, environment management, and output control.
+
+### Configuration
+
+#### `--config` or `-c`
+Specify a particular configuration file to use instead of the default `checkly.config.ts` or `checkly.config.js`.
+
+```bash
+npx checkly deploy --config="./checkly.staging.config.ts"
+npx checkly test -c "./configs/production.config.js"
+```
+
+**Default**: Looks for `checkly.config.ts` or `checkly.config.js` in the current directory.
+
+### Environment Variables
+
+#### `--env <key=value>` or `-e`
+Pass environment variables to the check execution runtime. Variables passed this way will override any existing variables stored in your Checkly account.
+
+```bash
+npx checkly test --env ENVIRONMENT_URL="https://staging.acme.com"
+npx checkly test -e API_KEY="test123" -e BASE_URL="https://api.staging.com"
+```
+
+**Usage**: You can pass multiple environment variables by using the flag multiple times.
+
+#### `--env-file`
+Read environment variables from a `.env` file by specifying the file path. This is useful for loading multiple variables at once.
+
+```bash
+npx checkly test --env-file="./.env"
+npx checkly deploy --env-file="./environments/.env.production"
+```
+
+**Note**: Variables passed via `--env` will override variables from `--env-file`.
+
+### Location & Execution
+
+#### `--location <location>` or `-l`
+Run checks against a specified location instead of the default `us-east-1`.
+
+```bash
+npx checkly test --location eu-west-1
+npx checkly trigger -l ap-southeast-2
+```
+
+**Available locations**: `us-east-1`, `us-west-1`, `eu-west-1`, `eu-central-1`, `ap-northeast-1`, `ap-southeast-1`, `ap-southeast-2`, and more.
+
+#### `--private-location <private location ID>`
+Run checks against a specified private location instead of public cloud locations.
+
+```bash
+npx checkly test --private-location pl_123abc456def
+npx checkly trigger --private-location my-datacenter-location
+```
+
+**Requirement**: The private location must be properly configured and running in your infrastructure.
+
+### Output & Reporting
+
+#### `--reporter` or `-r`
+Specify one or more output formats for test results. You can combine multiple reporters.
+
+```bash
+npx checkly test --reporter list
+npx checkly test -r json -r github
+```
+
+**Available reporters**:
+- `list`: Detailed list format (default)
+- `dot`: Compact dot format
+- `ci`: CI-friendly format
+- `github`: GitHub Actions format
+- `json`: JSON output format
+
+#### `--verbose` or `-v`
+Show detailed logs and output for all operations, including full check execution logs.
+
+```bash
+npx checkly test --verbose
+npx checkly deploy -v
+```
+
+**Use cases**: Debugging, detailed CI logs, troubleshooting check failures.
+
+### Execution Control
+
+#### `--force` or `-f`
+Skip confirmation dialogs and proceed with the operation automatically. Especially useful in CI/CD environments.
+
+```bash
+npx checkly deploy --force
+npx checkly destroy -f
+```
+
+**Warning**: Use with caution as this bypasses safety prompts.
+
+#### `--retries`
+Specify how many times to retry a failing check run.
+
+```bash
+npx checkly test --retries 2
+npx checkly trigger --retries 3
+```
+
+**Range**: 0-3 retries (0 by default)
+
+#### `--timeout`
+Set a fallback timeout in seconds to wait for checks to complete.
+
+```bash
+npx checkly test --timeout 300
+npx checkly trigger --timeout 900
+```
+
+**Default**: 600 seconds (10 minutes)
+
+### Filtering & Selection
+
+#### `--tags` or `-t`
+Filter checks using comma-separated tags. Checks must contain all specified tags to be selected.
+
+```bash
+npx checkly test --tags production,api
+npx checkly trigger -t staging,critical
+```
+
+**Multiple filters**: Use multiple `--tags` flags for OR logic:
+```bash
+npx checkly test --tags production,webapp --tags staging,backend
+```
+This runs checks with (production AND webapp) OR (staging AND backend).
+
+#### `--grep <pattern>` or `-g`
+Run only checks where the check name matches a regular expression pattern.
+
+```bash
+npx checkly test --grep "api.*test"
+npx checkly test -g "homepage|checkout"
+```
+
+**Pattern format**: Uses JavaScript regular expression syntax.
+
+### Recording & Sessions
+
+#### `--record`
+Record test results in Checkly as a test session with full logging, videos, and traces.
+
+```bash
+npx checkly test --record
+npx checkly trigger --record --test-session-name "Release validation"
+```
+
+**Benefits**: Persistent results, detailed debugging information, team collaboration.
+
+#### `--test-session-name`
+Provide a custom name for recorded test sessions (used with `--record`).
+
+```bash
+npx checkly trigger --record --test-session-name "Pre-deployment checks"
+```
+
+**Default**: Auto-generated name with timestamp and Git information when available.

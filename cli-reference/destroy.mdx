@@ -1,14 +1,86 @@
 ---
-title: 'Destroy Command'
+title: checkly destroy
 description: 'Destroy all project resources from your Checkly account.'
-sidebarTitle: 'Checkly Destroy'
+sidebarTitle: 'checkly destroy'
 ---
 
-## `npx checkly destroy`
+The `checkly destroy` command removes all resources associated with your project from your Checkly account, including checks, check groups, alert channels, maintenance windows, and other project-defined resources.
 
-Destroy all project's resources (checks, groups, alert channels, etc.) from your Checkly account.
+## Usage
 
-### Flags
+```bash
+npx checkly destroy
+```
 
-- `--config` or `-c`: Specify a particular configuration file, e.g. `--config="./checkly.staging.config.ts"`
-- `--force` or `-f`: Skips the confirmation dialog when deploying. Handy in CI environments. 
+Destroy all project resources with confirmation prompt.
+
+## Extended Usage
+
+```bash
+npx checkly destroy --force
+```
+Destroy all project resources without confirmation (useful for CI/CD).
+
+```bash
+npx checkly destroy --config="./checkly.staging.config.ts"
+```
+Destroy resources defined in a specific configuration file.
+
+## Unique Options
+
+This command has no unique options - it uses only [global options](/cli-reference/global-options).
+
+## Global Options
+
+This command supports the following [global options](/cli-reference/global-options):
+
+- [`--config`](/cli-reference/global-options#config-or-c) - Specify a configuration file
+- [`--force`](/cli-reference/global-options#force-or-f) - Skip confirmation dialogs
+
+## What Gets Destroyed
+
+The destroy command removes the following resources that were created by your project:
+
+- **Checks** (API, Browser, Heartbeat, etc.)
+- **Check Groups** and their configurations
+- **Alert Channels** defined in your project
+- **Maintenance Windows** created via CLI
+- **Environment Variables** at the project level
+- **Private Locations** (if managed by the project)
+- **Snippets** and reusable code blocks
+
+## Important Warnings
+
+<Warning>
+**Destructive Operation**: This command permanently deletes resources from your Checkly account. This action cannot be undone.
+</Warning>
+
+<Warning>
+**Shared Resources**: Be careful with shared resources like alert channels that might be used by other projects or manually created checks.
+</Warning>
+
+## Safety Considerations
+
+### Confirmation Dialog
+By default, the command prompts for confirmation:
+```
+⚠️  This will destroy all resources in your Checkly project.
+Are you sure you want to continue? (y/N)
+```
+
+### CI/CD Usage
+For automated environments, use `--force` to skip confirmation:
+```bash
+npx checkly destroy --force
+```
+
+### Backup Recommendation
+Before destroying, consider:
+1. **Exporting configuration** to preserve setup
+2. **Documenting dependencies** on shared resources
+3. **Checking team coordination** to avoid conflicts
+
+## Related Commands
+
+- [`checkly deploy`](/cli-reference/deploy) - Deploy resources to Checkly
+- [`checkly test`](/cli-reference/test) - Test your setup before deployment 

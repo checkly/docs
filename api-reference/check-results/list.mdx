@@ -1,0 +1,613 @@
+---
+title: 'List Check Results'
+openapi: 'GET /v1/check-results/{checkId}'
+description: 'Retrieve all execution results for a specific check'
+---
+
+## Overview
+
+This endpoint returns detailed execution results for a specific check. Check results contain comprehensive information about each check execution including response times, status codes, error details, and performance metrics.
+
+## Response Example
+
+```json
+{
+  "data": [
+    {
+      "id": "result_789123456",
+      "checkId": "check_api_health",
+      "checkName": "Production API Health Check",
+      "checkType": "api",
+      "runId": "run_456789123",
+      "status": "success",
+      "startedAt": "2024-01-25T14:30:00.000Z",
+      "finishedAt": "2024-01-25T14:30:01.245Z",
+      "duration": 1245,
+      "location": {
+        "id": "us-east-1",
+        "name": "N. Virginia, USA",
+        "region": "us-east-1"
+      },
+      "request": {
+        "method": "GET",
+        "url": "https://api.production.com/health",
+        "headers": {
+          "User-Agent": "Checkly/1.0",
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "statusCode": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-type": "application/json",
+          "content-length": "156",
+          "server": "nginx/1.18.0",
+          "cache-control": "no-cache"
+        },
+        "body": "{\"status\": \"healthy\", \"database\": \"connected\", \"cache\": \"operational\"}",
+        "responseTime": 245,
+        "size": 156
+      },
+      "assertions": [
+        {
+          "source": "STATUS_CODE",
+          "property": "",
+          "comparison": "EQUALS",
+          "target": "200",
+          "passed": true
+        },
+        {
+          "source": "JSON_BODY", 
+          "property": "$.status",
+          "comparison": "EQUALS",
+          "target": "healthy",
+          "passed": true
+        }
+      ],
+      "timing": {
+        "dns": 12,
+        "tcp": 23,
+        "tls": 45,
+        "firstByte": 189,
+        "download": 56,
+        "total": 245
+      },
+      "tags": ["api", "production", "health"],
+      "triggeredBy": "schedule"
+    },
+    {
+      "id": "result_987654321",
+      "checkId": "check_api_health", 
+      "checkName": "Production API Health Check",
+      "checkType": "api",
+      "runId": "run_321654987",
+      "status": "failed",
+      "startedAt": "2024-01-25T14:25:00.000Z",
+      "finishedAt": "2024-01-25T14:25:05.000Z",
+      "duration": 5000,
+      "location": {
+        "id": "us-east-1",
+        "name": "N. Virginia, USA",
+        "region": "us-east-1"
+      },
+      "request": {
+        "method": "GET",
+        "url": "https://api.production.com/health",
+        "headers": {
+          "User-Agent": "Checkly/1.0",
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "statusCode": 500,
+        "statusText": "Internal Server Error",
+        "headers": {
+          "content-type": "application/json",
+          "server": "nginx/1.18.0"
+        },
+        "body": "{\"error\": \"Database connection failed\"}",
+        "responseTime": 4832,
+        "size": 45
+      },
+      "error": {
+        "name": "AssertionError",
+        "message": "Expected status code 200 but got 500",
+        "stack": "AssertionError: Expected status code 200 but got 500\n    at checkAssertion (check.js:45:12)"
+      },
+      "assertions": [
+        {
+          "source": "STATUS_CODE",
+          "property": "",
+          "comparison": "EQUALS", 
+          "target": "200",
+          "passed": false,
+          "actual": "500"
+        }
+      ],
+      "timing": {
+        "dns": 15,
+        "tcp": 28,
+        "tls": 52,
+        "firstByte": 4720,
+        "download": 17,
+        "total": 4832
+      },
+      "tags": ["api", "production", "health"],
+      "triggeredBy": "schedule"
+    }
+  ],
+  "meta": {
+    "checkId": "check_api_health",
+    "checkName": "Production API Health Check",
+    "currentPage": 1,
+    "totalPages": 156,
+    "totalItems": 1547,
+    "limit": 10,
+    "hasMore": true,
+    "timeframe": {
+      "from": "2024-01-01T00:00:00.000Z",
+      "to": "2024-01-31T23:59:59.999Z"
+    },
+    "summary": {
+      "totalRuns": 1547,
+      "successfulRuns": 1523,
+      "failedRuns": 24,
+      "successRate": 98.45,
+      "averageResponseTime": 267.8,
+      "p95ResponseTime": 445.2,
+      "p99ResponseTime": 823.1
+    }
+  }
+}
+```
+
+## Common Use Cases
+
+<CardGroup cols={2}>
+
+<Card title="Performance Monitoring" icon="chart-line">
+Track API performance trends and identify regressions
+```bash
+GET /v1/check-results/{checkId}?period=7d&sortBy=responseTime
+```
+</Card>
+
+<Card title="Debugging Failed Checks" icon="bug">
+Investigate check failures with detailed error analysis
+```bash
+GET /v1/check-results/{checkId}?status=failed&limit=50
+```
+</Card>
+
+<Card title="SLA Compliance Reporting" icon="shield-check">
+Generate uptime and compliance reports for stakeholders
+```bash
+GET /v1/check-results/{checkId}?period=30d&includeSummary=true
+```
+</Card>
+
+<Card title="Geographic Performance Analysis" icon="globe">
+Compare performance across different monitoring locations
+```bash
+GET /v1/check-results/{checkId}?location=us-east-1&period=24h
+```
+</Card>
+
+</CardGroup>
+
+## Query Parameters
+
+<AccordionGroup>
+
+<Accordion title="Time Range Filters">
+- `from` (string): Start date for results (ISO 8601 format)
+- `to` (string): End date for results (ISO 8601 format)
+- `period` (string): Predefined time period (1h, 6h, 24h, 7d, 30d)
+
+**Example:**
+```
+?from=2024-01-01T00:00:00Z&to=2024-01-31T23:59:59Z
+```
+
+**Default:** Last 24 hours if no parameters provided
+</Accordion>
+
+<Accordion title="Filtering Options">
+- `status` (string): Filter by result status (success, failed)
+- `location` (string): Filter by monitoring location
+- `triggeredBy` (string): Filter by trigger type (schedule, api, manual)
+- `responseTimeMin` (integer): Minimum response time in milliseconds
+- `responseTimeMax` (integer): Maximum response time in milliseconds
+
+**Example:**
+```
+?status=failed&location=us-east-1&responseTimeMin=1000
+```
+</Accordion>
+
+<Accordion title="Pagination & Sorting">
+- `page` (integer): Page number (default: 1)
+- `limit` (integer): Number of results per page (default: 10, max: 100)
+- `sortBy` (string): Sort field (startedAt, duration, responseTime)
+- `sortOrder` (string): Sort order (asc, desc, default: desc)
+- `includeSummary` (boolean): Include summary statistics (default: true)
+
+**Default:** Returns first 10 results sorted by most recent
+</Accordion>
+
+</AccordionGroup>
+
+## Result Status Types
+
+<CardGroup cols={2}>
+
+<Card title="Success" icon="check-circle">
+**Indicates:**
+- All assertions passed
+- HTTP status codes in success range
+- No execution errors occurred
+- Response received within timeout
+
+**Characteristics:**
+- Status code typically 2xx
+- All defined assertions evaluate to true
+- Complete response received
+- Execution completed normally
+</Card>
+
+<Card title="Failed" icon="x-circle">
+**Indicates:**
+- One or more assertions failed
+- HTTP error status codes (4xx, 5xx)
+- Network or timeout errors
+- Script execution errors
+
+**Common causes:**
+- API returning error status codes
+- Assertion mismatches
+- Network connectivity issues
+- Timeout exceeded
+</Card>
+
+</CardGroup>
+
+## Response Time Breakdown
+
+<AccordionGroup>
+
+<Accordion title="Timing Components">
+**DNS Resolution** (`timing.dns`)
+- Time to resolve domain name to IP address
+- Typically 0-50ms for cached results
+- Higher values may indicate DNS issues
+
+**TCP Connection** (`timing.tcp`)
+- Time to establish TCP connection
+- Includes network latency
+- Geographic distance affects this timing
+
+**TLS Handshake** (`timing.tls`)
+- Time for SSL/TLS negotiation
+- Only present for HTTPS requests
+- Certificate validation time included
+
+**First Byte** (`timing.firstByte`)
+- Time from request sent to first response byte
+- Server processing time
+- Most critical for API performance analysis
+
+**Download** (`timing.download`)
+- Time to download response body
+- Affected by response size and bandwidth
+- Usually minimal for API responses
+</Accordion>
+
+<Accordion title="Performance Analysis">
+Use timing breakdown to identify bottlenecks:
+
+```javascript
+// Example: Analyze where time is spent
+const result = checkResults.data[0];
+const timing = result.timing;
+
+const breakdown = {
+  networkSetup: timing.dns + timing.tcp + timing.tls,
+  serverProcessing: timing.firstByte - timing.dns - timing.tcp - timing.tls,
+  dataTransfer: timing.download,
+  totalTime: timing.total
+};
+
+console.log('Time breakdown:');
+console.log(`Network setup: ${breakdown.networkSetup}ms (${(breakdown.networkSetup/timing.total*100).toFixed(1)}%)`);
+console.log(`Server processing: ${breakdown.serverProcessing}ms (${(breakdown.serverProcessing/timing.total*100).toFixed(1)}%)`);
+console.log(`Data transfer: ${breakdown.dataTransfer}ms (${(breakdown.dataTransfer/timing.total*100).toFixed(1)}%)`);
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Use Cases
+
+<AccordionGroup>
+
+<Accordion title="Performance Monitoring">
+Track API performance over time:
+- Monitor response time trends
+- Identify performance regressions
+- Track timing component changes
+- Set up performance baselines
+
+```bash
+# Get results with response time filtering
+curl -X GET "https://api.checklyhq.com/v1/check-results/check_api_health?responseTimeMin=500&period=7d" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+</Accordion>
+
+<Accordion title="Debugging Failed Checks">
+Investigate check failures in detail:
+- Examine error messages and stack traces
+- Analyze failed assertions
+- Review request/response details
+- Identify patterns in failures
+
+```python
+# Example: Analyze failed check results
+failed_results = [r for r in results if r['status'] == 'failed']
+for result in failed_results:
+    print(f"Failed at {result['startedAt']}")
+    print(f"Status: {result['response']['statusCode']}")
+    print(f"Error: {result.get('error', {}).get('message', 'No error message')}")
+    print(f"Failed assertions: {[a for a in result['assertions'] if not a['passed']]}")
+```
+</Accordion>
+
+<Accordion title="SLA Compliance Reporting">
+Generate compliance reports:
+- Calculate uptime percentages
+- Track SLA violations
+- Generate compliance dashboards
+- Export data for stakeholder reports
+
+```javascript
+// Calculate SLA compliance
+const totalResults = meta.summary.totalRuns;
+const successfulResults = meta.summary.successfulRuns;
+const uptimePercentage = (successfulResults / totalResults) * 100;
+
+const slaTarget = 99.9; // 99.9% SLA target
+const slaCompliant = uptimePercentage >= slaTarget;
+
+console.log(`Uptime: ${uptimePercentage.toFixed(3)}%`);
+console.log(`SLA Status: ${slaCompliant ? 'COMPLIANT' : 'BREACH'}`);
+if (!slaCompliant) {
+  console.log(`SLA deficit: ${(slaTarget - uptimePercentage).toFixed(3)}%`);
+}
+```
+</Accordion>
+
+<Accordion title="Geographic Performance Analysis">
+Compare performance across locations:
+- Identify regional performance differences
+- Optimize global infrastructure
+- Monitor CDN effectiveness
+- Plan capacity expansion
+
+```python
+# Group results by location for analysis
+from collections import defaultdict
+
+location_stats = defaultdict(list)
+for result in results:
+    location = result['location']['name']
+    if result['status'] == 'success':
+        location_stats[location].append(result['response']['responseTime'])
+
+for location, times in location_stats.items():
+    avg_time = sum(times) / len(times)
+    print(f"{location}: {avg_time:.1f}ms average ({len(times)} samples)")
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Additional Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET "https://api.checklyhq.com/v1/check-results/check_api_health?period=24h&limit=50&includeSummary=true" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
+```
+
+```javascript Node.js
+const checkId = 'check_api_health';
+const params = new URLSearchParams({
+  period: '7d',
+  limit: '100',
+  includeSummary: 'true',
+  sortBy: 'startedAt',
+  sortOrder: 'desc'
+});
+
+const response = await fetch(`https://api.checklyhq.com/v1/check-results/${checkId}?${params}`, {
+  headers: {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+  }
+});
+
+const checkResults = await response.json();
+const { data: results, meta } = checkResults;
+
+console.log(`Check: ${meta.checkName}`);
+console.log(`Results in last 7 days: ${meta.totalItems}`);
+console.log(`Success rate: ${meta.summary.successRate}%`);
+console.log(`Average response time: ${meta.summary.averageResponseTime}ms`);
+
+// Analyze response time distribution
+const responseTimes = results
+  .filter(r => r.status === 'success')
+  .map(r => r.response.responseTime);
+
+if (responseTimes.length > 0) {
+  const sorted = responseTimes.sort((a, b) => a - b);
+  const median = sorted[Math.floor(sorted.length / 2)];
+  const min = Math.min(...responseTimes);
+  const max = Math.max(...responseTimes);
+  
+  console.log(`\nResponse time distribution:`);
+  console.log(`Min: ${min}ms`);
+  console.log(`Median: ${median}ms`);
+  console.log(`Max: ${max}ms`);
+  console.log(`P95: ${meta.summary.p95ResponseTime}ms`);
+  console.log(`P99: ${meta.summary.p99ResponseTime}ms`);
+}
+
+// Find slow requests (>1 second)
+const slowRequests = results.filter(r => 
+  r.status === 'success' && r.response.responseTime > 1000
+);
+
+if (slowRequests.length > 0) {
+  console.log(`\n⚠️ ${slowRequests.length} slow requests (>1s) found:`);
+  slowRequests.slice(0, 5).forEach(r => {
+    console.log(`  ${r.startedAt}: ${r.response.responseTime}ms from ${r.location.name}`);
+  });
+}
+
+// Analyze failed requests
+const failedResults = results.filter(r => r.status === 'failed');
+if (failedResults.length > 0) {
+  console.log(`\n❌ ${failedResults.length} failed requests:`);
+  
+  // Group failures by status code
+  const failuresByStatus = failedResults.reduce((acc, r) => {
+    const status = r.response?.statusCode || 'No response';
+    acc[status] = (acc[status] || 0) + 1;
+    return acc;
+  }, {});
+  
+  Object.entries(failuresByStatus).forEach(([status, count]) => {
+    console.log(`  ${status}: ${count} failures`);
+  });
+}
+```
+
+```python Python
+import requests
+from datetime import datetime, timedelta
+import statistics
+
+check_id = 'check_api_health'
+headers = {
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
+}
+
+params = {
+    'period': '7d',
+    'limit': 100,
+    'includeSummary': True
+}
+
+response = requests.get(
+    f'https://api.checklyhq.com/v1/check-results/{check_id}',
+    headers=headers,
+    params=params
+)
+
+if response.status_code == 200:
+    check_results = response.json()
+    results = check_results['data']
+    meta = check_results['meta']
+    summary = meta['summary']
+    
+    print(f"Check: {meta['checkName']}")
+    print(f"Time period: {meta['timeframe']['from']} to {meta['timeframe']['to']}")
+    print(f"Total results: {meta['totalItems']}")
+    print(f"Success rate: {summary['successRate']}%")
+    print(f"Average response time: {summary['averageResponseTime']}ms")
+    
+    # Response time analysis
+    successful_results = [r for r in results if r['status'] == 'success']
+    if successful_results:
+        response_times = [r['response']['responseTime'] for r in successful_results]
+        
+        print(f"\nResponse Time Analysis:")
+        print(f"  Minimum: {min(response_times)}ms")
+        print(f"  Maximum: {max(response_times)}ms")
+        print(f"  Median: {statistics.median(response_times):.1f}ms")
+        print(f"  Standard deviation: {statistics.stdev(response_times):.1f}ms")
+        print(f"  95th percentile: {summary['p95ResponseTime']}ms")
+        print(f"  99th percentile: {summary['p99ResponseTime']}ms")
+    
+    # Error analysis
+    failed_results = [r for r in results if r['status'] == 'failed']
+    if failed_results:
+        print(f"\nError Analysis ({len(failed_results)} failures):")
+        
+        # Group by error type
+        error_types = {}
+        status_codes = {}
+        
+        for result in failed_results:
+            # Error message analysis
+            error_msg = result.get('error', {}).get('message', 'Unknown error')
+            error_types[error_msg] = error_types.get(error_msg, 0) + 1
+            
+            # Status code analysis
+            status_code = result['response'].get('statusCode', 'No response')
+            status_codes[status_code] = status_codes.get(status_code, 0) + 1
+        
+        print("  Most common errors:")
+        for error, count in sorted(error_types.items(), key=lambda x: x[1], reverse=True)[:3]:
+            print(f"    {error}: {count}")
+        
+        print("  Status code breakdown:")
+        for status, count in sorted(status_codes.items(), key=lambda x: x[1], reverse=True):
+            print(f"    {status}: {count}")
+    
+    # Performance by location
+    location_performance = {}
+    for result in successful_results:
+        location = result['location']['name']
+        response_time = result['response']['responseTime']
+        
+        if location not in location_performance:
+            location_performance[location] = []
+        location_performance[location].append(response_time)
+    
+    if location_performance:
+        print(f"\nPerformance by Location:")
+        for location, times in location_performance.items():
+            avg_time = sum(times) / len(times)
+            print(f"  {location}: {avg_time:.1f}ms average ({len(times)} samples)")
+    
+    # Timing breakdown analysis (for latest result)
+    if results and results[0]['status'] == 'success':
+        timing = results[0]['timing']
+        total = timing['total']
+        
+        print(f"\nLatest Request Timing Breakdown:")
+        print(f"  DNS resolution: {timing['dns']}ms ({timing['dns']/total*100:.1f}%)")
+        print(f"  TCP connection: {timing['tcp']}ms ({timing['tcp']/total*100:.1f}%)")
+        print(f"  TLS handshake: {timing['tls']}ms ({timing['tls']/total*100:.1f}%)")
+        print(f"  First byte: {timing['firstByte']}ms ({timing['firstByte']/total*100:.1f}%)")
+        print(f"  Download: {timing['download']}ms ({timing['download']/total*100:.1f}%)")
+        print(f"  Total: {timing['total']}ms")
+
+else:
+    print(f"Error: {response.status_code} - {response.text}")
+```
+
+</CodeGroup>
+
+<Note>
+Check results provide detailed execution data for performance analysis, debugging, and compliance reporting. The timing breakdown helps identify bottlenecks in different components of the request lifecycle.
+</Note>

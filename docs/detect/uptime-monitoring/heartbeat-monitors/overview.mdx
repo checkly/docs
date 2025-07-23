@@ -68,60 +68,19 @@ aws s3 cp backup.sql s3://my-backup-bucket/
 curl -m 5 --retry 3 https://ping.checklyhq.com/your-heartbeat-id
 ```
 
-## Creating Your First Heartbeat Monitor
+## Getting Started
 
-### 1. Basic Configuration
+Ready to create your first heartbeat monitor? Follow our comprehensive guide that walks you through each step of the setup process.
 
-Start by giving your monitor a descriptive name and relevant tags:
+<CardGroup cols={2}>
+<Card title="Creating Your First Monitor" href="/docs/detect/uptime-monitoring/heartbeat-monitors/creating-your-first-heartbeat-monitor">
+Step-by-step guide to configure your first heartbeat monitor
+</Card>
 
-- **Name**: Choose something descriptive like "Nightly Database Backup" or "Weekly Reports Job"
-- **Tags**: Use tags to group related monitors (e.g., "production", "backups", "weekly")
-
-### 2. Timing Configuration
-
-Configure when you expect pings and how much flexibility to allow:
-
-**Period**: How often your task should ping (e.g., every 24 hours, weekly)
-**Grace Period**: Extra time to wait before alerting (e.g., 30 minutes grace for a daily job)
-
-![Configure period and grace settings for your heartbeat monitor](/images/heartbeat-monitors/getting-started-period-and-grace.png)
-
-<AccordionGroup>
-<Accordion title="Understanding Grace Periods">
-Grace periods compensate for natural variance in job execution times. For example:
-
-- **Daily backup at 2 AM** with 30-minute grace → Alert if no ping by 2:30 AM
-- **Weekly report on Fridays** with 4-hour grace → Alert if no ping by end of Friday
-- **Hourly sync job** with 5-minute grace → Alert if ping is more than 5 minutes late
-
-Choose grace periods based on:
-- Normal variance in your job execution time
-- Acceptable delay before you need to know about failures
-- Time needed for any retries or recovery processes
-</Accordion>
-
-<Accordion title="Timer Behavior">
-The heartbeat timer works predictably:
-
-- **First ping starts the timer** - When you send the first ping, monitoring begins
-- **Each ping resets the timer** - Every successful ping resets the countdown
-- **Alerts also reset the timer** - After an alert fires, the timer restarts
-- **Deactivation resets everything** - Pausing and resuming a monitor restarts timing
-
-This means if your job is supposed to run every 6 hours but runs late at hour 7, the next ping will be expected at hour 13 (7 + 6), not hour 12.
-
-![Understanding how grace periods and timing work in heartbeat monitoring](/images/heartbeat-monitors/heartbeats-grace.jpg)
-</Accordion>
-</AccordionGroup>
-
-### 3. Alert Configuration
-
-Connect your heartbeat monitor to [alert channels](/docs/communicate/alerts/) to be notified when pings are missing:
-
-- Email notifications for immediate awareness
-- Slack or Teams for team coordination  
-- Webhooks for custom integrations
-- PagerDuty for critical production jobs
+<Card title="Integration Examples" href="/docs/detect/uptime-monitoring/heartbeat-monitors/integration-examples">
+Learn how to integrate with CLI, infrastructure as code, CI/CD, and more
+</Card>
+</CardGroup>
 
 ## Ping URL and Implementation
 
@@ -189,44 +148,6 @@ You can also send manual pings directly from your monitors list using the quick 
 
 ![Quick ping option in the heartbeat monitors list view](/images/heartbeat-monitors/heartbeat-ping-quick-menu.png)
 
-## Integration Examples
-
-### With the Checkly CLI
-
-Define heartbeat monitors as code alongside your other monitoring:
-
-<CodeGroup>
-```typescript TypeScript
-import { HeartbeatCheck } from 'checkly/constructs'
-
-new HeartbeatCheck('weekly-newsletter', {
-  name: 'Weekly Newsletter Campaign',
-  period: 7,
-  periodUnit: 'days',
-  grace: 4,
-  graceUnit: 'hours',
-  tags: ['newsletter', 'marketing', 'weekly']
-})
-```
-
-```javascript JavaScript
-const { HeartbeatCheck } = require('checkly/constructs')
-
-new HeartbeatCheck('database-backup', {
-  name: 'Nightly Database Backup',
-  period: 1,
-  periodUnit: 'days', 
-  grace: 30,
-  graceUnit: 'minutes',
-  tags: ['backup', 'database', 'critical']
-})
-```
-</CodeGroup>
-
-### With Infrastructure as Code
-
-Many teams manage heartbeat monitors alongside their infrastructure using tools like Terraform, ensuring monitoring is created when new scheduled jobs are deployed.
-
 ## Understanding Results and Alerts
 
 Heartbeat monitors provide different insights than active checks:
@@ -245,16 +166,16 @@ Use this data to:
 ## Next Steps
 
 <CardGroup cols={2}>
-<Card title="Implementation Examples" href="/docs/detect/uptime-monitoring/heartbeat-monitors/ping-examples">
+<Card title="Creating Your First Monitor" href="/docs/detect/uptime-monitoring/heartbeat-monitors/creating-your-first-heartbeat-monitor">
+Step-by-step guide to configure your first heartbeat monitor
+</Card>
+
+<Card title="Integration Examples" href="/docs/detect/uptime-monitoring/heartbeat-monitors/integration-examples">
+Learn how to integrate with CLI, infrastructure as code, CI/CD, and more
+</Card>
+
+<Card title="Ping Examples" href="/docs/detect/uptime-monitoring/heartbeat-monitors/ping-examples">
 See detailed code examples for every platform and framework
-</Card>
-
-<Card title="Check Results" href="/docs/monitor/check-results#heartbeat-check-results">
-Learn how to interpret heartbeat monitoring results and alerts
-</Card>
-
-<Card title="Monitoring as Code" href="/guides/monitoring-as-code">
-Discover how to manage heartbeat monitors with infrastructure as code
 </Card>
 
 <Card title="Alert Configuration" href="/docs/communicate/alerts">

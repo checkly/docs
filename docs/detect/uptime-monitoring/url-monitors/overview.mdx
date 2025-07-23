@@ -1,0 +1,258 @@
+---
+title: 'URL Monitors Overview'
+description: 'Monitor HTTP resources to verify that your website or service is online and returning the expected response.'
+sidebarTitle: Overview
+---
+
+import { Note, Warning, Tip } from 'mintlify/components'
+
+Monitor your websites, APIs, and HTTP services with Checkly's URL monitoring. URL monitors perform HTTP requests to your endpoints to verify they're accessible, responding correctly, and meeting your performance requirements.
+
+## What are URL Monitors?
+
+URL monitors are HTTP-based checks that request web pages, API endpoints, or other HTTP resources. They validate that your services return the correct status codes, response times, and content, ensuring your users can access your applications successfully.
+
+![URL monitor interface showing HTTP response validation](/images/url-monitors/url-monitor-overview.png)
+
+<CardGroup cols={2}>
+<Card title="Perfect for" icon="check">
+- Website uptime monitoring
+- REST API endpoint validation  
+- Landing page availability
+- CDN and static asset monitoring
+- Health check endpoints
+- Third-party service monitoring
+</Card>
+
+<Card title="Key benefits" icon="globe">
+- HTTP status code validation
+- Response time measurement
+- Content verification
+- SSL certificate monitoring
+- Custom header support
+- Redirect following
+</Card>
+</CardGroup>
+
+## How URL Monitoring Works
+
+URL monitors perform comprehensive HTTP checks:
+
+1. **DNS Resolution** - Resolves the hostname to an IP address
+2. **TCP Connection** - Establishes connection to the web server
+3. **SSL Handshake** - Validates certificates for HTTPS requests
+4. **HTTP Request** - Sends the configured HTTP request
+5. **Response Validation** - Checks status codes, headers, and content
+6. **Timing Measurement** - Records response times for each step
+
+<Tip>
+URL monitors provide detailed timing breakdowns to help identify performance bottlenecks in your web stack.
+</Tip>
+
+## Monitor Configuration
+
+### Basic Settings
+
+- **URL**: The HTTP/HTTPS endpoint to monitor
+- **Request Method**: GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS
+- **Request Headers**: Custom headers for authentication or content-type
+- **Request Body**: Data to send with POST/PUT requests
+- **Follow Redirects**: Whether to follow HTTP redirects (default: yes)
+
+### Validation Options
+
+- **Expected Status Code**: HTTP status code to consider successful (default: 200)
+- **Response Time Threshold**: Maximum acceptable response time
+- **Content Validation**: Text patterns that must appear in the response
+- **JSON Schema Validation**: Validate JSON responses against a schema
+- **Header Validation**: Check for specific response headers
+
+### Advanced Features
+
+- **User Agent**: Custom user agent string
+- **Basic Authentication**: Username/password for protected endpoints
+- **API Keys**: Custom authentication headers
+- **Proxy Configuration**: Route requests through specific proxies
+- **IPv4/IPv6**: Force specific IP protocol versions
+
+
+## Global Monitoring Network
+
+URL monitors run from Checkly's global monitoring network:
+
+- **20+ Global Locations**: Monitor from major cities worldwide
+- **Edge Location Testing**: Validate CDN performance
+- **Regional Performance**: Compare response times across regions
+- **Network Diversity**: Multiple ISPs and network paths
+- **Load Balancer Testing**: Verify geo-distributed applications
+
+## Response Time Analysis
+
+URL monitors track detailed performance metrics:
+
+### Timing Breakdown
+- **DNS Time**: Hostname resolution duration
+- **Connect Time**: TCP connection establishment
+- **SSL Time**: Certificate negotiation (HTTPS only)
+- **Send Time**: Request transmission duration
+- **Wait Time**: Server processing time (TTFB)
+- **Receive Time**: Response download duration
+
+### Performance Insights
+- Identify slow DNS providers
+- Detect network connectivity issues
+- Monitor server response times
+- Track SSL certificate performance
+- Analyze content delivery speed
+
+## Content Validation
+
+Validate response content to ensure functionality:
+
+### Text Pattern Matching
+```yaml
+Content Contains: "Login successful"
+Content Not Contains: "Error 500"
+```
+
+### JSON Response Validation
+```json
+{
+  "type": "object",
+  "properties": {
+    "status": {"type": "string", "enum": ["success"]},
+    "data": {"type": "object"}
+  },
+  "required": ["status", "data"]
+}
+```
+
+### Header Verification
+```yaml
+Headers Contains:
+  - "content-type: application/json"
+  - "cache-control: no-cache"
+Headers Not Contains:
+  - "x-debug-info"
+```
+
+## SSL Certificate Monitoring
+
+For HTTPS URLs, monitors automatically check:
+
+- **Certificate Validity**: Ensures certificates are not expired
+- **Chain Verification**: Validates the complete certificate chain
+- **Hostname Matching**: Confirms certificate matches the requested domain
+- **Protocol Security**: Checks for secure TLS versions and ciphers
+- **Expiration Alerts**: Warns before certificates expire
+
+<Warning>
+SSL certificate issues can cause complete service outages. Enable certificate monitoring for all HTTPS endpoints.
+</Warning>
+
+## Authentication Support
+
+URL monitors support various authentication methods:
+
+### Basic Authentication
+```yaml
+URL: https://api.example.com/protected
+Basic Auth:
+  Username: admin
+  Password: secret123
+```
+
+### Bearer Token Authentication
+```yaml
+Headers:
+  Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+### API Key Authentication
+```yaml
+Headers:
+  X-API-Key: "your-api-key-here"
+  X-Client-ID: "client-123"
+```
+
+### Custom Authentication
+```yaml
+Headers:
+  Custom-Auth: "signature=abc123&timestamp=1640995200"
+```
+
+## Error Detection and Alerting
+
+URL monitors detect various failure conditions:
+
+### HTTP Errors
+- **4xx Client Errors**: Bad requests, authentication failures
+- **5xx Server Errors**: Internal server errors, service unavailable
+- **Network Errors**: DNS failures, connection refused, timeouts
+
+### Performance Issues
+- **Slow Responses**: Response times exceeding thresholds
+- **Intermittent Slowdowns**: Periodic performance degradation
+- **Regional Variations**: Slow performance in specific locations
+
+### Content Issues
+- **Missing Content**: Expected text patterns not found
+- **Error Messages**: Error text appearing in responses
+- **Invalid JSON**: Malformed API responses
+- **Schema Violations**: JSON not matching expected structure
+
+
+## Limitations
+
+URL monitors have some constraints:
+
+- Cannot execute JavaScript or interact with dynamic content
+- Limited to HTTP/HTTPS protocols only
+- No support for complex authentication flows (OAuth2 flows)
+- Cannot maintain session state across requests
+
+<Note>
+For complex user interactions and JavaScript-heavy applications, consider using [Browser Checks](/docs/detect/synthetic-monitoring/browser-checks) alongside URL monitors.
+</Note>
+
+## Getting Started
+
+Ready to monitor your web services? Create your first URL monitor and ensure your applications are always available to users.
+
+<CardGroup cols={2}>
+<Card title="Creating Your First URL Monitor" href="/docs/detect/uptime-monitoring/url-monitors/creating-your-first-url-monitor">
+Step-by-step guide to set up HTTP monitoring for your websites and APIs
+</Card>
+
+<Card title="URL Monitor Use Cases" href="/docs/detect/uptime-monitoring/url-monitors/use-cases">
+Explore common use cases and real-world examples
+</Card>
+
+<Card title="URL Monitor Best Practices" href="/docs/detect/uptime-monitoring/url-monitors/best-practices">
+Learn optimization strategies and configuration recommendations
+</Card>
+
+<Card title="Alert Configuration" href="/docs/communicate/alerts">
+Configure effective alerting for your URL monitors
+</Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+<Card title="TCP Monitors" href="/docs/detect/uptime-monitoring/tcp-monitors/overview">
+Learn about low-level TCP monitoring for databases and services
+</Card>
+
+<Card title="API Checks" href="/docs/detect/synthetic-monitoring/api-checks/creating-your-first-api-check">
+Explore advanced API testing with authentication and data validation
+</Card>
+
+<Card title="Browser Checks" href="/docs/detect/synthetic-monitoring/browser-checks/creating-your-first-browser-check">
+Monitor complex user interactions with automated browser testing
+</Card>
+
+<Card title="Private Locations" href="/docs/getting-started/platform/private-locations/overview">
+Monitor internal applications with private monitoring locations
+</Card>
+</CardGroup>

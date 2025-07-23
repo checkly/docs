@@ -1,0 +1,702 @@
+---
+title: 'Alert Channels'
+description: 'Comprehensive guide to configuring notification channels including email, Slack, webhooks, PagerDuty, SMS, and custom integrations for Checkly alerts.'
+sidebarTitle: 'Alert Channels'
+---
+
+import { Note, Warning, Tip, Steps } from 'mintlify/components'
+
+Alert channels determine **how** alert notifications reach your team when checks fail, degrade, or recover. Checkly supports a wide range of notification methods, from simple email alerts to sophisticated incident management integrations.
+
+## Available Alert Channels
+
+Checkly provides multiple notification channels to fit your team's communication preferences and operational workflows:
+
+<CardGroup cols={3}>
+<Card title="Communication platforms" icon="message-square">
+- **Email**: Direct email notifications
+- **Slack**: Team channel integration
+- **Discord**: Community and team chat
+- **Telegram**: Mobile messaging
+- **SMS**: Text message alerts
+- **Phone calls**: Voice notifications
+</Card>
+
+<Card title="Incident management" icon="shield-alert">
+- **PagerDuty**: On-call management
+- **Opsgenie**: Alert orchestration
+- **FireHydrant**: Incident response
+- **Incident.io**: Incident coordination
+- **Rootly**: Post-incident analysis
+- **ilert**: Alert automation
+</Card>
+
+<Card title="Custom integrations" icon="webhook">
+- **Webhooks**: Custom API endpoints
+- **Jira**: Issue tracking
+- **Trello**: Project management
+- **Pushover**: Mobile notifications
+- **Splunk On-Call**: Enterprise alerting
+- **Spike.sh**: Developer alerts
+</Card>
+</CardGroup>
+
+## Managing Alert Channels
+
+### Channel Configuration Overview
+Configure channels with flexible subscription and filtering options:
+
+![Alert channels management interface](/images/alerting/alert-channels.png)
+
+<Steps>
+<Step title="Create Alert Channel">
+Choose your notification method and provide connection details
+</Step>
+
+<Step title="Configure Alert Types">
+Select which types of events should trigger notifications
+</Step>
+
+<Step title="Subscribe Checks">
+Choose which checks and check groups use this channel
+</Step>
+
+<Step title="Test Integration">
+Verify the channel works correctly with test notifications
+</Step>
+</Steps>
+
+### Alert Type Selection
+Choose which events trigger notifications for each channel:
+
+| Alert Type | Description | Recommended For |
+|------------|-------------|------------------|
+| **Failure** | Hard errors and assertion failures | All critical channels |
+| **Degradation** | Performance threshold violations | Performance-focused teams |
+| **Recovery** | Service restoration notifications | Operations and on-call teams |
+| **SSL Expiration** | Certificate expiration warnings | Security and infrastructure teams |
+
+### Check Subscription Management
+Control which checks send alerts to each channel:
+
+```yaml
+# Example channel subscription strategy
+Critical Production Channel:
+  Subscribed Checks: Payment API, User Auth, Core Database
+  Alert Types: Failure, Recovery
+  
+Performance Monitoring Channel:
+  Subscribed Checks: All API checks
+  Alert Types: Degradation, Recovery
+  
+Security Alerts Channel:
+  Subscribed Checks: All SSL-enabled checks
+  Alert Types: SSL Expiration
+```
+
+## Email Notifications
+
+### Basic Email Configuration
+Set up email alerts for individuals or distribution lists:
+
+```yaml
+Email Configuration:
+  Recipients: 
+    - engineering@company.com
+    - ops-team@company.com
+    - john.doe@company.com
+  Alert Types: [Failure, Recovery]
+  Subject Format: "[CHECKLY] {{ALERT_TITLE}}"
+  Include Details: Response time, location, direct link
+```
+
+### Email Content Customization
+Email alerts include comprehensive check information:
+
+```text
+Subject: [CHECKLY] Check "Payment API" has failed
+
+Alert Details:
+- Check Name: Payment API Health Check
+- Alert Type: ALERT_FAILURE
+- Location: N. Virginia (us-east-1)
+- Response Time: 5,234ms
+- Started At: 2024-01-15 14:30:22 UTC
+- Error: Connection timeout after 5000ms
+
+View detailed results: https://app.checklyhq.com/checks/abc123/results/def456
+
+Check configuration: https://app.checklyhq.com/checks/abc123
+```
+
+### Email Best Practices
+- Use distribution lists instead of individual addresses
+- Set up separate emails for different severity levels
+- Configure email filters for automated processing
+- Include relevant team members based on check ownership
+
+## Slack Integration
+
+### Slack Workspace Connection
+Connect Checkly to your Slack workspace with proper permissions:
+
+<Steps>
+<Step title="Install Checkly Slack App">
+Add the Checkly app to your Slack workspace with appropriate permissions
+</Step>
+
+<Step title="Configure Channel Access">
+Grant Checkly permission to post to specific channels
+</Step>
+
+<Step title="Set Up Channel Routing">
+Configure which alerts go to which Slack channels
+</Step>
+
+<Step title="Customize Message Format">
+Choose alert format and included information
+</Step>
+</Steps>
+
+### Slack Channel Strategy
+Organize alerts across different Slack channels:
+
+```yaml
+# Example Slack channel organization
+#alerts-critical:
+  Checks: Core production services
+  Alert Types: Failure, Recovery
+  Escalation: @here for immediate attention
+  
+#alerts-performance:
+  Checks: All API and browser checks
+  Alert Types: Degradation, Recovery
+  Escalation: No @here, passive monitoring
+  
+#alerts-security:
+  Checks: SSL certificate monitoring
+  Alert Types: SSL Expiration
+  Escalation: @security-team
+  
+#alerts-staging:
+  Checks: Development and staging environment
+  Alert Types: All
+  Escalation: @dev-team during business hours
+```
+
+### Slack Message Formatting
+Slack alerts include rich formatting and interactive elements:
+
+```text
+🔴 **ALERT: Payment API has failed**
+
+**Check**: Payment API Health Check
+**Location**: N. Virginia
+**Response Time**: 5,234ms
+**Started**: <!date^1642248622^{date_short_pretty} at {time}|2024-01-15 14:30:22 UTC>
+
+**Error**: Connection timeout after 5000ms
+
+[View Results](https://app.checklyhq.com/checks/abc123/results/def456) | [Check Config](https://app.checklyhq.com/checks/abc123)
+```
+
+### Slack Threading and Updates
+Configure how Checkly handles related alerts:
+
+- **Thread updates**: Group related alerts (failure → recovery) in threads
+- **Channel posting**: Each alert as separate message for visibility
+- **Mention strategies**: Use @here/@channel appropriately based on severity
+
+## Webhook Integration
+
+### Advanced Webhook Configuration
+Create sophisticated integrations with custom endpoints:
+
+```json
+{
+  "name": "Custom Incident Management",
+  "url": "https://api.internal-system.com/webhooks/checkly",
+  "method": "POST",
+  "headers": {
+    "Authorization": "Bearer {{API_TOKEN}}",
+    "Content-Type": "application/json",
+    "X-Source": "checkly-monitoring",
+    "X-Environment": "{{#contains CHECK_NAME 'staging'}}staging{{else}}production{{/contains}}"
+  },
+  "body": {
+    "timestamp": "{{STARTED_AT}}",
+    "event_type": "{{ALERT_TYPE}}",
+    "severity": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}high{{else}}{{#eq ALERT_TYPE 'ALERT_DEGRADED'}}medium{{else}}low{{/eq}}{{/eq}}",
+    "service": {
+      "name": "{{CHECK_NAME}}",
+      "id": "{{CHECK_ID}}",
+      "type": "{{CHECK_TYPE}}",
+      "tags": [{{#each TAGS}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}]
+    },
+    "incident": {
+      "title": "{{ALERT_TITLE}}",
+      "description": "Check failed from {{RUN_LOCATION}} with {{RESPONSE_TIME}}ms response time",
+      "url": "{{RESULT_LINK}}",
+      "location": "{{RUN_LOCATION}}",
+      "response_time": {{RESPONSE_TIME}},
+      "error_message": "{{CHECK_ERROR_MESSAGE}}"
+    }
+  }
+}
+```
+
+### Webhook Variables and Templating
+Use dynamic variables to create contextual alerts:
+
+| Variable | Description | Example Value |
+|----------|-------------|---------------|
+| `CHECK_NAME` | Full check name | "Payment API Health Check" |
+| `CHECK_ID` | UUID of the check | "abc123-def456-ghi789" |
+| `CHECK_TYPE` | Type of check | "API", "BROWSER", "HEARTBEAT" |
+| `ALERT_TITLE` | Human-readable alert title | "Check 'Payment API' has failed" |
+| `ALERT_TYPE` | Alert event type | "ALERT_FAILURE", "ALERT_RECOVERY" |
+| `CHECK_RESULT_ID` | UUID of the result | "result-123-456" |
+| `CHECK_ERROR_MESSAGE` | Error details | "Connection timeout after 5000ms" |
+| `RESPONSE_TIME` | Response time in milliseconds | 1234 |
+| `RUN_LOCATION` | Location where check ran | "N. Virginia" |
+| `RESULT_LINK` | Direct link to results | "https://app.checklyhq.com/..." |
+| `STARTED_AT` | ISO timestamp | "2024-01-15T14:30:22.000Z" |
+| `TAGS` | Array of check tags | ["critical", "payment", "api"] |
+| `GROUP_NAME` | Group name if applicable | "Payment Services" |
+
+### Handlebars Helpers and Conditional Logic
+Create dynamic webhook content with conditional formatting:
+
+```json
+{
+  "priority": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}P1{{else}}{{#eq ALERT_TYPE 'ALERT_DEGRADED'}}P2{{else}}P3{{/eq}}{{/eq}}",
+  "environment": "{{#contains CHECK_NAME 'prod'}}production{{else}}{{#contains CHECK_NAME 'staging'}}staging{{else}}development{{/contains}}{{/contains}}",
+  "escalation_needed": {{#and (eq ALERT_TYPE 'ALERT_FAILURE') (contains TAGS 'critical')}}true{{else}}false{{/and}},
+  "formatted_tags": [{{#each TAGS}}"{{uppercase this}}"{{#unless @last}},{{/unless}}{{/each}}],
+  "response_time_category": "{{#gt RESPONSE_TIME 5000}}slow{{else}}{{#gt RESPONSE_TIME 2000}}medium{{else}}fast{{/gt}}{{/gt}}",
+  "alert_color": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}#ff0000{{else}}{{#eq ALERT_TYPE 'ALERT_DEGRADED'}}#ffa500{{else}}#00ff00{{/eq}}{{/eq}}"
+}
+```
+
+### Webhook Security and Authentication
+Implement secure webhook delivery:
+
+```javascript
+// Webhook signature verification
+const crypto = require('crypto')
+
+function verifyChecklyWebhook(payload, signature, secret) {
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex')
+  
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expectedSignature)
+  )
+}
+
+// Express.js webhook endpoint
+app.post('/checkly-webhook', express.raw({type: 'application/json'}), (req, res) => {
+  const signature = req.headers['x-checkly-signature']
+  const timestamp = req.headers['x-checkly-timestamp']
+  
+  // Verify signature
+  if (!verifyChecklyWebhook(req.body, signature, process.env.WEBHOOK_SECRET)) {
+    return res.status(401).send('Invalid signature')
+  }
+  
+  // Check timestamp to prevent replay attacks
+  const webhookTimestamp = parseInt(timestamp)
+  const currentTime = Math.floor(Date.now() / 1000)
+  
+  if (Math.abs(currentTime - webhookTimestamp) > 300) { // 5 minutes
+    return res.status(401).send('Timestamp too old')
+  }
+  
+  // Process webhook
+  const alertData = JSON.parse(req.body)
+  handleChecklyAlert(alertData)
+  
+  res.status(200).send('OK')
+})
+```
+
+### Webhook Retry Logic
+Checkly automatically retries failed webhooks:
+
+```yaml
+Webhook Retry Behavior:
+  Max Retries: 5
+  Retry Trigger: HTTP status >= 400
+  Backoff Strategy: 20 seconds between retries
+  Total Retry Duration: 100 seconds (5 × 20s)
+  
+Timestamp Header: x-checkly-timestamp
+Purpose: Handle late arrivals due to retries
+```
+
+## PagerDuty Integration
+
+### PagerDuty Service Configuration
+Set up PagerDuty integration for on-call management:
+
+<Steps>
+<Step title="Create PagerDuty Service">
+Create a service in PagerDuty with Checkly integration
+</Step>
+
+<Step title="Configure Integration Key">
+Use the integration key in Checkly's PagerDuty channel configuration
+</Step>
+
+<Step title="Set Escalation Policies">
+Configure how alerts escalate through your on-call schedule
+</Step>
+
+<Step title="Test Integration">
+Send test alerts to verify proper incident creation
+</Step>
+</Steps>
+
+### PagerDuty Alert Mapping
+Configure how Checkly alerts map to PagerDuty incidents:
+
+```yaml
+PagerDuty Configuration:
+  Service: Production Monitoring
+  Integration Type: Events API v2
+  
+Alert Mapping:
+  ALERT_FAILURE → Critical Incident
+  ALERT_DEGRADED → Warning Incident  
+  ALERT_RECOVERY → Resolve Incident
+  
+Incident Details:
+  Title: "{{ALERT_TITLE}}"
+  Description: "Check {{CHECK_NAME}} from {{RUN_LOCATION}}"
+  Severity: Based on check tags and alert type
+  Component: Derived from check name or group
+  Custom Fields:
+    - Response Time: {{RESPONSE_TIME}}ms
+    - Check ID: {{CHECK_ID}}
+    - Location: {{RUN_LOCATION}}
+```
+
+### Advanced PagerDuty Features
+Leverage PagerDuty's advanced incident management:
+
+```json
+{
+  "incident": {
+    "type": "incident", 
+    "title": "{{ALERT_TITLE}}",
+    "service": {
+      "id": "P123ABC",
+      "type": "service_reference"
+    },
+    "priority": {
+      "id": "{{#contains TAGS 'critical'}}P1{{else}}P2{{/contains}}",
+      "type": "priority_reference"
+    },
+    "body": {
+      "type": "incident_body",
+      "details": "Check {{CHECK_NAME}} failed from {{RUN_LOCATION}}.\n\nResponse Time: {{RESPONSE_TIME}}ms\nError: {{CHECK_ERROR_MESSAGE}}\n\nView details: {{RESULT_LINK}}"
+    },
+    "escalation_policy": {
+      "id": "{{#contains CHECK_NAME 'payment'}}P456DEF{{else}}P789GHI{{/contains}}",
+      "type": "escalation_policy_reference"
+    }
+  }
+}
+```
+
+## SMS and Phone Calls
+
+### SMS Alert Configuration
+Set up text message notifications for critical alerts:
+
+```yaml
+SMS Configuration:
+  Phone Numbers:
+    - "+1-555-0123" # On-call engineer
+    - "+1-555-0456" # Backup engineer
+  
+Message Format: "[CHECKLY] {{CHECK_NAME}} failed at {{RUN_LOCATION}}. {{RESULT_LINK}}"
+
+Alert Conditions:
+  Triggers: ALERT_FAILURE only
+  Checks: Critical production services
+  Time Restrictions: 24/7 or business hours only
+```
+
+### Phone Call Escalation
+Configure voice call alerts for highest priority incidents:
+
+```yaml
+Phone Call Configuration:
+  Numbers: Primary and backup on-call
+  Trigger Conditions:
+    - Critical checks (tagged as "P1")
+    - Multiple location failures
+    - Extended outage duration (>10 minutes)
+  
+Message Script:
+  "This is a Checkly alert. The {{CHECK_NAME}} check has failed from {{RUN_LOCATION}}. 
+   Please check your monitoring dashboard immediately."
+  
+Escalation Rules:
+  - Call primary on-call first
+  - If no answer within 5 minutes, call backup
+  - Repeat cycle until acknowledged
+```
+
+## Third-Party Integration Examples
+
+### Jira Issue Creation
+Automatically create Jira tickets for check failures:
+
+```json
+{
+  "fields": {
+    "project": {
+      "key": "OPS"
+    },
+    "summary": "{{ALERT_TITLE}}",
+    "description": {
+      "version": 1,
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "Check Details:\n\n"
+            },
+            {
+              "type": "text",
+              "text": "Name: {{CHECK_NAME}}\n"
+            },
+            {
+              "type": "text",
+              "text": "Location: {{RUN_LOCATION}}\n"
+            },
+            {
+              "type": "text",
+              "text": "Response Time: {{RESPONSE_TIME}}ms\n"
+            },
+            {
+              "type": "text",
+              "text": "Error: {{CHECK_ERROR_MESSAGE}}\n\n"
+            },
+            {
+              "type": "text",
+              "text": "View results: ",
+              "marks": [
+                {
+                  "type": "link",
+                  "attrs": {
+                    "href": "{{RESULT_LINK}}"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "issuetype": {
+      "id": "10001"
+    },
+    "priority": {
+      "id": "{{#contains TAGS 'critical'}}1{{else}}3{{/contains}}"
+    },
+    "labels": [
+      "checkly",
+      "monitoring",
+      "{{#each TAGS}}{{this}}{{#unless @last}},{{/unless}}{{/each}}"
+    ]
+  }
+}
+```
+
+### Trello Card Creation
+Create Trello cards for incident tracking:
+
+```text
+URL: https://api.trello.com/1/cards?key={{TRELLO_KEY}}&token={{TRELLO_TOKEN}}
+
+Parameters:
+- idList: {{TRELLO_LIST_ID}}
+- name: {{ALERT_TITLE}}
+- desc: Check {{CHECK_NAME}} failed from {{RUN_LOCATION}} at {{STARTED_AT}}. Response time: {{RESPONSE_TIME}}ms. View details: {{RESULT_LINK}}
+- due: {{#eq ALERT_TYPE 'ALERT_FAILURE'}}{{addDays STARTED_AT 1}}{{/eq}}
+- labels: red (for failures), orange (for degraded)
+```
+
+### Discord Integration
+Send alerts to Discord channels:
+
+```json
+{
+  "embeds": [
+    {
+      "title": "{{ALERT_TITLE}}",
+      "description": "**Check**: {{CHECK_NAME}}\n**Location**: {{RUN_LOCATION}}\n**Response Time**: {{RESPONSE_TIME}}ms",
+      "color": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}15158332{{else}}{{#eq ALERT_TYPE 'ALERT_DEGRADED'}}16776960{{else}}3066993{{/eq}}{{/eq}}",
+      "fields": [
+        {
+          "name": "Error",
+          "value": "{{CHECK_ERROR_MESSAGE}}",
+          "inline": false
+        },
+        {
+          "name": "Started At",
+          "value": "{{STARTED_AT}}",
+          "inline": true
+        },
+        {
+          "name": "Location",
+          "value": "{{RUN_LOCATION}}",
+          "inline": true
+        }
+      ],
+      "footer": {
+        "text": "Checkly Monitoring"
+      },
+      "timestamp": "{{STARTED_AT}}",
+      "url": "{{RESULT_LINK}}"
+    }
+  ]
+}
+```
+
+## Channel Management Best Practices
+
+### Channel Organization Strategy
+Structure your alert channels for effective incident response:
+
+```yaml
+# Recommended channel organization
+Tier 1 - Critical Alerts:
+  Channels: PagerDuty + SMS + Slack #critical
+  Triggers: P1 checks, immediate escalation
+  Recipients: On-call engineers, team leads
+  
+Tier 2 - Standard Alerts:  
+  Channels: Slack #alerts + Email
+  Triggers: Standard production checks
+  Recipients: Engineering team, operations
+  
+Tier 3 - Development Alerts:
+  Channels: Email + Slack #dev-alerts
+  Triggers: Non-production environments
+  Recipients: Development team only
+  
+Security Alerts:
+  Channels: Email + Slack #security
+  Triggers: SSL expiration, security checks
+  Recipients: Security team, infrastructure team
+```
+
+### Alert Routing Logic
+Implement intelligent alert routing based on check properties:
+
+```yaml
+Routing Rules:
+  By Environment:
+    - production/* → Critical channels
+    - staging/* → Standard channels  
+    - development/* → Development channels
+    
+  By Service:
+    - payment* → Payment team + Critical
+    - user-auth* → Security team + Critical
+    - reporting* → Analytics team + Standard
+    
+  By Tags:
+    - "critical" → PagerDuty + SMS
+    - "performance" → Performance team
+    - "security" → Security team
+    
+  By Time:
+    - Business hours → Email + Slack
+    - After hours → PagerDuty + SMS (critical only)
+```
+
+### Testing and Validation
+Regularly test your alert channels to ensure reliability:
+
+<Steps>
+<Step title="Monthly Channel Tests">
+Send test alerts to verify all channels are working
+</Step>
+
+<Step title="Escalation Path Validation">
+Test the complete escalation chain for critical alerts
+</Step>
+
+<Step title="Response Time Measurement">
+Measure how quickly team members respond to alerts
+</Step>
+
+<Step title="Channel Performance Review">
+Analyze alert delivery success rates and failure patterns
+</Step>
+</Steps>
+
+## Channel Configuration Examples
+
+### Startup Configuration
+Simple alert setup for small teams:
+
+```yaml
+Basic Setup:
+  Email: team@startup.com
+  Slack: #general
+  
+Configuration:
+  All Checks: Email + Slack
+  Alert Types: Failure, Recovery
+  Escalation: None (small team)
+```
+
+### Enterprise Configuration
+Sophisticated multi-team alert routing:
+
+```yaml
+Enterprise Setup:
+  Critical Production:
+    - PagerDuty (Primary escalation)
+    - SMS (On-call engineers)
+    - Slack #production-alerts
+    
+  Standard Monitoring:
+    - Email distribution lists
+    - Slack team channels
+    - Jira ticket creation
+    
+  Security Monitoring:
+    - Security team email
+    - SIEM integration webhook
+    - Slack #security-alerts
+    
+  Development:
+    - Developer email notifications
+    - Slack #dev-alerts
+    - Optional Jira tickets
+```
+
+<Note>
+Start with simple email and Slack alerts, then gradually add sophisticated integrations like PagerDuty and webhooks as your monitoring program matures.
+</Note>
+
+<Warning>
+Always test your alert channels before depending on them for critical production monitoring. Failed alert delivery can be worse than no alerts at all.
+</Warning>
+
+<Tip>
+Use Checkly's alert notification log to track delivery success rates and identify any channels that frequently fail to deliver notifications.
+</Tip>

@@ -110,57 +110,13 @@ Before setting up Private Locations, ensure you have:
 - Minimum recommended: 2 CPU cores, 4GB RAM for mixed workloads
 </Info>
 
-## Quick Start Guide
+## Getting Started
 
-### Step 1: Create Your Private Location
+Ready to set up your first Private Location? Follow our comprehensive quick start guide:
 
-Navigate to [Private Locations](https://app.checklyhq.com/private-locations) and click "New private location":
-
-![Create a new private location with name and icon](/images/private-locations/pl_started_2.png)
-
-Provide a descriptive name and choose an icon that represents your location or environment.
-
-### Step 2: Secure Your API Key
-
-Copy and securely store the generated API key. This key authenticates your agents with Checkly:
-
-![Copy and securely store your Private Location API key](/images/private-locations/pl_started_3.png)
-
-<Warning>
-The API key is only shown once during creation. Store it securely in your secrets management system.
-</Warning>
-
-### Step 3: Deploy Your First Agent
-
-Start a Checkly Agent using Docker:
-
-```bash
-docker run -e API_KEY="pl_your_api_key_here" -d checkly/agent:latest
-```
-
-For production deployments, consider:
-- Using specific version tags instead of `latest`
-- Configuring resource limits and restart policies
-- Setting up monitoring and logging for the agent containers
-
-### Step 4: Verify Agent Connection
-
-Refresh your Private Locations page to see your active agents:
-
-![Verify that your Checkly Agent is connected and running](/images/private-locations/pl_started_4.png)
-
-The interface shows:
-- Number of active agents
-- Last connection time
-- Agent health status
-
-### Step 5: Configure Your Checks
-
-When creating checks, select your Private Location from the available locations:
-
-![Select your Private Location when creating or editing checks](/images/private-locations/pl_started_5.png)
-
-Deselect other locations to ensure your checks run exclusively from your Private Location.
+<Card title="Quick Start Guide" href="/docs/getting-started/platform/private-locations/quick-start">
+Get up and running with Private Locations in minutes. Follow step-by-step instructions to deploy your first Checkly Agent and start monitoring internal systems.
+</Card>
 
 ## Agent Lifecycle Management
 
@@ -185,171 +141,51 @@ Multiple agents in the same Private Location automatically:
 - Handle graceful failover during agent restarts
 - Requeue checks from failed agents (300-second timeout)
 
-## Integration with Checkly CLI
+## CLI Integration
 
-Define Private Locations in your monitoring-as-code workflow:
+Integrate Private Locations with your monitoring-as-code workflow:
 
-<CodeGroup>
-```typescript TypeScript
-import { ApiCheck, BrowserCheck } from 'checkly/constructs'
-
-// API check using private location
-new ApiCheck('internal-api-check', {
-  name: 'Internal API Health',
-  request: {
-    method: 'GET',
-    url: 'http://internal-api.company.local/health'
-  },
-  privateLocations: ['company-datacenter-east'],
-  maxResponseTime: 5000
-})
-
-// Browser check using private location  
-new BrowserCheck('internal-app-check', {
-  name: 'Internal App Login Flow',
-  code: {
-    entrypoint: './internal-app.spec.ts'
-  },
-  privateLocations: ['company-datacenter-east']
-})
-```
-
-```javascript JavaScript
-const { ApiCheck, BrowserCheck } = require('checkly/constructs')
-
-// API check for internal service
-new ApiCheck('database-health-check', {
-  name: 'Database Connection Health',
-  request: {
-    method: 'GET',
-    url: 'http://db-proxy.internal:8080/health'
-  },
-  privateLocations: ['internal-network'],
-  assertions: [
-    { source: 'STATUS_CODE', comparison: 'EQUALS', target: 200 }
-  ]
-})
-```
-</CodeGroup>
+<Card title="CLI Integration Guide" href="/docs/getting-started/platform/private-locations/cli-integration">
+Learn how to define Private Locations in TypeScript and JavaScript projects, integrate with CI/CD pipelines, and implement environment-specific configurations.
+</Card>
 
 ## Use Cases and Examples
 
-<AccordionGroup>
-<Accordion title="Development Environment Monitoring">
-Monitor staging and development environments:
+Explore real-world deployment patterns and monitoring scenarios:
 
-```bash
-# Development environment agent
-docker run \
-  -e API_KEY="pl_dev_environment_key" \
-  -e LOG_LEVEL="DEBUG" \
-  --name checkly-agent-dev \
-  -d checkly/agent:latest
-```
-
-Monitor internal development APIs, test databases, and staging applications before they go live.
-</Accordion>
-
-<Accordion title="Database and Backend Services">
-Monitor internal database health and backend services:
-
-```typescript
-// Monitor database connection pool
-new ApiCheck('database-pool-check', {
-  name: 'Database Pool Health',
-  request: {
-    method: 'GET',
-    url: 'http://db-monitor.internal:9090/pool-status'
-  },
-  privateLocations: ['datacenter-primary'],
-  assertions: [
-    { source: 'JSON_BODY', property: '$.activeConnections', comparison: 'LESS_THAN', target: 80 },
-    { source: 'JSON_BODY', property: '$.poolUtilization', comparison: 'LESS_THAN', target: 0.9 }
-  ]
-})
-```
-</Accordion>
-
-<Accordion title="Microservices Architecture">
-Monitor service-to-service communication:
-
-```typescript
-// Check internal service mesh health
-new ApiCheck('service-mesh-check', {
-  name: 'Service Mesh Health',
-  request: {
-    method: 'GET',
-    url: 'http://istio-proxy.istio-system:15000/stats/prometheus',
-    headers: { 'Accept': 'text/plain' }
-  },
-  privateLocations: ['kubernetes-cluster'],
-  assertions: [
-    { source: 'RESPONSE_TIME', comparison: 'LESS_THAN', target: 1000 }
-  ]
-})
-```
-</Accordion>
-
-<Accordion title="Compliance and Governance">
-Meet regulatory requirements with local monitoring:
-
-```bash
-# EU-specific private location for GDPR compliance
-docker run \
-  -e API_KEY="pl_eu_compliance_key" \
-  -e LOG_LEVEL="INFO" \
-  --label "compliance=gdpr" \
-  --label "region=eu-west" \
-  -d checkly/agent:latest
-```
-
-Ensure data processing and monitoring stays within required geographic boundaries.
-</Accordion>
-</AccordionGroup>
+<Card title="Use Cases Guide" href="/docs/getting-started/platform/private-locations/use-cases">
+Learn about monitoring internal systems, databases, microservices, compliance requirements, and more with detailed examples and implementation patterns.
+</Card>
 
 ## Supported Check Types
 
-Private Locations support all Checkly check types:
+Private Locations support all Checkly check types for comprehensive monitoring:
 
-<CardGroup cols={2}>
-<Card title="API Checks" icon="code">
-- REST API monitoring
-- GraphQL endpoint testing
-- Internal service health checks
-- Database connection monitoring
+<Card title="Supported Check Types Guide" href="/docs/getting-started/platform/private-locations/supported-checks">
+Learn about API checks, browser checks, TCP checks, and heartbeat monitors with detailed examples and configuration options.
 </Card>
-
-<Card title="Browser Checks" icon="browser">
-- Internal web application testing
-- End-to-end user journey validation
-- Playwright test suite execution
-- Visual regression testing
-</Card>
-
-<Card title="TCP Checks" icon="network-wired">
-- Port connectivity testing
-- Database connection validation
-- Load balancer health checks
-- Custom protocol monitoring
-</Card>
-
-<Card title="Heartbeat Checks" icon="heartbeat">
-- Internal job monitoring
-- Scheduled task validation
-- Backup process verification
-- ETL pipeline monitoring
-</Card>
-</CardGroup>
-
-<Note>
-**Playwright Support**: Playwright Test Suites are supported starting from Checkly Agent version 6.0.3. Ensure you're using a recent agent version for full Playwright compatibility.
-</Note>
 
 ## Next Steps
 
 <CardGroup cols={2}>
+<Card title="Quick Start Guide" href="/docs/getting-started/platform/private-locations/quick-start">
+Get up and running with Private Locations in minutes
+</Card>
+
+<Card title="Use Cases" href="/docs/getting-started/platform/private-locations/use-cases">
+Explore real-world deployment patterns and examples
+</Card>
+
+<Card title="CLI Integration" href="/docs/getting-started/platform/private-locations/cli-integration">
+Integrate with monitoring-as-code workflows
+</Card>
+
+<Card title="Supported Check Types" href="/docs/getting-started/platform/private-locations/supported-checks">
+Learn about all supported check types and configurations
+</Card>
+
 <Card title="Agent Configuration" href="/docs/getting-started/platform/private-locations/agent-configuration">
-Learn advanced agent configuration options, environment variables, and production settings
+Learn advanced agent configuration options and production settings
 </Card>
 
 <Card title="Kubernetes Deployment" href="/docs/getting-started/platform/private-locations/kubernetes-deployment">
@@ -375,5 +211,5 @@ Need help with Private Locations? Check these resources:
 - **GitHub**: Example configurations in our [checkly-k8s repository](https://github.com/checkly/checkly-k8s)
 
 <Tip>
-Start small with a single agent to test connectivity and functionality, then scale based on your monitoring requirements and workload patterns.
+Start with our [Quick Start Guide](/docs/getting-started/platform/private-locations/quick-start) to get up and running quickly, then explore advanced topics as needed.
 </Tip>

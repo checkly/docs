@@ -1,0 +1,385 @@
+---
+title: 'Supported Check Types'
+description: 'Learn about all the check types supported by Private Locations, including API checks, browser checks, TCP checks, and heartbeat monitors.'
+sidebarTitle: 'Supported Checks'
+---
+
+import { Note, Warning, Tip, Info } from 'mintlify/components'
+
+# Supported Check Types
+
+Private Locations support all Checkly check types, enabling comprehensive monitoring of your internal systems and applications.
+
+## API Checks
+
+Monitor REST APIs, GraphQL endpoints, and internal service health:
+
+<CardGroup cols={2}>
+<Card title="REST API Monitoring" icon="code">
+- HTTP/HTTPS endpoint testing
+- Request method validation (GET, POST, PUT, DELETE)
+- Header and authentication testing
+- Response time and status code validation
+</Card>
+
+<Card title="GraphQL Endpoint Testing" icon="database">
+- GraphQL query execution
+- Schema validation
+- Response parsing and assertion
+- Error handling and timeout management
+</Card>
+
+<Card title="Internal Service Health" icon="heartbeat">
+- Health check endpoint monitoring
+- Service availability validation
+- Dependency status checking
+- Circuit breaker pattern testing
+</Card>
+
+<Card title="Database Connection Monitoring" icon="server">
+- Database proxy health checks
+- Connection pool monitoring
+- Query performance validation
+- Database-specific endpoint testing
+</Card>
+</CardGroup>
+
+### API Check Examples
+
+**Basic Health Check:**
+```typescript
+new ApiCheck('internal-api-health', {
+  name: 'Internal API Health',
+  request: {
+    method: 'GET',
+    url: 'http://internal-api.company.local/health'
+  },
+  privateLocations: ['datacenter-east'],
+  assertions: [
+    { source: 'STATUS_CODE', comparison: 'EQUALS', target: 200 },
+    { source: 'RESPONSE_TIME', comparison: 'LESS_THAN', target: 1000 }
+  ]
+})
+```
+
+**Authenticated API Check:**
+```typescript
+new ApiCheck('authenticated-api-check', {
+  name: 'Authenticated API Test',
+  request: {
+    method: 'POST',
+    url: 'http://internal-api.company.local/api/data',
+    headers: {
+      'Authorization': 'Bearer ${process.env.API_TOKEN}',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ query: 'test-data' })
+  },
+  privateLocations: ['internal-network'],
+  assertions: [
+    { source: 'JSON_BODY', property: '$.status', comparison: 'EQUALS', target: 'success' }
+  ]
+})
+```
+
+## Browser Checks
+
+Execute Playwright tests and monitor internal web applications:
+
+<CardGroup cols={2}>
+<Card title="Internal Web Application Testing" icon="browser">
+- Internal application monitoring
+- User journey validation
+- Authentication flow testing
+- Form submission and data validation
+</Card>
+
+<Card title="End-to-End User Journey Validation" icon="route">
+- Complete user workflows
+- Multi-step process testing
+- Cross-page navigation validation
+- User experience monitoring
+</Card>
+
+<Card title="Playwright Test Suite Execution" icon="code">
+- Playwright test framework support
+- Custom test scripts
+- Visual regression testing
+- Performance benchmarking
+</Card>
+
+<Card title="Visual Regression Testing" icon="image">
+- Screenshot comparison
+- UI consistency validation
+- Layout and design testing
+- Cross-browser compatibility
+</Card>
+</CardGroup>
+
+### Browser Check Examples
+
+**Internal Application Login:**
+```typescript
+new BrowserCheck('internal-app-login', {
+  name: 'Internal App Login Flow',
+  code: {
+    entrypoint: './internal-login.spec.ts'
+  },
+  privateLocations: ['internal-network'],
+  maxResponseTime: 30000
+})
+```
+
+**Playwright Test Script:**
+```typescript
+// internal-login.spec.ts
+import { test, expect } from '@playwright/test'
+
+test('Internal application login', async ({ page }) => {
+  await page.goto('http://internal-app.company.local')
+  
+  await page.fill('[data-testid="username"]', process.env.INTERNAL_USERNAME)
+  await page.fill('[data-testid="password"]', process.env.INTERNAL_PASSWORD)
+  await page.click('[data-testid="login-button"]')
+  
+  await expect(page.locator('[data-testid="dashboard"]')).toBeVisible()
+  await expect(page.locator('[data-testid="user-menu"]')).toContainText('Admin User')
+})
+```
+
+<Note>
+**Playwright Support**: Playwright Test Suites are supported starting from Checkly Agent version 6.0.3. Ensure you're using a recent agent version for full Playwright compatibility.
+</Note>
+
+## TCP Checks
+
+Monitor port connectivity and network services:
+
+<CardGroup cols={2}>
+<Card title="Port Connectivity Testing" icon="network-wired">
+- TCP port availability
+- Service port monitoring
+- Connection timeout validation
+- Network reachability testing
+</Card>
+
+<Card title="Database Connection Validation" icon="database">
+- Database port monitoring
+- Connection pool testing
+- Database service availability
+- Connection string validation
+</Card>
+
+<Card title="Load Balancer Health Checks" icon="server">
+- Load balancer port monitoring
+- Backend service connectivity
+- Health check endpoint validation
+- Service discovery testing
+</Card>
+
+<Card title="Custom Protocol Monitoring" icon="code">
+- Custom protocol support
+- Binary protocol testing
+- Service-specific validation
+- Protocol compliance checking
+</Card>
+</CardGroup>
+
+### TCP Check Examples
+
+**Database Port Check:**
+```typescript
+new TcpCheck('database-port-check', {
+  name: 'Database Port Connectivity',
+  host: 'db-internal.company.local',
+  port: 5432,
+  privateLocations: ['datacenter-east'],
+  maxResponseTime: 5000
+})
+```
+
+**Load Balancer Health Check:**
+```typescript
+new TcpCheck('load-balancer-health', {
+  name: 'Load Balancer Health',
+  host: 'lb-internal.company.local',
+  port: 8080,
+  privateLocations: ['internal-network'],
+  maxResponseTime: 2000
+})
+```
+
+## Heartbeat Checks
+
+Monitor internal jobs, scheduled tasks, and processes:
+
+<CardGroup cols={2}>
+<Card title="Internal Job Monitoring" icon="clock">
+- Scheduled task validation
+- Cron job monitoring
+- Background process checking
+- Job execution tracking
+</Card>
+
+<Card title="Scheduled Task Validation" icon="calendar">
+- Task scheduler monitoring
+- Batch job execution
+- Maintenance window validation
+- Automated process checking
+</Card>
+
+<Card title="Backup Process Verification" icon="save">
+- Backup job monitoring
+- Data synchronization validation
+- Archive process checking
+- Recovery procedure testing
+</Card>
+
+<Card title="ETL Pipeline Monitoring" icon="database">
+- Data pipeline monitoring
+- ETL job execution
+- Data transformation validation
+- Pipeline health checking
+</Card>
+</CardGroup>
+
+### Heartbeat Check Examples
+
+**Scheduled Job Monitor:**
+```typescript
+new HeartbeatCheck('scheduled-job-monitor', {
+  name: 'Scheduled Job Heartbeat',
+  privateLocations: ['internal-network'],
+  gracePeriod: 300, // 5 minutes
+  maxResponseTime: 60000
+})
+```
+
+**Backup Process Monitor:**
+```typescript
+new HeartbeatCheck('backup-process-monitor', {
+  name: 'Daily Backup Process',
+  privateLocations: ['datacenter-east'],
+  gracePeriod: 3600, // 1 hour
+  maxResponseTime: 300000 // 5 minutes
+})
+```
+
+## Check Configuration Options
+
+### Common Configuration Parameters
+
+All check types support these common configuration options:
+
+```typescript
+{
+  name: 'Check Name',
+  privateLocations: ['location-name'],
+  maxResponseTime: 5000,
+  retryCount: 2,
+  tags: ['internal', 'critical'],
+  alertChannels: ['email-alerts'],
+  activated: true
+}
+```
+
+### Private Location Specific Options
+
+**Multiple Private Locations:**
+```typescript
+privateLocations: ['datacenter-east', 'datacenter-west']
+```
+
+**Environment-Specific Locations:**
+```typescript
+privateLocations: process.env.ENVIRONMENT === 'production' 
+  ? ['prod-east', 'prod-west'] 
+  : ['dev-network']
+```
+
+**Conditional Private Location Usage:**
+```typescript
+privateLocations: usePrivateLocations ? ['internal-network'] : []
+```
+
+## Performance Considerations
+
+### Resource Requirements by Check Type
+
+<Info>
+**Memory Guidelines:**
+- API checks: ~150MB per concurrent check
+- Browser checks: ~1.5GB per concurrent check
+- TCP checks: ~50MB per concurrent check
+- Heartbeat checks: ~100MB per concurrent check
+</Info>
+
+### Concurrent Check Limits
+
+Plan your agent deployment based on expected concurrent checks:
+
+```typescript
+// Example: Calculate required agents
+const concurrentChecks = 10
+const apiChecks = 6 // 6 * 150MB = 900MB
+const browserChecks = 2 // 2 * 1.5GB = 3GB
+const totalMemory = 3.9GB
+
+// Recommended: 2 agents with 4GB RAM each
+```
+
+## Best Practices
+
+<AccordionGroup>
+<Accordion title="Check Type Selection">
+- Use API checks for simple HTTP endpoints
+- Use browser checks for complex user interactions
+- Use TCP checks for network service monitoring
+- Use heartbeat checks for scheduled processes
+</Accordion>
+
+<Accordion title="Performance Optimization">
+- Group related checks in the same Private Location
+- Use appropriate timeouts for each check type
+- Monitor agent resource utilization
+- Scale agents based on check workload
+</Accordion>
+
+<Accordion title="Error Handling">
+- Implement proper error assertions
+- Use retry mechanisms for flaky services
+- Monitor check failure patterns
+- Set up appropriate alerting thresholds
+</Accordion>
+
+<Accordion title="Security">
+- Use environment variables for sensitive data
+- Implement proper authentication for internal services
+- Monitor access logs and security events
+- Regular security review of check configurations
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+<Card title="Quick Start Guide" href="/docs/getting-started/platform/private-locations/quick-start">
+Get started with your first Private Location check
+</Card>
+
+<Card title="Use Cases" href="/docs/getting-started/platform/private-locations/use-cases">
+Explore real-world monitoring scenarios
+</Card>
+
+<Card title="CLI Integration" href="/docs/getting-started/platform/private-locations/cli-integration">
+Integrate checks with monitoring-as-code
+</Card>
+
+<Card title="Agent Configuration" href="/docs/getting-started/platform/private-locations/agent-configuration">
+Configure agents for optimal performance
+</Card>
+</CardGroup>
+
+<Tip>
+Start with simple API checks to validate your Private Location setup, then gradually add more complex browser checks and TCP monitoring as needed.
+</Tip> 

@@ -1,0 +1,416 @@
+---
+title: 'Creating Your First URL Monitor'
+description: 'Step-by-step guide to set up your first URL monitor and ensure your websites and APIs are always accessible.'
+sidebarTitle: 'Creating Your First Monitor'
+---
+
+import { Note, Warning, Tip, Steps } from 'mintlify/components'
+
+This guide walks you through creating your first URL monitor to check the availability and performance of your websites, APIs, or any HTTP-based service.
+
+## Before You Start
+
+URL monitors are ideal for monitoring:
+- Website homepages and critical pages
+- REST API endpoints and health checks
+- CDN and static asset delivery
+- Third-party service availability
+- E-commerce checkout flows
+
+<Note>
+You'll need an HTTP or HTTPS URL to monitor. If you don't have one ready, you can use your company website or a public API for testing.
+</Note>
+
+## Step-by-Step Setup
+
+<Steps>
+<Step title="Navigate to Monitors">
+1. Log into your Checkly dashboard
+2. Go to **Monitors** in the main navigation
+3. Click **Create Monitor** and select **URL Monitor**
+
+![Navigate to create URL monitor](/images/url-monitors/create-url-monitor-nav.png)
+</Step>
+
+<Step title="Configure Basic Settings">
+Enter the essential details for your URL monitor:
+
+**Monitor Name**: Give your monitor a descriptive name
+```
+Homepage Availability
+```
+
+**URL**: The HTTP/HTTPS endpoint you want to monitor
+```
+https://www.myapp.com
+```
+
+**Request Method**: Choose the HTTP method
+- **GET**: Most common for websites and read-only APIs
+- **POST**: For API endpoints that create or modify data
+- **HEAD**: For checking availability without downloading content
+- **Other methods**: PUT, DELETE, PATCH, OPTIONS
+
+![Basic URL monitor configuration](/images/url-monitors/url-monitor-basic-config.png)
+</Step>
+
+<Step title="Set Request Options">
+Configure how the monitor makes HTTP requests:
+
+**Follow Redirects**: Enable to follow HTTP redirects (recommended: Yes)
+
+**Request Headers**: Add custom headers if needed
+```
+User-Agent: Checkly Monitor Bot 1.0
+Accept: application/json
+```
+
+**Request Body**: For POST/PUT requests, add the request data
+```json
+{
+  "action": "health_check",
+  "source": "monitoring"
+}
+```
+
+<Tip>
+For API monitoring, include authentication headers and appropriate content-type headers.
+</Tip>
+</Step>
+
+<Step title="Configure Response Validation">
+Set up validation to ensure your service responds correctly:
+
+**Expected Status Code**: HTTP status code that indicates success
+```
+200 OK
+```
+
+**Response Time Threshold**: Maximum acceptable response time
+```
+2000ms (2 seconds)
+```
+
+**Content Validation**: Text that should appear in the response
+```
+Welcome to MyApp
+```
+
+**Content Should Not Contain**: Text that indicates an error
+```
+Error 500
+```
+
+![URL monitor response validation settings](/images/url-monitors/url-monitor-response-config.png)
+</Step>
+
+<Step title="Choose Monitoring Locations">
+Select where to run your URL monitor from:
+
+1. **Global Coverage**: Monitor from multiple continents
+2. **Regional Focus**: Choose locations near your users
+3. **Private Locations**: Use your own monitoring infrastructure
+
+**Recommended setup**: Start with 3-5 locations in different regions where your users are located.
+
+![Select monitoring locations](/images/url-monitors/url-monitor-locations.png)
+</Step>
+
+<Step title="Set Monitoring Frequency">
+Choose how often to check your URL:
+
+- **Every minute**: For critical services requiring immediate detection
+- **Every 5 minutes**: Good balance for most production services
+- **Every 10 minutes**: For stable services with moderate requirements
+- **Custom interval**: Set specific timing (up to 60 minutes)
+
+```
+Every 5 minutes
+```
+</Step>
+
+<Step title="Configure SSL/TLS Monitoring (HTTPS)">
+For HTTPS URLs, enable SSL certificate monitoring:
+
+**SSL Certificate Validation**: Automatically enabled for HTTPS
+- ✅ Certificate validity and expiration checking
+- ✅ Certificate chain verification  
+- ✅ Hostname matching validation
+
+**Certificate Expiration Alert**: Get notified before certificates expire
+```
+Alert 30 days before expiration
+```
+
+![SSL/TLS configuration for URL monitors](/images/url-monitors/url-monitor-ssl-config.png)
+</Step>
+
+<Step title="Set Up Authentication (If Required)">
+Configure authentication for protected endpoints:
+
+**Basic Authentication**:
+```
+Username: api_user
+Password: secure_password123
+```
+
+**Bearer Token**:
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**API Key Authentication**:
+```
+X-API-Key: your-api-key-here
+X-Client-ID: client-123
+```
+
+<Warning>
+Store sensitive authentication credentials securely and rotate them regularly.
+</Warning>
+</Step>
+
+<Step title="Configure Alerting">
+Set up notifications for when issues are detected:
+
+**Alert Conditions**:
+- ✅ HTTP errors (4xx, 5xx status codes)
+- ✅ Response time threshold exceeded
+- ✅ Content validation failed
+- ✅ SSL certificate issues
+- ✅ Network connectivity problems
+
+**Alert Channels**: Choose notification methods
+- Email alerts
+- Slack notifications
+- Webhook integrations  
+- SMS alerts (premium feature)
+- PagerDuty integration
+
+![URL monitor alerting configuration](/images/url-monitors/url-monitor-alerts.png)
+</Step>
+
+<Step title="Test and Save">
+Before saving, validate your monitor configuration:
+
+1. Click **Test Monitor** to run a test check
+2. Review the test results for any issues
+3. Adjust configuration if needed
+4. Click **Create Monitor** to save
+
+The test results will show:
+- ✅ HTTP 200 OK response
+- ✅ Response time: 342ms
+- ✅ Content validation passed
+- ✅ SSL certificate valid (for HTTPS)
+
+![URL monitor test results](/images/url-monitors/url-monitor-test-results.png)
+</Step>
+</Steps>
+
+## Common Configuration Examples
+
+### Website Homepage
+```yaml
+Name: Company Website
+URL: https://www.company.com
+Method: GET
+Expected Status: 200
+Content Contains: "Welcome to Company"
+Response Time Threshold: 3000ms
+```
+
+### REST API Health Check
+```yaml
+Name: API Health Check
+URL: https://api.myapp.com/health
+Method: GET
+Headers:
+  Authorization: "Bearer token123"
+  Accept: "application/json"
+Expected Status: 200
+Content Contains: '"status":"healthy"'
+```
+
+### E-commerce Product Page
+```yaml
+Name: Product Page Monitoring
+URL: https://shop.example.com/products/featured
+Method: GET
+Expected Status: 200
+Content Contains: "Add to Cart"
+Content Not Contains: "Out of Stock"
+Response Time Threshold: 2000ms
+```
+
+### API POST Endpoint
+```yaml
+Name: User Registration API
+URL: https://api.myapp.com/users
+Method: POST
+Headers:
+  Content-Type: "application/json"
+  X-API-Key: "api-key-123"
+Body: '{"email":"test@example.com","action":"validate"}'
+Expected Status: 200
+```
+
+## Understanding Results
+
+Once your URL monitor is running, you'll see comprehensive results:
+
+### Status Dashboard
+- **Current Status**: Online/Offline with latest response code
+- **Response Time**: Latest request duration
+- **Uptime Percentage**: Availability over different time periods  
+- **Global Status Map**: Results from each monitoring location
+
+### Detailed Metrics
+- **DNS Resolution Time**: Hostname lookup duration
+- **Connect Time**: TCP connection establishment
+- **SSL Handshake Time**: Certificate negotiation (HTTPS only)
+- **Time to First Byte (TTFB)**: Server response time
+- **Content Download Time**: Response body transfer duration
+
+![URL monitor results dashboard](/images/url-monitors/url-monitor-results.png)
+
+### Performance Trends
+- Response time over time
+- Availability percentages
+- Error rate trends  
+- Regional performance comparisons
+
+## Troubleshooting Common Issues
+
+### HTTP Status Code Errors
+
+**4xx Client Errors**:
+- **401 Unauthorized**: Check authentication credentials
+- **403 Forbidden**: Verify API permissions
+- **404 Not Found**: Confirm URL is correct
+
+**5xx Server Errors**:
+- **500 Internal Server Error**: Check server logs
+- **502 Bad Gateway**: Verify proxy/load balancer configuration
+- **503 Service Unavailable**: Check service health
+
+### Timeout Errors
+**Symptom**: Monitor shows timeout errors
+**Causes**:
+- Server overloaded or slow
+- Network connectivity issues
+- Timeout threshold too low
+
+**Solutions**:
+1. Increase response time threshold
+2. Check server performance
+3. Verify network connectivity
+4. Optimize application performance
+
+### Content Validation Failures
+**Symptom**: Expected content not found in response
+**Causes**:
+- Page content changed
+- Error page being served
+- Dynamic content loading issues
+
+**Solutions**:
+1. Review actual response content
+2. Update content validation patterns
+3. Check for JavaScript-dependent content
+4. Verify user agent compatibility
+
+### SSL Certificate Issues
+**Symptom**: Certificate validation failures
+**Causes**:
+- Certificate expired
+- Invalid certificate chain
+- Hostname mismatch
+
+**Solutions**:
+1. Check certificate expiration: `openssl s_client -connect domain:443`
+2. Verify certificate chain completeness
+3. Ensure certificate matches the hostname
+4. Update certificates before expiration
+
+## Advanced Configuration
+
+### JSON Response Validation
+For API endpoints, validate JSON structure:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "status": {"type": "string", "enum": ["success", "ok"]},
+    "timestamp": {"type": "integer"},
+    "data": {"type": "object"}
+  },
+  "required": ["status"]
+}
+```
+
+### Custom User Agent
+Identify your monitoring requests:
+
+```
+User-Agent: MyApp-Monitor/1.0 (monitoring@mycompany.com)
+```
+
+### Regional Performance Testing
+Monitor from specific locations to test regional performance:
+- **North America**: us-east-1, us-west-1
+- **Europe**: eu-west-1, eu-central-1  
+- **Asia Pacific**: ap-southeast-1, ap-northeast-1
+
+## Best Practices
+
+### Configuration
+- Use descriptive monitor names that identify the service and environment
+- Set realistic response time thresholds based on your SLA requirements
+- Include meaningful content validation to catch functional issues
+- Monitor from locations where your actual users are based
+
+### Monitoring Strategy
+- Monitor critical user journeys, not just homepages
+- Include both successful and error scenarios in your validation
+- Test key functionality like login, checkout, or data submission
+- Monitor dependencies like CDNs, APIs, and third-party services
+
+### Security
+- Use environment variables for sensitive authentication data
+- Monitor for proper security headers in responses
+- Check SSL certificate expiration proactively
+- Validate that error responses don't expose sensitive information
+
+### Performance
+- Balance monitoring frequency with resource usage and costs
+- Increase monitoring frequency during deployments and high-traffic periods
+- Use geographic monitoring to understand global performance
+- Set up performance budgets and track trends over time
+
+## Next Steps
+
+Now that your URL monitor is running successfully:
+
+<CardGroup cols={2}>
+<Card title="Monitor Performance" icon="chart-line">
+Review response times and uptime trends to establish performance baselines and identify optimization opportunities.
+</Card>
+
+<Card title="Configure Alerts" href="/docs/communicate/alerts">
+Set up comprehensive alerting rules and notification channels to ensure your team is immediately notified of issues.
+</Card>
+
+<Card title="Add More Monitors" href="/docs/detect/uptime-monitoring/url-monitors/overview">
+Expand your monitoring coverage by adding monitors for other critical URLs and services.
+</Card>
+
+<Card title="Advanced Monitoring" href="/docs/detect/synthetic-monitoring/overview">
+Explore API checks and browser monitoring for comprehensive application testing.
+</Card>
+</CardGroup>
+
+<Note>
+URL monitors provide excellent coverage for HTTP-based services. For complex user interactions or JavaScript-heavy applications, consider adding [Browser Checks](/docs/detect/synthetic-monitoring/browser-checks) to your monitoring strategy.
+</Note>

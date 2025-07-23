@@ -1,0 +1,602 @@
+---
+title: 'URL Monitor Best Practices'
+description: 'Optimization strategies, configuration recommendations, and best practices for effective URL monitoring.'
+sidebarTitle: 'Best Practices'
+---
+
+import { Note, Warning, Tip } from 'mintlify/components'
+
+Follow these best practices to maximize the effectiveness of your URL monitoring while ensuring accurate results and optimal performance.
+
+## Configuration Best Practices
+
+### Request Configuration
+
+Structure your HTTP requests for accurate and reliable monitoring.
+
+**URL Structure Guidelines**:
+```yaml
+# Good: Specific, stable URLs
+URL: https://api.company.com/v1/health
+URL: https://www.company.com/products/category/electronics
+
+# Avoid: URLs with dynamic parameters that may cause inconsistent results
+URL: https://api.company.com/search?q=random&timestamp=12345
+```
+
+**HTTP Method Selection**:
+```yaml
+# GET: For read-only operations and health checks
+Method: GET
+URL: https://api.company.com/status
+
+# POST: For testing data submission endpoints
+Method: POST  
+URL: https://api.company.com/users/validate
+Body: '{"action": "health_check"}'
+
+# HEAD: For checking resource availability without downloading content
+Method: HEAD
+URL: https://cdn.company.com/large-file.zip
+```
+
+**Request Headers Optimization**:
+```yaml
+# Include essential headers for accurate testing
+Headers:
+  User-Agent: "Checkly Monitor Bot 1.0"
+  Accept: "application/json"
+  Content-Type: "application/json"
+  Cache-Control: "no-cache"  # For testing live content
+```
+
+<Tip>
+Use consistent User-Agent strings to identify monitoring traffic in your logs and distinguish it from real user traffic.
+</Tip>
+
+### Response Validation
+
+Implement comprehensive validation to catch functional issues early.
+
+**Status Code Validation**:
+```yaml
+# Be specific about expected status codes
+Expected Status: 200  # For successful responses
+Expected Status: 201  # For resource creation
+Expected Status: 202  # For accepted async operations
+Expected Status: 304  # For cached content validation
+```
+
+**Content Validation Best Practices**:
+```yaml
+# Good: Specific content validation
+Content Contains: "Welcome to Company Dashboard"
+Content Contains: '"status":"healthy"'
+Content Contains: "version"
+
+# Better: Multiple validation rules
+Content Contains: "Login successful"
+Content Not Contains: "Error 500"
+Content Not Contains: "Service temporarily unavailable"
+```
+
+**JSON Response Validation**:
+```json
+{
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string", 
+      "enum": ["success", "healthy", "ok"]
+    },
+    "timestamp": {
+      "type": "integer",
+      "minimum": 1600000000
+    },
+    "data": {
+      "type": "object",
+      "required": ["version"]
+    }
+  },
+  "required": ["status", "timestamp"]
+}
+```
+
+### Response Time Thresholds
+
+Set realistic performance expectations based on your service characteristics.
+
+**Threshold Guidelines by Service Type**:
+```yaml
+# Static content (CDN)
+Response Time Threshold: 500ms
+
+# Dynamic web pages
+Response Time Threshold: 2000ms
+
+# API endpoints (simple queries)
+Response Time Threshold: 1000ms
+
+# API endpoints (complex operations)
+Response Time Threshold: 5000ms
+
+# Third-party integrations
+Response Time Threshold: 10000ms
+```
+
+**Geographic Considerations**:
+```yaml
+# Local/regional services
+US East Coast monitoring: 200ms threshold
+US West Coast monitoring: 300ms threshold
+
+# Global services
+Cross-continental monitoring: 500-1000ms threshold
+Same-continent monitoring: 200-400ms threshold
+```
+
+## Monitoring Strategy
+
+### Location Selection Strategy
+
+Choose monitoring locations strategically based on your user base and infrastructure.
+
+**Global Service Monitoring**:
+```yaml
+Primary Locations:
+  - us-east-1 (North America)
+  - eu-west-1 (Europe)  
+  - ap-southeast-1 (Asia Pacific)
+
+Secondary Locations:
+  - us-west-2 (North America West)
+  - eu-central-1 (Europe Central)
+  - ap-northeast-1 (Asia Northeast)
+```
+
+**Regional Service Monitoring**:
+```yaml
+# US-focused service
+Locations: [us-east-1, us-west-2, us-central-1]
+
+# Europe-focused service  
+Locations: [eu-west-1, eu-central-1, eu-north-1]
+
+# Single-region service
+Locations: [us-east-1]  # Monitor from primary region only
+```
+
+**CDN Performance Testing**:
+```yaml
+# Test CDN performance from multiple continents
+Global CDN Testing:
+  - us-east-1, us-west-2 (North America)
+  - eu-west-1, eu-central-1 (Europe)  
+  - ap-southeast-1, ap-northeast-1 (Asia)
+  - sa-east-1 (South America)
+```
+
+### Monitoring Frequency Optimization
+
+Balance detection speed with resource usage and cost considerations.
+
+**Frequency by Service Criticality**:
+```yaml
+# Critical revenue-generating services
+Frequency: Every 1-2 minutes
+Examples: Checkout flow, payment processing, core APIs
+
+# Important production services
+Frequency: Every 5 minutes  
+Examples: User authentication, main website, key features
+
+# Supporting services
+Frequency: Every 10-15 minutes
+Examples: Admin interfaces, reporting, non-critical APIs
+
+# Development/staging services
+Frequency: Every 30-60 minutes
+Examples: Test environments, development APIs
+```
+
+**Event-Based Frequency Scaling**:
+```yaml
+# During deployments
+Deployment Window: Every 30 seconds for 1 hour
+Post-Deployment: Every 2 minutes for 4 hours
+Normal Operations: Every 5 minutes
+
+# During high-traffic events
+Event Period: Every 1 minute
+Pre/Post Event: Every 2 minutes  
+Normal Operations: Every 5 minutes
+```
+
+### Service Dependency Mapping
+
+Monitor services in a way that reflects their dependencies and criticality.
+
+**Layered Monitoring Approach**:
+```yaml
+# Infrastructure Layer (Tier 1)
+- Load balancer health checks
+- CDN edge server availability
+- Database connection health
+
+# Application Layer (Tier 2)  
+- Core API functionality
+- Authentication services
+- Data processing endpoints
+
+# User Experience Layer (Tier 3)
+- Website user journeys
+- Mobile app API endpoints
+- Third-party integrations
+```
+
+## Authentication and Security
+
+### Secure Credential Management
+
+Handle authentication credentials securely in monitoring configurations.
+
+**Service Account Best Practices**:
+```yaml
+# Create dedicated monitoring service accounts
+# with minimal required permissions
+Username: monitoring_readonly
+Permissions: read_health_status, validate_endpoints
+
+# Use environment-specific credentials
+Production: {{prod_api_key}}
+Staging: {{staging_api_key}}
+Development: {{dev_api_key}}
+```
+
+**API Key Management**:
+```yaml
+# Good: Reference secure credential store
+Headers:
+  X-API-Key: "{{api_key}}"
+  Authorization: "Bearer {{access_token}}"
+
+# Bad: Hardcoded credentials
+Headers:
+  X-API-Key: "ak_live_12345..."
+```
+
+**Token Rotation Strategy**:
+- Use short-lived tokens when possible
+- Implement automatic token renewal
+- Monitor token expiration dates
+- Have backup authentication methods
+
+### Network Security
+
+Ensure monitoring traffic follows security best practices.
+
+**HTTPS Enforcement**:
+```yaml
+# Always use HTTPS for sensitive endpoints
+URL: https://api.company.com/user/profile  ✓
+URL: http://api.company.com/user/profile   ✗
+
+# Monitor HTTP to HTTPS redirects
+URL: http://www.company.com
+Expected Status: 301
+Headers Contains: "location: https://www.company.com"
+```
+
+**IP Allowlisting**:
+```yaml
+# Configure monitoring IP addresses in security groups
+# Document Checkly's monitoring IP ranges
+# Update firewall rules to allow monitoring traffic
+```
+
+**Certificate Validation**:
+```yaml
+# Enable SSL certificate monitoring for all HTTPS endpoints
+SSL Certificate Validation: Enabled
+Certificate Expiration Alert: 30 days before expiration
+Minimum TLS Version: 1.2
+```
+
+## Performance Optimization
+
+### Request Optimization
+
+Optimize monitoring requests to minimize impact and maximize accuracy.
+
+**Efficient Request Patterns**:
+```yaml
+# Good: Lightweight health check
+URL: https://api.company.com/ping
+Method: GET
+Expected Status: 200
+Content Contains: "pong"
+
+# Avoid: Heavy resource requests
+URL: https://api.company.com/export/all-data  ✗
+```
+
+**Connection Management**:
+```yaml
+# Use appropriate timeouts
+Connection Timeout: 15s
+Read Timeout: 30s
+
+# Configure reasonable request limits
+Follow Redirects: Yes (up to 5 redirects)
+Max Response Size: 1MB
+```
+
+**Caching Considerations**:
+```yaml
+# For testing live content
+Headers:
+  Cache-Control: "no-cache"
+  Pragma: "no-cache"
+
+# For testing cached content
+Headers:
+  Cache-Control: "max-age=3600"
+```
+
+### Resource Usage Management
+
+Monitor efficiently to minimize costs and resource consumption.
+
+**Location Optimization**:
+```yaml
+# Don't over-monitor from unnecessary locations
+Recommended: 3-5 locations for global services
+Maximum: 8-10 locations for critical services
+Avoid: Monitoring from every available location
+```
+
+**Request Frequency Optimization**:
+```yaml
+# Tier monitoring frequency by business impact
+Critical Services: 1-2 minutes
+Important Services: 5 minutes  
+Standard Services: 15 minutes
+Development: 30-60 minutes
+```
+
+## Alerting Best Practices
+
+### Alert Configuration
+
+Configure alerts to provide actionable notifications while minimizing noise.
+
+**Failure Threshold Configuration**:
+```yaml
+# Require multiple failures to reduce false alerts
+Alert After: 2 consecutive failures from same location
+OR
+Alert When: 2 out of 3 locations fail simultaneously
+```
+
+**Alert Timing**:
+```yaml
+# Critical services
+Alert Delay: Immediate (0 minutes)
+Escalation: After 5 minutes of continued failure
+
+# Important services  
+Alert Delay: 2 minutes
+Escalation: After 15 minutes of continued failure
+
+# Standard services
+Alert Delay: 5 minutes
+Escalation: After 30 minutes of continued failure
+```
+
+**Content-Based Alerting**:
+```yaml
+# Alert on specific error conditions
+Content Contains: "Database connection failed"
+Alert Priority: High
+
+Content Contains: "Rate limit exceeded"  
+Alert Priority: Medium
+
+Content Not Contains: "Login successful"
+Alert Priority: High
+```
+
+### Alert Content Optimization
+
+Provide comprehensive information for rapid incident response.
+
+**Effective Alert Format**:
+```yaml
+Subject: "[CRITICAL] API Health Check Failed - api.company.com"
+
+Body: |
+  Service: Production API (api.company.com/health)
+  Status: HTTP 500 Internal Server Error
+  Duration: 3 minutes
+  Locations Affected: 3/5 (US-East, EU-West, AP-Southeast)
+  
+  Response Details:
+  - Error: "Database connection timeout"
+  - Response Time: 30.2s (threshold: 5s)
+  
+  Runbook: https://wiki.company.com/api-outage-response
+  Dashboard: https://monitoring.company.com/api-health
+  
+  Recent Deployments:
+  - API v2.1.3 deployed 15 minutes ago
+```
+
+**Poor Alert Example**:
+```yaml
+Subject: "Monitor failed"
+Body: "URL check returned error"
+```
+
+### Alert Routing and Escalation
+
+Implement appropriate alert routing based on service criticality and team structure.
+
+**Service Tier Routing**:
+```yaml
+# Tier 1 (Critical)
+Immediate: On-call engineer (PagerDuty)
+5 minutes: Engineering manager
+15 minutes: VP Engineering
+
+# Tier 2 (Important)
+Immediate: Team Slack channel
+10 minutes: On-call engineer  
+30 minutes: Engineering manager
+
+# Tier 3 (Standard)
+Immediate: Email to team distribution list
+1 hour: Team lead (email)
+```
+
+## Troubleshooting and Maintenance
+
+### Common Issues and Solutions
+
+Address frequent monitoring problems with systematic approaches.
+
+**SSL Certificate Issues**:
+```yaml
+# Proactive certificate monitoring
+Alert Thresholds:
+  - 30 days before expiration (Warning)
+  - 7 days before expiration (Critical)
+  - Certificate invalid (Critical)
+
+# Common fixes:
+- Verify certificate chain completeness
+- Check hostname matching
+- Update certificate before expiration
+- Validate intermediate certificates
+```
+
+**Response Time Degradation**:
+```yaml
+# Performance trend monitoring
+Alert Conditions:
+  - Response time > 2x baseline average
+  - Response time increasing trend over 1 hour
+  - 95th percentile > threshold for 15 minutes
+
+# Investigation steps:
+- Check server resource utilization
+- Review recent deployments
+- Analyze database query performance
+- Verify CDN cache hit rates
+```
+
+**Content Validation Failures**:
+```yaml
+# Content change detection
+Common Causes:
+- Application errors serving wrong content
+- A/B testing changing page content
+- Seasonal content updates
+- CDN serving stale content
+
+# Prevention strategies:
+- Use multiple content validation patterns
+- Update validators with application changes
+- Test validators in staging first
+- Use flexible content matching patterns
+```
+
+### Regular Maintenance Tasks
+
+Implement systematic maintenance to keep monitoring effective.
+
+**Monthly Reviews**:
+```yaml
+Tasks:
+- Review false positive rates by monitor
+- Analyze response time trends and adjust thresholds
+- Update content validation patterns for changed pages
+- Review and update authentication tokens
+- Validate monitoring coverage for new features
+```
+
+**Quarterly Assessments**:
+```yaml
+Tasks:
+- Assess monitoring location effectiveness
+- Review service criticality classifications
+- Update alert routing and escalation procedures
+- Optimize monitoring frequency based on usage patterns
+- Conduct monitoring infrastructure health checks
+```
+
+**Annual Planning**:
+```yaml
+Tasks:
+- Strategic review of monitoring coverage
+- Budget planning for monitoring resources
+- Technology stack evaluation
+- Integration with new development workflows
+- Training updates for development teams
+```
+
+## Integration with Development Workflow
+
+### CI/CD Pipeline Integration
+
+Integrate URL monitoring with development and deployment processes.
+
+**Pre-Deployment Validation**:
+```yaml
+# Staging environment validation
+- Run health checks against staging deployment
+- Validate new feature endpoints
+- Check API version consistency
+- Test authentication flows
+```
+
+**Post-Deployment Monitoring**:
+```yaml
+# Production deployment validation
+- Increase monitoring frequency for 1 hour post-deploy
+- Add temporary monitors for new endpoints
+- Validate canary deployments
+- Monitor error rates and performance metrics
+```
+
+**Feature Release Integration**:
+```yaml
+# New feature monitoring
+- Create monitors for new endpoints before release
+- Set up feature flag validation monitoring
+- Monitor usage patterns and performance
+- Track feature adoption rates
+```
+
+<Warning>
+Regular maintenance and optimization of URL monitors is crucial. Set up monthly reviews to ensure configurations remain effective as your applications evolve.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+<Card title="URL Monitor Use Cases" href="/docs/detect/uptime-monitoring/url-monitors/use-cases">
+Explore common use cases and real-world implementation examples
+</Card>
+
+<Card title="Creating Your First URL Monitor" href="/docs/detect/uptime-monitoring/url-monitors/creating-your-first-url-monitor">
+Get started with step-by-step setup instructions
+</Card>
+
+<Card title="API Checks" href="/docs/detect/synthetic-monitoring/api-checks/overview">
+Explore advanced API testing and validation capabilities
+</Card>
+
+<Card title="Alert Configuration" href="/docs/communicate/alerts">
+Set up comprehensive alerting strategies and notification channels
+</Card>
+</CardGroup>

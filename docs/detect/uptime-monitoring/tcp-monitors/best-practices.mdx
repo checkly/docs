@@ -1,0 +1,437 @@
+---
+title: 'TCP Monitor Best Practices'
+description: 'Optimization strategies, configuration recommendations, and best practices for effective TCP monitoring.'
+sidebarTitle: 'Best Practices'
+---
+
+import { Note, Warning, Tip } from 'mintlify/components'
+
+Follow these best practices to maximize the effectiveness of your TCP monitoring while minimizing false alerts and resource usage.
+
+## Configuration Best Practices
+
+### Setting Realistic Timeouts
+
+Choose timeout values that reflect your service's actual performance characteristics.
+
+**Connection Timeout Guidelines**:
+- **Local network services**: 5-10 seconds
+- **Internet-facing services**: 10-15 seconds  
+- **Cross-region services**: 15-30 seconds
+- **Satellite/slow connections**: 30+ seconds
+
+```yaml
+# Good: Realistic timeout for database
+Host: db.company.com
+Port: 3306
+Connection Timeout: 15s
+Read Timeout: 10s
+
+# Bad: Too aggressive timeout
+Connection Timeout: 2s  # May cause false alerts
+```
+
+<Tip>
+Set timeouts 2-3x your service's typical response time to account for network variance and temporary slowdowns.
+</Tip>
+
+### Expected Response Configuration
+
+Use specific response validation when possible for more accurate health checks.
+
+**Good Response Validation**:
+```yaml
+# MySQL - Expect server greeting
+Expected Response: "mysql_native_password"
+
+# SMTP - Expect service ready
+Expected Response: "220"
+
+# Redis - Active ping/pong
+Connection String: "PING\r\n"
+Expected Response: "+PONG"
+```
+
+**Avoid Generic Responses**:
+```yaml
+# Bad: Too generic, may match error responses
+Expected Response: "OK"
+
+# Better: More specific validation
+Expected Response: "MySQL Server version"
+```
+
+### Protocol Selection
+
+Choose the most appropriate protocol for your service:
+
+**TCP Protocol**: Basic connectivity checking
+```yaml
+Protocol: TCP
+# Use when you only need to verify port is open
+```
+
+**SSL/TLS Protocol**: Encrypted connections with certificate validation
+```yaml
+Protocol: SSL/TLS  
+# Use for services requiring encryption
+# Automatically validates certificates
+```
+
+**Custom Protocol**: Service-specific validation
+```yaml
+Protocol: TCP
+Connection String: "GET /health HTTP/1.1\r\nHost: example.com\r\n\r\n"
+Expected Response: "200 OK"
+```
+
+## Monitoring Strategy
+
+### Location Selection
+
+Choose monitoring locations strategically based on your architecture and user base.
+
+**Global Services**:
+```yaml
+Locations:
+  - us-east-1 (North America East)
+  - eu-west-1 (Europe West)  
+  - ap-southeast-1 (Asia Pacific)
+  - us-west-1 (North America West)
+  - eu-central-1 (Europe Central)
+```
+
+**Regional Services**:
+```yaml
+# Focus on regions where service is deployed
+Locations:
+  - us-east-1
+  - us-west-2
+# Skip unnecessary international monitoring
+```
+
+**Internal Services**:
+```yaml
+# Use private locations for internal monitoring
+Private Locations:
+  - company-datacenter-east
+  - company-datacenter-west
+```
+
+### Monitoring Frequency
+
+Balance detection speed with resource usage and cost.
+
+**Critical Production Services**:
+```yaml
+Frequency: Every 1-2 minutes
+# Fast detection for revenue-critical services
+```
+
+**Standard Production Services**:
+```yaml
+Frequency: Every 5 minutes
+# Good balance for most services
+```
+
+**Development/Staging**:
+```yaml
+Frequency: Every 15-30 minutes  
+# Lower frequency for non-production
+```
+
+**Batch/Background Services**:
+```yaml
+Frequency: Every 30-60 minutes
+# Less frequent for non-interactive services
+```
+
+### Service Priority Classification
+
+Classify services by business impact to optimize monitoring strategy:
+
+**Tier 1 - Critical**:
+- Revenue-generating services
+- Customer-facing applications
+- Core databases
+- **Monitoring**: Every 1-2 minutes, 5+ locations, immediate alerts
+
+**Tier 2 - Important**:
+- Supporting services
+- Internal APIs
+- Background processing
+- **Monitoring**: Every 5 minutes, 3+ locations, 5-minute alert delay
+
+**Tier 3 - Standard**:
+- Development services
+- Non-critical integrations
+- Reporting systems
+- **Monitoring**: Every 15+ minutes, 1-2 locations, 15-minute alert delay
+
+## Security Best Practices
+
+### Authentication and Access
+
+Handle authentication securely when monitoring protected services.
+
+**Use Service Accounts**:
+```yaml
+# Create dedicated monitoring service accounts
+# with minimal required permissions
+Username: monitoring_readonly
+Password: [stored in secrets manager]
+```
+
+**Avoid Hardcoded Credentials**:
+```yaml
+# Bad: Credentials in configuration
+Connection String: "USER monitoring PASS secret123"
+
+# Good: Reference secure credential store
+Connection String: "{{monitoring_credentials}}"
+```
+
+**Network-Level Access**:
+- Use dedicated monitoring networks when possible
+- Implement IP allowlisting for monitoring traffic
+- Monitor through VPN or private connections for sensitive services
+
+### SSL/TLS Configuration
+
+Ensure proper SSL/TLS monitoring for encrypted services.
+
+**Certificate Validation**:
+```yaml
+Protocol: SSL/TLS
+SSL Verification: Enabled
+Certificate Expiration Alert: 30 days
+```
+
+**Monitor Certificate Chain**:
+- Validate entire certificate chain
+- Check for intermediate certificate issues
+- Monitor certificate authority changes
+- Alert on weak cipher suites
+
+**Protocol Security**:
+```yaml
+Minimum TLS Version: 1.2
+Cipher Suite Validation: Enabled
+# Ensure secure protocols are enforced
+```
+
+## Performance Optimization
+
+### Resource Management
+
+Optimize monitoring resource usage and costs.
+
+**Efficient Location Strategy**:
+```yaml
+# Don't over-monitor from too many locations
+Recommended: 3-5 locations for global services
+Maximum: 10 locations for critical services
+```
+
+**Smart Frequency Scaling**:
+- Increase frequency during deployments
+- Reduce frequency for stable services
+- Use maintenance windows to pause non-critical monitoring
+
+**Connection Reuse**:
+- Enable connection pooling where supported
+- Reuse connections for multiple checks when possible
+- Configure appropriate connection limits
+
+### Monitoring Overhead
+
+Minimize impact on monitored services.
+
+**Connection Limits**:
+```yaml
+# Ensure monitoring doesn't overwhelm services
+Max Concurrent Connections: 5
+Connection Timeout: 15s
+```
+
+**Request Optimization**:
+- Use lightweight connection strings
+- Minimize data transfer in health checks
+- Avoid resource-intensive operations
+
+**Service Impact Assessment**:
+- Monitor connection count from monitoring system
+- Track impact on service performance metrics
+- Adjust frequency if monitoring causes load issues
+
+## Alerting Best Practices
+
+### Alert Configuration
+
+Configure alerts to minimize noise while ensuring rapid response.
+
+**Failure Threshold Settings**:
+```yaml
+# Require multiple failures before alerting
+Alert After: 2 consecutive failures
+# Prevents alerts from transient network issues
+```
+
+**Location-Based Alerting**:
+```yaml
+# Alert only when multiple locations fail
+Alert Threshold: 50% of locations failing
+# Distinguishes between local and global issues
+```
+
+**Time-Based Filtering**:
+```yaml
+# Suppress alerts during maintenance windows
+Maintenance Windows: 
+  - Sunday 02:00-04:00 UTC (Database maintenance)
+  - First Saturday of month 01:00-03:00 UTC
+```
+
+### Alert Escalation
+
+Implement proper escalation for different service tiers.
+
+**Tier 1 Services (Critical)**:
+1. Immediate alert to on-call engineer
+2. Escalate to manager after 5 minutes
+3. Escalate to executive team after 15 minutes
+
+**Tier 2 Services (Important)**:
+1. Alert to team channel after 5 minutes
+2. Escalate to on-call after 15 minutes
+3. Email summary to management
+
+**Tier 3 Services (Standard)**:
+1. Email notification after 15 minutes
+2. Daily summary reports
+3. No escalation unless prolonged outage
+
+### Alert Content Optimization
+
+Provide actionable information in alerts.
+
+**Good Alert Content**:
+```
+SERVICE: Production MySQL Database (db.prod.com:3306)
+STATUS: Connection Failed
+LOCATIONS: 3/5 locations failing (US-East, EU-West, AP-Southeast)
+DURATION: 2 minutes
+RESPONSE: Connection refused
+RUNBOOK: https://wiki.company.com/db-outage-response
+```
+
+**Poor Alert Content**:
+```
+TCP check failed
+```
+
+## Troubleshooting and Maintenance
+
+### Proactive Maintenance
+
+Prevent issues through proactive monitoring maintenance.
+
+**Regular Review Cycles**:
+- **Monthly**: Review alert frequency and false positive rates
+- **Quarterly**: Assess monitoring coverage and service criticality
+- **Annually**: Update timeout values based on performance trends
+
+**Performance Trending**:
+- Track response time trends over time
+- Identify gradual performance degradation
+- Establish baselines for normal behavior
+- Alert on significant trend changes
+
+**Configuration Validation**:
+- Test monitor configurations in staging first
+- Validate new monitors before production deployment
+- Document configuration changes and rationale
+
+### Incident Response Integration
+
+Integrate TCP monitoring with broader incident response processes.
+
+**Runbook Integration**:
+- Link monitors to specific troubleshooting procedures
+- Include service dependency information
+- Provide escalation contact information
+- Document common resolution steps
+
+**Correlation with Other Monitors**:
+- Link TCP failures to related HTTP monitor failures
+- Correlate with infrastructure monitoring (CPU, memory, disk)
+- Connect to application performance monitoring (APM)
+- Track upstream and downstream service dependencies
+
+## Common Pitfalls to Avoid
+
+### Over-Monitoring
+
+**Avoid These Mistakes**:
+- Monitoring from too many locations unnecessarily
+- Setting frequencies too high for service criticality
+- Creating redundant monitors for the same service
+- Monitoring every port on every server
+
+**Better Approach**:
+- Focus on user-impacting services
+- Match monitoring frequency to business criticality
+- Consolidate similar monitoring checks
+- Monitor service health, not infrastructure details
+
+### Alert Fatigue
+
+**Common Causes**:
+- Timeouts set too aggressively
+- Monitoring unstable or flaky services
+- No maintenance window configurations
+- Single-location failure alerts
+
+**Solutions**:
+- Tune timeout values based on actual performance
+- Fix underlying service issues before monitoring
+- Configure maintenance windows for planned outages
+- Require multi-location failures before alerting
+
+### Security Oversights
+
+**Avoid These Issues**:
+- Hardcoding credentials in monitor configurations
+- Using overprivileged service accounts
+- Monitoring over insecure connections
+- Exposing monitoring traffic to public networks
+
+**Secure Practices**:
+- Use dedicated monitoring credentials with minimal privileges
+- Store credentials in secure credential management systems
+- Use encrypted connections (SSL/TLS) when possible
+- Implement network segmentation for monitoring traffic
+
+<Warning>
+Regular maintenance and tuning of TCP monitors is essential. Set up quarterly reviews to ensure configurations remain optimal as your services evolve.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+<Card title="TCP Monitor Use Cases" href="/docs/detect/uptime-monitoring/tcp-monitors/use-cases">
+Explore common use cases and real-world examples
+</Card>
+
+<Card title="Creating Your First TCP Monitor" href="/docs/detect/uptime-monitoring/tcp-monitors/creating-your-first-tcp-monitor">
+Get started with step-by-step setup instructions  
+</Card>
+
+<Card title="Alert Configuration" href="/docs/communicate/alerts">
+Set up comprehensive alerting strategies
+</Card>
+
+<Card title="Private Locations" href="/docs/getting-started/platform/private-locations/overview">
+Monitor internal services with private monitoring infrastructure
+</Card>
+</CardGroup>

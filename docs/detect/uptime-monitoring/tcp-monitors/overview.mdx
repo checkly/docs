@@ -1,0 +1,162 @@
+---
+title: 'TCP Monitors Overview'
+description: 'Monitor the availability and performance of your TCP services by establishing connections and verifying responses.'
+sidebarTitle: Overview
+---
+
+import { Note, Warning, Tip } from 'mintlify/components'
+
+Monitor your TCP services, databases, mail servers, and other network services with Checkly's TCP monitoring. TCP monitors establish direct connections to your services to verify they're accepting connections and responding correctly.
+
+## What are TCP Monitors?
+
+TCP monitors perform low-level connectivity checks by establishing TCP connections to your services. They verify that your services are listening on the expected ports and can accept connections, making them essential for monitoring infrastructure components and backend services.
+
+![TCP monitor interface showing connection status](/images/tcp-monitors/tcp-monitor-overview.png)
+
+<CardGroup cols={2}>
+<Card title="Perfect for" icon="check">
+- Database servers (MySQL, PostgreSQL, MongoDB)
+- Mail servers (SMTP, IMAP, POP3)
+- Custom TCP services and APIs
+- Load balancers and proxies
+- SSH and FTP servers
+- Redis and Memcached instances
+</Card>
+
+<Card title="Key benefits" icon="network-wired">
+- Direct connection validation
+- Port availability checking
+- Response time measurement
+- SSL/TLS certificate validation
+- Global monitoring locations
+- Immediate failure detection
+</Card>
+</CardGroup>
+
+## How TCP Monitoring Works
+
+TCP monitors perform connection-level checks:
+
+1. **Connection Attempt** - Establishes a TCP connection to your service
+2. **Port Verification** - Confirms the service is listening on the specified port
+3. **Response Validation** - Optionally validates service responses
+4. **SSL/TLS Check** - Verifies certificate validity for secure connections
+5. **Timing Measurement** - Records connection and response times
+
+<Tip>
+TCP monitors are ideal for monitoring services that don't expose HTTP endpoints but need connectivity verification.
+</Tip>
+
+## Monitor Configuration
+
+### Basic Settings
+
+- **Host/IP Address**: The server hostname or IP address to monitor
+- **Port**: The TCP port your service is listening on
+- **Protocol**: Choose between TCP, SSL/TLS, or specific protocols
+- **Timeout**: Maximum time to wait for connection establishment
+
+### Advanced Options
+
+- **Expected Response**: Text pattern to match in the service response
+- **Connection String**: Custom data to send after connection
+- **SSL Certificate Validation**: Check certificate expiration and validity
+- **Monitoring Frequency**: How often to run the check (1-60 minutes)
+
+
+## Monitoring Locations
+
+TCP monitors can run from multiple global locations to ensure your services are accessible worldwide:
+
+- **Global Coverage**: Monitor from 20+ locations across 6 continents
+- **Regional Testing**: Focus on locations where your users are based
+- **Redundancy**: Multiple location checks provide confidence in results
+- **Network Path Validation**: Different routes help identify network issues
+
+## SSL/TLS Certificate Monitoring
+
+For services using SSL/TLS, TCP monitors automatically check:
+
+- **Certificate Validity**: Ensures certificates are not expired
+- **Chain Validation**: Verifies the complete certificate chain
+- **Expiration Warnings**: Alerts before certificates expire
+- **Protocol Compliance**: Checks for secure protocol versions
+
+<Warning>
+Certificate monitoring is only available when using SSL/TLS protocol options.
+</Warning>
+
+## Response Time Metrics
+
+TCP monitors track several timing metrics:
+
+- **Connection Time**: Time to establish the TCP connection
+- **First Byte Time**: Time to receive first response byte
+- **Total Response Time**: Complete request/response cycle
+- **DNS Resolution Time**: Time to resolve the hostname
+
+## Alerting and Notifications
+
+Configure alerts for various failure conditions:
+
+- **Connection Failures**: When the service doesn't accept connections
+- **Timeout Exceeded**: When responses take too long
+- **Response Validation**: When expected responses don't match
+- **Certificate Issues**: When SSL certificates are invalid or expiring
+
+
+## Limitations
+
+TCP monitors have some inherent limitations:
+
+- Cannot perform application-level validation
+- Limited protocol-specific checking beyond basic connectivity
+- May not detect issues within the application layer
+- Requires services to be network-accessible from monitoring locations
+
+<Note>
+For comprehensive application monitoring, combine TCP monitors with HTTP checks and synthetic monitoring.
+</Note>
+
+## Getting Started
+
+Ready to monitor your TCP services? Create your first TCP monitor and ensure your infrastructure is always accessible.
+
+<CardGroup cols={2}>
+<Card title="Creating Your First TCP Monitor" href="/docs/detect/uptime-monitoring/tcp-monitors/creating-your-first-tcp-monitor">
+Step-by-step guide to set up TCP monitoring for your services
+</Card>
+
+<Card title="TCP Monitor Use Cases" href="/docs/detect/uptime-monitoring/tcp-monitors/use-cases">
+Explore common use cases and real-world examples
+</Card>
+
+<Card title="TCP Monitor Best Practices" href="/docs/detect/uptime-monitoring/tcp-monitors/best-practices">
+Learn optimization strategies and configuration recommendations
+</Card>
+
+<Card title="Alert Configuration" href="/docs/communicate/alerts">
+Configure effective alerting for your TCP monitors
+</Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+<Card title="URL Monitors" href="/docs/detect/uptime-monitoring/url-monitors/overview">
+Learn about HTTP/HTTPS monitoring for web services
+</Card>
+
+<Card title="Synthetic Monitoring" href="/docs/detect/synthetic-monitoring/overview">
+Explore advanced monitoring with API and browser checks
+</Card>
+
+<Card title="Private Locations" href="/docs/getting-started/platform/private-locations/overview">
+Monitor internal services with private location agents
+</Card>
+
+<Card title="Monitoring Locations" href="/docs/concepts/locations">
+Learn about global monitoring locations and coverage
+</Card>
+</CardGroup>

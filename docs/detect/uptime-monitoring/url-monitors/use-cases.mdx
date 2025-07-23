@@ -1,0 +1,523 @@
+---
+title: 'URL Monitor Use Cases'
+description: 'Common use cases and real-world examples for URL monitoring across websites, APIs, and HTTP services.'
+sidebarTitle: 'Use Cases'
+---
+
+import { Note, Warning, Tip } from 'mintlify/components'
+
+URL monitors provide comprehensive HTTP-based monitoring for web applications, APIs, and online services. Here are the most effective use cases and implementation strategies.
+
+## Website Monitoring
+
+Monitor website availability, performance, and functionality across different pages and user journeys.
+
+### Homepage and Landing Pages
+Monitor your primary web presence:
+
+```yaml
+URL: https://www.company.com
+Method: GET
+Expected Status: 200
+Content Contains: "Welcome to Company"
+Response Time Threshold: 2000ms
+```
+
+**Key Benefits**:
+- Ensure first impression for new visitors
+- Monitor brand reputation and availability
+- Track performance from user perspective
+- Validate CDN and caching effectiveness
+
+### Critical User Pages
+Monitor pages essential for user engagement:
+
+```yaml
+# Login page
+URL: https://app.company.com/login
+Content Contains: "Sign In"
+Content Not Contains: "Service Unavailable"
+
+# Pricing page
+URL: https://www.company.com/pricing
+Content Contains: "Choose Your Plan"
+Response Time Threshold: 1500ms
+
+# Contact page
+URL: https://www.company.com/contact
+Content Contains: "Get In Touch"
+```
+
+### Multi-Step User Journeys
+Monitor complete user workflows:
+
+```yaml
+# Step 1: Product catalog
+URL: https://shop.company.com/products
+Expected Status: 200
+Content Contains: "Browse Products"
+
+# Step 2: Product detail
+URL: https://shop.company.com/products/123
+Content Contains: "Add to Cart"
+Response Time Threshold: 3000ms
+
+# Step 3: Shopping cart
+URL: https://shop.company.com/cart
+Content Contains: "Proceed to Checkout"
+```
+
+## E-commerce Monitoring
+
+Ensure critical e-commerce functionality remains available and performant.
+
+### Product Catalog and Search
+Monitor product discovery functionality:
+
+```yaml
+# Category pages
+URL: https://shop.company.com/category/electronics
+Content Contains: "Products found"
+Content Not Contains: "No products available"
+
+# Search functionality
+URL: https://shop.company.com/search?q=laptop
+Method: GET
+Content Contains: "Search results"
+Response Time Threshold: 2000ms
+
+# Product pages
+URL: https://shop.company.com/product/popular-item
+Content Contains: "Add to Cart"
+Content Not Contains: "Out of Stock"
+```
+
+### Checkout Process
+Monitor revenue-critical checkout flow:
+
+```yaml
+# Cart page
+URL: https://shop.company.com/cart
+Method: POST
+Body: '{"product_id": 123, "quantity": 1}'
+Headers:
+  Content-Type: "application/json"
+Expected Status: 200
+Content Contains: "Item added"
+
+# Checkout initiation
+URL: https://shop.company.com/checkout
+Content Contains: "Review Order"
+Content Not Contains: "Payment Error"
+
+# Payment processing (health check)
+URL: https://shop.company.com/api/payments/health
+Headers:
+  Authorization: "Bearer {{api_token}}"
+Expected Status: 200
+```
+
+### Inventory and Pricing
+Monitor product availability and pricing accuracy:
+
+```yaml
+# Inventory API
+URL: https://api.shop.company.com/inventory/check
+Method: POST
+Body: '{"product_ids": [123, 456, 789]}'
+Headers:
+  Content-Type: "application/json"
+  X-API-Key: "{{api_key}}"
+Expected Status: 200
+JSON Schema Validation: inventory-response-schema.json
+
+# Pricing API
+URL: https://api.shop.company.com/pricing/current
+Headers:
+  Authorization: "Bearer {{api_token}}"
+Content Contains: '"currency":"USD"'
+```
+
+## API Monitoring
+
+Monitor REST APIs, microservices, and backend systems.
+
+### Health Check Endpoints
+Monitor service health and readiness:
+
+```yaml
+# Application health
+URL: https://api.company.com/health
+Method: GET
+Expected Status: 200
+JSON Response Validation:
+  - status: "healthy"
+  - version: (any string)
+  - uptime: (numeric)
+
+# Database connectivity
+URL: https://api.company.com/health/database
+Headers:
+  X-Health-Check: "monitoring"
+Expected Status: 200
+Content Contains: '"database_status":"connected"'
+
+# External dependencies
+URL: https://api.company.com/health/dependencies
+Content Contains: '"all_services_healthy":true'
+```
+
+### Authentication Endpoints
+Monitor user authentication systems:
+
+```yaml
+# Token validation endpoint
+URL: https://auth.company.com/validate
+Method: POST
+Headers:
+  Content-Type: "application/json"
+Body: '{"token": "{{test_token}}"}'
+Expected Status: 200
+Content Contains: '"valid":true'
+
+# Login endpoint health
+URL: https://auth.company.com/login/health
+Method: GET
+Expected Status: 200
+Response Time Threshold: 1000ms
+```
+
+### Data API Endpoints
+Monitor data retrieval and manipulation:
+
+```yaml
+# User data API
+URL: https://api.company.com/users/profile
+Method: GET
+Headers:
+  Authorization: "Bearer {{api_token}}"
+Expected Status: 200
+JSON Schema Validation: user-profile-schema.json
+
+# Search API
+URL: https://api.company.com/search
+Method: POST
+Body: '{"query": "test", "limit": 10}'
+Headers:
+  Content-Type: "application/json"
+Expected Status: 200
+Content Contains: '"results":'
+```
+
+## Content Delivery and Performance
+
+Monitor CDN performance, static assets, and global content delivery.
+
+### Static Asset Delivery
+Monitor critical static resources:
+
+```yaml
+# Main application CSS
+URL: https://cdn.company.com/assets/main.css
+Method: GET
+Expected Status: 200
+Headers Contains: "content-type: text/css"
+Response Time Threshold: 500ms
+
+# JavaScript bundles
+URL: https://cdn.company.com/assets/app.js
+Expected Status: 200
+Headers Contains: "cache-control: public"
+Content Contains: "function"
+
+# Images and media
+URL: https://cdn.company.com/images/logo.png
+Expected Status: 200
+Headers Contains: "content-type: image/png"
+```
+
+### CDN Performance Across Regions
+Monitor global content delivery:
+
+```yaml
+# North America
+URL: https://na-cdn.company.com/api/ping
+Locations: [us-east-1, us-west-2, ca-central-1]
+Response Time Threshold: 200ms
+
+# Europe
+URL: https://eu-cdn.company.com/api/ping  
+Locations: [eu-west-1, eu-central-1, eu-north-1]
+Response Time Threshold: 300ms
+
+# Asia Pacific
+URL: https://ap-cdn.company.com/api/ping
+Locations: [ap-southeast-1, ap-northeast-1, ap-south-1]
+Response Time Threshold: 400ms
+```
+
+### Content Freshness
+Monitor content updates and cache invalidation:
+
+```yaml
+# Dynamic content updates
+URL: https://api.company.com/content/latest
+Method: GET
+Headers:
+  Cache-Control: "no-cache"
+Expected Status: 200
+Content Contains: "last_updated"
+
+# API version consistency
+URL: https://api.company.com/version
+Expected Status: 200
+JSON Response:
+  version: "{{expected_version}}"
+```
+
+## Third-Party Service Monitoring
+
+Monitor external services and integrations your application depends on.
+
+### Payment Processors
+Monitor payment gateway availability:
+
+```yaml
+# Payment gateway health
+URL: https://api.stripe.com/v1/charges
+Method: GET
+Headers:
+  Authorization: "Bearer {{stripe_test_key}}"
+Expected Status: 401  # Expected with test key
+Content Contains: "authentication"
+
+# PayPal API
+URL: https://api.paypal.com/v1/oauth2/token
+Method: POST
+Expected Status: 400  # Expected without credentials
+Content Contains: "error"
+```
+
+### Email Services
+Monitor email delivery services:
+
+```yaml
+# SendGrid API health
+URL: https://api.sendgrid.com/v3/user/profile
+Method: GET
+Headers:
+  Authorization: "Bearer {{sendgrid_api_key}}"
+Expected Status: 200
+Content Contains: '"username"'
+
+# Mailgun API
+URL: https://api.mailgun.net/v3/domains
+Headers:
+  Authorization: "Basic {{mailgun_auth}}"
+Expected Status: 200
+```
+
+### Social Media APIs
+Monitor social platform integrations:
+
+```yaml
+# Twitter API
+URL: https://api.twitter.com/2/tweets/by/username/company
+Headers:
+  Authorization: "Bearer {{twitter_token}}"
+Expected Status: 200
+Content Contains: '"data"'
+
+# Facebook Graph API
+URL: https://graph.facebook.com/v15.0/me
+Headers:
+  Authorization: "Bearer {{facebook_token}}"
+Expected Status: 200
+```
+
+## SaaS Application Monitoring
+
+Monitor software-as-a-service applications and multi-tenant systems.
+
+### Multi-Tenant Health Checks
+Monitor tenant-specific functionality:
+
+```yaml
+# Tenant A health check
+URL: https://tenant-a.company.com/api/health
+Headers:
+  X-Tenant-ID: "tenant-a"
+Expected Status: 200
+Content Contains: '"tenant":"tenant-a"'
+
+# Tenant B health check  
+URL: https://tenant-b.company.com/api/health
+Headers:
+  X-Tenant-ID: "tenant-b"
+Expected Status: 200
+Content Contains: '"status":"operational"'
+```
+
+### Feature Flag Monitoring
+Monitor feature availability across environments:
+
+```yaml
+# Feature flags API
+URL: https://api.company.com/features/flags
+Method: GET
+Headers:
+  Environment: "production"
+Expected Status: 200
+Content Contains: '"new_checkout_flow":true'
+
+# A/B testing configuration
+URL: https://api.company.com/experiments/active
+Expected Status: 200
+JSON Schema Validation: experiments-schema.json
+```
+
+### Subscription and Billing
+Monitor billing and subscription systems:
+
+```yaml
+# Billing API health
+URL: https://billing.company.com/api/health
+Headers:
+  X-Service: "subscription-monitor"
+Expected Status: 200
+Content Contains: '"billing_system":"operational"'
+
+# Subscription status check
+URL: https://api.company.com/subscriptions/health-check
+Method: POST
+Body: '{"action": "validate_billing_system"}'
+Expected Status: 200
+```
+
+## Monitoring Strategy by Application Type
+
+### E-commerce Platforms
+**Critical Monitors**:
+- Homepage and category pages (every 2 minutes)
+- Checkout flow (every 1 minute)
+- Payment processing (every 5 minutes)
+- Inventory APIs (every 5 minutes)
+
+**Response Time Targets**:
+- Product pages: < 2 seconds
+- Search results: < 3 seconds  
+- Checkout steps: < 1.5 seconds
+- API endpoints: < 500ms
+
+### Content Management Systems
+**Essential Monitors**:
+- Content delivery (every 5 minutes)
+- Admin interfaces (every 10 minutes)
+- Content APIs (every 5 minutes)
+- Media assets (every 15 minutes)
+
+### SaaS Applications
+**Key Focus Areas**:
+- User authentication (every 2 minutes)
+- Core application functionality (every 5 minutes)
+- API rate limiting (every 10 minutes)
+- Multi-tenant isolation (every 15 minutes)
+
+### Financial Services
+**High-Priority Monitors**:
+- Transaction processing (every 1 minute)
+- Account access (every 2 minutes)
+- Real-time data feeds (every 30 seconds)
+- Regulatory reporting (every 30 minutes)
+
+## Seasonal and Event-Based Monitoring
+
+### High-Traffic Events
+Prepare monitoring for expected traffic spikes:
+
+```yaml
+# Black Friday e-commerce monitoring
+Frequency: Every 30 seconds
+Locations: All global locations
+Alert Threshold: 1 failure
+Response Time Threshold: 1000ms
+
+# Product launch monitoring
+URLs: 
+  - Product announcement page
+  - Registration/signup flow
+  - Download/purchase endpoints
+Frequency: Every 1 minute
+```
+
+### Maintenance and Deployment Windows
+Adjust monitoring during planned changes:
+
+```yaml
+# Pre-deployment validation
+- Staging environment health checks
+- Database migration status
+- CDN cache warmup verification
+
+# Post-deployment monitoring
+- Increased monitoring frequency
+- Additional validation checks
+- Performance comparison with baseline
+```
+
+## Integration with Development Workflow
+
+### CI/CD Pipeline Integration
+Use URL monitors for deployment validation:
+
+```yaml
+# Staging deployment validation
+URL: https://staging.company.com/health
+Expected Status: 200
+Content Contains: '"version":"{{new_version}}"'
+
+# Production smoke tests
+URLs:
+  - https://www.company.com
+  - https://api.company.com/health
+  - https://app.company.com/login
+```
+
+### Feature Release Monitoring
+Monitor new feature rollouts:
+
+```yaml
+# New feature availability
+URL: https://app.company.com/api/features
+Content Contains: '"new_feature_enabled":true'
+
+# Feature usage endpoints
+URL: https://analytics.company.com/feature-usage
+Headers:
+  X-Feature: "new-checkout"
+Expected Status: 200
+```
+
+<Note>
+URL monitors provide excellent coverage for HTTP-based services. Combine them with TCP monitors for infrastructure-level checks and browser monitoring for complex user interactions.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+<Card title="URL Monitor Best Practices" href="/docs/detect/uptime-monitoring/url-monitors/best-practices">
+Learn optimization strategies and configuration recommendations
+</Card>
+
+<Card title="Creating Your First URL Monitor" href="/docs/detect/uptime-monitoring/url-monitors/creating-your-first-url-monitor">
+Get started with step-by-step setup instructions
+</Card>
+
+<Card title="API Checks" href="/docs/detect/synthetic-monitoring/api-checks/overview">
+Explore advanced API testing capabilities
+</Card>
+
+<Card title="Browser Checks" href="/docs/detect/synthetic-monitoring/browser-checks/overview">
+Monitor complex user interactions with automated browser testing
+</Card>
+</CardGroup>

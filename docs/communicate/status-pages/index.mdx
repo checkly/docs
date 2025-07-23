@@ -1,66 +1,464 @@
 ---
 title: 'Status Pages Overview'
-description: 'Overview of status page capabilities in Checkly'
+description: 'Create professional status pages to communicate service health, incidents, and maintenance to your customers with automatic incident management and custom branding.'
 sidebarTitle: 'Overview'
 ---
 
-# Status Pages Overview
+import { Note, Warning, Tip, Steps } from 'mintlify/components'
 
-Status pages are a crucial communication tool that keeps your users informed about the current state of your services. Checkly provides easy-to-use status page functionality to maintain transparency with your user base.
+Status pages provide transparent communication about your service health and incidents to customers, users, and stakeholders. Checkly's status pages automatically reflect your monitoring results and create a professional interface for incident communication.
 
 ## What are Status Pages?
 
-Status pages are public-facing websites that display the current status of your services, including:
+Status pages are public-facing websites that display real-time information about your services' health and operational status. They serve as the primary communication channel between your team and your users during both normal operations and incidents.
 
-- Real-time service status
-- Incident history and updates
-- Scheduled maintenance announcements
-- Performance metrics and uptime statistics
+<CardGroup cols={2}>
+<Card title="Real-time health display" icon="heartbeat">
+**Live Service Status**
+- Display current health of all services
+- Automatic updates from monitoring checks
+- Historical uptime and performance data
+- Color-coded status indicators
+</Card>
 
-## Key Features
+<Card title="Incident communication" icon="megaphone">
+**Professional Incident Management**
+- Automated incident creation from check failures
+- Manual incident creation for planned maintenance
+- Real-time updates and status progression
+- Email notifications for subscribers
+</Card>
 
-### Real-time Updates
-Automatically update your status page based on your monitoring results.
+<Card title="Custom branding" icon="paintbrush">
+**Professional Appearance**
+- Custom logos and favicon
+- Theme selection (light/dark/auto)
+- Custom domains and subdomains
+- Branded communication
+</Card>
 
-### Custom Branding
-Customize your status page with your company branding and colors.
+<Card title="User engagement" icon="users">
+**Subscriber Management**
+- Email subscription system
+- Verified subscriber notifications
+- Incident-specific updates
+- Maintenance announcements
+</Card>
+</CardGroup>
 
-### Incident Management
-Create and manage incidents with detailed updates and timelines.
+## Core Status Page Components
 
-### Subscriber Notifications
-Allow users to subscribe to status updates via email or other channels.
+### Services
+Services represent functional pieces of your application that users interact with:
 
-## Getting Started
+```yaml
+# Example service structure
+Payment Processing:
+  Description: "Credit card and payment processing"
+  Connected Checks: [Payment API, Stripe Integration, PayPal API]
+  Incident Automation: Enabled
+  Status: Operational
 
-To create a status page:
+User Authentication:
+  Description: "Login and user management systems"
+  Connected Checks: [Auth API, OAuth Service, User Database]
+  Incident Automation: Enabled
+  Status: Operational
+```
 
-1. Navigate to the Status Pages section
-2. Choose a custom domain or use Checkly's subdomain
-3. Configure your page title and description
-4. Add the services you want to monitor
-5. Set up incident management workflows
+### Service Cards
+Organize and group services for better user experience:
 
-## Available Resources
+- **Visual grouping**: Related services displayed together
+- **Custom ordering**: Arrange services by importance or user impact
+- **Status aggregation**: Overall health based on connected checks
+- **Description management**: Clear service explanations for users
 
-- **[Status Pages Guide](/docs/platform/communicate/status-pages)**: Detailed guide on status page creation
-- **Customization Options**: Learn about branding and styling
-- **Integration Documentation**: Setup guides for various integrations
+### Automatic Incident Management
+Connect monitoring checks directly to services for automated incident handling:
 
-## Benefits
+<CardGroup cols={2}>
+<Card title="Automatic incident creation" icon="zap">
+**When Checks Fail**
+- Incident opened automatically
+- Service status updated to "Major Outage" or "Partial Outage"
+- Subscribers notified via email
+- Status page reflects current state
+</Card>
 
-- **Transparency**: Keep users informed about service status
-- **Trust Building**: Demonstrate reliability and communication
-- **Reduced Support**: Answer common questions about service status
-- **Professional Image**: Present a professional face to your users
+<Card title="Automatic incident resolution" icon="check-circle">
+**When Checks Recover**
+- Incident automatically resolved
+- Service status returned to "Operational"
+- Resolution notification sent to subscribers
+- Historical record maintained
+</Card>
+</CardGroup>
 
-## Use Cases
+## Setting Up Your Status Page
 
-- **SaaS Applications**: Keep customers informed about service availability
-- **E-commerce**: Maintain customer trust during maintenance
-- **APIs**: Provide status information to API consumers
-- **Internal Services**: Keep internal teams informed about system status
+<Steps>
+<Step title="Create Your Status Page">
+Choose a name and configure basic settings for your status page
+</Step>
 
-## Next Steps
+<Step title="Configure Subdomain">
+Set up your status page URL (e.g., `status.yourcompany.com` or `yourcompany.checkly.run`)
+</Step>
 
-Explore the status pages documentation to learn how to create effective status pages for your services. 
+<Step title="Add Services">
+Create services that represent the functional components your users interact with
+</Step>
+
+<Step title="Connect Monitoring Checks">
+Link your existing Checkly checks to services for automatic incident management
+</Step>
+
+<Step title="Customize Appearance">
+Upload logos, set themes, and configure branding to match your company style
+</Step>
+
+<Step title="Test and Go Live">
+Verify incident automation works correctly and share your status page URL
+</Step>
+</Steps>
+
+### Service Creation and Management
+
+Create services that align with how your users think about your application:
+
+```yaml
+# Good service examples
+Frontend Application:
+  - Website loading and navigation
+  - User interface responsiveness
+  - Client-side functionality
+
+API Services:
+  - Core API endpoints
+  - Authentication services
+  - Data processing capabilities
+
+Third-party Integrations:
+  - Payment processors
+  - Email delivery services
+  - External data sources
+```
+
+<Tip>
+Create services from your users' perspective, not your internal architecture. Users care about "Login" working, not whether your "Auth microservice cluster" is healthy.
+</Tip>
+
+## Custom Domain Configuration
+
+### Domain Setup Process
+Configure custom domains to maintain brand consistency:
+
+<Steps>
+<Step title="DNS Configuration">
+Add CNAME and TXT records to your DNS provider
+</Step>
+
+<Step title="Domain Verification">
+Checkly verifies domain ownership through TXT records
+</Step>
+
+<Step title="SSL Certificate">
+Automatic SSL certificate provisioning and renewal
+</Step>
+
+<Step title="Go Live">
+Status page becomes available at your custom domain
+</Step>
+</Steps>
+
+### Required DNS Records
+
+```text
+# CNAME Record (required)
+Type: CNAME
+Name: status (or your chosen subdomain)
+Value: cnames.checklyhq.com
+
+# TXT Record (required for verification)
+Type: TXT
+Name: _checkly-status-page-domain-verification.status
+Value: [Verification code provided by Checkly]
+```
+
+<Warning>
+For Cloudflare users: Ensure the orange cloud (proxy) is **disabled** for your status page CNAME record. The record should be "DNS only" (gray cloud) for proper functionality.
+</Warning>
+
+## Status Page Customization
+
+### Branding Options
+Customize your status page to match your brand identity:
+
+<CardGroup cols={3}>
+<Card title="Logo configuration" icon="image">
+**Visual Identity**
+- Upload company logo
+- Set logo link destination
+- Optimize for different screen sizes
+- Support for multiple formats
+</Card>
+
+<Card title="Favicon setup" icon="browser">
+**Browser Integration**
+- Custom favicon upload
+- Browser tab identification
+- Professional appearance
+- Standard format support
+</Card>
+
+<Card title="Theme selection" icon="palette">
+**Visual Appearance**
+- Light theme for bright environments
+- Dark theme for reduced eye strain
+- Auto theme based on user preference
+- Consistent color schemes
+</Card>
+</CardGroup>
+
+### Advanced Customization
+Further customize your status page appearance and functionality:
+
+```css
+/* Example custom styling capabilities */
+.status-page {
+  font-family: "Your Brand Font", sans-serif;
+  primary-color: #your-brand-color;
+  background: #your-background-color;
+}
+
+.service-status {
+  border-radius: 8px;
+  custom-styling: enabled;
+}
+```
+
+## Incident Management Workflow
+
+### Manual Incident Creation
+Create incidents for planned maintenance or communication:
+
+<Steps>
+<Step title="Incident Type Selection">
+Choose between major impact, minor impact, or maintenance
+</Step>
+
+<Step title="Service Selection">
+Select affected services and impact level
+</Step>
+
+<Step title="Incident Details">
+Provide title, description, and initial status
+</Step>
+
+<Step title="Notification Sending">
+Automatically notify all subscribers via email
+</Step>
+
+<Step title="Ongoing Updates">
+Provide regular updates as incident progresses
+</Step>
+</Steps>
+
+### Incident Update Process
+Keep users informed throughout incident lifecycle:
+
+```yaml
+# Incident progression example
+Initial Report:
+  Status: "Investigating"
+  Message: "We are aware of login issues and are investigating"
+  Timestamp: "2024-01-15 14:30 UTC"
+
+Progress Update:
+  Status: "Identified"
+  Message: "Issue identified with authentication service, implementing fix"
+  Timestamp: "2024-01-15 14:45 UTC"
+
+Resolution:
+  Status: "Resolved"
+  Message: "Authentication service restored, all systems operational"
+  Timestamp: "2024-01-15 15:15 UTC"
+```
+
+### Automated Incident Management
+Leverage monitoring integration for hands-free incident communication:
+
+<CardGroup cols={2}>
+<Card title="Check failure detection" icon="exclamation-triangle">
+**Automatic Incident Opening**
+- Failed check triggers incident creation
+- Service status automatically updated
+- Subscribers immediately notified
+- Status page reflects current state
+</Card>
+
+<Card title="Check recovery detection" icon="check-circle">
+**Automatic Incident Resolution**
+- Successful check triggers incident closure
+- Service status returned to operational
+- Recovery notification sent to subscribers
+- Incident marked as resolved
+</Card>
+</CardGroup>
+
+## Subscriber Management and Notifications
+
+### Email Subscription System
+Enable users to stay informed about service status:
+
+<Steps>
+<Step title="Subscription Setup">
+Users provide email address for status updates
+</Step>
+
+<Step title="Email Verification">
+Verification email sent to confirm subscription
+</Step>
+
+<Step title="Notification Preferences">
+Users can manage notification settings
+</Step>
+
+<Step title="Incident Notifications">
+Automatic emails for incident updates and resolutions
+</Step>
+</Steps>
+
+### Notification Content Structure
+Status page notifications include comprehensive incident information:
+
+```text
+Subject: [INCIDENT] Payment Processing - Service Disruption
+
+Hello,
+
+We are currently experiencing issues with our Payment Processing service.
+
+Incident Details:
+- Service: Payment Processing
+- Status: Investigating
+- Started: January 15, 2024 at 14:30 UTC
+- Impact: Users may experience payment failures
+
+We are actively working to resolve this issue and will provide updates
+as more information becomes available.
+
+View status page: https://status.yourcompany.com
+Unsubscribe: [unsubscribe link]
+
+Best regards,
+Your Company Team
+```
+
+## Enterprise Features and Availability
+
+<Warning>
+Status pages are available as a paid add-on for Checkly Enterprise plans. Contact your account manager or Checkly sales for pricing and activation.
+</Warning>
+
+### Enterprise Plan Benefits
+- Unlimited status pages per account
+- Custom domain configuration
+- Advanced branding options
+- Incident automation capabilities
+- Subscriber management system
+- Historical incident backfilling
+
+## Advanced Features
+
+### Incident Backfilling
+Add historical incidents to maintain accurate status page history:
+
+<Steps>
+<Step title="Historical Accuracy">
+Create incidents for past outages or maintenance windows
+</Step>
+
+<Step title="Custom Date Selection">
+Set specific dates and times for historical incidents
+</Step>
+
+<Step title="Subscriber Management">
+Choose whether to notify current subscribers about historical incidents
+</Step>
+
+<Step title="Uptime Calculation">
+Backfilled incidents are included in uptime statistics
+</Step>
+</Steps>
+
+<Tip>
+When backfilling historical incidents, consider whether to notify current subscribers. Usually, you want to disable notifications for historical events to avoid confusion.
+</Tip>
+
+### Multi-Check Service Integration
+Connect multiple monitoring checks to a single service:
+
+```yaml
+# Example: E-commerce Checkout Service
+Checkout Service:
+  Connected Checks:
+    - Payment Processing API
+    - Inventory Management API
+    - Order Confirmation Email
+    - Shopping Cart Functionality
+  
+  Incident Logic:
+    - Any single check failure = "Partial Outage"
+    - Multiple check failures = "Major Outage"
+    - All checks failing = "Complete Outage"
+```
+
+## Status Page Best Practices
+
+### Service Organization
+- **User-centric services**: Create services based on user-facing functionality
+- **Logical grouping**: Group related services together for clarity
+- **Clear descriptions**: Use terminology your users understand
+- **Appropriate granularity**: Balance detail with simplicity
+
+### Incident Communication
+- **Timely updates**: Provide regular updates during ongoing incidents
+- **Clear messaging**: Use plain language to describe issues and impacts
+- **Proactive communication**: Notify users before they notice problems
+- **Transparent resolution**: Explain what was fixed and preventive measures
+
+### Maintenance Planning
+- **Advance notice**: Schedule maintenance announcements with sufficient lead time
+- **Impact assessment**: Clearly communicate which services will be affected
+- **Duration estimates**: Provide realistic timeframes for maintenance windows
+- **Progress updates**: Keep users informed during maintenance activities
+
+## Integration Resources
+
+<CardGroup cols={2}>
+<Card title="Incident Management" href="/docs/communicate/status-pages/incidents">
+Detailed guide to creating, managing, and updating incidents
+</Card>
+
+<Card title="Custom Domains" href="/docs/communicate/status-pages/custom-domains">
+Step-by-step setup for custom domain configuration
+</Card>
+
+<Card title="API Integration" href="/api-reference/status-pages">
+Programmatic status page and incident management
+</Card>
+
+<Card title="Webhook Integration" href="/docs/communicate/alerts/webhooks">
+Integrate status page updates with external systems
+</Card>
+</CardGroup>
+
+<Note>
+Status pages are most effective when they're part of a comprehensive communication strategy. Consider how status pages fit with your alerting, incident response, and customer support processes.
+</Note>
+
+<Tip>
+Start with a simple status page setup and gradually add more sophisticated features like incident automation and custom domains as your monitoring program matures.
+</Tip>

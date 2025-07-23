@@ -1,4 +1,932 @@
 ---
-title: Creating your First Multistep Check
-description: Step-by-step guide to creating your first API check in Checkly.
+title: 'Creating Your First Multistep Check'
+description: 'Step-by-step guide to creating your first multistep check in Checkly for monitoring complex API workflows and business processes.'
+sidebarTitle: 'Creating Your First Multistep Check'
 ---
+
+import { Note, Warning, Tip, Steps } from 'mintlify/components'
+
+Multistep checks allow you to monitor complex API workflows that span multiple endpoints and validate complete business processes. In this comprehensive guide, you'll create your first multistep check to ensure your critical API workflows function correctly end-to-end.
+
+## Before You Start
+
+Multistep checks are ideal for monitoring:
+- User registration and onboarding flows
+- E-commerce checkout and payment processes
+- Data processing and ETL pipelines
+- Authentication and authorization workflows
+- Multi-step form submissions
+- Complex business transaction validation
+
+<Note>
+You'll need a series of API endpoints that work together to complete a business process. Multistep checks excel at testing workflows that require data to flow from one API call to the next.
+</Note>
+
+## What You'll Learn
+
+- How to create multistep checks using the Checkly UI
+- Writing Playwright API test scripts with sequential requests
+- Passing data between workflow steps
+- Setting up authentication for protected endpoints
+- Validating complex business logic and data flows
+- Monitoring workflow performance and reliability
+
+## Step-by-Step Setup
+
+<Steps>
+<Step title="Navigate to Multistep Checks">
+1. Log into your Checkly dashboard
+2. Go to **Checks** in the main navigation
+3. Click **Create Check** and select **Multistep Check**
+
+![Navigate to create multistep check](/images/multistep-checks/create-multistep-check-nav.png)
+
+**Check Configuration**:
+- **Name**: Descriptive workflow name (e.g., "User Registration Flow")
+- **Tags**: Organize with labels like "critical", "auth", "workflow"
+- **Group**: Assign to a check group for shared settings and alerting
+</Step>
+
+<Step title="Write Your Workflow Script">
+Multistep checks use Playwright's `test.step()` function to organize sequential API requests:
+
+```typescript
+import { test, expect } from '@playwright/test'
+
+test('User registration and setup workflow', async ({ request }) => {
+  let userId, authToken, profileId
+  const timestamp = Date.now()
+  const testEmail = `test-${timestamp}@example.com`
+
+  await test.step('Register new user', async () => {
+    const response = await request.post('https://api.example.com/auth/register', {
+      data: {
+        email: testEmail,
+        password: 'SecurePassword123!',
+        firstName: 'John',
+        lastName: 'Doe'
+      }
+    })
+    
+    expect(response.status()).toBe(201)
+    const userData = await response.json()
+    userId = userData.id
+    expect(userId).toBeDefined()
+    console.log(`Created user with ID: ${userId}`)
+  })
+
+  await test.step('Login and get auth token', async () => {
+    const response = await request.post('https://api.example.com/auth/login', {
+      data: {
+        email: testEmail,
+        password: 'SecurePassword123!'
+      }
+    })
+    
+    expect(response.status()).toBe(200)
+    const loginData = await response.json()
+    authToken = loginData.access_token
+    expect(authToken).toBeDefined()
+    console.log('Successfully authenticated user')
+  })
+
+  await test.step('Create user profile', async () => {
+    const response = await request.post('https://api.example.com/users/profile', {
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      },
+      data: {
+        company: 'Example Corp',
+        jobTitle: 'Software Engineer',
+        phoneNumber: '+1-555-0123'
+      }
+    })
+    
+    expect(response.status()).toBe(201)
+    const profile = await response.json()
+    profileId = profile.id
+    expect(profile.company).toBe('Example Corp')
+    console.log(`Created profile with ID: ${profileId}`)
+  })
+
+  await test.step('Verify complete setup', async () => {
+    const response = await request.get(`https://api.example.com/users/${userId}/status`, {
+      headers: {
+        'Authorization': `Bearer ${authToken}`
+      }
+    })
+    
+    expect(response.status()).toBe(200)
+    const status = await response.json()
+    expect(status.registrationComplete).toBe(true)
+    expect(status.profileComplete).toBe(true)
+    console.log('User setup workflow completed successfully')
+  })
+})
+```
+
+**Key Concepts**:
+- **test.step()**: Organizes workflow into logical steps
+- **Data flow**: Variables pass data between steps
+- **Sequential execution**: Steps run in defined order
+- **Error propagation**: Failed steps stop the workflow
+
+![Multistep check script editor](/images/multistep-checks/multistep-check-script.png)
+</Step>
+
+<Step title="Configure Request Authentication">
+Set up authentication for protected API endpoints:
+
+**Environment Variables for Credentials**:
+```typescript
+// Use secure environment variables
+const apiConfig = {
+  baseURL: process.env.API_BASE_URL || 'https://api.example.com',
+  adminEmail: process.env.ADMIN_EMAIL,
+  adminPassword: process.env.ADMIN_PASSWORD,
+  apiKey: process.env.API_KEY
+}
+
+test('Authenticated workflow', async ({ request }) => {
+  let adminToken
+
+  await test.step('Admin authentication', async () => {
+    const response = await request.post(`${apiConfig.baseURL}/admin/login`, {
+      data: {
+        email: apiConfig.adminEmail,
+        password: apiConfig.adminPassword
+      }
+    })
+    
+    const auth = await response.json()
+    adminToken = auth.token
+  })
+
+  await test.step('Protected operation', async () => {
+    const response = await request.post(`${apiConfig.baseURL}/admin/users`, {
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+        'X-API-Key': apiConfig.apiKey
+      },
+      data: {
+        email: 'newuser@example.com',
+        role: 'user'
+      }
+    })
+    
+    expect(response.status()).toBe(201)
+  })
+})
+```
+
+**Multiple Authentication Methods**:
+```typescript
+await test.step('Setup authentication', async () => {
+  // Method 1: Bearer token
+  const tokenResponse = await request.post('/api/auth/token', {
+    headers: {
+      'Authorization': `Basic ${btoa('client:secret')}`
+    },
+    data: { grant_type: 'client_credentials' }
+  })
+  const tokenData = await tokenResponse.json()
+  
+  // Method 2: API key authentication
+  const apiKeyHeaders = {
+    'X-API-Key': process.env.API_KEY,
+    'X-Client-ID': process.env.CLIENT_ID
+  }
+  
+  // Store for use in subsequent steps
+  return { 
+    bearerToken: tokenData.access_token,
+    apiKeyHeaders 
+  }
+})
+```
+
+<Warning>
+Always use environment variables for sensitive data like passwords, API keys, and tokens. Never hardcode credentials in your workflow scripts.
+</Warning>
+</Step>
+
+<Step title="Implement Data Flow Between Steps">
+Pass data and state between workflow steps effectively:
+
+**Variable Management**:
+```typescript
+test('E-commerce purchase workflow', async ({ request }) => {
+  // Declare variables for the entire workflow
+  let authToken, customerId, cartId, orderId, paymentId
+
+  await test.step('Customer authentication', async () => {
+    const response = await request.post('/api/auth/customer-login', {
+      data: {
+        email: process.env.CUSTOMER_EMAIL,
+        password: process.env.CUSTOMER_PASSWORD
+      }
+    })
+    
+    const auth = await response.json()
+    authToken = auth.token
+    customerId = auth.customer.id
+    console.log(`Authenticated customer: ${customerId}`)
+  })
+
+  await test.step('Create shopping cart', async () => {
+    const response = await request.post('/api/carts', {
+      headers: { 'Authorization': `Bearer ${authToken}` },
+      data: { customerId: customerId }
+    })
+    
+    const cart = await response.json()
+    cartId = cart.id
+    expect(cart.customerId).toBe(customerId)
+    console.log(`Created cart: ${cartId}`)
+  })
+
+  await test.step('Add items to cart', async () => {
+    const items = [
+      { productId: 'PROD_001', quantity: 2, price: 29.99 },
+      { productId: 'PROD_002', quantity: 1, price: 49.99 }
+    ]
+
+    for (const item of items) {
+      const response = await request.post(`/api/carts/${cartId}/items`, {
+        headers: { 'Authorization': `Bearer ${authToken}` },
+        data: item
+      })
+      
+      expect(response.status()).toBe(201)
+    }
+    
+    // Verify cart total
+    const cartResponse = await request.get(`/api/carts/${cartId}`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    })
+    const cartData = await cartResponse.json()
+    expect(cartData.total).toBe(109.97) // 2*29.99 + 1*49.99
+    console.log(`Cart total: $${cartData.total}`)
+  })
+
+  await test.step('Process checkout', async () => {
+    const response = await request.post(`/api/carts/${cartId}/checkout`, {
+      headers: { 'Authorization': `Bearer ${authToken}` },
+      data: {
+        paymentMethod: {
+          type: 'card',
+          cardNumber: '4242424242424242',
+          expiryMonth: 12,
+          expiryYear: 2025,
+          cvv: '123'
+        },
+        shippingAddress: {
+          street: '123 Main St',
+          city: 'Boston',
+          state: 'MA',
+          zipCode: '02101'
+        }
+      }
+    })
+    
+    expect(response.status()).toBe(201)
+    const order = await response.json()
+    orderId = order.id
+    paymentId = order.payment.id
+    expect(order.status).toBe('confirmed')
+    console.log(`Order created: ${orderId}`)
+  })
+
+  await test.step('Verify order completion', async () => {
+    const response = await request.get(`/api/orders/${orderId}`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    })
+    
+    const order = await response.json()
+    expect(order.paymentStatus).toBe('paid')
+    expect(order.fulfillmentStatus).toBe('pending')
+    expect(order.total).toBe(109.97)
+    console.log('Order processing completed successfully')
+  })
+})
+```
+
+**Complex Data Extraction**:
+```typescript
+await test.step('Extract and transform data', async () => {
+  const response = await request.get('/api/analytics/report')
+  const analytics = await response.json()
+  
+  // Extract complex nested data
+  const totalRevenue = analytics.summary.revenue.total
+  const topProducts = analytics.products
+    .sort((a, b) => b.sales - a.sales)
+    .slice(0, 5)
+    .map(p => ({ id: p.id, name: p.name, sales: p.sales }))
+  
+  // Validate business rules
+  expect(totalRevenue).toBeGreaterThan(0)
+  expect(topProducts).toHaveLength(5)
+  
+  // Pass processed data to next step
+  return { totalRevenue, topProducts }
+})
+```
+</Step>
+
+<Step title="Add Comprehensive Assertions">
+Validate your workflow at each step with detailed assertions:
+
+**Response Status Validation**:
+```typescript
+await test.step('Validate API responses', async () => {
+  const response = await request.post('/api/transactions', {
+    data: { amount: 100.50, currency: 'USD' }
+  })
+  
+  // Status code validation
+  expect(response.status()).toBe(201)
+  
+  // Response headers validation
+  expect(response.headers()['content-type']).toContain('application/json')
+  expect(response.headers()['x-rate-limit-remaining']).toBeDefined()
+  
+  // Response body validation
+  const transaction = await response.json()
+  expect(transaction.id).toMatch(/^txn_\w+/)
+  expect(transaction.amount).toBe(100.50)
+  expect(transaction.currency).toBe('USD')
+  expect(transaction.status).toBe('pending')
+  expect(transaction.createdAt).toBeDefined()
+})
+```
+
+**Business Logic Validation**:
+```typescript
+await test.step('Validate business rules', async () => {
+  const response = await request.get('/api/account/balance')
+  const account = await response.json()
+  
+  // Business rule assertions
+  expect(account.balance).toBeGreaterThanOrEqual(0) // No negative balance
+  expect(account.currency).toBe('USD') // Correct currency
+  expect(account.lastTransaction).toBeDefined() // Transaction recorded
+  
+  // Date validation
+  const lastTransactionDate = new Date(account.lastTransaction.timestamp)
+  const now = new Date()
+  const timeDiff = now.getTime() - lastTransactionDate.getTime()
+  expect(timeDiff).toBeLessThan(60000) // Transaction within last minute
+})
+```
+
+**Array and Collection Validation**:
+```typescript
+await test.step('Validate data collections', async () => {
+  const response = await request.get('/api/users/123/orders')
+  const orders = await response.json()
+  
+  // Collection validation
+  expect(orders.data).toBeInstanceOf(Array)
+  expect(orders.data.length).toBeGreaterThan(0)
+  expect(orders.total).toBeGreaterThanOrEqual(orders.data.length)
+  
+  // Individual item validation
+  orders.data.forEach(order => {
+    expect(order.id).toBeDefined()
+    expect(order.status).toMatch(/^(pending|confirmed|shipped|delivered)$/)
+    expect(order.amount).toBeGreaterThan(0)
+    expect(order.items).toBeInstanceOf(Array)
+    expect(order.items.length).toBeGreaterThan(0)
+  })
+})
+```
+</Step>
+
+<Step title="Configure Error Handling">
+Implement robust error handling for workflow reliability:
+
+**Try-Catch Error Handling**:
+```typescript
+await test.step('Handle potential failures gracefully', async () => {
+  try {
+    // Attempt primary operation
+    const response = await request.post('/api/primary-operation', {
+      data: { action: 'process' }
+    })
+    
+    if (response.status() === 200) {
+      console.log('Primary operation succeeded')
+      return await response.json()
+    }
+  } catch (error) {
+    console.log('Primary operation failed, trying fallback')
+  }
+  
+  // Fallback operation
+  const fallbackResponse = await request.post('/api/fallback-operation', {
+    data: { action: 'process_fallback' }
+  })
+  
+  expect(fallbackResponse.status()).toBe(200)
+  return await fallbackResponse.json()
+})
+```
+
+**Conditional Logic and Retries**:
+```typescript
+await test.step('Process with retry logic', async () => {
+  let attempts = 0
+  const maxAttempts = 3
+  let lastError
+
+  while (attempts < maxAttempts) {
+    try {
+      attempts++
+      
+      const response = await request.post('/api/flaky-operation', {
+        data: { attempt: attempts }
+      })
+      
+      if (response.status() === 200) {
+        console.log(`Operation succeeded on attempt ${attempts}`)
+        return await response.json()
+      }
+      
+      if (response.status() === 429) {
+        // Rate limited - wait and retry
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        continue
+      }
+      
+      throw new Error(`HTTP ${response.status()}`)
+      
+    } catch (error) {
+      lastError = error
+      console.log(`Attempt ${attempts} failed:`, error.message)
+      
+      if (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+      }
+    }
+  }
+  
+  throw new Error(`Operation failed after ${maxAttempts} attempts: ${lastError.message}`)
+})
+```
+
+**Cleanup and Rollback Logic**:
+```typescript
+test('Workflow with cleanup', async ({ request }) => {
+  let createdResourceId
+
+  try {
+    await test.step('Create test resource', async () => {
+      const response = await request.post('/api/test-resources', {
+        data: { name: 'test-resource', type: 'temporary' }
+      })
+      
+      const resource = await response.json()
+      createdResourceId = resource.id
+    })
+
+    await test.step('Process with resource', async () => {
+      const response = await request.post(`/api/process/${createdResourceId}`, {
+        data: { action: 'test_workflow' }
+      })
+      
+      expect(response.status()).toBe(200)
+    })
+
+  } finally {
+    // Cleanup - always runs regardless of test outcome
+    if (createdResourceId) {
+      await test.step('Cleanup test resource', async () => {
+        try {
+          await request.delete(`/api/test-resources/${createdResourceId}`)
+          console.log(`Cleaned up resource: ${createdResourceId}`)
+        } catch (error) {
+          console.log('Cleanup failed:', error.message)
+        }
+      })
+    }
+  }
+})
+```
+</Step>
+
+<Step title="Set Monitoring Schedule and Locations">
+Configure when and where your multistep check runs:
+
+**Monitoring Frequency**:
+```yaml
+# Critical business workflows
+Frequency: Every 1-5 minutes
+
+# Important processes
+Frequency: Every 10 minutes
+
+# Standard workflows
+Frequency: Every 30 minutes
+
+# Long-running or expensive workflows
+Frequency: Every 1-2 hours
+```
+
+**Global Monitoring Locations**:
+```yaml
+# Recommended coverage for workflows
+Primary Locations:
+  - us-east-1 (N. Virginia)
+  - eu-west-1 (Ireland)
+  - ap-southeast-1 (Singapore)
+
+# Additional coverage for global services
+Extended Coverage:
+  - us-west-2 (Oregon)
+  - eu-central-1 (Frankfurt)
+  - ap-northeast-1 (Tokyo)
+```
+
+**Performance Considerations**:
+- **Timeout Settings**: Set appropriate timeouts for long workflows
+- **Resource Usage**: Consider API rate limits and costs
+- **Parallel Execution**: Avoid overwhelming backend systems
+
+![Multistep check monitoring configuration](/images/multistep-checks/multistep-check-monitoring.png)
+</Step>
+
+<Step title="Configure Alerting and Notifications">
+Set up comprehensive alerting for workflow failures:
+
+**Alert Conditions**:
+```yaml
+# Immediate Alerts
+- Any step fails in the workflow
+- Workflow timeout exceeded
+- Business logic assertions fail
+- Authentication or authorization errors
+
+# Warning Alerts
+- Workflow performance degradation
+- Increased error rates
+- API rate limiting encountered
+```
+
+**Notification Strategies**:
+```yaml
+# Critical business workflows
+Alert Strategy: Immediate notification on first failure
+Channels: PagerDuty, Slack, Email
+Escalation: Engineering manager after 5 minutes
+
+# Standard workflows
+Alert Strategy: Alert after 2 consecutive failures
+Channels: Slack, Email
+Escalation: Team lead after 15 minutes
+
+# Development workflows
+Alert Strategy: Alert after 3 consecutive failures
+Channels: Email only
+Escalation: None
+```
+
+**Alert Context and Information**:
+- **Failed Step**: Which step in the workflow failed
+- **Error Details**: Specific error messages and response codes
+- **Workflow Duration**: How long the workflow ran before failure
+- **Previous Results**: Recent success/failure patterns
+
+![Multistep check alerting configuration](/images/multistep-checks/multistep-check-alerts.png)
+</Step>
+
+<Step title="Test and Validate Your Workflow">
+Run your multistep check to ensure it works correctly:
+
+1. **Click "Test Check"** to run a manual execution
+2. **Review step-by-step execution** and timing
+3. **Validate data flow** between steps
+4. **Check error handling** with invalid data
+5. **Verify cleanup** and resource management
+
+**Test Results Include**:
+- **Step-by-step execution log** with detailed timing
+- **Request/response data** for each API call
+- **Variable values** passed between steps
+- **Performance metrics** for the entire workflow
+- **Error details** if any step fails
+
+**Debugging Workflow Issues**:
+- **Step Failures**: Check API responses and authentication
+- **Data Flow Issues**: Verify variable assignment and usage
+- **Timeout Problems**: Adjust timeouts or optimize API performance
+- **Authentication Errors**: Validate credentials and token expiration
+
+![Multistep check test results](/images/multistep-checks/multistep-check-test.png)
+</Step>
+
+<Step title="Deploy and Monitor">
+Save your multistep check and start workflow monitoring:
+
+1. **Click "Save Check"** to create your workflow monitoring
+2. **Verify configuration** in the check summary
+3. **Monitor initial executions** for any issues
+4. **Review workflow performance** and optimize as needed
+
+**What Happens Next**:
+- Multistep checks run on your defined schedule
+- Complete workflow results are tracked and stored
+- Alerts are sent when any step fails or performance degrades
+- Historical data shows workflow reliability trends
+
+**Monitoring Dashboard Features**:
+- **Workflow success rate** across all executions
+- **Step-level performance** and failure analysis
+- **Business process health** and availability metrics
+- **Trend analysis** for workflow optimization
+
+![Multistep check dashboard results](/images/multistep-checks/multistep-check-dashboard.png)
+</Step>
+</Steps>
+
+## Common Workflow Examples
+
+### User Registration and Onboarding
+```typescript
+test('Complete user onboarding workflow', async ({ request }) => {
+  const userEmail = `test-${Date.now()}@example.com`
+  let userId, authToken
+
+  await test.step('User registration', async () => {
+    const response = await request.post('/api/auth/register', {
+      data: {
+        email: userEmail,
+        password: 'SecurePass123!',
+        firstName: 'Test',
+        lastName: 'User'
+      }
+    })
+    
+    expect(response.status()).toBe(201)
+    userId = (await response.json()).id
+  })
+
+  await test.step('Email verification', async () => {
+    // Simulate email verification
+    const response = await request.post(`/api/auth/verify/${userId}`, {
+      data: { verificationCode: 'TEST_CODE' }
+    })
+    
+    expect(response.status()).toBe(200)
+  })
+
+  await test.step('Initial login', async () => {
+    const response = await request.post('/api/auth/login', {
+      data: { email: userEmail, password: 'SecurePass123!' }
+    })
+    
+    authToken = (await response.json()).token
+  })
+
+  await test.step('Profile completion', async () => {
+    const response = await request.post('/api/users/profile', {
+      headers: { 'Authorization': `Bearer ${authToken}` },
+      data: {
+        company: 'Test Corp',
+        jobTitle: 'Engineer',
+        preferences: { newsletter: true }
+      }
+    })
+    
+    expect(response.status()).toBe(201)
+  })
+
+  await test.step('Onboarding completion verification', async () => {
+    const response = await request.get(`/api/users/${userId}/onboarding-status`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    })
+    
+    const status = await response.json()
+    expect(status.complete).toBe(true)
+  })
+})
+```
+
+### Payment Processing Workflow
+```typescript
+test('Payment processing and verification', async ({ request }) => {
+  let customerId, paymentMethodId, chargeId
+
+  await test.step('Create customer', async () => {
+    const response = await request.post('/api/customers', {
+      data: {
+        email: 'customer@example.com',
+        name: 'Test Customer'
+      }
+    })
+    
+    customerId = (await response.json()).id
+  })
+
+  await test.step('Add payment method', async () => {
+    const response = await request.post('/api/payment-methods', {
+      data: {
+        customerId,
+        type: 'card',
+        cardNumber: '4242424242424242',
+        expiryMonth: 12,
+        expiryYear: 2025,
+        cvv: '123'
+      }
+    })
+    
+    paymentMethodId = (await response.json()).id
+  })
+
+  await test.step('Process payment', async () => {
+    const response = await request.post('/api/charges', {
+      data: {
+        amount: 2500, // $25.00
+        currency: 'usd',
+        customerId,
+        paymentMethodId
+      }
+    })
+    
+    const charge = await response.json()
+    chargeId = charge.id
+    expect(charge.status).toBe('succeeded')
+  })
+
+  await test.step('Verify payment in customer record', async () => {
+    const response = await request.get(`/api/customers/${customerId}/charges`)
+    const charges = await response.json()
+    
+    const recentCharge = charges.data.find(c => c.id === chargeId)
+    expect(recentCharge).toBeDefined()
+    expect(recentCharge.amount).toBe(2500)
+  })
+})
+```
+
+### Data Processing Pipeline
+```typescript
+test('Data processing and validation pipeline', async ({ request }) => {
+  let jobId, processedDataId
+
+  await test.step('Submit data for processing', async () => {
+    const response = await request.post('/api/data/process', {
+      data: {
+        source: 'test_data.csv',
+        operations: ['validate', 'transform', 'enrich']
+      }
+    })
+    
+    jobId = (await response.json()).jobId
+    expect(jobId).toBeDefined()
+  })
+
+  await test.step('Monitor processing status', async () => {
+    let attempts = 0
+    const maxAttempts = 30 // 5 minutes max
+    
+    while (attempts < maxAttempts) {
+      const response = await request.get(`/api/jobs/${jobId}/status`)
+      const job = await response.json()
+      
+      if (job.status === 'completed') {
+        processedDataId = job.outputDataId
+        break
+      } else if (job.status === 'failed') {
+        throw new Error(`Job failed: ${job.error}`)
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 10000)) // Wait 10s
+      attempts++
+    }
+    
+    expect(processedDataId).toBeDefined()
+  })
+
+  await test.step('Validate processed data', async () => {
+    const response = await request.get(`/api/data/${processedDataId}/summary`)
+    const summary = await response.json()
+    
+    expect(summary.recordCount).toBeGreaterThan(0)
+    expect(summary.validRecords).toBeGreaterThan(0)
+    expect(summary.errorRate).toBeLessThan(0.05) // Less than 5% error rate
+  })
+
+  await test.step('Export processed data', async () => {
+    const response = await request.post(`/api/data/${processedDataId}/export`, {
+      data: { format: 'json', destination: 'test_output' }
+    })
+    
+    expect(response.status()).toBe(202) // Accepted for processing
+    const exportJob = await response.json()
+    expect(exportJob.exportJobId).toBeDefined()
+  })
+})
+```
+
+## Understanding Multistep Check Results
+
+### Workflow Execution Details
+- **Step-by-step timeline**: Complete execution trace with timing
+- **Request/response logs**: Full HTTP transaction details for each step  
+- **Variable tracking**: Values passed between workflow steps
+- **Performance metrics**: Response times and execution duration
+- **Error context**: Detailed error information and stack traces
+
+### Business Process Insights
+- **Workflow success rate**: Percentage of successful end-to-end executions
+- **Step failure analysis**: Which steps fail most frequently
+- **Performance bottlenecks**: Slowest steps in the workflow
+- **Data flow validation**: Verification of data integrity across steps
+
+### Operational Metrics
+- **End-to-end timing**: Total workflow execution duration
+- **Step-level performance**: Individual request response times
+- **Resource utilization**: API rate limit usage and costs
+- **Geographic performance**: Workflow speed across monitoring locations
+
+## Troubleshooting Common Issues
+
+### Authentication and Authorization
+**Issue**: Authentication failures or token expiration
+**Solutions**:
+1. Verify credentials are current and valid
+2. Implement token refresh logic for long workflows
+3. Check API permissions for all required endpoints
+4. Use environment variables for sensitive credentials
+
+### Data Flow Problems
+**Issue**: Variables not passing correctly between steps
+**Solutions**:
+1. Verify variable assignment syntax and scope
+2. Add logging to track variable values
+3. Check JSON parsing and data extraction logic
+4. Validate API response formats match expectations
+
+### Timing and Performance Issues
+**Issue**: Workflows timing out or running slowly
+**Solutions**:
+1. Optimize API performance and database queries
+2. Increase timeout values for complex operations
+3. Implement parallel processing where possible
+4. Add monitoring for long-running operations
+
+### Error Handling and Recovery
+**Issue**: Workflows failing without proper cleanup
+**Solutions**:
+1. Implement try-catch blocks with proper error handling
+2. Add cleanup logic in finally blocks
+3. Design idempotent operations for safe retries
+4. Create rollback procedures for failed transactions
+
+## Next Steps
+
+Now that your multistep check is monitoring successfully:
+
+<CardGroup cols={2}>
+<Card title="Workflow Optimization" icon="performance">
+Learn performance optimization techniques and advanced error handling patterns.
+</Card>
+
+<Card title="Complex Scenarios" href="/docs/detect/synthetic-monitoring/multistep-checks/best-practices">
+Explore advanced workflow patterns and reliability strategies.
+</Card>
+
+<Card title="Data Management" icon="database">
+Implement secure data handling and state management across workflow steps.
+</Card>
+
+<Card title="Integration Patterns" href="/docs/concepts/organization">
+Organize related multistep checks and configure shared workflow settings.
+</Card>
+</CardGroup>
+
+### Expand Your Monitoring
+
+<CardGroup cols={2}>
+<Card title="API Checks" href="/docs/detect/synthetic-monitoring/api-checks/creating-your-first-api-check">
+Monitor individual API endpoints that support your workflows.
+</Card>
+
+<Card title="Browser Checks" href="/docs/detect/synthetic-monitoring/browser-checks/creating-your-first-browser-check">
+Test user interfaces and complete user experiences.
+</Card>
+
+<Card title="Private Locations" href="/docs/getting-started/platform/private-locations/overview">
+Monitor internal workflows with private monitoring infrastructure.
+</Card>
+
+<Card title="CLI Integration" href="/docs/cli/overview">
+Manage multistep checks as code with version control and CI/CD.
+</Card>
+</CardGroup>
+
+<Note>
+Multistep checks provide comprehensive validation of business processes and API workflows. Combine them with API checks and browser checks for complete application monitoring coverage.
+</Note>

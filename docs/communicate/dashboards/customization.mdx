@@ -1,0 +1,636 @@
+---
+title: 'Dashboard Customization'
+description: 'Comprehensive guide to customizing dashboard appearance, branding, domains, and layout options for professional status communication.'
+sidebarTitle: 'Customization'
+---
+
+import { Note, Warning, Tip, Steps } from 'mintlify/components'
+
+Dashboard customization allows you to create professional, branded status displays that align with your organization's visual identity and communication needs. From simple logo uploads to advanced CSS styling, Checkly provides comprehensive customization options.
+
+## Customization Overview
+
+Transform your dashboard from a basic monitoring display into a professional communication tool:
+
+<CardGroup cols={2}>
+<Card title="Visual branding" icon="paintbrush">
+**Brand Identity**
+- Custom logos and favicon
+- Color schemes and themes
+- Typography and styling
+- Professional appearance
+</Card>
+
+<Card title="URL and domain" icon="link">
+**Web Presence**
+- Custom subdomains
+- Full custom domains
+- SSL certificate management
+- Professional web addresses
+</Card>
+
+<Card title="Layout and content" icon="layout">
+**Information Display**
+- Auto-pagination and refresh
+- Header and footer customization
+- Performance metrics visibility
+- Check result presentation
+</Card>
+
+<Card title="Advanced styling" icon="code">
+**CSS Customization**
+- Complete style control
+- Custom themes and designs
+- Interactive elements
+- Responsive layouts
+</Card>
+</CardGroup>
+
+## URL and Domain Configuration
+
+### Default Dashboard URLs
+Every dashboard starts with a unique, randomly generated URL:
+
+```text
+# Default URL format
+https://{random-id}.checkly-dashboards.com
+
+# Example
+https://a1b2c3d4-e5f6-7890-abcd-ef1234567890.checkly-dashboards.com
+```
+
+### Custom Subdomain Setup
+Create memorable, branded dashboard URLs under the Checkly domain:
+
+<Steps>
+<Step title="Choose Subdomain">
+Select a unique subdomain that represents your organization
+</Step>
+
+<Step title="Configure Subdomain">
+Set the custom subdomain in dashboard settings
+</Step>
+
+<Step title="Verify Availability">
+Checkly verifies the subdomain is available across all dashboards
+</Step>
+
+<Step title="Update URLs">
+Your dashboard becomes available at the new subdomain immediately
+</Step>
+</Steps>
+
+```text
+# Custom subdomain format
+https://{your-subdomain}.checkly-dashboards.com
+
+# Examples
+https://acme-status.checkly-dashboards.com
+https://api-health.checkly-dashboards.com
+https://prod-monitoring.checkly-dashboards.com
+```
+
+<Note>
+Custom subdomains must be unique across all Checkly users. Choose something specific to your organization to avoid conflicts.
+</Note>
+
+### Full Custom Domain Configuration
+Use your own domain for maximum branding control and professional appearance:
+
+<Steps>
+<Step title="Domain Configuration">
+Add your custom domain in the dashboard settings
+</Step>
+
+<Step title="DNS Setup">
+Create the required DNS records at your domain provider
+</Step>
+
+<Step title="Domain Verification">
+Complete domain verification if required by Checkly
+</Step>
+
+<Step title="SSL Certificate">
+Automatic SSL certificate provisioning and renewal
+</Step>
+
+<Step title="Go Live">
+Dashboard becomes accessible at your custom domain
+</Step>
+</Steps>
+
+#### Required DNS Records
+
+```text
+# CNAME Record (required)
+Type: CNAME
+Name: status (or your chosen subdomain)
+Value: checkly-dashboards.com
+TTL: 3600 (or your domain provider's default)
+
+# TXT Record (if domain verification required)
+Type: TXT
+Name: _checkly-domain-verification.status
+Value: [Verification code provided by Checkly]
+TTL: 3600 (or your domain provider's default)
+```
+
+#### Domain Configuration Examples
+
+```yaml
+# Example custom domain setups
+Customer Status Page:
+  Domain: status.acme-corp.com
+  Purpose: External customer communication
+  SSL: Automatic via Let's Encrypt
+  
+Internal Operations:
+  Domain: monitoring.internal.company.com
+  Purpose: Internal team visibility
+  Access: Password-protected
+  
+Partner Integration:
+  Domain: api-status.partner-portal.com
+  Purpose: Partner API status communication
+  Branding: Partner-focused styling
+```
+
+<Warning>
+DNS changes can take up to 24-48 hours to propagate globally. Plan custom domain setup accordingly if you have time-sensitive launch requirements.
+</Warning>
+
+## Visual Branding Configuration
+
+### Logo and Brand Assets
+Create professional brand consistency across your status communications:
+
+<CardGroup cols={2}>
+<Card title="Logo configuration" icon="image">
+**Brand Logo Setup**
+- Upload custom logo images
+- Configure logo link destination
+- Optimize sizing and positioning
+- Support for various image formats
+</Card>
+
+<Card title="Favicon setup" icon="browser">
+**Browser Integration**
+- Custom favicon for browser tabs
+- Professional tab identification
+- Brand recognition in bookmarks
+- Standard ICO and PNG format support
+</Card>
+</CardGroup>
+
+#### Logo Configuration Options
+
+```yaml
+# Logo setup parameters
+Logo Configuration:
+  Image Upload: Support for PNG, JPG, SVG formats
+  Maximum Size: 2MB file size limit
+  Recommended Dimensions: 200px width, auto height
+  Logo Link: Optional URL for logo click destination
+  
+Placement Options:
+  Position: Header left, header center, header right
+  Sizing: Auto-fit, custom width/height
+  Margin: Configurable spacing around logo
+  
+Best Practices:
+  Format: SVG for scalability, PNG for compatibility
+  Background: Transparent for flexible placement
+  Contrast: Ensure visibility on dashboard background
+```
+
+### Theme and Color Configuration
+Control the overall visual appearance of your dashboard:
+
+<CardGroup cols={3}>
+<Card title="Light theme" icon="sun">
+**Bright Environment**
+- High contrast for bright offices
+- Traditional professional appearance
+- Better for detailed reading
+- Reduced eye strain in daylight
+</Card>
+
+<Card title="Dark theme" icon="moon">
+**Low Light Environment**
+- Reduced eye strain in dark environments
+- Modern, sleek appearance
+- Better for wall-mounted displays
+- Improved battery life on OLED screens
+</Card>
+
+<Card title="Auto theme" icon="monitor">
+**Adaptive Display**
+- Follows user system preferences
+- Automatic light/dark switching
+- Optimal for diverse viewing environments
+- Consistent with user expectations
+</Card>
+</CardGroup>
+
+## Layout and Content Customization
+
+### Display Options Configuration
+Fine-tune how information is presented on your dashboard:
+
+<CardGroup cols={2}>
+<Card title="Content presentation" icon="layout">
+**Information Display**
+- Title and description customization
+- Tag visibility and filtering
+- Performance statistics display
+- Check result link configuration
+</Card>
+
+<Card title="Automatic behavior" icon="refresh-cw">
+**Dynamic Updates**
+- Auto-pagination for large check lists
+- Auto-refresh intervals (1, 5, 10 minutes)
+- Header visibility control
+- Responsive layout adaptation
+</Card>
+</CardGroup>
+
+### Dashboard Header Configuration
+
+```yaml
+# Header customization options
+Header Configuration:
+  Visibility: Show/hide dashboard header
+  Title: Custom dashboard title
+  Description: Optional dashboard description
+  Logo: Brand logo with optional link
+  
+Content Options:
+  Title Example: "Acme Corp Service Status"
+  Description Example: "Real-time status of customer-facing services"
+  Logo Link: Company homepage or status page info
+  
+Layout Control:
+  Header Height: Auto-sizing based on content
+  Background: Customizable via CSS
+  Typography: Configurable fonts and sizing
+```
+
+### Auto-Pagination and Refresh Settings
+
+<CardGroup cols={2}>
+<Card title="Auto-pagination" icon="layers">
+**Large Check Lists**
+- Automatic page splitting for readability
+- Configurable items per page
+- Smooth navigation between pages
+- Maintains performance with many checks
+</Card>
+
+<Card title="Auto-refresh" icon="refresh-cw">
+**Real-Time Updates**
+- 1-minute refresh for critical monitoring
+- 5-minute refresh for standard use
+- 10-minute refresh for overview dashboards
+- Manual refresh option always available
+</Card>
+</CardGroup>
+
+```yaml
+# Auto-refresh configuration examples
+Critical Production Dashboard:
+  Refresh Interval: 1 minute
+  Use Case: Real-time incident monitoring
+  Audience: Operations teams during incidents
+  
+Standard Customer Dashboard:
+  Refresh Interval: 5 minutes
+  Use Case: General status communication
+  Audience: External customers and users
+  
+Executive Overview Dashboard:
+  Refresh Interval: 10 minutes
+  Use Case: High-level status overview
+  Audience: Management and stakeholders
+```
+
+### Check Display Customization
+
+Configure how individual monitoring checks are presented:
+
+```yaml
+# Check presentation options
+Check Display Configuration:
+  Check Result Links: Enable/disable links to detailed results
+  Tag Visibility: Show/hide check tags on dashboard
+  Performance Stats: Display/hide response time metrics
+  Status Indicators: Color-coded status visualization
+  
+Check Organization:
+  Grouping: Organize checks by tags or status
+  Sorting: Order by name, status, or response time
+  Filtering: Show only specific check types or statuses
+  
+Visual Presentation:
+  Card Layout: Compact or expanded check cards
+  Status Colors: Customizable color scheme
+  Typography: Font sizing and styling options
+```
+
+## Advanced CSS Customization
+
+### CSS Editor and Tools
+For Team and Enterprise plans, unlock complete design control:
+
+<Steps>
+<Step title="Access CSS Editor">
+Navigate to the Look & Feel section and open the CSS editor
+</Step>
+
+<Step title="Generate Boilerplate">
+Use the boilerplate generator to create starting CSS structure
+</Step>
+
+<Step title="Review Available Classes">
+Check the hints tab for available CSS classes and selectors
+</Step>
+
+<Step title="Edit Styles">
+Modify CSS in the editor to achieve desired appearance
+</Step>
+
+<Step title="Save and Test">
+Save changes and reload dashboard to preview styling
+</Step>
+
+<Step title="Iterate Design">
+Refine styling through iterative testing and adjustment
+</Step>
+</Steps>
+
+### CSS Class Structure
+Understanding the dashboard's CSS architecture for effective customization:
+
+```css
+/* Main dashboard structure */
+.dashboard-container {
+  /* Overall dashboard wrapper */
+}
+
+.dashboard-header {
+  /* Header containing logo, title, description */
+}
+
+.dashboard-main {
+  /* Main content area with checks and metrics */
+}
+
+.dashboard-footer {
+  /* Footer area with branding and links */
+}
+
+/* Check card styling */
+.check-card {
+  /* Individual check display cards */
+}
+
+.check-card-header {
+  /* Check name and status indicator */
+}
+
+.check-card-metrics {
+  /* Performance metrics display */
+}
+
+/* Status indicators */
+.status-operational {
+  /* Green status styling */
+}
+
+.status-degraded {
+  /* Yellow/orange status styling */
+}
+
+.status-failing {
+  /* Red status styling */
+}
+
+/* Incident banners */
+.incident-banner {
+  /* Incident message display */
+}
+
+.incident-major {
+  /* Major incident styling */
+}
+
+.incident-minor {
+  /* Minor incident styling */
+}
+
+.incident-maintenance {
+  /* Maintenance window styling */
+}
+```
+
+### Custom Theme Examples
+
+#### Professional Corporate Theme
+Clean, corporate styling for business environments:
+
+```css
+/* Corporate theme example */
+.dashboard-header {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  color: white;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-main {
+  background: #f8fafc;
+  padding: 2rem;
+}
+
+.check-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.check-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.status-operational {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+}
+```
+
+#### Modern Dark Theme
+Sleek, modern styling for technology-focused organizations:
+
+```css
+/* Modern dark theme example */
+.dashboard-container {
+  background: #0f172a;
+  color: #f1f5f9;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-bottom: 1px solid #334155;
+  padding: 2rem;
+}
+
+.check-card {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border: 1px solid #475569;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.check-card:hover {
+  border-color: #64748b;
+  transform: scale(1.02);
+}
+
+.status-operational {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 0 20px rgba(5, 150, 105, 0.3);
+}
+
+.status-failing {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+}
+```
+
+#### Creative Brand Theme
+Custom styling that reflects unique brand personality:
+
+```css
+/* Creative brand theme example */
+.dashboard-header {
+  background: linear-gradient(45deg, #ff6b6b, #feca57, #48cae4, #a8e6cf);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.check-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+.check-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ff6b6b, #feca57, #48cae4);
+}
+
+.status-operational {
+  background: linear-gradient(135deg, #a8e6cf 0%, #88d8a3 100%);
+  border-radius: 25px;
+  padding: 0.75rem 1.5rem;
+  font-weight: bold;
+}
+```
+
+<Tip>
+Start with the CSS boilerplate generator to understand the dashboard's structure, then gradually customize elements to match your brand. Test changes frequently to ensure responsive behavior.
+</Tip>
+
+## Responsive Design Considerations
+
+### Multi-Device Optimization
+Ensure your dashboard works well across different screen sizes and devices:
+
+```css
+/* Responsive design example */
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: 1rem;
+    text-align: center;
+  }
+  
+  .check-card {
+    margin-bottom: 0.5rem;
+    padding: 1rem;
+  }
+  
+  .dashboard-main {
+    padding: 1rem;
+  }
+}
+
+/* Tablet optimization */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .check-card {
+    flex: 1 1 calc(50% - 1rem);
+  }
+}
+
+/* Desktop optimization */
+@media (min-width: 1025px) {
+  .check-card {
+    flex: 1 1 calc(33.333% - 1rem);
+  }
+}
+
+/* Large display optimization */
+@media (min-width: 1440px) {
+  .dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+}
+```
+
+## Customization Best Practices
+
+### Design Guidelines
+- **Consistent branding**: Maintain visual consistency with your organization's brand
+- **Accessibility**: Ensure sufficient color contrast and readable typography
+- **Performance**: Optimize images and CSS for fast loading times
+- **Responsiveness**: Test dashboard appearance on various screen sizes
+
+### User Experience Optimization
+- **Clear hierarchy**: Use visual hierarchy to prioritize important information
+- **Intuitive navigation**: Make it easy for users to understand dashboard content
+- **Professional appearance**: Maintain credibility with polished design
+- **Loading performance**: Ensure fast loading times for all users
+
+<Note>
+Remember that dashboard customization should enhance communication effectiveness, not just visual appeal. Always prioritize clarity and usability in your design decisions.
+</Note>
+
+<Warning>
+Extensive CSS customization can sometimes interfere with dashboard functionality. Test thoroughly after making styling changes, especially for interactive elements and responsive behavior.
+</Warning>

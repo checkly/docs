@@ -1,0 +1,495 @@
+---
+title: 'Alerting and Retries Overview'
+description: 'Comprehensive alerting and retry strategies to minimize false positives and ensure reliable incident response when your checks fail or recover.'
+sidebarTitle: 'Overview'
+---
+
+import { Note, Warning, Tip, Steps } from 'mintlify/components'
+
+Checkly provides sophisticated alerting and retry mechanisms to keep you informed when your checks change state—whether they fail, show degraded performance, or recover. Smart configuration helps you avoid alert fatigue while ensuring critical issues reach the right people at the right time.
+
+## What is Checkly Alerting?
+
+Checkly alerts you when your checks transition between states such as passing to failing, degraded performance, or recovery. The system is designed to provide actionable notifications while minimizing noise through intelligent retry strategies and flexible escalation policies.
+
+![Checkly alerting dashboard overview](/images/alerting/alerting-overview.png)
+
+<CardGroup cols={2}>
+<Card title="Smart alerting" icon="bell">
+- Configurable alert thresholds and escalation
+- Multiple notification channels and integrations
+- Location-based failure filtering
+- SSL certificate expiration monitoring
+</Card>
+
+<Card title="Retry strategies" icon="refresh">
+- Reduce false positives with intelligent retries
+- Fixed, linear, and exponential backoff options
+- Location-based and network-specific retry logic
+- Configurable retry limits and timeouts
+</Card>
+</CardGroup>
+
+## Core Alerting Components
+
+### 1. Alert Settings
+Control **when** and **how often** you receive notifications with threshold alerting:
+
+<CardGroup cols={2}>
+<Card title="Escalation strategies" icon="stairs">
+- **Run-based**: Alert after consecutive failures
+- **Time-based**: Alert if failing for specific duration
+- **Location threshold**: Only alert when % of locations fail
+- **Immediate**: Alert on first failure
+</Card>
+
+<Card title="Reminder configuration" icon="clock">
+- Multiple reminder intervals
+- Automatic cancellation on recovery
+- Customizable reminder frequency
+- Escalation to different teams
+</Card>
+</CardGroup>
+
+### 2. Alert Channels
+Determine **how** alert notifications reach your team:
+
+<CardGroup cols={3}>
+<Card title="Communication" icon="message-square">
+- Email notifications
+- Slack integration
+- SMS and phone calls
+- Discord and Telegram
+</Card>
+
+<Card title="Incident management" icon="shield-alert">
+- PagerDuty integration
+- Opsgenie alerts
+- FireHydrant incidents
+- Incident.io integration
+</Card>
+
+<Card title="Custom integrations" icon="webhook">
+- Webhook notifications
+- Jira ticket creation
+- Trello card creation
+- Custom API endpoints
+</Card>
+</CardGroup>
+
+### 3. Retry Mechanisms
+Reduce false positives and alert noise with intelligent retry strategies:
+
+```typescript
+// Example retry configuration
+const retryConfig = {
+  strategy: "exponential", // fixed, linear, exponential
+  maxRetries: 3,
+  initialInterval: 5, // seconds
+  maxDuration: 300, // 5 minutes maximum
+  sameLocation: false // retry from different location
+}
+```
+
+## Alert States and Transitions
+
+Understanding how Checkly tracks check states helps you configure appropriate alerting:
+
+<Steps>
+<Step title="Check Execution">
+Your check runs according to its schedule from configured locations
+</Step>
+
+<Step title="State Evaluation">
+Checkly evaluates the check result against performance thresholds and assertions
+</Step>
+
+<Step title="State Transition">
+If the check state changes (pass → fail, fail → pass, normal → degraded), the alert system activates
+</Step>
+
+<Step title="Retry Logic">
+If configured, failed checks are automatically retried according to your retry strategy
+</Step>
+
+<Step title="Alert Escalation">
+If retries don't resolve the issue, alerts are sent based on your escalation settings
+</Step>
+
+<Step title="Recovery Notification">
+When checks recover, recovery alerts are sent according to your notification preferences
+</Step>
+</Steps>
+
+### Alert Types and States
+
+| Alert Type | Description | When Triggered |
+|------------|-------------|----------------|
+| `ALERT_FAILURE` | Check hard failure | Check encounters error or assertion failure |
+| `ALERT_DEGRADED` | Performance degradation | Check succeeds but exceeds response time thresholds |
+| `ALERT_RECOVERY` | Service recovery | Failed or degraded check returns to passing state |
+| `ALERT_DEGRADED_RECOVERY` | Performance improvement | Degraded check returns to normal performance |
+| `ALERT_SSL` | SSL certificate expiration | Certificate expires within warning threshold |
+
+## Comprehensive Alert Configuration
+
+### Account-Level Defaults
+Set organization-wide alerting defaults that apply to all checks unless overridden:
+
+```yaml
+# Account-level alert settings
+Escalation Strategy: Run-based (2 consecutive failures)
+Reminder Schedule: 
+  - First reminder: 5 minutes
+  - Second reminder: 15 minutes
+Alert Channels:
+  - Email: team@company.com
+  - Slack: #ops-alerts
+Location Threshold: 50% of locations must fail
+```
+
+### Group-Level Overrides
+Configure specific alerting behavior for related checks:
+
+```yaml
+# Production API Group
+Escalation Strategy: Time-based (5 minutes)
+Alert Channels:
+  - PagerDuty: Production escalation policy
+  - Slack: #production-alerts
+Mute Alerts: During maintenance windows
+
+# Development Group
+Escalation Strategy: Run-based (3 consecutive failures)
+Alert Channels:
+  - Email: dev-team@company.com
+Reminder Schedule: None
+```
+
+### Check-Level Customization
+Fine-tune alerting for individual checks with specific requirements:
+
+```yaml
+# Critical payment API
+Escalation Strategy: Immediate (first failure)
+Alert Channels:
+  - PagerDuty: Payment team escalation
+  - SMS: On-call engineer
+Retry Strategy: Fixed (3 retries, 10 second intervals)
+
+# Internal monitoring dashboard
+Escalation Strategy: Run-based (5 consecutive failures)
+Alert Channels:
+  - Email: Internal team
+Mute Alerts: Enabled during development
+```
+
+## Advanced Retry Strategies
+
+### Fixed Interval Retries
+Consistent timing between retry attempts:
+
+```typescript
+// Good for: Consistent network issues, simple service hiccups
+const fixedRetry = {
+  strategy: "fixed",
+  interval: 10, // 10s, 10s, 10s
+  maxRetries: 3,
+  maxDuration: 60
+}
+```
+
+### Linear Backoff Retries
+Gradually increasing intervals:
+
+```typescript
+// Good for: Services that need time to recover
+const linearRetry = {
+  strategy: "linear",
+  baseInterval: 5, // 5s, 10s, 15s, 20s
+  maxRetries: 4,
+  maxDuration: 120
+}
+```
+
+### Exponential Backoff Retries
+Rapidly increasing intervals:
+
+```typescript
+// Good for: Rate-limited APIs, overloaded services
+const exponentialRetry = {
+  strategy: "exponential",
+  baseInterval: 5, // 5s, 25s, 125s (2m 5s)
+  maxRetries: 3,
+  maxDuration: 180
+}
+```
+
+### Network-Specific Retries
+Automatic retries for network-related failures:
+
+```typescript
+// Retry only on network errors, not application errors
+const networkRetry = {
+  enabled: true,
+  retryOnNetworkErrors: [
+    "ECONNRESET",
+    "ENOTFOUND", 
+    "ETIMEDOUT",
+    "EAI_AGAIN",
+    "ECONNREFUSED"
+  ],
+  skipOnHttpStatus: true // Don't retry 4xx/5xx responses
+}
+```
+
+## Smart Location-Based Alerting
+
+### Location Failure Thresholds
+Reduce noise from regional outages:
+
+<CardGroup cols={2}>
+<Card title="Global service monitoring" icon="globe">
+```yaml
+Locations: 6 worldwide
+Threshold: 50% must fail
+Result: Alert only when 3+ locations fail
+Use case: CDN or global service availability
+```
+</Card>
+
+<Card title="Regional service monitoring" icon="map">
+```yaml
+Locations: 3 regional
+Threshold: 67% must fail  
+Result: Alert when 2+ locations fail
+Use case: Regional service or data center
+```
+</Card>
+</CardGroup>
+
+### Location-Based Retry Logic
+
+```typescript
+// Retry from same location (location-specific issues)
+const sameLocationRetry = {
+  sameLocation: true,
+  useCase: "Network routing issues, regional problems"
+}
+
+// Retry from different location (service availability)
+const differentLocationRetry = {
+  sameLocation: false, 
+  useCase: "General service uptime, global availability"
+}
+```
+
+## Webhook Integration and Custom Alerts
+
+### Advanced Webhook Configuration
+Create sophisticated integrations with third-party systems:
+
+```json
+{
+  "url": "https://api.incident-system.com/webhooks/{{WEBHOOK_TOKEN}}",
+  "method": "POST",
+  "headers": {
+    "Authorization": "Bearer {{API_TOKEN}}",
+    "Content-Type": "application/json",
+    "X-Checkly-Source": "monitoring"
+  },
+  "body": {
+    "incident": {
+      "title": "{{ALERT_TITLE}}",
+      "severity": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}high{{else}}medium{{/eq}}",
+      "description": "Check {{CHECK_NAME}} failed at {{STARTED_AT}} from {{RUN_LOCATION}}",
+      "metadata": {
+        "check_id": "{{CHECK_ID}}",
+        "response_time": "{{RESPONSE_TIME}}",
+        "result_link": "{{RESULT_LINK}}",
+        "location": "{{RUN_LOCATION}}",
+        "tags": [{{#each TAGS}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}]
+      }
+    }
+  }
+}
+```
+
+### Webhook Security and Validation
+Ensure webhook authenticity with cryptographic signatures:
+
+```javascript
+// Verify webhook signature (Node.js example)
+const crypto = require('crypto')
+
+function verifyWebhookSignature(payload, signature, secret) {
+  const hmac = crypto.createHmac('sha256', secret)
+  const digest = hmac.update(payload).digest('hex')
+  return crypto.timingSafeEqual(
+    Buffer.from(digest), 
+    Buffer.from(signature)
+  )
+}
+
+// Express.js webhook handler
+app.post('/checkly-webhook', (req, res) => {
+  const signature = req.headers['x-checkly-signature']
+  const payload = JSON.stringify(req.body)
+  
+  if (verifyWebhookSignature(payload, signature, process.env.WEBHOOK_SECRET)) {
+    // Process validated webhook
+    handleAlert(req.body)
+    res.status(200).send('OK')
+  } else {
+    res.status(401).send('Unauthorized')
+  }
+})
+```
+
+## SSL Certificate Monitoring
+
+### Automatic SSL Alerting
+Monitor certificate expiration across your infrastructure:
+
+```yaml
+SSL Alert Configuration:
+  Warning Threshold: 30 days before expiration
+  Critical Threshold: 7 days before expiration
+  Check Frequency: Daily
+  Alert Channels:
+    - Email: security-team@company.com
+    - Slack: #security-alerts
+  
+SSL Variables Available:
+  - SSL_DAYS_REMAINING: Days until expiration
+  - SSL_CHECK_DOMAIN: Certificate domain
+  - ALERT_TITLE: "SSL certificate for {domain} expires in {days} days"
+```
+
+### SSL Webhook Example
+Create custom SSL certificate monitoring workflows:
+
+```json
+{
+  "alert_type": "ssl_expiration",
+  "domain": "{{SSL_CHECK_DOMAIN}}",
+  "days_remaining": {{SSL_DAYS_REMAINING}},
+  "expires_at": "{{STARTED_AT}}",
+  "priority": "{{#lt SSL_DAYS_REMAINING 7}}critical{{else}}warning{{/lt}}",
+  "action_required": {{#lt SSL_DAYS_REMAINING 14}}true{{else}}false{{/lt}},
+  "certificate_info": {
+    "check_id": "{{CHECK_ID}}",
+    "result_link": "{{RESULT_LINK}}"
+  }
+}
+```
+
+## Alert Optimization and Best Practices
+
+### Frequency-Based Configuration
+Tailor alerting strategies to your check frequency:
+
+<CardGroup cols={3}>
+<Card title="High frequency (1-5 min)" icon="zap">
+```yaml
+Strategy: Time-based (10 minutes)
+Retries: 2 with linear backoff
+Location threshold: 67%
+Use case: Critical services
+```
+</Card>
+
+<Card title="Standard frequency (10-30 min)" icon="clock">
+```yaml
+Strategy: Run-based (2 failures)
+Retries: 3 with exponential backoff
+Location threshold: 50%
+Use case: Most applications
+```
+</Card>
+
+<Card title="Low frequency (1+ hours)" icon="timer">
+```yaml
+Strategy: Run-based (1 failure)
+Retries: 5 with exponential backoff
+Location threshold: 33%
+Use case: Background jobs
+```
+</Card>
+</CardGroup>
+
+### Environment-Specific Alerting
+Configure different alerting behavior across environments:
+
+```yaml
+Production:
+  Escalation: Immediate for critical checks
+  Channels: PagerDuty + Slack + SMS
+  Retries: Minimal (reduce MTTR)
+  
+Staging:
+  Escalation: After 2 failures
+  Channels: Slack + Email
+  Retries: Moderate (balance noise vs detection)
+  
+Development:
+  Escalation: After 5 failures
+  Channels: Email only
+  Retries: Aggressive (reduce false positives)
+```
+
+## Getting Started with Alerting
+
+<Steps>
+<Step title="Configure Account Defaults">
+Set up organization-wide alert settings that work for most of your checks
+</Step>
+
+<Step title="Set Up Alert Channels">
+Configure email, Slack, PagerDuty, or custom webhook integrations
+</Step>
+
+<Step title="Define Retry Strategies">
+Choose appropriate retry mechanisms to reduce false positives
+</Step>
+
+<Step title="Configure Group Overrides">
+Set specific alerting for different teams or service categories
+</Step>
+
+<Step title="Test Your Configuration">
+Use Checkly's test features to validate your alerting setup
+</Step>
+
+<Step title="Monitor and Optimize">
+Review alert patterns and adjust configurations to reduce noise
+</Step>
+</Steps>
+
+## Alert Management Resources
+
+<CardGroup cols={2}>
+<Card title="Alert Channels" href="/docs/communicate/alerts/channels">
+Complete guide to setting up notification channels and integrations
+</Card>
+
+<Card title="Alert Configuration" href="/docs/communicate/alerts/configuration">
+Detailed configuration options for escalation, retries, and thresholds
+</Card>
+
+<Card title="Webhook Integration" href="/docs/communicate/alerts/webhooks">
+Advanced webhook patterns and third-party system integrations
+</Card>
+
+<Card title="Best Practices" href="/docs/communicate/alerts/best-practices">
+Proven strategies for effective alerting and incident response
+</Card>
+</CardGroup>
+
+<Note>
+Effective alerting balances timely notification with alert fatigue prevention. Start with conservative settings and gradually tune based on your team's response patterns and service reliability requirements.
+</Note>
+
+<Tip>
+Use Checkly's alert notification log to analyze your alerting patterns and identify opportunities to reduce noise while maintaining coverage of critical issues.
+</Tip> 

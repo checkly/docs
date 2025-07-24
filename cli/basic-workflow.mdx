@@ -1,0 +1,169 @@
+---
+title: Basic Workflow
+description: 'Complete workflow for using the Checkly CLI - from testing to deployment'
+sidebarTitle: 'Basic Workflow'
+---
+
+The Checkly CLI follows a simple workflow that enables you to test and deploy your monitoring checks:
+
+```bash
+# 1. Test checks locally  
+npx checkly test
+
+# 2. Deploy to Checkly
+npx checkly deploy
+```
+
+<Note>Before using the CLI, you'll need to [authenticate with your Checkly account](/cli/authentication).</Note>
+
+## Step 1: Testing Checks Locally
+
+The `test` command allows you to run your checks locally before deploying them to Checkly's infrastructure.
+
+### Basic Testing
+
+```bash
+npx checkly test
+```
+
+This command will:
+- Execute all checks defined in your project
+- Run them in your local environment
+- Display real-time results and logs
+- Show pass/fail status for each check
+
+### Testing Specific Checks
+
+You can test individual checks or groups:
+
+```bash
+# Test a specific check by name
+npx checkly test --check "My API Check"
+
+# Test checks with specific tags
+npx checkly test --tags "api,production"
+
+# Test checks in a specific group
+npx checkly test --group "E-commerce Monitoring"
+```
+
+### Testing Options
+
+```bash
+# Run tests in a specific location
+npx checkly test --location "us-east-1"
+
+# Run tests with verbose output
+npx checkly test --verbose
+
+# Run tests and generate a report
+npx checkly test --reporter json
+```
+
+### Local Testing Benefits
+
+- **Fast Feedback**: Get immediate results without waiting for scheduled runs
+- **Cost Effective**: No consumption of your Checkly plan's check runs
+- **Development Friendly**: Perfect for debugging and development workflows
+- **CI/CD Integration**: Can be used in automated testing pipelines
+
+## Step 2: Deploying to Checkly
+
+Once you've tested your checks locally and are satisfied with the results, deploy them to Checkly's global infrastructure.
+
+### Basic Deployment
+
+```bash
+npx checkly deploy
+```
+
+This command will:
+- Upload your check configurations to Checkly
+- Create or update checks in your Checkly account
+- Set up the monitoring schedule based on your configuration
+- Deploy to all specified locations
+
+### Deployment Options
+
+```bash
+# Deploy with preview (shows what will be created/updated)
+npx checkly deploy --preview
+
+# Deploy to a specific environment
+npx checkly deploy --environment production
+
+# Force deployment (overwrite existing checks)
+npx checkly deploy --force
+
+# Deploy with dry run (simulate without making changes)
+npx checkly deploy --dry-run
+```
+
+### Deployment Process
+
+The deployment process includes:
+
+1. **Validation**: CLI validates your check configurations
+2. **Upload**: Check files and dependencies are uploaded to Checkly
+3. **Creation/Update**: Checks are created or updated in your account
+4. **Scheduling**: Monitoring schedules are configured
+5. **Activation**: Checks become active and start monitoring
+
+### Post-Deployment Verification
+
+After deployment, you can verify your checks are running:
+
+```bash
+# List all deployed checks
+npx checkly list
+
+# Check the status of your checks
+npx checkly status
+
+# View recent results
+npx checkly results
+```
+
+## CI/CD Integration
+
+```yaml
+# Example GitHub Actions workflow
+name: Deploy Monitoring
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npx checkly test
+      - run: npx checkly deploy
+        env:
+          CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
+```
+
+## Environment Management
+
+```bash
+# Switch between environments
+npx checkly switch --environment staging
+npx checkly switch --environment production
+
+# View current environment
+npx checkly env
+```
+
+## Workflow Best Practices
+
+1. **Start Local**: Always test changes locally first
+2. **Incremental Testing**: Test individual checks during development
+3. **Version Control**: Commit your check configurations to Git
+4. **Review Changes**: Use `--preview` to review before deployment
+5. **Monitor Results**: Check results after deployment
+
+This comprehensive workflow ensures you can develop, test, and deploy monitoring checks with confidence, maintaining the reliability and performance of your applications.

@@ -1,0 +1,101 @@
+---
+title: Authentication
+description: 'How to authenticate with the Checkly CLI'
+sidebarTitle: 'Authentication'
+---
+
+Before you can use the Checkly CLI, you need to authenticate with your Checkly account.
+
+## Login Process
+
+The primary way to authenticate is using the interactive login command:
+
+```bash
+npx checkly login
+```
+
+This command will:
+- Open your default browser to the Checkly authentication page
+- Prompt you to log in to your Checkly account
+- Generate an API key that the CLI will use for authentication
+- Store the credentials securely on your local machine
+
+## Authentication Options
+
+### Environment Variables
+
+You can also authenticate using environment variables, which is useful for CI/CD pipelines and automated environments:
+
+```bash
+# Set your Checkly API key
+export CHECKLY_API_KEY=your_api_key_here
+
+# Set your Checkly account ID (optional, CLI will detect automatically)
+export CHECKLY_ACCOUNT_ID=your_account_id_here
+```
+
+### API Key Management
+
+To get your API key:
+
+1. Log in to your Checkly dashboard
+2. Navigate to **Account Settings** → **API Keys**
+3. Create a new API key or copy an existing one
+4. Use the key in your environment variables or CLI configuration
+
+## Verifying Authentication
+
+To verify you're properly authenticated:
+
+```bash
+npx checkly whoami
+```
+
+This will display your account information and confirm your authentication status.
+
+## Logging Out
+
+To log out and clear your stored credentials:
+
+```bash
+npx checkly logout
+```
+
+This will remove the stored API key from your local machine.
+
+## Multiple Accounts
+
+If you work with multiple Checkly accounts, you can switch between them:
+
+```bash
+# Switch to a different account
+npx checkly switch --account-id your_account_id
+
+# View current account
+npx checkly whoami
+```
+
+## Security Best Practices
+
+- **Never commit API keys** to version control
+- **Use environment variables** in production environments
+- **Rotate API keys** regularly for security
+- **Use least privilege** - create API keys with minimal required permissions
+- **Monitor API key usage** in your Checkly dashboard
+
+## Troubleshooting
+
+### Common Issues
+
+**"Authentication failed" error:**
+- Verify your API key is correct
+- Check that your account ID is correct (if specified)
+- Ensure your API key hasn't expired
+
+**"Browser didn't open" error:**
+- Manually navigate to the authentication URL shown in the terminal
+- Copy and paste the URL into your browser
+
+**"Permission denied" error:**
+- Verify your API key has the necessary permissions
+- Check if your account has the required features enabled 

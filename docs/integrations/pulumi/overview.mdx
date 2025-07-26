@@ -1,0 +1,295 @@
+---
+title: 'The Checkly Pulumi Provider'
+description: 'Learn about the Checkly Pulumi Provider'
+sidebarTitle: 'Pulumi Provider'
+---
+
+import { Note, Warning, Tip, Steps, Step, CardGroup, Card, Tabs, Tab, CodeGroup, Callout } from 'mintlify/components'
+
+The [Checkly Pulumi provider](https://www.pulumi.com/registry/packages/checkly/) enables declaring your monitoring setup as code using [Pulumi](https://www.pulumi.com/).
+
+<Callout type="info" emoji="🚀">
+This integration allows you to manage your entire Checkly monitoring infrastructure as code, providing version control, collaboration, and automated deployments for your monitoring setup.
+</Callout>
+
+## What is the Checkly Pulumi Provider?
+
+The Checkly Pulumi provider is an official integration that allows you to define and manage your Checkly monitoring resources using Pulumi's infrastructure-as-code approach. This enables you to:
+
+<CardGroup cols={2}>
+<Card title="Version Control" icon="git-branch">
+**Track Changes**
+- Git-based version control for monitoring configs
+- Review and approve changes through PRs
+- Rollback capabilities for monitoring changes
+- Collaborative monitoring management
+</Card>
+
+<Card title="Automated Deployments" icon="rocket">
+**CI/CD Integration**
+- Automated monitoring deployments
+- Environment-specific configurations
+- Consistent monitoring across environments
+- Reduced manual configuration errors
+</Card>
+
+<Card title="Scalable Management" icon="scale">
+**Infrastructure Scaling**
+- Manage hundreds of checks efficiently
+- Consistent tagging and organization
+- Bulk updates and modifications
+- Environment parity enforcement
+</Card>
+
+<Card title="Team Collaboration" icon="users">
+**Developer Workflows**
+- Familiar code-based workflows
+- Code review processes
+- Documentation as code
+- Standardized monitoring patterns
+</Card>
+</CardGroup>
+
+## Quick Start
+
+<Steps>
+<Step title="Install Pulumi CLI">
+Install the Pulumi CLI and create an account at [app.pulumi.com](https://app.pulumi.com/signup)
+</Step>
+
+<Step title="Configure Authentication">
+Set up your Checkly API key and account ID as environment variables
+</Step>
+
+<Step title="Create Project">
+Initialize a new Pulumi project and install the Checkly provider
+</Step>
+
+<Step title="Define Resources">
+Write your monitoring configuration using the Checkly provider
+</Step>
+
+<Step title="Deploy">
+Run `pulumi up` to deploy your monitoring infrastructure
+</Step>
+</Steps>
+
+## Prerequisites
+
+Before getting started, ensure you have:
+
+- **Pulumi CLI** installed and configured
+- **Checkly account** with API access
+- **Node.js** (version 14 or higher) for JavaScript/TypeScript projects
+- **Git** for version control
+
+## Installation
+
+### 1. Pulumi CLI Setup
+
+<CodeGroup>
+```bash npm
+npm install -g @pulumi/pulumi
+```
+
+```bash yarn
+yarn global add @pulumi/pulumi
+```
+
+```bash brew
+brew install pulumi/tap/pulumi
+```
+</CodeGroup>
+
+### 2. Checkly Provider Installation
+
+<CodeGroup>
+```bash npm
+npm install @checkly/pulumi
+```
+
+```bash yarn
+yarn add @checkly/pulumi
+```
+</CodeGroup>
+
+## Configuration
+
+### Environment Variables
+
+Set up your Checkly credentials as environment variables:
+
+```bash
+export CHECKLY_ACCOUNT_ID=your_account_id
+export CHECKLY_API_KEY=your_api_key
+```
+
+<Tip>
+You can also use Pulumi's configuration system for better team collaboration:
+```bash
+pulumi config set checkly:apiKey your_api_key --secret
+pulumi config set checkly:accountId your_account_id
+```
+</Tip>
+
+## Basic Examples
+
+### API Check
+
+<Tabs>
+<Tab title="JavaScript">
+```javascript
+const checkly = require('@checkly/pulumi')
+
+new checkly.Check('my-api-check', {
+  name: 'Public SpaceX API',
+  activated: true,
+  frequency: 10,
+  type: 'API',
+  locations: ['eu-west-1', 'us-west-2'],
+  tags: ['pulumi'],
+  degradedResponseTime: 5000,
+  maxResponseTime: 15000,
+  request: {
+    method: 'GET',
+    url: 'https://api.spacexdata.com/v3',
+    assertions: [
+      {
+        source: 'STATUS_CODE',
+        comparison: 'EQUALS',
+        target: '200',
+      },
+      {
+        source: 'JSON_BODY',
+        property: '$.project_name',
+        comparison: 'EQUALS',
+        target: 'SpaceX-API',
+      },
+    ],
+  },
+  useGlobalAlertSettings: true,
+})
+```
+</Tab>
+<Tab title="TypeScript">
+```typescript
+import * as checkly from '@checkly/pulumi'
+
+new checkly.Check('my-api-check', {
+  name: 'Public SpaceX API',
+  activated: true,
+  frequency: 10,
+  type: 'API',
+  locations: ['eu-west-1', 'us-west-2'],
+  tags: ['pulumi'],
+  degradedResponseTime: 5000,
+  maxResponseTime: 15000,
+  request: {
+    method: 'GET',
+    url: 'https://api.spacexdata.com/v3',
+    assertions: [
+      {
+        source: 'STATUS_CODE',
+        comparison: 'EQUALS',
+        target: '200',
+      },
+      {
+        source: 'JSON_BODY',
+        property: '$.project_name',
+        comparison: 'EQUALS',
+        target: 'SpaceX-API',
+      },
+    ],
+  },
+  useGlobalAlertSettings: true,
+})
+```
+</Tab>
+</Tabs>
+
+### Browser Check
+
+<Tabs>
+<Tab title="JavaScript">
+```javascript
+const checkly = require('@checkly/pulumi')
+
+new checkly.Check('my-browser-check', {
+  name: 'Google.com Playwright check',
+  activated: true,
+  frequency: 10,
+  type: 'BROWSER',
+  script: `
+  const { expect, test } = require('@playwright/test')
+
+  test('visit page and take screenshot', async ({ page }) => {
+    const response = await page.goto('https://checklyhq.com')
+    expect(response.status()).toBeLessThan(400)
+    await page.screenshot({ path: 'screenshot.jpg' })
+  })`,
+  locations: ['eu-west-1', 'us-west-2'],
+  tags: ['pulumi'],
+})
+```
+</Tab>
+<Tab title="TypeScript">
+```typescript
+import * as checkly from '@checkly/pulumi'
+
+new checkly.Check('my-browser-check', {
+  name: 'Google.com Playwright check',
+  activated: true,
+  frequency: 10,
+  type: 'BROWSER',
+  script: `
+  const { expect, test } = require('@playwright/test')
+
+  test('visit page and take screenshot', async ({ page }) => {
+    const response = await page.goto('https://checklyhq.com')
+    expect(response.status()).toBeLessThan(400)
+    await page.screenshot({ path: 'screenshot.jpg' })
+  })`,
+  locations: ['eu-west-1', 'us-west-2'],
+  tags: ['pulumi'],
+})
+```
+</Tab>
+</Tabs>
+
+## Deployment
+
+Deploy your monitoring infrastructure:
+
+```bash
+pulumi up
+```
+
+<Warning>
+Checkly resources should be managed _either_ through Pulumi _or_ the Checkly UI, not both. Modifying Pulumi-managed resources via the UI, and vice-versa, is likely to cause issues.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+<Card title="Setup Guide" icon="wrench" href="/integrations/pulumi/setup">
+Learn detailed setup instructions for Pulumi CLI and Checkly integration
+</Card>
+
+<Card title="Examples" icon="code" href="/integrations/pulumi/examples">
+Explore comprehensive examples for different check types and configurations
+</Card>
+
+<Card title="Best Practices" icon="shield-check" href="/integrations/pulumi/best-practices">
+Discover best practices for managing monitoring as code
+</Card>
+
+<Card title="CI/CD Integration" icon="git-merge" href="/integrations/pulumi/ci-cd">
+Learn how to integrate Pulumi with your CI/CD pipelines
+</Card>
+</CardGroup>
+
+## Additional Resources
+
+- [The official Pulumi Provider documentation](https://www.pulumi.com/registry/packages/checkly/)
+- [The Pulumi Provider on GitHub](https://github.com/checkly/pulumi-checkly)
+- [Detailed examples in JavaScript and TypeScript](https://github.com/checkly/pulumi-checkly#examples)

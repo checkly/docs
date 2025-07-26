@@ -1,0 +1,661 @@
+---
+title: 'Troubleshooting'
+description: 'Common issues and solutions when using the Checkly Terraform provider'
+sidebarTitle: 'Troubleshooting'
+---
+
+import { Note, Warning, Tip, Steps, Step, CardGroup, Card, Tabs, Tab, CodeGroup, Callout } from 'mintlify/components'
+
+This page covers common issues users encounter while using the Checkly Terraform provider, along with their likely root causes and solutions.
+
+<Callout type="warning" emoji="🚨">
+Most Terraform provider issues stem from configuration mismatches, resource conflicts, or authentication problems. Follow these troubleshooting steps systematically.
+</Callout>
+
+## Common Error Categories
+
+<CardGroup cols={2}>
+<Card title="Authentication Issues" icon="key">
+**API Access Problems**
+- Invalid API keys
+- Incorrect account IDs
+- Permission issues
+- Expired credentials
+</Card>
+
+<Card title="Configuration Errors" icon="settings">
+**Resource Setup Issues**
+- Missing required parameters
+- Invalid configuration values
+- Resource relationship problems
+- Syntax errors
+</Card>
+
+<Card title="Resource Conflicts" icon="warning">
+**State Management Issues**
+- Resource already exists
+- Conflicting resource names
+- State file corruption
+- Import problems
+</Card>
+
+<Card title="Quota & Limits" icon="chart-line">
+**Account Limitations**
+- Check limit exceeded
+- Feature not available
+- Plan restrictions
+- Rate limiting
+</Card>
+</CardGroup>
+
+## Authentication & API Issues
+
+### Error: 401 Unauthorized
+
+This indicates authentication problems with your Checkly API credentials.
+
+<Tabs>
+<Tab title="Diagnosis">
+```bash
+# Check your environment variables
+echo $TF_VAR_checkly_api_key
+echo $TF_VAR_checkly_account_id
+
+# Verify API key format
+# Should start with 'cu_' for user keys or 'ac_' for account keys
+```
+</Tab>
+
+<Tab title="Solution">
+```terraform
+# Ensure correct variable configuration
+variable "checkly_api_key" {
+  description = "Checkly API Key"
+  type        = string
+  sensitive   = true
+}
+
+variable "checkly_account_id" {
+  description = "Checkly Account ID"
+  type        = string
+}
+
+provider "checkly" {
+  api_key    = var.checkly_api_key
+  account_id = var.checkly_account_id
+}
+```
+
+**Steps to fix:**
+1. Verify your API key in [Checkly settings](https://app.checklyhq.com/settings/user/api-keys)
+2. Confirm your Account ID in [account settings](https://app.checklyhq.com/settings/account/general)
+3. Ensure environment variables are properly set
+4. Check for trailing spaces or newlines in credentials
+</Tab>
+</Tabs>
+
+### Error: 403 Forbidden
+
+This suggests insufficient permissions or incorrect account access.
+
+<Tabs>
+<Tab title="Common Causes">
+```bash
+# Check if you're using the correct account ID
+# Account ID should be numeric
+echo $TF_VAR_checkly_account_id
+
+# Verify API key permissions
+# Some operations require admin privileges
+```
+</Tab>
+
+<Tab title="Resolution">
+**Troubleshooting steps:**
+1. Verify you have the correct permissions for the account
+2. Ensure you're not using a read-only API key
+3. Contact your account admin if you lack necessary permissions
+4. Try creating a new API key with full permissions
+</Tab>
+</Tabs>
+
+## Resource Configuration Issues
+
+### Error: 402 Payment Required
+
+This occurs when you've reached your account's check limit.
+
+<Tabs>
+<Tab title="Understanding the Error">
+```terraform
+# This will fail if you exceed your plan's check limit
+resource "checkly_check" "api_check" {
+  name = "API Health Check"
+  type = "API"
+  # ... configuration
+}
+```
+</Tab>
+
+<Tab title="Solutions">
+**Options to resolve:**
+
+1. **Upgrade Your Plan**
+   - Contact Checkly Support via chat widget
+   - Discuss plan options for higher limits
+   - Consider usage-based pricing
+
+2. **Optimize Check Usage**
+   - Remove unused checks
+   - Consolidate similar checks
+   - Use check groups efficiently
+   - Review check frequency settings
+
+3. **Temporary Workaround**
+   ```terraform
+   # Deactivate non-critical checks temporarily
+   resource "checkly_check" "non_critical" {
+     name      = "Non-Critical Check"
+     activated = false  # Temporarily disable
+     # ... rest of configuration
+   }
+   ```
+</Tab>
+</Tabs>
+
+### Alert Channel Has 0 Subscribers
+
+Alert channels show no subscribers when checks/groups aren't properly subscribed.
+
+<Tabs>
+<Tab title="Problem Identification">
+```terraform
+# This creates an alert channel but no subscriptions
+resource "checkly_alert_channel" "email_alerts" {
+  email {
+    address = "team@example.com"
+  }
+  send_recovery = true
+  send_failure  = true
+}
+
+# ❌ Missing: Alert channel subscriptions
+resource "checkly_check" "api_check" {
+  name = "API Check"
+  type = "API"
+  # Missing alert_channel_subscription block
+}
+```
+</Tab>
+
+<Tab title="Correct Configuration">
+```terraform
+# ✅ Properly configured with subscriptions
+resource "checkly_alert_channel" "email_alerts" {
+  email {
+    address = "team@example.com"
+  }
+  send_recovery = true
+  send_failure  = true
+}
+
+resource "checkly_check" "api_check" {
+  name = "API Check"
+  type = "API"
+  
+  # ✅ Explicit subscription to alert channel
+  alert_channel_subscription {
+    channel_id = checkly_alert_channel.email_alerts.id
+    activated  = true
+  }
+  
+  request {
+    url = "https://api.example.com/health"
+    assertion {
+      source     = "STATUS_CODE"
+      comparison = "EQUALS"
+      target     = "200"
+    }
+  }
+}
+```
+
+**Key points:**
+- Checks and groups need **explicit** subscriptions to alert channels
+- Alert channels are **not** automatically subscribed
+- Use `alert_channel_subscription` blocks in your resources
+</Tab>
+</Tabs>
+
+## Location and Execution Issues
+
+### Check Runs from Wrong Locations
+
+This happens when group-level settings override check-level settings.
+
+<Tabs>
+<Tab title="Problem Analysis">
+```terraform
+# ❌ Problematic setup
+resource "checkly_check_group" "api_group" {
+  name = "API Group"
+  
+  # Group locations override check locations
+  locations = ["us-west-1"]  
+}
+
+resource "checkly_check" "api_check" {
+  name     = "API Check"
+  group_id = checkly_check_group.api_group.id
+  
+  # ❌ These locations will be IGNORED
+  locations = ["us-west-1", "eu-central-1", "ap-southeast-1"]
+  
+  request {
+    url = "https://api.example.com/health"
+    assertion {
+      source     = "STATUS_CODE"
+      comparison = "EQUALS"
+      target     = "200"
+    }
+  }
+}
+```
+</Tab>
+
+<Tab title="Solutions">
+```terraform
+# ✅ Solution 1: Configure locations at group level
+resource "checkly_check_group" "api_group" {
+  name = "API Group"
+  
+  # Set desired locations at group level
+  locations = ["us-west-1", "eu-central-1", "ap-southeast-1"]
+}
+
+resource "checkly_check" "api_check" {
+  name     = "API Check"
+  group_id = checkly_check_group.api_group.id
+  
+  # No need to specify locations - inherited from group
+  request {
+    url = "https://api.example.com/health"
+    assertion {
+      source     = "STATUS_CODE"
+      comparison = "EQUALS"
+      target     = "200"
+    }
+  }
+}
+
+# ✅ Solution 2: Remove check from group
+resource "checkly_check" "standalone_check" {
+  name = "Standalone Check"
+  # No group_id specified
+  
+  # Check-level locations will be used
+  locations = ["us-west-1", "eu-central-1", "ap-southeast-1"]
+  
+  request {
+    url = "https://api.example.com/health"
+    assertion {
+      source     = "STATUS_CODE"
+      comparison = "EQUALS"
+      target     = "200"
+    }
+  }
+}
+```
+
+**Remember:**
+- Group-level settings **always** override check-level settings
+- This applies to locations, alert subscriptions, and other shared configurations
+- Check the `group_id` parameter if settings aren't being applied as expected
+</Tab>
+</Tabs>
+
+## Alert Configuration Issues
+
+### Alerts Not Being Sent / Wrong Channels Used
+
+This typically occurs when checks are part of a group with different alert configurations.
+
+<Tabs>
+<Tab title="Problem Diagnosis">
+```terraform
+# ❌ Conflicting alert configurations
+resource "checkly_alert_channel" "email_alerts" {
+  email {
+    address = "team@example.com"
+  }
+}
+
+resource "checkly_alert_channel" "slack_alerts" {
+  slack {
+    url     = "https://hooks.slack.com/services/xxx"
+    channel = "#alerts"
+  }
+}
+
+resource "checkly_check_group" "api_group" {
+  name = "API Group"
+  
+  # Group subscribes to Slack
+  alert_channel_subscription {
+    channel_id = checkly_alert_channel.slack_alerts.id
+    activated  = true
+  }
+}
+
+resource "checkly_check" "api_check" {
+  name     = "API Check"
+  group_id = checkly_check_group.api_group.id
+  
+  # ❌ This email subscription will be IGNORED
+  alert_channel_subscription {
+    channel_id = checkly_alert_channel.email_alerts.id
+    activated  = true
+  }
+}
+```
+</Tab>
+
+<Tab title="Correct Configuration">
+```terraform
+# ✅ Consistent alert configuration
+resource "checkly_alert_channel" "email_alerts" {
+  email {
+    address = "team@example.com"
+  }
+}
+
+resource "checkly_alert_channel" "slack_alerts" {
+  slack {
+    url     = "https://hooks.slack.com/services/xxx"
+    channel = "#alerts"
+  }
+}
+
+resource "checkly_check_group" "api_group" {
+  name = "API Group"
+  
+  # Configure all desired alert channels at group level
+  alert_channel_subscription {
+    channel_id = checkly_alert_channel.email_alerts.id
+    activated  = true
+  }
+  
+  alert_channel_subscription {
+    channel_id = checkly_alert_channel.slack_alerts.id
+    activated  = true
+  }
+}
+
+resource "checkly_check" "api_check" {
+  name     = "API Check"
+  group_id = checkly_check_group.api_group.id
+  
+  # No alert subscriptions needed - inherited from group
+}
+```
+
+**Best practice:**
+- Configure alert subscriptions at the **group level** for checks that belong to groups
+- Remove redundant check-level alert subscriptions
+- Use check-level subscriptions only for standalone checks
+</Tab>
+</Tabs>
+
+## State Management Issues
+
+### Resource Already Exists
+
+This error occurs when trying to create a resource that already exists in Checkly.
+
+<Tabs>
+<Tab title="Error Example">
+```bash
+Error: [POST /v1/checks] 422 - {"message":"Check with name 'API Health Check' already exists"}
+
+# This happens when:
+# - Resource exists in Checkly but not in Terraform state
+# - Resource was created outside of Terraform
+# - State file was corrupted or lost
+```
+</Tab>
+
+<Tab title="Solutions">
+**Option 1: Import Existing Resource**
+```bash
+# Find the resource ID in Checkly dashboard
+# Import it into Terraform state
+terraform import checkly_check.api_health_check "existing-check-id"
+
+# Then update your configuration to match the existing resource
+```
+
+**Option 2: Use Different Name**
+```terraform
+resource "checkly_check" "api_health_check_v2" {
+  name = "API Health Check v2"  # Different name
+  type = "API"
+  # ... rest of configuration
+}
+```
+
+**Option 3: Remove from Checkly UI**
+- Delete the conflicting resource from Checkly dashboard
+- Run `terraform apply` to recreate it via Terraform
+</Tab>
+</Tabs>
+
+### State File Issues
+
+<Tabs>
+<Tab title="State Corruption">
+```bash
+# Symptoms of state file issues
+Error: state file corrupted
+Error: resource not found in state
+Error: state lock timeout
+
+# Check state file
+terraform show
+terraform state list
+```
+</Tab>
+
+<Tab title="Recovery Steps">
+```bash
+# 1. Backup current state
+cp terraform.tfstate terraform.tfstate.backup
+
+# 2. Refresh state from remote resources
+terraform refresh
+
+# 3. If using remote state, check for locks
+terraform force-unlock LOCK_ID
+
+# 4. Validate state consistency
+terraform plan
+
+# 5. If state is severely corrupted, consider:
+# - Importing resources individually
+# - Recreating state from scratch
+# - Restoring from backup
+```
+</Tab>
+</Tabs>
+
+## Performance and Timeout Issues
+
+### Terraform Operations Timing Out
+
+<Tabs>
+<Tab title="Common Causes">
+```bash
+# Large numbers of resources
+# Network connectivity issues
+# Checkly API rate limiting
+# Resource dependencies causing delays
+```
+</Tab>
+
+<Tab title="Solutions">
+```terraform
+# 1. Reduce resource count per apply
+# Use targeted applies
+terraform apply -target=checkly_check.specific_check
+
+# 2. Optimize resource dependencies
+# Avoid unnecessary depends_on relationships
+
+# 3. Use parallel resource creation wisely
+# Terraform automatically parallelizes when possible
+
+# 4. For large configurations, consider:
+# - Breaking into smaller modules
+# - Using workspaces for different environments
+# - Batching resource creation
+```
+</Tab>
+</Tabs>
+
+## Debugging Strategies
+
+### Enable Verbose Logging
+
+<Tabs>
+<Tab title="Debug Commands">
+```bash
+# Enable detailed Terraform logging
+export TF_LOG=DEBUG
+export TF_LOG_PATH=terraform.log
+
+# Run Terraform with detailed output
+terraform plan -input=false
+
+# Check the log file for detailed error information
+tail -f terraform.log
+```
+</Tab>
+</Tabs>
+
+### Validate Configuration
+
+<Tabs>
+<Tab title="Validation Steps">
+```bash
+# 1. Check Terraform syntax
+terraform fmt -check
+terraform validate
+
+# 2. Plan before applying
+terraform plan -out=tfplan
+
+# 3. Validate provider version
+terraform version
+
+# 4. Check resource documentation
+terraform providers schema -json | jq '.provider_schemas'
+```
+</Tab>
+</Tabs>
+
+## Getting Help
+
+### Information to Collect
+
+When seeking help, gather this information:
+
+<Tabs>
+<Tab title="Essential Details">
+```bash
+# 1. Terraform version
+terraform version
+
+# 2. Provider version
+terraform providers
+
+# 3. Error messages (full output)
+terraform apply 2>&1 | tee error.log
+
+# 4. Relevant configuration
+# Share the problematic resource configuration
+
+# 5. Environment details
+echo $TF_VAR_checkly_api_key | sed 's/./*/g'  # Masked
+echo $TF_VAR_checkly_account_id
+```
+</Tab>
+</Tabs>
+
+### Support Channels
+
+<CardGroup cols={2}>
+<Card title="Community Support" icon="users">
+**Community Resources**
+- [GitHub Issues](https://github.com/checkly/terraform-provider-checkly/issues)
+- [Terraform Registry Documentation](https://registry.terraform.io/providers/checkly/checkly/latest/docs)
+- [Checkly Documentation](/docs/terraform-provider/)
+- Community forums and discussions
+</Card>
+
+<Card title="Direct Support" icon="headset">
+**Checkly Support**
+- In-app chat widget
+- Support email
+- Account-specific assistance
+- Plan and billing questions
+</Card>
+</CardGroup>
+
+## Best Practices for Prevention
+
+<CardGroup cols={2}>
+<Card title="Configuration Management" icon="settings">
+**Avoid Issues**
+- Use version control for all configurations
+- Test in staging environments first
+- Implement proper CI/CD pipelines
+- Regular configuration validation
+</Card>
+
+<Card title="State Management" icon="database">
+**Maintain State Health**
+- Use remote state backends
+- Regular state backups
+- Monitor state file integrity
+- Implement state locking
+</Card>
+
+<Card title="Resource Organization" icon="sitemap">
+**Structure Resources**
+- Use consistent naming conventions
+- Group related resources logically
+- Document resource relationships
+- Plan resource hierarchies carefully
+</Card>
+
+<Card title="Monitoring & Alerts" icon="bell">
+**Operational Excellence**
+- Monitor Terraform operations
+- Set up alerts for failures
+- Regular configuration audits
+- Track resource drift
+</Card>
+</CardGroup>
+
+<Warning>
+Always backup your Terraform state file before making significant changes. State file corruption can lead to resource management issues that are difficult to recover from.
+</Warning>
+
+<Tip>
+When debugging complex issues, start with the simplest possible configuration and gradually add complexity until you identify the problem source.
+</Tip>
+
+## Additional Resources
+
+- [Terraform Provider GitHub Repository](https://github.com/checkly/terraform-provider-checkly)
+- [Checkly API Documentation](https://developers.checklyhq.com/)
+- [Terraform Best Practices](https://www.terraform.io/docs/cloud/guides/recommended-practices/index.html)

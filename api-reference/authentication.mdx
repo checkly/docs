@@ -12,39 +12,15 @@ The Checkly API uses Bearer token authentication to secure all endpoints. Every 
 API authentication is required for all endpoints except public status pages. All requests must include both Authorization and X-Checkly-Account headers.
 </Info>
 
-## Common Use Cases
 
-<CardGroup cols={2}>
+## Authentication Headers
 
-<Card title="Quick API Testing" icon="flask">
-Test your API credentials and connection quickly
-```bash
-curl -I https://api.checklyhq.com/v1/checks
-```
-</Card>
+All API requests must include these two headers:
 
-<Card title="SDK Configuration" icon="code">
-Set up authentication for JavaScript/Python SDKs
-```javascript
-const client = new ChecklyAPI(apiKey, accountId)
-```
-</Card>
-
-<Card title="CI/CD Integration" icon="cogs">
-Authenticate in automated workflows and deployments
-```bash
-export CHECKLY_API_KEY=${{ secrets.CHECKLY_API_KEY }}
-```
-</Card>
-
-<Card title="Secure Environment Setup" icon="shield">
-Manage credentials securely across environments
-```bash
-echo "CHECKLY_API_KEY=cu_xxx" >> .env.production
-```
-</Card>
-
-</CardGroup>
+| Header | Description | Example |
+|--------|-------------|---------|
+| `Authorization` | Bearer token with your API key | `Bearer cu_1234567890abcdef` |
+| `X-Checkly-Account` | Your Checkly Account ID | `550e8400-e29b-41d4-a716-446655440000` |
 
 ## Authentication Response Example
 
@@ -97,20 +73,11 @@ echo "CHECKLY_API_KEY=cu_xxx" >> .env.production
 }
 ```
 
-## Authentication Headers
-
-All API requests must include these two headers:
-
-| Header | Description | Example |
-|--------|-------------|---------|
-| `Authorization` | Bearer token with your API key | `Bearer cu_1234567890abcdef` |
-| `X-Checkly-Account` | Your Checkly Account ID | `550e8400-e29b-41d4-a716-446655440000` |
 
 ## Getting Your Credentials
 
-<AccordionGroup>
+### API Key Setup
 
-<Accordion title="API Key Setup">
 1. Navigate to [API Keys Settings](https://app.checklyhq.com/settings/user/api-keys) in your Checkly dashboard
 2. Click "Create API Key" 
 3. Provide a descriptive name for your key (e.g., "Production Monitoring", "CI/CD Pipeline")
@@ -123,9 +90,9 @@ All API requests must include these two headers:
 <Warning>
 API keys are only shown once during creation. Store them securely in environment variables or credential management systems.
 </Warning>
-</Accordion>
 
-<Accordion title="Account ID Location">
+### Account ID Location
+
 Your Account ID can be found in multiple places:
 
 **Dashboard URL**: Look for the UUID in your dashboard URL
@@ -138,9 +105,9 @@ https://app.checklyhq.com/dashboard/550e8400-e29b-41d4-a716-446655440000
 **API Response**: Make any authenticated request and the account ID is included in error messages
 
 **Format**: Always a UUID like `550e8400-e29b-41d4-a716-446655440000`
-</Accordion>
 
-<Accordion title="Environment Variables">
+### Environment Variables
+
 Set up authentication credentials securely using environment variables:
 
 ```bash
@@ -158,9 +125,6 @@ export CHECKLY_ACCOUNT_ID="550e8400-e29b-41d4-a716-446655440000"
 - Use different API keys for different environments
 - Set appropriate scopes for each key
 - Rotate keys regularly (every 90 days recommended)
-</Accordion>
-
-</AccordionGroup>
 
 ## Testing & Validation
 
@@ -286,7 +250,7 @@ diagnose_checkly_connection()
 
 </AccordionGroup>
 
-## Additional Examples
+## Examples
 
 <CodeGroup>
 
@@ -363,9 +327,9 @@ func main() {
 
 ## Authentication Errors
 
-<CardGroup cols={2}>
+<AccordionGroup>
 
-<Card title="Missing Authentication" icon="exclamation-triangle">
+<Accordion title="Missing Authentication">
 **HTTP 401 Unauthorized**
 ```json
 {
@@ -378,9 +342,9 @@ func main() {
   }
 }
 ```
-</Card>
+</Accordion>
 
-<Card title="Invalid API Key" icon="key">
+<Accordion title="Invalid API Key">
 **HTTP 401 Unauthorized**
 ```json
 {
@@ -393,9 +357,9 @@ func main() {
   }
 }
 ```
-</Card>
+</Accordion>
 
-<Card title="Missing Account ID" icon="building">
+<Accordion title="Missing Account ID">
 **HTTP 400 Bad Request**
 ```json
 {
@@ -408,9 +372,9 @@ func main() {
   }
 }
 ```
-</Card>
+</Accordion>
 
-<Card title="Access Denied" icon="ban">
+<Accordion title="Access Denied">
 **HTTP 403 Forbidden**
 ```json
 {
@@ -423,9 +387,9 @@ func main() {
   }
 }
 ```
-</Card>
+</Accordion>
 
-</CardGroup>
+</AccordionGroup>
 
 ## Security & Best Practices
 

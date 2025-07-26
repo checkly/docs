@@ -1,0 +1,78 @@
+---
+title: 'What are Checks?'
+description: 'Checks are the foundational unit of Checkly, representing a single result of a test run.'
+sidebarTitle: 'Checks'
+---
+
+
+Think of Checks as your programmable tester in staging or production. Each Check can be a complex, multi-step test scenario that runs at whatever frequency you choose—from every minute to once a day or a simple assertion that monitors an authenticated API endpoint. 
+
+Checks proactively experience your application the same way real users would—clicking buttons, making API calls, filling forms, or connecting to services. When something goes wrong, you know about it immediately, often before any customers are affected.
+
+## Types of Checks
+
+Checkly's flexible offering includes several types of Checks, each designed for different levels of complexity and testing scenarios:
+
+<AccordionGroup>
+
+<Accordion title="Browser Checks">
+Simulate real user interactions in a headless browser using TypeScript/JavaScript with @playwright/test. Navigate, screenshot, and assert your key webapp flows. Browser Checks can handle complex scenarios that simple uptime monitoring cannot.
+
+**Perfect for:**
+- Complete user journey testing
+- Login flows and authentication
+- Checkout processes and e-commerce flows
+- Form submissions and data entry
+- Visual regression testing
+- Mobile device emulation
+</Accordion>
+
+<Accordion title="API Checks">
+Advanced API testing that goes beyond basic uptime monitoring. Use setup and teardown scripts, complex assertions, and custom request handling. Validate that your backend services respond correctly, perform within acceptable timeframes, and return the right data structures.
+
+**Perfect for:**
+- Complex API endpoint validation
+- Authentication and authorization testing
+- Data structure and schema validation
+- Performance benchmarking
+- Custom request/response handling
+- Integration testing between services
+</Accordion>
+
+<Accordion title="Multistep Checks">
+Write sophisticated Node.js scripts that run multiple API requests in sequence with arbitrary code between requests. Perfect for testing complex workflows involving authentication, data manipulation, and multi-step processes that span multiple endpoints.
+
+**Perfect for:**
+- Multi-step authentication flows
+- Data transformation workflows
+- Complex business logic testing
+- End-to-end API integrations
+- Workflow orchestration testing
+- Cross-service data validation
+</Accordion>
+
+</AccordionGroup>
+
+
+## How Checks Execute
+
+A cron process picks up each Check based on its individual schedule—which you control completely. The system validates that the Check is not currently in progress to avoid race conditions, then queues it to run from your configured data center locations.
+
+You can select one or more data center locations to run your Checks from. We recommend at least 2 locations for redundancy and to help distinguish between actual application issues and temporary network problems in specific regions.
+
+
+## Code-First Philosophy
+
+Checks treat monitoring as code, meaning your tests live alongside your application code and follow the same development practices. Your checks should live in your codebase and be managed as any other application code, making full use of code reviews, versioning, and your general software development lifecycle.
+
+This approach transforms monitoring from a manual, UI-driven process into a programmable, scalable system that grows with your application. You can version control your monitoring logic, collaborate on it through code reviews, and deploy monitoring changes through the same CI/CD pipelines you use for application code.
+
+
+## Flexible Scheduling and Pricing
+
+With Checks, you purchase monitoring capacity as a single unit and decide how to use it:
+
+- **Your Choice of Frequency**: Run individual Checks as often as every 10 seconds or as infrequently as once per day
+- **Unified Billing**: One package covers all your Check types—mix and match Browser, API, and Multistep Checks as needed
+- **Resource Allocation**: Distribute your Check runs across different tests based on your priorities
+- **Scalable**: Add more capacity as your testing needs grow

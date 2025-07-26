@@ -1,0 +1,273 @@
+---
+title: 'The Checkly Terraform Provider'
+description: 'Learn about the Checkly Terraform Provider'
+sidebarTitle: 'Terraform Provider'
+---
+
+import { Note, Warning, Tip, Steps, Step, CardGroup, Card, Tabs, Tab, CodeGroup, Callout } from 'mintlify/components'
+
+The [Checkly Terraform provider](https://github.com/checkly/terraform-provider-checkly) enables you to declare your monitoring setup as code using [HashiCorp Terraform](https://www.terraform.io/). You can get started with it in a matter of minutes by following the steps shown below.
+
+<Callout type="info" emoji="🚀">
+This integration allows you to manage your entire Checkly monitoring infrastructure as code, providing version control, collaboration, and automated deployments for your monitoring setup.
+</Callout>
+
+## What is the Checkly Terraform Provider?
+
+The Checkly Terraform provider is an official integration that allows you to define and manage your Checkly monitoring resources using Terraform's infrastructure-as-code approach. This enables you to:
+
+<CardGroup cols={2}>
+<Card title="Version Control" icon="git-branch">
+**Track Changes**
+- Git-based version control for monitoring configs
+- Review and approve changes through PRs
+- Rollback capabilities for monitoring changes
+- Collaborative monitoring management
+</Card>
+
+<Card title="Automated Deployments" icon="rocket">
+**CI/CD Integration**
+- Automated monitoring deployments
+- Environment-specific configurations
+- Consistent monitoring across environments
+- Reduced manual configuration errors
+</Card>
+
+<Card title="Scalable Management" icon="scale">
+**Infrastructure Scaling**
+- Manage hundreds of checks efficiently
+- Consistent tagging and organization
+- Bulk updates and modifications
+- Environment parity enforcement
+</Card>
+
+<Card title="Team Collaboration" icon="users">
+**Developer Workflows**
+- Familiar code-based workflows
+- Code review processes
+- Documentation as code
+- Standardized monitoring patterns
+</Card>
+</CardGroup>
+
+<Tip>
+Looking for Monitoring as Code but don't want to use Terraform? Give our [CLI solution](/docs/cli/) a try.
+</Tip>
+
+## Quick Start
+
+<Steps>
+<Step title="Install Terraform">
+Install [Terraform](https://www.terraform.io/downloads) and create your project directory
+</Step>
+
+<Step title="Configure Provider">
+Create your `main.tf` file and configure the Checkly provider
+</Step>
+
+<Step title="Set Credentials">
+Configure your Checkly API key and account ID as environment variables
+</Step>
+
+<Step title="Initialize Project">
+Run `terraform init` to install the provider and initialize your project
+</Step>
+
+<Step title="Deploy Resources">
+Run `terraform apply` to deploy your monitoring infrastructure
+</Step>
+</Steps>
+
+## Prerequisites
+
+Before getting started, ensure you have:
+
+- **Terraform CLI** installed (version 0.13 or higher)
+- **Checkly account** with API access
+- **API key** from your Checkly user settings
+- **Account ID** from your Checkly account settings
+
+## Installation
+
+### 1. Create Project Directory
+
+```bash
+mkdir terraform-checkly-getting-started && cd $_ && touch main.tf
+```
+
+### 2. Configure Provider
+
+Add the following to your `main.tf`:
+
+```terraform
+terraform {
+  required_providers {
+    checkly = {
+      source = "checkly/checkly"
+      version = "~> 1.0"
+    }
+  }
+}
+
+variable "checkly_api_key" {}
+variable "checkly_account_id" {}
+
+provider "checkly" {
+  api_key = var.checkly_api_key
+  account_id = var.checkly_account_id
+}
+```
+
+## Configuration
+
+### Environment Variables
+
+Set up your Checkly credentials as environment variables:
+
+1. Get your User API key from the [API keys tab](https://app.checklyhq.com/settings/user/api-keys) in your user settings
+2. Get your Account ID from your [account settings](https://app.checklyhq.com/settings/account/general)
+
+```bash
+export TF_VAR_checkly_api_key=cu_xxx
+export TF_VAR_checkly_account_id=xxx
+```
+
+### Initialize Project
+
+Run `terraform init` to install the Checkly Terraform provider:
+
+```bash
+terraform init
+```
+
+## Basic Examples
+
+### Browser Check
+
+<Tabs>
+<Tab title="Terraform">
+```terraform
+resource "checkly_check" "browser-check-1" {
+  name                      = "Example Browser Check"
+  type                      = "BROWSER"
+  activated                 = true
+  frequency                 = 5
+  
+  locations = [
+    "eu-central-1",
+    "us-west-1"
+  ]
+
+  retry_strategy = {
+    type = "LINEAR"
+  }
+
+  script = <<EOT
+const { test, expect } = require('@playwright/test');
+
+test('Has "Playwright" in the page title', async ({ page }) => {
+  await page.goto('https://playwright.dev/');
+  await expect(page).toHaveTitle(/Playwright/);
+});
+EOT
+}
+```
+</Tab>
+</Tabs>
+
+### API Check
+
+<Tabs>
+<Tab title="Terraform">
+```terraform
+resource "checkly_check" "api-check-1" {
+  name                      = "Example API Check"
+  type                      = "API"
+  activated                 = true
+  frequency                 = 1
+
+  locations = [
+    "us-west-1",
+    "eu-central-1"
+  ]
+
+  request {
+    url              = "https://api.example.com/"
+    follow_redirects = true
+    skip_ssl         = false
+    assertion {
+      source     = "STATUS_CODE"
+      comparison = "EQUALS"
+      target     = "200"
+    }
+  }
+}
+```
+</Tab>
+</Tabs>
+
+### Alert Channel
+
+<Tabs>
+<Tab title="Terraform">
+```terraform
+resource "checkly_alert_channel" "email_ac" {
+  email {
+    address = "jane.doe@email.com"
+  }
+  send_recovery = true
+  send_failure = true
+  send_degraded = false
+}
+
+resource "checkly_check" "browser-check-1" {
+  # ... other configuration
+
+  alert_channel_subscription {
+    channel_id = checkly_alert_channel.email_ac.id
+    activated  = true
+  }
+}
+```
+</Tab>
+</Tabs>
+
+## Deployment
+
+Deploy your monitoring infrastructure:
+
+```bash
+terraform apply
+```
+
+<Warning>
+Checkly resources should be managed _either_ through Terraform _or_ through the Checkly UI, not both. Modifying Terraform-managed resources via the UI, and vice-versa, is likely to cause issues.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+<Card title="Alerting" icon="bell" href="/docs/integrations/terraform/alerting">
+Learn how to set up comprehensive alerting and notification channels
+</Card>
+
+<Card title="Check Groups" icon="layer-group" href="/docs/integrations/terraform/checks-groups">
+Organize your checks using groups for better management and shared configurations
+</Card>
+
+<Card title="CI/CD Integration" icon="git-merge" href="/docs/integrations/terraform/ci-cd">
+Integrate Terraform with your CI/CD pipelines for automated deployments
+</Card>
+
+<Card title="Troubleshooting" icon="wrench" href="/docs/integrations/terraform/troubleshooting">
+Common issues and solutions when working with the Terraform provider
+</Card>
+</CardGroup>
+
+## Additional Resources
+
+If you prefer, you can also clone our [sample repository](https://github.com/checkly/checkly-terraform-getting-started) and play around with the resources on your own.
+
+- [The official Terraform Provider documentation](https://registry.terraform.io/providers/checkly/checkly/latest/docs)
+- [The Terraform Provider on GitHub](https://github.com/checkly/terraform-provider-checkly)
+- [HashiCorp's official Terraform documentation](https://developer.hashicorp.com/terraform/docs)

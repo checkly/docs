@@ -1,0 +1,559 @@
+---
+title: 'Checks and Groups'
+description: 'Create and organize monitoring checks using Terraform'
+sidebarTitle: 'Checks & Groups'
+---
+
+import { Note, Warning, Tip, Steps, Step, CardGroup, Card, Tabs, Tab, CodeGroup, Callout } from 'mintlify/components'
+
+Checks make up the most important unit of your Checkly monitoring setup. Groups help you organize them according to your needs and keep complexity down.
+
+<Callout type="info" emoji="🔍">
+Checkly supports multiple check types: Browser checks, API checks, Heartbeat monitors, Multistep checks, and TCP monitors. Each type has unique configuration options but shares common settings.
+</Callout>
+
+## Check Types Overview
+
+<CardGroup cols={2}>
+<Card title="Browser Checks" icon="browser">
+**End-to-End Testing**
+- Playwright-based automation
+- User journey validation
+- Visual regression testing
+- Multi-step workflows
+</Card>
+
+<Card title="API Checks" icon="api">
+**API Monitoring**
+- HTTP endpoint validation
+- Response time monitoring
+- Status code assertions
+- JSON/XML response validation
+</Card>
+
+<Card title="Heartbeat Monitors" icon="heart-pulse">
+**Service Health**
+- Periodic ping monitoring
+- Cron job validation
+- Background process monitoring
+- Grace period configuration
+</Card>
+
+<Card title="TCP Monitors" icon="network-wired">
+**Port Monitoring**
+- TCP service availability
+- Custom port monitoring
+- Response time validation
+- Data exchange verification
+</Card>
+</CardGroup>
+
+## Browser Checks
+
+Browser checks use Playwright to automate real browser interactions and validate user journeys.
+
+### Inline Script Configuration
+
+<Tabs>
+<Tab title="Inline Script">
+```terraform
+resource "checkly_check" "e2e-login" {
+  name                      = "Login Flow"
+  type                      = "BROWSER"
+  activated                 = true
+  frequency                 = 10
+  ssl_check                 = true
+  use_global_alert_settings = true
+  run_parallel              = true
+
+  locations = [
+    "us-west-1",
+    "eu-central-1"
+  ]
+
+  retry_strategy = {
+    type = "LINEAR"
+  }
+
+  script = <<EOT
+const { expect, test } = require('@playwright/test');
+
+test('Login flow', async ({ page }) => {
+  await page.goto('https://danube-web.shop/');
+  await page.getByRole('button', { name: 'Log in' }).click();
+
+  await page.getByPlaceholder('Email').type('user@email.com');
+  await page.getByPlaceholder('Password').type('supersecure1');
+
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await expect(page.getByText(/Welcome back/)).toBeVisible();
+});
+EOT
+}
+```
+</Tab>
+</Tabs>
+
+### External Script File (Recommended)
+
+<Tabs>
+<Tab title="External File">
+```terraform
+resource "checkly_check" "e2e-login" {
+  name                      = "Login Flow"
+  type                      = "BROWSER"
+  activated                 = true
+  frequency                 = 1
+  ssl_check                 = false
+  use_global_alert_settings = true
+
+  locations = [
+    "us-west-1",
+    "eu-central-1"
+  ]
+
+  retry_strategy = {
+    type = "LINEAR"
+  }
+
+  # Reference external script file
+  script = file("${path.module}/scripts/login.spec.js")
+}
+```
+</Tab>
+</Tabs>
+
+<Tip>
+Store scripts in separate files for better maintainability, version control, and IDE support with syntax highlighting and linting.
+</Tip>
+
+## API Checks
+
+API checks monitor HTTP endpoints and validate responses, status codes, and performance.
+
+<Tabs>
+<Tab title="Basic API Check">
+```terraform
+resource "checkly_check" "get-books" {
+  name                      = "GET /books"
+  type                      = "API"
+  activated                 = true
+  should_fail               = false
+  frequency                 = 1
+  ssl_check                 = true
+  use_global_alert_settings = true
+  run_parallel              = true
+
+  locations = [
+    "us-west-1",
+    "eu-central-1"
+  ]
+  
+  retry_strategy = {
+    type = "LINEAR"
+  }
+
+  request {
+    url              = "https://danube-web.shop/api/books"
+    follow_redirects = true
+    skip_ssl         = false
+    
+    assertion {
+      source     = "STATUS_CODE"
+      comparison = "EQUALS"
+      target     = "200"
+    }
+    
+    assertion {
+      source     = "RESPONSE_TIME"
+      comparison = "LESS_THAN"
+      target     = "2000"
+    }
+  }
+}
+```
+</Tab>
+
+<Tab title="Advanced API Check">
+```terraform
+resource "checkly_check" "api-advanced" {
+  name      = "Advanced API Check"
+  type      = "API"
+  activated = true
+  frequency = 5
+
+  locations = ["us-west-1", "eu-central-1"]
+
+  request {
+    url    = "https://api.example.com/users"
+    method = "POST"
+    
+    headers = {
+      "Content-Type"  = "application/json"
+      "Authorization" = "Bearer ${var.api_token}"
+    }
+    
+    body = jsonencode({
+      name  = "Test User"
+      email = "test@example.com"
+    })
+
+    assertion {
+      source     = "STATUS_CODE"
+      comparison = "EQUALS"
+      target     = "201"
+    }
+
+    assertion {
+      source     = "JSON_BODY"
+      property   = "$.id"
+      comparison = "NOT_EMPTY"
+      target     = ""
+    }
+  }
+}
+```
+</Tab>
+</Tabs>
+
+## Heartbeat Monitors
+
+Heartbeat monitors track periodic tasks and services that should "ping" Checkly at regular intervals.
+
+<Tabs>
+<Tab title="Weekly Task">
+```terraform
+resource "checkly_check" "weekly-digest" {
+  name                      = "Send Weekly Digest"
+  type                      = "HEARTBEAT"
+  activated                 = true
+  use_global_alert_settings = true
+  
+  heartbeat {
+    period      = 7      # Expected ping every 7 days
+    period_unit = "days"
+    grace       = 1      # 1-day grace period
+    grace_unit  = "days"
+  }
+}
+```
+</Tab>
+
+<Tab title="Hourly Service">
+```terraform
+resource "checkly_check" "data-sync" {
+  name      = "Data Sync Service"
+  type      = "HEARTBEAT"
+  activated = true
+  
+  heartbeat {
+    period      = 1        # Expected ping every hour
+    period_unit = "hours"
+    grace       = 30       # 30-minute grace period
+    grace_unit  = "minutes"
+  }
+}
+```
+</Tab>
+</Tabs>
+
+<Note>
+After applying your Terraform configuration, you'll receive a read-only heartbeat ping token stored in your `tfstate` file. Use this token in your services to ping the heartbeat endpoint.
+</Note>
+
+## Multistep Checks
+
+Multistep checks allow complex API workflows with multiple sequential requests.
+
+<Tabs>
+<Tab title="Multistep Check">
+```terraform
+resource "checkly_check" "e2e-shopping" {
+  name                      = "Shopping Flow"
+  type                      = "MULTI_STEP"
+  activated                 = true
+  frequency                 = 1
+  use_global_alert_settings = true
+  
+  locations = [
+    "us-west-1",
+    "eu-central-1"
+  ]
+
+  # Reference external multistep script
+  script = file("${path.module}/scripts/shopping.js")
+}
+```
+</Tab>
+</Tabs>
+
+<Warning>
+Multistep checks are only supported on runtime 2023.09 or later. See [Runtimes](/docs/runtimes/) for more details.
+</Warning>
+
+## TCP Monitors
+
+TCP monitors verify service availability and responsiveness on specific ports.
+
+<Tabs>
+<Tab title="TCP Monitor">
+```terraform
+resource "checkly_tcp_monitor" "api-tcp" {
+  name                   = "API TCP Monitor"
+  activated              = true
+  frequency              = 1
+  degraded_response_time = 4000
+  max_response_time      = 5000
+
+  locations = [
+    "us-west-1",
+    "ap-northeast-1",
+    "ap-south-1"
+  ]
+
+  alert_settings {
+    escalation_type = "RUN_BASED"
+    
+    run_based_escalation {
+      failed_run_threshold = 1
+    }
+    
+    reminders {
+      amount = 1
+    }
+  }
+
+  retry_strategy {
+    type                 = "FIXED"
+    base_backoff_seconds = 60
+    max_duration_seconds = 600
+    max_retries          = 3
+    same_region          = false
+  }
+
+  request {
+    hostname = "api.checklyhq.com"
+    port     = 80
+    data     = "hello"
+
+    assertion {
+      source     = "RESPONSE_DATA"
+      comparison = "CONTAINS"
+      target     = "welcome"
+    }
+
+    assertion {
+      source     = "RESPONSE_TIME"
+      comparison = "LESS_THAN"
+      target     = "2000"
+    }
+  }
+}
+```
+</Tab>
+</Tabs>
+
+## Check Groups
+
+Groups help organize related checks and apply shared configurations efficiently.
+
+### Basic Group Configuration
+
+<Tabs>
+<Tab title="Check Group">
+```terraform
+resource "checkly_check_group" "key-shop-flows" {
+  name      = "Key Shop Flows"
+  activated = true
+  muted     = false
+
+  locations = [
+    "eu-west-1",
+    "eu-central-1"
+  ]
+
+  concurrency               = 3     # Parallel execution limit
+  use_global_alert_settings = false
+  run_parallel              = true
+
+  retry_strategy = {
+    type = "LINEAR"
+  }
+  
+  # Group-level alert settings
+  alert_settings {
+    escalation_type = "RUN_BASED"
+    
+    run_based_escalation {
+      failed_run_threshold = 1
+    }
+    
+    reminders {
+      amount   = 2
+      interval = 10
+    }
+  }
+}
+```
+</Tab>
+</Tabs>
+
+### Adding Checks to Groups
+
+<Tabs>
+<Tab title="Group Member">
+```terraform
+resource "checkly_check" "get-books" {
+  name      = "GET /books"
+  type      = "API"
+  activated = true
+  frequency = 1
+  
+  # Link to group - inherits group settings
+  group_id = checkly_check_group.key-shop-flows.id
+
+  request {
+    url = "https://danube-web.shop/api/books"
+    
+    assertion {
+      source     = "STATUS_CODE"
+      comparison = "EQUALS"
+      target     = "200"
+    }
+  }
+}
+```
+</Tab>
+</Tabs>
+
+<Warning>
+Locations and alert channel subscriptions defined at group level always override those defined at check level. Verify your configuration to ensure checks run from intended regions and alert on correct channels.
+</Warning>
+
+## Configuration Best Practices
+
+<CardGroup cols={2}>
+<Card title="Script Management" icon="file-code">
+**External Files**
+- Store scripts in separate files
+- Use version control for script changes
+- Enable IDE support and linting
+- Organize scripts by functionality
+</Card>
+
+<Card title="Group Organization" icon="layer-group">
+**Logical Grouping**
+- Group related checks together
+- Share common configurations
+- Centralize alert management
+- Use consistent naming conventions
+</Card>
+
+<Card title="Location Strategy" icon="globe">
+**Global Coverage**
+- Select appropriate regions
+- Consider user distribution
+- Balance coverage vs cost
+- Use parallel execution wisely
+</Card>
+
+<Card title="Retry Configuration" icon="refresh">
+**Failure Handling**
+- Configure appropriate retry strategies
+- Set reasonable backoff periods
+- Limit maximum retries
+- Consider same-region retries
+</Card>
+</CardGroup>
+
+## Complete Example
+
+Here's a comprehensive example showing checks, groups, and their relationships:
+
+<Tabs>
+<Tab title="Complete Setup">
+```terraform
+# Check group for API monitoring
+resource "checkly_check_group" "api_monitoring" {
+  name      = "API Monitoring"
+  activated = true
+  
+  locations = [
+    "us-west-1",
+    "eu-central-1",
+    "ap-southeast-1"
+  ]
+  
+  concurrency  = 5
+  run_parallel = true
+  
+  alert_settings {
+    escalation_type = "RUN_BASED"
+    
+    run_based_escalation {
+      failed_run_threshold = 1
+    }
+    
+    reminders {
+      amount   = 3
+      interval = 15
+    }
+  }
+}
+
+# API check as group member
+resource "checkly_check" "user_api" {
+  name      = "User API Health"
+  type      = "API"
+  frequency = 5
+  group_id  = checkly_check_group.api_monitoring.id
+  
+  request {
+    url = "https://api.example.com/users"
+    
+    assertion {
+      source     = "STATUS_CODE"
+      comparison = "EQUALS"
+      target     = "200"
+    }
+    
+    assertion {
+      source     = "RESPONSE_TIME"
+      comparison = "LESS_THAN"
+      target     = "1000"
+    }
+  }
+}
+
+# Browser check as group member
+resource "checkly_check" "login_flow" {
+  name      = "User Login Flow"
+  type      = "BROWSER"
+  frequency = 10
+  group_id  = checkly_check_group.api_monitoring.id
+  
+  script = file("${path.module}/scripts/login.spec.js")
+}
+
+# Heartbeat monitor (standalone)
+resource "checkly_check" "backup_job" {
+  name      = "Daily Backup Job"
+  type      = "HEARTBEAT"
+  activated = true
+  
+  heartbeat {
+    period      = 1
+    period_unit = "days"
+    grace       = 2
+    grace_unit  = "hours"
+  }
+}
+```
+</Tab>
+</Tabs>
+
+## Additional Resources
+
+- [Complete check configuration options](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/check#schema)
+- [Group configuration options](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/check_group)
+- [TCP monitor configuration](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/tcp_monitor)

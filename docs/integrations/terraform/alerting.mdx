@@ -1,0 +1,402 @@
+---
+title: 'Alert Channels and Settings'
+description: 'Configure alerting for your Terraform-managed Checkly resources'
+sidebarTitle: 'Alerting'
+---
+
+import { Note, Warning, Tip, Steps, Step, CardGroup, Card, Tabs, Tab, CodeGroup, Callout } from 'mintlify/components'
+
+Alerting is organized around alert settings and alert channels, giving you complete control over when and how your team gets notified about monitoring issues.
+
+<Callout type="info" emoji="🔔">
+Alert settings determine **when** and how many times alerts should be sent, while alert channels determine **how** (to which systems) alerts are delivered.
+</Callout>
+
+## Alert Settings
+
+[Alert settings](https://www.checklyhq.com/docs/alerting/) control the timing and frequency of your alerts. You can configure them at both the check and group level.
+
+### Check-Level Alert Settings
+
+<Tabs>
+<Tab title="Run-Based Escalation">
+```terraform
+resource "checkly_check" "api-check" {
+  name = "GET /api/books"
+  type = "API"
+  
+  alert_settings {
+    escalation_type = "RUN_BASED"
+    
+    run_based_escalation {
+      failed_run_threshold = 1    # Alert after 1 failed run
+    }
+    
+    ssl_certificates {
+      enabled         = true      # Check SSL certificate expiry
+      alert_threshold = 30        # Alert 30 days before expiry
+    }
+    
+    reminders {
+      amount   = 2               # Send 2 reminder alerts
+      interval = 5               # 5 minutes between reminders
+    }
+    
+    parallel_run_failure_threshold {
+      enabled    = true          # For multi-location checks
+      percentage = 50            # 50% of locations must fail
+    }
+  }
+}
+```
+</Tab>
+
+<Tab title="Time-Based Escalation">
+```terraform
+resource "checkly_check" "api-check" {
+  name = "GET /api/books"
+  type = "API"
+  
+  alert_settings {
+    escalation_type = "TIME_BASED"
+    
+    time_based_escalation {
+      minutes_failing_threshold = 5  # Alert after 5 minutes of failure
+    }
+    
+    ssl_certificates {
+      enabled         = true
+      alert_threshold = 30
+    }
+    
+    reminders {
+      amount   = 3
+      interval = 10
+    }
+  }
+}
+```
+</Tab>
+</Tabs>
+
+### Group-Level Alert Settings
+
+<Tabs>
+<Tab title="Group Configuration">
+```terraform
+resource "checkly_check_group" "key-shop-flows" {
+  name      = "Key Shop Flows"
+  activated = true
+  
+  alert_settings {
+    escalation_type = "RUN_BASED"
+    
+    run_based_escalation {
+      failed_run_threshold = 1
+    }
+    
+    ssl_certificates {
+      enabled         = true
+      alert_threshold = 30
+    }
+    
+    reminders {
+      amount   = 2
+      interval = 5
+    }
+    
+    parallel_run_failure_threshold {
+      enabled    = true
+      percentage = 50
+    }
+  }
+}
+```
+</Tab>
+</Tabs>
+
+### Configuration Options
+
+<CardGroup cols={2}>
+<Card title="Escalation Types" icon="clock">
+**Run-Based vs Time-Based**
+- **Run-Based**: Alert after X failed runs
+- **Time-Based**: Alert after X minutes of failure
+- Choose based on your monitoring frequency
+</Card>
+
+<Card title="SSL Monitoring" icon="shield-check">
+**Certificate Expiry**
+- Monitor SSL certificate expiration
+- Configurable alert threshold (days)
+- Automatic certificate validation
+</Card>
+
+<Card title="Reminder System" icon="bell">
+**Follow-up Alerts**
+- Configure reminder frequency
+- Set maximum reminder count
+- Prevent alert fatigue
+</Card>
+
+<Card title="Multi-Location" icon="globe">
+**Parallel Run Thresholds**
+- Configure failure percentage for multi-location checks
+- Reduce false positives from single location issues
+- Supported values: 10-100% in 10% increments
+</Card>
+</CardGroup>
+
+## Alert Channels
+
+[Alert channels](https://www.checklyhq.com/docs/alerting/alert-channels/) define how alerts are delivered to your team. Checkly supports multiple notification methods.
+
+### Email Alerts
+
+<Tabs>
+<Tab title="Basic Email">
+```terraform
+resource "checkly_alert_channel" "email_channel" {
+  email {
+    address = "team@example.com"
+  }
+  send_recovery = true     # Notify when checks recover
+  send_failure  = true     # Notify when checks fail
+  send_degraded = false    # Skip degraded performance alerts
+}
+```
+</Tab>
+</Tabs>
+
+### Slack Integration
+
+<Tabs>
+<Tab title="Slack Webhook">
+```terraform
+resource "checkly_alert_channel" "slack_channel" {
+  slack {
+    url     = "https://hooks.slack.com/services/xxx"
+    channel = "#monitoring"
+  }
+  send_recovery = true
+  send_failure  = true
+  send_degraded = true
+}
+```
+</Tab>
+</Tabs>
+
+### PagerDuty Integration
+
+<Tabs>
+<Tab title="PagerDuty">
+```terraform
+resource "checkly_alert_channel" "pagerduty_channel" {
+  pagerduty {
+    account         = "your-account"
+    service_key     = "your-service-key"
+    service_name    = "checkly-monitoring"
+  }
+  send_recovery = true
+  send_failure  = true
+}
+```
+</Tab>
+</Tabs>
+
+### Webhook Integration
+
+<Tabs>
+<Tab title="Custom Webhook">
+```terraform
+resource "checkly_alert_channel" "webhook_channel" {
+  webhook {
+    name       = "Custom Webhook"
+    url        = "https://api.example.com/webhooks/checkly"
+    method     = "POST"
+    template   = "custom"
+    headers = {
+      "Authorization" = "Bearer ${var.webhook_token}"
+      "Content-Type"  = "application/json"
+    }
+  }
+  send_recovery = true
+  send_failure  = true
+}
+```
+</Tab>
+</Tabs>
+
+## Alert Channel Subscriptions
+
+Connect your checks and groups to alert channels through subscriptions:
+
+### Individual Check Subscriptions
+
+<Tabs>
+<Tab title="Single Check">
+```terraform
+resource "checkly_check" "api-check" {
+  name = "GET /api/books"
+  type = "API"
+  
+  # Check configuration...
+  
+  alert_channel_subscription {
+    channel_id = checkly_alert_channel.email_channel.id
+    activated  = true
+  }
+  
+  alert_channel_subscription {
+    channel_id = checkly_alert_channel.slack_channel.id
+    activated  = true
+  }
+}
+```
+</Tab>
+</Tabs>
+
+### Group Subscriptions
+
+<Tabs>
+<Tab title="Check Group">
+```terraform
+resource "checkly_check_group" "api-group" {
+  name      = "API Monitoring"
+  activated = true
+  
+  # Group configuration...
+  
+  alert_channel_subscription {
+    channel_id = checkly_alert_channel.pagerduty_channel.id
+    activated  = true
+  }
+}
+```
+</Tab>
+</Tabs>
+
+<Warning>
+Checks and groups need to be **explicitly** subscribed to alert channels - they will **not** be auto-subscribed.
+</Warning>
+
+<Tip>
+Checks that are part of a group inherit the group's alert subscriptions. Handle alerting at the group level to avoid redundant subscriptions.
+</Tip>
+
+## Complete Example
+
+Here's a comprehensive example combining alert settings, channels, and subscriptions:
+
+<Tabs>
+<Tab title="Complete Setup">
+```terraform
+# Email alert channel
+resource "checkly_alert_channel" "email_alerts" {
+  email {
+    address = "devops@example.com"
+  }
+  send_recovery = true
+  send_failure  = true
+  send_degraded = false
+}
+
+# Slack alert channel
+resource "checkly_alert_channel" "slack_alerts" {
+  slack {
+    url     = var.slack_webhook_url
+    channel = "#alerts"
+  }
+  send_recovery = true
+  send_failure  = true
+  send_degraded = true
+}
+
+# Check group with alert settings
+resource "checkly_check_group" "critical_apis" {
+  name      = "Critical API Endpoints"
+  activated = true
+  
+  alert_settings {
+    escalation_type = "RUN_BASED"
+    
+    run_based_escalation {
+      failed_run_threshold = 1
+    }
+    
+    ssl_certificates {
+      enabled         = true
+      alert_threshold = 14  # Alert 2 weeks before expiry
+    }
+    
+    reminders {
+      amount   = 3
+      interval = 15
+    }
+    
+    parallel_run_failure_threshold {
+      enabled    = true
+      percentage = 30  # Alert if 30% of locations fail
+    }
+  }
+  
+  # Subscribe group to both channels
+  alert_channel_subscription {
+    channel_id = checkly_alert_channel.email_alerts.id
+    activated  = true
+  }
+  
+  alert_channel_subscription {
+    channel_id = checkly_alert_channel.slack_alerts.id
+    activated  = true
+  }
+}
+
+# Check that inherits group alert settings
+resource "checkly_check" "user_api" {
+  name     = "User API Health"
+  type     = "API"
+  group_id = checkly_check_group.critical_apis.id
+  
+  # Check configuration...
+  # Inherits alert settings and subscriptions from group
+}
+```
+</Tab>
+</Tabs>
+
+## Best Practices
+
+<CardGroup cols={2}>
+<Card title="Alert Fatigue Prevention" icon="mute">
+**Reduce Noise**
+- Use appropriate failure thresholds
+- Configure reminder limits
+- Leverage parallel run thresholds for multi-location checks
+</Card>
+
+<Card title="Channel Strategy" icon="route">
+**Smart Routing**
+- Use email for non-critical alerts
+- Route critical alerts to PagerDuty/Slack
+- Configure different channels for different severity levels
+</Card>
+
+<Card title="Group Organization" icon="layer-group">
+**Efficient Management**
+- Group related checks together
+- Configure alerting at the group level
+- Avoid duplicate individual subscriptions
+</Card>
+
+<Card title="SSL Monitoring" icon="certificate">
+**Certificate Management**
+- Enable SSL certificate monitoring
+- Set appropriate threshold (14-30 days)
+- Monitor all external endpoints
+</Card>
+</CardGroup>
+
+## Additional Resources
+
+For all available alert channel configurations, see the [Terraform provider documentation](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/alert_channel).

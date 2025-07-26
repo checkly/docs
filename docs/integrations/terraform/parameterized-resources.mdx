@@ -1,0 +1,797 @@
+---
+title: 'Parameterized Resources'
+description: 'Create dynamic and scalable Terraform configurations for Checkly resources'
+sidebarTitle: 'Parameterized Resources'
+---
+
+import { Note, Warning, Tip, Steps, Step, CardGroup, Card, Tabs, Tab, CodeGroup, Callout } from 'mintlify/components'
+
+Parameterized resources allow you to create dynamic, scalable Terraform configurations that can generate multiple resources from templates, reducing code duplication and improving maintainability.
+
+<Callout type="info" emoji="🔄">
+Use parameterization to efficiently manage multiple similar resources, automate resource creation from data sources, and maintain consistent configurations across environments.
+</Callout>
+
+## Benefits of Parameterization
+
+<CardGroup cols={2}>
+<Card title="Scalability" icon="expand">
+**Dynamic Resource Creation**
+- Generate multiple resources from templates
+- Scale monitoring with your infrastructure
+- Reduce configuration complexity
+- Maintain consistency across resources
+</Card>
+
+<Card title="Maintainability" icon="wrench">
+**Code Efficiency**
+- Eliminate duplicate configuration
+- Centralize common settings
+- Update multiple resources simultaneously
+- Simplify configuration management
+</Card>
+
+<Card title="Automation" icon="robot">
+**Data-Driven Configuration**
+- Generate resources from data sources
+- Integrate with external systems
+- Automate resource provisioning
+- Support dynamic environments
+</Card>
+
+<Card title="Flexibility" icon="puzzle">
+**Adaptive Configuration**
+- Environment-specific variations
+- Conditional resource creation
+- Dynamic parameter injection
+- Configurable resource properties
+</Card>
+</CardGroup>
+
+## File-Based Parameterization
+
+Create multiple resources based on files in your project directory using Terraform's `for_each` and `fileset` functions.
+
+### Browser Checks from Script Files
+
+<Tabs>
+<Tab title="Basic File-Based">
+```terraform
+# Create browser checks for each script file
+resource "checkly_check" "browser_checks" {
+  for_each = fileset("${path.module}/scripts", "*.spec.js")
+
+  name      = replace(each.key, ".spec.js", "")  # Clean name from filename
+  type      = "BROWSER"
+  activated = true
+  frequency = 1
+  
+  locations = [
+    "us-west-1",
+    "eu-central-1"
+  ]
+
+  retry_strategy = {
+    type = "LINEAR"
+  }
+
+  # Load script content from file
+  script = file("${path.module}/scripts/${each.key}")
+  
+  # Tag with filename for organization
+  tags = [
+    "automated",
+    "browser",
+    replace(each.key, ".spec.js", "")
+  ]
+}
+```
+</Tab>
+
+<Tab title="Advanced File-Based">
+```terraform
+# More sophisticated file-based parameterization
+locals {
+  # Get all JavaScript test files
+  script_files = fileset("${path.module}/scripts", "*.spec.js")
+  
+  # Create metadata for each script
+  script_configs = {
+    for filename in local.script_files : filename => {
+      name        = replace(replace(filename, ".spec.js", ""), "_", " ")
+      frequency   = contains(filename, "critical") ? 1 : 5
+      locations   = contains(filename, "global") ? [
+        "us-west-1", "eu-central-1", "ap-southeast-1"
+      ] : ["us-west-1", "eu-central-1"]
+      environment = contains(filename, "prod") ? "production" : "staging"
+    }
+  }
+}
+
+resource "checkly_check" "parameterized_browser" {
+  for_each = local.script_configs
+
+  name      = local.script_configs[each.key].name
+  type      = "BROWSER"
+  activated = true
+  frequency = local.script_configs[each.key].frequency
+  
+  locations = local.script_configs[each.key].locations
+
+  retry_strategy = {
+    type = "LINEAR"
+  }
+
+  script = file("${path.module}/scripts/${each.key}")
+  
+  tags = [
+    "automated",
+    "browser",
+    local.script_configs[each.key].environment,
+    contains(each.key, "critical") ? "critical" : "standard"
+  ]
+}
+```
+</Tab>
+</Tabs>
+
+### API Checks from Configuration Files
+
+<Tabs>
+<Tab title="JSON Configuration">
+```terraform
+# api-configs/users-api.json
+# {
+#   "name": "Users API Health",
+#   "url": "https://api.example.com/users",
+#   "frequency": 1,
+#   "locations": ["us-west-1", "eu-central-1"],
+#   "assertions": [
+#     {"source": "STATUS_CODE", "comparison": "EQUALS", "target": "200"},
+#     {"source": "RESPONSE_TIME", "comparison": "LESS_THAN", "target": "1000"}
+#   ]
+# }
+
+locals {
+  # Load API configurations from JSON files
+  api_config_files = fileset("${path.module}/api-configs", "*.json")
+  api_configs = {
+    for filename in local.api_config_files :
+    filename => jsondecode(file("${path.module}/api-configs/${filename}"))
+  }
+}
+
+resource "checkly_check" "api_checks_from_config" {
+  for_each = local.api_configs
+
+  name      = each.value.name
+  type      = "API"
+  activated = true
+  frequency = each.value.frequency
+  
+  locations = each.value.locations
+
+  request {
+    url = each.value.url
+    
+    # Generate assertions dynamically
+    dynamic "assertion" {
+      for_each = each.value.assertions
+      content {
+        source     = assertion.value.source
+        comparison = assertion.value.comparison
+        target     = assertion.value.target
+      }
+    }
+  }
+  
+  tags = [
+    "api",
+    "automated",
+    replace(each.key, ".json", "")
+  ]
+}
+```
+</Tab>
+</Tabs>
+
+## Variable-Based Parameterization
+
+Use Terraform variables and locals to create flexible, reusable configurations.
+
+### Environment-Based Configuration
+
+<Tabs>
+<Tab title="Environment Variables">
+```terraform
+# Variables for different environments
+variable "environments" {
+  description = "Environment configurations"
+  type = map(object({
+    api_base_url = string
+    frequency    = number
+    locations    = list(string)
+    tags        = list(string)
+  }))
+  
+  default = {
+    staging = {
+      api_base_url = "https://staging-api.example.com"
+      frequency    = 5
+      locations    = ["us-west-1"]
+      tags         = ["staging", "non-critical"]
+    }
+    production = {
+      api_base_url = "https://api.example.com"
+      frequency    = 1
+      locations    = ["us-west-1", "eu-central-1", "ap-southeast-1"]
+      tags         = ["production", "critical"]
+    }
+  }
+}
+
+# Create checks for each environment
+resource "checkly_check" "api_health_by_env" {
+  for_each = var.environments
+
+  name      = "API Health - ${title(each.key)}"
+  type      = "API"
+  activated = true
+  frequency = each.value.frequency
+  
+  locations = each.value.locations
+
+  request {
+    url = "${each.value.api_base_url}/health"
+    
+    assertion {
+      source     = "STATUS_CODE"
+      comparison = "EQUALS"
+      target     = "200"
+    }
+  }
+  
+  tags = concat(each.value.tags, ["health-check"])
+}
+```
+</Tab>
+</Tabs>
+
+### Service-Based Configuration
+
+<Tabs>
+<Tab title="Service Configuration">
+```terraform
+# Define services to monitor
+locals {
+  services = {
+    user_service = {
+      name         = "User Service"
+      endpoint     = "/users"
+      frequency    = 1
+      critical     = true
+      method       = "GET"
+      timeout      = 5000
+    }
+    order_service = {
+      name         = "Order Service" 
+      endpoint     = "/orders"
+      frequency    = 2
+      critical     = true
+      method       = "GET"
+      timeout      = 10000
+    }
+    notification_service = {
+      name         = "Notification Service"
+      endpoint     = "/notifications"
+      frequency    = 5
+      critical     = false
+      method       = "GET"
+      timeout      = 3000
+    }
+    analytics_service = {
+      name         = "Analytics Service"
+      endpoint     = "/analytics"
+      frequency    = 10
+      critical     = false
+      method       = "GET"
+      timeout      = 15000
+    }
+  }
+  
+  # Base configuration
+  base_url = "https://api.example.com"
+  base_locations = ["us-west-1", "eu-central-1"]
+  critical_locations = ["us-west-1", "eu-central-1", "ap-southeast-1"]
+}
+
+# Create API checks for each service
+resource "checkly_check" "service_monitors" {
+  for_each = local.services
+
+  name      = each.value.name
+  type      = "API"
+  activated = true
+  frequency = each.value.frequency
+  
+  # Use more locations for critical services
+  locations = each.value.critical ? local.critical_locations : local.base_locations
+
+  request {
+    url    = "${local.base_url}${each.value.endpoint}"
+    method = each.value.method
+    
+    assertion {
+      source     = "STATUS_CODE"
+      comparison = "EQUALS"
+      target     = "200"
+    }
+    
+    assertion {
+      source     = "RESPONSE_TIME"
+      comparison = "LESS_THAN"
+      target     = tostring(each.value.timeout)
+    }
+  }
+  
+  tags = [
+    "api",
+    "service",
+    each.key,
+    each.value.critical ? "critical" : "standard"
+  ]
+}
+```
+</Tab>
+</Tabs>
+
+## Advanced Parameterization Patterns
+
+### Multi-Resource Parameterization
+
+<Tabs>
+<Tab title="Complete Service Setup">
+```terraform
+# Comprehensive service configuration
+locals {
+  services = {
+    user_api = {
+      name          = "User API"
+      endpoints = {
+        health = { path = "/health", frequency = 1 }
+        users  = { path = "/users", frequency = 2 }
+        login  = { path = "/auth/login", frequency = 5 }
+      }
+      browser_flows = ["login", "signup"]
+      critical      = true
+    }
+    order_api = {
+      name          = "Order API"
+      endpoints = {
+        health = { path = "/health", frequency = 1 }
+        orders = { path = "/orders", frequency = 3 }
+      }
+      browser_flows = ["checkout", "order-history"]
+      critical      = true
+    }
+  }
+}
+
+# Create API checks for each service endpoint
+resource "checkly_check" "api_endpoints" {
+  for_each = merge([
+    for service_key, service in local.services : {
+      for endpoint_key, endpoint in service.endpoints :
+      "${service_key}_${endpoint_key}" => {
+        service_name = service.name
+        service_key  = service_key
+        endpoint_key = endpoint_key
+        path         = endpoint.path
+        frequency    = endpoint.frequency
+        critical     = service.critical
+      }
+    }
+  ]...)
+
+  name      = "${each.value.service_name} - ${title(each.value.endpoint_key)}"
+  type      = "API"
+  activated = true
+  frequency = each.value.frequency
+  
+  locations = each.value.critical ? [
+    "us-west-1", "eu-central-1", "ap-southeast-1"
+  ] : ["us-west-1", "eu-central-1"]
+
+  request {
+    url = "https://api.example.com${each.value.path}"
+    
+    assertion {
+      source     = "STATUS_CODE"
+      comparison = "EQUALS"
+      target     = "200"
+    }
+  }
+  
+  tags = [
+    "api",
+    each.value.service_key,
+    each.value.endpoint_key,
+    each.value.critical ? "critical" : "standard"
+  ]
+}
+
+# Create browser checks for each service flow
+resource "checkly_check" "browser_flows" {
+  for_each = merge([
+    for service_key, service in local.services : {
+      for flow in service.browser_flows :
+      "${service_key}_${flow}" => {
+        service_name = service.name
+        service_key  = service_key
+        flow_name    = flow
+        critical     = service.critical
+      }
+    }
+  ]...)
+
+  name      = "${each.value.service_name} - ${title(each.value.flow_name)} Flow"
+  type      = "BROWSER"
+  activated = true
+  frequency = each.value.critical ? 5 : 10
+  
+  locations = ["us-west-1", "eu-central-1"]
+
+  script = file("${path.module}/scripts/${each.value.service_key}/${each.value.flow_name}.spec.js")
+  
+  tags = [
+    "browser",
+    each.value.service_key,
+    each.value.flow_name,
+    each.value.critical ? "critical" : "standard"
+  ]
+}
+```
+</Tab>
+</Tabs>
+
+### Conditional Resource Creation
+
+<Tabs>
+<Tab title="Conditional Creation">
+```terraform
+# Environment-specific variables
+variable "environment" {
+  description = "Current environment"
+  type        = string
+  default     = "staging"
+}
+
+variable "enable_performance_tests" {
+  description = "Enable performance testing"
+  type        = bool
+  default     = false
+}
+
+locals {
+  # Environment-specific configuration
+  env_config = {
+    staging = {
+      create_performance_tests = false
+      api_frequency           = 5
+      browser_frequency       = 10
+      locations              = ["us-west-1"]
+    }
+    production = {
+      create_performance_tests = true
+      api_frequency           = 1
+      browser_frequency       = 5
+      locations              = ["us-west-1", "eu-central-1", "ap-southeast-1"]
+    }
+  }
+  
+  current_config = local.env_config[var.environment]
+  
+  # Base checks that always exist
+  base_checks = {
+    health_check = {
+      name = "Health Check"
+      type = "API"
+      url  = "https://api.example.com/health"
+    }
+    login_flow = {
+      name = "Login Flow"
+      type = "BROWSER"
+      script = "login.spec.js"
+    }
+  }
+  
+  # Performance checks (conditional)
+  performance_checks = local.current_config.create_performance_tests ? {
+    load_test = {
+      name = "Load Test"
+      type = "API"
+      url  = "https://api.example.com/load-test"
+    }
+    stress_test = {
+      name = "Stress Test Browser"
+      type = "BROWSER"
+      script = "stress-test.spec.js"
+    }
+  } : {}
+  
+  # Combine all checks
+  all_checks = merge(local.base_checks, local.performance_checks)
+}
+
+# Create checks based on configuration
+resource "checkly_check" "conditional_checks" {
+  for_each = local.all_checks
+
+  name      = each.value.name
+  type      = each.value.type
+  activated = true
+  frequency = each.value.type == "API" ? local.current_config.api_frequency : local.current_config.browser_frequency
+  
+  locations = local.current_config.locations
+
+  # Conditional configuration based on type
+  dynamic "request" {
+    for_each = each.value.type == "API" ? [1] : []
+    content {
+      url = each.value.url
+      assertion {
+        source     = "STATUS_CODE"
+        comparison = "EQUALS"
+        target     = "200"
+      }
+    }
+  }
+
+  script = each.value.type == "BROWSER" ? file("${path.module}/scripts/${each.value.script}") : null
+  
+  tags = concat(
+    [var.environment, each.value.type == "API" ? "api" : "browser"],
+    local.current_config.create_performance_tests && contains(keys(local.performance_checks), each.key) ? ["performance"] : []
+  )
+}
+```
+</Tab>
+</Tabs>
+
+## Data Source Integration
+
+Integrate with external data sources to create dynamic monitoring configurations.
+
+<Tabs>
+<Tab title="External Data Integration">
+```terraform
+# Example: Load service configuration from external API
+data "http" "service_registry" {
+  url = "https://service-registry.example.com/api/services"
+  
+  request_headers = {
+    Accept = "application/json"
+  }
+}
+
+locals {
+  # Parse external service data
+  external_services = jsondecode(data.http.service_registry.body)
+  
+  # Transform to Checkly configuration
+  service_checks = {
+    for service in local.external_services.services :
+    service.name => {
+      name         = service.display_name
+      health_url   = "${service.base_url}/health"
+      frequency    = service.critical ? 1 : 5
+      locations    = service.global ? ["us-west-1", "eu-central-1", "ap-southeast-1"] : ["us-west-1"]
+      tags         = concat(["automated", "external"], service.tags)
+    }
+  }
+}
+
+# Create checks from external data
+resource "checkly_check" "external_service_checks" {
+  for_each = local.service_checks
+
+  name      = each.value.name
+  type      = "API"
+  activated = true
+  frequency = each.value.frequency
+  
+  locations = each.value.locations
+
+  request {
+    url = each.value.health_url
+    
+    assertion {
+      source     = "STATUS_CODE"
+      comparison = "EQUALS"
+      target     = "200"
+    }
+  }
+  
+  tags = each.value.tags
+}
+```
+</Tab>
+</Tabs>
+
+## Best Practices
+
+<CardGroup cols={2}>
+<Card title="Organization" icon="folder">
+**Structure Your Code**
+- Use clear naming conventions
+- Organize files logically
+- Document parameterization logic
+- Separate configuration from code
+</Card>
+
+<Card title="Maintainability" icon="gear">
+**Keep It Simple**
+- Avoid over-parameterization
+- Use meaningful variable names
+- Add comments for complex logic
+- Test parameterized configurations
+</Card>
+
+<Card title="Flexibility" icon="adjust">
+**Design for Change**
+- Plan for environment differences
+- Support conditional creation
+- Enable easy configuration updates
+- Allow for future expansion
+</Card>
+
+<Card title="Performance" icon="zap">
+**Optimize Resource Creation**
+- Limit unnecessary iterations
+- Use efficient data structures
+- Cache external data when possible
+- Monitor Terraform plan/apply times
+</Card>
+</CardGroup>
+
+## Complete Example
+
+Here's a comprehensive example demonstrating multiple parameterization techniques:
+
+<Tabs>
+<Tab title="Complete Parameterized Setup">
+```terraform
+# Variables
+variable "environment" {
+  description = "Environment name"
+  type        = string
+  default     = "staging"
+}
+
+variable "services_config_file" {
+  description = "Path to services configuration file"
+  type        = string
+  default     = "services.yaml"
+}
+
+# Load external configuration
+locals {
+  services_config = yamldecode(file("${path.module}/${var.services_config_file}"))
+  
+  # Environment-specific settings
+  env_settings = {
+    staging = {
+      locations = ["us-west-1"]
+      frequency_multiplier = 5
+      enable_browser_tests = false
+    }
+    production = {
+      locations = ["us-west-1", "eu-central-1", "ap-southeast-1"]
+      frequency_multiplier = 1
+      enable_browser_tests = true
+    }
+  }
+  
+  current_env = local.env_settings[var.environment]
+  
+  # Process services configuration
+  processed_services = {
+    for service_name, service_config in local.services_config.services :
+    service_name => merge(service_config, {
+      actual_frequency = service_config.base_frequency * local.current_env.frequency_multiplier
+      actual_locations = local.current_env.locations
+      tags = concat(
+        service_config.tags,
+        [var.environment],
+        service_config.critical ? ["critical"] : ["standard"]
+      )
+    })
+  }
+  
+  # Generate API checks
+  api_checks = {
+    for service_name, service in local.processed_services :
+    service_name => service if service.type == "api"
+  }
+  
+  # Generate browser checks (if enabled)
+  browser_checks = local.current_env.enable_browser_tests ? {
+    for service_name, service in local.processed_services :
+    service_name => service if service.type == "browser"
+  } : {}
+  
+  # Script files for browser checks
+  script_files = local.current_env.enable_browser_tests ? 
+    fileset("${path.module}/scripts", "*.spec.js") : []
+}
+
+# API checks from configuration
+resource "checkly_check" "parameterized_api" {
+  for_each = local.api_checks
+
+  name      = "${each.value.display_name} - ${title(var.environment)}"
+  type      = "API"
+  activated = true
+  frequency = each.value.actual_frequency
+  
+  locations = each.value.actual_locations
+
+  request {
+    url = each.value.endpoint
+    
+    dynamic "assertion" {
+      for_each = each.value.assertions
+      content {
+        source     = assertion.value.source
+        comparison = assertion.value.comparison
+        target     = assertion.value.target
+      }
+    }
+  }
+  
+  tags = each.value.tags
+}
+
+# Browser checks from scripts
+resource "checkly_check" "parameterized_browser" {
+  for_each = toset(local.script_files)
+
+  name      = "${replace(each.key, ".spec.js", "")} - ${title(var.environment)}"
+  type      = "BROWSER"
+  activated = true
+  frequency = 10 * local.current_env.frequency_multiplier
+  
+  locations = local.current_env.locations
+
+  script = file("${path.module}/scripts/${each.key}")
+  
+  tags = [
+    var.environment,
+    "browser",
+    "automated",
+    replace(each.key, ".spec.js", "")
+  ]
+}
+
+# Outputs
+output "created_checks" {
+  value = {
+    api_checks_count     = length(local.api_checks)
+    browser_checks_count = length(local.script_files)
+    total_checks        = length(local.api_checks) + length(local.script_files)
+    environment         = var.environment
+  }
+}
+```
+</Tab>
+</Tabs>
+
+<Tip>
+Parameterized resources work well with other Terraform resources like alert channels, groups, and maintenance windows. Apply the same patterns to create comprehensive, scalable monitoring configurations.
+</Tip>
+
+## Additional Resources
+
+- [Terraform for_each documentation](https://www.terraform.io/language/meta-arguments/for_each)
+- [Terraform functions reference](https://www.terraform.io/language/functions)
+- [Dynamic blocks in Terraform](https://www.terraform.io/language/expressions/dynamic-blocks)

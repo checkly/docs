@@ -1,0 +1,706 @@
+---
+title: 'Testing Scripts Locally'
+description: 'Develop and test Playwright scripts locally before deploying to Checkly'
+sidebarTitle: 'Local Testing'
+---
+
+import { Note, Warning, Tip, Steps, Step, CardGroup, Card, Tabs, Tab, CodeGroup, Callout } from 'mintlify/components'
+
+Testing Playwright scripts locally allows you to develop browser checks faster and with more confidence before deploying them to Checkly's monitoring infrastructure.
+
+<Callout type="info" emoji="🧪">
+Local testing enables rapid development cycles, easier debugging, and ensures your scripts work correctly before they're deployed to production monitoring.
+</Callout>
+
+## Benefits of Local Testing
+
+<CardGroup cols={2}>
+<Card title="Faster Development" icon="rocket">
+**Quick Iteration**
+- Immediate feedback on script changes
+- No deployment delays
+- Real-time debugging capabilities
+- Fast test execution
+</Card>
+
+<Card title="Better Debugging" icon="bug">
+**Development Tools**
+- Visual test execution
+- Step-by-step debugging
+- Browser developer tools access
+- Detailed error messages
+</Card>
+
+<Card title="Cost Efficiency" icon="dollar-sign">
+**Resource Optimization**
+- No check execution charges during development
+- Unlimited local test runs
+- Efficient resource usage
+- Development environment isolation
+</Card>
+
+<Card title="Confidence" icon="shield-check">
+**Quality Assurance**
+- Validate scripts before deployment
+- Test different scenarios locally
+- Catch issues early
+- Ensure production reliability
+</Card>
+</CardGroup>
+
+## Basic Local Testing Setup
+
+Enable local script execution by storing browser check scripts in local folders and referencing them in your Terraform configuration.
+
+### Simple Script Configuration
+
+<Tabs>
+<Tab title="Terraform Configuration">
+```terraform
+resource "checkly_check" "e2e_checkout" {
+  name                      = "Checkout Flow"
+  type                      = "BROWSER"
+  activated                 = true
+  frequency                 = 1
+  use_global_alert_settings = true
+  
+  locations = [
+    "us-west-1",
+    "eu-central-1"
+  ]
+  
+  retry_strategy = {
+    type = "LINEAR"
+  }
+
+  # Reference local script file
+  script = file("${path.module}/scripts/checkout.spec.ts")
+  
+  tags = ["e2e", "checkout", "critical"]
+}
+```
+</Tab>
+
+<Tab title="Project Structure">
+```
+terraform-checkly/
+├── main.tf
+├── variables.tf
+├── scripts/
+│   ├── checkout.spec.ts
+│   ├── login.spec.js
+│   └── product-search.spec.ts
+├── snippets/
+│   ├── auth-helpers.js
+│   └── page-objects.ts
+└── package.json
+```
+</Tab>
+</Tabs>
+
+### Basic Script Examples
+
+<Tabs>
+<Tab title="TypeScript">
+```typescript
+// scripts/basic.spec.ts
+import { test, expect } from '@playwright/test'
+
+test('Should load the web store', async ({ page }) => {
+  await page.goto('https://danube-web.shop')
+  
+  // Expect a title "to contain" a substring
+  await expect(page).toHaveTitle(/danube-store/)
+  
+  // Check for key elements
+  await expect(page.locator('[data-testid="product-grid"]')).toBeVisible()
+  await expect(page.locator('[data-testid="search-bar"]')).toBeVisible()
+})
+```
+</Tab>
+
+<Tab title="JavaScript">
+```javascript
+// scripts/basic.spec.js
+const { test, expect } = require('@playwright/test')
+
+test('Should load the web store', async ({ page }) => {
+  await page.goto('https://danube-web.shop')
+  
+  // Expect a title "to contain" a substring
+  await expect(page).toHaveTitle(/danube-store/)
+  
+  // Verify essential page elements
+  await expect(page.locator('.product-list')).toBeVisible()
+  await expect(page.locator('#search-input')).toBeVisible()
+})
+```
+</Tab>
+</Tabs>
+
+## Advanced Local Testing with Page Object Models
+
+When using [Page Object Models](https://playwright.dev/docs/pom) or importing other files, leverage Checkly's [code snippets](/docs/terraform-provider/snippets-variables/) for seamless local and remote execution.
+
+### Project Structure for Complex Scripts
+
+<Tabs>
+<Tab title="Directory Structure">
+```
+terraform-checkly/
+├── main.tf
+├── scripts/
+│   ├── snippets/          # Matches Checkly's snippet structure
+│   │   ├── shoppingCart.ts
+│   │   ├── navigation.ts
+│   │   └── auth-helpers.ts
+│   ├── checkout.spec.ts
+│   ├── login.spec.ts
+│   └── product-browse.spec.ts
+├── playwright.config.ts
+└── package.json
+```
+</Tab>
+</Tabs>
+
+### Page Object Model Implementation
+
+<Tabs>
+<Tab title="TypeScript POM">
+```typescript
+// scripts/snippets/shoppingCart.ts
+import { type Locator, type Page } from '@playwright/test'
+
+export class ShoppingCart {
+  readonly page: Page
+  readonly shoppingCartButton: Locator
+  readonly cartDrawer: Locator
+  readonly cartItems: Locator
+  readonly totalPrice: Locator
+  readonly checkoutButton: Locator
+
+  constructor(page: Page) {
+    this.page = page
+    this.shoppingCartButton = page.locator('#cart-button')
+    this.cartDrawer = page.locator('[data-testid="cart-drawer"]')
+    this.cartItems = page.locator('.cart-item')
+    this.totalPrice = page.locator('[data-testid="total-price"]')
+    this.checkoutButton = page.locator('[data-testid="checkout-btn"]')
+  }
+
+  async openCart() {
+    await this.shoppingCartButton.click()
+    await this.cartDrawer.waitFor({ state: 'visible' })
+  }
+
+  async getItemCount(): Promise<number> {
+    await this.openCart()
+    return await this.cartItems.count()
+  }
+
+  async getTotalPrice(): Promise<string> {
+    await this.openCart()
+    return await this.totalPrice.textContent() || '0'
+  }
+
+  async proceedToCheckout() {
+    await this.openCart()
+    await this.checkoutButton.click()
+    await this.page.waitForURL('**/checkout')
+  }
+
+  async clearCart() {
+    await this.openCart()
+    const removeButtons = this.page.locator('.remove-item')
+    const count = await removeButtons.count()
+    
+    for (let i = 0; i < count; i++) {
+      await removeButtons.first().click()
+      await this.page.waitForTimeout(500) // Wait for removal animation
+    }
+  }
+}
+```
+</Tab>
+
+<Tab title="JavaScript POM">
+```javascript
+// scripts/snippets/shoppingCart.js
+class ShoppingCart {
+  constructor(page) {
+    this.page = page
+    this.shoppingCartButton = page.locator('#cart-button')
+    this.cartDrawer = page.locator('[data-testid="cart-drawer"]')
+    this.cartItems = page.locator('.cart-item')
+    this.totalPrice = page.locator('[data-testid="total-price"]')
+    this.checkoutButton = page.locator('[data-testid="checkout-btn"]')
+  }
+
+  async openCart() {
+    await this.shoppingCartButton.click()
+    await this.cartDrawer.waitFor({ state: 'visible' })
+  }
+
+  async getItemCount() {
+    await this.openCart()
+    return await this.cartItems.count()
+  }
+
+  async getTotalPrice() {
+    await this.openCart()
+    return await this.totalPrice.textContent() || '0'
+  }
+
+  async proceedToCheckout() {
+    await this.openCart()
+    await this.checkoutButton.click()
+    await this.page.waitForURL('**/checkout')
+  }
+}
+
+module.exports = { ShoppingCart }
+```
+</Tab>
+</Tabs>
+
+### Using Page Object Models in Tests
+
+<Tabs>
+<Tab title="TypeScript Test">
+```typescript
+// scripts/checkout.spec.ts
+import { test, expect } from '@playwright/test'
+import { ShoppingCart } from './snippets/shoppingCart'
+
+test('Shopping cart functionality', async ({ page }) => {
+  await page.goto('https://danube-web.shop')
+
+  const shoppingCart = new ShoppingCart(page)
+
+  // Test empty cart
+  await shoppingCart.openCart()
+  await expect(shoppingCart.cartDrawer).toContainText('Your shopping cart is empty')
+
+  // Add items to cart
+  await page.locator('[data-testid="add-to-cart"]').first().click()
+  await page.waitForSelector('[data-testid="cart-notification"]')
+
+  // Verify cart has items
+  const itemCount = await shoppingCart.getItemCount()
+  expect(itemCount).toBeGreaterThan(0)
+
+  // Test checkout flow
+  await shoppingCart.proceedToCheckout()
+  await expect(page).toHaveURL(/.*checkout/)
+})
+```
+</Tab>
+
+<Tab title="JavaScript Test">
+```javascript
+// scripts/checkout.spec.js
+const { test, expect } = require('@playwright/test')
+const { ShoppingCart } = require('./snippets/shoppingCart')
+
+test('Shopping cart should be empty by default', async ({ page }) => {
+  await page.goto('https://danube-web.shop')
+
+  const shoppingCart = new ShoppingCart(page)
+
+  await shoppingCart.openCart()
+  await expect(shoppingCart.cartDrawer).toContainText('Your shopping cart is empty')
+})
+
+test('Should add items to cart', async ({ page }) => {
+  await page.goto('https://danube-web.shop')
+
+  const shoppingCart = new ShoppingCart(page)
+
+  // Add item to cart
+  await page.locator('.add-to-cart').first().click()
+  
+  // Verify cart has items
+  const itemCount = await shoppingCart.getItemCount()
+  expect(itemCount).toBe(1)
+})
+```
+</Tab>
+</Tabs>
+
+## Terraform Configuration for Complex Scripts
+
+Configure Terraform to use both the main script and its dependencies as snippets.
+
+<Tabs>
+<Tab title="Complete Terraform Setup">
+```terraform
+# Page Object Model snippet
+resource "checkly_snippet" "shopping_cart" {
+  name   = "shoppingCart"  # This becomes the filename in Checkly
+  script = file("${path.module}/scripts/snippets/shoppingCart.ts")
+}
+
+# Authentication helpers snippet
+resource "checkly_snippet" "auth_helpers" {
+  name   = "auth-helpers"
+  script = file("${path.module}/scripts/snippets/auth-helpers.ts")
+}
+
+# Navigation utilities snippet
+resource "checkly_snippet" "navigation" {
+  name   = "navigation"
+  script = file("${path.module}/scripts/snippets/navigation.ts")
+}
+
+# Main checkout flow check
+resource "checkly_check" "checkout_flow" {
+  name                      = "E2E Checkout Flow"
+  type                      = "BROWSER"
+  activated                 = true
+  frequency                 = 5
+  use_global_alert_settings = true
+  
+  locations = [
+    "us-west-1",
+    "eu-central-1"
+  ]
+  
+  retry_strategy = {
+    type = "LINEAR"
+  }
+
+  script = file("${path.module}/scripts/checkout.spec.ts")
+  
+  tags = ["e2e", "checkout", "shopping-cart"]
+}
+
+# Additional browser checks using the same snippets
+resource "checkly_check" "cart_persistence" {
+  name      = "Cart Persistence Test"
+  type      = "BROWSER"
+  activated = true
+  frequency = 10
+  
+  locations = ["us-west-1", "eu-central-1"]
+  
+  script = file("${path.module}/scripts/cart-persistence.spec.ts")
+  
+  tags = ["cart", "persistence"]
+}
+```
+</Tab>
+</Tabs>
+
+<Note>
+Checkly infers the snippet filename from the `name` property of the resource. Keep snippet names consistent with your local file structure for easier development.
+</Note>
+
+## Local Development Environment Setup
+
+### Package.json Configuration
+
+<Tabs>
+<Tab title="Package.json">
+```json
+{
+  "name": "checkly-terraform-tests",
+  "version": "1.0.0",
+  "description": "Browser tests for Checkly monitoring",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "test:specific": "playwright test --grep",
+    "install:browsers": "playwright install",
+    "lint": "eslint scripts/**/*.{js,ts}",
+    "format": "prettier --write scripts/**/*.{js,ts}"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0",
+    "eslint": "^8.50.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  }
+}
+```
+</Tab>
+</Tabs>
+
+### Playwright Configuration
+
+<Tabs>
+<Tab title="playwright.config.ts">
+```typescript
+import { defineConfig, devices } from '@playwright/test'
+
+export default defineConfig({
+  testDir: './scripts',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: 'html',
+  
+  use: {
+    baseURL: process.env.BASE_URL || 'https://danube-web.shop',
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+  },
+
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
+    // Mobile testing
+    {
+      name: 'Mobile Chrome',
+      use: { ...devices['Pixel 5'] },
+    },
+  ],
+
+  webServer: process.env.CI ? undefined : {
+    command: 'npm run start:test-server',
+    port: 3000,
+    reuseExistingServer: !process.env.CI,
+  },
+})
+```
+</Tab>
+</Tabs>
+
+## Development Workflow
+
+### Step-by-Step Development Process
+
+<Steps>
+<Step title="Initial Setup">
+Set up your local development environment with Playwright and necessary dependencies
+</Step>
+
+<Step title="Write Tests Locally">
+Develop and test your scripts locally using `npx playwright test` commands
+</Step>
+
+<Step title="Organize Code">
+Structure your code using Page Object Models and shared utilities in the snippets directory
+</Step>
+
+<Step title="Test Thoroughly">
+Run tests in different browsers and scenarios to ensure reliability
+</Step>
+
+<Step title="Configure Terraform">
+Set up Terraform resources for both main scripts and snippet dependencies
+</Step>
+
+<Step title="Deploy to Checkly">
+Apply Terraform configuration to deploy your monitoring checks
+</Step>
+</Steps>
+
+### Common Development Commands
+
+<Tabs>
+<Tab title="Local Testing Commands">
+```bash
+# Install Playwright browsers
+npx playwright install
+
+# Run all tests
+npm test
+
+# Run tests with browser UI visible
+npm run test:headed
+
+# Debug specific test
+npx playwright test checkout.spec.ts --debug
+
+# Run tests in UI mode for interactive development
+npm run test:ui
+
+# Run specific test pattern
+npx playwright test --grep "shopping cart"
+
+# Generate test code
+npx playwright codegen https://danube-web.shop
+
+# View test results
+npx playwright show-report
+```
+</Tab>
+</Tabs>
+
+## Environment-Specific Testing
+
+Handle different environments using environment variables and configuration files.
+
+<Tabs>
+<Tab title="Environment Configuration">
+```typescript
+// scripts/config/test-config.ts
+export interface TestConfig {
+  baseUrl: string
+  apiUrl: string
+  timeout: number
+  retries: number
+  headless: boolean
+}
+
+export const getConfig = (): TestConfig => {
+  const env = process.env.NODE_ENV || 'development'
+  
+  const configs: Record<string, TestConfig> = {
+    development: {
+      baseUrl: 'http://localhost:3000',
+      apiUrl: 'http://localhost:3001/api',
+      timeout: 30000,
+      retries: 0,
+      headless: false,
+    },
+    staging: {
+      baseUrl: 'https://staging.example.com',
+      apiUrl: 'https://staging-api.example.com',
+      timeout: 15000,
+      retries: 2,
+      headless: true,
+    },
+    production: {
+      baseUrl: 'https://example.com',
+      apiUrl: 'https://api.example.com',
+      timeout: 10000,
+      retries: 3,
+      headless: true,
+    },
+  }
+  
+  return configs[env] || configs.development
+}
+```
+</Tab>
+
+<Tab title="Using Environment Config">
+```typescript
+// scripts/e2e-flow.spec.ts
+import { test, expect } from '@playwright/test'
+import { getConfig } from './config/test-config'
+
+const config = getConfig()
+
+test.describe('E2E User Flow', () => {
+  test.beforeEach(async ({ page }) => {
+    // Set environment-specific timeout
+    page.setDefaultTimeout(config.timeout)
+  })
+
+  test('complete user journey', async ({ page }) => {
+    // Use environment-specific base URL
+    await page.goto(config.baseUrl)
+    
+    // Test implementation...
+    await expect(page).toHaveTitle(/Expected Title/)
+  })
+})
+```
+</Tab>
+</Tabs>
+
+## Best Practices
+
+<CardGroup cols={2}>
+<Card title="Code Organization" icon="folder">
+**File Structure**
+- Keep snippets in `/snippets` directory
+- Use consistent naming conventions
+- Separate concerns (auth, navigation, etc.)
+- Version control all test files
+</Card>
+
+<Card title="Development Workflow" icon="flow">
+**Efficient Process**
+- Test locally before deploying
+- Use browser dev tools for debugging
+- Implement proper error handling
+- Write descriptive test names
+</Card>
+
+<Card title="Snippet Management" icon="puzzle">
+**Reusable Code**
+- Create modular, focused snippets
+- Document snippet interfaces
+- Test snippets independently
+- Avoid snippet interdependencies
+</Card>
+
+<Card title="Environment Handling" icon="settings">
+**Configuration**
+- Use environment variables
+- Separate config from code
+- Handle different environments gracefully
+- Document environment requirements
+</Card>
+</CardGroup>
+
+## Debugging and Troubleshooting
+
+### Common Issues and Solutions
+
+<Tabs>
+<Tab title="Import Path Issues">
+```typescript
+// ❌ Problematic - absolute path
+import { ShoppingCart } from '/absolute/path/to/snippets/shoppingCart'
+
+// ✅ Correct - relative path matching Checkly structure
+import { ShoppingCart } from './snippets/shoppingCart'
+
+// For Checkly compatibility, ensure snippet names match filenames
+resource "checkly_snippet" "shopping_cart" {
+  name   = "shoppingCart"  // This becomes the filename in Checkly
+  script = file("${path.module}/scripts/snippets/shoppingCart.ts")
+}
+```
+</Tab>
+
+<Tab title="Environment Variables">
+```typescript
+// scripts/helpers/env-utils.ts
+export const getEnvironmentValue = (key: string, defaultValue?: string): string => {
+  const value = process.env[key]
+  if (!value && !defaultValue) {
+    throw new Error(`Environment variable ${key} is required but not set`)
+  }
+  return value || defaultValue!
+}
+
+// Usage in tests
+const apiUrl = getEnvironmentValue('API_BASE_URL', 'http://localhost:3001')
+const testEmail = getEnvironmentValue('TEST_EMAIL', 'test@example.com')
+```
+</Tab>
+</Tabs>
+
+<Warning>
+Store snippet files in a `./snippets/` directory to maintain consistency between local development and Checkly's remote execution environment.
+</Warning>
+
+<Tip>
+Use environment variables to handle different paths for local development versus remote execution. This allows the same script to work in both environments seamlessly.
+</Tip>
+
+## Additional Resources
+
+- [Playwright Test documentation](https://playwright.dev/docs/test-intro)
+- [Page Object Model patterns](https://playwright.dev/docs/pom)
+- [Checkly code snippets documentation](/docs/browser-checks/partials-code-snippets/)

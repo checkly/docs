@@ -48,7 +48,7 @@ There are two ways to import individual resources:
 The import process will automatically `export` resouces to make them available in other constructs. It is recommended to also export manually created resources so that future import processes can take advantage of the same process.
 
 Here is an example of an exported alert channel:
-```ts {title="alert-channel.ts"}
+```ts Alert-Channel.check.ts
 import { EmailAlertChannel } from 'checkly/constructs'
 
 // This resource can be accessed by other imported resources.
@@ -59,7 +59,7 @@ export const emailAlert1 = new EmailAlertChannel('email-example', {
 ```
 
 Since the channel has been exported, the CLI code generation would automatically add the `import` and refer to it directly in the `alertChannels` section:
-```ts {title="alert-channel.ts"}
+```ts Alert-Channel.check.ts
 import { AlertEscalationBuilder, BrowserCheck, RetryStrategyBuilder } from 'checkly/constructs'
 import { emailAlert1 } from '../../alert-channels/email-example.check'
 

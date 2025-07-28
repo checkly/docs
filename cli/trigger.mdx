@@ -8,7 +8,7 @@ The `checkly trigger` command executes checks that are already deployed in your 
 
 ## Usage
 
-```bash
+```bash Terminal
 npx checkly trigger
 ```
 
@@ -16,17 +16,17 @@ Trigger all checks in your account.
 
 ## Extended Usage
 
-```bash
+```bash Terminal
 npx checkly trigger --tags production,api
 ```
 Trigger only checks tagged with both "production" and "api".
 
-```bash
+```bash Terminal
 npx checkly trigger --record --test-session-name="Release validation" --location eu-west-1
 ```
 Record a named test session running all checks in the EU West region.
 
-```bash
+```bash Terminal
 npx checkly trigger --tags critical --env ENVIRONMENT_URL="https://staging.acme.com"
 ```
 Run critical checks against a staging environment with custom variables.
@@ -36,7 +36,7 @@ Run critical checks against a staging environment with custom variables.
 ### `--test-session-name`
 Provide a custom name for recorded test sessions when using `--record`.
 
-```bash
+```bash Terminal
 npx checkly trigger --record --test-session-name "Pre-deployment validation"
 ```
 
@@ -73,20 +73,20 @@ This command supports the following [global options](/cli-reference/global-optio
 ### Pre-deployment Validation
 Run your deployed checks before promoting code to production:
 
-```bash
+```bash Terminal
 npx checkly trigger --tags staging --record --test-session-name "Pre-prod validation"
 ```
 
 ### Scheduled Testing
 Integrate with CI/CD for scheduled check execution:
 
-```bash
+```bash Terminal
 npx checkly trigger --tags nightly --reporter ci --timeout 1800
 ```
 
 ### Environment-specific Testing
 Test deployed checks against different environments:
 
-```bash
+```bash Terminal
 npx checkly trigger --env ENVIRONMENT_URL="https://preview-branch-123.vercel.app"
 ``` 

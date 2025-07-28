@@ -164,39 +164,6 @@ This endpoint returns detailed execution results for a specific check. Check res
 }
 ```
 
-## Common Use Cases
-
-<CardGroup cols={2}>
-
-<Card title="Performance Monitoring" icon="chart-line">
-Track API performance trends and identify regressions
-```bash
-GET /v1/check-results/{checkId}?period=7d&sortBy=responseTime
-```
-</Card>
-
-<Card title="Debugging Failed Checks" icon="bug">
-Investigate check failures with detailed error analysis
-```bash
-GET /v1/check-results/{checkId}?status=failed&limit=50
-```
-</Card>
-
-<Card title="SLA Compliance Reporting" icon="shield-check">
-Generate uptime and compliance reports for stakeholders
-```bash
-GET /v1/check-results/{checkId}?period=30d&includeSummary=true
-```
-</Card>
-
-<Card title="Geographic Performance Analysis" icon="globe">
-Compare performance across different monitoring locations
-```bash
-GET /v1/check-results/{checkId}?location=us-east-1&period=24h
-```
-</Card>
-
-</CardGroup>
 
 ## Query Parameters
 
@@ -242,37 +209,10 @@ GET /v1/check-results/{checkId}?location=us-east-1&period=24h
 
 ## Result Status Types
 
-<CardGroup cols={2}>
-
-<Card title="Success" icon="check-circle">
-**Indicates:**
-- All assertions passed
-- HTTP status codes in success range
-- No execution errors occurred
-- Response received within timeout
-
-**Characteristics:**
-- Status code typically 2xx
-- All defined assertions evaluate to true
-- Complete response received
-- Execution completed normally
-</Card>
-
-<Card title="Failed" icon="x-circle">
-**Indicates:**
-- One or more assertions failed
-- HTTP error status codes (4xx, 5xx)
-- Network or timeout errors
-- Script execution errors
-
-**Common causes:**
-- API returning error status codes
-- Assertion mismatches
-- Network connectivity issues
-- Timeout exceeded
-</Card>
-
-</CardGroup>
+| Status | Indicates | Characteristics | Common Causes |
+|--------|-----------|----------------|---------------|
+| **Success** | • All assertions passed<br/>• HTTP status codes in success range<br/>• No execution errors occurred<br/>• Response received within timeout | • Status code typically 2xx<br/>• All defined assertions evaluate to true<br/>• Complete response received<br/>• Execution completed normally | N/A |
+| **Failed** | • One or more assertions failed<br/>• HTTP error status codes (4xx, 5xx)<br/>• Network or timeout errors<br/>• Script execution errors | • Status code in error range<br/>• Assertions evaluate to false<br/>• Incomplete or missing response<br/>• Execution terminated abnormally | • API returning error status codes<br/>• Assertion mismatches<br/>• Network connectivity issues<br/>• Timeout exceeded |
 
 ## Response Time Breakdown
 
@@ -329,7 +269,41 @@ console.log(`Data transfer: ${breakdown.dataTransfer}ms (${(breakdown.dataTransf
 
 </AccordionGroup>
 
-## Use Cases
+## Common Use Cases
+
+<CardGroup cols={1}>
+
+<Card title="Performance Monitoring" icon="chart-line">
+Track API performance trends and identify regressions
+```bash
+GET /v1/check-results/{checkId}?period=7d&sortBy=responseTime
+```
+</Card>
+
+<Card title="Debugging Failed Checks" icon="bug">
+Investigate check failures with detailed error analysis
+```bash
+GET /v1/check-results/{checkId}?status=failed&limit=50
+```
+</Card>
+
+<Card title="SLA Compliance Reporting" icon="shield-check">
+Generate uptime and compliance reports for stakeholders
+```bash
+GET /v1/check-results/{checkId}?period=30d&includeSummary=true
+```
+</Card>
+
+<Card title="Geographic Performance Analysis" icon="globe">
+Compare performance across different monitoring locations
+```bash
+GET /v1/check-results/{checkId}?location=us-east-1&period=24h
+```
+</Card>
+
+</CardGroup>
+
+## Additional Use Cases
 
 <AccordionGroup>
 

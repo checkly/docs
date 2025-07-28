@@ -6,18 +6,20 @@ sidebarTitle: 'Creating Your First Test'
 
 Checkly enables you to transform your existing Playwright tests into powerful synthetic monitors that run continuously across global locations. This guide will walk you through creating your first test, from setup to deployment.
 
-## Prerequisites
-
-Before you start, make sure you have:
+<AccordionGroup>
+<Accordion title="Prerequisites">
 - Node.js 18+ installed
 - A Checkly account (sign up at [checklyhq.com](https://www.checklyhq.com))
 - Basic familiarity with JavaScript/TypeScript
+</Accordion>
+</AccordionGroup>
+
 
 ## Step 1: Initialize Your Project
 
 Start by creating a new Checkly project using the CLI:
 
-```bash
+```bash Terminal
 npm create checkly@latest
 ```
 
@@ -51,7 +53,7 @@ my-checkly-project/
 
 Open `checkly.config.ts` to configure your monitoring setup:
 
-```ts
+```ts Checkly.config.ts
 import { defineConfig } from '@checkly/cli'
 
 export default defineConfig({
@@ -83,7 +85,7 @@ export default defineConfig({
 
 Create a new Playwright test file in the `__checks__` directory:
 
-```ts
+```ts Playwright.test.ts
 // __checks__/my-first-test.spec.ts
 import { test, expect } from '@playwright/test'
 
@@ -123,7 +125,7 @@ test('Navigation works correctly', async ({ page }) => {
 
 Before deploying, test your checks locally:
 
-```bash
+```bash Terminal
 # Test all checks
 npx checkly test
 
@@ -155,7 +157,7 @@ After deployment, you can:
 
 For more control over your browser checks:
 
-```ts
+```ts Checkly.config.ts
 // __checks__/advanced-browser.check.ts
 import { BrowserCheck, Frequency } from '@checkly/cli/constructs'
 
@@ -197,12 +199,12 @@ new BrowserCheck('advanced-check', {
 - Check for timing issues
 
 **Environment variable not found:**
-```bash
+```bash Terminal
 npx checkly test --env VARIABLE_NAME="value"
 ```
 
 **Login required for testing:**
-```ts
+```ts Playwright.test.ts  
 // Use Playwright's built-in authentication
 test.use({ storageState: 'auth.json' })
 ```

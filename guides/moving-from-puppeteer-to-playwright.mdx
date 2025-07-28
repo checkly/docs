@@ -9,7 +9,9 @@ tags:
 sidebarTitle: Moving from Puppeteer to Playwright
 ---
 
-> **UPDATE**: _you can use our [puppeteer-to-playwright](https://github.com/checkly/puppeteer-to-playwright) conversion script to quickly migrate your Puppeteer codebase to Playwright._
+<Note>
+You can use our [puppeteer-to-playwright](https://github.com/checkly/puppeteer-to-playwright) conversion script to quickly migrate your Puppeteer codebase to Playwright.
+</Note>
 
 ## Puppeteer and Playwright today
 
@@ -41,7 +43,7 @@ Remember to add `await` as necessary.
 | `page.waitForSelector(selector)` `page.click(selector);` | `page.click(selector)`              |
 | `page.waitForXPath(XPathSelector)`          | `page.waitForSelector(XPathSelector)`            |
 | `page.$x(xpath_selector)`                   | `page.$(xpath_selector)`                         |
-| `page.waitForNetworkIdle(...)`              | `page.waitForLoadState({ state: 'networkidle' }})` |
+| `page.waitForNetworkIdle(...)`              | `page.waitForLoadState({ state: 'networkidle' })` |
 | `page.waitForFileChooser(...)`              | Removed, [handled differently](https://playwright.dev/docs/input/#upload-files). |
 | `page.waitFor(timeout)`                     | `page.waitForTimeout(timeout)` |
 | `page.type(selector, text)`                 | `page.fill(selector, text)` |
@@ -52,7 +54,9 @@ Remember to add `await` as necessary.
 | `elementHandle.uploadFile(...)`             | `elementHandle.setInputFiles(...)` |
 | Tricky file download.                       | Better [support for downloads](https://playwright.dev/docs/downloads). |
 
-> Did we forget anything? Please let us know by getting in touch, or [submit your own PR](https://github.com/checkly/checklyhq.com).
+
+
+<Note> Did we forget anything? Please let us know by getting in touch, or [submit your own PR](https://github.com/checkly/checklyhq.com).</Note>
 
 ## What to change in your scripts - in depth
 
@@ -60,7 +64,7 @@ Remember to add `await` as necessary.
 
 In Puppeteer, the first few lines of your script would have most likely looked close to the following:
 
-```js
+```js Puppeteer.js
 const puppeteer = require('puppeteer');
 
 (async () => {
@@ -72,7 +76,7 @@ const puppeteer = require('puppeteer');
 
 With Playwright you do not need to change much:
 
-```js
+```js Playwright.js
 const { chromium } = require('playwright');
 
 (async () => {
@@ -85,7 +89,7 @@ const { chromium } = require('playwright');
 Playwright offers cross-browser support out of the box, and you can choose which browser to run with just by changing the first line, e.g. to `const { webkit } = require('playwright');`
 In Puppeteer, this would have been done through the browser's launch options:
 
-```js
+```js Puppeteer.js
   const browser = await puppeteer.launch({ product: 'firefox' })
 ```
 
@@ -93,7 +97,7 @@ In Puppeteer, this would have been done through the browser's launch options:
 
 [Browser contexts](https://playwright.dev/docs/api/class-browsercontext) already existed in Puppeteer:
 
-```js
+```js Puppeteer.js
 const browser = await puppeteer.launch();
 const context = await browser.createIncognitoBrowserContext();
 const page = await context.newPage();
@@ -101,7 +105,7 @@ const page = await context.newPage();
 
 Playwright's API puts even more importance on them, and handles them a little differently:
 
-```js
+```js Playwright.js
 const browser = await chromium.launch();
 const context = await browser.newContext();
 const page = await context.newPage();
@@ -109,7 +113,7 @@ const page = await context.newPage();
 
 Like in Puppeteer, for basic cases and single-page flows, you can use the default context:
 
-```js
+```js Playwright.js
 const browser = await chromium.launch();
 const page = await browser.newPage();
 ```
@@ -172,7 +176,7 @@ XPath selectors starting with `//` or `..` are automatically recognised by Playw
 
 Playwright [device emulation settings](https://playwright.dev/docs/emulation) are set at Browser Context level, e.g.:
 
-```js
+```js Playwright.js
 const pixel2 = devices['Pixel 2'];
 const context = await browser.newContext({
   ...pixel2,
@@ -185,7 +189,7 @@ On top of that, permission, geolocation and other device parameters are also ava
 
 Trying to download files in Puppeteer in headless mode can be tricky. Playwright makes this more streamlined:
 
-```js
+```js Playwright.js
 const [download] = await Promise.all([
   page.waitForEvent('download'),
   page.click('#orders > ul > li:nth-child(1) > a')
@@ -206,7 +210,7 @@ See our [example on file upload](/learn/headless/e2e-account-settings/).
 
 Request interception in Puppeteer is handled via `[page.on('request', ...)](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-event-request)`:
 
-```js
+```js Playwright.js
 await page.setRequestInterception(true)
 
 page.on('request', (request) => {
@@ -217,7 +221,7 @@ page.on('request', (request) => {
 
 In Playwright, `[page.route](https://playwright.dev/docs/api/class-page#page-route)` can be used to intercept requests with a URL matching a specific pattern:
 
-```js
+```js Playwright.js
 await page.route('**/*', (route) => {
   return route.request().resourceType() === 'image'
     ? route.abort()
@@ -300,7 +304,7 @@ This reveals additional information about the check execution, including:
 ## Read More
 
 <div class="cards-list">
-<Card title="Checkly CLI" href="/guides/monitoring-as-code-cli/">
+  <Card title="Monitoring as Code" href="/guides/monitoring-as-code/">
   Understand monitoring as code (MaC) via our Checkly CLI.
 </Card>
 

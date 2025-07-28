@@ -1,14 +1,8 @@
 ---
 title: Reusing Playwright Monitors Across Every Phase of your Software Development Life Cycle
-displayTitle: Reusing Monitors Across Every Phase of your SDLC
 sidebarTitle: Reusing Playwright Across The SDLC
-description: >-
-  The same Playwright code you write for end-to-end testing before deployment, can also test code earlier as part of the dev process, and end-to-end tests can be run on a cadence in Checkly to turn test code into monitoring code.
-author: Nočnica Mellifera
-date: 2025-03-07
-avatar: 'images/avatars/nica-mellifera.png'
-tags:
-  - FAQ
+description: The same Playwright code you write for end-to-end testing before deployment, can also test code earlier as part of the dev process, and end-to-end tests can be run on a cadence in Checkly to turn test code into monitoring code.
+tags: Playwright
 ---
 
 Recently I had a chance to write about going from Playwright testing, [using Playwright to run e2e tests against your staging/pre-deploy environment, and Checkly to monitor your production envrionment](https://www.checklyhq.com/guides/playwright-testing-to-monitoring/). Once you’re using the power of Playwright and Checkly together to monitor your production environment, it’s time to go one step further: use the powerful tools from Checkly to monitor all your environments, from local development on your laptop, to a staging environment, to production. With this guide, the same code you wrote in Playwright for your initial tests on your laptop will get re-used (as appropriate) to monitor Staging, and finally Production to let you know that everything’s working, and find problems before your users do.
@@ -66,7 +60,7 @@ Let’s say you want to log in to your application before running a set of tests
 
 Create a `fixtures.js` file to define your custom fixture. This fixture will extend the base `test` object provided by Playwright.
 
-```ts
+```ts Playwright.test.ts
 // fixtures.js
 import { test as base } from '@playwright/test';
 
@@ -95,7 +89,7 @@ export { expect } from '@playwright/test';
 
 Now that the fixture is defined, you can use it in your tests. Import the custom `test` object from `fixtures.js` and write your tests as usual.
 
-```ts
+```ts Playwright.test.ts
 // example.spec.js
 import { test, expect } from './fixtures';
 
@@ -168,7 +162,7 @@ const email = process.env.EMAIL || 'stefan@checklyhq.com';
 
 If you want to override this email address locally, you can set an environment variable in your terminal before running the Checkly CLI:
 
-```bash
+```bash Terminal    
 EMAIL=raccoon@checklyhq.com npx checkly deploy
 
 ```
@@ -192,7 +186,7 @@ const url = process.env.SCREENSHOT_URL || '<https://www.checklyhq.com>';
 
 If `SCREENSHOT_URL` isn’t set remotely, the check will default to `checklyhq.com`. To set this variable in the Checkly cloud, you can use the Checkly CLI:
 
-```bash
+```bash Terminal
 npx checkly env add SCREENSHOT_URL <https://docs.checklyhq.com>
 
 ```
@@ -205,7 +199,7 @@ Now, when the browser check runs in the Checkly cloud, it will use the updated U
 
 Sometimes, you might want to override remote environment variables temporarily, like during a preview deployment. The Checkly CLI makes this easy with the `-e` flag:
 
-```bash
+```bash Terminal  
 npx checkly test -e SCREENSHOT_URL=https://google.com --record --verbose
 
 ```

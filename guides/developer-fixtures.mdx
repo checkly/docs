@@ -1,10 +1,7 @@
 ---
 title: Automating Check Steps for Developers
-displayTitle: Involve Every Developer in Monitoring with Automated Setup
-description: >-
+description: 
   When we enable developers to create page or API monitors, we want to automate as much of the code writing process as possible, so that developers can test the functionality they care about without getting bogged down in setup steps.
-author: Nočnica Mellifera
-avatar: 'images/avatars/nica-mellifera.png'
 tags:
   - FAQ
 sidebarTitle: Testing Fixtures
@@ -89,7 +86,7 @@ While there are sophisticated ways to share authentication across checks discuss
 
 To open this modal and log in, we might use some lines like the following:
 
-```ts {title="recentOrders.spec.ts"}
+```ts RecentOrders.test.ts
 import { test, expect } from '@playwright/test';
 
 test('display Recent Orders', async ({ page }) => {
@@ -108,7 +105,7 @@ This is a fine practice for a single test, but if we have dozens that all requir
 
 We'd want to move this code into an extension of the Playwright page fixture like so:
 
-```ts {title="recentOrdersWithFixture.spec.ts"}
+```ts RecentOrdersWithFixture.test.ts
 
 import { test as baseTest, expect } from '@playwright/test';
 
@@ -172,7 +169,7 @@ While it's useful to package up tasks like logging in across multiple tests, we 
 
 For these, again, we could use core Javascript/Typescript modules to accomplish this task, here's an example
 
-```ts {title="ecommerceActions.spec.ts"}
+```ts EcommerceActions.test.ts
 import {setup, teardown } from "./standardScripts.ts"
 
 test.beforeEach(() => {
@@ -188,7 +185,7 @@ test.afterEach(() => {
 
 But while it's great to use native features, this is requiring a good amount of setup in each test file (the above snippets would have to be repeated in each new file), and our goal is to make creating new checks as easy as possible for developers. So let's use Playwright's native features to make this even easier for them.
 
-```ts {title=testFixtures.ts}
+```ts TestFixtures.ts
 import { test as base } from '@playwright/test';
 
 export const test = base.extend<{ forEachTest: void }>({
@@ -204,7 +201,7 @@ export const test = base.extend<{ forEachTest: void }>({
 
 Now the only change you'll need to make to your test files is to have them import the `test` function from this fixture file, for example:
 
-```ts {title="ecommerceActions.spec.ts"}
+```ts EcommerceActions.test.ts
 import { test } from './testFixtures';
 import { expect } from '@playwright/test';
 ```

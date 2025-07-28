@@ -4,8 +4,6 @@ description: 'Step-by-step guide to set up your first URL monitor and ensure you
 sidebarTitle: 'Creating Your First Monitor'
 ---
 
-import { Note, Warning, Tip, Steps } from 'mintlify/components'
-
 This guide walks you through creating your first URL monitor to check the availability and performance of your websites, APIs, or any HTTP-based service.
 
 ## Before You Start
@@ -414,3 +412,50 @@ Explore API checks and browser monitoring for comprehensive application testing.
 <Note>
 URL monitors provide excellent coverage for HTTP-based services. For complex user interactions or JavaScript-heavy applications, consider adding [Browser Checks](/docs/detect/synthetic-monitoring/browser-checks) to your monitoring strategy.
 </Note>
+
+## CLI Configuration
+
+With the [Checkly CLI](/docs/cli/), you can define URL monitors in TypeScript or JavaScript and manage them as code.
+
+<Tabs>
+<Tab title="TypeScript">
+
+```ts {title="hello-url.check.ts"}
+import { UrlMonitor, UrlAssertionBuilder } from 'checkly/constructs'
+
+new UrlMonitor('hello-url-1', {
+  name: 'Hello URL',
+  activated: true,
+  request: {
+    method: 'GET',
+    url: 'https://api.checklyhq.com/v1/echo/get',
+    assertions: [
+      UrlAssertionBuilder.statusCode().equals(200),
+    ]
+  }
+})
+```
+
+</Tab>
+<Tab title="JavaScript">
+
+```js {title="hello-url.check.js"}
+const { UrlMonitor, UrlAssertionBuilder } = require('checkly/constructs')
+
+new UrlMonitor('hello-url-1', {
+  name: 'Hello URL',
+  activated: true,
+  request: {
+    method: 'GET',
+    url: 'https://api.checklyhq.com/v1/echo/get',
+    assertions: [
+      UrlAssertionBuilder.statusCode().equals(200),
+    ]
+  }
+})
+```
+
+</Tab>
+</Tabs>
+
+See the full [Url monitor construct reference](/docs/cli/constructs-reference/#urlmonitor) for more context.

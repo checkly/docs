@@ -1,12 +1,8 @@
 ---
-title: Creating a Keyword-Based Monitor
-sidebarTitle: Keyword Monitors
-description: >-
-  With Checkly, we can use Playwright to create monitors that verify page content by checking for keywords.
-author: Nočnica Mellifera
-avatar: 'images/avatars/nica-mellifera.png'
-tags:
-  - FAQ
+title: Creating a Keyword Monitor
+sidebarTitle: Keyword Monitoring
+description: With Checkly, we can use Playwright to create monitors that verify page content by checking for keywords.
+tags: Playwright
 ---
 
 While basic uptime monitoring tells you if your site is running, it can't tell you if your most critical content is actually visible to customers. Monitoring for keywords or content in a user-interface can help extend coverage and improve your UX and bottom-line. It can be used for several purposes:
@@ -20,9 +16,11 @@ With Checkly, we can use Playwright to create monitors that verify content in th
 
 Picture this: you’ve got a successful eCommerce book store. Your best-sellers provide you with 100% of your operating revenue, and your long tail of products provides pure profit. Life is good. But suddenly users start reporting that they came to your shop looking for your best selling book, but couldn’t find it. You only have scattered reports, but by the time you’re investigating your sales, and your profits, are already slipping. Game over. To prevent this disaster scenario, we want to monitor our site constantly to make sure that our best-selling items are always visible, no matter how the site is updated.
 
-## Tl:dr this is the playwright code to check for a keyword on your page
+<Note>
+Tl;dr this is the playwright code to check for a keyword on your page
+</Note>
 
-```jsx
+```jsx Playwright.test.ts
 await expect(page.getByText('KEYWORD')).toBeVisible()
 ```
 
@@ -36,7 +34,7 @@ In this example from the [Danube Web Shop](https://danube-webshop.herokuapp.com/
 
 The code for this page monitor reads as follows:
 
-```tsx
+```tsx BestSeller.test.ts
 const { expect, test } = require('@playwright/test')
 
 test('Check for my best seller', async ({ page }) => {
@@ -89,7 +87,7 @@ With these settings we can rest easy knowing that our users are seeing our best-
 
 The code above lacks the wrapper code to be run as a Checkly monitor, here’s a bare-bones example of that code:
 
-```jsx
+```jsx KeywordMonitor.test.ts
 const { expect, test } = require('@playwright/test')
 
 test('Check for an element with text containing a keyword', async ({ page }) => {
@@ -120,7 +118,7 @@ In this case, the page load took 1.8 seconds, and only 33ms later, our best sell
 
 If you want to find an element that has an *exact* match of the text we searched for, this is an option with the Playwright `getByText` method.
 
-```jsx
+```jsx KeywordMonitor.test.ts
   await expect(page.getByText('Keyword!', {exact: true})).toBeVisible()
 ```
 
@@ -134,7 +132,7 @@ Taking a look back at our storefront:
 
 A number of strings are repeated in a few places (for example the word ‘Fiction’ or ‘$9.95’) and a keyword check for those using the code above will fail. If we change the assertion to be:
 
-```tsx
+```tsx KeywordMonitor.test.ts
   await expect(page.getByText('9.95')).toBeVisible()
 ```
 
@@ -152,7 +150,7 @@ In our Checkly report for this monitor, we’ll get notified if this code starts
 
 Tl;dr you can suppress all these `resolved to [number] elements` by only looking at the first result:
 
-```jsx
+```jsx KeywordMonitor.test.ts
   await expect(page.getByText('9.95').first()).toBeVisible()
 ```
 
@@ -170,7 +168,7 @@ For page components like banners, CTA’s, and login buttons, it may make sense 
 
 In another scenario, we might be checking to make sure that each page has a ‘sign up’ call to action somewhere on the page. We start with an assertion like:
 
-```jsx
+```jsx KeywordMonitor.test.ts
 await expect(page.getByText('sign up')).toBeVisible()
 ```
 
@@ -180,7 +178,7 @@ But it turns out the marketing team keeps rewriting the call to action on variou
 
 almost any place an assertion or locator is taking a string within Playwright, a regex pattern can also be used. 
 
-```jsx
+```jsx KeywordMonitor.test.ts
   await expect(page.getByText(/Sign up|register/)).toBeVisible()
 ```
 
@@ -188,7 +186,7 @@ note that by default in Playwright, patterns are run without the `/i` config, me
 
 Regex can be quite useful for detailed matching. For example, if I only want to accept correct capitalization I could write:
 
-```jsx
+```jsx KeywordMonitor.test.ts
   await expect(page.getByText(/[Ss]ign [Uu]p|[Rr]egister/)).toBeVisible()
 ```
 
@@ -198,7 +196,7 @@ so that ‘sIGn uP’ would also cause the monitor to fail. Of course with regul
 
 Since we can return multiple matches on a Playwright locator with `.or()` the other way to match on multiple keywords is with a check like this:
 
-```jsx
+```jsx KeywordMonitor.test.ts
 const { expect, test } = require('@playwright/test')
 
 test('visit page and take screenshot', async ({ page }) => {
@@ -215,7 +213,7 @@ test('visit page and take screenshot', async ({ page }) => {
 
 Note that, since we’re now explicitly giving multiple locators, it would be a good idea to add `.first()` so our test will not fail with multiple matches, and examine the first item found for further check conditions:
 
-```jsx
+```jsx KeywordMonitor.test.ts
   await expect(
     page.getByText('sign up')
       .or(page.getByText('register'))
@@ -227,7 +225,7 @@ Note that, since we’re now explicitly giving multiple locators, it would be a 
 
 Let’s cover the case where we want to make sure that users see a ‘sign up’ button on the page we’re checking. 
 
-```jsx
+```jsx BestSellerOnFrontPage.test.ts
 //best-seller-on-front-page.spec.ts
 const { expect, test } = require('@playwright/test')
 
@@ -245,7 +243,7 @@ test('Check for my best seller', async ({ page }) => {
 
 Previously we’ve used the Checkly web UI to make our settings to this page monitor, but as you monitor a production site you’ll want to consider adopting a [monitoring as code](https://www.checklyhq.com/guides/monitoring-as-code/) strategy where your page monitors *and* their configuration are stored in a code repository. In that case the same configuration described in a previous section would be stored in a config file:
 
-```jsx
+```jsx BestSellerOnFrontPage.check.ts   
 //best-seller-on-front-page.check.ts
 import { BrowserCheck, Frequency, RetryStrategyBuilder } from 'checkly/constructs'
 

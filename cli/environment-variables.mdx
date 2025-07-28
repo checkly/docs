@@ -29,7 +29,7 @@ Here is an example of setting up an `SmsAlertChannel` where we pass in the actua
 variable. Note the exclamation mark `!` at the end. This is to tell the Typescript compiler the value will be set.
 Alternatively you can use a string template.
 
-```ts {title="alert-channels.ts"}
+```ts Alert-Channel.check.ts
 import { SmsAlertChannel } from 'checkly/constructs'
 
 export const smsChannel = new SmsAlertChannel('sms-channel-1', {
@@ -64,7 +64,7 @@ a check executes on the Checkly cloud.
 Here is an example of a Playwright script using an `ENVIRONMENT_URL` variable to define the page to visit. We also added
 a fallback value in case that variable is not defined for some reason.
 
-```ts {title="home.check.ts"}
+```ts Home.check.ts
 import { test } from '@playwright/test'
 
 test('Check Home Page', async ({ page }) => {
@@ -74,7 +74,7 @@ test('Check Home Page', async ({ page }) => {
 ```
 Here is an example of a Checkly [ApiCheck construct](/docs/cli/constructs-reference/#apicheck) using an `ENVIRONMENT_URL` variable to define the page to visit. Notice the `{{ENVIRONMENT_URL}}` is wrapped in double handlebars and must be written this way for a remote environment variable to be parsed within an ApiCheck construct.
 
-```ts {title="api.check.ts"}
+```ts Api.check.ts
 import * as path from 'path'
 import { ApiCheck, AssertionBuilder } from 'checkly/constructs'
 import { websiteGroup } from './website-group.check'
@@ -100,7 +100,7 @@ new ApiCheck('books-api-check-1', {
 
 You can now test this check and temporarily set the environment variable as follows.
 
-```
+```bash Terminal
 npx checkly test -e ENVIRONMENT_URL="https://staging.checklyhq.com"
 ```
 
@@ -115,7 +115,7 @@ environment variables are not replaced in code dependencies.
 
 If you have a lot of variables, it makes sense to store them in a `.env` file. Make sure to add that to your `.gitignore` file!
 
-```
+```bash Terminal
 ENVIRONMENT_URL=https://checklyhq.com
 USER_NAME=admin
 PASSWORD=admin
@@ -123,7 +123,7 @@ PASSWORD=admin
 
 You can reference that file in the `test` as follows:
 
-```bash
+```bash Terminal
 npx checkly test --env-file="./.env"
 ```
 
@@ -137,25 +137,25 @@ and export your global variables. Here are some examples:
 
 List all your stored variables and lock it.
 
-```bash
+```bash Terminal
 npx checkly env ls
 ```
 
 Create a new variable.
 
-```bash
+```bash Terminal
 npx checkly env add  MY_PASSWORD 123test [--secret OR --locked]
 ```
 
 Pull in the variables from your account and store them in a file.
 
-```bash
+```bash Terminal
 npx checkly env pull .env.prod
 ```
 
 Reference that file in your `test` command.
 
-```bash
+```bash Terminal
 npx checkly test --env-file="./.env.prod"
 ```
 

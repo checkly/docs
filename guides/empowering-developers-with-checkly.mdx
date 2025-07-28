@@ -1,12 +1,8 @@
 ---
-title: How to empower developers and operations with Monitoring as Code - Checkly Guides
-displayTitle: How to empower developers and operations with Monitoring as Code
+title: Empowering DevOps with Monitoring as Code
 description: >-
   Discover how Checkly empowers developers and platform teams to streamline complex monitoring through a code-first approach. Learn how collaboration, automation, and integrated alerts improve reliability and reduce bottlenecks in modern software delivery workflows.
-author: Daniel Giordano
-avatar: 'images/avatars/daniel-giordano.png'
-tags:
-  - FAQ
+tags: MaC
 sidebarTitle: MaC for Platform Teams
 ---
 ## Why developers need to contribute to monitoring
@@ -28,7 +24,7 @@ No more throwing monitoring over the proverbial wall. Rather than relying on a s
 
 For example, here’s a simple API check defined in Checkly’s CLI:
 
-```bash
+```bash Terminal
 curl --request POST \
      --url 'https://api.checklyhq.com/v1/checks/api?autoAssignAlerts=true' \
      --header 'Authorization: [your-key]' \
@@ -97,7 +93,7 @@ Platform teams often handle the configuration of complex alerts, thresholds, and
 
 For example, here’s a more complex Checkly configuration, where the platform team might define specific response time thresholds and alerting rules:
 
-```bash
+```bash Terminal
 resource "checkly_check" "example_check_2" {
   name                   = "Example API check 2"
   type                   = "API"
@@ -136,7 +132,7 @@ Checkly also integrates alert channels into the code, allowing teams to manage a
 
 For instance, here’s how to set up email alerts for a check:
 
-```bash
+```bash Terminal    
 resource "checkly_alert_channel" "email_ac1" {
   email {
     address = "info1@example.com"

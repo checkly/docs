@@ -8,7 +8,7 @@ The `checkly test` command executes all checks in your project on the Checkly cl
 
 ## Usage
 
-```bash
+```bash Terminal
 npx checkly test
 ```
 
@@ -16,22 +16,22 @@ Run all checks in your project as a dry run.
 
 ## Extended Usage
 
-```bash
+```bash Terminal
 npx checkly test product api
 ```
 Run only checks that contain `product` and `api` in their file names.
 
-```bash
+```bash Terminal
 npx checkly test --record --location eu-west-1
 ```
 Record a test session with full logging, videos, and traces in the EU West region.
 
-```bash
+```bash Terminal
 npx checkly test --env ENVIRONMENT_URL="https://staging.acme.com" --env PASSWORD=secret123
 ```
 Run checks with specific environment variables for testing against staging environments.
 
-```bash
+```bash Terminal
 npx checkly test --grep "homepage|checkout" --tags production,critical
 ```
 Run checks matching regex patterns and containing specific tags.
@@ -41,7 +41,7 @@ Run checks matching regex patterns and containing specific tags.
 ### `--list`
 Display all checks in your project without executing them.
 
-```bash
+```bash Terminal
 npx checkly test --list
 ```
 
@@ -50,7 +50,7 @@ Useful for verifying which checks would be included in a test run.
 ### `--grep <pattern>` or `-g`
 Run only checks where the check name matches a JavaScript regular expression.
 
-```bash
+```bash Terminal
 npx checkly test --grep "api.*test"
 npx checkly test -g "homepage|checkout"
 ```
@@ -58,7 +58,7 @@ npx checkly test -g "homepage|checkout"
 ### `--update-snapshots` or `-u`
 Update the golden images and reference snapshots for visual comparison and snapshot tests.
 
-```bash
+```bash Terminal
 npx checkly test --update-snapshots
 ```
 
@@ -67,7 +67,7 @@ npx checkly test --update-snapshots
 ### File Pattern Matching
 You can specify file patterns as arguments to run specific subsets of checks:
 
-```bash
+```bash Terminal
 npx checkly test home.spec.js          # Run specific file
 npx checkly test api                   # Run files containing 'api'
 npx checkly test product checkout      # Run files containing 'product' OR 'checkout'
@@ -94,7 +94,7 @@ This command supports the following [global options](/cli-reference/global-optio
 The `test` command is particularly powerful when combined with environment variables, allowing you to target different environments with specific configurations:
 
 ### Staging Environment
-```bash
+```bash Terminal
 npx checkly test \
   --env ENVIRONMENT_URL="https://staging.acme.com" \
   --env API_KEY="staging_key_123" \
@@ -102,7 +102,7 @@ npx checkly test \
 ```
 
 ### Using Environment Files
-```bash
+```bash Terminal    
 # .env.staging
 ENVIRONMENT_URL=https://staging.acme.com
 API_KEY=staging_key_123

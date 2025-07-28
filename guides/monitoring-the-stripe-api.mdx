@@ -38,7 +38,9 @@ If we were interested in just verifying a server or a virtual machine's availabi
 
 The more customisable the HTTP request is, the more cases can be covered, for example with authentication, headers and payloads.
 
-> It is worth noting that in real-world scenarios, requests do not happen in a vacuum: they are often handling data retrieved previously, possibly by earlier API calls. Therefore, some mechanism to gather this data and inject it into the request is often needed.
+<Note>
+It is worth noting that in real-world scenarios, requests do not happen in a vacuum: they are often handling data retrieved previously, possibly by earlier API calls. Therefore, some mechanism to gather this data and inject it into the request is often needed.
+</Note>
 
 Let's dive in deeper into each point.
 
@@ -56,14 +58,14 @@ Essentially, we are trying to craft a complete request for exact endpoint. Not o
 
 One such case can be where user-specified parameters such as pagination and timeframes might largely change the response. This is exemplified by the `List Customers` method in [Stripe's Customer API](https://stripe.com/docs/api/customers/list?lang=curl), which we can use to query elements in very different ways, such as by just specifying a limit of results or asking for all results linked to a specific creation date. In this case, both of the following cases are worth monitoring:
 
-```sh
+```sh Terminal
 curl https://api.stripe.com/v1/customers \
   -u sk_test_4eC39HqLyjWDarjtT1zdp7dc: \
   -d limit=3 \
   -G
 ```
 
-```sh
+```sh Terminal      
 curl https://api.stripe.com/v1/customers \
   -u sk_test_4eC39HqLyjWDarjtT1zdp7dc: \
   -d created=1616519668 \
@@ -72,7 +74,7 @@ curl https://api.stripe.com/v1/customers \
 
 If we chose to set up a call using Javascript, for example, we could achieve the same call as in the first case above using [axios](https://github.com/axios/axios):
 
-```js
+```js Stripe.js
 const { default: axios } = require("axios");
 const AUTH_TOKEN = Buffer.from(process.env.API_KEY).toString('base64')
 
@@ -98,7 +100,7 @@ We also need to authenticate to GitHub, by sending over our [personal access tok
 
 The request body will contain our GraphQL query:
 
-```graphql
+```graphql GraphQL.gql
 query {
   repository(owner:"checkly", name:"headless-recorder") {
     issues(last:3, states:OPEN) {
@@ -122,7 +124,7 @@ query {
 
 Putting it all together into a cURL command:
 
-```sh
+```sh Terminal
 curl https://api.github.com/graphql -H "Authorization: bearer <GITHUB_TOKEN>" -d '{"query":"query { repository (owner:\"checkly\", name:\"headless-recorder\") { issues (last:3,states:OPEN) { edges { node{ title url labels(first:3) { edges { node { name } } } } } } } }","variables":{}}'
 ```
 
@@ -206,7 +208,7 @@ To validate the API response, we should be able to check against
 
 Let's look at an example: creating a customer via the [Stripe Customer API](https://stripe.com/docs/api/customers/create?lang=curl). Since we are not the API's developers, we are assuming the result we get running call right now is correct and can be used to model our assertions. Let's run the following curl command in verbose mode:
 
-```sh
+```sh Terminal
 curl -v https://api.stripe.com/v1/customers \
   -u sk_test_4eC39HqLyjWDarjtT1zdp7dc: \
   -d description="My First Test Customer (created for API docs)"
@@ -252,7 +254,7 @@ And finally the response body, which we might want to inspect to ensure the righ
 
 We could expand on our previous code example by add adding an assertion library, such as [chai's](https://www.chaijs.com/api/assert/) or [Jest expect](https://jestjs.io/docs/expect):
 
-```js
+```js Stripe.js
 const { default: axios } = require("axios");
 const expect = require('expect')
 
@@ -364,7 +366,7 @@ As we increase our monitoring coverage across our APIs, we can also increase the
 ## Read More
 
 <div class="cards-list">
-<Card title="Checkly CLI" href="/guides/monitoring-as-code-cli/">
+<Card title="Monitoring as Code" href="/guides/monitoring-as-code/">
   Understand monitoring as code (MaC) via our Checkly CLI.
 </Card>
 

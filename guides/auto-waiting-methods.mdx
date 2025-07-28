@@ -1,10 +1,8 @@
 ---
-title: What to do when auto-waiting isn't working
+title: Troubleshooting Auto-Waiting in Playwright
 sidebarTitle: Auto-Waiting Troubleshooting
 description: >-
   Playwright's auto-waiting is a great feature to avoid test flakiness, but in some situations it doesn't work as expected, what are the alternatives?
-author: Nočnica Mellifera
-avatar: 'images/avatars/nica-mellifera.png'
 tags:
   - FAQ
 ---
@@ -19,7 +17,7 @@ The reason not to add hard waits is simple: Playwright provides better ways to t
 
 Every time you tell Playwright to do something like:
 
-```ts
+```ts Playwright.test.ts
   await page.waitForTimeout(10000);
 ```
 
@@ -37,14 +35,13 @@ I’ve created a somewhat contrived scenario where waiting *seems* to be the bes
 
 In the following contrived example, a UI that looks fully loaded and functioning **starts reacting to user interactions only after five seconds**. Buttons that should open a modal, open it after this artificially added delay.
 
-> [!NOTE]
-> While this scenario might seem extreme, the pattern of unresponsive UI is very common.
->
-> Modern Frontend Frameworks often deliver static and unresponsive HTML that starts functioning after loading the required JavaScript. This adding of functionality is called hydration, and websites often appear unresponsive and broken before all code is loaded.
+<Warning>
+ While this scenario might seem extreme, the pattern of unresponsive UI is very common. Modern Frontend Frameworks often deliver static and unresponsive HTML that starts functioning after loading the required JavaScript. This adding of functionality is called hydration, and websites often appear unresponsive and broken before all code is loaded.
 
-*I know it seems odd that I’ve added a giant HTML file here with embedded JS, but we will want to refer to the page structure*
+I know it seems odd that I’ve added a giant HTML file here with embedded JS, but we will want to refer to the page structure
+</Warning>
 
-```html
+```html modalLoader.html
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -107,7 +104,7 @@ But if you try again after five seconds, the modal opens as expected.
 
 A test relying on Playwright's auto-waiting will fail with this page.
 
-```ts
+```ts Playwright.test.ts
 
 import { test, expect } from '@playwright/test';
 
@@ -123,7 +120,7 @@ test('test', async ({ page }) => {
 
 As a quick fix, we might be tempted to make this test functional by adding a hardcoded timeout:
 
-```ts
+```ts Playwright.test.ts
 import { test, expect } from '@playwright/test';
 
 test('test', async ({ page }) => {
@@ -182,7 +179,7 @@ This change isn’t just fixing the end-to-end test; it has the knock-on benefit
 
 Once this change is made, Playwright's auto-waiting will work as expected, since it’s waiting for the buttons to become active and enabled.
 
-```ts
+```ts Playwright.test.ts
 import { test, expect } from '@playwright/test';
 
 test('test', async ({ page }) => {
@@ -226,7 +223,7 @@ Playwright has built-in functions to wait for an event before continuing with ex
 
 This example waits for any response matching the given pattern:
 
-```ts
+```ts Playwright.test.ts
 // Attach network event listener
 const responsePromise = page.waitForResponse('site.example/modalBackend');
 // Trigger network request
@@ -244,7 +241,7 @@ But sometimes, there will be multiple requests to a URL. For example, when polli
 
 In these cases, `waitForResponse` lets us access and wait for response details, too.
 
-```ts
+```ts Playwright.test.ts
 // Attach network event listener and
 // wait for PUT requests receiving a 200 status code
 const responsePromise = page.waitForResponse(response =>
@@ -282,7 +279,7 @@ If we consider the modal example, you can try to repeat your actions until they 
 
 Playwright's `toPass` assertion allows you to implement precisely this functionality.
 
-```ts
+```ts Playwright.test.ts
 import { test, expect } from '@playwright/test';
 
 test('test', async ({ page }) => {

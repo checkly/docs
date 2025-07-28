@@ -1,12 +1,8 @@
 ---
-title: How to create an API monitor using an OpenAPI (Swagger) spec
-sidebarTitle: API Monitoring
-description: >-
-  OpenAPI and Swagger help users design and document APIs in a way that is readable from both humans and machines. As a consequence, they can also be used to generate the code that will run the specified API - both on the provider and consumer side. Can we leverage this same principle to simplify API monitoring? After a brief first look at OpenAPI and Swagger, this article will show how we can quickly use them to monitor a new or existing API.
-author: Giovanni Rago
-avatar: 'images/avatars/giovanni-rago.png'
-tags:
-  - API
+title: How to Create an API Monitor using an OpenAPI (Swagger) Spec
+sidebarTitle: Monitoring an OpenAPI Spec
+description: OpenAPI and Swagger help users design and document APIs in a way that is readable from both humans and machines. As a consequence, they can also be used to generate the code that will run the specified API - both on the provider and consumer side. Can we leverage this same principle to simplify API monitoring? After a brief first look at OpenAPI and Swagger, this article will show how we can quickly use them to monitor a new or existing API.
+tags: API Monitoring
 ---
 
 ## What is the OpenAPI Specification?
@@ -33,7 +29,7 @@ The core of our API specification will happen in the OpenAPI root document, norm
 
 The bare minimum we need to declare is the OpenAPI version, the basic information about our API, and finally the available endpoints.
 
-```yml
+```yml OpenAPI.yml
 openapi: 3.0.0
 info:
   title: OpenAPI document for our new Payment API
@@ -43,7 +39,7 @@ paths: {} # Nothing here yet
 
 An API without endpoints is not very useful. We can add our first, together with a `GET` operation:
 
-```yml
+```yml OpenAPI.yml
 openapi: 3.0.0
 info:
   title: OpenAPI document for our new Payment API
@@ -58,7 +54,7 @@ paths:
 
 The next step is to define what the operation will look like. In this case, we will specify some constraints on the `id` parameter, as well as the response.
 
-```yml
+```yml OpenAPI.yml
 openapi: 3.0.0
 info:
   title: OpenAPI document for our new Payment API
@@ -91,7 +87,7 @@ Notice we are explicitly defining which schemas the parameter and response shoul
 
 As we proceed, we might add multiple endpoints, each with one or more operations.
 
-```yml
+```yml OpenAPI.yml
 openapi: 3.0.0
 info:
   title: OpenAPI document for our new Payment API
@@ -127,7 +123,7 @@ When writing a new API, we will oftentimes need to produce a certain amount of b
 
 The following snippet is an example of the code Swagger Codegen can generate starting from an OAS file.
 
-```js
+```js OpenAPI.js
 /**
    * Invokes the REST service using the supplied settings and parameters.
    * @param {String} path The base URL to invoke.
@@ -240,7 +236,7 @@ As we look to increase our endpoint coverage across our APIs, we might want to e
 ## Read More
 
 <div class="cards-list">
-<Card title="Checkly CLI" href="/guides/monitoring-as-code-cli/">
+<Card title="Monitoring as Code" href="/guides/monitoring-as-code/">
   Understand monitoring as code (MaC) via our Checkly CLI.
 </Card>
 

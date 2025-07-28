@@ -1,12 +1,7 @@
 ---
-title: How to use setup scripts for better API monitoring
-displayTitle: How to use setup scripts for better API monitoring
-description: >-
-  Setup scripts are a fundamental tool to tailor API checks to your own target endpoints. Their power and flexibility can intimidate beginners, who might struggle to understand how the different parts fit together. This guide will present and break down different real-world examples to help you master this game-changing tool.
-author: Giovanni Rago
-avatar: 'images/avatars/giovanni-rago.png'
-tags:
-  - API
+title: How to Use Setup Scripts for Better API Monitoring
+description: Setup scripts are a fundamental tool to tailor API checks to your own target endpoints. Their power and flexibility can intimidate beginners, who might struggle to understand how the different parts fit together. This guide will present and break down different real-world examples to help you master this game-changing tool.
+tags: API Monitoring
 sidebarTitle: Setup Scripts for API Monitoring
 ---
 
@@ -54,13 +49,13 @@ Note that we are including the `Authorization` header set to `Bearer <YOUR_CHECK
 
 Let's now look at the setup script. The first thing we need to do is decide what library we will use for creating our dummy check, then import it. I will use [axios](https://axios-http.com/):
 
-```js
+```js SetupScript.js
 const axios = require("axios"); // import axios library explicitly
 ```
 
 The basic axios config will set up a POST request to our [`CREATE CHECK` endpoint](https://www.checklyhq.com/docs/api#operation/postV1Checks) at `https://api.checklyhq.com/v1/checks`. We will set the `Authorization` header to pass our account's API key to authenticate ourselves.
 
-```js
+```js SetupScript.js
 const { data } = await axios({ // create dummy check on Checkly
   method: "post",
   url: "https://api.checklyhq.com/v1/checks",
@@ -73,7 +68,7 @@ const { data } = await axios({ // create dummy check on Checkly
 
 Note that you can use [environment variables](https://www.checklyhq.com/docs/api-checks/variables/) not to expose your credentials in the setup script:
 
-```js
+```js SetupScript.js
 const apiKey = process.env.API_KEY;
 
 const { data } = await axios({ // create dummy check on Checkly
@@ -87,7 +82,7 @@ const { data } = await axios({ // create dummy check on Checkly
 
 Next we specify the body of our axios request, which states how the check we want created for us will look like:
 
-```js
+```js SetupScript.js
 const { data } = await axios({ // create dummy check on Checkly
   ...
   data: {
@@ -107,14 +102,14 @@ const { data } = await axios({ // create dummy check on Checkly
 
 The last bit of the script is where we will extract the `id` of the newly created dummy check from the response to our axios request, in order to pass it on to our API check's own HTTP request. Specifically, we will add the `id` to the target URL, as the target endpoint (`DELETE /v1/checks/{id}`) requires.
 
-```js
+```js SetupScript.js
 const checkId = data.id; // extract dummy check id from response
 request.url = request.url + "/" + checkId; // pass check id as path param in check's main http request url
 ```
 
 Putting everything together, the final result is:
 
-```js
+```js SetupScript.js
 const axios = require("axios"); // import axios library explicitly
 const apiKey = process.env.API_KEY;
 
@@ -162,7 +157,7 @@ Our main request will hit the `POST` endpoint at `https://fakestoreapi.com/produ
 
 Now for the setup script. We are going to have an external API generate random data for us. In this case, we want to request information about a random device (e.g. a smartphone) from `random-data-api.com`, precisely with a `GET` to `https://random-data-api.com/api/device/random_device`. Using axios, the request will look as follows:
 
-```js
+```js SetupScript.js
 const axios = require('axios') // import axios library explicitly
 
 const { data } = await axios({ // retrieve random device information from random-data-api.com
@@ -188,7 +183,7 @@ The response body we will get back from this endpoint will look similar to the f
 
 We will then need to extract some of this information and manually add it to the right fields in the body of the second request, to match its expected schema. First, let's create the object that will make up the response body.
 
-```js
+```js SetupScript.js
 const responseData = { // create the response body object
   title: data.model,
   price: data.id,
@@ -201,13 +196,13 @@ Notice that, since the first API did not return anything to do with the product'
 
 Now, we can transform the object into a JSON string and add it to the body of the second request:
 
-```js
+```js SetupScript.js
 request.body = JSON.stringify(responseData) // set request body to stringified response body object
 ```
 
 Putting everything together our setup script will look as follows:
 
-```js
+```js SetupScript.js
 const axios = require('axios') // import axios library explicitly
 
 const { data } = await axios({ // retrieve random device information from random-data-api.com
@@ -232,7 +227,7 @@ We built a fully encapsulated check that fetches dynamic (random, in this case) 
 ## Read More
 
 <div class="cards-list">
-<Card title="Checkly CLI" href="/guides/monitoring-as-code-cli/">
+<Card title="Monitoring as Code" href="/guides/monitoring-as-code/">
   Understand monitoring as code (MaC) via our Checkly CLI.
 </Card>
 

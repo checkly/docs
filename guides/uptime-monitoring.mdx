@@ -8,7 +8,7 @@ date: 2025-07-12
 avatar: 'images/avatars/nica-mellifera.png'
 tags:
   - FAQ
-sidebarTitle: The First Line of Defense
+sidebarTitle: A Guide to Uptime Monitoring
 ---
 
 Uptime Monitoring is part of a ‘[reliability in depth](https://www.checklyhq.com/blog/the-defense-in-depth-approach-to-app-monitoring/)’ strategy of guaranteeing that your services maintain available and performant while allowing you to meet your Service Level Agreements (SLAs) with your customers. You can combine Uptime Monitoring with [Synthetinc Monitoring](https://www.checklyhq.com/learn/monitoring/synthetic-monitoring/) and full-stack traces for a deep, 360 degree view into your applications health. The following guide will focus on your first layer of defense, Uptime Monitoring, and show you how to monitor every endpoint, service, and URL that your service supports. As an extension, you may consider monitoring third-party services that your service relies on. This guide will cover the three types of uptime monitors we have at Checkly:
@@ -25,7 +25,7 @@ This can be useful for monitoring your homepage, landing pages, product pages, a
 
 It’s easy to create a URL Monitor from your IDE with Checkly CLI, just create a check file in your project with the `URLMonitor` type:
 
-```tsx
+```tsx UptimeMonitoring.check.ts
 //urlPinger.check.js
 import { Frequency, UrlMonitor, UrlAssertionBuilder } from 'checkly/constructs'
 
@@ -54,7 +54,7 @@ Along with monitoring your own services, both URL monitors and synthetics checks
 
 While URL checks will send regular HTTP requests, we all still have services that will only respond to TCP requests, for example mail services and ftp services. For these there’s TCP checks. Just like the other checks in this guide, you can create monitors from your IDE with Monitoring as code. Here’s an example:
 
-```tsx
+```tsx UptimeMonitoring.check.ts
 import { TcpMonitor, TcpAssertionBuilder } from 'checkly/constructs'
 
 new TcpMonitor('hello-tcp-1', {
@@ -91,7 +91,7 @@ Another type of service you’ll want to monitor is one that doesn’t accept an
 
 There’s really not much to getting one to work, just set up a heartbeat in the Checkly UI or with the Checkly CLI. For example, the following code 
 
-```tsx
+```tsx UptimeMonitoring.check.ts      
 //heartbeat.check.ts
 import { HeartbeatCheck } from 'checkly/constructs'
 

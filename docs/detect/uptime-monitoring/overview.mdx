@@ -6,39 +6,61 @@ sidebarTitle: 'Overview'
 
 Uptime monitoring is essential for ensuring your applications are always available to your users. Checkly provides comprehensive uptime monitoring capabilities to help you track and maintain your application's reliability.
 
-## Uptime Monitoring In Checkly
+## Benefits
 
-Uptime monitoring continuously checks if your applications and services are accessible and responding correctly. It helps you:
+Uptime monitoring continuously checks if your applications and services are accessible and responding correctly. Typical use cases include:
 
-- Detect outages and performance issues quickly
-- Track your application's availability over time
-- Receive immediate alerts when problems occur
-- Maintain high service levels for your users
+- Ensuring your marketing site returns a 200 OK
+- Verifying your documentation site loads quickly
+- Checking that your SSL certificate is still valid
+- Confirming that a public pricing endpoint is reachable for customers
 
-## Key Features
+## Types of Uptime Monitors
 
-<CardGroup>
-<Card title="Global Monitoring" icon="globe">
-Monitor your applications from multiple locations worldwide to ensure they're accessible from anywhere your users are located.
-</Card>
-<Card title="Response Time Tracking" icon="clock">
-Track how quickly your applications respond, helping you identify performance degradation before it becomes a problem.
-</Card>
-<Card title="Status Code Monitoring" icon="code">
-Ensure your applications return the correct HTTP status codes and handle errors appropriately.
-</Card>
-<Card title="SSL Certificate Monitoring" icon="lock">
-Automatically monitor SSL certificate expiration and validity to prevent security issues.
-</Card>
-</CardGroup>
+<AccordionGroup>
+<Accordion title="URL Monitors" defaultOpen>
+URL monitors are the most common type of uptime monitor. They check if your application is accessible from a specific URL.
 
-## Getting Started With Uptime Monitoring
+[Learn more about URL Monitors](/docs/detect/uptime-monitoring/url-monitors/overview)
+</Accordion>
+<Accordion title="Heartbeat Monitors">
+Heartbeat monitors are a type of uptime monitor that checks if your application is responding to a specific endpoint.
 
-1. **Create a Check**: Set up your first uptime check in the Checkly dashboard
-2. **Configure Locations**: Choose monitoring locations that match your user base
-3. **Set Thresholds**: Define acceptable response times and status codes
-4. **Configure Alerts**: Set up notifications for when issues are detected
-5. **Monitor Results**: Track your uptime metrics and performance over time
+[Learn more about Heartbeat Monitors](/docs/detect/uptime-monitoring/heartbeat-monitors/overview)
+</Accordion>
+<Accordion title="TCP Monitors">
+TCP monitors are a type of uptime monitor that checks if your application is responding to a specific ping.
+
+[Learn more about TCP Monitors](/docs/detect/uptime-monitoring/tcp-monitors/overview)
+</Accordion>
+</AccordionGroup>
+
+## Alerting
+Uptime Monitors can be configure to alert when:
+- a status code returns a value not equal to the set status code
+- a response time exceeds a set thresholds
+
+To learn more about alerting, see [Alerting](/docs/introduction/concepts/alerting).
+
+## Scheduling
+Uptime Monitors are scheduled to run at a frequency that is appropriate for the service being monitored - you can change the frequency in the Checkly dashboard or via your configuration files. 
+
+To learn more about scheduling, see [Scheduling](/docs/introduction/concepts/scheduling).
+
+## Locations
+Uptime Monitors can be configured to run from multiple locations around the world. This helps you ensure your application is available from all parts of the world.
+
+To learn more about locations, see [Locations](/docs/introduction/concepts/locations).
+
+
+## Metrics
+
+| Metric | Description |
+|--------|-------------|
+| Uptime Percentage | The percentage of time your application is available |
+| Response Time | How quickly your application responds to requests |
+| Status Codes | The HTTP status codes returned by your application |
+| Error Rates | The frequency of errors and failures |
 
 
 ## Best Practices
@@ -48,8 +70,3 @@ Automatically monitor SSL certificate expiration and validity to prevent securit
 - Configure appropriate alerting rules
 - Regularly review and update your monitoring setup
 - Use synthetic monitoring alongside uptime monitoring
-
-## Next Steps
-
-- [Testing](/docs/platform/detect/testing)
-- [Synthetic Monitoring](/docs/platform/detect/synthetic-monitoring) 

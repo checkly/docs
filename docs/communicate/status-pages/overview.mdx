@@ -8,43 +8,6 @@ import { Note, Warning, Tip, Steps } from 'mintlify/components'
 
 Status pages provide transparent communication about your service health and incidents to customers, users, and stakeholders. Checkly's status pages automatically reflect your monitoring results and create a professional interface for incident communication.
 
-## What are Status Pages?
-
-Status pages are public-facing websites that display real-time information about your services' health and operational status. They serve as the primary communication channel between your team and your users during both normal operations and incidents.
-
-<CardGroup cols={2}>
-<Card title="Real-time health display" icon="heartbeat">
-**Live Service Status**
-- Display current health of all services
-- Automatic updates from monitoring checks
-- Historical uptime and performance data
-- Color-coded status indicators
-</Card>
-
-<Card title="Incident communication" icon="megaphone">
-**Professional Incident Management**
-- Automated incident creation from check failures
-- Manual incident creation for planned maintenance
-- Real-time updates and status progression
-- Email notifications for subscribers
-</Card>
-
-<Card title="Custom branding" icon="paintbrush">
-**Professional Appearance**
-- Custom logos and favicon
-- Theme selection (light/dark/auto)
-- Custom domains and subdomains
-- Branded communication
-</Card>
-
-<Card title="User engagement" icon="users">
-**Subscriber Management**
-- Email subscription system
-- Verified subscriber notifications
-- Incident-specific updates
-- Maintenance announcements
-</Card>
-</CardGroup>
 
 ## Core Status Page Components
 
@@ -78,16 +41,14 @@ Organize and group services for better user experience:
 Connect monitoring checks directly to services for automated incident handling:
 
 <CardGroup cols={2}>
-<Card title="Automatic incident creation" icon="zap">
-**When Checks Fail**
+<Card title="When Checks Fail" >
 - Incident opened automatically
 - Service status updated to "Major Outage" or "Partial Outage"
 - Subscribers notified via email
 - Status page reflects current state
 </Card>
 
-<Card title="Automatic incident resolution" icon="check-circle">
-**When Checks Recover**
+<Card title="When Checks Recover">
 - Incident automatically resolved
 - Service status returned to "Operational"
 - Resolution notification sent to subscribers
@@ -95,58 +56,8 @@ Connect monitoring checks directly to services for automated incident handling:
 </Card>
 </CardGroup>
 
-## Subscriber Management and Notifications
 
-### Email Subscription System
-Enable users to stay informed about service status:
-
-<Steps>
-<Step title="Subscription Setup">
-Users provide email address for status updates
-</Step>
-
-<Step title="Email Verification">
-Verification email sent to confirm subscription
-</Step>
-
-<Step title="Notification Preferences">
-Users can manage notification settings
-</Step>
-
-<Step title="Incident Notifications">
-Automatic emails for incident updates and resolutions
-</Step>
-</Steps>
-
-### Notification Content Structure
-Status page notifications include comprehensive incident information:
-
-```text
-Subject: [INCIDENT] Payment Processing - Service Disruption
-
-Hello,
-
-We are currently experiencing issues with our Payment Processing service.
-
-Incident Details:
-- Service: Payment Processing
-- Status: Investigating
-- Started: January 15, 2024 at 14:30 UTC
-- Impact: Users may experience payment failures
-
-We are actively working to resolve this issue and will provide updates
-as more information becomes available.
-
-View status page: https://status.yourcompany.com
-Unsubscribe: [unsubscribe link]
-
-Best regards,
-Your Company Team
-```
-
-## Advanced Features
-
-### Incident Backfilling
+## Incident Backfilling
 Add historical incidents to maintain accurate status page history:
 
 <Steps>
@@ -171,23 +82,6 @@ Backfilled incidents are included in uptime statistics
 When backfilling historical incidents, consider whether to notify current subscribers. Usually, you want to disable notifications for historical events to avoid confusion.
 </Tip>
 
-### Multi-Check Service Integration
-Connect multiple monitoring checks to a single service:
-
-```yaml
-# Example: E-commerce Checkout Service
-Checkout Service:
-  Connected Checks:
-    - Payment Processing API
-    - Inventory Management API
-    - Order Confirmation Email
-    - Shopping Cart Functionality
-  
-  Incident Logic:
-    - Any single check failure = "Partial Outage"
-    - Multiple check failures = "Major Outage"
-    - All checks failing = "Complete Outage"
-```
 
 ## Status Page Best Practices
 

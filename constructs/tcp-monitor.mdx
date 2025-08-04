@@ -1,0 +1,289 @@
+---
+title: 'TcpMonitor Construct'
+description: 'Learn how to configure TCP monitors with the Checkly CLI.'
+sidebarTitle: 'TCP Monitor'
+---
+
+Use TCP monitors to verify connectivity and response times of your TCP services. The examples below show how to configure monitoring for different types of services.
+
+<Info>
+Learn more about TCP monitors in the [TCP Monitors overview](/docs/detect/uptime-monitoring/tcp-monitors/overview).
+</Info>
+
+## `TcpMonitor` Examples
+
+<CodeGroup>
+
+```ts Basic Example
+import { TcpMonitor, TcpAssertionBuilder } from 'checkly/constructs'
+
+new TcpMonitor('database-tcp-1', {
+  name: 'Database Connection Check',
+  activated: true,
+  maxResponseTime: 5000,
+  degradedResponseTime: 2000,
+  request: {
+    hostname: 'db.example.com',
+    port: 5432,
+    ipFamily: 'IPv4',
+    assertions: [
+      TcpAssertionBuilder.responseTime().lessThan(1000)
+    ]
+  }
+})
+```
+
+```ts Advanced Example
+import { TcpMonitor, TcpAssertionBuilder, Frequency } from 'checkly/constructs'
+
+new TcpMonitor('redis-tcp-1', {
+  name: 'Redis Service Check',
+  activated: true,
+  frequency: Frequency.EVERY_5M,
+  locations: ['us-east-1', 'eu-west-1'],
+  maxResponseTime: 3000,
+  degradedResponseTime: 1500,
+  tags: ['redis', 'cache', 'critical'],
+  request: {
+    hostname: 'redis.example.com',
+    port: 6379,
+    ipFamily: 'IPv4',
+    data: 'PING\r\n',
+    assertions: [
+      TcpAssertionBuilder.responseTime().lessThan(500),
+      TcpAssertionBuilder.responseData().contains('PONG')
+    ]
+  }
+})
+```
+
+</CodeGroup>
+
+## `TcpMonitor` Configuration
+
+<Tabs>
+  <Tab title="Unique Configuration">
+
+Configure performance thresholds for your TCP monitors:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `maxResponseTime` | `number` | ❌ | `30000` | Maximum response time in milliseconds before marking as failed |
+| `degradedResponseTime` | `number` | ❌ | `15000` | Response time threshold in milliseconds for degraded status |
+| `shouldFail` | `boolean` | ❌ | `false` | When true, monitor succeeds if connection fails |
+| `request` | `object` | ✅ | - | TCP connection configuration object |
+
+</Tab>
+
+<Tab title="Shared Configuration">
+Configure common properties that apply to all monitor types:
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `name` | `string` | ✅ | - | Friendly name for your monitor |
+| `frequency` | `Frequency` | ❌ | - | How often to run your monitor |
+| `locations` | `string[]` | ❌ | `[]` | Array of public location codes |
+| `privateLocations` | `string[]` | ❌ | `[]` | Array of Private Location slugs |
+| `activated` | `boolean` | ❌ | `true` | Whether the monitor is enabled |
+| `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
+| `group` | `CheckGroup` | ❌ | - | The CheckGroup this monitor belongs to |
+| `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Array of AlertChannel objects for notifications |
+| `tags` | `string[]` | ❌ | `[]` | Array of tags to organize monitors |
+| `testOnly` | `boolean` | ❌ | `false` | Only run with test, not during deploy |
+| `retryStrategy` | `RetryStrategy` | ❌ | - | Strategy for configuring retries |
+| `runParallel` | `boolean` | ❌ | `false` | Run monitors in parallel or round-robin |
+| `alertEscalationPolicy` | `AlertEscalationPolicy` | ❌ | - | Advanced alert settings |
+
+</Tab>
+</Tabs>
+
+## `request` Configuration
+
+The `request` object is a mandatory part of a TCP monitor and defines the connection parameters:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `hostname` | `string` | ✅ | - | The hostname to connect to (without scheme or port) |
+| `port` | `number` | ✅ | - | The port number for the TCP connection |
+| `ipFamily` | `string` | ❌ | `'IPv4'` | IP family: `'IPv4'` \| `'IPv6'` |
+| `data` | `string` | ❌ | - | Data to send to the target host |
+| `assertions` | `array` | ❌ | `[]` | Response assertions using `TcpAssertionBuilder` |
+
+<Info>
+Use the `hostname` parameter without including a scheme (like `http://`) or port number. Specify the port separately using the `port` parameter.
+</Info>
+
+## `assertions` Configuration
+
+You can define assertions using the `TcpAssertionBuilder` to validate both response time and response data:
+
+<Tabs>
+  <Tab title="Response Time">
+    ```ts
+    // Assert response time is less than 1000ms
+    TcpAssertionBuilder.responseTime().lessThan(1000)
+    ```
+    
+    Renders to:
+    ```json
+    { 
+      "source": "RESPONSE_TIME", 
+      "regex": "", 
+      "property": "", 
+      "comparison": "LESS_THAN", 
+      "target": "1000" 
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Response Data">
+    ```ts
+    // Assert response contains specific text
+    TcpAssertionBuilder.responseData().contains('ping')
+    ```
+    
+    Renders to:
+    ```json
+    { 
+      "source": "RESPONSE_DATA", 
+      "regex": "", 
+      "property": "", 
+      "comparison": "CONTAINS", 
+      "target": "ping" 
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## TCP Monitor Examples
+
+<Tabs>
+  <Tab title="Database (PostgreSQL)">
+    ```ts
+    new TcpMonitor('postgres-check', {
+      name: 'PostgreSQL Connection',
+      frequency: Frequency.EVERY_5M,
+      maxResponseTime: 5000,
+      degradedResponseTime: 2000,
+      tags: ['database', 'postgres'],
+      request: {
+        hostname: 'db.example.com',
+        port: 5432,
+        assertions: [
+          TcpAssertionBuilder.responseTime().lessThan(1000)
+        ]
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Redis Cache">
+    ```ts
+    new TcpMonitor('redis-check', {
+      name: 'Redis Connectivity',
+      frequency: Frequency.EVERY_2M,
+      maxResponseTime: 2000,
+      degradedResponseTime: 1000,
+      tags: ['cache', 'redis'],
+      request: {
+        hostname: 'cache.example.com',
+        port: 6379,
+        data: 'PING\r\n',
+        assertions: [
+          TcpAssertionBuilder.responseTime().lessThan(500),
+          TcpAssertionBuilder.responseData().contains('PONG')
+        ]
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="SMTP Server">
+    ```ts
+    new TcpMonitor('smtp-check', {
+      name: 'SMTP Server Check',
+      frequency: Frequency.EVERY_10M,
+      maxResponseTime: 10000,
+      degradedResponseTime: 5000,
+      tags: ['email', 'smtp'],
+      request: {
+        hostname: 'mail.example.com',
+        port: 587,
+        assertions: [
+          TcpAssertionBuilder.responseTime().lessThan(3000),
+          TcpAssertionBuilder.responseData().contains('220')
+        ]
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="SSH Server">
+    ```ts
+    new TcpMonitor('ssh-check', {
+      name: 'SSH Connectivity',
+      frequency: Frequency.EVERY_15M,
+      maxResponseTime: 5000,
+      degradedResponseTime: 2000,
+      tags: ['ssh', 'server'],
+      request: {
+        hostname: 'server.example.com',
+        port: 22,
+        assertions: [
+          TcpAssertionBuilder.responseTime().lessThan(1000),
+          TcpAssertionBuilder.responseData().contains('SSH')
+        ]
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Custom Application Port">
+    ```ts
+    new TcpMonitor('app-port-check', {
+      name: 'Custom Application Port',
+      frequency: Frequency.EVERY_5M,
+      maxResponseTime: 3000,
+      degradedResponseTime: 1500,
+      tags: ['application', 'custom-port'],
+      request: {
+        hostname: 'app.example.com',
+        port: 8080,
+        data: 'HEALTH\n',
+        assertions: [
+          TcpAssertionBuilder.responseTime().lessThan(1000),
+          TcpAssertionBuilder.responseData().contains('OK')
+        ]
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Connection Failure Test">
+    ```ts
+    new TcpMonitor('blocked-port-check', {
+      name: 'Verify Port is Blocked',
+      frequency: Frequency.EVERY_30M,
+      maxResponseTime: 5000,
+      degradedResponseTime: 2000,
+      shouldFail: true, // Monitor succeeds when connection fails
+      tags: ['security', 'firewall'],
+      request: {
+        hostname: 'secure.example.com',
+        port: 23, // Telnet port that should be blocked
+        assertions: [
+          TcpAssertionBuilder.responseTime().lessThan(5000)
+        ]
+      }
+    })
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+When sending data to services, ensure you use proper protocol formatting. For example, Redis commands should end with `\r\n`.
+</Warning>
+
+<Info>
+Failing assertions will cause the monitor to fail, regardless of the `shouldFail` value. Use `shouldFail: true` when you want to verify that a connection is properly blocked or unavailable.
+</Info>

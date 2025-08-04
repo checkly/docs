@@ -1,0 +1,287 @@
+---
+title: 'MultiStepCheck Construct'
+description: 'Learn how to configure multistep checks with the Checkly CLI.'
+sidebarTitle: 'Multistep Check'
+---
+
+Use multistep checks to run complex end-to-end workflows with Playwright that span multiple pages and user interactions. The examples below show how to configure multistep checks for different testing scenarios.
+
+<Info>
+Learn more about multistep checks in the [Multistep Checks overview](/docs/detect/synthetic-monitoring/multistep-checks/overview).
+</Info>
+
+## `MultiStepCheck` Examples
+
+<CodeGroup>
+
+```ts Basic Example
+import { MultiStepCheck, Frequency } from 'checkly/constructs'
+import * as path from 'path'
+
+new MultiStepCheck('multistep-check-1', {
+  name: 'Multistep Check #1',
+  runtimeId: '2025.04',
+  frequency: Frequency.EVERY_10M,
+  locations: ['us-east-1', 'eu-west-1'],
+  code: {
+    entrypoint: path.join(__dirname, 'home.spec.ts')
+  }
+})
+```
+
+```ts Advanced Example
+import { MultiStepCheck, Frequency } from 'checkly/constructs'
+import * as path from 'path'
+
+new MultiStepCheck('complex-multistep-check', {
+  name: 'Complex User Journey',
+  activated: true,
+  runtimeId: '2025.04',
+  frequency: Frequency.EVERY_15M,
+  locations: ['us-east-1', 'eu-west-1'],
+  tags: ['e2e', 'user-journey', 'critical'],
+  environmentVariables: [
+    { key: 'BASE_URL', value: 'https://app.example.com' },
+    { key: 'TEST_USER_EMAIL', value: 'test@example.com' },
+    { key: 'TEST_USER_PASSWORD', value: '{{SECRET_PASSWORD}}', secret: true }
+  ],
+  code: {
+    entrypoint: path.join(__dirname, 'user-journey.spec.ts')
+  }
+})
+```
+
+</CodeGroup>
+
+## `MultiStepCheck` Configuration
+
+<Tabs>
+  <Tab title="Unique Configuration">
+
+Configure multistep-specific settings for your checks:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `code` | `object` | ✅ | - | The Playwright test code configuration |
+
+</Tab>
+
+<Tab title="Shared Configuration">
+Configure common properties that apply to all check types:
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `name` | `string` | ✅ | - | Friendly name for your check |
+| `frequency` | `Frequency` | ❌ | - | How often to run your check |
+| `locations` | `string[]` | ❌ | `[]` | Array of public location codes |
+| `privateLocations` | `string[]` | ❌ | `[]` | Array of Private Location slugs |
+| `activated` | `boolean` | ❌ | `true` | Whether the check is enabled |
+| `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
+| `group` | `CheckGroup` | ❌ | - | The CheckGroup this check belongs to |
+| `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Array of AlertChannel objects for notifications |
+| `tags` | `string[]` | ❌ | `[]` | Array of tags to organize checks |
+| `runtimeId` | `string` | ❌ | - | The ID of the runtime to use (2023.09 or later required) |
+| `testOnly` | `boolean` | ❌ | `false` | Only run with test, not during deploy |
+| `retryStrategy` | `RetryStrategy` | ❌ | - | Strategy for configuring retries |
+| `runParallel` | `boolean` | ❌ | `false` | Run checks in parallel or round-robin |
+| `alertEscalationPolicy` | `AlertEscalationPolicy` | ❌ | - | Advanced alert settings |
+| `environmentVariables` | `object[]` | ❌ | `[]` | Check-level environment variables |
+
+</Tab>
+</Tabs>
+
+## `code` Configuration
+
+The `code` object is a mandatory part of a multistep check and defines how to execute your Playwright test:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `entrypoint` | `string` | ❌ | Path to a `.spec.js` or `.spec.ts` file containing the Playwright test |
+| `content` | `string` | ❌ | Inline JavaScript/TypeScript code as a string |
+
+<Info>
+You must provide either `entrypoint` or `content`, but not both.
+</Info>
+
+```ts
+// Using file reference
+code: {
+  entrypoint: path.join(__dirname, 'complex-workflow.spec.ts')
+}
+
+// Using inline content
+code: {
+  content: `
+    import { test, expect } from '@playwright/test'
+
+    test('complete user workflow', async ({ page }) => {
+      // Step 1: Login
+      await page.goto('https://app.example.com/login')
+      await page.fill('[data-testid="email"]', process.env.TEST_EMAIL)
+      await page.fill('[data-testid="password"]', process.env.TEST_PASSWORD)
+      await page.click('[data-testid="login-button"]')
+      
+      // Step 2: Navigate to dashboard
+      await expect(page).toHaveURL(/dashboard/)
+      
+      // Step 3: Perform actions...
+    })
+  `
+}
+```
+
+## Multistep Check Examples
+
+<Tabs>
+  <Tab title="Complete User Onboarding">
+    ```ts
+    new MultiStepCheck('user-onboarding-flow', {
+      name: 'Complete User Onboarding Flow',
+      runtimeId: '2025.04',
+      frequency: Frequency.EVERY_30M,
+      locations: ['us-east-1', 'eu-west-1'],
+      tags: ['onboarding', 'critical-path'],
+      code: {
+        entrypoint: path.join(__dirname, 'onboarding.spec.ts')
+      }
+    })
+
+    // onboarding.spec.ts
+    import { test, expect } from '@playwright/test'
+
+    test('user onboarding journey', async ({ page }) => {
+      // Step 1: Registration
+      await page.goto('https://app.example.com/signup')
+      await page.fill('[data-testid="email"]', 'newuser@example.com')
+      await page.fill('[data-testid="password"]', 'SecurePass123!')
+      await page.click('[data-testid="signup-button"]')
+      
+      // Step 2: Email verification (simulate)
+      await expect(page.locator('[data-testid="verify-email-message"]')).toBeVisible()
+      
+      // Step 3: Profile setup
+      await page.goto('https://app.example.com/profile/setup')
+      await page.fill('[data-testid="first-name"]', 'John')
+      await page.fill('[data-testid="last-name"]', 'Doe')
+      await page.selectOption('[data-testid="country"]', 'US')
+      await page.click('[data-testid="save-profile"]')
+      
+      // Step 4: Welcome dashboard
+      await expect(page).toHaveURL(/dashboard/)
+      await expect(page.locator('[data-testid="welcome-message"]')).toContainText('Welcome, John!')
+    })
+    ```
+  </Tab>
+  
+  <Tab title="E-commerce Full Journey">
+    ```ts
+    new MultiStepCheck('ecommerce-journey', {
+      name: 'Complete E-commerce Journey',
+      runtimeId: '2025.04',
+      frequency: Frequency.EVERY_20M,
+      code: {
+        entrypoint: path.join(__dirname, 'ecommerce-journey.spec.ts')
+      }
+    })
+
+    // ecommerce-journey.spec.ts
+    import { test, expect } from '@playwright/test'
+
+    test('complete purchase journey', async ({ page }) => {
+      // Step 1: Browse products
+      await page.goto('https://shop.example.com')
+      await page.click('[data-testid="category-electronics"]')
+      
+      // Step 2: Product selection
+      await page.click('[data-testid="product-laptop"]')
+      await expect(page.locator('[data-testid="product-title"]')).toContainText('Laptop')
+      
+      // Step 3: Add to cart
+      await page.click('[data-testid="add-to-cart"]')
+      await expect(page.locator('[data-testid="cart-count"]')).toContainText('1')
+      
+      // Step 4: Guest checkout
+      await page.click('[data-testid="cart-button"]')
+      await page.click('[data-testid="checkout-button"]')
+      await page.click('[data-testid="guest-checkout"]')
+      
+      // Step 5: Fill shipping information
+      await page.fill('[data-testid="email"]', 'customer@example.com')
+      await page.fill('[data-testid="first-name"]', 'Jane')
+      await page.fill('[data-testid="last-name"]', 'Smith')
+      await page.fill('[data-testid="address"]', '123 Main St')
+      await page.fill('[data-testid="city"]', 'New York')
+      await page.fill('[data-testid="zip"]', '10001')
+      
+      // Step 6: Payment information
+      await page.fill('[data-testid="card-number"]', '4242424242424242')
+      await page.fill('[data-testid="card-expiry"]', '12/25')
+      await page.fill('[data-testid="card-cvc"]', '123')
+      
+      // Step 7: Complete order
+      await page.click('[data-testid="place-order"]')
+      await expect(page.locator('[data-testid="order-confirmation"]')).toBeVisible()
+      await expect(page.locator('[data-testid="order-number"]')).toMatch(/ORD-\d+/)
+    })
+    ```
+  </Tab>
+  
+  <Tab title="SaaS App Workflow">
+    ```ts
+    new MultiStepCheck('saas-workflow', {
+      name: 'SaaS Application Workflow',
+      runtimeId: '2025.04',
+      frequency: Frequency.EVERY_15M,
+      code: {
+        entrypoint: path.join(__dirname, 'saas-workflow.spec.ts')
+      }
+    })
+
+    // saas-workflow.spec.ts
+    import { test, expect } from '@playwright/test'
+
+    test('complete saas workflow', async ({ page }) => {
+      // Step 1: Login
+      await page.goto('https://app.example.com/login')
+      await page.fill('[data-testid="email"]', process.env.TEST_EMAIL)
+      await page.fill('[data-testid="password"]', process.env.TEST_PASSWORD)
+      await page.click('[data-testid="login-button"]')
+      
+      // Step 2: Create new project
+      await page.click('[data-testid="new-project-button"]')
+      await page.fill('[data-testid="project-name"]', 'Test Project')
+      await page.fill('[data-testid="project-description"]', 'Automated test project')
+      await page.click('[data-testid="create-project"]')
+      
+      // Step 3: Configure project settings
+      await page.click('[data-testid="project-settings"]')
+      await page.check('[data-testid="enable-notifications"]')
+      await page.selectOption('[data-testid="timezone"]', 'America/New_York')
+      await page.click('[data-testid="save-settings"]')
+      
+      // Step 4: Invite team member
+      await page.click('[data-testid="team-tab"]')
+      await page.click('[data-testid="invite-member"]')
+      await page.fill('[data-testid="member-email"]', 'teammate@example.com')
+      await page.selectOption('[data-testid="member-role"]', 'editor')
+      await page.click('[data-testid="send-invitation"]')
+      
+      // Step 5: Create and publish content
+      await page.click('[data-testid="content-tab"]')
+      await page.click('[data-testid="new-content"]')
+      await page.fill('[data-testid="content-title"]', 'Test Content')
+      await page.fill('[data-testid="content-body"]', 'This is test content')
+      await page.click('[data-testid="publish-content"]')
+      
+      // Step 6: Verify dashboard
+      await page.click('[data-testid="dashboard-tab"]')
+      await expect(page.locator('[data-testid="project-count"]')).toContainText('1')
+      await expect(page.locator('[data-testid="team-size"]')).toContainText('2')
+    })
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+Multistep checks are only supported on runtime 2023.09 or later. Make sure to specify a compatible `runtimeId` in your check configuration.
+</Warning>

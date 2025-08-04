@@ -1,188 +1,61 @@
 ---
 title: 'Synthetic Monitoring Overview'
-description: 'Comprehensive end-to-end monitoring with API checks, browser automation, and multistep workflows to ensure optimal user experiences and system reliability.'
+description: 'Comprehensive synthetic monitoring for detecting downtime and performance issues in APIs and Applications'
 sidebarTitle: 'Overview'
 ---
 
-Synthetic monitoring proactively validates your applications by simulating real user interactions and API workflows. Checkly's comprehensive synthetic monitoring platform ensures your critical systems work correctly from both technical and user experience perspectives.
-
 ## What is Synthetic Monitoring?
 
-Synthetic monitoring goes beyond simple uptime checks by executing realistic user journeys and API workflows. It validates complete business processes, user experiences, and system integrations before your users encounter issues.
+Synthetic monitoring goes beyond simple uptime checks by proactively validating your applications by simulating real user interactions and API workflows. Checkly's Synthetic Monitoring ensures your critical systems work correctly from both technical and user experience perspectives. It validates complete business processes, user experiences, and system integrations before your users encounter issues.
 
-![Synthetic monitoring dashboard showing API, browser, and multistep checks](/images/synthetic-monitoring/synthetic-monitoring-overview.png)
 
-<CardGroup cols={2}>
-<Card title="Proactive validation" icon="shield-check">
-- Detect issues before users experience them
-- Validate complete business workflows
-- Monitor global performance and availability
-- Ensure consistent user experiences
-</Card>
-
-<Card title="Complete coverage" icon="network-wired">
-- API endpoint monitoring and validation
-- Browser-based user journey testing
-- Complex multistep workflow verification
-- Performance and reliability tracking
-</Card>
-</CardGroup>
-
-## Synthetic Monitoring Check Types
+## Types of Synthetic Monitoring Checks
 
 Checkly provides three powerful check types to comprehensively monitor your applications:
 
-### API Checks
-Monitor individual API endpoints with detailed request/response validation.
+<AccordionGroup>
+<Accordion title="Browser Checks">
+Simulate real user interactions with automated browser testing using Playwright.
 
-<CardGroup cols={2}>
-<Card title="Perfect for" icon="api">
+**Great for:** User authentication flows, form submissions and workflows, payment processing, frontend performance monitoring.
+
+
+- [Learn more about Browser Checks](/docs/detect/synthetic-monitoring/browser-checks/overview)
+- [Browser Check Construct](/constructs/browser-check)
+
+</Accordion>
+<Accordion title="API Checks">
+Monitor individual API endpoints with detailed request/response validation. 
+
+**Great for:**
 - REST API health monitoring
 - Authentication endpoint validation
 - Third-party API integration testing
 - Microservice communication verification
 - Database connectivity checks
 - Performance threshold monitoring
-</Card>
 
-<Card title="Key capabilities" icon="check-circle">
-- HTTP methods (GET, POST, PUT, DELETE, PATCH)
-- Authentication (Bearer, Basic, API keys)
-- JSON/XML response validation
-- Custom headers and request bodies
-- Performance assertions and thresholds
-- Global monitoring locations
-</Card>
-</CardGroup>
+- [Learn more about API Checks](/docs/detect/synthetic-monitoring/api-checks/overview)
+- [API Check Construct](/constructs/api-check)
 
-```typescript
-// Example API check validation
-expect(response.status).to.equal(200)
-expect(response.responseTime).to.be.below(2000)
-const data = JSON.parse(response.body)
-expect(data.user.email).to.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
-```
+</Accordion>
 
-### Browser Checks
-Simulate real user interactions with automated browser testing using Playwright.
 
-<CardGroup cols={2}>
-<Card title="Perfect for" icon="browser">
-- User authentication flows
-- E-commerce checkout processes
-- Form submissions and workflows
-- SaaS application onboarding
-- Critical user journey validation
-- Frontend performance monitoring
-</Card>
 
-<Card title="Key capabilities" icon="mouse-pointer">
-- Real browser automation (Chromium/Chrome)
-- Playwright-powered interactions
-- Visual regression testing
-- Core Web Vitals collection
-- Mobile device simulation
-- Screenshot and video recording
-</Card>
-</CardGroup>
-
-```typescript
-// Example browser check workflow
-test('User login workflow', async ({ page }) => {
-  await page.goto('https://app.example.com/login')
-  await page.fill('[data-testid="email-input"]', 'test@example.com')
-  await page.fill('[data-testid="password-input"]', 'secure_password')
-  await page.click('[data-testid="login-button"]')
-  await expect(page.locator('[data-testid="user-menu"]')).toBeVisible()
-})
-```
-
-### Multistep Checks
+<Accordion title="Multistep Checks">
 Test complex API workflows with sequential requests and data flow validation.
 
-<CardGroup cols={2}>
-<Card title="Perfect for" icon="workflow">
+**Great for:**
 - User registration and onboarding flows
 - E-commerce checkout and payment processes
 - Data processing and ETL pipelines
 - Authentication and authorization workflows
-- Multi-step form submissions
-- Complex business transaction validation
-</Card>
 
-<Card title="Key capabilities" icon="list-check">
-- Sequential API request execution
-- Data passing between workflow steps
-- Complex authentication flows
-- Transaction rollback testing
-- Workflow state validation
-- End-to-end performance measurement
-</Card>
-</CardGroup>
+- [Learn more about Multistep Checks](/docs/detect/synthetic-monitoring/multistep-checks/overview)
+- [Multistep Check Construct](/constructs/multistep-check)
 
-```typescript
-// Example multistep workflow
-test('User registration workflow', async ({ request }) => {
-  let userId, authToken
-  
-  await test.step('Register new user', async () => {
-    const response = await request.post('/api/auth/register', {
-      data: { email: 'test@example.com', password: 'SecurePass123!' }
-    })
-    userId = (await response.json()).id
-  })
-  
-  await test.step('Login and authenticate', async () => {
-    const response = await request.post('/api/auth/login', {
-      data: { email: 'test@example.com', password: 'SecurePass123!' }
-    })
-    authToken = (await response.json()).token
-  })
-})
-```
-
-## Comprehensive Monitoring Strategy
-
-### Layered Monitoring Approach
-Combine all three check types for complete application coverage:
-
-1. **Infrastructure Layer**: API checks validate backend services and dependencies
-2. **Application Layer**: Multistep checks verify business logic and workflows
-3. **User Experience Layer**: Browser checks ensure optimal user interactions
-
-### Global Performance Validation
-Monitor from multiple geographic locations to ensure consistent global performance:
-- **North America**: US East, US West, Canada Central
-- **Europe**: Ireland, Frankfurt, London, Stockholm
-- **Asia Pacific**: Singapore, Tokyo, Sydney, Mumbai
-- **Private Locations**: Your own infrastructure for internal monitoring
-
-### Performance Metrics and Thresholds
-Track comprehensive performance data across all check types:
-- **Response times**: End-to-end timing and performance bottlenecks
-- **Core Web Vitals**: Loading, interactivity, and visual stability metrics
-- **Business metrics**: Transaction success rates and workflow completion
-- **Availability**: Global uptime and reliability percentages
-
-## Advanced Monitoring Features
-
-### Authentication and Security
-- **Environment variables**: Secure credential management
-- **Multi-factor authentication**: Support for complex auth flows
-- **Session state management**: Reusable authentication contexts
-- **Certificate monitoring**: SSL/TLS certificate validation
-
-### Error Handling and Recovery
-- **Retry logic**: Configurable retry strategies for resilient monitoring
-- **Conditional workflows**: Dynamic test paths based on application state
-- **Cleanup procedures**: Automated test data management
-- **Rollback validation**: Transaction integrity verification
-
-### Performance Optimization
-- **Parallel execution**: Concurrent monitoring for faster feedback
-- **Resource management**: Efficient test execution and cleanup
-- **Cache strategies**: Optimized authentication and session handling
-- **Rate limiting**: Respectful API monitoring practices
+</Accordion>
+</AccordionGroup>
 
 ## Getting Started Guide
 
@@ -219,106 +92,7 @@ Launch your synthetic monitoring and track results:
 </Step>
 </Steps>
 
-## Real-World Use Cases
-
-### E-commerce Platform
-```yaml
-API Checks:
-  - Product catalog API health
-  - Inventory management endpoints
-  - Payment gateway connectivity
-  
-Browser Checks:
-  - Product browsing and search
-  - Shopping cart functionality
-  - Checkout process completion
-  
-Multistep Checks:
-  - Complete purchase workflow
-  - User account creation flow
-  - Order fulfillment process
-```
-
-### SaaS Application
-```yaml
-API Checks:
-  - Authentication service health
-  - User management APIs
-  - Data processing endpoints
-  
-Browser Checks:
-  - User login and dashboard access
-  - Core feature interactions
-  - Settings and configuration pages
-  
-Multistep Checks:
-  - User onboarding workflow
-  - Data import/export processes
-  - Integration setup procedures
-```
-
-### Financial Services
-```yaml
-API Checks:
-  - Account balance APIs
-  - Transaction processing endpoints
-  - Security validation services
-  
-Browser Checks:
-  - Online banking login
-  - Money transfer workflows
-  - Account management features
-  
-Multistep Checks:
-  - Complete transaction workflows
-  - Account opening procedures
-  - Compliance verification processes
-```
-
-## Integration and Automation
-
-### CI/CD Pipeline Integration
-```typescript
-// Checkly configuration as code
-import { ApiCheck, BrowserCheck, MultistepCheck } from 'checkly/constructs'
-
-// Deploy monitoring with your application
-new ApiCheck('user-api-health', {
-  name: 'User API Health Check',
-  frequency: Frequency.EVERY_5M,
-  locations: ['us-east-1', 'eu-west-1'],
-  request: {
-    method: 'GET',
-    url: '{{API_URL}}/health',
-    assertions: [
-      AssertionBuilder.statusCode().equals(200),
-      AssertionBuilder.responseTime().lessThan(2000)
-    ]
-  }
-})
-```
-
-### Environment Management
-- **Development**: Validate new features before release
-- **Staging**: Comprehensive pre-production testing
-- **Production**: Continuous monitoring and alerting
-- **Rollback**: Automated detection of deployment issues
-
-## Monitoring Dashboard and Analytics
-
-### Real-Time Visibility
-- **Live status**: Current check results across all locations
-- **Performance trends**: Response time and availability patterns
-- **Error analysis**: Detailed failure information and context
-- **Geographic insights**: Regional performance comparisons
-
-### Historical Analysis
-- **Trend identification**: Long-term performance and reliability patterns
-- **Capacity planning**: Growth and scaling insights
-- **SLA reporting**: Service level agreement tracking
-- **Optimization opportunities**: Performance improvement recommendations
-
-## Getting Started with Synthetic Monitoring
+## What's Next?
 
 Ready to implement comprehensive synthetic monitoring? Choose your starting point based on your monitoring needs:
 
@@ -333,26 +107,6 @@ Monitor user experiences with automated browser testing
 
 <Card title="Multistep Checks" href="/docs/detect/synthetic-monitoring/multistep-checks/overview">
 Test complex workflows with sequential API requests
-</Card>
-</CardGroup>
-
-### Implementation Resources
-
-<CardGroup cols={2}>
-<Card title="Quick Start Guides" icon="rocket">
-Step-by-step tutorials for each check type with real-world examples
-</Card>
-
-<Card title="Best Practices" icon="star">
-Proven strategies for reliable and efficient monitoring
-</Card>
-
-<Card title="CLI Integration" href="/docs/cli/overview">
-Manage monitoring as code with version control and CI/CD
-</Card>
-
-<Card title="Private Locations" href="/docs/getting-started/platform/private-locations/overview">
-Monitor internal applications with private monitoring infrastructure
 </Card>
 </CardGroup>
 

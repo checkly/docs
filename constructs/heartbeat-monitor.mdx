@@ -1,0 +1,253 @@
+---
+title: 'Heartbeat Monitor Construct'
+description: 'Learn how to configure heartbeat monitors with the Checkly CLI.'
+sidebarTitle: 'Heartbeat Monitor'
+---
+
+Use heartbeat monitors to track passive monitoring scenarios where external services ping Checkly at regular intervals. The examples below show how to configure monitoring for different types of scheduled jobs and services.
+
+<Info>
+Learn more about heartbeat monitors in the [Heartbeat Monitors overview](/docs/detect/uptime-monitoring/heartbeat-monitors/overview).
+</Info>
+
+## `HeartbeatMonitor` Examples
+
+<CodeGroup>
+
+```ts Basic Example
+import { HeartbeatMonitor } from 'checkly/constructs'
+
+new HeartbeatMonitor('daily-backup-heartbeat', {
+  name: 'Daily Backup Job',
+  period: 1,
+  periodUnit: 'days',
+  grace: 2,
+  graceUnit: 'hours'
+})
+```
+
+```ts Advanced Example
+import { HeartbeatMonitor } from 'checkly/constructs'
+
+new HeartbeatMonitor('newsletter-heartbeat', {
+  name: 'Weekly Newsletter Job',
+  activated: true,
+  muted: false,
+  period: 7,
+  periodUnit: 'days',
+  grace: 4,
+  graceUnit: 'hours',
+  tags: ['newsletter', 'marketing', 'weekly'],
+  alertChannels: [emailChannel, slackChannel]
+})
+```
+
+</CodeGroup>
+
+## `HeartbeatMonitor` Configuration
+
+<Tabs>
+  <Tab title="Unique Configuration">
+
+Configure timing settings for your heartbeat monitors:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `period` | `number` | ✅ | - | The expected period between pings (30 seconds to 365 days) |
+| `periodUnit` | `string` | ✅ | - | Time unit: `'seconds'` \| `'minutes'` \| `'hours'` \| `'days'` |
+| `grace` | `number` | ✅ | - | Grace period before alerting (0 seconds to 365 days) |
+| `graceUnit` | `string` | ✅ | - | Grace time unit: `'seconds'` \| `'minutes'` \| `'hours'` \| `'days'` |
+
+</Tab>
+
+<Tab title="Shared Configuration">
+Configure common properties that apply to all monitor types:
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `name` | `string` | ✅ | - | Friendly name for your monitor |
+| `activated` | `boolean` | ❌ | `true` | Whether the monitor is enabled |
+| `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
+| `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Array of AlertChannel objects for notifications |
+| `tags` | `string[]` | ❌ | `[]` | Array of tags to organize monitors |
+
+</Tab>
+</Tabs>
+
+## Heartbeat Monitor Examples
+
+<Tabs>
+  <Tab title="Daily Backup Job">
+    ```ts
+    new HeartbeatMonitor('backup-job-heartbeat', {
+      name: 'Daily Database Backup',
+      period: 1,
+      periodUnit: 'days',
+      grace: 2,
+      graceUnit: 'hours',
+      tags: ['backup', 'database', 'critical']
+    })
+
+    // Example cron job that would ping this heartbeat:
+    // 0 2 * * * curl -X POST https://ping.checklyhq.com/[heartbeat-id] && /scripts/backup-database.sh
+    ```
+  </Tab>
+  
+  <Tab title="Hourly Data Sync">
+    ```ts
+    new HeartbeatMonitor('sync-job-heartbeat', {
+      name: 'Hourly Data Synchronization',
+      period: 1,
+      periodUnit: 'hours',
+      grace: 15,
+      graceUnit: 'minutes',
+      tags: ['sync', 'data', 'hourly']
+    })
+
+    // Example Node.js job:
+    // setInterval(async () => {
+    //   try {
+    //     await syncData()
+    //     await fetch('https://ping.checklyhq.com/[heartbeat-id]', { method: 'POST' })
+    //   } catch (error) {
+    //     console.error('Sync failed:', error)
+    //   }
+    // }, 60 * 60 * 1000) // Every hour
+    ```
+  </Tab>
+  
+  <Tab title="Weekly Report">
+    ```ts
+    new HeartbeatMonitor('weekly-report-heartbeat', {
+      name: 'Weekly Analytics Report',
+      period: 7,
+      periodUnit: 'days',
+      grace: 4,
+      graceUnit: 'hours',
+      tags: ['reports', 'analytics', 'weekly']
+    })
+
+    // Example Python script that runs weekly:
+    // import requests
+    // 
+    // def generate_weekly_report():
+    //     try:
+    //         # Generate report logic here
+    //         generate_report()
+    //         
+    //         # Ping Checkly on success
+    //         requests.post('https://ping.checklyhq.com/[heartbeat-id]')
+    //     except Exception as e:
+    //         print(f"Report generation failed: {e}")
+    ```
+  </Tab>
+  
+  <Tab title="CI/CD Pipeline">
+    ```ts
+    new HeartbeatMonitor('deployment-heartbeat', {
+      name: 'Production Deployment Pipeline',
+      period: 2,
+      periodUnit: 'hours',
+      grace: 30,
+      graceUnit: 'minutes',
+      tags: ['deployment', 'ci-cd', 'production']
+    })
+
+    // Example GitHub Actions workflow step:
+    // - name: Ping Checkly on successful deployment
+    //   if: success()
+    //   run: |
+    //     curl -X POST https://ping.checklyhq.com/${{ secrets.HEARTBEAT_ID }}
+    ```
+  </Tab>
+  
+  <Tab title="Log Processing">
+    ```ts
+    new HeartbeatMonitor('log-processing-heartbeat', {
+      name: 'Log Processing Job',
+      period: 30,
+      periodUnit: 'minutes',
+      grace: 10,
+      graceUnit: 'minutes',
+      tags: ['logs', 'processing', 'monitoring']
+    })
+
+    // Example log processing service:
+    // const processLogs = async () => {
+    //   try {
+    //     await processLogFiles()
+    //     
+    //     // Ping heartbeat on successful processing
+    //     await fetch(process.env.CHECKLY_HEARTBEAT_URL, {
+    //       method: 'POST',
+    //       headers: { 'User-Agent': 'LogProcessor/1.0' }
+    //     })
+    //   } catch (error) {
+    //     console.error('Log processing failed:', error)
+    //   }
+    // }
+    // 
+    // // Run every 30 minutes
+    // setInterval(processLogs, 30 * 60 * 1000)
+    ```
+  </Tab>
+  
+  <Tab title="Short Interval Check">
+    ```ts
+    new HeartbeatMonitor('frequent-task-heartbeat', {
+      name: 'Every Minute Task',
+      period: 60,
+      periodUnit: 'seconds',
+      grace: 30,
+      graceUnit: 'seconds',
+      tags: ['frequent', 'monitoring']
+    })
+
+    // Example for very frequent tasks:
+    // setInterval(async () => {
+    //   try {
+    //     await performQuickCheck()
+    //     await fetch('https://ping.checklyhq.com/[heartbeat-id]', { method: 'POST' })
+    //   } catch (error) {
+    //     console.error('Quick check failed:', error)
+    //   }
+    // }, 60000) // Every minute
+    ```
+  </Tab>
+</Tabs>
+
+## Getting the Ping URL
+
+After deploying your heartbeat monitor, you can obtain the ping URL in several ways:
+
+<Tabs>
+  <Tab title="CLI Output">
+    ```bash
+    npx checkly deploy
+
+    # Output will include:
+    # ✅ HeartbeatMonitor 'daily-backup-heartbeat' deployed
+    # 📍 Ping URL: https://ping.checklyhq.com/hb_abc123def456
+    ```
+  </Tab>
+  
+  <Tab title="Web UI">
+    Navigate to your heartbeat monitor in the [Checkly web UI](https://app.checklyhq.com/heartbeats) to copy the ping URL.
+  </Tab>
+  
+  <Tab title="API">
+    ```bash
+    curl -H "Authorization: Bearer YOUR_API_KEY" \
+         -H "X-Checkly-Account: YOUR_ACCOUNT_ID" \
+         https://api.checklyhq.com/v1/heartbeats/
+    ```
+  </Tab>
+</Tabs>
+
+<Info>
+The ping URL is unique for each heartbeat monitor and should be kept secure. Anyone with access to this URL can send pings to your monitor.
+</Info>
+
+<Warning>
+Heartbeat monitors are passive - they wait for your external services to ping them. Make sure your jobs and services are configured to send HTTP POST requests to the ping URL on successful completion.
+</Warning>

@@ -1,0 +1,395 @@
+---
+title: 'Dashboard Construct'
+description: 'Learn how to configure dashboards with the Checkly CLI.'
+sidebarTitle: 'Dashboard'
+---
+
+Use Dashboard to create public or private dashboards that display checks and their related metrics on a single page. Dashboards provide a centralized view of your monitoring data.
+
+<Info>
+Learn more about dashboards in the [Dashboards documentation](/docs/communicate/dashboards/).
+</Info>
+
+## `Dashboard` Examples
+
+<CodeGroup>
+
+```ts Basic Example
+import { Dashboard } from 'checkly/constructs'
+
+new Dashboard('basic-dashboard', {
+  header: 'Service Status',
+  description: 'Real-time monitoring dashboard',
+  tags: ['production', 'api'],
+  customUrl: 'service-status'
+})
+```
+
+```ts Advanced Example
+import { Dashboard } from 'checkly/constructs'
+import * as path from 'path'
+
+new Dashboard('advanced-dashboard', {
+  header: 'ACME Production Status',
+  description: 'Comprehensive monitoring for all ACME services',
+  tags: ['prod', 'api', 'web'],
+  logo: 'https://assets.acme.com/images/acme-logo.png',
+  customUrl: 'acme-production-status',
+  customDomain: 'status.acme.com',
+  favicon: 'https://assets.acme.com/favicon.ico',
+  link: 'https://acme.com',
+  width: 'FULL',
+  refreshRate: 60,
+  paginate: true,
+  paginationRate: 30,
+  checksPerPage: 20,
+  useTagsAndOperator: true,
+  hideTags: false,
+  enableIncidents: true,
+  expandChecks: false,
+  showHeader: true,
+  showP95: true,
+  showP99: true,
+  isPrivate: false,
+  customCSS: {
+    entrypoint: path.join(__dirname, 'dashboard.css')
+  }
+})
+```
+
+</CodeGroup>
+
+## `Dashboard` Configuration
+
+<Tabs>
+  <Tab title="Basic Configuration">
+
+Configure essential dashboard settings:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `header` | `string` | ❌ | - | Text displayed at the top of your dashboard |
+| `description` | `string` | ❌ | - | Text displayed below the header |
+| `tags` | `string[]` | ❌ | `[]` | Tags that filter which checks appear on the dashboard |
+| `customUrl` | `string` | ❌ | - | Subdomain under "checklyhq.com" (required if customDomain not specified) |
+| `customDomain` | `string` | ❌ | - | Custom domain (e.g., "status.example.com") |
+
+</Tab>
+
+<Tab title="Branding Configuration">
+
+Configure visual branding and appearance:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `logo` | `string` | ❌ | - | URL to logo image for the dashboard header |
+| `favicon` | `string` | ❌ | - | URL to favicon image |
+| `link` | `string` | ❌ | - | URL to redirect when dashboard logo is clicked |
+| `customCSS` | `object` | ❌ | - | Custom CSS styling (Team/Enterprise plans only) |
+
+</Tab>
+
+<Tab title="Display Configuration">
+
+Configure how the dashboard displays content:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `width` | `string` | ❌ | `'FULL'` | Dashboard width: `'FULL'` \| `'960PX'` |
+| `refreshRate` | `number` | ❌ | `60` | Auto-refresh interval: `60` \| `300` \| `600` seconds |
+| `paginate` | `boolean` | ❌ | `true` | Enable pagination for checks |
+| `paginationRate` | `number` | ❌ | `60` | Pagination interval: `30` \| `60` \| `300` seconds |
+| `checksPerPage` | `number` | ❌ | `15` | Number of checks per page (1-20) |
+| `useTagsAndOperator` | `boolean` | ❌ | `false` | Use AND instead of OR for tag filtering |
+| `hideTags` | `boolean` | ❌ | `false` | Hide tags on the dashboard |
+| `enableIncidents` | `boolean` | ❌ | `false` | Enable incidents (Team/Enterprise plans only) |
+| `expandChecks` | `boolean` | ❌ | `false` | Expand checks by default |
+| `showHeader` | `boolean` | ❌ | `true` | Show header and description |
+| `showP95` | `boolean` | ❌ | `true` | Show P95 statistics |
+| `showP99` | `boolean` | ❌ | `true` | Show P99 statistics |
+| `isPrivate` | `boolean` | ❌ | `false` | Make dashboard private (Team/Enterprise plans only) |
+
+</Tab>
+</Tabs>
+
+## `customCSS` Configuration
+
+Configure custom CSS styling for your dashboard:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `entrypoint` | `string` | ❌ | Path to a CSS file containing custom styles |
+| `content` | `string` | ❌ | Inline CSS content as a string |
+
+<Info>
+You must provide either `entrypoint` or `content`, but not both. Custom CSS is only available on Team and Enterprise plans.
+</Info>
+
+```ts
+// Using file reference
+customCSS: {
+  entrypoint: path.join(__dirname, 'dashboard.css')
+}
+
+// Using inline content
+customCSS: {
+  content: `
+    .header {
+      background: #080808;
+      border-bottom-color: #313035;
+    }
+    .header .logo a {
+      color: #f7f8f8;
+    }
+  `
+}
+```
+
+## Dashboard Examples
+
+<Tabs>
+  <Tab title="Production Monitoring">
+    ```ts
+    new Dashboard('production-monitoring', {
+      header: 'Production Services',
+      description: 'Real-time monitoring of all production services',
+      tags: ['production', 'critical'],
+      customUrl: 'production-monitoring',
+      logo: 'https://company.com/logo.png',
+      refreshRate: 60,
+      width: 'FULL',
+      showP95: true,
+      showP99: true,
+      enableIncidents: true
+    })
+    ```
+  </Tab>
+  
+  <Tab title="API Dashboard">
+    ```ts
+    new Dashboard('api-dashboard', {
+      header: 'API Endpoints Status',
+      description: 'Monitor all API endpoints and their performance',
+      tags: ['api'],
+      customUrl: 'api-status',
+      customDomain: 'api-status.company.com',
+      width: '960PX',
+      refreshRate: 30,
+      checksPerPage: 25,
+      useTagsAndOperator: false,
+      expandChecks: true
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Regional Dashboard">
+    ```ts
+    new Dashboard('us-east-dashboard', {
+      header: 'US East Region Status',
+      description: 'Monitoring for US East infrastructure',
+      tags: ['us-east', 'production'],
+      customUrl: 'us-east-status',
+      logo: 'https://assets.company.com/regional-logo.png',
+      refreshRate: 120,
+      paginate: false,
+      showHeader: true,
+      hideTags: true
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Team Dashboard">
+    ```ts
+    new Dashboard('platform-team-dashboard', {
+      header: 'Platform Team Services',
+      description: 'Services owned and maintained by the Platform team',
+      tags: ['platform-team'],
+      customUrl: 'platform-team-status',
+      width: '960PX',
+      refreshRate: 300,
+      checksPerPage: 10,
+      useTagsAndOperator: true,
+      expandChecks: true,
+      isPrivate: true // Only accessible with authentication
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Customer-Facing Dashboard">
+    ```ts
+    new Dashboard('customer-dashboard', {
+      header: 'Service Availability',
+      description: 'Current status of all customer-facing services',
+      tags: ['customer-facing', 'public'],
+      customUrl: 'service-status',
+      customDomain: 'status.company.com',
+      logo: 'https://company.com/public-logo.png',
+      favicon: 'https://company.com/favicon.ico',
+      link: 'https://company.com',
+      width: 'FULL',
+      refreshRate: 60,
+      paginate: true,
+      paginationRate: 60,
+      checksPerPage: 15,
+      showHeader: true,
+      hideTags: true,
+      enableIncidents: true,
+      showP95: false,
+      showP99: false
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Custom Styled Dashboard">
+    ```ts
+    import * as path from 'path'
+
+    new Dashboard('branded-dashboard', {
+      header: 'ACME Corporation Status',
+      description: 'Service availability dashboard',
+      tags: ['production'],
+      customUrl: 'acme-status',
+      logo: 'https://acme.com/logo.svg',
+      customCSS: {
+        entrypoint: path.join(__dirname, 'acme-dashboard.css')
+      },
+      width: 'FULL',
+      refreshRate: 60
+    })
+
+    // acme-dashboard.css
+    /*
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-bottom: 2px solid #4c63d2;
+    }
+    
+    .header .logo a {
+      color: #ffffff;
+      font-weight: 600;
+    }
+    
+    .check-card {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .check-card.success {
+      border-left: 4px solid #10b981;
+    }
+    
+    .check-card.failure {
+      border-left: 4px solid #ef4444;
+    }
+    */
+    ```
+  </Tab>
+</Tabs>
+
+## Tag Filtering
+
+Dashboards display checks based on tag filtering:
+
+<Tabs>
+  <Tab title="OR Filtering (Default)">
+    ```ts
+    new Dashboard('or-filtering-dashboard', {
+      header: 'API or Web Services',
+      tags: ['api', 'web'],
+      useTagsAndOperator: false, // Default: shows checks with ANY of these tags
+      customUrl: 'api-or-web'
+    })
+    // Shows checks tagged with 'api' OR 'web' OR both
+    ```
+  </Tab>
+  
+  <Tab title="AND Filtering">
+    ```ts
+    new Dashboard('and-filtering-dashboard', {
+      header: 'Production API Services',
+      tags: ['production', 'api'],
+      useTagsAndOperator: true, // Shows checks with ALL of these tags
+      customUrl: 'production-api'
+    })
+    // Shows only checks tagged with BOTH 'production' AND 'api'
+    ```
+  </Tab>
+  
+  <Tab title="All Checks">
+    ```ts
+    new Dashboard('all-checks-dashboard', {
+      header: 'All Monitoring',
+      tags: [], // Empty array shows ALL checks
+      customUrl: 'all-monitoring'
+    })
+    ```
+  </Tab>
+</Tabs>
+
+## Custom Domains
+
+To use a custom domain for your dashboard:
+
+<Tabs>
+  <Tab title="DNS Configuration">
+    ```bash
+    # Add a CNAME record pointing to Checkly
+    status.example.com CNAME checklyhq.com
+    ```
+  </Tab>
+  
+  <Tab title="SSL Certificate">
+    Checkly automatically provisions SSL certificates for verified custom domains.
+  </Tab>
+  
+  <Tab title="Configuration">
+    ```ts
+    new Dashboard('custom-domain-dashboard', {
+      header: 'Service Status',
+      customDomain: 'status.example.com', // Must be verified in Checkly UI
+      tags: ['production']
+    })
+    ```
+  </Tab>
+</Tabs>
+
+## Performance Optimization
+
+<Tabs>
+  <Tab title="Large Dashboards">
+    ```ts
+    // For dashboards with many checks
+    new Dashboard('large-dashboard', {
+      header: 'Comprehensive Monitoring',
+      tags: ['all-services'],
+      customUrl: 'comprehensive-status',
+      refreshRate: 300, // Slower refresh for performance
+      paginate: true,
+      checksPerPage: 10, // Fewer checks per page
+      paginationRate: 60
+    })
+    ```
+  </Tab>
+  
+  <Tab title="High-Frequency Updates">
+    ```ts
+    // For critical dashboards needing frequent updates
+    new Dashboard('critical-dashboard', {
+      header: 'Critical Services',
+      tags: ['critical'],
+      customUrl: 'critical-status',
+      refreshRate: 60, // Fast refresh
+      paginate: false, // No pagination for immediate view
+      checksPerPage: 20
+    })
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+**Custom Domain Verification**: Custom domains must be verified through the Checkly UI before they can be used. DNS changes may take time to propagate.
+</Warning>
+
+<Info>
+**Plan Limitations**: Some features like custom CSS, private dashboards, and incidents are only available on Team and Enterprise plans.
+</Info>

@@ -158,43 +158,122 @@
         }
       }
     },
-    "/v1/analytics/metrics": {
+    "/v1/analytics/metrics/{checkType}": {
       "get": {
-        "summary": "Get Analytics Metrics",
-        "description": "Get comprehensive analytics metrics",
-        "operationId": "getAnalyticsMetrics",
+        "summary": "List Analytics Metrics",
+        "description": "Returns all the available metrics for a specific check-type (API, URL, TCP or BROWSER)",
+        "operationId": "listAnalyticsMetrics",
         "parameters": [
           {
-            "name": "from",
-            "in": "query",
-            "description": "Start date",
+            "name": "checkType",
+            "in": "path",
+            "required": true,
+            "description": "The check type to retrieve metrics for",
             "schema": {
               "type": "string",
-              "format": "date-time"
+              "enum": ["api", "url", "tcp", "browser", "heartbeat", "multistep"]
             }
           },
           {
-            "name": "to",
+            "name": "category",
             "in": "query",
-            "description": "End date",
+            "description": "Filter by metric category",
             "schema": {
               "type": "string",
-              "format": "date-time"
+              "enum": ["response_time", "success_rate", "core_web_vitals", "heartbeat", "performance", "volume"]
+            }
+          },
+          {
+            "name": "includeThresholds",
+            "in": "query",
+            "description": "Include performance thresholds and benchmarks",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Response format",
+            "schema": {
+              "type": "string",
+              "enum": ["detailed", "summary"],
+              "default": "detailed"
+            }
+          },
+          {
+            "name": "includeExamples",
+            "in": "query",
+            "description": "Include example values and use cases",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "includeCalculations",
+            "in": "query",
+            "description": "Include calculation method details",
+            "schema": {
+              "type": "boolean",
+              "default": false
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Analytics metrics data",
+            "description": "List of available metrics for the specified check type",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AnalyticsMetrics"
+                  "$ref": "#/components/schemas/MetricsList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid check type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
           }
-        }
+        },
+        "tags": ["Analytics"]
       }
     },
     "/v1/check-alerts": {
@@ -1443,6 +1522,135 @@
           "overallSuccessRate": {
             "type": "number",
             "description": "Overall success rate percentage"
+          }
+        }
+      },
+      "MetricsList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "responseTimeMetrics": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Metric"
+                }
+              },
+              "successMetrics": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Metric"
+                }
+              },
+              "volumeMetrics": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Metric"
+                }
+              },
+              "browserSpecificMetrics": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Metric"
+                }
+              },
+              "heartbeatSpecificMetrics": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Metric"
+                }
+              }
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "totalMetrics": {
+                "type": "integer",
+                "description": "Total number of metrics available"
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Available metric categories"
+              },
+              "checkTypes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Supported check types"
+              }
+            }
+          }
+        }
+      },
+      "Metric": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Metric identifier name"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Human-readable metric name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description of what the metric measures"
+          },
+          "unit": {
+            "type": "string",
+            "description": "Unit of measurement (milliseconds, percentage, count, etc.)"
+          },
+          "dataType": {
+            "type": "string",
+            "enum": ["number", "integer"],
+            "description": "Data type of the metric value"
+          },
+          "availableFor": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Check types this metric is available for"
+          },
+          "calculationMethod": {
+            "type": "string",
+            "description": "How the metric is calculated"
+          },
+          "precision": {
+            "type": "integer",
+            "description": "Number of decimal places for precision"
+          },
+          "category": {
+            "type": "string",
+            "description": "Metric category grouping"
+          },
+          "goodThreshold": {
+            "type": "number",
+            "description": "Threshold value considered good performance"
+          },
+          "needsImprovementThreshold": {
+            "type": "number",
+            "description": "Threshold value that needs improvement"
+          },
+          "range": {
+            "type": "object",
+            "properties": {
+              "min": {
+                "type": "number",
+                "description": "Minimum possible value"
+              },
+              "max": {
+                "type": "number",
+                "description": "Maximum possible value"
+              }
+            }
           }
         }
       },

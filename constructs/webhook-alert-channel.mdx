@@ -1,0 +1,325 @@
+---
+title: 'WebhookAlertChannel Construct'
+description: 'Learn how to configure webhook alert channels with the Checkly CLI.'
+sidebarTitle: 'Webhook Alert Channel'
+---
+
+Use WebhookAlertChannel to send HTTP requests to any URL when checks fail or recover. This is the most flexible alert channel type, allowing integration with any service that accepts HTTP webhooks.
+
+<Info>
+Learn more about webhook alerts in the [Webhook Alerts documentation](/docs/alerting/webhooks/).
+</Info>
+
+## `WebhookAlertChannel` Examples
+
+<CodeGroup>
+
+```ts Basic Example
+import { WebhookAlertChannel } from 'checkly/constructs'
+
+const webhookChannel = new WebhookAlertChannel('webhook-channel-1', {
+  name: 'Basic Webhook',
+  method: 'POST',
+  url: new URL('https://api.example.com/webhooks/checkly'),
+  template: JSON.stringify({
+    message: "Check {{ALERT_TITLE}} is {{ALERT_TYPE}}",
+    timestamp: "{{STARTED_AT}}"
+  })
+})
+```
+
+```ts Advanced Example
+import { WebhookAlertChannel } from 'checkly/constructs'
+
+const webhookChannel = new WebhookAlertChannel('advanced-webhook', {
+  name: 'Advanced Webhook Channel',
+  method: 'POST',
+  url: new URL('https://api.example.com/webhooks/alerts'),
+  headers: [
+    { key: 'Authorization', value: 'Bearer {{API_TOKEN}}' },
+    { key: 'Content-Type', value: 'application/json' },
+    { key: 'X-Source', value: 'Checkly' }
+  ],
+  queryParameters: [
+    { key: 'source', value: 'checkly' },
+    { key: 'version', value: 'v1' }
+  ],
+  template: JSON.stringify({
+    alert: {
+      title: "{{ALERT_TITLE}}",
+      type: "{{ALERT_TYPE}}",
+      status: "{{ALERT_TYPE}}",
+      started_at: "{{STARTED_AT}}",
+      ended_at: "{{ENDED_AT}}",
+      response_time: "{{RESPONSE_TIME}}ms",
+      result_link: "{{RESULT_LINK}}",
+      check: {
+        name: "{{CHECK_NAME}}",
+        type: "{{CHECK_TYPE}}",
+        location: "{{LOCATION}}"
+      }
+    }
+  }),
+  sendRecovery: true,
+  sendFailure: true,
+  sendDegrade: true
+})
+```
+
+</CodeGroup>
+
+## `WebhookAlertChannel` Configuration
+
+<Tabs>
+  <Tab title="Unique Configuration">
+
+Configure webhook-specific settings:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `name` | `string` | ❌ | - | Friendly name for the webhook channel |
+| `method` | `string` | ✅ | - | HTTP method: `GET` \| `POST` \| `PUT` \| `PATCH` \| `HEAD` \| `DELETE` |
+| `url` | `URL` | ✅ | - | Target URL for the webhook request |
+| `template` | `string` | ❌ | - | Request body template with Handlebars-style variables |
+| `headers` | `array` | ❌ | `[]` | Array of `{ key, value }` objects for HTTP headers |
+| `queryParameters` | `array` | ❌ | `[]` | Array of `{ key, value }` objects for query parameters |
+
+</Tab>
+
+<Tab title="Shared Configuration">
+Configure common alert channel properties:
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `sendRecovery` | `boolean` | ❌ | `true` | Send notifications when checks recover |
+| `sendFailure` | `boolean` | ❌ | `true` | Send notifications when checks fail |
+| `sendDegrade` | `boolean` | ❌ | `false` | Send notifications when checks degrade (API checks only) |
+| `sslExpiry` | `boolean` | ❌ | `false` | Send notifications for SSL certificate expiry |
+| `sslExpiryThreshold` | `number` | ❌ | `30` | Days before SSL expiry to send notification |
+
+</Tab>
+</Tabs>
+
+## `template` Configuration
+
+The template supports Handlebars-style variables that are replaced with actual values:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `{{ALERT_TITLE}}` | Alert title | "API check failed" |
+| `{{ALERT_TYPE}}` | Alert type | "ALERT_FAILURE", "ALERT_RECOVERY", "ALERT_DEGRADED" |
+| `{{CHECK_NAME}}` | Name of the check | "API Health Check" |
+| `{{CHECK_TYPE}}` | Type of check | "API", "BROWSER", "HEARTBEAT" |
+| `{{STARTED_AT}}` | When the alert started | "2025-01-01T10:00:00Z" |
+| `{{ENDED_AT}}` | When the alert ended | "2025-01-01T10:05:00Z" |
+| `{{RESPONSE_TIME}}` | Response time in ms | "1500" |
+| `{{RESULT_LINK}}` | Link to check result | "https://app.checklyhq.com/..." |
+| `{{LOCATION}}` | Check location | "us-east-1" |
+| `{{API_CHECK_RESPONSE_STATUS_CODE}}` | HTTP status code (API checks) | "500" |
+| `{{TAGS}}` | Comma-separated check tags | "api,production" |
+
+## Webhook Alert Channel Examples
+
+<Tabs>
+  <Tab title="Pushover Notifications">
+    ```ts
+    const pushoverWebhook = new WebhookAlertChannel('pushover-webhook', {
+      name: 'Pushover Notifications',
+      method: 'POST',
+      url: new URL('https://api.pushover.net/1/messages.json'),
+      template: JSON.stringify({
+        token: "{{PUSHOVER_APP_TOKEN}}",
+        user: "{{PUSHOVER_USER_KEY}}",
+        title: "{{ALERT_TITLE}}",
+        message: "{{CHECK_NAME}} is {{ALERT_TYPE}} ({{RESPONSE_TIME}}ms) - {{RESULT_LINK}}",
+        html: 1,
+        priority: 2,
+        retry: 30,
+        expire: 10800
+      })
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Discord Webhook">
+    ```ts
+    const discordWebhook = new WebhookAlertChannel('discord-webhook', {
+      name: 'Discord Notifications',
+      method: 'POST',
+      url: new URL('https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN'),
+      headers: [
+        { key: 'Content-Type', value: 'application/json' }
+      ],
+      template: JSON.stringify({
+        content: null,
+        embeds: [{
+          title: "{{ALERT_TITLE}}",
+          description: "Check: {{CHECK_NAME}}\nLocation: {{LOCATION}}\nResponse Time: {{RESPONSE_TIME}}ms",
+          color: "{{ALERT_TYPE}}" === "ALERT_FAILURE" ? 15158332 : 3066993,
+          timestamp: "{{STARTED_AT}}",
+          footer: {
+            text: "Checkly Monitoring"
+          },
+          fields: [{
+            name: "View Result",
+            value: "[Open in Checkly]({{RESULT_LINK}})",
+            inline: false
+          }]
+        }]
+      })
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Custom API Integration">
+    ```ts
+    const customApiWebhook = new WebhookAlertChannel('custom-api-webhook', {
+      name: 'Custom API Integration',
+      method: 'POST',
+      url: new URL('https://api.mycompany.com/alerts'),
+      headers: [
+        { key: 'Authorization', value: 'Bearer {{API_SECRET}}' },
+        { key: 'Content-Type', value: 'application/json' },
+        { key: 'X-Checkly-Source', value: 'monitoring' }
+      ],
+      queryParameters: [
+        { key: 'severity', value: 'high' },
+        { key: 'team', value: 'platform' }
+      ],
+      template: JSON.stringify({
+        event: {
+          type: "monitoring_alert",
+          severity: "{{ALERT_TYPE}}" === "ALERT_FAILURE" ? "critical" : "info",
+          title: "{{ALERT_TITLE}}",
+          description: "{{CHECK_NAME}} monitoring alert",
+          timestamp: "{{STARTED_AT}}",
+          metadata: {
+            check_name: "{{CHECK_NAME}}",
+            check_type: "{{CHECK_TYPE}}",
+            location: "{{LOCATION}}",
+            response_time_ms: "{{RESPONSE_TIME}}",
+            tags: "{{TAGS}}",
+            result_url: "{{RESULT_LINK}}"
+          }
+        }
+      }),
+      sendFailure: true,
+      sendRecovery: true,
+      sendDegrade: false
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Telegram Bot">
+    ```ts
+    const telegramWebhook = new WebhookAlertChannel('telegram-webhook', {
+      name: 'Telegram Bot Notifications',
+      method: 'POST',
+      url: new URL('https://api.telegram.org/bot{{TELEGRAM_BOT_TOKEN}}/sendMessage'),
+      template: JSON.stringify({
+        chat_id: "{{TELEGRAM_CHAT_ID}}",
+        text: "🚨 *{{ALERT_TITLE}}*\n\n" +
+              "Check: {{CHECK_NAME}}\n" +
+              "Type: {{CHECK_TYPE}}\n" +
+              "Location: {{LOCATION}}\n" +
+              "Response Time: {{RESPONSE_TIME}}ms\n" +
+              "Time: {{STARTED_AT}}\n\n" +
+              "[View Details]({{RESULT_LINK}})",
+        parse_mode: "Markdown"
+      })
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Microsoft Teams">
+    ```ts
+    const teamsWebhook = new WebhookAlertChannel('teams-webhook', {
+      name: 'Microsoft Teams Notifications',
+      method: 'POST',
+      url: new URL('https://outlook.office.com/webhook/YOUR_WEBHOOK_URL'),
+      headers: [
+        { key: 'Content-Type', value: 'application/json' }
+      ],
+      template: JSON.stringify({
+        "@type": "MessageCard",
+        "@context": "http://schema.org/extensions",
+        themeColor: "{{ALERT_TYPE}}" === "ALERT_FAILURE" ? "FF0000" : "00FF00",
+        summary: "{{ALERT_TITLE}}",
+        sections: [{
+          activityTitle: "{{ALERT_TITLE}}",
+          activitySubtitle: "{{CHECK_NAME}}",
+          facts: [{
+            name: "Check Type",
+            value: "{{CHECK_TYPE}}"
+          }, {
+            name: "Location",
+            value: "{{LOCATION}}"
+          }, {
+            name: "Response Time",
+            value: "{{RESPONSE_TIME}}ms"
+          }, {
+            name: "Time",
+            value: "{{STARTED_AT}}"
+          }],
+          markdown: true
+        }],
+        potentialAction: [{
+          "@type": "OpenUri",
+          name: "View in Checkly",
+          targets: [{
+            os: "default",
+            uri: "{{RESULT_LINK}}"
+          }]
+        }]
+      })
+    })
+    ```
+  </Tab>
+  
+  <Tab title="GET Request with Query Params">
+    ```ts
+    const getWebhook = new WebhookAlertChannel('get-webhook', {
+      name: 'GET Request Webhook',
+      method: 'GET',
+      url: new URL('https://api.example.com/notify'),
+      queryParameters: [
+        { key: 'alert_type', value: '{{ALERT_TYPE}}' },
+        { key: 'check_name', value: '{{CHECK_NAME}}' },
+        { key: 'response_time', value: '{{RESPONSE_TIME}}' },
+        { key: 'location', value: '{{LOCATION}}' },
+        { key: 'result_link', value: '{{RESULT_LINK}}' }
+      ],
+      headers: [
+        { key: 'Authorization', value: 'Bearer {{API_TOKEN}}' }
+      ]
+    })
+    ```
+  </Tab>
+</Tabs>
+
+## Environment Variables in Templates
+
+Use environment variables in your webhook templates for sensitive data:
+
+```ts
+const webhookChannel = new WebhookAlertChannel('secure-webhook', {
+  name: 'Secure Webhook',
+  method: 'POST',
+  url: new URL('https://api.example.com/webhooks'),
+  headers: [
+    { key: 'Authorization', value: 'Bearer {{API_TOKEN}}' }
+  ],
+  template: JSON.stringify({
+    api_key: "{{SECRET_API_KEY}}",
+    alert: "{{ALERT_TITLE}}"
+  })
+})
+```
+
+<Warning>
+**Security**: Be careful with sensitive data in webhook templates. Use environment variables for API tokens and secrets.
+</Warning>
+
+<Info>
+**Template Testing**: You can test your webhook templates by triggering manual check runs and observing the webhook requests in your target service's logs.
+</Info>

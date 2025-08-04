@@ -1,0 +1,96 @@
+---
+title: checkly deploy
+description: 'Deploy checks and resources to your Checkly account.'
+sidebarTitle: 'checkly deploy'
+---
+
+The `checkly deploy` command deploys all your checks and associated resources like alert channels to your Checkly account. This command synchronizes your local monitoring-as-code configuration with your Checkly account.
+
+## Usage
+
+Deploy all resources to your Checkly account.
+
+```bash Terminal
+npx checkly deploy
+```
+
+## Extended Usage
+
+Preview the differences between your local configuration and your account before deploying.
+
+```bash Terminal
+npx checkly deploy --preview
+```
+
+Deploy without confirmation and show applied differences after deployment.
+
+```bash Terminal
+npx checkly deploy --force --output
+```
+
+Deploy using a specific configuration file without triggering check runs.
+
+```bash Terminal
+npx checkly deploy --config="./checkly.staging.config.ts" --no-schedule-on-deploy
+```
+
+## Unique Options
+
+### `--preview` or `-p`
+Preview the differences between your local configuration and your Checkly account without making any changes.
+
+```bash Terminal
+npx checkly deploy --preview
+```
+
+Shows you exactly what will be added, modified, or removed during deployment.
+
+### `--output` or `-o`
+Show applied differences after deploying, providing a summary of what was changed.
+
+```bash Terminal
+npx checkly deploy --output
+```
+
+### `--debug-bundle`
+Generate a JSON file containing the data sent to Checkly servers when deploying. Useful for debugging configuration issues.
+
+```bash Terminal
+npx checkly deploy --debug-bundle
+```
+
+Creates a `checkly-bundle-debug.json` file in your project directory.
+
+### `--no-schedule-on-deploy`
+Prevent checks from running automatically when they are deployed.
+
+```bash Terminal        
+npx checkly deploy --no-schedule-on-deploy
+```
+
+Useful when you want to deploy changes but delay execution until later.
+
+## Global Options
+
+This command supports the following [global options](/cli-reference/global-options):
+
+- [`--config`](/cli-reference/global-options#config-or-c) - Specify a configuration file
+- [`--force`](/cli-reference/global-options#force-or-f) - Skip confirmation dialogs
+- [`--env`](/cli-reference/global-options#env-keyvalue-or-e) - Pass environment variables
+- [`--env-file`](/cli-reference/global-options#env-file) - Load variables from file
+- [`--verbose`](/cli-reference/global-options#verbose-or-v) - Show detailed output
+
+## Git Integration
+
+When you deploy a project, you can attach Git-specific information so changes to any resources are displayed in the Checkly web UI with the correct commit, branch, and author information.
+
+The following Git variables are automatically detected from your local or CI environment:
+
+- `CHECKLY_GIT_REPO_URL` - Repository URL
+- `CHECKLY_GIT_BRANCH` - Current branch
+- `CHECKLY_GIT_COMMIT_SHA` - Commit hash
+- `CHECKLY_GIT_COMMIT_MESSAGE` - Commit message
+- `CHECKLY_GIT_COMMIT_AUTHOR_NAME` - Author name
+- `CHECKLY_GIT_COMMIT_AUTHOR_EMAIL` - Author email
+
+You can also set these manually as environment variables if automatic detection doesn't work in your environment.

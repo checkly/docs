@@ -3,34 +3,22 @@ title: 'TCP Monitors Overview'
 description: 'Monitor the availability and performance of your TCP services by establishing connections and verifying responses.'
 sidebarTitle: Overview
 ---
-
-Monitor your TCP services, databases, mail servers, and other network services with Checkly's TCP monitoring. TCP monitors establish direct connections to your services to verify they're accepting connections and responding correctly.
-
+<Tip>
+**Monitoring as Code**: Learn more about the [TCP Monitor Construct](/constructs/tcp-monitor).
+</Tip>
 ## What are TCP Monitors?
 
 TCP monitors perform low-level connectivity checks by establishing TCP connections to your services. They verify that your services are listening on the expected ports and can accept connections, making them essential for monitoring infrastructure components and backend services.
 
 ![TCP monitor interface showing connection status](/images/tcp-monitors/tcp-monitor-overview.png)
 
-<CardGroup cols={2}>
-<Card title="Perfect for" icon="check">
+**TCP Monitors are perfect for detecting downtime and performance issues in:**
 - Database servers (MySQL, PostgreSQL, MongoDB)
 - Mail servers (SMTP, IMAP, POP3)
 - Custom TCP services and APIs
 - Load balancers and proxies
 - SSH and FTP servers
 - Redis and Memcached instances
-</Card>
-
-<Card title="Key benefits" icon="network-wired">
-- Direct connection validation
-- Port availability checking
-- Response time measurement
-- SSL/TLS certificate validation
-- Global monitoring locations
-- Immediate failure detection
-</Card>
-</CardGroup>
 
 ## How TCP Monitoring Works
 
@@ -46,32 +34,6 @@ TCP monitors perform connection-level checks:
 TCP monitors are ideal for monitoring services that don't expose HTTP endpoints but need connectivity verification.
 </Tip>
 
-## Monitor Configuration
-
-### Basic Settings
-
-- **Host/IP Address**: The server hostname or IP address to monitor
-- **Port**: The TCP port your service is listening on
-- **Protocol**: Choose between TCP, SSL/TLS, or specific protocols
-- **Timeout**: Maximum time to wait for connection establishment
-
-### Advanced Options
-
-- **Expected Response**: Text pattern to match in the service response
-- **Connection String**: Custom data to send after connection
-- **SSL Certificate Validation**: Check certificate expiration and validity
-- **Monitoring Frequency**: How often to run the check (1-60 minutes)
-
-
-## Monitoring Locations
-
-TCP monitors can run from multiple global locations to ensure your services are accessible worldwide. See [monitoring locations](/docs/detect/uptime-monitoring/locations) for detailed configuration guidance:
-
-- **Global Coverage**: Monitor from 20+ locations across 6 continents
-- **Regional Testing**: Focus on locations where your users are based
-- **Redundancy**: Multiple location checks provide confidence in results
-- **Network Path Validation**: Different routes help identify network issues
-
 ## SSL/TLS Certificate Monitoring
 
 For services using SSL/TLS, TCP monitors automatically check:
@@ -85,84 +47,100 @@ For services using SSL/TLS, TCP monitors automatically check:
 Certificate monitoring is only available when using SSL/TLS protocol options.
 </Warning>
 
-## Response Time Metrics
+## Locations
 
-TCP monitors track several timing metrics:
+TCP monitors can run from multiple global locations to ensure your services are accessible worldwide. See [monitoring locations](/docs/detect/uptime-monitoring/locations) for detailed configuration guidance:
+
+
+## Metrics
+
+TCP monitors track several timing metrics. Once your TCP monitor is running, you'll see:
+
 
 - **Connection Time**: Time to establish the TCP connection
 - **First Byte Time**: Time to receive first response byte
 - **Total Response Time**: Complete request/response cycle
 - **DNS Resolution Time**: Time to resolve the hostname
+- **SSL Handshake Time**: Certificate validation time (if applicable)
 
-## Alerting and Notifications
 
-Configure alerts for various failure conditions. See [alerting configuration](/docs/detect/uptime-monitoring/alerting) for comprehensive setup guidance:
+## Alerting 
 
+Configure alerts for various metric conditions. See [alerting configuration](/docs/detect/uptime-monitoring/alerting) for comprehensive setup guidance:
 - **Connection Failures**: When the service doesn't accept connections
 - **Timeout Exceeded**: When responses take too long
 - **Response Validation**: When expected responses don't match
 - **Certificate Issues**: When SSL certificates are invalid or expiring
 
 
-## Limitations
 
-TCP monitors have some inherent limitations:
+## Best Practices
 
-- Cannot perform application-level validation
-- Limited protocol-specific checking beyond basic connectivity
-- May not detect issues within the application layer
-- Requires services to be network-accessible from monitoring locations
+### Configuration
+- Use descriptive monitor names that identify the service and environment
+- Set realistic timeout values based on service performance
+- Enable SSL certificate monitoring for all encrypted connections
+- Monitor from locations relevant to your user base
 
-<Note>
-For comprehensive application monitoring, combine TCP monitors with HTTP checks and synthetic monitoring.
-</Note>
+### Monitoring Strategy
+- Start with basic connectivity, add response validation as needed
+- Use different monitoring frequencies based on service criticality
+- Combine TCP monitors with application-level checks for comprehensive coverage
 
-## Getting Started
+### Alerting
+- Configure multiple alert channels for redundancy
+- Set up escalation rules for critical services
+- Test alert configurations regularly
+- Use maintenance windows during planned downtime
 
-Ready to monitor your TCP services? Create your first TCP monitor and ensure your infrastructure is always accessible.
 
-<CardGroup cols={2}>
-<Card title="Creating Your First TCP Monitor" href="/docs/detect/uptime-monitoring/tcp-monitors/creating-your-first-tcp-monitor">
-Step-by-step guide to set up TCP monitoring for your services
-</Card>
+## Troubleshooting Common Issues
 
-<Card title="TCP Monitor Use Cases" href="/docs/detect/uptime-monitoring/tcp-monitors/use-cases">
-Explore common use cases and real-world examples
-</Card>
+<AccordionGroup>
+<Accordion title="Connection Refused">
+**Symptom**: Monitor shows "Connection refused" errors
+**Causes**:
+- Service is not running
+- Port is blocked by firewall
+- Incorrect host/port configuration
 
-<Card title="TCP Monitor Best Practices" href="/docs/detect/uptime-monitoring/tcp-monitors/best-practices">
-Learn optimization strategies and configuration recommendations
-</Card>
 
-<Card title="Alerting Configuration" href="/docs/detect/uptime-monitoring/alerting">
-Configure effective alerting for your TCP monitors
-</Card>
-</CardGroup>
+**Solutions**:
+1. Verify service is running: `netstat -tlnp | grep :3306`
+2. Check firewall rules
+3. Test connectivity: `telnet hostname port`
+</Accordion>
 
-## Next Steps
+<Accordion title="Timeout Errors">
+**Symptom**: Monitor times out without connecting
+**Causes**:
+- Network latency or packet loss
+- Service overloaded
+- Timeout set too low
 
-<CardGroup cols={2}>
-<Card title="URL Monitors" href="/docs/detect/uptime-monitoring/url-monitors/overview">
-Learn about HTTP/HTTPS monitoring for web services
-</Card>
+**Solutions**:
+1. Increase connection timeout
+2. Check network connectivity
+3. Monitor service performance
 
-<Card title="Synthetic Monitoring" href="/docs/detect/synthetic-monitoring/overview">
-Explore advanced monitoring with API and browser checks
-</Card>
+</Accordion>
 
-<Card title="Private Locations" href="/docs/getting-started/platform/private-locations/overview">
-Monitor internal services with private location agents
-</Card>
+<Accordion title="SSL Certificate Issues">
+**Symptom**: SSL validation failures
+**Causes**:
+- Certificate expired
+- Hostname mismatch
+- Invalid certificate chain
 
-<Card title="Monitoring Locations" href="/docs/detect/uptime-monitoring/locations">
-Learn about global monitoring locations and coverage
-</Card>
+**Solutions**:
+1. Check certificate validity: `openssl s_client -connect hostname:port`
+2. Verify certificate expiration dates
+3. Update certificates before expiration
 
-<Card title="Scheduling" href="/docs/detect/uptime-monitoring/scheduling">
-Configure monitoring frequency and timing strategies
-</Card>
+</Accordion>
 
-<Card title="CLI Configuration" href="/docs/detect/uptime-monitoring/cli-configuration">
-Manage TCP monitors as code with the Checkly CLI
-</Card>
-</CardGroup>
+</AccordionGroup>
+
+
+
+

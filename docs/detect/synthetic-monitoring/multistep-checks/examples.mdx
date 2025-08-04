@@ -1,0 +1,186 @@
+---
+
+title: 'Multistep Check Examples'
+description: 'Learn how to use multistep checks with Playwright.'
+sidebarTitle: Examples
+---
+
+Multistep checks are perfect for monitoring complex API workflows that span multiple endpoints. These examples demonstrate how to implement comprehensive user journey monitoring across different industries and scenarios.
+
+## User Registration and Onboarding
+```typescript
+test('Complete user onboarding workflow', async ({ request }) => {
+  const userEmail = `test-${Date.now()}@example.com`
+  let userId, authToken
+
+  await test.step('User registration', async () => {
+    const response = await request.post('/api/auth/register', {
+      data: {
+        email: userEmail,
+        password: 'SecurePass123!',
+        firstName: 'Test',
+        lastName: 'User'
+      }
+    })
+    
+    expect(response.status()).toBe(201)
+    userId = (await response.json()).id
+  })
+
+  await test.step('Email verification', async () => {
+    // Simulate email verification
+    const response = await request.post(`/api/auth/verify/${userId}`, {
+      data: { verificationCode: 'TEST_CODE' }
+    })
+    
+    expect(response.status()).toBe(200)
+  })
+
+  await test.step('Initial login', async () => {
+    const response = await request.post('/api/auth/login', {
+      data: { email: userEmail, password: 'SecurePass123!' }
+    })
+    
+    authToken = (await response.json()).token
+  })
+
+  await test.step('Profile completion', async () => {
+    const response = await request.post('/api/users/profile', {
+      headers: { 'Authorization': `Bearer ${authToken}` },
+      data: {
+        company: 'Test Corp',
+        jobTitle: 'Engineer',
+        preferences: { newsletter: true }
+      }
+    })
+    
+    expect(response.status()).toBe(201)
+  })
+
+  await test.step('Onboarding completion verification', async () => {
+    const response = await request.get(`/api/users/${userId}/onboarding-status`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    })
+    
+    const status = await response.json()
+    expect(status.complete).toBe(true)
+  })
+})
+```
+
+## Payment Processing Workflow
+```typescript
+test('Payment processing and verification', async ({ request }) => {
+  let customerId, paymentMethodId, chargeId
+
+  await test.step('Create customer', async () => {
+    const response = await request.post('/api/customers', {
+      data: {
+        email: 'customer@example.com',
+        name: 'Test Customer'
+      }
+    })
+    
+    customerId = (await response.json()).id
+  })
+
+  await test.step('Add payment method', async () => {
+    const response = await request.post('/api/payment-methods', {
+      data: {
+        customerId,
+        type: 'card',
+        cardNumber: '4242424242424242',
+        expiryMonth: 12,
+        expiryYear: 2025,
+        cvv: '123'
+      }
+    })
+    
+    paymentMethodId = (await response.json()).id
+  })
+
+  await test.step('Process payment', async () => {
+    const response = await request.post('/api/charges', {
+      data: {
+        amount: 2500, // $25.00
+        currency: 'usd',
+        customerId,
+        paymentMethodId
+      }
+    })
+    
+    const charge = await response.json()
+    chargeId = charge.id
+    expect(charge.status).toBe('succeeded')
+  })
+
+  await test.step('Verify payment in customer record', async () => {
+    const response = await request.get(`/api/customers/${customerId}/charges`)
+    const charges = await response.json()
+    
+    const recentCharge = charges.data.find(c => c.id === chargeId)
+    expect(recentCharge).toBeDefined()
+    expect(recentCharge.amount).toBe(2500)
+  })
+})
+```
+
+## Data Processing Pipeline
+```typescript
+test('Data processing and validation pipeline', async ({ request }) => {
+  let jobId, processedDataId
+
+  await test.step('Submit data for processing', async () => {
+    const response = await request.post('/api/data/process', {
+      data: {
+        source: 'test_data.csv',
+        operations: ['validate', 'transform', 'enrich']
+      }
+    })
+    
+    jobId = (await response.json()).jobId
+    expect(jobId).toBeDefined()
+  })
+
+  await test.step('Monitor processing status', async () => {
+    let attempts = 0
+    const maxAttempts = 30 // 5 minutes max
+    
+    while (attempts < maxAttempts) {
+      const response = await request.get(`/api/jobs/${jobId}/status`)
+      const job = await response.json()
+      
+      if (job.status === 'completed') {
+        processedDataId = job.outputDataId
+        break
+      } else if (job.status === 'failed') {
+        throw new Error(`Job failed: ${job.error}`)
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 10000)) // Wait 10s
+      attempts++
+    }
+    
+    expect(processedDataId).toBeDefined()
+  })
+
+  await test.step('Validate processed data', async () => {
+    const response = await request.get(`/api/data/${processedDataId}/summary`)
+    const summary = await response.json()
+    
+    expect(summary.recordCount).toBeGreaterThan(0)
+    expect(summary.validRecords).toBeGreaterThan(0)
+    expect(summary.errorRate).toBeLessThan(0.05) // Less than 5% error rate
+  })
+
+  await test.step('Export processed data', async () => {
+    const response = await request.post(`/api/data/${processedDataId}/export`, {
+      data: { format: 'json', destination: 'test_output' }
+    })
+    
+    expect(response.status()).toBe(202) // Accepted for processing
+    const exportJob = await response.json()
+    expect(exportJob.exportJobId).toBeDefined()
+  })
+})
+```

@@ -1,0 +1,228 @@
+---
+title: checkly import
+description: 'Import existing resources into your CLI-managed project.'
+sidebarTitle: 'checkly import'
+---
+
+The `checkly import` command imports existing resources from your Checkly account into your CLI-managed project. This allows you to bring existing checks, alert channels, and other resources under code management using a structured three-phase workflow.
+
+## Usage
+
+Import all resources from your account into the current project.
+
+```bash Terminal
+npx checkly import
+```
+
+## Extended Usage
+
+Import all resources into a specific directory using the root option.
+
+```bash Terminal
+npx checkly import --root ./src/checks
+```
+
+Import specific resources by providing their type and ID as arguments.
+
+```bash Terminal
+npx checkly import check:abc123 alert-channel:456
+```
+
+Import using a specific configuration file for different environments.
+
+```bash Terminal
+npx checkly import --config ./checkly.staging.config.ts
+```
+
+## Unique Options
+
+### `--root`
+Specify the directory where generated code should be placed.
+
+```bash Terminal
+npx checkly import --root ./monitoring
+```
+
+**Default**: Uses the `checkMatch` directory defined in your `checkly.config.ts/js`.
+
+### Resource Type Selection
+Import specific resources by providing `resource-type:id` arguments:
+
+```bash Terminal
+npx checkly import check:abc123 alert-channel:def456
+```
+
+**Available resource types**:
+- `check` - Individual monitoring checks
+- `check-group` - Collections of related checks  
+- `alert-channel` - Notification channels
+- `maintenance-window` - Scheduled maintenance periods
+- `private-location` - Custom monitoring locations
+- `dashboard` - Public status dashboards
+- `snippet` - Reusable code snippets
+- `status-page` - Status page configurations
+- `status-page-service` - Status page service definitions
+
+## Import Workflow
+
+The import process follows a three-phase workflow for safe resource migration:
+
+### 1. Plan Generation
+Analyze your account and generate an import plan showing what will be imported.
+
+```bash Terminal
+npx checkly import
+```
+
+### 2. Plan Application  
+Apply the generated plan, creating code files for your resources.
+
+```bash Terminal
+npx checkly import apply
+```
+
+### 3. Plan Commitment
+Commit the applied changes and mark resources as CLI-managed.
+
+```bash Terminal
+npx checkly import commit  
+```
+
+## Subcommands
+
+### `checkly import apply`
+Apply a previously generated import plan to create the actual code files in your project structure.
+
+```bash Terminal
+npx checkly import apply
+```
+
+### `checkly import commit`
+Commit an applied import plan to finalize the import and mark resources as managed by your CLI project.
+
+```bash Terminal
+npx checkly import commit
+```
+
+### `checkly import cancel`
+Cancel a generated plan that hasn't been committed to discard any pending import operations.
+
+```bash Terminal
+npx checkly import cancel
+```
+
+## Import Process Example
+
+Complete example showing the full three-phase workflow:
+
+```bash Terminal        
+# 1. Generate import plan
+npx checkly import
+# Output shows: "Found 15 checks, 3 alert channels, 1 check group"
+
+# 2. Review and apply the plan
+npx checkly import apply
+# Output: "Created 19 files in ./src/checks/"
+
+# 3. Commit the changes
+npx checkly import commit
+# Output: "Import completed. Resources now managed by CLI."
+```
+
+## Generated Code Structure
+
+Imported resources are converted to CLI constructs with organized directory structure:
+
+```
+src/checks/
+├── api-checks/
+│   ├── homepage-api.check.ts
+│   └── user-login-api.check.ts
+├── browser-checks/
+│   ├── checkout-flow.check.ts
+│   └── user-dashboard.check.ts
+├── alert-channels/
+│   ├── slack-alerts.ts
+│   └── email-notifications.ts
+└── check-groups/
+    └── production-monitoring.group.ts
+```
+
+## Environment Variable Targeting
+
+Use environment-specific imports for different deployment stages:
+
+### Staging Environment Import
+```bash Terminal
+npx checkly import \
+  --config ./checkly.staging.config.ts \
+  --env ENVIRONMENT=staging
+```
+
+### Production Environment Import
+```bash Terminal
+npx checkly import \
+  --config ./checkly.production.config.ts \
+  --env ENVIRONMENT=production
+```
+
+## Selective Import Strategy
+
+For large accounts, consider importing incrementally to manage complexity:
+
+Import critical checks first by check group.
+
+```bash Terminal
+npx checkly import check-group:production
+```
+
+Import alert channels to establish notification infrastructure.
+
+```bash Terminal
+npx checkly import alert-channel:slack alert-channel:email
+```
+
+Import remaining resources after establishing core infrastructure.
+
+```bash Terminal
+npx checkly import
+```
+
+## Best Practices
+
+### Before Importing
+1. **Backup existing project** structure
+2. **Review your account** resources to understand what will be imported
+3. **Plan directory structure** using `--root` if needed
+4. **Test with specific resources** first using `resource-type:id` syntax
+
+### After Importing
+1. **Review generated code** for accuracy and style consistency
+2. **Test imported checks** using `checkly test`
+3. **Commit to version control** to track changes
+4. **Deploy to verify** everything works as expected
+
+## Troubleshooting
+
+### Resource Conflicts
+If resources already exist in your project, the import will show conflicts in the plan. Review carefully before applying.
+
+### Permission Issues
+Ensure your account has sufficient permissions to read all resources you're trying to import.
+
+### Large Account Import
+For accounts with many resources, consider using the selective import approach to manage complexity.
+
+## Global Options
+
+This command supports the following [global options](/cli/checkly-global-options):
+
+| Option | Description |
+|--------|-------------|
+| [`--config`](/cli/checkly-global-options#config-or-c) | Specify a configuration file |
+| [`--verbose`](/cli/checkly-global-options#verbose-or-v) | Show detailed output |
+
+## Related Commands
+
+- [`checkly deploy`](/cli/checkly-deploy) - Deploy imported resources
+- [`checkly test`](/cli/checkly-test) - Test imported checks locally 

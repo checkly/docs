@@ -1,14 +1,13 @@
 ---
-title: 'Heartbeat Monitors Overview'
-description: 'Monitor scheduled jobs, background tasks, and cron jobs with passive heartbeat monitoring. Ensure your critical automated processes are running as expected.'
+title: Heartbeat Monitors
+description:  Ensure your critical automated processes are running as expected.
 sidebarTitle: Overview
 ---
-
+<Tip>
+**Monitoring as Code**: Learn more about the [Heartbeat Monitor Construct](/constructs/heartbeat-monitor).
+</Tip>
 Monitor your scheduled jobs, background tasks, and automated processes with Checkly's heartbeat monitoring. Unlike traditional active monitoring, heartbeat monitors work passively—they listen for regular "pings" from your tasks to ensure they're running as expected.
 
-<Note>
-Heartbeat monitors are available on our [Team and Enterprise plans](https://www.checklyhq.com/pricing).
-</Note>
 
 ## What are Heartbeat Monitors?
 
@@ -18,39 +17,30 @@ If Checkly doesn't receive a ping within the expected timeframe, it triggers ale
 
 ![Heartbeat check overview showing the monitoring interface](/images/heartbeat-monitors/heartbeat-check-overview.png)
 
-<CardGroup cols={2}>
-<Card title="Perfect for" icon="check">
+Heartbeat monitors are perfect for: 
 - Backup jobs and data exports
 - ETL processes and data imports  
 - Scheduled maintenance scripts
 - Newsletter and email campaigns
 - Database cleanup tasks
 - File processing workflows
-</Card>
-
-<Card title="Key benefits" icon="heart">
-- Zero infrastructure overhead
-- Works with any platform or language
-- Flexible timing with grace periods
-- Immediate failure detection
-- Simple HTTP-based integration
-</Card>
-</CardGroup>
 
 ## How Heartbeat Monitoring Works
 
-The heartbeat monitoring process is straightforward:
+The heartbeat monitoring process is straightforward. Once created, your heartbeat monitor provides a unique ping URL. Your tasks should make an HTTP GET or POST request to this URL when they complete successfully.
 
 1. **Create a monitor** - Set up a heartbeat monitor with your expected ping frequency
 2. **Get your ping URL** - Checkly provides a unique URL for your task to ping
 3. **Add the ping** - Include a simple HTTP request in your task's success path
-4. **Monitor results** - Checkly tracks pings and alerts you when they're missing
+4. **Monitor results** - Checkly tracks pings and alerts you when they're 
 
 <Tip>
 Always add the heartbeat ping at the very end of your task, after all critical operations have completed successfully. This ensures you only get "success" pings when your job actually finished.
 </Tip>
 
-## Quick Example
+## Construct
+
+### Heartbeat Example
 
 Here's how you'd monitor a backup script:
 
@@ -66,41 +56,87 @@ aws s3 cp backup.sql s3://my-backup-bucket/
 curl -m 5 --retry 3 https://ping.checklyhq.com/your-heartbeat-id
 ```
 
-## Getting Started
+### Request Configuration
 
-Ready to create your first heartbeat monitor? Follow our comprehensive guide that walks you through each step of the setup process.
+When creating heartbeat monitors, you can configure timing parameters to match your task's schedule:
 
-<CardGroup cols={2}>
-<Card title="Creating Your First Monitor" href="/docs/detect/uptime-monitoring/heartbeat-monitors/creating-your-first-heartbeat-monitor">
-Step-by-step guide to configure your first heartbeat monitor
-</Card>
+| Parameter | Type | Required | Range | Description |
+|-----------|------|----------|-------|-------------|
+| `period` | `number` | ✅ | 30 seconds - 365 days | The expected period of time between each ping |
+| `periodUnit` | `string` | ✅ | `'seconds'` \| `'minutes'` \| `'hours'` \| `'days'` | The unit of time for the period |
+| `grace` | `number` | ✅ | 0 seconds - 365 days | The grace period to wait for before sending an alert |
+| `graceUnit` | `string` | ✅ | `'seconds'` \| `'minutes'` \| `'hours'` \| `'days'` | The unit of time for the grace period |
 
-<Card title="Integration Examples" href="/docs/detect/uptime-monitoring/heartbeat-monitors/integration-examples">
-Learn how to integrate with CLI, infrastructure as code, CI/CD, and more
-</Card>
-</CardGroup>
+<Warning>
+The grace period starts counting after the expected period expires. For example, with a 1-hour period and 5-minute grace, alerts trigger if no ping is received within 65 minutes of the last ping. Set grace periods carefully. Too short and you’ll get false alarms from normal execution variance. Too long and you’ll miss actual failures.
+</Warning>
 
-## Ping URL and Implementation
 
-Once created, your heartbeat monitor provides a unique ping URL. Your tasks should make an HTTP `GET` or `POST` request to this URL when they complete successfully.
+### Example Configurations
 
-### Ping Requirements
+<Tabs>
+  <Tab title="Daily Backup">
+    ```ts
+    // Daily backup job with 30 minute grace period
+    period: 1,
+    periodUnit: 'days',
+    grace: 30,
+    graceUnit: 'minutes'
+    ```
+  </Tab>
+  
+  <Tab title="Hourly Task">
+    ```ts
+    // Hourly process with 10 minute grace period
+    period: 1,
+    periodUnit: 'hours',
+    grace: 10,
+    graceUnit: 'minutes'
+    ```
+  </Tab>
+  
+  <Tab title="Weekly Report">
+    ```ts
+    // Weekly report with 2 hour grace period
+    period: 7,
+    periodUnit: 'days',
+    grace: 2,
+    graceUnit: 'hours'
+    ```
+  </Tab>
+</Tabs>
 
-<CardGroup cols={2}>
-<Card title="Supported Methods" icon="globe">
-- `GET` requests (most common)
-- `POST` requests
-- Custom headers for source tracking
-</Card>
+## Locations
+Since heartbeat monitors start from your own infrastructure, there is no need to configure locations.
 
-<Card title="Not Supported" icon="x">
-- `PUT` or `DELETE` requests
-- Requests from blocked bots
-- Pings before first activation
-</Card>
-</CardGroup>
 
-### Best Practices for Pings
+
+
+
+
+
+
+## Metrics
+
+Heartbeat monitors provide different metrics andinsights than other types of checks and monitors:
+
+- **Ping History**: Timeline of when pings were received
+- **Missed Pings**: Gaps where expected pings didn't arrive
+- **Alert Timeline**: When alerts were triggered and resolved
+- **Source Tracking**: Which systems or processes sent pings
+
+Use this data to:
+- Identify patterns in job failures
+- Optimize grace periods based on actual variance
+- Track the reliability of different scheduled processes
+- Coordinate incident response when jobs fail
+
+<Warning>
+Remember: Heartbeat monitors detect when jobs fail to complete, but they can't tell you why a job failed. Combine heartbeat monitoring with application logging and error tracking for complete observability.
+</Warning>
+
+
+## Best Practices
 
 **Always include timeout and retry options:**
 ```bash
@@ -129,66 +165,31 @@ except Exception as e:
 curl -H "Origin: backup-server-01" https://ping.checklyhq.com/your-id
 ```
 
-## Manual Testing
 
-You can manually send pings through the Checkly interface to:
+## Troubleshooting
 
-- Test your monitor setup before deployment
-- Start the timer for a newly created monitor
-- Reset alerts during maintenance windows
-- Verify alert configurations are working
+<AccordionGroup>
+<Accordion title="Monitor Not Starting">
+- **Issue**: Timer doesn't start after first ping
+- **Solution**: Check that the monitor is activated and the ping URL is correct
 
-Manual pings are available both on the monitor detail page and in the quick actions menu from your monitors list.
+</Accordion>
 
-![Send manual pings from the heartbeat monitor overview page](/images/heartbeat-monitors/heartbeat-ping-overview-page.png)
+<Accordion title="False Alerts">
+- **Issue**: Getting alerts even when job runs successfully
+- **Solution**: Increase grace period or check if ping is being sent correctly
 
-You can also send manual pings directly from your monitors list using the quick actions menu:
+</Accordion>
 
-![Quick ping option in the heartbeat monitors list view](/images/heartbeat-monitors/heartbeat-ping-quick-menu.png)
+<Accordion title="Missing Pings">
+- **Issue**: Job runs but no ping is received
+- **Solution**: Verify network connectivity and ping URL accessibility
 
-## Understanding Results and Alerts
+</Accordion>
 
-Heartbeat monitors provide different insights than active checks:
+<Accordion title="Timer Reset Issues">
+- **Issue**: Timer doesn't reset after successful ping
+- **Solution**: Check ping method (GET/POST) and ensure no network timeouts
 
-- **Ping History**: Timeline of when pings were received
-- **Missed Pings**: Gaps where expected pings didn't arrive
-- **Alert Timeline**: When alerts were triggered and resolved
-- **Source Tracking**: Which systems or processes sent pings
-
-Use this data to:
-- Identify patterns in job failures
-- Optimize grace periods based on actual variance
-- Track the reliability of different scheduled processes
-- Coordinate incident response when jobs fail
-
-## Next Steps
-
-<CardGroup cols={2}>
-<Card title="Creating Your First Monitor" href="/docs/detect/uptime-monitoring/heartbeat-monitors/creating-your-first-heartbeat-monitor">
-Step-by-step guide to configure your first heartbeat monitor
-</Card>
-
-<Card title="Integration Examples" href="/docs/detect/uptime-monitoring/heartbeat-monitors/integration-examples">
-Learn how to integrate with CLI, infrastructure as code, CI/CD, and more
-</Card>
-
-<Card title="Ping Examples" href="/docs/detect/uptime-monitoring/heartbeat-monitors/ping-examples">
-See detailed code examples for every platform and framework
-</Card>
-
-<Card title="Alerting Configuration" href="/docs/detect/uptime-monitoring/alerting">
-Set up effective alerting for your heartbeat monitors
-</Card>
-
-<Card title="Scheduling" href="/docs/detect/uptime-monitoring/scheduling">
-Understand timing strategies for heartbeat monitoring
-</Card>
-
-<Card title="CLI Configuration" href="/docs/detect/uptime-monitoring/cli-configuration">
-Manage heartbeat monitors as code with the Checkly CLI
-</Card>
-</CardGroup>
-
-<Warning>
-Remember: Heartbeat monitors detect when jobs fail to complete, but they can't tell you why a job failed. Combine heartbeat monitoring with application logging and error tracking for complete observability.
-</Warning>
+</Accordion>
+</AccordionGroup>

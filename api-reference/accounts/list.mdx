@@ -12,119 +12,12 @@ The List Accounts endpoint returns all accounts accessible with your API key. Th
 This endpoint is currently in beta and may change without notice.
 </Warning>
 
-## Common Use Cases
+**Common Use Cases**:
+- Multi-Account Management
+- Account Discovery
+- Plan Information
+- Account Audit
 
-<CardGroup cols={1}>
-
-<Card title="Multi-Account Management" icon="users">
-List all accounts accessible with your API key for account switching and management
-```bash
-GET /v1/accounts
-```
-</Card>
-
-<Card title="Account Discovery" icon="search">
-Discover available accounts when setting up integrations or tools
-```bash
-GET /v1/accounts
-```
-</Card>
-
-<Card title="Plan Information" icon="credit-card">
-Get current plan details for billing and feature availability across accounts
-```bash
-GET /v1/accounts
-```
-</Card>
-
-<Card title="Account Audit" icon="shield-check">
-Audit account access and permissions for security compliance
-```bash
-GET /v1/accounts
-```
-</Card>
-
-</CardGroup>
-
-## Response Example
-
-```json
-{
-  "data": [
-    {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "name": "Acme Corp Production",
-      "plan": {
-        "name": "Team",
-        "type": "subscription"
-      },
-      "createdAt": "2024-01-15T10:30:00.000Z",
-      "updatedAt": "2024-01-20T14:45:00.000Z"
-    },
-    {
-      "id": "660f9511-f3ac-52e5-b827-557766551111",
-      "name": "Acme Corp Staging",
-      "plan": {
-        "name": "Hobby",
-        "type": "free"
-      },
-      "createdAt": "2024-01-10T08:15:00.000Z",
-      "updatedAt": "2024-01-18T16:20:00.000Z"
-    }
-  ],
-  "meta": {
-    "currentPage": 1,
-    "totalPages": 1,
-    "totalItems": 2,
-    "limit": 10
-  }
-}
-```
-
-## Additional Examples
-
-<CodeGroup>
-
-```bash List All Accounts
-curl -X GET "https://api.checklyhq.com/v1/accounts" \
-  -H "Authorization: Bearer cu_1234567890abcdef" \
-  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000"
-```
-
-```javascript Account Discovery
-const response = await fetch('https://api.checklyhq.com/v1/accounts', {
-  headers: {
-    'Authorization': 'Bearer cu_1234567890abcdef',
-    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
-  }
-});
-
-const data = await response.json();
-console.log(`Found ${data.meta.totalItems} accounts`);
-data.data.forEach(account => {
-  console.log(`${account.name}: ${account.plan.name} plan`);
-});
-```
-
-```python Multi-Account Setup
-import requests
-
-headers = {
-    'Authorization': 'Bearer cu_1234567890abcdef',
-    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000'
-}
-
-response = requests.get(
-    'https://api.checklyhq.com/v1/accounts',
-    headers=headers
-)
-
-data = response.json()
-for account in data['data']:
-    print(f"Account: {account['name']} ({account['plan']['name']})")
-```
-
-</CodeGroup>
 
 <Note>
 This endpoint requires authentication and returns accounts accessible with your current API key. The account specified in the X-Checkly-Account header must be one you have access to. Use this endpoint to discover and manage multiple accounts in your Checkly setup.

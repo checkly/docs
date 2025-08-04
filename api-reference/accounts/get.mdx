@@ -12,112 +12,16 @@ The Get Account endpoint retrieves detailed information about a specific account
 This endpoint is currently in beta and may change without notice.
 </Warning>
 
-## Common Use Cases
+**Common Use Cases**:
+- Account Overview: Get complete account information for dashboard displays and monitoring
+- Usage Monitoring: Track resource usage against plan limits and quotas
+- Plan Validation: Verify plan features before creating new resources
+- Settings Retrieval: Get account preferences and configuration settings
 
-<CardGroup cols={2}>
+<Note>
+This endpoint provides detailed account information including current usage metrics. Use this to understand plan limits and available features before creating new resources. The response includes both current usage and plan limits to help you make informed decisions about resource allocation.
+</Note>
 
-<Card title="Account Overview" icon="dashboard">
-Get complete account information for dashboard displays and monitoring
-```bash
-GET /v1/accounts/{accountId}
-```
-</Card>
-
-<Card title="Usage Monitoring" icon="chart-bar">
-Track resource usage against plan limits and quotas
-```bash
-GET /v1/accounts/{accountId}
-```
-</Card>
-
-<Card title="Plan Validation" icon="check-circle">
-Verify plan features before creating new resources
-```bash
-GET /v1/accounts/{accountId}
-```
-</Card>
-
-<Card title="Settings Retrieval" icon="cog">
-Get account preferences and configuration settings
-```bash
-GET /v1/accounts/{accountId}
-```
-</Card>
-
-</CardGroup>
-
-## Response Example
-
-```json
-{
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "name": "Acme Corp Production",
-  "plan": {
-    "name": "Team",
-    "type": "subscription",
-    "features": {
-      "maxChecks": 100,
-      "maxAlertChannels": 50,
-      "maxPrivateLocations": 10,
-      "supportLevel": "standard"
-    }
-  },
-  "settings": {
-    "timezone": "America/New_York",
-    "dateFormat": "MM/DD/YYYY",
-    "defaultCheckFrequency": 10
-  },
-  "usage": {
-    "checksUsed": 45,
-    "alertChannelsUsed": 12,
-    "privateLocationsUsed": 2
-  },
-  "createdAt": "2024-01-15T10:30:00.000Z",
-  "updatedAt": "2024-01-20T14:45:00.000Z"
-}
-```
-
-## Account Plans
-
-<AccordionGroup>
-
-<Accordion title="Hobby Plan">
-Free tier with basic monitoring capabilities
-
-**Features:**
-- Up to 5 checks
-- Email alerts only
-- Community support
-- Public locations only
-
-**Use Case:** Small projects and personal use
-</Accordion>
-
-<Accordion title="Team Plan">
-Professional monitoring for small to medium teams
-
-**Features:**
-- Up to 100 checks
-- Multiple alert channels
-- Priority support
-- Private locations available
-
-**Use Case:** Growing businesses and development teams
-</Accordion>
-
-<Accordion title="Enterprise Plan">
-Advanced monitoring for large organizations
-
-**Features:**
-- Unlimited checks
-- Advanced integrations
-- Dedicated support
-- Custom SLAs
-
-**Use Case:** Large enterprises with complex monitoring needs
-</Accordion>
-
-</AccordionGroup>
 
 ## Additional Examples
 
@@ -166,7 +70,3 @@ print(f"Checks: {account['usage']['checksUsed']}/{account['plan']['features']['m
 ```
 
 </CodeGroup>
-
-<Note>
-This endpoint provides detailed account information including current usage metrics. Use this to understand plan limits and available features before creating new resources. The response includes both current usage and plan limits to help you make informed decisions about resource allocation.
-</Note>

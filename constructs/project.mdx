@@ -1,0 +1,327 @@
+---
+title: 'Project Construct'
+description: 'Learn how to configure projects with the Checkly CLI.'
+sidebarTitle: 'Project'
+---
+
+Use the Project construct to define core settings and defaults for your entire Checkly CLI project. This is typically configured in your `checkly.config.ts` file and provides global defaults for all checks and constructs.
+
+<Info>
+Learn more about project configuration in the [CLI documentation](/docs/cli/).
+</Info>
+
+## `Project` Examples
+
+<CodeGroup>
+
+```ts Basic Example
+import { defineConfig } from 'checkly'
+import { Frequency } from 'checkly/constructs'
+
+export default defineConfig({
+  projectName: 'Website Monitoring',
+  logicalId: 'website-monitoring-1',
+  repoUrl: 'https://github.com/acme/website',
+  checks: {
+    activated: true,
+    muted: false,
+    runtimeId: '2025.04',
+    frequency: Frequency.EVERY_5M,
+    locations: ['us-east-1', 'eu-west-1'],
+    tags: ['website', 'api']
+  }
+})
+```
+
+```ts Advanced Example
+import { defineConfig } from 'checkly'
+import { Frequency } from 'checkly/constructs'
+
+export default defineConfig({
+  projectName: 'Production Monitoring Suite',
+  logicalId: 'prod-monitoring-2025',
+  repoUrl: 'https://github.com/acme/monitoring',
+  checks: {
+    activated: true,
+    muted: false,
+    runtimeId: '2025.04',
+    frequency: Frequency.EVERY_10M,
+    locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
+    tags: ['production', 'critical'],
+    checkMatch: '**/__checks__/*.check.ts',
+    ignoreDirectoriesMatch: ['node_modules/**', 'dist/**'],
+    playwrightConfig: {
+      use: {
+        baseURL: 'https://app.example.com'
+      }
+    },
+    browserChecks: {
+      frequency: Frequency.EVERY_30M,
+      testMatch: '**/__tests__/*.spec.ts'
+    }
+  },
+  cli: {
+    runLocation: 'eu-west-1',
+    privateRunLocation: 'private-dc1',
+    retries: 2
+  }
+})
+```
+
+</CodeGroup>
+
+## `Project` Configuration
+
+<Tabs>
+  <Tab title="Core Configuration">
+
+Configure basic project settings:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `projectName` | `string` | ✅ | - | Friendly name for your project |
+| `logicalId` | `string` | ✅ | - | Unique identifier for this project (should be stable) |
+| `repoUrl` | `string` | ❌ | - | Optional URL to a Git repository |
+| `checks` | `object` | ❌ | - | Top-level defaults for all checks in this project |
+| `cli` | `object` | ❌ | - | Defaults for CLI commands |
+
+</Tab>
+</Tabs>
+
+## `checks` Configuration
+
+The `checks` object provides default settings that apply to all checks in your project:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `activated` | `boolean` | ❌ | `true` | Whether checks are enabled by default |
+| `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted by default |
+| `runtimeId` | `string` | ❌ | - | Default runtime ID for all checks |
+| `frequency` | `Frequency` | ❌ | - | Default frequency for all checks |
+| `locations` | `string[]` | ❌ | `[]` | Default public locations for all checks |
+| `tags` | `string[]` | ❌ | `[]` | Default tags applied to all checks |
+| `checkMatch` | `string` | ❌ | - | Glob pattern to find check construct files |
+| `ignoreDirectoriesMatch` | `string[]` | ❌ | `[]` | Glob patterns for directories to ignore |
+| `playwrightConfig` | `object` | ❌ | - | Subset of Playwright configuration options |
+| `browserChecks` | `object` | ❌ | - | Default settings for browser checks |
+
+```ts
+checks: {
+  activated: true,
+  muted: false,
+  runtimeId: '2025.04',
+  frequency: Frequency.EVERY_10M,
+  locations: ['us-east-1', 'eu-west-1'],
+  tags: ['production'],
+  checkMatch: '**/__checks__/*.check.ts',
+  ignoreDirectoriesMatch: ['node_modules/**'],
+  playwrightConfig: {
+    use: {
+      baseURL: 'https://app.example.com',
+      timeout: 30000
+    }
+  }
+}
+```
+
+## `browserChecks` Configuration
+
+Configure defaults specifically for browser checks:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `frequency` | `Frequency` | ❌ | - | Default frequency for browser checks (overrides general frequency) |
+| `testMatch` | `string` | ❌ | - | Glob pattern to find Playwright test files |
+
+```ts
+browserChecks: {
+  frequency: Frequency.EVERY_30M,
+  testMatch: '**/__tests__/*.spec.ts'
+}
+```
+
+## `cli` Configuration
+
+Configure defaults for CLI commands:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `runLocation` | `string` | ❌ | - | Default location for `checkly test` and `checkly trigger` |
+| `privateRunLocation` | `string` | ❌ | - | Default private location for CLI commands |
+| `retries` | `number` | ❌ | `0` | Default retry count for failing checks (max 3) |
+
+```ts
+cli: {
+  runLocation: 'eu-west-1',
+  privateRunLocation: 'private-dc1',
+  retries: 2
+}
+```
+
+## Project Examples
+
+<Tabs>
+  <Tab title="Simple Website Monitoring">
+    ```ts
+    // checkly.config.ts
+    import { defineConfig } from 'checkly'
+    import { Frequency } from 'checkly/constructs'
+
+    export default defineConfig({
+      projectName: 'Acme Website',
+      logicalId: 'acme-website-prod',
+      repoUrl: 'https://github.com/acme/website',
+      checks: {
+        activated: true,
+        frequency: Frequency.EVERY_5M,
+        locations: ['us-east-1', 'eu-west-1'],
+        tags: ['website'],
+        checkMatch: 'monitoring/**/*.check.ts'
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Multi-Environment Setup">
+    ```ts
+    // checkly.config.ts
+    import { defineConfig } from 'checkly'
+    import { Frequency } from 'checkly/constructs'
+
+    const isProduction = process.env.NODE_ENV === 'production'
+
+    export default defineConfig({
+      projectName: isProduction ? 'Production Monitoring' : 'Staging Monitoring',
+      logicalId: `app-monitoring-${isProduction ? 'prod' : 'staging'}`,
+      repoUrl: 'https://github.com/acme/app',
+      checks: {
+        activated: true,
+        muted: !isProduction, // Mute alerts in staging
+        frequency: isProduction ? Frequency.EVERY_5M : Frequency.EVERY_30M,
+        locations: isProduction 
+          ? ['us-east-1', 'eu-west-1', 'ap-southeast-1']
+          : ['us-east-1'],
+        tags: [isProduction ? 'production' : 'staging'],
+        runtimeId: '2025.04'
+      },
+      cli: {
+        runLocation: 'us-east-1',
+        retries: isProduction ? 3 : 1
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Complex Application">
+    ```ts
+    // checkly.config.ts
+    import { defineConfig } from 'checkly'
+    import { Frequency } from 'checkly/constructs'
+
+    export default defineConfig({
+      projectName: 'E-commerce Platform Monitoring',
+      logicalId: 'ecommerce-platform-2025',
+      repoUrl: 'https://github.com/acme/ecommerce',
+      checks: {
+        activated: true,
+        muted: false,
+        runtimeId: '2025.04',
+        frequency: Frequency.EVERY_10M,
+        locations: ['us-east-1', 'eu-west-1'],
+        tags: ['ecommerce', 'critical'],
+        checkMatch: 'src/monitoring/**/*.check.ts',
+        ignoreDirectoriesMatch: [
+          'node_modules/**',
+          'dist/**',
+          '**/*.test.ts',
+          'coverage/**'
+        ],
+        playwrightConfig: {
+          use: {
+            baseURL: 'https://shop.acme.com',
+            timeout: 30000,
+            screenshot: 'only-on-failure',
+            video: 'retain-on-failure'
+          }
+        },
+        browserChecks: {
+          frequency: Frequency.EVERY_30M,
+          testMatch: 'e2e/**/*.spec.ts'
+        }
+      },
+      cli: {
+        runLocation: 'us-east-1',
+        retries: 2
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="API-First Project">
+    ```ts
+    // checkly.config.ts
+    import { defineConfig } from 'checkly'
+    import { Frequency } from 'checkly/constructs'
+
+    export default defineConfig({
+      projectName: 'API Monitoring Suite',
+      logicalId: 'api-monitoring-v2',
+      repoUrl: 'https://github.com/acme/api-monitoring',
+      checks: {
+        activated: true,
+        muted: false,
+        runtimeId: '2025.04',
+        frequency: Frequency.EVERY_2M,
+        locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
+        tags: ['api', 'microservices'],
+        checkMatch: 'checks/**/*.api.ts',
+        ignoreDirectoriesMatch: ['tests/**', 'docs/**']
+      },
+      cli: {
+        runLocation: 'us-east-1',
+        retries: 3
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Private Locations">
+    ```ts
+    // checkly.config.ts
+    import { defineConfig } from 'checkly'
+    import { Frequency } from 'checkly/constructs'
+
+    export default defineConfig({
+      projectName: 'Internal Services Monitoring',
+      logicalId: 'internal-services-monitoring',
+      checks: {
+        activated: true,
+        frequency: Frequency.EVERY_10M,
+        locations: [], // No public locations
+        tags: ['internal', 'vpc'],
+        checkMatch: 'internal-checks/**/*.check.ts'
+      },
+      cli: {
+        privateRunLocation: 'vpc-us-east-1',
+        retries: 2
+      }
+    })
+    ```
+  </Tab>
+</Tabs>
+
+## Configuration Hierarchy
+
+The CLI follows a configuration hierarchy where more specific settings override general ones:
+
+1. **Individual Check Settings** (highest priority)
+2. **Check Group Settings**
+3. **Project Settings** (lowest priority)
+
+<Info>
+This hierarchy allows you to set sensible defaults at the project level while overriding specific settings for individual checks or groups as needed.
+</Info>
+
+<Warning>
+The `logicalId` should remain stable across deployments. Changing it will cause Checkly to treat it as a new project, potentially losing historical data and configurations.
+</Warning>

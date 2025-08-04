@@ -12,7 +12,6 @@ The Checkly API uses Bearer token authentication to secure all endpoints. Every 
 API authentication is required for all endpoints except public status pages. All requests must include both Authorization and X-Checkly-Account headers.
 </Info>
 
-
 ## Authentication Headers
 
 All API requests must include these two headers:
@@ -21,57 +20,6 @@ All API requests must include these two headers:
 |--------|-------------|---------|
 | `Authorization` | Bearer token with your API key | `Bearer cu_1234567890abcdef` |
 | `X-Checkly-Account` | Your Checkly Account ID | `550e8400-e29b-41d4-a716-446655440000` |
-
-## Authentication Response Example
-
-```json
-{
-  "success": true,
-  "user": {
-    "id": "user_123456789",
-    "email": "user@example.com",
-    "name": "John Developer",
-    "role": "owner",
-    "permissions": [
-      "checks:read",
-      "checks:write",
-      "alerts:read", 
-      "alerts:write",
-      "analytics:read",
-      "account:admin"
-    ]
-  },
-  "account": {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "name": "Acme Corp",
-    "plan": "team",
-    "limits": {
-      "checks": 100,
-      "checkRuns": 50000,
-      "alertChannels": 20,
-      "teammates": 10
-    },
-    "usage": {
-      "checksUsed": 67,
-      "checkRunsUsed": 23450,
-      "alertChannelsUsed": 8,
-      "teammatesUsed": 5
-    }
-  },
-  "apiKey": {
-    "id": "key_abc123def456",
-    "name": "Production API Access",
-    "scopes": ["checks", "alerts", "analytics"],
-    "createdAt": "2024-01-15T10:30:00.000Z",
-    "lastUsedAt": "2024-01-25T14:30:00.000Z",
-    "expiresAt": null,
-    "rateLimit": {
-      "requestsPerMinute": 100,
-      "requestsPerHour": 5000
-    }
-  }
-}
-```
 
 
 ## Getting Your Credentials
@@ -156,6 +104,9 @@ X-RateLimit-Reset: 1706192400
 <Accordion title="Permission Validation">
 Test specific permissions for your API key:
 
+Test your API key permissions using the manual code provided below.
+
+**Manual Testing Code:**
 ```javascript
 // Test different permission levels
 const permissions = [
@@ -256,8 +207,8 @@ diagnose_checkly_connection()
 
 ```bash cURL
 curl -X GET https://api.checklyhq.com/v1/checks \
-  -H "Authorization: Bearer cu_1234567efse890abcdef" \
-  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-44efs6655440000" \
+  -H "Authorization: Bearer cu_1234567890abcdef" \
+  -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000" \
   -H "Content-Type: application/json"
 ```
 
@@ -265,8 +216,8 @@ curl -X GET https://api.checklyhq.com/v1/checks \
 const response = await fetch('https://api.checklyhq.com/v1/checks', {
   method: 'GET',
   headers: {
-    'Authorization': 'Bearer cu_1234sda567890abcdef',
-    'X-Checkly-Account': '550e8400-e29b-41dddwada4-a716-446655440000',
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000',
     'Content-Type': 'application/json'
   }
 });
@@ -278,8 +229,8 @@ const data = await response.json();
 import requests
 
 headers = {
-    'Authorization': 'Bearer cu_123456dwawdwa7890abcdef',
-    'X-Checkly-Account': '550e8wadawd400-e29b-41d4-a716-446655440000',
+    'Authorization': 'Bearer cu_1234567890abcdef',
+    'X-Checkly-Account': '550e8400-e29b-41d4-a716-446655440000',
     'Content-Type': 'application/json'
 }
 
@@ -304,8 +255,8 @@ func main() {
         panic(err)
     }
     
-    req.Header.Add("Authorization", "Bearer cu_123dwda4567890abcdef")
-    req.Header.Add("X-Checkly-Account", "550e8400-e29b-wadawd41d4-a716-446655440000")
+    req.Header.Add("Authorization", "Bearer cu_1234567890abcdef")
+    req.Header.Add("X-Checkly-Account", "550e8400-e29b-41d4-a716-446655440000")
     req.Header.Add("Content-Type", "application/json")
     
     resp, err := client.Do(req)

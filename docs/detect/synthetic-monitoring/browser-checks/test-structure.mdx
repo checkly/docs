@@ -1,0 +1,193 @@
+--- 
+title: 'Browser Check Test Structure'
+description: 'Learn how to structure your browser checks with Playwright.'
+sidebarTitle: Test Structure
+---
+
+<Tip>
+**Monitoring as Code**: Learn more about the [Browser Check Construct](/constructs/browser-check).
+</Tip>
+
+## Test Script Structure
+
+Browser checks use Playwright's test framework with a familiar structure:
+
+```typescript
+import { test, expect } from '@playwright/test'
+
+test('User login workflow', async ({ page }) => {
+  // Navigate to login page
+  await page.goto('https://app.example.com/login')
+  
+  // Fill in credentials
+  await page.fill('[data-testid="email"]', 'user@example.com')
+  await page.fill('[data-testid="password"]', 'securepassword')
+  
+  // Submit login form
+  await page.click('[data-testid="login-button"]')
+  
+  // Verify successful login
+  await expect(page.locator('[data-testid="dashboard"]')).toBeVisible()
+  await expect(page).toHaveURL(/.*dashboard/)
+})
+```
+
+## Interactions & Navigations
+
+### Page Interactions
+```typescript
+// Navigation
+await page.goto('https://example.com')
+await page.goBack()
+await page.reload()
+
+// Element interactions
+await page.click('button[type="submit"]')
+await page.fill('input[name="email"]', 'test@example.com')
+await page.selectOption('select[name="country"]', 'US')
+await page.check('input[type="checkbox"]')
+
+// Keyboard and mouse actions
+await page.keyboard.press('Enter')
+await page.mouse.click(100, 200)
+await page.hover('.tooltip-trigger')
+
+// File operations
+await page.setInputFiles('input[type="file"]', './document.pdf')
+```
+
+### Element Selection Strategies
+```typescript
+// By test ID (recommended)
+await page.click('[data-testid="submit-button"]')
+
+// By text content
+await page.click('text=Submit Order')
+
+// By CSS selector
+await page.click('.btn-primary')
+
+// By XPath
+await page.click('//button[@class="submit-btn"]')
+
+// By role and name
+await page.click('role=button[name="Submit"]')
+```
+
+## Assertions and Validation
+
+### Page Content Assertions
+```typescript
+// Text content validation
+await expect(page.locator('.success-message')).toHaveText('Order confirmed')
+await expect(page).toHaveTitle('Dashboard - MyApp')
+
+// Element visibility
+await expect(page.locator('.loading-spinner')).toBeHidden()
+await expect(page.locator('.user-profile')).toBeVisible()
+
+// URL validation
+await expect(page).toHaveURL('https://app.example.com/dashboard')
+await expect(page).toHaveURL(/.*checkout\/success/)
+
+// Element attributes
+await expect(page.locator('input[name="email"]')).toHaveValue('user@example.com')
+await expect(page.locator('.status-badge')).toHaveClass('status-active')
+```
+
+### Custom Validation Logic
+```typescript
+// Complex assertions with custom logic
+const orderTotal = await page.locator('[data-testid="order-total"]').textContent()
+const expectedTotal = '$99.99'
+expect(orderTotal).toBe(expectedTotal)
+
+
+// Validate array of elements
+
+const productTitles = await page.locator('.product-title').allTextContents()
+expect(productTitles).toContain('Premium Plan')
+expect(productTitles).toHaveLength(3)
+
+```
+## Advanced Features
+
+### Screenshots and Visual Testing
+
+Browser checks can take screenshots of the page and compare them to a baseline. This is useful for visual regression testing.
+
+```typescript
+// Full page screenshot
+await page.screenshot({ path: 'dashboard.png', fullPage: true })
+
+// Element screenshot
+await page.locator('.product-card').screenshot({ path: 'product.png' })
+
+// Visual comparison (with setup)
+await expect(page).toHaveScreenshot('homepage.png')
+```
+
+### Mobile Device Simulation
+```typescript
+// Test responsive design
+test('Mobile checkout workflow', async ({ page }) => {
+  // Simulate iPhone 12
+  await page.setViewportSize({ width: 390, height: 844 })
+  
+  // Test mobile-specific interactions
+  await page.goto('https://shop.example.com')
+  await page.click('[data-testid="mobile-menu-toggle"]')
+  await expect(page.locator('.mobile-nav')).toBeVisible()
+})
+```
+
+### Multi-Tab and Context Handling
+```typescript
+// Handle multiple tabs
+const [newPage] = await Promise.all([
+  context.waitForEvent('page'),
+  page.click('a[target="_blank"]')
+])
+
+await newPage.waitForLoadState()
+await expect(newPage).toHaveTitle('External Service')
+```
+
+### Authentication and Session Management
+```typescript
+// Login once and reuse session
+test('Setup authentication', async ({ page }) => {
+  await page.goto('https://app.example.com/login')
+  await page.fill('[name="email"]', process.env.TEST_EMAIL)
+  await page.fill('[name="password"]', process.env.TEST_PASSWORD)
+  await page.click('[type="submit"]')
+  
+  // Save authentication state
+  await page.context().storageState({ path: 'auth-state.json' })
+})
+
+// Use saved authentication
+test.use({ storageState: 'auth-state.json' })
+test('Authenticated user workflow', async ({ page }) => {
+  // User is already logged in
+  await page.goto('https://app.example.com/dashboard')
+  await expect(page.locator('.welcome-message')).toBeVisible()
+})
+```
+
+## Integration and Deployment
+
+### Environment Configuration
+```typescript
+// Use environment-specific URLs and credentials
+const baseURL = process.env.BASE_URL || 'https://app.example.com'
+const testUser = process.env.TEST_USER_EMAIL
+const testPassword = process.env.TEST_USER_PASSWORD
+
+test('Environment-aware test', async ({ page }) => {
+  await page.goto(`${baseURL}/login`)
+  await page.fill('[name="email"]', testUser)
+  await page.fill('[name="password"]', testPassword)
+  // ... rest of test
+})
+```

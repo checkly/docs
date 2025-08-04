@@ -3,34 +3,29 @@ title: 'API Checks Overview'
 description: 'Monitor API endpoints with comprehensive HTTP request validation, performance testing, and detailed response analysis.'
 sidebarTitle: 'Overview'
 ---
-
-Monitor your API endpoints with Checkly's API checks to ensure they respond correctly, perform well, and meet your service level agreements. API checks send HTTP requests to your endpoints and validate responses against your specifications.
-
+<Tip>
+**Monitoring as Code**: Learn more about the [API Check Construct](/constructs/api-check).
+</Tip>  
 ## What are API Checks?
 
 API checks are automated HTTP requests that validate API endpoint functionality by checking status codes, response content, headers, and performance metrics. They simulate real API usage patterns and help catch issues before they impact your users.
 
-![API check interface showing HTTP request configuration](/images/api-checks/api-check-overview.png)
-
-<CardGroup cols={2}>
-<Card title="Perfect for" icon="check">
+**API checks are perfect for:**
 - REST API endpoint monitoring
 - GraphQL API validation
 - Authentication system testing
 - Third-party API dependency monitoring
 - Microservice health checking
 - Payment and transaction APIs
-</Card>
 
-<Card title="Key capabilities" icon="api">
+<Accordion title="Key capabilities" icon="api">
 - HTTP method support (GET, POST, PUT, DELETE, etc.)
 - Request/response validation
 - JSON schema validation
 - Authentication handling
 - Performance measurement
 - Global monitoring locations
-</Card>
-</CardGroup>
+</Accordion>
 
 ## How API Checks Work
 
@@ -46,122 +41,11 @@ API checks perform comprehensive endpoint validation:
 API checks are ideal for testing both internal microservices and external API dependencies your application relies on.
 </Tip>
 
-## Request Configuration
 
-### HTTP Methods
-Support for all standard HTTP methods:
-- **GET**: Retrieve data from endpoints
-- **POST**: Create resources or submit data
-- **PUT**: Update existing resources
-- **PATCH**: Partial resource updates
-- **DELETE**: Remove resources
-- **HEAD**: Check resource existence without body
-- **OPTIONS**: Discover allowed methods
 
-### Request Components
-```yaml
-# Example API check configuration
-Method: POST
-URL: https://api.example.com/v1/users
-Headers:
-  Content-Type: "application/json"
-  Authorization: "Bearer {{api_token}}"
-Body: |
-  {
-    "name": "John Doe",
-    "email": "john@example.com"
-  }
-```
 
-### Authentication Support
-- **Bearer Token**: JWT and OAuth token authentication
-- **Basic Auth**: Username/password authentication
-- **API Keys**: Custom header or query parameter authentication
-- **Custom Headers**: Flexible authentication patterns
 
-## Response Validation
-
-### Status Code Assertions
-Validate HTTP response codes:
-```javascript
-// Status code validation
-expect(response.status).to.equal(200)
-expect(response.status).to.be.oneOf([200, 201, 202])
-expect(response.status).to.be.below(400)
-```
-
-### Content Validation
-Validate response content and structure:
-```javascript
-// JSON response validation
-const data = JSON.parse(response.body)
-expect(data.success).to.be.true
-expect(data.user.id).to.be.a('number')
-expect(data.user.email).to.include('@')
-
-// Text content validation
-expect(response.body).to.include('success')
-expect(response.body).to.not.include('error')
-```
-
-### Header Validation
-Check response headers:
-```javascript
-// Header validation
-expect(response.headers['content-type']).to.include('application/json')
-expect(response.headers['cache-control']).to.exist
-expect(response.headers['x-rate-limit-remaining']).to.be.above(0)
-```
-
-### JSON Schema Validation
-Validate complex response structures:
-```json
-{
-  "type": "object",
-  "properties": {
-    "id": {"type": "integer"},
-    "name": {"type": "string"},
-    "email": {"type": "string", "format": "email"},
-    "created_at": {"type": "string", "format": "date-time"}
-  },
-  "required": ["id", "name", "email"]
-}
-```
-
-## Setup and Teardown Scripts
-
-### Setup Scripts
-Execute code before the main request:
-```javascript
-// Fetch authentication token
-const authResponse = await fetch('https://api.example.com/auth', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    username: process.env.API_USERNAME,
-    password: process.env.API_PASSWORD
-  })
-})
-
-const authData = await authResponse.json()
-// Make token available for main request
-process.env.AUTH_TOKEN = authData.access_token
-```
-
-### Teardown Scripts
-Clean up after the main request:
-```javascript
-// Clean up test data
-if (response.status === 201) {
-  const data = JSON.parse(response.body)
-  await fetch(`https://api.example.com/v1/users/${data.id}`, {
-    method: 'DELETE',
-    headers: { 'Authorization': `Bearer ${process.env.AUTH_TOKEN}` }
-  })
-}
-```
-
-## Performance Monitoring
+## Metrics
 
 ### Response Time Thresholds
 Set performance expectations:
@@ -177,9 +61,8 @@ Track comprehensive timing data:
 - **Content Download Time**: Response body transfer
 - **Total Response Time**: Complete request cycle
 
-## Global Monitoring
 
-### Location Coverage
+## Locations
 Monitor from multiple global locations:
 - **North America**: US East, US West, Canada Central
 - **Europe**: Ireland, Frankfurt, London, Stockholm
@@ -192,174 +75,11 @@ Monitor from multiple global locations:
 - Validate CDN and edge server performance
 - Test global API gateway configurations
 
-## Advanced Features
 
-### Environment Variables
-Use variables for dynamic content:
-```javascript
-// Reference environment variables
-const baseUrl = process.env.API_BASE_URL
-const apiKey = process.env.API_KEY
-
-// Dynamic request configuration
-const userId = Math.floor(Math.random() * 1000)
-```
-
-### Request Chaining
-Use previous responses in subsequent requests:
-```javascript
-// Setup script - create test user
-const userResponse = await fetch('https://api.example.com/users', {
-  method: 'POST',
-  body: JSON.stringify({
-    name: 'Test User',
-    email: `test+${Date.now()}@example.com`
-  })
-})
-const userData = await userResponse.json()
-process.env.TEST_USER_ID = userData.id
-
-// Main request uses created user ID
-// URL: https://api.example.com/users/{{TEST_USER_ID}}/profile
-```
-
-### GraphQL Support
-Monitor GraphQL APIs:
-```javascript
-// GraphQL query example
-const query = `
-  query GetUser($id: ID!) {
-    user(id: $id) {
-      id
-      name
-      email
-      profile {
-        avatar
-        bio
-      }
-    }
-  }
-`
-
-// Request body
-{
-  "query": query,
-  "variables": {
-    "id": "123"
-  }
-}
-```
-
-## Monitoring Strategies
-
-### Critical API Endpoints
-Monitor your most important APIs:
-- User authentication endpoints
-- Payment processing APIs
-- Core business logic endpoints
-- Data retrieval services
-
-### Third-Party Dependencies
-Monitor external services you depend on:
-- Payment gateways (Stripe, PayPal)
-- Email services (SendGrid, Mailgun)
-- Cloud services (AWS, Azure, GCP)
-- Social media APIs (Twitter, Facebook)
-
-### Microservice Health Checks
-Monitor internal service communications:
-- Service discovery endpoints
-- Health check endpoints
-- Inter-service authentication
-- Data synchronization APIs
-
-## Error Detection and Alerting
-
-### Common Failure Scenarios
-API checks detect various issues:
-- **HTTP Errors**: 4xx/5xx status codes
-- **Timeout Issues**: Slow or unresponsive endpoints
-- **Authentication Failures**: Invalid or expired credentials
-- **Data Validation Errors**: Unexpected response format
-- **Performance Degradation**: Response times exceeding thresholds
-
-### Alert Configuration
+## Alerts
 Set up comprehensive alerting:
 - **Immediate Alerts**: Critical endpoint failures
 - **Escalation**: Multi-level notification chains
 - **Recovery Notifications**: Automatic resolution alerts
 - **Performance Alerts**: Degraded response time warnings
 
-## Integration Capabilities
-
-### CI/CD Integration
-Integrate API monitoring with development workflows:
-- Pre-deployment API validation
-- Post-deployment verification
-- Automated rollback triggers
-- Performance regression detection
-
-### Monitoring as Code
-Define API checks programmatically:
-```typescript
-import { ApiCheck, AssertionBuilder, Frequency } from 'checkly/constructs'
-
-new ApiCheck('user-api-health', {
-  name: 'User API Health Check',
-  frequency: Frequency.EVERY_5M,
-  request: {
-    method: 'GET',
-    url: 'https://api.example.com/v1/users/health',
-    headers: {
-      'Authorization': 'Bearer {{API_TOKEN}}'
-    },
-    assertions: [
-      AssertionBuilder.statusCode().equals(200),
-      AssertionBuilder.responseTime().lessThan(2000),
-      AssertionBuilder.jsonBody('$.status').equals('healthy')
-    ]
-  }
-})
-```
-
-## Getting Started
-
-Ready to monitor your APIs? Create your first API check and ensure your endpoints are always performing optimally.
-
-<CardGroup cols={2}>
-<Card title="Creating Your First API Check" href="/docs/detect/synthetic-monitoring/api-checks/creating-your-first-api-check">
-Step-by-step guide to set up API monitoring
-</Card>
-
-<Card title="API Check Use Cases" href="/docs/detect/synthetic-monitoring/api-checks/use-cases">
-Explore common use cases and real-world examples
-</Card>
-
-<Card title="API Check Best Practices" href="/docs/detect/synthetic-monitoring/api-checks/best-practices">
-Learn optimization strategies and configuration tips
-</Card>
-
-<Card title="Alert Configuration" href="/docs/communicate/alerts">
-Set up effective alerting for your API checks
-</Card>
-</CardGroup>
-
-## Next Steps
-
-<CardGroup cols={2}>
-<Card title="Browser Checks" href="/docs/detect/synthetic-monitoring/browser-checks/overview">
-Monitor user interactions and complex workflows
-</Card>
-
-<Card title="Multistep Checks" href="/docs/detect/synthetic-monitoring/multistep-checks/overview">
-Test complete API user journeys with sequential requests
-</Card>
-
-<Card title="Private Locations" href="/docs/getting-started/platform/private-locations/overview">
-Monitor internal APIs with private monitoring infrastructure
-</Card>
-
-<Card title="Environment Variables" href="/docs/concepts/secrets">
-Securely manage API credentials and configuration
-</Card>
-</CardGroup>

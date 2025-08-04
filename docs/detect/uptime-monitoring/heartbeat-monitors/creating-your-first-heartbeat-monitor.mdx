@@ -6,46 +6,20 @@ sidebarTitle: Creating Your First Monitor
 
 Follow this comprehensive guide to create your first heartbeat monitor in Checkly. We'll walk through each configuration step and explain the best practices to ensure your monitoring is effective.
 
-<Note>
-Heartbeat monitors are available on our [Team and Enterprise plans](https://www.checklyhq.com/pricing).
-</Note>
-
-## Prerequisites
-
+<Accordion title="Prerequisites">
 Before creating your heartbeat monitor, make sure you have:
 
 - A Checkly account with Team or Enterprise plan
 - A scheduled job, script, or automated process you want to monitor
 - Access to modify the code/script that runs your task
+</Accordion>
+
 
 ## Step 1: Basic Configuration
 
-Start by giving your monitor a descriptive name and relevant tags:
+Start by giving your monitor a descriptive name and relevant tags. Choose something descriptive that clearly identifies what the monitor is tracking, like "Nightly Database Backup" or "Weekly Reports Job".
 
-### Monitor Name
-Choose something descriptive that clearly identifies what the monitor is tracking:
-
-**Good examples:**
-- "Nightly Database Backup"
-- "Weekly Reports Job"
-- "Daily Email Campaign"
-- "Hourly Data Sync"
-
-**Avoid generic names like:**
-- "Heartbeat Monitor"
-- "Job Monitor"
-- "Task Check"
-
-### Tags
-Use tags to group related monitors and make them easier to find and manage:
-
-**Common tag categories:**
-- **Environment**: `production`, `staging`, `development`
-- **Frequency**: `daily`, `weekly`, `hourly`, `monthly`
-- **Purpose**: `backup`, `reports`, `sync`, `cleanup`
-- **Team**: `engineering`, `marketing`, `data-team`
-
-Example tags: `["production", "backup", "daily", "database"]`
+Use tags to group related monitors and make them easier to find and manage.
 
 ## Step 2: Timing Configuration
 
@@ -146,23 +120,83 @@ Configure when alerts should fire:
 
 Once created, your heartbeat monitor provides a unique ping URL. Your tasks should make an HTTP `GET` or `POST` request to this URL when they complete successfully.
 
-### Ping Requirements
 
-<CardGroup cols={2}>
-<Card title="Supported Methods" icon="globe">
-- `GET` requests (most common)
-- `POST` requests
-- Custom headers for source tracking
-</Card>
+## Step 5: Testing Your Setup
 
-<Card title="Not Supported" icon="x">
-- `PUT` or `DELETE` requests
-- Requests from blocked bots
-- Pings before first activation
-</Card>
-</CardGroup>
+Before deploying to production, test your heartbeat monitor:
 
-### Best Practices for Pings
+### Manual Testing
+
+You can manually send pings through the Checkly interface to:
+
+- Test your monitor setup before deployment
+- Start the timer for a newly created monitor
+- Reset alerts during maintenance windows
+- Verify alert configurations are working
+
+Manual pings are available both on the monitor detail page and in the quick actions menu from your monitors list.
+
+![Send manual pings from the heartbeat monitor overview page](/images/heartbeat-monitors/heartbeat-ping-overview-page.png)
+
+You can also send manual pings directly from your monitors list using the quick actions menu:
+
+![Quick ping option in the heartbeat monitors list view](/images/heartbeat-monitors/heartbeat-ping-quick-menu.png)
+
+
+## Common Configuration Patterns
+
+<Tabs>
+<Tab title="Daily Backup Job">
+
+```typescript
+import { HeartbeatMonitor } from 'checkly/constructs'
+
+new HeartbeatMonitor('daily-backup-monitor', {
+  name: 'Daily Database Backup',
+  period: 24,
+  periodUnit: 'hours',
+  grace: 30,
+  graceUnit: 'minutes',
+  tags: ['backup', 'database', 'daily', 'production']
+})
+```
+
+</Tab>
+<Tab title="Weekly Report Generation">
+
+```typescript
+import { HeartbeatMonitor } from 'checkly/constructs'
+
+new HeartbeatMonitor('weekly-report-monitor', {
+  name: 'Weekly Analytics Report',
+  period: 7,
+  periodUnit: 'days',
+  grace: 4,
+  graceUnit: 'hours',
+  tags: ['reports', 'analytics', 'weekly', 'marketing']
+})
+```
+
+</Tab>
+<Tab title="Hourly Data Sync">
+
+```typescript
+import { HeartbeatMonitor } from 'checkly/constructs'
+
+new HeartbeatMonitor('hourly-sync-monitor', {
+  name: 'Hourly Customer Data Sync',
+  period: 1,
+  periodUnit: 'hours',
+  grace: 10,
+  graceUnit: 'minutes',
+  tags: ['sync', 'data', 'hourly', 'critical']
+})
+```
+
+</Tab>
+</Tabs>
+
+## Best Practices for Pings
 
 **Always include timeout and retry options:**
 ```bash
@@ -187,106 +221,7 @@ except Exception as e:
 ```
 
 **Use source headers for tracking:**
-```bash
+```bash 
 curl -H "Origin: backup-server-01" https://ping.checklyhq.com/your-id
 ```
 
-## Step 5: Testing Your Setup
-
-Before deploying to production, test your heartbeat monitor:
-
-### Manual Testing
-
-You can manually send pings through the Checkly interface to:
-
-- Test your monitor setup before deployment
-- Start the timer for a newly created monitor
-- Reset alerts during maintenance windows
-- Verify alert configurations are working
-
-Manual pings are available both on the monitor detail page and in the quick actions menu from your monitors list.
-
-![Send manual pings from the heartbeat monitor overview page](/images/heartbeat-monitors/heartbeat-ping-overview-page.png)
-
-You can also send manual pings directly from your monitors list using the quick actions menu:
-
-![Quick ping option in the heartbeat monitors list view](/images/heartbeat-monitors/heartbeat-ping-quick-menu.png)
-
-### Testing Checklist
-
-Before going live, verify:
-
-- [ ] Monitor is created with correct period and grace settings
-- [ ] Alert channels are configured and tested
-- [ ] Ping URL is accessible from your job's environment
-- [ ] Manual ping works and resets the timer
-- [ ] Alerts fire when expected (test by not pinging)
-- [ ] Job code includes proper ping implementation
-
-## Common Configuration Patterns
-
-### Daily Backup Job
-```yaml
-Name: "Daily Database Backup"
-Period: 24 hours
-Grace: 30 minutes
-Tags: ["backup", "database", "daily", "production"]
-```
-
-### Weekly Report Generation
-```yaml
-Name: "Weekly Analytics Report"
-Period: 7 days
-Grace: 4 hours
-Tags: ["reports", "analytics", "weekly", "marketing"]
-```
-
-### Hourly Data Sync
-```yaml
-Name: "Hourly Customer Data Sync"
-Period: 1 hour
-Grace: 10 minutes
-Tags: ["sync", "data", "hourly", "critical"]
-```
-
-## Troubleshooting
-
-### Monitor Not Starting
-- **Issue**: Timer doesn't start after first ping
-- **Solution**: Check that the monitor is activated and the ping URL is correct
-
-### False Alerts
-- **Issue**: Getting alerts even when job runs successfully
-- **Solution**: Increase grace period or check if ping is being sent correctly
-
-### Missing Pings
-- **Issue**: Job runs but no ping is received
-- **Solution**: Verify network connectivity and ping URL accessibility
-
-### Timer Reset Issues
-- **Issue**: Timer doesn't reset after successful ping
-- **Solution**: Check ping method (GET/POST) and ensure no network timeouts
-
-## Next Steps
-
-<CardGroup cols={2}>
-<Card title="Ping Examples" href="/docs/detect/uptime-monitoring/heartbeat-monitors/ping-examples">
-See detailed code examples for every platform and framework
-</Card>
-
-<Card title="Integration Examples" href="/docs/detect/uptime-monitoring/heartbeat-monitors/integration-examples">
-Learn how to integrate heartbeat monitors with your existing tools and workflows
-</Card>
-
-<Card title="Alert Configuration" href="/docs/communicate/alerts">
-Set up effective alerting for your heartbeat monitors
-</Card>
-
-<Card title="Monitoring as Code" href="/guides/monitoring-as-code">
-Discover how to manage heartbeat monitors with infrastructure as code
-</Card>
-</CardGroup>
-
-<Warning>
-Remember: Heartbeat monitors detect when jobs fail to complete, but they can't tell you why a job failed. Combine heartbeat monitoring with application logging and error tracking for complete observability.
-</Warning> 

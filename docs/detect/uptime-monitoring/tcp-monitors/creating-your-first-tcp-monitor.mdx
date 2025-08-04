@@ -8,15 +8,6 @@ import { Note, Warning, Tip, Steps } from 'mintlify/components'
 
 This guide walks you through creating your first TCP monitor to check the availability of your network services, databases, or any TCP-based application.
 
-## Before You Start
-
-TCP monitors are perfect for checking:
-- Database servers (MySQL, PostgreSQL, Redis, MongoDB)
-- Mail servers (SMTP, IMAP, POP3)  
-- Custom TCP services and internal APIs
-- SSH servers and file transfer services
-- Load balancers and proxy servers
-
 <Note>
 You'll need a service running on a specific TCP port. If you don't have one ready, you can use a public service like a mail server or database for testing.
 </Note>
@@ -212,102 +203,7 @@ Protocol: TCP
 Expected Response: "SSH-2.0"
 ```
 
-## Understanding Results
 
-Once your TCP monitor is running, you'll see:
-
-### Status Dashboard
-- **Current Status**: Online/Offline indicator
-- **Response Time**: Latest connection time
-- **Uptime Percentage**: Availability over time periods
-- **Location Results**: Status from each monitoring location
-
-### Detailed Metrics
-- **Connection Time**: Time to establish TCP connection
-- **Response Time**: Complete request/response cycle
-- **DNS Resolution Time**: Hostname lookup duration
-- **SSL Handshake Time**: Certificate validation time (if applicable)
-
-![TCP monitor results dashboard](/images/tcp-monitors/tcp-monitor-results.png)
-
-## Troubleshooting Common Issues
-
-### Connection Refused
-**Symptom**: Monitor shows "Connection refused" errors
-**Causes**:
-- Service is not running
-- Port is blocked by firewall
-- Incorrect host/port configuration
-
-**Solutions**:
-1. Verify service is running: `netstat -tlnp | grep :3306`
-2. Check firewall rules
-3. Test connectivity: `telnet hostname port`
-
-### Timeout Errors
-**Symptom**: Monitor times out without connecting
-**Causes**:
-- Network latency or packet loss
-- Service overloaded
-- Timeout set too low
-
-**Solutions**:
-1. Increase connection timeout
-2. Check network connectivity
-3. Monitor service performance
-
-### SSL Certificate Issues
-**Symptom**: SSL validation failures
-**Causes**:
-- Certificate expired
-- Hostname mismatch
-- Invalid certificate chain
-
-**Solutions**:
-1. Check certificate validity: `openssl s_client -connect hostname:port`
-2. Verify certificate expiration dates
-3. Update certificates before expiration
-
-## Best Practices
-
-### Configuration
-- Use descriptive monitor names that identify the service and environment
-- Set realistic timeout values based on service performance
-- Enable SSL certificate monitoring for all encrypted connections
-- Monitor from locations relevant to your user base
-
-### Monitoring Strategy
-- Start with basic connectivity, add response validation as needed
-- Use different monitoring frequencies based on service criticality
-- Combine TCP monitors with application-level checks for comprehensive coverage
-
-### Alerting
-- Configure multiple alert channels for redundancy
-- Set up escalation rules for critical services
-- Test alert configurations regularly
-- Use maintenance windows during planned downtime
-
-## Next Steps
-
-Now that your TCP monitor is running:
-
-<CardGroup cols={2}>
-<Card title="Monitor Performance" icon="chart-line">
-Review response times and uptime trends to establish baselines for your service performance.
-</Card>
-
-<Card title="Configure Alerts" href="/docs/communicate/alerts">
-Set up comprehensive alerting rules and notification channels for your team.
-</Card>
-
-<Card title="Add More Monitors" href="/docs/detect/uptime-monitoring/tcp-monitors/overview">
-Monitor other TCP services and create a complete infrastructure monitoring strategy.
-</Card>
-
-<Card title="Synthetic Monitoring" href="/docs/detect/synthetic-monitoring/overview">
-Expand to application-level monitoring with API and browser checks.
-</Card>
-</CardGroup>
 
 <Note>
 TCP monitors provide network-level connectivity verification. For application-level monitoring, consider adding HTTP/API checks and synthetic monitoring to your monitoring strategy.

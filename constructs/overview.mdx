@@ -1,0 +1,84 @@
+---
+title: Using Constructs
+description: 'Build monitoring infrastructure with reusable TypeScript classes'
+sidebarTitle: 'Overview'
+---
+
+Constructs are TypeScript classes that represent your monitoring resources. Import them from `checkly/constructs` to create checks, alert channels, and other resources in code.
+
+```ts
+import { ApiCheck, EmailAlertChannel } from 'checkly/constructs'
+
+new ApiCheck('api-health-check', {
+  name: 'API Health Check',
+  request: { url: 'https://api.example.com/health' }
+})
+```
+
+When you run `npx checkly deploy`, constructs become live resources in your Checkly account.
+
+## Logical IDs
+
+Every construct requires a unique `logicalId` as its first parameter. This ID tracks resources across deployments and updates.
+
+**Key rules:**
+- IDs must be unique within your project
+- Project IDs must be unique within your Checkly account  
+- Changing an ID creates a new resource and removes the old one
+- IDs can be any string up to 255 characters
+
+```ts
+// Good: descriptive, unique IDs
+new ApiCheck('homepage-api-check', { /* ... */ })
+new ApiCheck('user-auth-check', { /* ... */ })
+
+// Bad: duplicate IDs will cause conflicts
+new ApiCheck('check-1', { /* ... */ })
+new ApiCheck('check-1', { /* ... */ }) // ❌ Duplicate ID
+```
+
+## Available Constructs
+
+### Monitoring Checks
+- **[ApiCheck](/constructs/api-check)** - Monitor HTTP APIs and endpoints
+- **[BrowserCheck](/constructs/browser-check)** - Run Playwright scripts for E2E testing
+- **[HeartbeatCheck](/constructs/heartbeat-check)** - Monitor services via heartbeat signals
+- **[MultistepCheck](/constructs/multistep-check)** - Create complex multi-step scenarios
+
+### Alert Channels  
+- **[EmailAlertChannel](/constructs/email-alert-channel)** - Email notifications
+- **[SlackAlertChannel](/constructs/slack-alert-channel)** - Slack notifications
+- **[SmsAlertChannel](/constructs/sms-alert-channel)** - SMS notifications
+- **[WebhookAlertChannel](/constructs/webhook-alert-channel)** - Custom webhook notifications
+
+### Organization
+- **[CheckGroup](/constructs/check-group)** - Group related checks together
+- **[MaintenanceWindow](/constructs/maintenance-window)** - Schedule maintenance periods
+
+## Programming with Constructs
+
+Constructs are just TypeScript classes, so you can use standard programming patterns:
+
+```ts
+// Use loops to create multiple checks
+const endpoints = ['/api/users', '/api/orders', '/api/products']
+endpoints.forEach(endpoint => 
+  new ApiCheck(`${endpoint.replace('/', '-')}-check`, {
+    name: `${endpoint} Check`,
+    request: { url: `https://api.example.com${endpoint}` }
+  })
+)
+
+// Share alert channels across checks
+const alertChannel = new EmailAlertChannel('team-alerts', {
+  address: 'team@example.com'
+})
+
+// Apply to multiple checks
+const checks = [check1, check2, check3]
+checks.forEach(check => check.alertChannels = [alertChannel])
+```
+
+## Next Steps
+
+Each construct has detailed documentation with examples, configuration options, and best practices. Start with the construct type you need, or browse the [complete constructs reference](/docs/cli/constructs-reference). 

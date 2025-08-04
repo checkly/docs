@@ -1,0 +1,126 @@
+---
+title: checkly switch
+description: 'Switch between multiple Checkly accounts.'
+sidebarTitle: 'checkly switch'
+---
+
+The `checkly switch` command switches between multiple Checkly accounts that you have access to with your current credentials. Useful when you need to manage monitoring across different organizations or environments.
+
+## Usage
+
+Display available accounts and switch to a different one.
+
+```bash Terminal
+npx checkly switch
+```
+
+## Extended Usage
+
+The switch command provides an interactive account selection interface:
+
+```bash Terminal
+npx checkly switch
+```
+
+Example interactive session:
+```bash Terminal      
+? Select account to switch to:
+❯ Acme Corp (550e8400-e29b-41d4-a716-446655440000) - Team Plan
+  Personal Account (660f9511-f3ac-52e5-b827-557766551111) - Free Plan
+  Client Project (770g0622-g4bd-63f6-c938-668877662222) - Enterprise Plan
+
+✓ Switched to account: Acme Corp
+✓ Active account updated
+```
+
+## Unique Options
+
+This command has no unique options - it provides interactive account selection.
+
+## Global Options
+
+This command supports the following [global options](/cli/checkly-global-options):
+
+- [`--verbose`](/cli/checkly-global-options#verbose-or-v) - Show detailed account information during selection
+
+## Account Access Requirements
+
+### Multiple Account Access
+To use the switch command, you must have access to multiple Checkly accounts through:
+
+- **Team memberships** across different organizations
+- **Client projects** where you're added as a collaborator
+- **Personal accounts** plus organizational accounts
+- **Service accounts** with cross-organization permissions
+
+### Authentication Requirements
+You must be logged in with credentials that have access to multiple accounts. If you only have access to one account, the switch command will display a message indicating no alternative accounts are available.
+
+## Account Information Display
+
+For each available account, the selection interface shows:
+
+- **Account name** and organization
+- **Account ID** (unique identifier)
+- **Subscription plan** (Free, Developer, Team, Enterprise)
+- **Your role** in that account (Owner, Admin, Editor, Viewer)
+- **Current status** (active account is marked)
+
+## Related Commands
+
+- [`checkly whoami`](/cli/checkly-whoami) - Display current active account
+- [`checkly login`](/cli/checkly-login) - Authenticate with Checkly
+- [`checkly logout`](/cli/checkly-logout) - Sign out of current account
+
+## Use Cases
+
+### Multi-Client Management
+Switch between client accounts when managing multiple projects:
+
+```bash Terminal
+npx checkly switch
+# Select client account
+npx checkly deploy --config client-config.ts
+```
+
+### Environment Separation
+Switch between accounts for different environments:
+
+```bash Terminal
+# Switch to staging account
+npx checkly switch
+npx checkly deploy --config staging.config.ts
+
+# Switch to production account  
+npx checkly switch
+npx checkly deploy --config production.config.ts
+```
+
+### Team Collaboration
+Switch to shared team accounts for collaborative work:
+
+```bash Terminal    
+npx checkly switch
+# Select team account
+npx checkly test --record --test-session-name "Team validation"
+```
+
+## Troubleshooting
+
+### No Alternative Accounts
+If you see "No alternative accounts available":
+- You only have access to one Checkly account
+- Contact account administrators to request access to additional accounts
+- Consider using separate authentication for different accounts
+
+### Account Not Listed
+If an expected account doesn't appear:
+- Verify you have active access to that account
+- Check that your user hasn't been removed from the account
+- Try logging out and back in to refresh account permissions
+
+### Permission Issues
+After switching accounts, you may encounter different permissions:
+- Each account has its own role-based access controls
+- Verify your role in the new account supports your intended operations
+- Some operations may require higher privileges in different accounts

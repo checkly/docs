@@ -1,0 +1,260 @@
+---
+title: 'Browser Check Construct'
+description: 'Learn how to configure browser checks with the Checkly CLI.'
+sidebarTitle: 'Browser Check'
+---
+
+Use browser checks to run end-to-end tests with Playwright. The examples below show how to configure browser checks for different testing scenarios.
+
+<Info>
+Learn more about browser checks in the [Browser Checks overview](/docs/detect/synthetic-monitoring/browser-checks/overview).
+</Info>
+
+## `BrowserCheck` Examples
+
+<CodeGroup>
+
+```ts Basic Example
+import { BrowserCheck, Frequency } from 'checkly/constructs'
+import * as path from 'path'
+
+new BrowserCheck('browser-check-1', {
+  name: 'Browser check #1',
+  frequency: Frequency.EVERY_10M,
+  locations: ['us-east-1', 'eu-west-1'],
+  code: {
+    entrypoint: path.join(__dirname, 'home.spec.js')
+  }
+})
+```
+
+```ts Advanced Example
+import { BrowserCheck, Frequency } from 'checkly/constructs'
+import * as path from 'path'
+
+new BrowserCheck('advanced-browser-check', {
+  name: 'Advanced Browser Check',
+  activated: true,
+  frequency: Frequency.EVERY_5M,
+  locations: ['us-east-1', 'eu-west-1'],
+  tags: ['e2e', 'critical-path'],
+  runtimeId: '2025.04',
+  environmentVariables: [
+    { key: 'TEST_USERNAME', value: 'testuser' },
+    { key: 'TEST_PASSWORD', value: '{{SECRET_PASSWORD}}', secret: true }
+  ],
+  code: {
+    entrypoint: path.join(__dirname, 'advanced-flow.spec.ts')
+  }
+})
+```
+
+</CodeGroup>
+
+## `BrowserCheck` Configuration
+
+<Tabs>
+  <Tab title="Unique Configuration">
+
+Configure browser-specific settings for your checks:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `code` | `object` | ✅ | - | The Playwright test code configuration |
+
+</Tab>
+
+<Tab title="Shared Configuration">
+Configure common properties that apply to all check types:
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `name` | `string` | ✅ | - | Friendly name for your check |
+| `frequency` | `Frequency` | ❌ | - | How often to run your check |
+| `locations` | `string[]` | ❌ | `[]` | Array of public location codes |
+| `privateLocations` | `string[]` | ❌ | `[]` | Array of Private Location slugs |
+| `activated` | `boolean` | ❌ | `true` | Whether the check is enabled |
+| `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
+| `group` | `CheckGroup` | ❌ | - | The CheckGroup this check belongs to |
+| `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Array of AlertChannel objects for notifications |
+| `tags` | `string[]` | ❌ | `[]` | Array of tags to organize checks |
+| `runtimeId` | `string` | ❌ | - | The ID of the runtime to use |
+| `testOnly` | `boolean` | ❌ | `false` | Only run with test, not during deploy |
+| `retryStrategy` | `RetryStrategy` | ❌ | - | Strategy for configuring retries |
+| `runParallel` | `boolean` | ❌ | `false` | Run checks in parallel or round-robin |
+| `alertEscalationPolicy` | `AlertEscalationPolicy` | ❌ | - | Advanced alert settings |
+| `environmentVariables` | `object[]` | ❌ | `[]` | Check-level environment variables |
+
+</Tab>
+</Tabs>
+
+## `code` Configuration
+
+The `code` object is a mandatory part of a browser check and defines how to execute your Playwright test:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `entrypoint` | `string` | ❌ | Path to a `.spec.js` or `.spec.ts` file containing the Playwright test |
+| `content` | `string` | ❌ | Inline JavaScript/TypeScript code as a string |
+
+<Info>
+You must provide either `entrypoint` or `content`, but not both.
+</Info>
+
+```ts
+// Using file reference
+code: {
+  entrypoint: path.join(__dirname, 'login-flow.spec.ts')
+}
+
+// Using inline content
+code: {
+  content: `
+    import { test, expect } from '@playwright/test'
+
+    test('homepage loads', async ({ page }) => {
+      await page.goto('https://example.com')
+      await expect(page).toHaveTitle(/Example/)
+    })
+  `
+}
+```
+
+## Browser Check Examples
+
+<Tabs>
+  <Tab title="Login Flow">
+    ```ts
+    new BrowserCheck('login-flow-check', {
+      name: 'User Login Flow',
+      frequency: Frequency.EVERY_15M,
+      locations: ['us-east-1', 'eu-west-1'],
+      code: {
+        entrypoint: path.join(__dirname, 'login.spec.ts')
+      }
+    })
+
+    // login.spec.ts
+    import { test, expect } from '@playwright/test'
+
+    test('user can login successfully', async ({ page }) => {
+      await page.goto('https://app.example.com/login')
+      
+      await page.fill('[data-testid="email"]', process.env.TEST_USERNAME)
+      await page.fill('[data-testid="password"]', process.env.TEST_PASSWORD)
+      await page.click('[data-testid="login-button"]')
+      
+      await expect(page).toHaveURL(/dashboard/)
+      await expect(page.locator('[data-testid="user-menu"]')).toBeVisible()
+    })
+    ```
+  </Tab>
+  
+  <Tab title="E-commerce Purchase">
+    ```ts
+    new BrowserCheck('purchase-flow-check', {
+      name: 'Purchase Flow',
+      frequency: Frequency.EVERY_30M,
+      locations: ['us-east-1', 'eu-west-1'],
+      tags: ['e2e', 'critical', 'revenue'],
+      code: {
+        entrypoint: path.join(__dirname, 'purchase.spec.ts')
+      }
+    })
+
+    // purchase.spec.ts
+    import { test, expect } from '@playwright/test'
+
+    test('user can complete purchase', async ({ page }) => {
+      await page.goto('https://shop.example.com')
+      
+      // Add item to cart
+      await page.click('[data-testid="product-1"]')
+      await page.click('[data-testid="add-to-cart"]')
+      
+      // Go to checkout
+      await page.click('[data-testid="cart-button"]')
+      await page.click('[data-testid="checkout-button"]')
+      
+      // Fill checkout form
+      await page.fill('[data-testid="email"]', 'test@example.com')
+      await page.fill('[data-testid="card-number"]', '4242424242424242')
+      
+      // Complete purchase
+      await page.click('[data-testid="complete-purchase"]')
+      
+      await expect(page.locator('[data-testid="success-message"]')).toBeVisible()
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Form Submission">
+    ```ts
+    new BrowserCheck('contact-form-check', {
+      name: 'Contact Form Submission',
+      frequency: Frequency.EVERY_10M,
+      code: {
+        entrypoint: path.join(__dirname, 'contact-form.spec.ts')
+      }
+    })
+
+    // contact-form.spec.ts
+    import { test, expect } from '@playwright/test'
+
+    test('contact form works correctly', async ({ page }) => {
+      await page.goto('https://example.com/contact')
+      
+      await page.fill('[name="name"]', 'John Doe')
+      await page.fill('[name="email"]', 'john@example.com')
+      await page.fill('[name="message"]', 'This is a test message')
+      
+      await page.click('[type="submit"]')
+      
+      await expect(page.locator('.success-message')).toContainText('Thank you')
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Performance Testing">
+    ```ts
+    new BrowserCheck('performance-check', {
+      name: 'Page Performance Check',
+      frequency: Frequency.EVERY_5M,
+      code: {
+        content: `
+          import { test, expect } from '@playwright/test'
+
+          test('page loads within performance budget', async ({ page }) => {
+            const startTime = Date.now()
+            
+            await page.goto('https://example.com')
+            await page.waitForLoadState('networkidle')
+            
+            const loadTime = Date.now() - startTime
+            
+            // Assert page loads within 3 seconds
+            expect(loadTime).toBeLessThan(3000)
+            
+            // Check Core Web Vitals
+            const vitals = await page.evaluate(() => {
+              return new Promise((resolve) => {
+                new PerformanceObserver((list) => {
+                  const entries = list.getEntries()
+                  const lcp = entries.find(entry => entry.entryType === 'largest-contentful-paint')
+                  if (lcp) resolve(lcp.startTime)
+                }).observe({ entryTypes: ['largest-contentful-paint'] })
+              })
+            })
+            
+            expect(vitals).toBeLessThan(2500) // LCP should be under 2.5s
+          })
+        `
+      }
+    })
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+Browser checks require Playwright test files. Make sure your test files use the `@playwright/test` framework and follow Playwright's testing conventions.
+</Warning>

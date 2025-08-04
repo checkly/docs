@@ -1,0 +1,224 @@
+---
+title: checkly sync-playwright
+description: 'Synchronize Playwright configuration with Checkly settings.'
+sidebarTitle: 'checkly sync-playwright'
+---
+
+The `checkly sync-playwright` command synchronizes your Playwright configuration with your Checkly project configuration. This command copies relevant settings from your `playwright.config.ts` file into your `checkly.config.ts`, ensuring consistency between local testing and cloud monitoring environments.
+
+## Usage
+
+Copy Playwright configuration settings to your Checkly config automatically.
+
+```bash Terminal
+npx checkly sync-playwright
+```
+
+## Extended Usage
+
+The command performs automatic configuration synchronization with detailed output showing the sync process:
+
+```bash Terminal
+npx checkly sync-playwright --verbose
+```
+
+Example process output:
+```bash Terminal
+✓ Found playwright.config.ts
+✓ Reading Playwright configuration...
+✓ Merging with checkly.config.ts...
+✓ Updated browser configuration
+✓ Synchronized test timeouts
+✓ Applied viewport settings
+✓ Configuration sync completed
+```
+
+## Configuration Sync
+
+### Playwright Settings Synchronized
+
+The sync process copies these settings from your Playwright config:
+
+**Browser Configuration:**
+- `use.browserName` → Browser selection for checks
+- `use.headless` → Headless mode setting
+- `use.viewport` → Default viewport size
+
+**Timeout Settings:**
+- `timeout` → Test execution timeout
+- `expect.timeout` → Assertion timeout
+- `use.actionTimeout` → Action timeout
+
+**Network Configuration:**  
+- `use.baseURL` → Base URL for relative navigation
+- `use.httpCredentials` → HTTP authentication
+- `use.ignoreHTTPSErrors` → SSL error handling
+
+**Testing Behavior:**
+- `use.screenshot` → Screenshot configuration
+- `use.video` → Video recording settings
+- `use.trace` → Tracing options
+
+### Generated Checkly Configuration
+
+After sync, your `checkly.config.ts` includes synchronized settings:
+
+```typescript
+import { defineConfig } from 'checkly'
+
+export default defineConfig({
+  projectName: 'My Project',
+  // Synchronized from Playwright config
+  browserChecks: {
+    frequency: 300,
+    locations: ['us-east-1', 'eu-west-1'],
+    tags: ['browser', 'production'],
+    playwrightConfig: {
+      use: {
+        headless: true,
+        viewport: { width: 1280, height: 720 },
+        actionTimeout: 30000,
+        navigationTimeout: 30000,
+      },
+    },
+  },
+  // ... other configuration
+})
+```
+
+## Prerequisites
+
+### Required Files
+- **Playwright config**: `playwright.config.ts` or `playwright.config.js`
+- **Checkly config**: `checkly.config.ts` or `checkly.config.js`
+
+### Project Structure
+The sync command expects both configuration files in the same directory or follows standard project structure conventions.
+
+## Sync Process
+
+### 1. Configuration Discovery
+Search for and locate both Playwright and Checkly configuration files.
+
+```bash Terminal
+npx checkly sync-playwright
+# Searches for playwright.config.ts/js
+# Locates checkly.config.ts/js
+```
+
+### 2. Setting Analysis
+The command analyzes Playwright settings and determines which are relevant for Checkly monitoring.
+
+### 3. Configuration Update  
+Relevant settings are merged into your Checkly configuration, preserving existing Checkly-specific settings.
+
+### 4. Validation
+The updated configuration is validated for compatibility and consistency.
+
+## Use Cases
+
+### Initial Setup
+Sync configurations when setting up monitoring for existing Playwright tests:
+
+```bash Terminal
+# After creating checkly.config.ts
+npx checkly sync-playwright
+npx checkly test
+```
+
+### Configuration Maintenance
+Keep configurations in sync after updating Playwright settings:
+
+```bash Terminal
+# After updating playwright.config.ts
+npx checkly sync-playwright
+npx checkly deploy --preview
+```
+
+### Team Consistency
+Ensure all team members use consistent browser and timeout settings:
+
+```bash Terminal    
+# In CI/CD or team setup scripts
+npx checkly sync-playwright
+npx checkly test --record
+```
+
+## Environment-Specific Synchronization
+
+### Development Environment
+Sync settings optimized for development workflow:
+
+```bash Terminal
+npx checkly sync-playwright --config ./checkly.dev.config.ts
+```
+
+### Production Environment
+Sync settings optimized for production monitoring:
+
+```bash Terminal
+npx checkly sync-playwright --config ./checkly.prod.config.ts
+```
+
+## Best Practices
+
+### Before Syncing
+1. **Review Playwright config** for production-appropriate settings
+2. **Backup Checkly config** to preserve custom configurations
+3. **Test locally** with Playwright to verify settings work
+
+### After Syncing
+1. **Review merged config** for accuracy and conflicts
+2. **Test with Checkly** to verify settings work in cloud environment
+3. **Commit changes** to version control
+4. **Deploy with preview** to verify production behavior
+
+### Configuration Strategy
+1. **Use Playwright config as source of truth** for browser settings
+2. **Keep Checkly-specific settings** separate from Playwright config
+3. **Sync regularly** to maintain consistency
+4. **Document custom overrides** that shouldn't be synced
+
+## Manual Configuration
+
+If automatic sync doesn't meet your needs, you can manually configure browser settings in your `checkly.config.ts`:
+
+```typescript
+export default defineConfig({
+  browserChecks: {
+    playwrightConfig: {
+      use: {
+        // Custom browser configuration
+        viewport: { width: 1920, height: 1080 },
+        userAgent: 'Custom User Agent',
+        // ... other settings
+      },
+    },
+  },
+})
+```
+
+## Troubleshooting
+
+### Configuration File Not Found
+Ensure both `playwright.config.ts` and `checkly.config.ts` exist in your project.
+
+### Sync Conflicts
+Review merged configuration carefully - some settings may need manual adjustment.
+
+### Browser Compatibility
+Verify that Playwright settings are compatible with Checkly's runtime environment.
+
+## Global Options
+
+This command supports the following [global options](/cli/checkly-global-options):
+
+| Option | Description |
+|--------|-------------|
+| [`--config`](/cli/checkly-global-options#config-or-c) | Specify a configuration file |
+| [`--verbose`](/cli/checkly-global-options#verbose-or-v) | Show detailed sync process information |
+
+## Related Commands
+
+- [`checkly test`](/cli/checkly-test) - Test with synchronized configuration
+- [`checkly deploy`](/cli/checkly-deploy) - Deploy with updated settings

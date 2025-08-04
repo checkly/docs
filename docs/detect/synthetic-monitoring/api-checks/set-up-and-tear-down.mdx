@@ -1,0 +1,43 @@
+---
+
+title: 'API Check Set Up and Tear Down'
+description: 'Learn how to set up and tear down an API check with Checkly.'
+sidebarTitle: Set Up and Tear Down
+---
+
+<Tip>
+**Monitoring as Code**: Learn more about the [API Check Construct](/constructs/api-check).
+</Tip>
+
+## Setup and Teardown Scripts
+
+### Setup Scripts
+Execute code before the main request:
+```javascript
+// Fetch authentication token
+const authResponse = await fetch('https://api.example.com/auth', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    username: process.env.API_USERNAME,
+    password: process.env.API_PASSWORD
+  })
+})
+
+const authData = await authResponse.json()
+// Make token available for main request
+process.env.AUTH_TOKEN = authData.access_token
+```
+
+### Teardown Scripts
+Clean up after the main request:
+```javascript
+// Clean up test data
+if (response.status === 201) {
+  const data = JSON.parse(response.body)
+  await fetch(`https://api.example.com/v1/users/${data.id}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${process.env.AUTH_TOKEN}` }
+  })
+}
+```

@@ -6,34 +6,38 @@ sidebarTitle: 'Overview'
 
 Uptime monitoring is essential for ensuring your applications are always available to your users. Checkly provides comprehensive uptime monitoring capabilities to help you track and maintain your application's reliability.
 
-## Benefits
+## Types of Uptime Monitors
 
+<AccordionGroup>
+    <Accordion title="URL Monitors">
+    URL monitors are the most common type of uptime monitor. They check if your application is accessible from a specific URL.
+
+    - [Learn more about URL Monitors](/docs/detect/uptime-monitoring/url-monitors/overview)
+    - [URL Monitor Construct](/constructs/url-monitor)
+    </Accordion>
+    <Accordion title="Heartbeat Monitors">
+    Heartbeat monitors are a type of uptime monitor that checks if your application is responding to a specific endpoint.
+
+    - [Learn more about Heartbeat Monitors](/docs/detect/uptime-monitoring/heartbeat-monitors/overview)
+    - [Heartbeat Monitor Construct](/constructs/heartbeat-monitor)
+    </Accordion>
+    <Accordion title="TCP Monitors">
+    TCP monitors are a type of uptime monitor that checks if your application is responding to a specific ping.
+
+    - [Learn more about TCP Monitors](/docs/detect/uptime-monitoring/tcp-monitors/overview)
+    - [TCP Monitor Construct](/constructs/tcp-monitor)
+    </Accordion>
+</AccordionGroup>
+
+
+## Benefits of Uptime Monitoring
 Uptime monitoring continuously checks if your applications and services are accessible and responding correctly. Typical use cases include:
 
 - Ensuring your marketing site returns a 200 OK
 - Verifying your documentation site loads quickly
-- Checking that your SSL certificate is still valid
-- Confirming that a public pricing endpoint is reachable for customers
+- Monitoring database connectivity with TCP checks
+- Confirming heartbeat endpoints are responding in your CI/CD pipeline
 
-## Types of Uptime Monitors
-
-<AccordionGroup>
-<Accordion title="URL Monitors" defaultOpen>
-URL monitors are the most common type of uptime monitor. They check if your application is accessible from a specific URL.
-
-[Learn more about URL Monitors](/docs/detect/uptime-monitoring/url-monitors/overview)
-</Accordion>
-<Accordion title="Heartbeat Monitors">
-Heartbeat monitors are a type of uptime monitor that checks if your application is responding to a specific endpoint.
-
-[Learn more about Heartbeat Monitors](/docs/detect/uptime-monitoring/heartbeat-monitors/overview)
-</Accordion>
-<Accordion title="TCP Monitors">
-TCP monitors are a type of uptime monitor that checks if your application is responding to a specific ping.
-
-[Learn more about TCP Monitors](/docs/detect/uptime-monitoring/tcp-monitors/overview)
-</Accordion>
-</AccordionGroup>
 
 ## Alerting
 Uptime Monitors can be configure to alert when:
@@ -62,11 +66,3 @@ To learn more about locations, see [Locations](/docs/introduction/concepts/locat
 | Status Codes | The HTTP status codes returned by your application |
 | Error Rates | The frequency of errors and failures |
 
-
-## Best Practices
-
-- Monitor from multiple geographic locations
-- Set realistic response time thresholds
-- Configure appropriate alerting rules
-- Regularly review and update your monitoring setup
-- Use synthetic monitoring alongside uptime monitoring

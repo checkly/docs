@@ -1,0 +1,210 @@
+---
+title: 'Status Pages Overview'
+description: 'Create professional status pages to communicate service health, incidents, and maintenance to your customers with automatic incident management and custom branding.'
+sidebarTitle: 'Overview'
+---
+
+import { Note, Warning, Tip, Steps } from 'mintlify/components'
+
+Status pages provide transparent communication about your service health and incidents to customers, users, and stakeholders. Checkly's status pages automatically reflect your monitoring results and create a professional interface for incident communication.
+
+## What are Status Pages?
+
+Status pages are public-facing websites that display real-time information about your services' health and operational status. They serve as the primary communication channel between your team and your users during both normal operations and incidents.
+
+<CardGroup cols={2}>
+<Card title="Real-time health display" icon="heartbeat">
+**Live Service Status**
+- Display current health of all services
+- Automatic updates from monitoring checks
+- Historical uptime and performance data
+- Color-coded status indicators
+</Card>
+
+<Card title="Incident communication" icon="megaphone">
+**Professional Incident Management**
+- Automated incident creation from check failures
+- Manual incident creation for planned maintenance
+- Real-time updates and status progression
+- Email notifications for subscribers
+</Card>
+
+<Card title="Custom branding" icon="paintbrush">
+**Professional Appearance**
+- Custom logos and favicon
+- Theme selection (light/dark/auto)
+- Custom domains and subdomains
+- Branded communication
+</Card>
+
+<Card title="User engagement" icon="users">
+**Subscriber Management**
+- Email subscription system
+- Verified subscriber notifications
+- Incident-specific updates
+- Maintenance announcements
+</Card>
+</CardGroup>
+
+## Core Status Page Components
+
+### Services
+Services represent functional pieces of your application that users interact with:
+
+```yaml
+# Example service structure
+Payment Processing:
+  Description: "Credit card and payment processing"
+  Connected Checks: [Payment API, Stripe Integration, PayPal API]
+  Incident Automation: Enabled
+  Status: Operational
+
+User Authentication:
+  Description: "Login and user management systems"
+  Connected Checks: [Auth API, OAuth Service, User Database]
+  Incident Automation: Enabled
+  Status: Operational
+```
+
+### Service Cards
+Organize and group services for better user experience:
+
+- **Visual grouping**: Related services displayed together
+- **Custom ordering**: Arrange services by importance or user impact
+- **Status aggregation**: Overall health based on connected checks
+- **Description management**: Clear service explanations for users
+
+### Automatic Incident Management
+Connect monitoring checks directly to services for automated incident handling:
+
+<CardGroup cols={2}>
+<Card title="Automatic incident creation" icon="zap">
+**When Checks Fail**
+- Incident opened automatically
+- Service status updated to "Major Outage" or "Partial Outage"
+- Subscribers notified via email
+- Status page reflects current state
+</Card>
+
+<Card title="Automatic incident resolution" icon="check-circle">
+**When Checks Recover**
+- Incident automatically resolved
+- Service status returned to "Operational"
+- Resolution notification sent to subscribers
+- Historical record maintained
+</Card>
+</CardGroup>
+
+## Subscriber Management and Notifications
+
+### Email Subscription System
+Enable users to stay informed about service status:
+
+<Steps>
+<Step title="Subscription Setup">
+Users provide email address for status updates
+</Step>
+
+<Step title="Email Verification">
+Verification email sent to confirm subscription
+</Step>
+
+<Step title="Notification Preferences">
+Users can manage notification settings
+</Step>
+
+<Step title="Incident Notifications">
+Automatic emails for incident updates and resolutions
+</Step>
+</Steps>
+
+### Notification Content Structure
+Status page notifications include comprehensive incident information:
+
+```text
+Subject: [INCIDENT] Payment Processing - Service Disruption
+
+Hello,
+
+We are currently experiencing issues with our Payment Processing service.
+
+Incident Details:
+- Service: Payment Processing
+- Status: Investigating
+- Started: January 15, 2024 at 14:30 UTC
+- Impact: Users may experience payment failures
+
+We are actively working to resolve this issue and will provide updates
+as more information becomes available.
+
+View status page: https://status.yourcompany.com
+Unsubscribe: [unsubscribe link]
+
+Best regards,
+Your Company Team
+```
+
+## Advanced Features
+
+### Incident Backfilling
+Add historical incidents to maintain accurate status page history:
+
+<Steps>
+<Step title="Historical Accuracy">
+Create incidents for past outages or maintenance windows
+</Step>
+
+<Step title="Custom Date Selection">
+Set specific dates and times for historical incidents
+</Step>
+
+<Step title="Subscriber Management">
+Choose whether to notify current subscribers about historical incidents
+</Step>
+
+<Step title="Uptime Calculation">
+Backfilled incidents are included in uptime statistics
+</Step>
+</Steps>
+
+<Tip>
+When backfilling historical incidents, consider whether to notify current subscribers. Usually, you want to disable notifications for historical events to avoid confusion.
+</Tip>
+
+### Multi-Check Service Integration
+Connect multiple monitoring checks to a single service:
+
+```yaml
+# Example: E-commerce Checkout Service
+Checkout Service:
+  Connected Checks:
+    - Payment Processing API
+    - Inventory Management API
+    - Order Confirmation Email
+    - Shopping Cart Functionality
+  
+  Incident Logic:
+    - Any single check failure = "Partial Outage"
+    - Multiple check failures = "Major Outage"
+    - All checks failing = "Complete Outage"
+```
+
+## Status Page Best Practices
+
+### Service Organization
+- **User-centric services**: Create services based on user-facing functionality
+- **Logical grouping**: Group related services together for clarity
+- **Clear descriptions**: Use terminology your users understand
+- **Appropriate granularity**: Balance detail with simplicity
+
+### Incident Communication
+- **Timely updates**: Provide regular updates during ongoing incidents
+- **Clear messaging**: Use plain language to describe issues and impacts
+- **Proactive communication**: Notify users before they notice problems
+- **Transparent resolution**: Explain what was fixed and preventive measures
+
+### Maintenance Planning
+- **Advance notice**: Schedule maintenance announcements with sufficient lead time
+- **Impact assessment**: Clearly communicate which services will be affected
+- **Duration estimates**: Provide realistic timeframes for maintenance windows
+- **Progress updates**: Keep users informed during maintenance activities

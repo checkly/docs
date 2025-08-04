@@ -1,0 +1,227 @@
+---
+title: 'EmailAlertChannel Construct'
+description: 'Learn how to configure email alert channels with the Checkly CLI.'
+sidebarTitle: 'Email Alert Channel'
+---
+
+Use EmailAlertChannel to send email notifications when checks fail or recover. The examples below show how to configure email alerting for different scenarios.
+
+<Info>
+Learn more about email alerts in the [Email Alerts documentation](/docs/alerting/email/).
+</Info>
+
+## `EmailAlertChannel` Examples
+
+<CodeGroup>
+
+```ts Basic Example
+import { EmailAlertChannel } from 'checkly/constructs'
+
+const emailChannel = new EmailAlertChannel('email-channel-1', {
+  address: 'alerts@acme.com'
+})
+```
+
+```ts Advanced Example
+import { EmailAlertChannel } from 'checkly/constructs'
+
+const emailChannel = new EmailAlertChannel('ops-email-channel', {
+  address: 'ops-team@acme.com',
+  sendRecovery: true,
+  sendFailure: true,
+  sendDegrade: true,
+  sslExpiry: true,
+  sslExpiryThreshold: 30
+})
+```
+
+</CodeGroup>
+
+## `EmailAlertChannel` Configuration
+
+<Tabs>
+  <Tab title="Unique Configuration">
+
+Configure email-specific settings:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `address` | `string` | ✅ | - | Email address to send notifications to |
+
+</Tab>
+
+<Tab title="Shared Configuration">
+Configure common alert channel properties:
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `sendRecovery` | `boolean` | ❌ | `true` | Send notifications when checks recover |
+| `sendFailure` | `boolean` | ❌ | `true` | Send notifications when checks fail |
+| `sendDegrade` | `boolean` | ❌ | `false` | Send notifications when checks degrade (API checks only) |
+| `sslExpiry` | `boolean` | ❌ | `false` | Send notifications for SSL certificate expiry |
+| `sslExpiryThreshold` | `number` | ❌ | `30` | Days before SSL expiry to send notification |
+
+</Tab>
+</Tabs>
+
+## Email Alert Channel Examples
+
+<Tabs>
+  <Tab title="Basic Team Alerts">
+    ```ts
+    import { EmailAlertChannel, ApiCheck } from 'checkly/constructs'
+
+    const teamEmail = new EmailAlertChannel('team-email', {
+      address: 'dev-team@acme.com'
+    })
+
+    new ApiCheck('api-health-check', {
+      name: 'API Health Check',
+      alertChannels: [teamEmail],
+      request: {
+        method: 'GET',
+        url: 'https://api.acme.com/health'
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="On-Call Notifications">
+    ```ts
+    const onCallEmail = new EmailAlertChannel('oncall-email', {
+      address: 'oncall@acme.com',
+      sendRecovery: true,
+      sendFailure: true,
+      sendDegrade: false // Only critical failures
+    })
+
+    new ApiCheck('critical-api-check', {
+      name: 'Critical API Endpoint',
+      alertChannels: [onCallEmail],
+      request: {
+        method: 'GET',
+        url: 'https://api.acme.com/critical-endpoint'
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="SSL Certificate Monitoring">
+    ```ts
+    const securityEmail = new EmailAlertChannel('security-email', {
+      address: 'security@acme.com',
+      sendRecovery: false,
+      sendFailure: true,
+      sslExpiry: true,
+      sslExpiryThreshold: 14 // Alert 14 days before expiry
+    })
+
+    new ApiCheck('ssl-cert-check', {
+      name: 'SSL Certificate Check',
+      alertChannels: [securityEmail],
+      request: {
+        method: 'GET',
+        url: 'https://secure.acme.com'
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Degraded Performance Alerts">
+    ```ts
+    const performanceEmail = new EmailAlertChannel('performance-email', {
+      address: 'performance-team@acme.com',
+      sendRecovery: true,
+      sendFailure: true,
+      sendDegrade: true // Alert on degraded performance
+    })
+
+    new ApiCheck('performance-check', {
+      name: 'API Performance Check',
+      maxResponseTime: 5000,
+      degradedResponseTime: 2000,
+      alertChannels: [performanceEmail],
+      request: {
+        method: 'GET',
+        url: 'https://api.acme.com/slow-endpoint'
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Multiple Recipients">
+    ```ts
+    // Create separate channels for different recipients
+    const devEmail = new EmailAlertChannel('dev-email', {
+      address: 'dev@acme.com',
+      sendDegrade: true
+    })
+
+    const opsEmail = new EmailAlertChannel('ops-email', {
+      address: 'ops@acme.com',
+      sendFailure: true,
+      sendRecovery: true
+    })
+
+    const managerEmail = new EmailAlertChannel('manager-email', {
+      address: 'manager@acme.com',
+      sendFailure: true,
+      sendRecovery: false
+    })
+
+    new ApiCheck('important-service', {
+      name: 'Important Service Check',
+      alertChannels: [devEmail, opsEmail, managerEmail],
+      request: {
+        method: 'GET',
+        url: 'https://api.acme.com/important'
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Using fromId()">
+    ```ts
+    // Reference an existing email channel by ID
+    const existingEmailChannel = EmailAlertChannel.fromId(123)
+
+    new ApiCheck('existing-channel-check', {
+      name: 'Check with Existing Channel',
+      alertChannels: [existingEmailChannel],
+      request: {
+        method: 'GET',
+        url: 'https://api.acme.com/endpoint'
+      }
+    })
+    ```
+  </Tab>
+</Tabs>
+
+## Best Practices
+
+<Info>
+**Single Email Address**: EmailAlertChannel only accepts one email address. For multiple recipients, create separate EmailAlertChannel instances or use distribution lists.
+</Info>
+
+<Warning>
+**Email Delivery**: Email notifications may be subject to spam filters or delivery delays. For critical alerts, consider combining email with other notification methods like SMS or Slack.
+</Warning>
+
+## Getting Channel ID
+
+You can find the email channel ID in the Checkly web UI or via the API:
+
+<Tabs>
+  <Tab title="Web UI">
+    1. Go to [Alert Channels](https://app.checklyhq.com/alerts/settings/channels) in your Checkly dashboard
+    2. Find your email channel and note the ID in the URL or channel details
+  </Tab>
+  
+  <Tab title="API">
+    ```bash
+    curl -H "Authorization: Bearer YOUR_API_KEY" \
+         -H "X-Checkly-Account: YOUR_ACCOUNT_ID" \
+         https://api.checklyhq.com/v1/alert-channels/
+    ```
+  </Tab>
+</Tabs>

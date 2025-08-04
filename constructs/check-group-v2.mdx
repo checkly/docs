@@ -1,0 +1,308 @@
+---
+title: 'CheckGroupV2 Construct'
+description: 'Learn how to configure check groups with the Checkly CLI.'
+sidebarTitle: 'Check Group (V2)'
+---
+
+Use CheckGroupV2 to organize your checks into logical groups. This provides better organization, shared configuration, and group-level controls for your monitoring setup.
+
+<Info>
+Learn more about check groups in the [Check Groups documentation](/docs/groups/).
+</Info>
+
+## `CheckGroupV2` Examples
+
+<CodeGroup>
+
+```ts Basic Example
+import { CheckGroupV2, ApiCheck, Frequency } from 'checkly/constructs'
+
+const group = new CheckGroupV2('api-group-1', {
+  name: 'API Endpoints Group',
+  activated: true,
+  muted: false,
+  frequency: Frequency.EVERY_15M,
+  locations: ['us-east-1', 'eu-west-1'],
+  tags: ['api-group']
+})
+
+new ApiCheck('api-check-1', {
+  name: 'API check #1',
+  group,
+  request: {
+    method: 'GET',
+    url: 'https://api.example.com/health',
+  }
+})
+```
+
+```ts Advanced Example
+import { CheckGroupV2, ApiCheck, BrowserCheck, Frequency } from 'checkly/constructs'
+import * as path from 'path'
+
+const group = new CheckGroupV2('comprehensive-group', {
+  name: 'Comprehensive Monitoring Group',
+  activated: true,
+  muted: false,
+  frequency: Frequency.EVERY_10M,
+  locations: ['us-east-1', 'eu-west-1'],
+  tags: ['production', 'critical'],
+  concurrency: 5,
+  environmentVariables: [
+    { key: 'API_BASE_URL', value: 'https://api.example.com' },
+    { key: 'API_KEY', value: '{{SECRET_API_KEY}}', secret: true }
+  ],
+  alertChannels: [emailChannel, slackChannel],
+  browserChecks: {
+    frequency: Frequency.EVERY_30M,
+    testMatch: '*.spec.js'
+  }
+})
+```
+
+</CodeGroup>
+
+## `CheckGroupV2` Configuration
+
+<Tabs>
+  <Tab title="Unique Configuration">
+
+Configure group-specific settings:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `name` | `string` | ✅ | - | Friendly name for your check group |
+| `activated` | `boolean` | ❌ | `true` | Whether checks in the group are running |
+| `muted` | `boolean` | ❌ | `false` | Whether to mute alerts for all checks in the group |
+| `concurrency` | `number` | ❌ | `10` | Number of concurrent checks when group is triggered |
+| `frequency` | `Frequency` | ❌ | - | How often to run checks within the group |
+| `locations` | `string[]` | ❌ | - | Public locations for all checks in the group |
+| `privateLocations` | `string[]` | ❌ | - | Private locations for all checks in the group |
+| `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Alert channels for all checks in the group |
+| `tags` | `string[]` | ❌ | `[]` | Tags that apply to all checks in the group |
+| `runtimeId` | `string` | ❌ | - | Runtime ID for all checks in the group |
+| `environmentVariables` | `object[]` | ❌ | `[]` | Environment variables for all checks in the group |
+| `localSetupScript` | `string` | ❌ | - | Setup script for all API checks in the group |
+| `localTearDownScript` | `string` | ❌ | - | Teardown script for all API checks in the group |
+| `retryStrategy` | `RetryStrategy` | ❌ | - | Retry strategy for all checks in the group |
+| `apiCheckDefaults` | `object` | ❌ | - | Default settings for API checks in the group |
+| `browserChecks` | `object` | ❌ | - | Settings for browser checks in the group |
+| `runParallel` | `boolean` | ❌ | - | Whether to run checks in parallel across locations |
+| `alertEscalationPolicy` | `AlertEscalationPolicy` | ❌ | - | Alert escalation policy for all checks in the group |
+
+</Tab>
+</Tabs>
+
+## `browserChecks` Configuration
+
+Configure browser-specific settings for checks automatically added via `testMatch`:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `frequency` | `Frequency` | ❌ | - | Frequency override for browser checks |
+| `testMatch` | `string` | ❌ | - | Glob pattern to automatically include browser test files |
+
+```ts
+browserChecks: {
+  frequency: Frequency.EVERY_30M,
+  testMatch: '**/*.spec.js'
+}
+```
+
+## Check Group Examples
+
+<Tabs>
+  <Tab title="API Monitoring Group">
+    ```ts
+    const apiGroup = new CheckGroupV2('api-monitoring-group', {
+      name: 'API Monitoring',
+      activated: true,
+      frequency: Frequency.EVERY_5M,
+      locations: ['us-east-1', 'eu-west-1'],
+      tags: ['api', 'production'],
+      environmentVariables: [
+        { key: 'API_BASE_URL', value: 'https://api.example.com' },
+        { key: 'API_VERSION', value: 'v2' }
+      ],
+      alertChannels: [slackChannel]
+    })
+
+    new ApiCheck('users-api', {
+      name: 'Users API',
+      group: apiGroup,
+      request: {
+        method: 'GET',
+        url: '{{API_BASE_URL}}/{{API_VERSION}}/users'
+      }
+    })
+
+    new ApiCheck('orders-api', {
+      name: 'Orders API',
+      group: apiGroup,
+      request: {
+        method: 'GET',
+        url: '{{API_BASE_URL}}/{{API_VERSION}}/orders'
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="E2E Testing Group">
+    ```ts
+    const e2eGroup = new CheckGroupV2('e2e-testing-group', {
+      name: 'End-to-End Tests',
+      activated: true,
+      frequency: Frequency.EVERY_30M,
+      locations: ['us-east-1'],
+      tags: ['e2e', 'critical-path'],
+      concurrency: 3,
+      runtimeId: '2025.04',
+      browserChecks: {
+        frequency: Frequency.EVERY_1H,
+        testMatch: '__tests__/e2e/*.spec.ts'
+      },
+      environmentVariables: [
+        { key: 'TEST_USER_EMAIL', value: 'test@example.com' },
+        { key: 'TEST_USER_PASSWORD', value: '{{SECRET_PASSWORD}}', secret: true }
+      ]
+    })
+
+    // Browser checks will be automatically included via testMatch
+    // Plus manually defined checks:
+    new BrowserCheck('critical-flow', {
+      name: 'Critical User Flow',
+      group: e2eGroup,
+      code: {
+        entrypoint: path.join(__dirname, 'critical-flow.spec.ts')
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Multi-Service Group">
+    ```ts
+    const servicesGroup = new CheckGroupV2('services-monitoring', {
+      name: 'Core Services Monitoring',
+      activated: true,
+      frequency: Frequency.EVERY_10M,
+      locations: ['us-east-1', 'eu-west-1'],
+      tags: ['services', 'infrastructure'],
+      alertChannels: [emailChannel, pagerdutyChannel],
+      retryStrategy: RetryStrategyBuilder.linearStrategy({
+        baseBackoffSeconds: 30,
+        maxRetries: 3,
+        sameRegion: false
+      })
+    })
+
+    // API checks
+    new ApiCheck('database-health', {
+      name: 'Database Health',
+      group: servicesGroup,
+      request: {
+        method: 'GET',
+        url: 'https://api.example.com/health/database'
+      }
+    })
+
+    // TCP monitors
+    new TcpMonitor('redis-connectivity', {
+      name: 'Redis Connectivity',
+      group: servicesGroup,
+      request: {
+        hostname: 'redis.example.com',
+        port: 6379
+      }
+    })
+
+    // URL monitors
+    new UrlMonitor('cdn-availability', {
+      name: 'CDN Availability',
+      group: servicesGroup,
+      request: {
+        url: 'https://cdn.example.com/health'
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Regional Group">
+    ```ts
+    const regionalGroup = new CheckGroupV2('us-east-monitoring', {
+      name: 'US East Region Monitoring',
+      activated: true,
+      frequency: Frequency.EVERY_2M,
+      locations: ['us-east-1'], // Single region focus
+      tags: ['us-east', 'regional'],
+      runParallel: false, // Sequential execution
+      alertEscalationPolicy: AlertEscalationBuilder.runBasedEscalation(2, {
+        interval: 5,
+        amount: 2
+      })
+    })
+
+    new ApiCheck('us-east-api', {
+      name: 'US East API Endpoint',
+      group: regionalGroup,
+      request: {
+        method: 'GET',
+        url: 'https://us-east-api.example.com/health'
+      }
+    })
+    ```
+  </Tab>
+  
+  <Tab title="Development Environment">
+    ```ts
+    const devGroup = new CheckGroupV2('development-group', {
+      name: 'Development Environment',
+      activated: true,
+      muted: true, // Mute alerts for dev environment
+      frequency: Frequency.EVERY_1H,
+      locations: ['us-east-1'],
+      tags: ['development', 'testing'],
+      environmentVariables: [
+        { key: 'ENV', value: 'development' },
+        { key: 'DEBUG', value: 'true' }
+      ]
+    })
+
+    new ApiCheck('dev-api', {
+      name: 'Development API',
+      group: devGroup,
+      testOnly: true, // Only run during tests
+      request: {
+        method: 'GET',
+        url: 'https://dev-api.example.com/health'
+      }
+    })
+    ```
+  </Tab>
+</Tabs>
+
+## Group Behavior
+
+<Info>
+**Override Behavior**: When group-level settings are defined, they override individual check settings. If a setting is not defined at the group level, checks use their individual configuration.
+</Info>
+
+<Warning>
+**Alert Channel Override**: If you add a check to a group with group-level alert channels, the check will only send alerts through the group's channels. Ensure the group has at least one alert channel configured.
+</Warning>
+
+## Migration from CheckGroup
+
+CheckGroupV2 replaces the deprecated CheckGroup construct with more intuitive behavior:
+
+```ts
+// Old way (deprecated)
+const oldGroup = new CheckGroup('old-group', {
+  // Properties were always treated as overrides
+})
+
+// New way (recommended)
+const newGroup = new CheckGroupV2('new-group', {
+  // Properties only override when explicitly set
+  // Undefined properties allow checks to use individual settings
+})
+```

@@ -17,7 +17,7 @@ When a span is missing, they create a hole in this chain, making it difficult to
 
 Checkly uses contextual span data—such as the trace it belongs to and its parent span—to display any missing pieces in the span chain. This helps you identify which application or service may be incorrectly instrumented.
 
-![Trace with missing spans](/docs/images/otel/traces-missing-spans.png)
+![Trace with missing spans](images/docs/images/otel/traces-missing-spans.png)
 
 
 ## Troubleshooting missing spans
@@ -32,7 +32,7 @@ Missing spans can happen due to various reasons. Whether you're sending data to 
 
    * **Step 1**. Make sure that you're filtering out non-checkly spans:
 
-      ```yaml
+      ```yaml 
       processors:
          batch:
          filter/checkly:
@@ -82,7 +82,7 @@ Ensure the right Authorization keys and endpoints are in use.
    
    Confirm your environment variables use the correct endpoint and authorization:
 
-   ```bash
+   ```bash Terminal
    OTEL_EXPORTER_OTLP_HEADERS="authorization=<your-api-key>"
          
    OTEL_EXPORTER_OTLP_ENDPOINT="https://otel.eu-west-1.checklyhq.com"
@@ -101,7 +101,7 @@ Ensure the right Authorization keys and endpoints are in use.
   
       For example, to allow HTTP traces to be sent out:
 
-      ```bash
+      ```bash Terminal
       A OUTPUT -p tcp --dport 4318 -j ACCEPT
       ```
 

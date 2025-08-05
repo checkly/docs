@@ -1,0 +1,85 @@
+---
+title: 'Groups'
+description: 'Organize your checks and apply shared configuration with Groups'
+sidebarTitle: 'Groups'
+---
+
+Groups help you organize your checks (e.g. by team or feature) and apply shared configuration such as API defaults, scheduling & location overrides, and other properties.
+
+![Check group screenshot](/images/docs/images/groups/group-in-dashboard.png)
+
+Groups serve multiple purposes: they act as organizational folders, configuration templates, and execution units. Think of them as the filing system for your monitoring infrastructure that transforms scattered checks into a coherent system reflecting your application architecture and team responsibilities.
+
+## Creating a Check Group
+
+By default, newly created check groups behave like folders, with no group-level configuration applied. To get started:
+
+- **Define a name:** Pick a meaningful name for your group. It helps you and your team identify the group in Checkly and in alerts triggered by failures.
+- **Add tags (optional)**: Tags help you relate groups to one another and also determine which checks appear on your dashboards.
+
+You can populate a group by moving existing checks into it or by creating new checks directly within the group.
+
+## Group-Level Configuration
+
+Groups let you apply shared configuration to standardize how checks behave. Group-level configurations override check-level settings when applied.
+
+<AccordionGroup>
+<Accordion title="API Check Defaults">
+Define common base URLs, request information, assertions, and setup & teardown scripts to manage API checks in your group at scale. This eliminates repetitive configuration across similar API checks.
+</Accordion>
+
+<Accordion title="Variables">
+Create group environment variables and secrets for configuration commonly used by checks in your group. These are merged with variables at the global and check levels when a check runs, following a clear hierarchy.
+</Accordion>
+
+<Accordion title="Scheduling & Locations">
+- **Locations:** Override location settings for all checks in the group with selected public or private locations
+- **Scheduling strategy:** Override scheduling strategy (parallel, round-robin) for all checks in the group  
+- **Frequency:** Set a default scheduling interval for new checks created in the group
+</Accordion>
+
+<Accordion title="Retries & Alerting">
+- **Retries:** Configure retry strategy for failed checks (fixed, linear, exponential)
+- **Alert settings:** Set up alert channels for the group - email, SMS, Slack, webhooks, etc.
+
+<Warning>
+Make sure to select an alert channel, otherwise checks in this group will not alert.
+</Warning>
+</Accordion>
+
+<Accordion title="Testing & Runtimes">
+- **Testing:** Run checks in this group as E2E tests locally or from CI/CD pipelines
+- **Runtimes:** Set the JavaScript runtime environment for browser checks and scripts if different from account default
+</Accordion>
+</AccordionGroup>
+
+## Managing Check Membership
+
+**Moving a check into a group:** If the group has group-level configuration defined, adding a check may change how it runs. Settings like API defaults, locations & scheduling, or retries & alerting can override the check's configuration.
+
+**Removing check from group:** Any group-level configuration will no longer apply, and the check will use its own configuration going forward.
+
+<Warning>
+To prevent issues (e.g. broken references to group variables), the check will be automatically deactivated after being added to or removed from a group. Make sure to review its settings before reactivating.
+</Warning>
+
+## How Grouped Checks Execute
+
+Understanding how grouped checks run is important for sophisticated monitoring setups:
+
+1. **Individual scheduling:** Checks are scheduled as individual checks, not "as a group"
+2. **Group triggers:** Calling a "group run" using CLI or GitHub integration runs all checks in the group
+3. **No group state:** The group itself does not have an explicit runtime state
+4. **Individual results:** No results or metrics are collected at the group level
+5. **Independent timing:** Checks in a group maintain their individual scheduling settings
+
+Groups are primarily configuration containers that provide shared settings and organizational structure. This approach ensures flexibility while enabling powerful configuration management at scale.
+
+## Flexible Configuration Strategy
+
+Groups can serve different organizational needs:
+
+- **Strict templates:** Enforce consistency through shared configurations
+- **Loose containers:** Provide structure without imposing shared settings
+- **Team boundaries:** Enable clear ownership and delegation of monitoring responsibilities
+- **Scaling mechanism:** Manage complexity through logical decomposition as your infrastructure grows

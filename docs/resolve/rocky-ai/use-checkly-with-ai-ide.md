@@ -1,0 +1,138 @@
+---
+title: Using Checkly with AI IDEs and Copilots - Checkly Docs
+sidebarTitle: Use Checkly with AI IDEs & Copilots
+
+---
+
+## Docs
+
+You can index our docs pages in your IDE to leverage better code generation results. To do so, follow the guides for your IDE of choice:
+
+Make sure to index the following url:
+
+```txt
+https://checklyhq.com/docs/
+```
+
+- [Referencing @docs with Cursor](https://docs.cursor.com/context/@-symbols/@-docs)
+
+At the time of writing this unfortunately no other IDE supports this kind of context enrichment.
+
+## Plain text docs
+
+Every page on our docs site is accessible as a plain markdown file by appending `index.md` to the url, e.g. 
+[https://www.checklyhq.com/docs/cli/constructs-reference/index.md](https://www.checklyhq.com/docs/cli/constructs-reference/index.md).
+
+There is also an [`/llms.txt`](https://www.checklyhq.com/llms.txt) at the root of our site which contains all the URLs
+of our docs pages in plain text format. You can use this file to index our docs in your AI IDE of choice.
+
+## Custom Rules
+
+We prepared a first set of AI rules which you can use to teach your AI IDE of choice on how to generate code for Checkly.
+Go into the root of your IDE's workspace and download the rules according to your IDE's config parameters.
+When asking questions about Checkly, manually add the downloaded rules files to your prompt.
+
+### GitHub Copilot
+
+{{< tabs "GH Copilot" >}}
+
+{{< tab "Mac and Linux" >}}
+
+```bash
+mkdir -p .github && curl -o .github/copilot-instructions.md "https://www.checklyhq.com/docs/ai/checkly.rules.md" -L
+```
+
+{{< /tab >}}
+
+{{< tab "Windows" >}}
+
+```bash
+New-Item -ItemType Directory -Path ".github\instructions" -Force
+Invoke-WebRequest -Uri "https://www.checklyhq.com/docs/ai/docs/ai/checkly.rules.md" -OutFile ".github\copilot-instructions.md"
+```
+
+{{< /tab >}}
+
+{{< /tabs >}}
+
+You can ask Copilot to install the `checkly` NPM package and generate code for API Checks, Browser checks, Multistep checks
+and all other constructs.
+
+
+### Cursor
+
+{{< tabs "Cursor" >}}
+
+{{< tab "Mac and Linux" >}}
+
+```bash
+mkdir -p .cursor/rules && curl -o .cursor/rules/checkly.mdc  "https://www.checklyhq.com/docs/ai/checkly.rules.md" -L
+```
+
+Now make sure to add the new `checkly.mdc` file to your context.
+
+You can now ask Cursor to install the `checkly` NPM package and generate code for API Checks, Browser checks, Multistep checks
+and all other constructs. Make sure to use the `checkly.mdc` file as context for your questions.
+
+{{< /tab >}}
+
+{{< tab "Windows" >}}
+```bash
+New-Item -ItemType Directory -Path ".cursor\rules" -Force
+Invoke-WebRequest -Uri "https://www.checklyhq.com/docs/ai/checkly.rules.md" -OutFile ".cursor\rules\checkly.mdc"
+```
+{{< /tab >}}
+
+{{< /tabs >}}
+
+You can now reference the `checkly.mdc` using `@checkly.mdc` file in your Cursor chats and ask it to generate code for
+API Checks, Browser checks, Multistep checks and all other constructs.
+
+### Windsurf
+
+{{< tabs "Windsurf" >}}
+
+{{< tab "Mac and Linux" >}}
+
+```bash
+mkdir -p .windsurf/rules && curl -o .windsurf/rules/checkly.md "https://www.checklyhq.com/docs/ai/checkly.rules.md" -L
+```
+{{< /tab >}}
+
+{{< tab "Windows" >}}
+
+```bash
+New-Item -ItemType Directory -Path ".windsurf\rules" -Force
+Invoke-WebRequest -Uri "https://www.checklyhq.com/docs/ai/checkly.rules.md" -OutFile ".windsurf\rules\checkly.md"
+```
+{{< /tab >}}
+
+{{< /tabs >}}
+
+You can now reference the `checkly.md` using `@checkly.md` file in your WindSurf chats and ask it to generate code for 
+API Checks, Browser checks, Multistep checks and all other constructs.
+### Claude Code 
+
+{{< tabs "Claude Code" >}}
+
+{{< tab "Mac and Linux" >}}
+
+```bash
+mkdir \p .claude &&
+curl -o .claude/checkly.rules.md https://www.checklyhq.com/docs/ai/checkly.rules.md -L
+echo "- examine checkly.rules.md for code generation rules" >> .claude/CLAUDE.md
+```
+{{< /tab >}}
+
+{{< tab "Windows" >}}
+
+```bash
+New-Item -ItemType Directory -Path ".claude" -Force
+Invoke-WebRequest -Uri "https://www.checklyhq.com/docs/ai/checkly.rules.md" -OutFile ".claude\checkly.md"
+echo - examine checkly.md for code generation rules >> .claude/CLAUDE.md
+```
+{{< /tab >}}
+
+{{< /tabs >}}
+
+Exit and restart your Claude Code session to re-read the `CLAUDE.MD` file into Claude Code's context.

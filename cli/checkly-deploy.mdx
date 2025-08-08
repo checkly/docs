@@ -6,79 +6,326 @@ sidebarTitle: 'checkly deploy'
 
 The `checkly deploy` command deploys all your checks and associated resources like alert channels to your Checkly account. This command synchronizes your local monitoring-as-code configuration with your Checkly account.
 
+<Accordion title="Prerequisites">
+Before using `checkly deploy`, ensure you have:
+
+- A Checkly CLI project initialized with `npx checkly init`
+- At least one check or resource defined in your project
+- Valid Checkly account authentication (run `npx checkly login` if needed)
+- A `checkly.config.ts` or `checkly.config.js` configuration file
+
+For additional setup information, see [CLI overview](/cli/overview).
+</Accordion>
+
 ## Usage
 
-Deploy all resources to your Checkly account.
+The basic command deploys all resources to your Checkly account, synchronizing your local monitoring-as-code configuration.
 
 ```bash Terminal
-npx checkly deploy
+npx checkly deploy [options]
 ```
 
-## Extended Usage
+## Options
 
-Preview the differences between your local configuration and your account before deploying.
+<Tabs>
+<Tab title="Unique Options">
 
-```bash Terminal
-npx checkly deploy --preview
-```
+| Option | Description | Type | Required |
+|--------|-------------|------|----------|
+| `--preview, -p` | Preview differences without deploying | boolean | No |
+| `--output, -o` | Show applied differences after deployment | boolean | No |
+| `--debug-bundle` | Generate debug JSON file | boolean | No |
+| `--no-schedule-on-deploy` | Prevent automatic check scheduling | boolean | No |
 
-Deploy without confirmation and show applied differences after deployment.
+</Tab>
+<Tab title="Common Options">
 
-```bash Terminal
-npx checkly deploy --force --output
-```
+| Option | Description | Type | Required |
+|--------|-------------|------|----------|
+| `--config, -c` | Specify a configuration file | string | No |
+| `--force, -f` | Skip confirmation dialogs | boolean | No |
+| `--env, -e` | Pass environment variables | string | No |
+| `--verbose, -v` | Show detailed output | boolean | No |
 
-Deploy using a specific configuration file without triggering check runs.
+</Tab>
+<Tab title="All Global Options">
 
-```bash Terminal
-npx checkly deploy --config="./checkly.staging.config.ts" --no-schedule-on-deploy
-```
+| Option | Description | Type | Required |
+|--------|-------------|------|----------|
+| `--env-file` | Load variables from file | string | No |
+| `--location, -l` | Run checks in specific location | string | No |
+| `--private-location` | Use private location | string | No |
+| `--record` | Record test session | boolean | No |
+| `--reporter, -r` | Specify output format | string | No |
+| `--tags, -t` | Filter by tags | string | No |
+| `--retries` | Set retry attempts | number | No |
+| `--timeout` | Set execution timeout | number | No |
+
+For detailed information about global options, see [global options](/cli/global-options).
+
+</Tab>
+</Tabs>
 
 ## Unique Options
 
-### `--preview` or `-p`
+<ResponseField name="--preview, -p" type="boolean">
 Preview the differences between your local configuration and your Checkly account without making any changes.
 
+### Usage
 ```bash Terminal
 npx checkly deploy --preview
+npx checkly deploy -p
+```
+
+### Examples
+```bash Terminal
+# Preview all changes
+npx checkly deploy --preview
+
+# Preview with specific config file
+npx checkly deploy --preview --config ./checkly.staging.config.ts
+
+# Preview with verbose output
+npx checkly deploy -p --verbose
 ```
 
 Shows you exactly what will be added, modified, or removed during deployment.
+</ResponseField>
 
-### `--output` or `-o`
+<ResponseField name="--output, -o" type="boolean">
 Show applied differences after deploying, providing a summary of what was changed.
 
+### Usage
 ```bash Terminal
 npx checkly deploy --output
+npx checkly deploy -o
 ```
 
-### `--debug-bundle`
+### Examples
+```bash Terminal
+# Deploy and show changes
+npx checkly deploy --output
+
+# Deploy with force and show output
+npx checkly deploy --force --output
+
+# Combine with other options
+npx checkly deploy -o --verbose
+```
+</ResponseField>
+
+<ResponseField name="--debug-bundle" type="boolean">
 Generate a JSON file containing the data sent to Checkly servers when deploying. Useful for debugging configuration issues.
 
+### Usage
 ```bash Terminal
 npx checkly deploy --debug-bundle
 ```
 
-Creates a `checkly-bundle-debug.json` file in your project directory.
+### Examples
+```bash Terminal
+# Generate debug bundle
+npx checkly deploy --debug-bundle
 
-### `--no-schedule-on-deploy`
+# Generate bundle without actually deploying
+npx checkly deploy --preview --debug-bundle
+
+# Debug with verbose output
+npx checkly deploy --debug-bundle --verbose
+```
+
+Creates a `checkly-bundle-debug.json` file in your project directory.
+</ResponseField>
+
+<ResponseField name="--no-schedule-on-deploy" type="boolean">
 Prevent checks from running automatically when they are deployed.
 
-```bash Terminal        
+### Usage
+```bash Terminal
 npx checkly deploy --no-schedule-on-deploy
 ```
 
+### Examples
+```bash Terminal
+# Deploy without scheduling
+npx checkly deploy --no-schedule-on-deploy
+
+# Deploy to staging without scheduling
+npx checkly deploy --config ./checkly.staging.config.ts --no-schedule-on-deploy
+
+# Force deploy without scheduling
+npx checkly deploy --force --no-schedule-on-deploy
+```
+
 Useful when you want to deploy changes but delay execution until later.
+</ResponseField>
 
-## Global Options
+## Common Options
 
-This command supports the following [global options](/cli-reference/global-options):
+<ResponseField name="--config, -c" type="string">
+Specify a particular configuration file to use instead of the default `checkly.config.ts` or `checkly.config.js`.
 
-- [`--config`](/cli-reference/global-options#config-or-c) - Specify a configuration file
-- [`--force`](/cli-reference/global-options#force-or-f) - Skip confirmation dialogs
-- [`--env`](/cli-reference/global-options#env-keyvalue-or-e) - Pass environment variables
-- [`--env-file`](/cli-reference/global-options#env-file) - Load variables from file
-- [`--verbose`](/cli-reference/global-options#verbose-or-v) - Show detailed output
+### Usage
+```bash Terminal
+npx checkly deploy --config <file-path>
+npx checkly deploy -c <file-path>
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Different Environments">
+
+```bash Terminal
+# Deploy to staging
+npx checkly deploy --config ./checkly.staging.config.ts
+
+# Deploy to production
+npx checkly deploy --config ./checkly.production.config.ts
+```
+
+</Tab>
+<Tab title="Custom Config Location">
+
+```bash Terminal
+# Use config from different directory
+npx checkly deploy --config ./configs/checkly.custom.js
+
+# Relative path config
+npx checkly deploy -c ../shared-configs/monitoring.config.ts
+```
+
+</Tab>
+</Tabs>
+
+**Default**: Looks for `checkly.config.ts` or `checkly.config.js` in the current directory.
+</ResponseField>
+
+<ResponseField name="--force, -f" type="boolean">
+Skip confirmation dialogs and proceed with the operation automatically. Especially useful in CI/CD environments.
+
+### Usage
+```bash Terminal
+npx checkly deploy --force
+npx checkly deploy -f
+```
+
+### Examples
+
+<Tabs>
+<Tab title="CI/CD Deployment">
+
+```bash Terminal
+# Automated CI deployment
+npx checkly deploy --force
+
+# Output
+Deploying without confirmation...
+✓ 12 checks deployed
+✓ 3 alert channels updated
+```
+
+</Tab>
+<Tab title="With Other Options">
+
+```bash Terminal
+# Force deploy with preview and output
+npx checkly deploy --force --preview --output
+
+# Force deploy to staging
+npx checkly deploy -f --config ./checkly.staging.config.ts
+```
+
+</Tab>
+</Tabs>
+
+**Warning**: Use with caution as this bypasses safety prompts.
+</ResponseField>
+
+<ResponseField name="--env, -e" type="string">
+Pass environment variables to the deployment process. Variables passed this way will override any existing variables stored in your Checkly account.
+
+### Usage
+```bash Terminal
+npx checkly deploy --env <KEY=value>
+npx checkly deploy -e <KEY=value>
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Single Variable">
+
+```bash Terminal
+# Deploy with environment URL
+npx checkly deploy --env ENVIRONMENT_URL="https://staging.acme.com"
+
+# Output
+Deploying with environment variables...
+✓ ENVIRONMENT_URL overridden for this deployment
+```
+
+</Tab>
+<Tab title="Multiple Variables">
+
+```bash Terminal
+# Deploy with multiple environment variables
+npx checkly deploy --env API_KEY="staging123" --env BASE_URL="https://api.staging.com"
+
+# Combined with config file
+npx checkly deploy -e VERSION="v2.1.0" --config ./checkly.production.config.ts
+```
+
+</Tab>
+</Tabs>
+
+**Usage**: You can pass multiple environment variables by using the flag multiple times.
+</ResponseField>
+
+<ResponseField name="--verbose, -v" type="boolean">
+Show detailed logs and output for all operations, including full deployment information.
+
+### Usage
+```bash Terminal
+npx checkly deploy --verbose
+npx checkly deploy -v
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Standard Deployment">
+
+```bash Terminal
+# Standard deploy
+npx checkly deploy
+
+# Output
+✓ 12 checks deployed
+✓ 3 alert channels updated
+```
+
+</Tab>
+<Tab title="Verbose Deployment">
+
+```bash Terminal
+# Verbose deploy
+npx checkly deploy --verbose
+
+# Output
+✓ 12 checks deployed
+  - Homepage Check: updated (runtime: nodejs18.x)
+  - API Health: created (location: us-east-1)
+✓ 3 alert channels updated
+  - Slack #alerts: webhook URL updated
+  - Email notifications: 2 recipients added
+```
+
+</Tab>
+</Tabs>
+
+**Use cases**: Debugging deployments, detailed CI logs, troubleshooting configuration issues.
+</ResponseField>
 
 ## Git Integration
 
@@ -94,3 +341,4 @@ The following Git variables are automatically detected from your local or CI env
 - `CHECKLY_GIT_COMMIT_AUTHOR_EMAIL` - Author email
 
 You can also set these manually as environment variables if automatic detection doesn't work in your environment.
+

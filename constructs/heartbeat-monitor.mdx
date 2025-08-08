@@ -6,9 +6,16 @@ sidebarTitle: 'Heartbeat Monitor'
 
 Use heartbeat monitors to track passive monitoring scenarios where external services ping Checkly at regular intervals. The examples below show how to configure monitoring for different types of scheduled jobs and services.
 
-<Info>
-Learn more about heartbeat monitors in the [Heartbeat Monitors overview](/docs/detect/uptime-monitoring/heartbeat-monitors/overview).
-</Info>
+<Accordion title="Prerequisites">
+Before creating heartbeat monitors, ensure you have:
+
+- A Checkly CLI project initialized with `npx checkly init`
+- External services, cron jobs, or scripts that can send HTTP POST requests
+- Understanding of your scheduled job intervals and expected timing
+- Network access from your services to Checkly's ping endpoints
+
+For additional setup information, see [CLI overview](/cli/overview) and [Heartbeat Monitors overview](/docs/detect/uptime-monitoring/heartbeat-monitors/overview).
+</Accordion>
 
 ## `HeartbeatMonitor` Structure
 
@@ -44,12 +51,10 @@ new HeartbeatMonitor('newsletter-heartbeat', {
 
 </CodeGroup>
 
-## `HeartbeatMonitor` Configuration
+## Options
 
 <Tabs>
-  <Tab title="Unique Configuration">
-
-Configure timing settings for your heartbeat monitors:
+<Tab title="Unique Options">
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
@@ -59,13 +64,17 @@ Configure timing settings for your heartbeat monitors:
 | `graceUnit` | `string` | ✅ | - | Grace time unit: `'seconds'` \| `'minutes'` \| `'hours'` \| `'days'` |
 
 </Tab>
-
-<Tab title="Shared Configuration">
-Configure common properties that apply to all monitor types:
+<Tab title="Common Options">
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `name` | `string` | ✅ | - | Friendly name for your monitor |
+
+</Tab>
+<Tab title="Global Options">
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
 | `activated` | `boolean` | ❌ | `true` | Whether the monitor is enabled |
 | `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
 | `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Array of AlertChannel objects for notifications |
@@ -74,7 +83,231 @@ Configure common properties that apply to all monitor types:
 </Tab>
 </Tabs>
 
-## Heartbeat Monitor Examples
+## Unique Options
+
+<ResponseField name="period" type="number" required>
+The expected period between pings from your external service. This defines how often your job or service should check in.
+
+### Usage
+```ts
+new HeartbeatMonitor('my-heartbeat', {
+  period: 1,
+  periodUnit: 'days' // Daily check-in expected
+})
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Daily Jobs">
+
+```ts
+// Daily backup job
+new HeartbeatMonitor('backup-job', {
+  name: 'Daily Database Backup',
+  period: 1,
+  periodUnit: 'days',
+  grace: 2,
+  graceUnit: 'hours'
+})
+```
+
+</Tab>
+<Tab title="Hourly Tasks">
+
+```ts
+// Hourly data sync
+new HeartbeatMonitor('data-sync', {
+  name: 'Hourly Data Sync',
+  period: 1,
+  periodUnit: 'hours',
+  grace: 15,
+  graceUnit: 'minutes'
+})
+```
+
+</Tab>
+<Tab title="Frequent Checks">
+
+```ts
+// Every 5 minutes
+new HeartbeatMonitor('frequent-task', {
+  name: 'Frequent Health Check',
+  period: 5,
+  periodUnit: 'minutes',
+  grace: 2,
+  graceUnit: 'minutes'
+})
+```
+
+</Tab>
+</Tabs>
+
+**Range**: 30 seconds to 365 days
+</ResponseField>
+
+<ResponseField name="periodUnit" type="string" required>
+The time unit for the period. Defines whether the period is in seconds, minutes, hours, or days.
+
+### Usage
+```ts
+new HeartbeatMonitor('my-heartbeat', {
+  period: 2,
+  periodUnit: 'hours' // Every 2 hours
+})
+```
+
+### Examples
+```ts
+// Various time units
+new HeartbeatMonitor('quick-check', {
+  period: 30,
+  periodUnit: 'seconds'  // Every 30 seconds
+})
+
+new HeartbeatMonitor('regular-task', {
+  period: 15,
+  periodUnit: 'minutes'  // Every 15 minutes
+})
+
+new HeartbeatMonitor('daily-report', {
+  period: 1,
+  periodUnit: 'days'     // Every day
+})
+```
+
+**Available units**: `'seconds'`, `'minutes'`, `'hours'`, `'days'`
+</ResponseField>
+
+<ResponseField name="grace" type="number" required>
+The grace period to wait before alerting after the expected ping time has passed. This allows for slight delays in job execution.
+
+### Usage
+```ts
+new HeartbeatMonitor('my-heartbeat', {
+  period: 1,
+  periodUnit: 'hours',
+  grace: 10,
+  graceUnit: 'minutes' // 10 minute grace period
+})
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Short Grace Period">
+
+```ts
+// Strict timing requirements
+new HeartbeatMonitor('critical-task', {
+  name: 'Critical System Task',
+  period: 5,
+  periodUnit: 'minutes',
+  grace: 1,              // Only 1 minute grace
+  graceUnit: 'minutes'
+})
+```
+
+</Tab>
+<Tab title="Moderate Grace Period">
+
+```ts
+// Standard tolerance
+new HeartbeatMonitor('standard-job', {
+  name: 'Standard Processing Job',
+  period: 1,
+  periodUnit: 'hours',
+  grace: 15,             // 15 minute grace period
+  graceUnit: 'minutes'
+})
+```
+
+</Tab>
+<Tab title="Long Grace Period">
+
+```ts
+// Flexible timing for complex jobs
+new HeartbeatMonitor('complex-job', {
+  name: 'Complex Data Processing',
+  period: 1,
+  periodUnit: 'days',
+  grace: 4,              // 4 hour grace period
+  graceUnit: 'hours'
+})
+```
+
+</Tab>
+</Tabs>
+
+**Range**: 0 seconds to 365 days
+</ResponseField>
+
+<ResponseField name="graceUnit" type="string" required>
+The time unit for the grace period. Defines whether the grace period is in seconds, minutes, hours, or days.
+
+### Usage
+```ts
+new HeartbeatMonitor('my-heartbeat', {
+  period: 6,
+  periodUnit: 'hours',
+  grace: 30,
+  graceUnit: 'minutes' // 30 minute grace period
+})
+```
+
+### Examples
+```ts
+// Different grace time units
+new HeartbeatMonitor('quick-response', {
+  period: 2,
+  periodUnit: 'minutes',
+  grace: 30,
+  graceUnit: 'seconds'   // 30 second grace
+})
+
+new HeartbeatMonitor('weekly-job', {
+  period: 7,
+  periodUnit: 'days',
+  grace: 1,
+  graceUnit: 'days'      // 1 day grace period
+})
+```
+
+**Available units**: `'seconds'`, `'minutes'`, `'hours'`, `'days'`
+</ResponseField>
+
+## Common Options
+
+<ResponseField name="name" type="string" required>
+Friendly name for your heartbeat monitor that will be displayed in the Checkly dashboard and used in notifications.
+
+### Usage
+```ts
+new HeartbeatMonitor('my-heartbeat', {
+  name: 'Daily Backup Job Monitor'
+})
+```
+
+### Examples
+```ts
+// Job-based naming
+new HeartbeatMonitor('backup-heartbeat', {
+  name: 'Daily Database Backup'
+})
+
+// Service-based naming
+new HeartbeatMonitor('sync-heartbeat', {
+  name: 'Hourly Data Synchronization'
+})
+
+// Pipeline-based naming
+new HeartbeatMonitor('deploy-heartbeat', {
+  name: 'Production Deployment Pipeline'
+})
+```
+</ResponseField>
+
+## Examples
 
 <Tabs>
   <Tab title="Daily Backup Job">

@@ -52,12 +52,10 @@ new StatusPage('company-status', {
 
 </CodeGroup>
 
-## `StatusPageService` Configuration
+## Options
 
 <Tabs>
-  <Tab title="Configuration">
-
-Configure status page service settings:
+<Tab title="Unique Options">
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
@@ -66,260 +64,309 @@ Configure status page service settings:
 </Tab>
 </Tabs>
 
-## Status Page Service Examples
+## Unique Options
 
-<Tabs>
-  <Tab title="API Services">
-    ```ts
-    import { StatusPageService } from 'checkly/constructs'
+<ResponseField name="name" type="string" required>
+Display name for the service on the status page. This name appears in the status page cards and helps users identify which service component is being monitored.
 
-    const restApi = new StatusPageService('rest-api', {
-      name: 'REST API'
-    })
+### Usage
+```ts
+new StatusPageService('api-service', {
+  name: 'API Service'
+})
+```
 
-    const graphqlApi = new StatusPageService('graphql-api', {
-      name: 'GraphQL API'
-    })
+### Examples
 
-    const webhookApi = new StatusPageService('webhook-api', {
-      name: 'Webhook API'
-    })
+<CodeGroup>
 
-    const authApi = new StatusPageService('auth-api', {
-      name: 'Authentication API'
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Infrastructure Services">
-    ```ts
-    const database = new StatusPageService('primary-database', {
-      name: 'Primary Database'
-    })
+```ts Clear Service Names
+const userAuth = new StatusPageService('user-auth', {
+  name: 'User Authentication' // Clear, descriptive name
+})
 
-    const cache = new StatusPageService('redis-cache', {
-      name: 'Redis Cache'
-    })
+const paymentApi = new StatusPageService('payment-api', {
+  name: 'Payment Processing API' // Specific functionality
+})
 
-    const messageQueue = new StatusPageService('message-queue', {
-      name: 'Message Queue'
-    })
+const database = new StatusPageService('main-db', {
+  name: 'Primary Database' // Infrastructure component
+})
+```
 
-    const fileStorage = new StatusPageService('file-storage', {
-      name: 'File Storage'
-    })
+```ts Customer-Friendly Names
+const webApp = new StatusPageService('web-application', {
+  name: 'Web Application' // User-facing service
+})
 
-    const cdn = new StatusPageService('cdn', {
-      name: 'Content Delivery Network'
-    })
-    ```
-  </Tab>
-  
-  <Tab title="User-Facing Services">
-    ```ts
-    const webApplication = new StatusPageService('web-app', {
-      name: 'Web Application'
-    })
+const mobileApp = new StatusPageService('mobile-app', {
+  name: 'Mobile App' // Customer understands impact
+})
 
-    const mobileApp = new StatusPageService('mobile-app', {
-      name: 'Mobile Application'
-    })
+const emailService = new StatusPageService('email-notifications', {
+  name: 'Email Notifications' // Clear user impact
+})
+```
 
-    const customerPortal = new StatusPageService('customer-portal', {
-      name: 'Customer Portal'
-    })
+```ts Regional Services
+const usEast = new StatusPageService('us-east-api', {
+  name: 'US East API' // Regional identifier
+})
 
-    const adminDashboard = new StatusPageService('admin-dashboard', {
-      name: 'Admin Dashboard'
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Third-Party Integrations">
-    ```ts
-    const paymentProcessing = new StatusPageService('payment-processing', {
-      name: 'Payment Processing'
-    })
+const europe = new StatusPageService('europe-api', {
+  name: 'Europe API' // Consistent naming pattern
+})
 
-    const emailDelivery = new StatusPageService('email-delivery', {
-      name: 'Email Delivery'
-    })
+const asiaPacific = new StatusPageService('asia-pacific-api', {
+  name: 'Asia Pacific API' // Geographic clarity
+})
+```
 
-    const smsNotifications = new StatusPageService('sms-notifications', {
-      name: 'SMS Notifications'
-    })
+</CodeGroup>
 
-    const socialLogin = new StatusPageService('social-login', {
-      name: 'Social Media Login'
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Regional Services">
-    ```ts
-    const usEastService = new StatusPageService('us-east-api', {
-      name: 'US East API'
-    })
+**Use cases**: User-facing service identification, infrastructure monitoring, regional service tracking, team-specific services.
+</ResponseField>
 
-    const usWestService = new StatusPageService('us-west-api', {
-      name: 'US West API'
-    })
+## Examples
 
-    const europeService = new StatusPageService('europe-api', {
-      name: 'Europe API'
-    })
+<CodeGroup>
 
-    const asiaPacificService = new StatusPageService('asia-pacific-api', {
-      name: 'Asia Pacific API'
-    })
-    ```
-  </Tab>
-  
-  <Tab title="E-commerce Services">
-    ```ts
-    const productCatalog = new StatusPageService('product-catalog', {
-      name: 'Product Catalog'
-    })
+```ts API Services
+import { StatusPageService } from 'checkly/constructs'
 
-    const shoppingCart = new StatusPageService('shopping-cart', {
-      name: 'Shopping Cart'
-    })
+const restApi = new StatusPageService('rest-api', {
+  name: 'REST API'
+})
 
-    const checkout = new StatusPageService('checkout', {
-      name: 'Checkout Process'
-    })
+const graphqlApi = new StatusPageService('graphql-api', {
+  name: 'GraphQL API'
+})
 
-    const orderTracking = new StatusPageService('order-tracking', {
-      name: 'Order Tracking'
-    })
+const webhookApi = new StatusPageService('webhook-api', {
+  name: 'Webhook API'
+})
 
-    const inventory = new StatusPageService('inventory-management', {
-      name: 'Inventory Management'
-    })
-    ```
-  </Tab>
-</Tabs>
+const authApi = new StatusPageService('auth-api', {
+  name: 'Authentication API'
+})
+```
+
+```ts Infrastructure Services
+const database = new StatusPageService('primary-database', {
+  name: 'Primary Database'
+})
+
+const cache = new StatusPageService('redis-cache', {
+  name: 'Redis Cache'
+})
+
+const messageQueue = new StatusPageService('message-queue', {
+  name: 'Message Queue'
+})
+
+const fileStorage = new StatusPageService('file-storage', {
+  name: 'File Storage'
+})
+
+const cdn = new StatusPageService('cdn', {
+  name: 'Content Delivery Network'
+})
+```
+
+```ts User-Facing Services
+const webApplication = new StatusPageService('web-app', {
+  name: 'Web Application'
+})
+
+const mobileApp = new StatusPageService('mobile-app', {
+  name: 'Mobile Application'
+})
+
+const customerPortal = new StatusPageService('customer-portal', {
+  name: 'Customer Portal'
+})
+
+const adminDashboard = new StatusPageService('admin-dashboard', {
+  name: 'Admin Dashboard'
+})
+```
+
+```ts Third-Party Integrations
+const paymentProcessing = new StatusPageService('payment-processing', {
+  name: 'Payment Processing'
+})
+
+const emailDelivery = new StatusPageService('email-delivery', {
+  name: 'Email Delivery'
+})
+
+const smsNotifications = new StatusPageService('sms-notifications', {
+  name: 'SMS Notifications'
+})
+
+const socialLogin = new StatusPageService('social-login', {
+  name: 'Social Media Login'
+})
+```
+
+```ts Regional Services
+const usEastService = new StatusPageService('us-east-api', {
+  name: 'US East API'
+})
+
+const usWestService = new StatusPageService('us-west-api', {
+  name: 'US West API'
+})
+
+const europeService = new StatusPageService('europe-api', {
+  name: 'Europe API'
+})
+
+const asiaPacificService = new StatusPageService('asia-pacific-api', {
+  name: 'Asia Pacific API'
+})
+```
+
+```ts E-commerce Services
+const productCatalog = new StatusPageService('product-catalog', {
+  name: 'Product Catalog'
+})
+
+const shoppingCart = new StatusPageService('shopping-cart', {
+  name: 'Shopping Cart'
+})
+
+const checkout = new StatusPageService('checkout', {
+  name: 'Checkout Process'
+})
+
+const orderTracking = new StatusPageService('order-tracking', {
+  name: 'Order Tracking'
+})
+
+const inventory = new StatusPageService('inventory-management', {
+  name: 'Inventory Management'
+})
+```
+
+</CodeGroup>
 
 ## Organizing Services in Status Pages
 
 Services can be organized into logical groups using cards on status pages:
 
-<Tabs>
-  <Tab title="By Function">
-    ```ts
-    import { StatusPage, StatusPageService } from 'checkly/constructs'
+<CodeGroup>
 
-    // Define services
-    const webApp = new StatusPageService('web-app', {
-      name: 'Web Application'
-    })
+```ts By Function
+import { StatusPage, StatusPageService } from 'checkly/constructs'
 
-    const mobileApi = new StatusPageService('mobile-api', {
-      name: 'Mobile API'
-    })
+// Define services
+const webApp = new StatusPageService('web-app', {
+  name: 'Web Application'
+})
 
-    const database = new StatusPageService('database', {
-      name: 'Database'
-    })
+const mobileApi = new StatusPageService('mobile-api', {
+  name: 'Mobile API'
+})
 
-    const cache = new StatusPageService('cache', {
-      name: 'Cache Layer'
-    })
+const database = new StatusPageService('database', {
+  name: 'Database'
+})
 
-    // Organize by function
-    new StatusPage('functional-status', {
-      name: 'Service Status by Function',
-      url: 'functional-status',
-      cards: [
-        {
-          name: 'User-Facing Services',
-          services: [webApp, mobileApi]
-        },
-        {
-          name: 'Data Layer',
-          services: [database, cache]
-        }
-      ]
-    })
-    ```
-  </Tab>
-  
-  <Tab title="By Team">
-    ```ts
-    const frontendApp = new StatusPageService('frontend-app', {
-      name: 'Frontend Application'
-    })
+const cache = new StatusPageService('cache', {
+  name: 'Cache Layer'
+})
 
-    const backendApi = new StatusPageService('backend-api', {
-      name: 'Backend API'
-    })
+// Organize by function
+new StatusPage('functional-status', {
+  name: 'Service Status by Function',
+  url: 'functional-status',
+  cards: [
+    {
+      name: 'User-Facing Services',
+      services: [webApp, mobileApi]
+    },
+    {
+      name: 'Data Layer',
+      services: [database, cache]
+    }
+  ]
+})
+```
 
-    const paymentService = new StatusPageService('payment-service', {
-      name: 'Payment Service'
-    })
+```ts By Team
+const frontendApp = new StatusPageService('frontend-app', {
+  name: 'Frontend Application'
+})
 
-    const notificationService = new StatusPageService('notification-service', {
-      name: 'Notification Service'
-    })
+const backendApi = new StatusPageService('backend-api', {
+  name: 'Backend API'
+})
 
-    // Organize by team ownership
-    new StatusPage('team-status', {
-      name: 'Service Status by Team',
-      url: 'team-status',
-      cards: [
-        {
-          name: 'Frontend Team',
-          services: [frontendApp]
-        },
-        {
-          name: 'Backend Team',
-          services: [backendApi]
-        },
-        {
-          name: 'Platform Team',
-          services: [paymentService, notificationService]
-        }
-      ]
-    })
-    ```
-  </Tab>
-  
-  <Tab title="By Priority">
-    ```ts
-    const coreApi = new StatusPageService('core-api', {
-      name: 'Core API'
-    })
+const paymentService = new StatusPageService('payment-service', {
+  name: 'Payment Service'
+})
 
-    const authService = new StatusPageService('auth-service', {
-      name: 'Authentication'
-    })
+const notificationService = new StatusPageService('notification-service', {
+  name: 'Notification Service'
+})
 
-    const reportingService = new StatusPageService('reporting-service', {
-      name: 'Reporting Service'
-    })
+// Organize by team ownership
+new StatusPage('team-status', {
+  name: 'Service Status by Team',
+  url: 'team-status',
+  cards: [
+    {
+      name: 'Frontend Team',
+      services: [frontendApp]
+    },
+    {
+      name: 'Backend Team',
+      services: [backendApi]
+    },
+    {
+      name: 'Platform Team',
+      services: [paymentService, notificationService]
+    }
+  ]
+})
+```
 
-    const analyticsService = new StatusPageService('analytics-service', {
-      name: 'Analytics Service'
-    })
+```ts By Priority
+const coreApi = new StatusPageService('core-api', {
+  name: 'Core API'
+})
 
-    // Organize by business priority
-    new StatusPage('priority-status', {
-      name: 'Service Status by Priority',
-      url: 'priority-status',
-      cards: [
-        {
-          name: 'Critical Services',
-          services: [coreApi, authService]
-        },
-        {
-          name: 'Supporting Services',
-          services: [reportingService, analyticsService]
-        }
-      ]
-    })
-    ```
-  </Tab>
-</Tabs>
+const authService = new StatusPageService('auth-service', {
+  name: 'Authentication'
+})
+
+const reportingService = new StatusPageService('reporting-service', {
+  name: 'Reporting Service'
+})
+
+const analyticsService = new StatusPageService('analytics-service', {
+  name: 'Analytics Service'
+})
+
+// Organize by business priority
+new StatusPage('priority-status', {
+  name: 'Service Status by Priority',
+  url: 'priority-status',
+  cards: [
+    {
+      name: 'Critical Services',
+      services: [coreApi, authService]
+    },
+    {
+      name: 'Supporting Services',
+      services: [reportingService, analyticsService]
+    }
+  ]
+})
+```
+
+</CodeGroup>
 
 ## Service Reusability
 
@@ -365,73 +412,69 @@ new StatusPage('internal-status', {
 
 ## Naming Best Practices
 
-<Tabs>
-  <Tab title="Clear and Descriptive">
-    ```ts
-    // Good: Clear and specific
-    const userAuthenticationApi = new StatusPageService('user-auth-api', {
-      name: 'User Authentication API'
-    })
+<CodeGroup>
 
-    const orderProcessingService = new StatusPageService('order-processing', {
-      name: 'Order Processing Service'
-    })
+```ts Clear and Descriptive
+// Good: Clear and specific
+const userAuthenticationApi = new StatusPageService('user-auth-api', {
+  name: 'User Authentication API'
+})
 
-    // Avoid: Vague or technical
-    const service1 = new StatusPageService('svc-1', {
-      name: 'Service 1'
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Customer-Friendly Names">
-    ```ts
-    // Good: Customer understands the impact
-    const webApplication = new StatusPageService('web-app', {
-      name: 'Web Application'
-    })
+const orderProcessingService = new StatusPageService('order-processing', {
+  name: 'Order Processing Service'
+})
 
-    const mobileApp = new StatusPageService('mobile-app', {
-      name: 'Mobile App'
-    })
+// Avoid: Vague or technical
+const service1 = new StatusPageService('svc-1', {
+  name: 'Service 1'
+})
+```
 
-    const emailNotifications = new StatusPageService('email-notifications', {
-      name: 'Email Notifications'
-    })
+```ts Customer-Friendly Names
+// Good: Customer understands the impact
+const webApplication = new StatusPageService('web-app', {
+  name: 'Web Application'
+})
 
-    // Avoid: Technical jargon
-    const kubePods = new StatusPageService('k8s-pods', {
-      name: 'Kubernetes Pods'
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Consistent Naming">
-    ```ts
-    // Good: Consistent pattern
-    const usEastApi = new StatusPageService('us-east-api', {
-      name: 'US East API'
-    })
+const mobileApp = new StatusPageService('mobile-app', {
+  name: 'Mobile App'
+})
 
-    const usWestApi = new StatusPageService('us-west-api', {
-      name: 'US West API'
-    })
+const emailNotifications = new StatusPageService('email-notifications', {
+  name: 'Email Notifications'
+})
 
-    const europeApi = new StatusPageService('europe-api', {
-      name: 'Europe API'
-    })
+// Avoid: Technical jargon
+const kubePods = new StatusPageService('k8s-pods', {
+  name: 'Kubernetes Pods'
+})
+```
 
-    // Avoid: Inconsistent naming
-    const eastCoast = new StatusPageService('east-api', {
-      name: 'East Coast'
-    })
+```ts Consistent Naming
+// Good: Consistent pattern
+const usEastApi = new StatusPageService('us-east-api', {
+  name: 'US East API'
+})
 
-    const westRegion = new StatusPageService('west-region-api', {
-      name: 'Western Region API'
-    })
-    ```
-  </Tab>
-</Tabs>
+const usWestApi = new StatusPageService('us-west-api', {
+  name: 'US West API'
+})
+
+const europeApi = new StatusPageService('europe-api', {
+  name: 'Europe API'
+})
+
+// Avoid: Inconsistent naming
+const eastCoast = new StatusPageService('east-api', {
+  name: 'East Coast'
+})
+
+const westRegion = new StatusPageService('west-region-api', {
+  name: 'Western Region API'
+})
+```
+
+</CodeGroup>
 
 <Info>
 **Service Names**: Use clear, customer-friendly names that help users understand which part of your service might be affected.

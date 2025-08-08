@@ -6,40 +6,95 @@ sidebarTitle: 'checkly logout'
 
 The `checkly logout` command signs out of your current Checkly account and removes stored authentication tokens from your local machine.
 
+<Accordion title="Prerequisites">
+Before using `checkly logout`, ensure you have:
+
+- Currently authenticated with Checkly CLI (check with `npx checkly whoami`)
+- Access to the terminal/command line
+
+No internet connection is required as logout works locally.
+</Accordion>
+
 ## Usage
 
-Log out of your current Checkly account.
+The basic command logs out of your current Checkly account and removes stored authentication tokens.
 
 ```bash Terminal
 npx checkly logout
 ```
 
-## Extended Usage
+<Tabs>
+<Tab title="Common Options">
 
-The logout process displays confirmation of successful logout and token removal.
+| Option | Description | Type | Required |
+|--------|-------------|------|---------|
+| `--verbose, -v` | Show detailed logout process | boolean | No |
 
-```bash Terminal                
+</Tab>
+<Tab title="All Global Options">
+
+| Option | Description | Type | Required |
+|--------|-------------|------|---------|
+| `--config, -c` | Specify a configuration file | string | No |
+
+For detailed information about global options, see [global options](/cli/global-options).
+
+</Tab>
+</Tabs>
+
+## Common Options
+
+<ResponseField name="--verbose, -v" type="boolean">
+Show detailed information about the logout process for debugging or understanding what happens during logout.
+
+### Usage
+```bash Terminal
+npx checkly logout --verbose
+npx checkly logout -v
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Standard Logout">
+
+```bash Terminal
+# Standard logout
 npx checkly logout
+
+# Output
 ✓ Successfully logged out from user@company.com
 ✓ Authentication tokens removed
 ```
 
+</Tab>
+<Tab title="Verbose Logout">
+
+```bash Terminal
+# Verbose logout with details
+npx checkly logout --verbose
+
+# Output
+→ Invalidating session on Checkly servers...
+→ Removing authentication tokens from: ~/.config/checkly-cli/auth.json
+→ Clearing cached user information
+✓ Successfully logged out from user@company.com
+✓ Authentication tokens removed
+```
+
+</Tab>
+</Tabs>
+
+**Use cases**: Understanding the logout process, debugging authentication issues.
+</ResponseField>
+
+## What Happens During Logout
+
+### Session Invalidation
 The logout process will:
 1. **Invalidate your session** on Checkly servers
 2. **Remove local tokens** from your machine
 3. **Require re-authentication** for future CLI usage
-
-## Unique Options
-
-This command has no unique options - it performs a simple logout operation.
-
-## Global Options
-
-This command supports the following [global options](/cli/checkly-global-options):
-
-- [`--verbose`](/cli/checkly-global-options#verbose-or-v) - Show detailed logout process
-
-## What Happens During Logout
 
 ### Token Removal
 The command removes authentication tokens stored locally in:
@@ -47,9 +102,6 @@ The command removes authentication tokens stored locally in:
 - **macOS**: `~/Library/Application Support/checkly-cli/`
 - **Linux**: `~/.config/checkly-cli/`
 - **Windows**: `%APPDATA%\checkly-cli\`
-
-### Session Invalidation
-Your active session is invalidated on Checkly servers, requiring fresh authentication for any future CLI usage.
 
 ## After Logout
 

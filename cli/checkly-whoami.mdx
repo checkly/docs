@@ -6,24 +6,63 @@ sidebarTitle: 'checkly whoami'
 
 The `checkly whoami` command displays detailed information about your current Checkly authentication, including the logged-in user account and active Checkly account details.
 
+<Accordion title="Prerequisites">
+Before using `checkly whoami`, ensure you have:
+
+- Checkly CLI installed
+- Previous authentication attempt (successful or failed)
+
+This command can be run without authentication to check your current status.
+</Accordion>
+
 ## Usage
 
-Show current authentication status and account information.
+The basic command shows current authentication status and account information.
 
 ```bash Terminal
 npx checkly whoami
 ```
 
-## Extended Usage
 
-View detailed authentication and account information including user details, subscription plan, and CLI version.
+<Tabs>
+<Tab title="Common Options">
 
+| Option | Description | Type | Required |
+|--------|-------------|------|----------|
+| `--verbose, -v` | Show additional account details | boolean | No |
+
+</Tab>
+<Tab title="All Global Options">
+
+| Option | Description | Type | Required |
+|--------|-------------|------|----------|
+| `--config, -c` | Specify a configuration file | string | No |
+
+For detailed information about global options, see [global options](/cli/global-options).
+
+</Tab>
+</Tabs>
+
+
+## Options
+<ResponseField name="--verbose, -v" type="boolean">
+Show additional account details including user role, configuration file location, token expiry, and account usage limits.
+
+### Usage
 ```bash Terminal
-npx checkly whoami
+npx checkly whoami --verbose
 ```
 
-Example output:
+### Examples
+
+<Tabs>
+<Tab title="Standard">
+
 ```bash Terminal
+# Standard command
+npx checkly whoami
+
+# Output
 ✓ Logged in as: john.doe@company.com
 ✓ Active account: Acme Corp (550e8400-e29b-41d4-a716-446655440000)
 ✓ Account plan: Team
@@ -31,38 +70,39 @@ Example output:
 ✓ CLI version: 4.15.0
 ```
 
-## Unique Options
+</Tab>
+<Tab title="Verbose">
 
-This command has no unique options - it displays authentication information only.
+```bash Terminal
+# Verbose command
+npx checkly whoami --verbose
 
-## Global Options
+# Output
+✓ Logged in as: john.doe@company.com
+✓ Active account: Acme Corp (550e8400-e29b-41d4-a716-446655440000)  
+✓ Account plan: Team
+✓ Account region: US East
+✓ User role: Admin
+✓ CLI version: 4.15.0
+✓ Config file: /Users/john/.checkly/config.json
+✓ Last login: 2024-01-15T10:30:45Z
+✓ Token expires: 2024-01-22T10:30:45Z
+✓ Account limits:
+  • Checks: 50/100 used
+  • Alert channels: 5/10 used  
+  • Private locations: 2/3 used
+```
 
-This command supports the following [global options](/cli/checkly-global-options):
+</Tab>
+</Tabs>
+</ResponseField>
 
-- [`--verbose`](/cli/checkly-global-options#verbose-or-v) - Show additional account details
+## Troubleshooting
 
-## Information Displayed
 
-### User Details
-- **Email address** of the logged-in user
-- **User role** within the active account
-- **Authentication status** and token validity
-
-### Account Details
-- **Account name** and unique identifier
-- **Subscription plan** (Free, Developer, Team, Enterprise)
-- **Account region** for data storage and processing
-- **Account limits** and usage information (with `--verbose`)
-
-### CLI Information
-- **CLI version** currently installed
-- **Configuration file** location (with `--verbose`)
-- **Last authentication** timestamp (with `--verbose`)
-
-## Authentication Status
-
-### Successfully Authenticated
-When properly logged in, you'll see complete account information with checkmarks (✓).
+<Note>
+If you have access to multiple Checkly accounts, `whoami` shows the currently active account. Use [`checkly switch`](/cli/checkly-switch) to change accounts if needed.
+</Note>
 
 ### Not Authenticated
 If not logged in, you'll see:
@@ -79,12 +119,6 @@ For expired authentication:
 ⚠️ Authentication token expired
 Please run 'npx checkly login' to re-authenticate
 ```
-
-## Related Commands
-
-- [`checkly login`](/cli/checkly-login) - Authenticate with Checkly
-- [`checkly logout`](/cli/checkly-logout) - Sign out of current account
-- [`checkly switch`](/cli/checkly-switch) - Switch between accounts
 
 ## Use Cases
 
@@ -114,7 +148,7 @@ npx checkly whoami --verbose
 ### CI/CD Verification
 Validate service account authentication in pipelines:
 
-```bash Terminal            
+```bash Terminal
 # Verify CI authentication
 npx checkly whoami
 
@@ -122,6 +156,8 @@ npx checkly whoami
 npx checkly deploy --force
 ```
 
-## Multiple Accounts
+## Related Commands
 
-If you have access to multiple Checkly accounts, `whoami` shows the currently active account. Use [`checkly switch`](/cli/checkly-switch) to change accounts if needed.
+- [`checkly login`](/cli/checkly-login) - Authenticate with Checkly
+- [`checkly logout`](/cli/checkly-logout) - Sign out of current account
+- [`checkly switch`](/cli/checkly-switch) - Switch between accounts

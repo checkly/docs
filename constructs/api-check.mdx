@@ -18,56 +18,36 @@ Learn more about API checks in the [API Checks overview](/docs/detect/synthetic-
 import { ApiCheck, AssertionBuilder } from 'checkly/constructs'
 
 new ApiCheck('hello-api-1', {
-  name: 'Hello API',
-  activated: true,
+  name: 'Hello API check',
   request: {
     method: 'GET',
-    url: 'https://httpbin.org/get',
-    assertions: [
-      AssertionBuilder.statusCode().equals(200),
-    ]
+    url: 'https://api.checklyhq.com/hello'
   }
 })
 ```
 
 ```ts Advanced Example
-import { ApiCheck, AssertionBuilder } from 'checkly/constructs'
-import * as path from 'path'
+import { ApiCheck, AssertionBuilder, Frequency } from 'checkly/constructs'
 
-new ApiCheck('hello-api-1', {
-  name: 'Hello API',
+new ApiCheck('advanced-api-check', {
+  name: 'Advanced API Check',
   activated: true,
-  setupScript: {
-    entrypoint: path.join(__dirname, 'setup.ts')
-  },
-  tearDownScript: {
-    entrypoint: path.join(__dirname, 'teardown.ts')
-  },
+  frequency: Frequency.EVERY_5M,
+  locations: ['us-east-1', 'eu-west-1'],
+  tags: ['api', 'critical'],
   maxResponseTime: 10000,
   degradedResponseTime: 5000,
   request: {
     method: 'POST',
-    url: 'https://httpbin.org/post',
-    body: JSON.stringify({
-      name: 'checkly'
-    }),
-    skipSSL: false,
-    followRedirects: true,
+    url: 'https://api.example.com/users',
     headers: [
-      {
-        key: 'X-My-Header',
-        value: 'My custom header value'
-      }
+      { key: 'Content-Type', value: 'application/json' },
+      { key: 'Authorization', value: 'Bearer {{API_TOKEN}}' }
     ],
-    queryParameters: [
-      {
-        key: 'myParam',
-        value: 'true'
-      }
-    ],
+    body: JSON.stringify({ name: 'Test User' }),
     assertions: [
-      AssertionBuilder.statusCode().equals(200),
-      AssertionBuilder.jsonBody('$.name').notEmpty(),
+      AssertionBuilder.statusCode().equals(201),
+      AssertionBuilder.jsonBody('$.id').exists(),
       AssertionBuilder.headers('strict-transport-security', 'max-age=(\\d+)').greaterThan(10000),
     ]
   }
@@ -76,12 +56,10 @@ new ApiCheck('hello-api-1', {
 
 </CodeGroup>
 
-## `ApiCheck` Configuration
+## Options
 
 <Tabs>
-  <Tab title="Unique Configuration">
-
-Configure performance thresholds and scripts for your API checks:
+<Tab title="Unique Options">
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
@@ -93,35 +71,49 @@ Configure performance thresholds and scripts for your API checks:
 | `tearDownScript` | `object` | ❌ | - | Script to run after the API check execution |
 
 </Tab>
-
-<Tab title="Shared Configuration">
-Configure common properties that apply to all check types:
+<Tab title="Common Options">
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `name` | `string` | ✅ | - | Friendly name for your check |
 | `frequency` | `Frequency` | ❌ | - | How often to run your check |
 | `locations` | `string[]` | ❌ | `[]` | Array of public location codes |
-| `privateLocations` | `string[]` | ❌ | `[]` | Array of Private Location slugs |
 | `activated` | `boolean` | ❌ | `true` | Whether the check is enabled |
+| `tags` | `string[]` | ❌ | `[]` | Array of tags to organize checks |
+| `environmentVariables` | `object[]` | ❌ | `[]` | Check-level environment variables |
+
+</Tab>
+<Tab title="Global Options">
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `privateLocations` | `string[]` | ❌ | `[]` | Array of Private Location slugs |
 | `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
 | `group` | `CheckGroup` | ❌ | - | The CheckGroup this check belongs to |
 | `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Array of AlertChannel objects for notifications |
-| `tags` | `string[]` | ❌ | `[]` | Array of tags to organize checks |
 | `runtimeId` | `string` | ❌ | - | The ID of the runtime to use |
 | `testOnly` | `boolean` | ❌ | `false` | Only run with test, not during deploy |
 | `retryStrategy` | `RetryStrategy` | ❌ | - | Strategy for configuring retries |
 | `runParallel` | `boolean` | ❌ | `false` | Run checks in parallel or round-robin |
 | `alertEscalationPolicy` | `AlertEscalationPolicy` | ❌ | - | Advanced alert settings |
-| `environmentVariables` | `object[]` | ❌ | `[]` | Check-level environment variables |
 
 </Tab>
 </Tabs>
 
-## `request` Configuration
+## Unique Options
 
-The `request` object is a mandatory part of an API check and defines the HTTP request parameters:
+<ResponseField name="request" type="object" required>
+The HTTP request configuration that defines the API endpoint to monitor. This is the core component of any API check.
 
+### Usage
+```ts
+request: {
+  method: 'GET',
+  url: 'https://api.example.com/users'
+}
+```
+
+### Parameters
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `url` | `string` | ✅ | - | The target URL for the HTTP request |
@@ -139,97 +131,233 @@ The `request` object is a mandatory part of an API check and defines the HTTP re
 The `bodyType` property is primarily for UI rendering and is not required when using the CLI.
 </Info>
 
-## `assertions` Configuration
+### Examples
 
-You can define assertions using the `AssertionBuilder` to validate status codes, response bodies, headers, and response times:
+<CodeGroup>
 
-<Tabs>
-  <Tab title="Status Code">
-    ```ts
-    // Assert HTTP status code equals 200
-    AssertionBuilder.statusCode().equals(200)
-    ```
-    
-    Renders to:
-    ```json
-    { 
-      "source": "STATUS_CODE", 
-      "regex": "", 
-      "property": "", 
-      "comparison": "EQUALS", 
-      "target": "200" 
-    }
-    ```
-  </Tab>
-  
-  <Tab title="JSON Response">
-    ```ts
-    // Assert JSON response body using JSON path
-    AssertionBuilder.jsonBody('$.data').greaterThan(2000)
-    ```
-    
-    Renders to:
-    ```json
-    { 
-      "source": "JSON_BODY", 
-      "regex": "", 
-      "property": "$.data", 
-      "comparison": "GREATER_THAN", 
-      "target": "2000" 
-    }
-    ```
-  </Tab>
+```ts REST API
+request: {
+  method: 'GET',
+  url: 'https://api.example.com/users',
+  headers: [
+    { key: 'Authorization', value: 'Bearer {{API_TOKEN}}' },
+    { key: 'Content-Type', value: 'application/json' }
+  ],
+  assertions: [
+    AssertionBuilder.statusCode().equals(200),
+    AssertionBuilder.jsonBody('$.users').isArray(),
+    AssertionBuilder.responseTime().lessThan(1000)
+  ]
+}
+```
 
-  <Tab title="Response Headers">
-    ```ts
-    // Assert response header with regex extraction
-    AssertionBuilder.headers('strict-transport-security', 'max-age=(\\d+)').greaterThan(10000)
-    ```
-    
-    Renders to:
-    ```json
-    { 
-      "source": "HEADERS", 
-      "regex": "max-age=(\\d+)", 
-      "property": "strict-transport-security", 
-      "comparison": "GREATER_THAN", 
-      "target": "10000" 
-    }
-    ```
-  </Tab>
+```ts GraphQL API
+request: {
+  method: 'POST',
+  url: 'https://api.example.com/graphql',
+  headers: [
+    { key: 'Content-Type', value: 'application/json' }
+  ],
+  body: JSON.stringify({
+    query: `
+      query GetUser($id: ID!) {
+        user(id: $id) {
+          id
+          name
+          email
+        }
+      }
+    `,
+    variables: { id: "1" }
+  }),
+  assertions: [
+    AssertionBuilder.statusCode().equals(200),
+    AssertionBuilder.jsonBody('$.data.user.id').equals('1'),
+    AssertionBuilder.jsonBody('$.errors').isEmpty()
+  ]
+}
+```
 
-  <Tab title="Response Time">
-    ```ts
-    // Assert total response time
-    AssertionBuilder.responseTime().lessThan(500)
-    ```
-    
-    Renders to:
-    ```json
-    { 
-      "source": "RESPONSE_TIME", 
-      "regex": "", 
-      "property": "", 
-      "comparison": "LESS_THAN", 
-      "target": "500" 
-    }
-    ```
-  </Tab>
-</Tabs>
+```ts Form POST
+request: {
+  method: 'POST',
+  url: 'https://httpbin.org/post',
+  headers: [
+    { key: 'Content-Type', value: 'application/x-www-form-urlencoded' }
+  ],
+  body: 'name=John+Doe&email=john%40example.com',
+  assertions: [
+    AssertionBuilder.statusCode().equals(200),
+    AssertionBuilder.jsonBody('$.form.name').equals('John Doe')
+  ]
+}
+```
 
-## `setupScript` Configuration
+```ts API with Authentication
+request: {
+  method: 'GET',
+  url: 'https://api.example.com/protected-resource',
+  basicAuth: {
+    username: 'admin',
+    password: '{{SECRET_PASSWORD}}'
+  },
+  assertions: [
+    AssertionBuilder.statusCode().equals(200),
+    AssertionBuilder.headers('x-rate-limit-remaining').greaterThan(0)
+  ]
+}
+```
 
-You can define setup scripts that run before your API check using either file references or inline content:
+</CodeGroup>
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `entrypoint` | `string` | ❌ | Path to a `.js` or `.ts` file containing the setup script |
-| `content` | `string` | ❌ | Inline JavaScript/TypeScript code as a string |
+**Use cases**: HTTP endpoint monitoring, REST API testing, GraphQL API validation, authentication testing.
+</ResponseField>
 
-<Info>
-You must provide either `entrypoint` or `content`, but not both.
-</Info>
+<ResponseField name="maxResponseTime" type="number">
+Maximum response time in milliseconds before marking the check as failed. This sets the absolute threshold for check failure based on response time.
 
+### Usage
+```ts
+new ApiCheck('timeout-check', {
+  name: 'API Timeout Check',
+  maxResponseTime: 5000, // Fail if response takes longer than 5 seconds
+  request: {
+    url: 'https://api.example.com/slow-endpoint'
+  }
+})
+```
+
+### Examples
+
+<CodeGroup>
+
+```ts Fast API
+new ApiCheck('fast-api-check', {
+  name: 'Fast API Endpoint',
+  maxResponseTime: 1000, // 1 second threshold
+  request: {
+    url: 'https://api.example.com/health'
+  }
+})
+```
+
+```ts Slow API
+new ApiCheck('slow-api-check', {
+  name: 'Data Processing API',
+  maxResponseTime: 30000, // 30 second threshold for heavy operations
+  request: {
+    url: 'https://api.example.com/process-data'
+  }
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Performance monitoring, SLA compliance, timeout management.
+</ResponseField>
+
+<ResponseField name="degradedResponseTime" type="number">
+Response time threshold in milliseconds for marking the check as degraded. This provides an early warning before the check fails completely.
+
+### Usage
+```ts
+new ApiCheck('performance-check', {
+  name: 'Performance Monitoring',
+  degradedResponseTime: 2000, // Warning at 2 seconds
+  maxResponseTime: 5000, // Failure at 5 seconds
+  request: {
+    url: 'https://api.example.com/users'
+  }
+})
+```
+
+### Examples
+
+<CodeGroup>
+
+```ts Performance Tiers
+new ApiCheck('tiered-performance', {
+  name: 'Tiered Performance Check',
+  degradedResponseTime: 1500, // Warning threshold
+  maxResponseTime: 3000, // Failure threshold
+  request: {
+    url: 'https://api.example.com/search'
+  }
+})
+```
+
+```ts Critical Path
+new ApiCheck('critical-path-check', {
+  name: 'Critical User Path',
+  degradedResponseTime: 500, // Very strict degraded threshold
+  maxResponseTime: 1000, // Strict failure threshold
+  request: {
+    url: 'https://api.example.com/checkout'
+  }
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Performance alerting, SLA monitoring, gradual degradation detection.
+</ResponseField>
+
+<ResponseField name="shouldFail" type="boolean">
+Whether a failure should count as a pass. When set to `true`, HTTP status codes 400 and above are reported as passed instead of failed.
+
+### Usage
+```ts
+new ApiCheck('negative-test', {
+  name: 'Test Error Handling',
+  shouldFail: true, // Expect this to fail
+  request: {
+    url: 'https://api.example.com/invalid-endpoint'
+  }
+})
+```
+
+### Examples
+
+<CodeGroup>
+
+```ts Error Testing
+new ApiCheck('error-handling-test', {
+  name: 'Error Handling Test',
+  shouldFail: true, // We expect 4xx/5xx responses
+  request: {
+    method: 'POST',
+    url: 'https://api.example.com/protected',
+    // No auth headers - should return 401
+    assertions: [
+      AssertionBuilder.statusCode().equals(401)
+    ]
+  }
+})
+```
+
+```ts Rate Limit Testing
+new ApiCheck('rate-limit-test', {
+  name: 'Rate Limit Behavior',
+  shouldFail: true, // Expecting 429 Too Many Requests
+  request: {
+    url: 'https://api.example.com/rate-limited-endpoint',
+    assertions: [
+      AssertionBuilder.statusCode().equals(429),
+      AssertionBuilder.headers('retry-after').exists()
+    ]
+  }
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Negative testing, error handling validation, security testing.
+</ResponseField>
+
+<ResponseField name="setupScript" type="object">
+Script to run before the API check execution. Useful for setting up test data or authentication tokens.
+
+### Usage
 ```ts
 // Using file reference
 setupScript: {
@@ -245,19 +373,60 @@ setupScript: {
 }
 ```
 
-## `tearDownScript` Configuration
-
-You can define teardown scripts that run after your API check using either file references or inline content:
-
+### Parameters
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `entrypoint` | `string` | ❌ | Path to a `.js` or `.ts` file containing the teardown script |
+| `entrypoint` | `string` | ❌ | Path to a `.js` or `.ts` file containing the setup script |
 | `content` | `string` | ❌ | Inline JavaScript/TypeScript code as a string |
 
 <Info>
 You must provide either `entrypoint` or `content`, but not both.
 </Info>
 
+### Examples
+
+<CodeGroup>
+
+```ts File Reference
+new ApiCheck('api-with-setup', {
+  name: 'API with Setup Script',
+  setupScript: {
+    entrypoint: path.join(__dirname, 'scripts/api-setup.ts')
+  },
+  request: {
+    url: 'https://api.example.com/users'
+  }
+})
+```
+
+```ts Inline Script
+new ApiCheck('inline-setup', {
+  name: 'API with Inline Setup',
+  setupScript: {
+    content: `
+      // Generate test data
+      const testUser = {
+        name: 'Test User',
+        email: 'test@example.com'
+      };
+      console.log('Test user created:', testUser);
+    `
+  },
+  request: {
+    url: 'https://api.example.com/users'
+  }
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Test data setup, authentication preparation, environment configuration.
+</ResponseField>
+
+<ResponseField name="tearDownScript" type="object">
+Script to run after the API check execution. Useful for cleaning up test data or resources.
+
+### Usage
 ```ts
 // Using file reference
 tearDownScript: {
@@ -273,104 +442,145 @@ tearDownScript: {
 }
 ```
 
-## API Check Examples
+### Parameters
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `entrypoint` | `string` | ❌ | Path to a `.js` or `.ts` file containing the teardown script |
+| `content` | `string` | ❌ | Inline JavaScript/TypeScript code as a string |
 
-<Tabs>
-  <Tab title="REST API">
-    ```ts
-    new ApiCheck('users-api-check', {
-      name: 'Users API Check',
-      maxResponseTime: 5000,
-      degradedResponseTime: 2000,
-      request: {
-        method: 'GET',
-        url: 'https://api.example.com/users',
-        headers: [
-          { key: 'Authorization', value: 'Bearer {{API_TOKEN}}' },
-          { key: 'Content-Type', value: 'application/json' }
-        ],
-        assertions: [
-          AssertionBuilder.statusCode().equals(200),
-          AssertionBuilder.jsonBody('$.users').isArray(),
-          AssertionBuilder.responseTime().lessThan(1000)
-        ]
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="GraphQL API">
-    ```ts
-    new ApiCheck('graphql-api-check', {
-      name: 'GraphQL API Check',
-      request: {
-        method: 'POST',
-        url: 'https://api.example.com/graphql',
-        headers: [
-          { key: 'Content-Type', value: 'application/json' }
-        ],
-        body: JSON.stringify({
-          query: `
-            query GetUser($id: ID!) {
-              user(id: $id) {
-                id
-                name
-                email
-              }
-            }
-          `,
-          variables: { id: "1" }
-        }),
-        assertions: [
-          AssertionBuilder.statusCode().equals(200),
-          AssertionBuilder.jsonBody('$.data.user.id').equals('1'),
-          AssertionBuilder.jsonBody('$.errors').isEmpty()
-        ]
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Form POST">
-    ```ts
-    new ApiCheck('form-api-check', {
-      name: 'Form Submission Check',
-      request: {
-        method: 'POST',
-        url: 'https://httpbin.org/post',
-        headers: [
-          { key: 'Content-Type', value: 'application/x-www-form-urlencoded' }
-        ],
-        body: 'name=John+Doe&email=john%40example.com',
-        assertions: [
-          AssertionBuilder.statusCode().equals(200),
-          AssertionBuilder.jsonBody('$.form.name').equals('John Doe')
-        ]
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="API with Authentication">
-    ```ts
-    new ApiCheck('protected-api-check', {
-      name: 'Protected API Check',
-      request: {
-        method: 'GET',
-        url: 'https://api.example.com/protected-resource',
-        basicAuth: {
-          username: 'admin',
-          password: '{{SECRET_PASSWORD}}'
-        },
-        assertions: [
-          AssertionBuilder.statusCode().equals(200),
-          AssertionBuilder.headers('x-rate-limit-remaining').greaterThan(0)
-        ]
-      }
-    })
-    ```
-  </Tab>
-</Tabs>
+<Info>
+You must provide either `entrypoint` or `content`, but not both.
+</Info>
+
+### Examples
+
+<CodeGroup>
+
+```ts File Reference
+new ApiCheck('api-with-teardown', {
+  name: 'API with Teardown Script',
+  tearDownScript: {
+    entrypoint: path.join(__dirname, 'scripts/api-teardown.ts')
+  },
+  request: {
+    url: 'https://api.example.com/users'
+  }
+})
+```
+
+```ts Inline Script
+new ApiCheck('inline-teardown', {
+  name: 'API with Inline Teardown',
+  tearDownScript: {
+    content: `
+      // Clean up test data
+      console.log('Cleaning up test resources');
+      // Cleanup logic here
+    `
+  },
+  request: {
+    url: 'https://api.example.com/users'
+  }
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Test data cleanup, resource cleanup, logging and reporting.
+</ResponseField>
+
+## Examples
+
+<CodeGroup>
+
+```ts REST API Check
+new ApiCheck('users-api-check', {
+  name: 'Users API Check',
+  maxResponseTime: 5000,
+  degradedResponseTime: 2000,
+  request: {
+    method: 'GET',
+    url: 'https://api.example.com/users',
+    headers: [
+      { key: 'Authorization', value: 'Bearer {{API_TOKEN}}' },
+      { key: 'Content-Type', value: 'application/json' }
+    ],
+    assertions: [
+      AssertionBuilder.statusCode().equals(200),
+      AssertionBuilder.jsonBody('$.users').isArray(),
+      AssertionBuilder.responseTime().lessThan(1000)
+    ]
+  }
+})
+```
+
+```ts GraphQL API Check
+new ApiCheck('graphql-api-check', {
+  name: 'GraphQL API Check',
+  request: {
+    method: 'POST',
+    url: 'https://api.example.com/graphql',
+    headers: [
+      { key: 'Content-Type', value: 'application/json' }
+    ],
+    body: JSON.stringify({
+      query: `
+        query GetUser($id: ID!) {
+          user(id: $id) {
+            id
+            name
+            email
+          }
+        }
+      `,
+      variables: { id: "1" }
+    }),
+    assertions: [
+      AssertionBuilder.statusCode().equals(200),
+      AssertionBuilder.jsonBody('$.data.user.id').equals('1'),
+      AssertionBuilder.jsonBody('$.errors').isEmpty()
+    ]
+  }
+})
+```
+
+```ts Form Submission Check
+new ApiCheck('form-api-check', {
+  name: 'Form Submission Check',
+  request: {
+    method: 'POST',
+    url: 'https://httpbin.org/post',
+    headers: [
+      { key: 'Content-Type', value: 'application/x-www-form-urlencoded' }
+    ],
+    body: 'name=John+Doe&email=john%40example.com',
+    assertions: [
+      AssertionBuilder.statusCode().equals(200),
+      AssertionBuilder.jsonBody('$.form.name').equals('John Doe')
+    ]
+  }
+})
+```
+
+```ts Authenticated API Check
+new ApiCheck('protected-api-check', {
+  name: 'Protected API Check',
+  request: {
+    method: 'GET',
+    url: 'https://api.example.com/protected-resource',
+    basicAuth: {
+      username: 'admin',
+      password: '{{SECRET_PASSWORD}}'
+    },
+    assertions: [
+      AssertionBuilder.statusCode().equals(200),
+      AssertionBuilder.headers('x-rate-limit-remaining').greaterThan(0)
+    ]
+  }
+})
+```
+
+</CodeGroup>
 
 <Warning>
 When using environment variables in your requests (like `{{API_TOKEN}}`), make sure they are properly configured in your project or check group settings.

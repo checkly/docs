@@ -6,7 +6,7 @@ sidebarTitle: 'Overview'
 
 Constructs are TypeScript classes that represent your monitoring resources. Import them from `checkly/constructs` to create checks, alert channels, and other resources in code.
 
-```ts
+```ts api-check.ts
 import { ApiCheck, EmailAlertChannel } from 'checkly/constructs'
 
 new ApiCheck('api-health-check', {
@@ -27,7 +27,7 @@ Every construct requires a unique `logicalId` as its first parameter. This ID tr
 - Changing an ID creates a new resource and removes the old one
 - IDs can be any string up to 255 characters
 
-```ts
+```ts api-check.ts
 // Good: descriptive, unique IDs
 new ApiCheck('homepage-api-check', { /* ... */ })
 new ApiCheck('user-auth-check', { /* ... */ })
@@ -59,7 +59,7 @@ new ApiCheck('check-1', { /* ... */ }) // ❌ Duplicate ID
 
 Constructs are just TypeScript classes, so you can use standard programming patterns:
 
-```ts
+```ts api-check.ts  
 // Use loops to create multiple checks
 const endpoints = ['/api/users', '/api/orders', '/api/products']
 endpoints.forEach(endpoint => 

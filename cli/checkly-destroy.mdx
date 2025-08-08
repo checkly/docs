@@ -6,38 +6,132 @@ sidebarTitle: 'checkly destroy'
 
 The `checkly destroy` command removes all resources associated with your project from your Checkly account, including checks, check groups, alert channels, maintenance windows, and other project-defined resources.
 
+<Accordion title="Prerequisites">
+Before using `checkly destroy`, ensure you have:
+
+- A Checkly CLI project initialized with `npx checkly init`
+- Valid Checkly account authentication (run `npx checkly login` if needed)
+- Understanding of which resources will be deleted (see "What Gets Destroyed" section)
+
+<Warning>
+**Destructive Operation**: This command permanently deletes resources from your Checkly account. This action cannot be undone.
+</Warning>
+</Accordion>
+
 ## Usage
 
-Destroy all project resources with confirmation prompt.
+The basic command destroys all project resources with a confirmation prompt.
 
 ```bash Terminal
-npx checkly destroy
+npx checkly destroy [options]
 ```
 
-## Extended Usage
+<Tabs>
+<Tab title="Common Options">
 
-Destroy all project resources without confirmation (useful for CI/CD).
+| Option | Description | Type | Required |
+|--------|-------------|------|----------|
+| `--config, -c` | Specify a configuration file | string | No |
+| `--force, -f` | Skip confirmation dialogs | boolean | No |
 
+</Tab>
+<Tab title="All Global Options">
+
+| Option | Description | Type | Required |
+|--------|-------------|------|----------|
+| `--env, -e` | Pass environment variables | string | No |
+| `--env-file` | Load variables from file | string | No |
+| `--verbose, -v` | Show detailed output | boolean | No |
+
+For detailed information about global options, see [global options](/cli/global-options).
+
+</Tab>
+</Tabs>
+
+## Common Options
+
+<ResponseField name="--config, -c" type="string">
+Specify a particular configuration file to use instead of the default `checkly.config.ts` or `checkly.config.js`.
+
+### Usage
+```bash Terminal
+npx checkly destroy --config <file-path>
+npx checkly destroy -c <file-path>
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Staging Environment">
+
+```bash Terminal
+# Destroy staging resources
+npx checkly destroy --config ./checkly.staging.config.ts
+
+# Output
+⚠️  This will destroy all resources from staging project.
+Are you sure you want to continue? (y/N)
+```
+
+</Tab>
+<Tab title="Production Environment">
+
+```bash Terminal
+# Destroy production resources (be very careful!)
+npx checkly destroy --config ./checkly.production.config.ts
+
+# Output
+⚠️  This will destroy all resources from production project.
+Are you sure you want to continue? (y/N)
+```
+
+</Tab>
+</Tabs>
+
+**Default**: Looks for `checkly.config.ts` or `checkly.config.js` in the current directory.
+</ResponseField>
+
+<ResponseField name="--force, -f" type="boolean">
+Skip confirmation dialogs and proceed with the operation automatically. Especially useful in CI/CD environments.
+
+### Usage
 ```bash Terminal
 npx checkly destroy --force
+npx checkly destroy -f
 ```
 
-Destroy resources defined in a specific configuration file.
+### Examples
+
+<Tabs>
+<Tab title="CI/CD Pipeline">
 
 ```bash Terminal
-npx checkly destroy --config="./checkly.staging.config.ts"
+# Automated destruction in pipeline
+npx checkly destroy --force
+
+# Output
+Destroying resources without confirmation...
+✓ 12 checks destroyed
+✓ 3 alert channels destroyed
+✓ 2 check groups destroyed
 ```
 
-## Unique Options
+</Tab>
+<Tab title="With Config File">
 
-This command has no unique options - it uses only [global options](/cli-reference/global-options).
+```bash Terminal
+# Force destroy staging environment
+npx checkly destroy --force --config ./checkly.staging.config.ts
 
-## Global Options
+# Destroy with verbose output
+npx checkly destroy -f --verbose
+```
 
-This command supports the following [global options](/cli-reference/global-options):
+</Tab>
+</Tabs>
 
-- [`--config`](/cli-reference/global-options#config-or-c) - Specify a configuration file
-- [`--force`](/cli-reference/global-options#force-or-f) - Skip confirmation dialogs
+**Warning**: Use with extreme caution as this bypasses safety prompts.
+</ResponseField>
 
 ## What Gets Destroyed
 
@@ -50,12 +144,6 @@ The destroy command removes the following resources that were created by your pr
 - **Environment Variables** at the project level
 - **Private Locations** (if managed by the project)
 - **Snippets** and reusable code blocks
-
-## Important Warnings
-
-<Warning>
-**Destructive Operation**: This command permanently deletes resources from your Checkly account. This action cannot be undone.
-</Warning>
 
 <Warning>
 **Shared Resources**: Be careful with shared resources like alert channels that might be used by other projects or manually created checks.
@@ -71,20 +159,37 @@ By default, the command prompts for confirmation:
 Are you sure you want to continue? (y/N)
 ```
 
-### CI/CD Usage
-For automated environments, use `--force` to skip confirmation:
-
-```bash Terminal        
-npx checkly destroy --force
-```
-
 ### Backup Recommendation
 Before destroying, consider:
 1. **Exporting configuration** to preserve setup
 2. **Documenting dependencies** on shared resources
 3. **Checking team coordination** to avoid conflicts
 
+## Use Cases
+
+### Clean Up Test Environment
+Remove all test resources after development:
+
+```bash Terminal
+npx checkly destroy --config ./checkly.test.config.ts
+```
+
+### CI/CD Pipeline Cleanup
+Automated cleanup in deployment pipelines:
+
+```bash Terminal
+npx checkly destroy --force --config ./checkly.preview.config.ts
+```
+
+### Project Migration
+Remove old resources when migrating to new setup:
+
+```bash Terminal
+# Backup first, then destroy
+npx checkly destroy --verbose
+```
+
 ## Related Commands
 
-- [`checkly deploy`](/cli-reference/checkly-deploy) - Deploy resources to Checkly
-- [`checkly test`](/cli-reference/checkly-test) - Test your setup before deployment
+- [`checkly deploy`](/cli/checkly-deploy) - Deploy resources to Checkly
+- [`checkly test`](/cli/checkly-test) - Test your setup before deployment

@@ -62,12 +62,7 @@ const group = new CheckGroupV2('comprehensive-group', {
 
 </CodeGroup>
 
-## `CheckGroupV2` Configuration
-
-<Tabs>
-  <Tab title="Unique Configuration">
-
-Configure group-specific settings:
+## Options
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
@@ -90,26 +85,199 @@ Configure group-specific settings:
 | `runParallel` | `boolean` | ❌ | - | Whether to run checks in parallel across locations |
 | `alertEscalationPolicy` | `AlertEscalationPolicy` | ❌ | - | Alert escalation policy for all checks in the group |
 
-</Tab>
-</Tabs>
+## Group Options
 
-## `browserChecks` Configuration
+<ResponseField name="name" type="string" required>
+Friendly name for your check group that will be displayed in the Checkly dashboard and used for organization.
 
-Configure browser-specific settings for checks automatically added via `testMatch`:
+### Usage
+```ts
+const group = new CheckGroupV2('my-group', {
+  name: 'API Monitoring Group'
+})
+```
 
+### Examples
+```ts
+// Service-based naming
+const apiGroup = new CheckGroupV2('api-group', {
+  name: 'API Endpoints Group'
+})
+
+// Environment-based naming
+const prodGroup = new CheckGroupV2('prod-group', {
+  name: 'Production Monitoring'
+})
+
+// Feature-based naming
+const checkoutGroup = new CheckGroupV2('checkout-group', {
+  name: 'Checkout Flow Monitoring'
+})
+```
+
+**Use cases**: Group organization, dashboard display, team coordination.
+</ResponseField>
+
+<ResponseField name="activated" type="boolean" default="true">
+Whether checks in the group are running. When false, all checks in the group are paused.
+
+### Usage
+```ts
+const group = new CheckGroupV2('my-group', {
+  activated: false // Pause all checks in group
+})
+```
+
+### Examples
+```ts
+// Environment-based activation
+const isProduction = process.env.NODE_ENV === 'production'
+
+const group = new CheckGroupV2('conditional-group', {
+  name: 'Production Only Checks',
+  activated: isProduction
+})
+
+// Maintenance mode
+const maintenanceGroup = new CheckGroupV2('maintenance-group', {
+  name: 'Under Maintenance',
+  activated: false
+})
+```
+
+**Use cases**: Environment-specific checks, maintenance windows, temporary disabling.
+</ResponseField>
+
+<ResponseField name="muted" type="boolean" default="false">
+Whether to mute alerts for all checks in the group. Checks will still run but won't send notifications.
+
+### Usage
+```ts
+const group = new CheckGroupV2('my-group', {
+  muted: true // Silence all alerts
+})
+```
+
+### Examples
+```ts
+// Development environment
+const devGroup = new CheckGroupV2('dev-group', {
+  name: 'Development Environment',
+  muted: true // Don't alert on dev issues
+})
+
+// Staging environment
+const stagingGroup = new CheckGroupV2('staging-group', {
+  name: 'Staging Environment', 
+  muted: process.env.NODE_ENV !== 'production'
+})
+```
+
+**Use cases**: Non-production environments, testing phases, scheduled maintenance.
+</ResponseField>
+
+<ResponseField name="frequency" type="Frequency">
+How often to run checks within the group. This frequency applies to all checks in the group unless overridden at the check level.
+
+### Usage
+```ts
+import { Frequency } from 'checkly/constructs'
+
+const group = new CheckGroupV2('my-group', {
+  frequency: Frequency.EVERY_10M
+})
+```
+
+### Examples
+```ts
+// Critical services - high frequency
+const criticalGroup = new CheckGroupV2('critical-group', {
+  name: 'Critical Services',
+  frequency: Frequency.EVERY_1M
+})
+
+// Background services - lower frequency  
+const backgroundGroup = new CheckGroupV2('background-group', {
+  name: 'Background Services',
+  frequency: Frequency.EVERY_30M
+})
+```
+
+**Available frequencies**: `EVERY_30S`, `EVERY_1M`, `EVERY_2M`, `EVERY_5M`, `EVERY_10M`, `EVERY_15M`, `EVERY_30M`, `EVERY_1H`, `EVERY_2H`, `EVERY_4H`, `EVERY_6H`, `EVERY_8H`, `EVERY_12H`, `EVERY_24H`
+</ResponseField>
+
+<ResponseField name="locations" type="string[]" default="[]">
+Public locations for all checks in the group. Checks inherit these locations unless they specify their own.
+
+### Usage
+```ts
+const group = new CheckGroupV2('my-group', {
+  locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1']
+})
+```
+
+### Examples
+```ts
+// Global coverage
+const globalGroup = new CheckGroupV2('global-group', {
+  name: 'Global Service Monitoring',
+  locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1']
+})
+
+// Regional focus
+const euGroup = new CheckGroupV2('eu-group', {
+  name: 'European Services',
+  locations: ['eu-west-1', 'eu-central-1']
+})
+```
+
+**Use cases**: Global monitoring, regional service coverage, user experience testing.
+</ResponseField>
+
+<ResponseField name="browserChecks" type="object">
+Settings for browser checks in the group, including automatic test file discovery.
+
+### Usage
+```ts
+const group = new CheckGroupV2('my-group', {
+  browserChecks: {
+    frequency: Frequency.EVERY_30M,
+    testMatch: '**/*.spec.js'
+  }
+})
+```
+
+### Properties
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `frequency` | `Frequency` | ❌ | - | Frequency override for browser checks |
 | `testMatch` | `string` | ❌ | - | Glob pattern to automatically include browser test files |
 
+### Examples
 ```ts
-browserChecks: {
-  frequency: Frequency.EVERY_30M,
-  testMatch: '**/*.spec.js'
-}
+// E2E test automation
+const e2eGroup = new CheckGroupV2('e2e-group', {
+  name: 'E2E Tests',
+  browserChecks: {
+    frequency: Frequency.EVERY_1H,
+    testMatch: '__tests__/e2e/*.spec.ts'
+  }
+})
+
+// Critical user flows
+const flowGroup = new CheckGroupV2('flow-group', {
+  name: 'User Flows',
+  browserChecks: {
+    frequency: Frequency.EVERY_15M,
+    testMatch: 'tests/critical-flows/*.spec.js'
+  }
+})
 ```
 
-## Check Group Examples
+**Use cases**: Automated test discovery, E2E test organization, user flow monitoring.
+</ResponseField>
+
+## Examples
 
 <Tabs>
   <Tab title="API Monitoring Group">

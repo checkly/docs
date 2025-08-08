@@ -39,12 +39,10 @@ const slackChannel = new SlackAlertChannel('team-slack-channel', {
 
 </CodeGroup>
 
-## `SlackAlertChannel` Configuration
+## Options
 
 <Tabs>
-  <Tab title="Unique Configuration">
-
-Configure Slack-specific settings:
+<Tab title="Unique Options">
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
@@ -52,9 +50,7 @@ Configure Slack-specific settings:
 | `channel` | `string` | ❌ | - | Target Slack channel (e.g., '#ops', '@user') |
 
 </Tab>
-
-<Tab title="Shared Configuration">
-Configure common alert channel properties:
+<Tab title="Common Options">
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
@@ -67,11 +63,354 @@ Configure common alert channel properties:
 </Tab>
 </Tabs>
 
-## Slack Alert Channel Examples
+## Unique Options
 
-<Tabs>
-  <Tab title="Team Channel Alerts">
-    ```ts
+<ResponseField name="url" type="URL" required>
+Slack webhook URL for incoming messages. This is the endpoint where Checkly will send alert notifications.
+
+### Usage
+```ts
+new SlackAlertChannel('slack-channel', {
+  url: new URL('https://hooks.slack.com/services/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'),
+  channel: '#alerts'
+})
+```
+
+### Examples
+
+<CodeGroup>
+
+```ts Direct URL
+const slackChannel = new SlackAlertChannel('direct-slack', {
+  url: new URL('https://hooks.slack.com/services/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'),
+  channel: '#monitoring'
+})
+```
+
+```ts Environment Variable
+const secureSlack = new SlackAlertChannel('secure-slack', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!), // Store securely
+  channel: '#alerts'
+})
+```
+
+```ts Multiple Teams
+// Different webhook URLs for different teams
+const devSlack = new SlackAlertChannel('dev-slack', {
+  url: new URL(process.env.DEV_SLACK_WEBHOOK_URL!),
+  channel: '#dev-alerts'
+})
+
+const opsSlack = new SlackAlertChannel('ops-slack', {
+  url: new URL(process.env.OPS_SLACK_WEBHOOK_URL!),
+  channel: '#ops-alerts'
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Team notifications, webhook integration, secure credential storage, multi-team alerting.
+</ResponseField>
+
+<ResponseField name="channel" type="string">
+Target Slack channel or user for notifications. Can override the default channel configured in the webhook.
+
+### Usage
+```ts
+new SlackAlertChannel('channel-slack', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#ops' // Send to #ops channel
+})
+```
+
+### Examples
+
+<CodeGroup>
+
+```ts Channel Notifications
+const channelSlack = new SlackAlertChannel('channel-slack', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#monitoring-alerts' // Public channel
+})
+```
+
+```ts Direct Messages
+const dmSlack = new SlackAlertChannel('dm-slack', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '@john.doe' // Direct message to user
+})
+```
+
+```ts Different Channels for Different Purposes
+const criticalSlack = new SlackAlertChannel('critical-slack', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#critical-alerts'
+})
+
+const performanceSlack = new SlackAlertChannel('performance-slack', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#performance-monitoring'
+})
+
+const securitySlack = new SlackAlertChannel('security-slack', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#security-alerts'
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Team-specific alerts, direct notifications, alert categorization, noise management.
+</ResponseField>
+
+## Common Options
+
+<ResponseField name="sendRecovery" type="boolean">
+Whether to send notifications when checks recover from failure or degraded state.
+
+### Usage
+```ts
+new SlackAlertChannel('recovery-slack', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#alerts',
+  sendRecovery: true // Send recovery notifications
+})
+```
+
+### Examples
+
+<CodeGroup>
+
+```ts Recovery Notifications
+const opsSlack = new SlackAlertChannel('ops-slack', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#ops',
+  sendRecovery: true, // Get notified when issues are resolved
+  sendFailure: true
+})
+```
+
+```ts Failure Only
+const alertsSlack = new SlackAlertChannel('alerts-only', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#critical-alerts',
+  sendRecovery: false, // Only failures, no recovery notifications
+  sendFailure: true
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Recovery confirmation, operational awareness, noise reduction.
+</ResponseField>
+
+<ResponseField name="sendFailure" type="boolean">
+Whether to send notifications when checks fail.
+
+### Usage
+```ts
+new SlackAlertChannel('failure-slack', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#alerts',
+  sendFailure: true // Send failure notifications
+})
+```
+
+### Examples
+
+<CodeGroup>
+
+```ts Critical Failures Only
+const criticalSlack = new SlackAlertChannel('critical-slack', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#critical-alerts',
+  sendFailure: true, // Critical failures
+  sendRecovery: true,
+  sendDegrade: false // No degraded alerts
+})
+```
+
+```ts All Notifications
+const comprehensiveSlack = new SlackAlertChannel('all-notifications', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#monitoring',
+  sendFailure: true, // All failures
+  sendRecovery: true,
+  sendDegrade: true
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Incident response, failure monitoring, operational alerting.
+</ResponseField>
+
+<ResponseField name="sendDegrade" type="boolean">
+Whether to send notifications when API checks degrade (performance thresholds exceeded but not failed).
+
+### Usage
+```ts
+new SlackAlertChannel('performance-slack', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#performance',
+  sendDegrade: true // Send degraded performance notifications
+})
+```
+
+### Examples
+
+<CodeGroup>
+
+```ts Performance Monitoring
+const performanceSlack = new SlackAlertChannel('performance-slack', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#performance',
+  sendRecovery: true,
+  sendFailure: true,
+  sendDegrade: true // Alert on degraded performance
+})
+
+new ApiCheck('performance-check', {
+  name: 'API Performance Check',
+  maxResponseTime: 3000,
+  degradedResponseTime: 1500, // Triggers degrade alerts
+  alertChannels: [performanceSlack],
+  request: {
+    method: 'GET',
+    url: 'https://api.example.com/slow-endpoint'
+  }
+})
+```
+
+```ts Critical Only
+const criticalOnlySlack = new SlackAlertChannel('critical-only', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#critical-alerts',
+  sendFailure: true,
+  sendRecovery: true,
+  sendDegrade: false // Only complete failures, not performance issues
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Performance monitoring, early warning systems, SLA tracking.
+</ResponseField>
+
+<ResponseField name="sslExpiry" type="boolean">
+Whether to send notifications for SSL certificate expiry warnings.
+
+### Usage
+```ts
+new SlackAlertChannel('security-slack', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#security',
+  sslExpiry: true,
+  sslExpiryThreshold: 30 // Alert 30 days before expiry
+})
+```
+
+### Examples
+
+<CodeGroup>
+
+```ts Security Team Alerts
+const securitySlack = new SlackAlertChannel('security-slack', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#security',
+  sendRecovery: false,
+  sendFailure: true,
+  sslExpiry: true,
+  sslExpiryThreshold: 7 // Alert 7 days before expiry
+})
+
+new ApiCheck('ssl-cert-check', {
+  name: 'SSL Certificate Check',
+  alertChannels: [securitySlack],
+  request: {
+    method: 'GET',
+    url: 'https://secure.example.com'
+  }
+})
+```
+
+```ts Early Warning System
+const earlyWarningSlack = new SlackAlertChannel('ssl-early-warning', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#devops',
+  sslExpiry: true,
+  sslExpiryThreshold: 60 // Alert 60 days before expiry for planning
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Certificate management, security compliance, proactive maintenance.
+</ResponseField>
+
+<ResponseField name="sslExpiryThreshold" type="number">
+Number of days before SSL certificate expiry to send notifications. Only relevant when `sslExpiry` is enabled.
+
+### Usage
+```ts
+new SlackAlertChannel('ssl-monitoring', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#devops',
+  sslExpiry: true,
+  sslExpiryThreshold: 30 // Alert 30 days before expiry
+})
+```
+
+### Examples
+
+<CodeGroup>
+
+```ts Conservative Warning
+// Give plenty of time for certificate renewal
+new SlackAlertChannel('ssl-conservative', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#devops',
+  sslExpiry: true,
+  sslExpiryThreshold: 60 // 60 days notice
+})
+```
+
+```ts Last Minute Alert
+// Alert close to expiry for urgent action
+new SlackAlertChannel('ssl-urgent', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#security',
+  sslExpiry: true,
+  sslExpiryThreshold: 7 // 7 days notice
+})
+```
+
+```ts Multiple Thresholds
+// Create multiple channels with different thresholds
+const earlyWarning = new SlackAlertChannel('ssl-early', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#planning',
+  sslExpiry: true,
+  sslExpiryThreshold: 90 // Planning notification
+})
+
+const urgentWarning = new SlackAlertChannel('ssl-urgent', {
+  url: new URL(process.env.SLACK_WEBHOOK_URL!),
+  channel: '#oncall',
+  sslExpiry: true,
+  sslExpiryThreshold: 7 // Urgent notification
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Certificate renewal planning, compliance management, operational scheduling.
+</ResponseField>
+
+## Examples
+
+<CodeGroup>
+```ts Team Channel Alerts
     import { SlackAlertChannel, ApiCheck } from 'checkly/constructs'
 
     const teamSlack = new SlackAlertChannel('team-slack', {
@@ -87,11 +426,9 @@ Configure common alert channel properties:
         url: 'https://api.acme.com/health'
       }
     })
-    ```
-  </Tab>
-  
-  <Tab title="Critical Alerts Channel">
-    ```ts
+```
+
+```ts Critical Alerts Channel
     const criticalSlack = new SlackAlertChannel('critical-slack', {
       url: new URL('https://hooks.slack.com/services/YOUR/WEBHOOK/URL'),
       channel: '#critical-alerts',
@@ -109,11 +446,9 @@ Configure common alert channel properties:
         url: 'https://api.acme.com/payments/health'
       }
     })
-    ```
-  </Tab>
-  
-  <Tab title="Performance Monitoring">
-    ```ts
+```
+
+```ts Performance Monitoring
     const performanceSlack = new SlackAlertChannel('performance-slack', {
       url: new URL('https://hooks.slack.com/services/YOUR/WEBHOOK/URL'),
       channel: '#performance',
@@ -132,11 +467,9 @@ Configure common alert channel properties:
         url: 'https://api.acme.com/slow-endpoint'
       }
     })
-    ```
-  </Tab>
-  
-  <Tab title="Direct Message Alerts">
-    ```ts
+```
+
+```ts Direct Message Alerts
     const dmSlack = new SlackAlertChannel('dm-slack', {
       url: new URL('https://hooks.slack.com/services/YOUR/WEBHOOK/URL'),
       channel: '@john.doe', // Direct message to user
@@ -152,11 +485,9 @@ Configure common alert channel properties:
         url: 'https://personal-project.example.com'
       }
     })
-    ```
-  </Tab>
-  
-  <Tab title="SSL Certificate Monitoring">
-    ```ts
+```
+
+```ts SSL Certificate Monitoring
     const securitySlack = new SlackAlertChannel('security-slack', {
       url: new URL('https://hooks.slack.com/services/YOUR/WEBHOOK/URL'),
       channel: '#security',
@@ -174,11 +505,9 @@ Configure common alert channel properties:
         url: 'https://secure.acme.com'
       }
     })
-    ```
-  </Tab>
-  
-  <Tab title="Multiple Channels">
-    ```ts
+```
+
+```ts Multiple Channels
     const devSlack = new SlackAlertChannel('dev-slack', {
       url: new URL('https://hooks.slack.com/services/YOUR/WEBHOOK/URL'),
       channel: '#development',
@@ -200,9 +529,9 @@ Configure common alert channel properties:
         url: 'https://api.acme.com/important'
       }
     })
-    ```
-  </Tab>
-</Tabs>
+```
+
+</CodeGroup>
 
 ## Setting Up Slack Webhooks
 

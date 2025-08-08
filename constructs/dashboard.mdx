@@ -59,12 +59,6 @@ new Dashboard('advanced-dashboard', {
 
 </CodeGroup>
 
-## `Dashboard` Configuration
-
-<Tabs>
-  <Tab title="Basic Configuration">
-
-Configure essential dashboard settings:
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
@@ -73,28 +67,9 @@ Configure essential dashboard settings:
 | `tags` | `string[]` | ❌ | `[]` | Tags that filter which checks appear on the dashboard |
 | `customUrl` | `string` | ❌ | - | Subdomain under "checklyhq.com" (required if customDomain not specified) |
 | `customDomain` | `string` | ❌ | - | Custom domain (e.g., "status.example.com") |
-
-</Tab>
-
-<Tab title="Branding Configuration">
-
-Configure visual branding and appearance:
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
 | `logo` | `string` | ❌ | - | URL to logo image for the dashboard header |
 | `favicon` | `string` | ❌ | - | URL to favicon image |
 | `link` | `string` | ❌ | - | URL to redirect when dashboard logo is clicked |
-| `customCSS` | `object` | ❌ | - | Custom CSS styling (Team/Enterprise plans only) |
-
-</Tab>
-
-<Tab title="Display Configuration">
-
-Configure how the dashboard displays content:
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
 | `width` | `string` | ❌ | `'FULL'` | Dashboard width: `'FULL'` \| `'960PX'` |
 | `refreshRate` | `number` | ❌ | `60` | Auto-refresh interval: `60` \| `300` \| `600` seconds |
 | `paginate` | `boolean` | ❌ | `true` | Enable pagination for checks |
@@ -108,44 +83,241 @@ Configure how the dashboard displays content:
 | `showP95` | `boolean` | ❌ | `true` | Show P95 statistics |
 | `showP99` | `boolean` | ❌ | `true` | Show P99 statistics |
 | `isPrivate` | `boolean` | ❌ | `false` | Make dashboard private (Team/Enterprise plans only) |
+| `customCSS` | `object` | ❌ | - | Custom CSS styling (Team/Enterprise plans only) |
 
-</Tab>
-</Tabs>
+## `dashboard` Options
 
-## `customCSS` Configuration
+<ResponseField name="header" type="string">
+Text displayed at the top of your dashboard as the main title.
 
-Configure custom CSS styling for your dashboard:
+### Usage
+```ts
+new Dashboard('my-dashboard', {
+  header: 'Production Services Status'
+})
+```
 
+### Examples
+```ts
+// Service-focused header
+new Dashboard('api-dashboard', {
+  header: 'API Services Status'
+})
+
+// Regional header
+new Dashboard('us-dashboard', {
+  header: 'US East Region Status'
+})
+
+```
+
+**Use cases**: Brand identity, service identification, user clarity.
+</ResponseField>
+
+<ResponseField name="description" type="string">
+Text displayed below the header providing additional context about the dashboard.
+
+### Usage
+```ts
+new Dashboard('my-dashboard', {
+  header: 'Production Services',
+  description: 'Real-time monitoring of all production services'
+})
+```
+
+### Examples
+```ts
+// Detailed description
+new Dashboard('comprehensive-dashboard', {
+  header: 'Service Health Monitor',
+  description: 'Comprehensive monitoring dashboard showing the status of all customer-facing services, APIs, and infrastructure components.'
+})
+
+// Simple description
+new Dashboard('api-dashboard', {
+  header: 'API Status',
+  description: 'Current status of all API endpoints'
+})
+```
+
+**Use cases**: Context provision, scope clarification, user guidance.
+</ResponseField>
+
+<ResponseField name="tags" type="string[]" default="[]">
+Tags that filter which checks appear on the dashboard. Empty array shows all checks.
+
+### Usage
+```ts
+new Dashboard('my-dashboard', {
+  tags: ['production', 'api']
+})
+```
+
+### Examples
+```ts
+// Service-specific tags
+new Dashboard('api-dashboard', {
+  header: 'API Services',
+  tags: ['api'],
+  customUrl: 'api-status'
+})
+
+// Environment and service tags
+new Dashboard('prod-web-dashboard', {
+  header: 'Production Web Services',
+  tags: ['production', 'web'],
+  useTagsAndOperator: true // Must have BOTH tags
+})
+
+// All checks (empty array)
+new Dashboard('all-services', {
+  header: 'All Services',
+  tags: [] // Shows all checks
+})
+```
+
+**Use cases**: Service filtering, environment separation, team organization.
+</ResponseField>
+
+<ResponseField name="customUrl" type="string">
+Subdomain under "checklyhq.com" for your dashboard (e.g., "my-status" becomes "my-status.checklyhq.com").
+
+### Usage
+```ts
+new Dashboard('my-dashboard', {
+  customUrl: 'service-status'
+})
+// Creates: service-status.checklyhq.com
+```
+
+### Examples
+```ts
+// Company branding
+new Dashboard('company-status', {
+  header: 'ACME Services',
+  customUrl: 'acme-status'
+})
+// URL: acme-status.checklyhq.com
+
+// Service-specific
+new Dashboard('api-status', {
+  header: 'API Status',
+  customUrl: 'api-monitoring'
+})
+// URL: api-monitoring.checklyhq.com
+```
+
+<Info>
+Required if `customDomain` is not specified. Use lowercase letters, numbers, and hyphens only.
+</Info>
+
+**Use cases**: Public access, branded URLs, easy sharing.
+</ResponseField>
+
+<ResponseField name="customDomain" type="string">
+Custom domain for your dashboard (e.g., "status.example.com"). Must be verified through the Checkly UI.
+
+### Usage
+```ts
+new Dashboard('my-dashboard', {
+  customDomain: 'status.example.com'
+})
+```
+
+### Examples
+```ts
+// Company status page
+new Dashboard('public-status', {
+  header: 'Service Status',
+  customDomain: 'status.acme.com',
+  logo: 'https://acme.com/logo.png'
+})
+
+// Team-specific domain
+new Dashboard('platform-status', {
+  header: 'Platform Services',
+  customDomain: 'platform-status.internal.company.com'
+})
+```
+
+<Warning>
+Custom domains must be verified through the Checkly UI before they can be used. DNS changes may take time to propagate.
+</Warning>
+
+**Use cases**: Brand consistency, professional appearance, domain control.
+</ResponseField>
+
+<ResponseField name="customCSS" type="object">
+Custom CSS styling for your dashboard. Only available on Team and Enterprise plans.
+
+### Usage
+```ts
+// Using file reference
+new Dashboard('styled-dashboard', {
+  customCSS: {
+    entrypoint: path.join(__dirname, 'dashboard.css')
+  }
+})
+
+// Using inline content
+new Dashboard('styled-dashboard', {
+  customCSS: {
+    content: `
+      .header {
+        background: #080808;
+        border-bottom-color: #313035;
+      }
+      .header .logo a {
+        color: #f7f8f8;
+      }
+    `
+  }
+})
+```
+
+### Properties
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `entrypoint` | `string` | ❌ | Path to a CSS file containing custom styles |
 | `content` | `string` | ❌ | Inline CSS content as a string |
 
 <Info>
-You must provide either `entrypoint` or `content`, but not both. Custom CSS is only available on Team and Enterprise plans.
+You must provide either `entrypoint` or `content`, but not both.
 </Info>
 
+### Examples
 ```ts
-// Using file reference
-customCSS: {
-  entrypoint: path.join(__dirname, 'dashboard.css')
-}
+// Corporate branding
+new Dashboard('branded-dashboard', {
+  header: 'ACME Status',
+  customCSS: {
+    content: `
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-bottom: 2px solid #4c63d2;
+      }
+      .check-card.success {
+        border-left: 4px solid #10b981;
+      }
+      .check-card.failure {
+        border-left: 4px solid #ef4444;
+      }
+    `
+  }
+})
 
-// Using inline content
-customCSS: {
-  content: `
-    .header {
-      background: #080808;
-      border-bottom-color: #313035;
-    }
-    .header .logo a {
-      color: #f7f8f8;
-    }
-  `
-}
+// External stylesheet
+new Dashboard('theme-dashboard', {
+  customCSS: {
+    entrypoint: path.join(__dirname, 'company-theme.css')
+  }
+})
 ```
 
-## Dashboard Examples
+**Use cases**: Brand consistency, custom themes, visual identity, enhanced UX.
+</ResponseField>
+
+## Examples
 
 <Tabs>
   <Tab title="Production Monitoring">
@@ -286,72 +458,7 @@ customCSS: {
   </Tab>
 </Tabs>
 
-## Tag Filtering
 
-Dashboards display checks based on tag filtering:
-
-<Tabs>
-  <Tab title="OR Filtering (Default)">
-    ```ts
-    new Dashboard('or-filtering-dashboard', {
-      header: 'API or Web Services',
-      tags: ['api', 'web'],
-      useTagsAndOperator: false, // Default: shows checks with ANY of these tags
-      customUrl: 'api-or-web'
-    })
-    // Shows checks tagged with 'api' OR 'web' OR both
-    ```
-  </Tab>
-  
-  <Tab title="AND Filtering">
-    ```ts
-    new Dashboard('and-filtering-dashboard', {
-      header: 'Production API Services',
-      tags: ['production', 'api'],
-      useTagsAndOperator: true, // Shows checks with ALL of these tags
-      customUrl: 'production-api'
-    })
-    // Shows only checks tagged with BOTH 'production' AND 'api'
-    ```
-  </Tab>
-  
-  <Tab title="All Checks">
-    ```ts
-    new Dashboard('all-checks-dashboard', {
-      header: 'All Monitoring',
-      tags: [], // Empty array shows ALL checks
-      customUrl: 'all-monitoring'
-    })
-    ```
-  </Tab>
-</Tabs>
-
-## Custom Domains
-
-To use a custom domain for your dashboard:
-
-<Tabs>
-  <Tab title="DNS Configuration">
-    ```bash
-    # Add a CNAME record pointing to Checkly
-    status.example.com CNAME checklyhq.com
-    ```
-  </Tab>
-  
-  <Tab title="SSL Certificate">
-    Checkly automatically provisions SSL certificates for verified custom domains.
-  </Tab>
-  
-  <Tab title="Configuration">
-    ```ts
-    new Dashboard('custom-domain-dashboard', {
-      header: 'Service Status',
-      customDomain: 'status.example.com', // Must be verified in Checkly UI
-      tags: ['production']
-    })
-    ```
-  </Tab>
-</Tabs>
 
 ## Performance Optimization
 

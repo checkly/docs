@@ -6,23 +6,101 @@ sidebarTitle: 'checkly switch'
 
 The `checkly switch` command switches between multiple Checkly accounts that you have access to with your current credentials. Useful when you need to manage monitoring across different organizations or environments.
 
+<Accordion title="Prerequisites">
+Before using `checkly switch`, ensure you have:
+
+- Valid Checkly account authentication (run `npx checkly login` if needed)
+- Access to multiple Checkly accounts (team memberships, client projects, etc.)
+- Permissions to access the accounts you want to switch between
+
+If you only have access to one account, this command will indicate no alternative accounts are available.
+</Accordion>
+
 ## Usage
 
-Display available accounts and switch to a different one.
+The basic command displays available accounts and provides an interactive selection interface.
 
 ```bash Terminal
 npx checkly switch
 ```
 
-## Extended Usage
+<Tabs>
+<Tab title="Common Options">
 
+| Option | Description | Type | Required |
+|--------|-------------|------|---------|
+| `--verbose, -v` | Show detailed account information | boolean | No |
+
+</Tab>
+<Tab title="All Global Options">
+
+| Option | Description | Type | Required |
+|--------|-------------|------|---------|
+| `--config, -c` | Specify a configuration file | string | No |
+
+For detailed information about global options, see [global options](/cli/global-options).
+
+</Tab>
+</Tabs>
+
+## Common Options
+
+<ResponseField name="--verbose, -v" type="boolean">
+Show detailed account information during the selection process, including subscription plans, roles, and additional metadata.
+
+### Usage
+```bash Terminal
+npx checkly switch --verbose
+npx checkly switch -v
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Standard Switch">
+
+```bash Terminal
+# Standard account switching
+npx checkly switch
+
+# Output
+? Select account to switch to:
+❯ Acme Corp (550e8400-e29b-41d4-a716-446655440000)
+  Personal Account (660f9511-f3ac-52e5-b827-557766551111)
+  Client Project (770g0622-g4bd-63f6-c938-668877662222)
+```
+
+</Tab>
+<Tab title="Verbose Switch">
+
+```bash Terminal
+# Verbose account switching with details
+npx checkly switch --verbose
+
+# Output
+? Select account to switch to:
+❯ Acme Corp (550e8400-e29b-41d4-a716-446655440000) - Team Plan - Admin
+  Personal Account (660f9511-f3ac-52e5-b827-557766551111) - Free Plan - Owner
+  Client Project (770g0622-g4bd-63f6-c938-668877662222) - Enterprise Plan - Editor
+
+✓ Switched to account: Acme Corp
+→ Account: Acme Corp
+→ Role: Admin
+→ Plan: Team Plan
+→ Checks: 24 active
+```
+
+</Tab>
+</Tabs>
+
+**Use cases**: Understanding account details, verifying permissions, team collaboration.
+</ResponseField>
+
+## Account Selection Interface
+
+### Interactive Selection
 The switch command provides an interactive account selection interface:
 
-```bash Terminal
-npx checkly switch
-```
-
-Example interactive session:
 ```bash Terminal      
 ? Select account to switch to:
 ❯ Acme Corp (550e8400-e29b-41d4-a716-446655440000) - Team Plan
@@ -33,15 +111,14 @@ Example interactive session:
 ✓ Active account updated
 ```
 
-## Unique Options
+### Account Information Display
+For each available account, the selection interface shows:
 
-This command has no unique options - it provides interactive account selection.
-
-## Global Options
-
-This command supports the following [global options](/cli/checkly-global-options):
-
-- [`--verbose`](/cli/checkly-global-options#verbose-or-v) - Show detailed account information during selection
+- **Account name** and organization
+- **Account ID** (unique identifier)
+- **Subscription plan** (Free, Developer, Team, Enterprise)
+- **Your role** in that account (Owner, Admin, Editor, Viewer)
+- **Current status** (active account is marked)
 
 ## Account Access Requirements
 
@@ -55,16 +132,6 @@ To use the switch command, you must have access to multiple Checkly accounts thr
 
 ### Authentication Requirements
 You must be logged in with credentials that have access to multiple accounts. If you only have access to one account, the switch command will display a message indicating no alternative accounts are available.
-
-## Account Information Display
-
-For each available account, the selection interface shows:
-
-- **Account name** and organization
-- **Account ID** (unique identifier)
-- **Subscription plan** (Free, Developer, Team, Enterprise)
-- **Your role** in that account (Owner, Admin, Editor, Viewer)
-- **Current status** (active account is marked)
 
 ## Related Commands
 

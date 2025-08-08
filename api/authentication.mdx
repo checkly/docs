@@ -44,7 +44,7 @@ API keys are only shown once during creation. Store them securely in environment
 Your Account ID can be found in multiple places:
 
 **Dashboard URL**: Look for the UUID in your dashboard URL
-```
+``` URL URL Bar
 https://app.checklyhq.com/dashboard/550e8400-e29b-41d4-a716-446655440000
 ```
 
@@ -58,7 +58,7 @@ https://app.checklyhq.com/dashboard/550e8400-e29b-41d4-a716-446655440000
 
 Set up authentication credentials securely using environment variables:
 
-```bash
+```bash .env 
 # .env file
 CHECKLY_API_KEY=cu_1234567890abcdef
 CHECKLY_ACCOUNT_ID=550e8400-e29b-41d4-a716-446655440000
@@ -81,7 +81,7 @@ export CHECKLY_ACCOUNT_ID="550e8400-e29b-41d4-a716-446655440000"
 <Accordion title="Quick Authentication Test">
 Validate your credentials with a simple health check:
 
-```bash
+```bash Terminal
 # Test authentication
 curl -I https://api.checklyhq.com/v1/checks \
   -H "Authorization: Bearer $CHECKLY_API_KEY" \
@@ -107,7 +107,7 @@ Test specific permissions for your API key:
 Test your API key permissions using the manual code provided below.
 
 **Manual Testing Code:**
-```javascript
+```javascript permission-test.js
 // Test different permission levels
 const permissions = [
   { endpoint: '/v1/checks', method: 'GET', permission: 'checks:read' },
@@ -137,7 +137,7 @@ for (const test of permissions) {
 <Accordion title="Connection Diagnostics">
 Diagnose common connection issues:
 
-```python
+```python connection-diagnostics.pys
 import requests
 import os
 from urllib.parse import urlparse
@@ -205,14 +205,14 @@ diagnose_checkly_connection()
 
 <CodeGroup>
 
-```bash cURL
+```bash Terminal
 curl -X GET https://api.checklyhq.com/v1/checks \
   -H "Authorization: Bearer cu_1234567890abcdef" \
   -H "X-Checkly-Account: 550e8400-e29b-41d4-a716-446655440000" \
   -H "Content-Type: application/json"
 ```
 
-```javascript JavaScript
+```javascript checkly-api-example.js
 const response = await fetch('https://api.checklyhq.com/v1/checks', {
   method: 'GET',
   headers: {
@@ -225,7 +225,7 @@ const response = await fetch('https://api.checklyhq.com/v1/checks', {
 const data = await response.json();
 ```
 
-```python Python
+```python checkly-api-example.py
 import requests
 
 headers = {
@@ -238,7 +238,7 @@ response = requests.get('https://api.checklyhq.com/v1/checks', headers=headers)
 data = response.json()
 ```
 
-```go Go
+```go checkly-api-example.go
 package main
 
 import (
@@ -282,7 +282,7 @@ func main() {
 
 <Accordion title="Missing Authentication">
 **HTTP 401 Unauthorized**
-```json
+```json error-response.json
 {
   "error": "Unauthorized",
   "message": "Missing or invalid authentication credentials",
@@ -297,7 +297,7 @@ func main() {
 
 <Accordion title="Invalid API Key">
 **HTTP 401 Unauthorized**
-```json
+```json error-response.json
 {
   "error": "Unauthorized", 
   "message": "Invalid API key",
@@ -312,7 +312,7 @@ func main() {
 
 <Accordion title="Missing Account ID">
 **HTTP 400 Bad Request**
-```json
+```json error-response.json
 {
   "error": "Bad Request",
   "message": "X-Checkly-Account header is required",
@@ -327,7 +327,7 @@ func main() {
 
 <Accordion title="Access Denied">
 **HTTP 403 Forbidden**
-```json
+```json error-response.json
 {
   "error": "Forbidden",
   "message": "Access denied for the specified account",
@@ -348,7 +348,7 @@ func main() {
 
 <Accordion title="Secure Credential Management">
 **Environment Variables**:
-```bash
+```bash .env
 # Production
 export CHECKLY_API_KEY="cu_prod_1234567890abcdef"
 export CHECKLY_ACCOUNT_ID="550e8400-e29b-41d4-a716-446655440000"
@@ -372,7 +372,7 @@ export CHECKLY_ACCOUNT_ID="550e8400-e29b-41d4-a716-446655440000"
 - Use overlapping validity periods during rotation
 
 **Monitoring Usage**:
-```javascript
+```javascript checkly-api-example.js
 // Monitor API key usage
 const keyUsage = await checkly.apiKeys.getUsage('key_abc123def456');
 console.log(`Requests this month: ${keyUsage.requestsThisMonth}`);
@@ -394,7 +394,7 @@ console.log(`Rate limit: ${keyUsage.rateLimit.remaining}/${keyUsage.rateLimit.li
 - Burst allowance of 200 requests
 
 **Implementing Backoff**:
-```python
+```python checkly-api-example.py
 import time
 import requests
 from requests.adapters import HTTPAdapter
@@ -425,7 +425,7 @@ if response.status_code == 429:
 
 <Accordion title="Error Handling & Debugging">
 **Comprehensive Error Handling**:
-```javascript
+```javascript checkly-api-example.js    
 class ChecklyAPIError extends Error {
   constructor(response, requestId) {
     super(response.message);

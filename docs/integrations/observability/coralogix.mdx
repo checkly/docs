@@ -1,11 +1,7 @@
 ---
-title: Export Metrics & Data via Coralogix with Checkly - Checkly Docs
-displayTitle: Export Metrics & Data via Coralogix
-navTitle: Coralogix
-weight: 69
-menu:
-  integrations:
-    parent: "Integrations"
+title: 'Export Metrics & Data via Coralogix'
+description: 'Deep integration with Coralogix for Open Telemetry tracing, RUM monitoring, and alert notifications'
+sidebarTitle: 'Coralogix'
 ---
 
 Checkly deeply integrates with [Coralogix](https://coralogix.com/) in three ways:
@@ -20,7 +16,7 @@ as traces.
 To set up the Open Telemetry tracing integration, first enable the Coralogix integration in your Checkly account in the
 [integrations section](https://app.checklyhq.com/settings/account/integrations).
 
-![coralogix otel integration](/docs/images/integrations/coralogix/cx_otel_int1.png)
+![coralogix otel integration](/images/docs/images/integrations/coralogix/cx_otel_int1.png)
 
 1. Pick the region of your tenant and enter the team name. We use this to determine the correct trace ingest endpoint for Coralogix.
 2. Create a "Send Your Data" API key in your Coralogix account, you can find these in the **Data Flow > API Keys** section 
@@ -36,12 +32,12 @@ The integration is now active and Checkly will start doing two things
 | `traceparent` | `{version}-{trace_id}-{span_id}-{trace_flags}` | A trace parent ID in [the canonical w3c format](https://www.w3.org/TR/trace-context/#traceparent-header-field-values) |
 | `tracestate`  | `checkly=true`                                 | A vendor specific header so you can recognize traces originating from Checkly                                         |
 
-![coralogix checkly traces in coralogix](/docs/images/integrations/coralogix/cx_otel_int2.png)
+![coralogix checkly traces in coralogix](/images/docs/images/integrations/coralogix/cx_otel_int2.png)
 
 Moreover, it will show a **trace ID** and a **permalink** to the recorded trace in the check result page, so you can easily
 correlate the check run with the trace in Coralogix.
 
-![coralogix link in checkly result](/docs/images/integrations/coralogix/cx_otel_int3.png)
+![coralogix link in checkly result](/images/docs/images/integrations/coralogix/cx_otel_int3.png)
 
 Each trace will have the following metadata added to it as **tags**: 
 
@@ -68,13 +64,13 @@ In addition to the Open Telemetry tracing, Checkly can also send RUM data to Cor
 tracking your Playwright-powered checks to be recorded as (semi) real users, so you can compare and contrast the performance
 between synthetic and real users.
 
-![coralogix rum integration](/docs/images/integrations/coralogix/cx_rum_int1.png)
+![coralogix rum integration](/images/docs/images/integrations/coralogix/cx_rum_int1.png)
 
 1. Click **Enable Coralogix RUM** and pick the region of your tenant.
 2. Set the global name of the application you will be targeting with your checks, e.g. "Acme webshop".
 3. Create a new RUM integration in your Coralogix account via **Data Flow > Integrations > Real User Monitoring**
 
-![rum api key area](/docs/images/integrations/coralogix/cx_rum_api_creation.png)
+![rum api key area](/images/docs/images/integrations/coralogix/cx_rum_api_creation.png)
 
 4. You will need to create an **Integration Key** and a **SourceMap Upload Key**. 
 Copy and paste the integration key into Checkly.
@@ -100,7 +96,7 @@ Note that you can use this integration separately from the other two integration
 1. In Checkly, navigate to [alert settings](https://app.checklyhq.com/alerts/settings/). Click the **Add more channels** 
 button, find Coralogix on the list, and click **Add channel**.
 
-![coralogix alert channels](/docs/images/integrations/coralogix/coralogix_alert_channels.png)
+![coralogix alert channels](/images/docs/images/integrations/coralogix/coralogix_alert_channels.png)
 
 2. Create a "Send Your Data" API key in your Coralogix account, you can find these in the **Data Flow > API Keys** section
 of your Coralogix dashboard. Copy and paste the API key.
@@ -109,5 +105,4 @@ of your Coralogix dashboard. Copy and paste the API key.
 `https://ingress.eu2.coralogix.com/logs/v1/singles` Make sure that the right checks are subscribing to the channel and 
 that the **Send when** rules are correctly set, then hit **Save Coralogix Webhook**.
 
-![coralogix integration step 4](/docs/images/integrations/coralogix/coralogix_step4.png)
-
+![coralogix integration step 4](/images/docs/images/integrations/coralogix/coralogix_step4.png)

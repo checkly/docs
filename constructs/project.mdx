@@ -70,12 +70,7 @@ export default defineConfig({
 
 </CodeGroup>
 
-## `Project` Configuration
-
-<Tabs>
-  <Tab title="Core Configuration">
-
-Configure basic project settings:
+## Options
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
@@ -85,13 +80,122 @@ Configure basic project settings:
 | `checks` | `object` | ❌ | - | Top-level defaults for all checks in this project |
 | `cli` | `object` | ❌ | - | Defaults for CLI commands |
 
-</Tab>
-</Tabs>
+## Core Options
 
-## `checks` Configuration
+<ResponseField name="projectName" type="string" required>
+Friendly name for your project that will be displayed in the Checkly dashboard and used for identification.
 
-The `checks` object provides default settings that apply to all checks in your project:
+### Usage
+```ts
+export default defineConfig({
+  projectName: 'Website Monitoring'
+})
+```
 
+### Examples
+```ts
+// Environment-specific naming
+const isProduction = process.env.NODE_ENV === 'production'
+
+export default defineConfig({
+  projectName: isProduction ? 'Production API Monitoring' : 'Staging API Monitoring'
+})
+
+// Service-specific naming
+export default defineConfig({
+  projectName: 'E-commerce Platform Monitoring'
+})
+
+// Team-specific naming
+export default defineConfig({
+  projectName: 'Frontend Team - Website Checks'
+})
+```
+
+**Use cases**: Dashboard identification, project organization, team coordination.
+</ResponseField>
+
+<ResponseField name="logicalId" type="string" required>
+Unique identifier for this project that should remain stable across deployments. Changing this will cause Checkly to treat it as a new project.
+
+### Usage
+```ts
+export default defineConfig({
+  logicalId: 'website-monitoring-prod'
+})
+```
+
+### Examples
+```ts
+// Environment-based logical IDs
+export default defineConfig({
+  logicalId: `api-monitoring-${process.env.NODE_ENV || 'dev'}`
+})
+
+// Service and version-based
+export default defineConfig({
+  logicalId: 'ecommerce-platform-2025'
+})
+
+// Team and service-based
+export default defineConfig({
+  logicalId: 'frontend-website-monitoring'
+})
+```
+
+<Warning>
+The `logicalId` should remain stable across deployments. Changing it will cause Checkly to treat it as a new project, potentially losing historical data and configurations.
+</Warning>
+
+**Use cases**: Project identification, deployment tracking, configuration persistence.
+</ResponseField>
+
+<ResponseField name="repoUrl" type="string">
+Optional URL to a Git repository for documentation and team collaboration purposes.
+
+### Usage
+```ts
+export default defineConfig({
+  repoUrl: 'https://github.com/acme/website'
+})
+```
+
+### Examples
+```ts
+// GitHub repository
+export default defineConfig({
+  repoUrl: 'https://github.com/company/monitoring-checks'
+})
+
+// GitLab repository
+export default defineConfig({
+  repoUrl: 'https://gitlab.com/company/api-monitoring'
+})
+
+// Bitbucket repository
+export default defineConfig({
+  repoUrl: 'https://bitbucket.org/company/website-checks'
+})
+```
+
+**Use cases**: Documentation linking, team collaboration, source code reference.
+</ResponseField>
+
+<ResponseField name="checks" type="object">
+Top-level defaults for all checks in this project. Individual checks and groups can override these settings.
+
+### Usage
+```ts
+export default defineConfig({
+  checks: {
+    activated: true,
+    frequency: Frequency.EVERY_10M,
+    locations: ['us-east-1', 'eu-west-1']
+  }
+})
+```
+
+### Properties
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `activated` | `boolean` | ❌ | `true` | Whether checks are enabled by default |
@@ -105,60 +209,81 @@ The `checks` object provides default settings that apply to all checks in your p
 | `playwrightConfig` | `object` | ❌ | - | Subset of Playwright configuration options |
 | `browserChecks` | `object` | ❌ | - | Default settings for browser checks |
 
+### Examples
 ```ts
-checks: {
-  activated: true,
-  muted: false,
-  runtimeId: '2025.04',
-  frequency: Frequency.EVERY_10M,
-  locations: ['us-east-1', 'eu-west-1'],
-  tags: ['production'],
-  checkMatch: '**/__checks__/*.check.ts',
-  ignoreDirectoriesMatch: ['node_modules/**'],
-  playwrightConfig: {
-    use: {
-      baseURL: 'https://app.example.com',
-      timeout: 30000
-    }
+// Production configuration
+export default defineConfig({
+  checks: {
+    activated: true,
+    muted: false,
+    runtimeId: '2025.04',
+    frequency: Frequency.EVERY_5M,
+    locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
+    tags: ['production', 'critical'],
+    checkMatch: 'monitoring/**/*.check.ts',
+    ignoreDirectoriesMatch: ['node_modules/**', 'dist/**']
   }
-}
+})
+
+// Development configuration
+export default defineConfig({
+  checks: {
+    activated: true,
+    muted: true, // Mute alerts in development
+    frequency: Frequency.EVERY_30M,
+    locations: ['us-east-1'],
+    tags: ['development']
+  }
+})
 ```
 
-## `browserChecks` Configuration
+**Use cases**: Global defaults, environment-specific settings, check organization.
+</ResponseField>
 
-Configure defaults specifically for browser checks:
+<ResponseField name="cli" type="object">
+Defaults for CLI commands like `checkly test` and `checkly trigger`.
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `frequency` | `Frequency` | ❌ | - | Default frequency for browser checks (overrides general frequency) |
-| `testMatch` | `string` | ❌ | - | Glob pattern to find Playwright test files |
-
+### Usage
 ```ts
-browserChecks: {
-  frequency: Frequency.EVERY_30M,
-  testMatch: '**/__tests__/*.spec.ts'
-}
+export default defineConfig({
+  cli: {
+    runLocation: 'us-east-1',
+    retries: 2
+  }
+})
 ```
 
-## `cli` Configuration
-
-Configure defaults for CLI commands:
-
+### Properties
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `runLocation` | `string` | ❌ | - | Default location for `checkly test` and `checkly trigger` |
 | `privateRunLocation` | `string` | ❌ | - | Default private location for CLI commands |
 | `retries` | `number` | ❌ | `0` | Default retry count for failing checks (max 3) |
 
+### Examples
 ```ts
-cli: {
-  runLocation: 'eu-west-1',
-  privateRunLocation: 'private-dc1',
-  retries: 2
-}
+// Public location CLI defaults
+export default defineConfig({
+  cli: {
+    runLocation: 'eu-west-1',
+    retries: 3
+  }
+})
+
+// Private location CLI defaults
+export default defineConfig({
+  cli: {
+    privateRunLocation: 'corporate-vpc',
+    retries: 2
+  }
+})
 ```
 
-## Project Examples
+**Use cases**: Local testing defaults, CI/CD configuration, development workflow.
+</ResponseField>
+
+
+## Examples
 
 <Tabs>
   <Tab title="Simple Website Monitoring">

@@ -6,9 +6,17 @@ sidebarTitle: 'Multistep Check'
 
 Use multistep checks to run complex end-to-end workflows with Playwright that span multiple pages and user interactions. The examples below show how to configure multistep checks for different testing scenarios.
 
-<Info>
-Learn more about multistep checks in the [Multistep Checks overview](/docs/detect/synthetic-monitoring/multistep-checks/overview).
-</Info>
+<Accordion title="Prerequisites">
+Before creating multistep checks, ensure you have:
+
+- A Checkly CLI project initialized with `npx checkly init`
+- Playwright installed and configured in your project (`npm install @playwright/test`)
+- At least one Playwright test file (`.spec.ts` or `.spec.js`) with multistep workflows
+- Understanding of complex user journeys and end-to-end testing patterns
+- Runtime 2023.09 or later (multistep checks require newer runtimes)
+
+For additional setup information, see [CLI overview](/cli/overview) and [Multistep Checks overview](/docs/detect/synthetic-monitoring/multistep-checks/overview).
+</Accordion>
 
 ## `MultiStepCheck` Structure
 
@@ -53,34 +61,36 @@ new MultiStepCheck('complex-multistep-check', {
 
 </CodeGroup>
 
-## `MultiStepCheck` Configuration
+## Options
 
 <Tabs>
-  <Tab title="Unique Configuration">
-
-Configure multistep-specific settings for your checks:
+<Tab title="Unique Options">
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `code` | `object` | ✅ | - | The Playwright test code configuration |
 
 </Tab>
-
-<Tab title="Shared Configuration">
-Configure common properties that apply to all check types:
+<Tab title="Common Options">
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `name` | `string` | ✅ | - | Friendly name for your check |
+| `runtimeId` | `string` | ❌ | - | The ID of the runtime to use (2023.09 or later required) |
 | `frequency` | `Frequency` | ❌ | - | How often to run your check |
 | `locations` | `string[]` | ❌ | `[]` | Array of public location codes |
+
+</Tab>
+<Tab title="Global Options">
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
 | `privateLocations` | `string[]` | ❌ | `[]` | Array of Private Location slugs |
 | `activated` | `boolean` | ❌ | `true` | Whether the check is enabled |
 | `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
 | `group` | `CheckGroup` | ❌ | - | The CheckGroup this check belongs to |
 | `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Array of AlertChannel objects for notifications |
 | `tags` | `string[]` | ❌ | `[]` | Array of tags to organize checks |
-| `runtimeId` | `string` | ❌ | - | The ID of the runtime to use (2023.09 or later required) |
 | `testOnly` | `boolean` | ❌ | `false` | Only run with test, not during deploy |
 | `retryStrategy` | `RetryStrategy` | ❌ | - | Strategy for configuring retries |
 | `runParallel` | `boolean` | ❌ | `false` | Run checks in parallel or round-robin |
@@ -90,10 +100,31 @@ Configure common properties that apply to all check types:
 </Tab>
 </Tabs>
 
-## `code` Configuration
+## Unique Options
 
-The `code` object is a mandatory part of a multistep check and defines how to execute your Playwright test:
+<ResponseField name="code" type="object" required>
+The Playwright test code configuration that defines the multistep workflow. This is the core component that contains your end-to-end test logic.
 
+### Usage
+```ts
+// Using file reference
+code: {
+  entrypoint: path.join(__dirname, 'user-journey.spec.ts')
+}
+
+// Using inline content
+code: {
+  content: `
+    import { test, expect } from '@playwright/test'
+    
+    test('complete workflow', async ({ page }) => {
+      // Multistep logic here
+    })
+  `
+}
+```
+
+### Parameters
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `entrypoint` | `string` | ❌ | Path to a `.spec.js` or `.spec.ts` file containing the Playwright test |
@@ -103,34 +134,258 @@ The `code` object is a mandatory part of a multistep check and defines how to ex
 You must provide either `entrypoint` or `content`, but not both.
 </Info>
 
+### Examples
+
+<Tabs>
+<Tab title="User Onboarding Flow">
+
 ```ts
-// Using file reference
-code: {
-  entrypoint: path.join(__dirname, 'complex-workflow.spec.ts')
-}
+new MultiStepCheck('onboarding-flow', {
+  name: 'Complete User Onboarding',
+  runtimeId: '2025.04',
+  code: {
+    entrypoint: path.join(__dirname, 'onboarding.spec.ts')
+  }
+})
 
-// Using inline content
-code: {
-  content: `
-    import { test, expect } from '@playwright/test'
+// onboarding.spec.ts
+import { test, expect } from '@playwright/test'
 
-    test('complete user workflow', async ({ page }) => {
-      // Step 1: Login
-      await page.goto('https://app.example.com/login')
-      await page.fill('[data-testid="email"]', process.env.TEST_EMAIL)
-      await page.fill('[data-testid="password"]', process.env.TEST_PASSWORD)
-      await page.click('[data-testid="login-button"]')
-      
-      // Step 2: Navigate to dashboard
-      await expect(page).toHaveURL(/dashboard/)
-      
-      // Step 3: Perform actions...
-    })
-  `
-}
+test('user onboarding journey', async ({ page }) => {
+  // Step 1: Registration
+  await page.goto('https://app.example.com/signup')
+  await page.fill('[data-testid="email"]', 'user@example.com')
+  
+  // Step 2: Profile setup
+  await page.fill('[data-testid="first-name"]', 'John')
+  
+  // Step 3: Verify completion
+  await expect(page).toHaveURL(/dashboard/)
+})
 ```
 
-## Multistep Check Examples
+</Tab>
+<Tab title="E-commerce Journey">
+
+```ts
+new MultiStepCheck('purchase-flow', {
+  name: 'Complete Purchase Flow',
+  runtimeId: '2025.04',
+  code: {
+    entrypoint: path.join(__dirname, 'purchase.spec.ts')
+  },
+  environmentVariables: [
+    { key: 'CUSTOMER_EMAIL', value: 'test@example.com' }
+  ]
+})
+```
+
+</Tab>
+<Tab title="Inline Workflow">
+
+```ts
+new MultiStepCheck('quick-workflow', {
+  name: 'Quick Multistep Test',
+  runtimeId: '2025.04',
+  code: {
+    content: `
+      import { test, expect } from '@playwright/test'
+      
+      test('multi-page workflow', async ({ page }) => {
+        await page.goto('https://example.com')
+        await page.click('a[href="/about"]')
+        await expect(page).toHaveURL(/about/)
+        
+        await page.click('a[href="/contact"]')
+        await expect(page).toHaveURL(/contact/)
+      })
+    `
+  }
+})
+```
+
+</Tab>
+</Tabs>
+
+**Use cases**: Complex user journeys, end-to-end workflows, multi-page testing, business process validation.
+</ResponseField>
+
+## Common Options
+
+<ResponseField name="name" type="string" required>
+Friendly name for your multistep check that will be displayed in the Checkly dashboard and used in notifications.
+
+### Usage
+```ts
+new MultiStepCheck('my-multistep', {
+  name: 'Complete User Journey Test'
+})
+```
+
+### Examples
+```ts
+// User journey naming
+new MultiStepCheck('onboarding-flow', {
+  name: 'User Onboarding Flow'
+})
+
+// Business process naming
+new MultiStepCheck('purchase-journey', {
+  name: 'E-commerce Purchase Journey'
+})
+
+// Workflow-specific naming
+new MultiStepCheck('saas-workflow', {
+  name: 'SaaS Application Workflow'
+})
+```
+</ResponseField>
+
+<ResponseField name="runtimeId" type="string">
+The ID of the runtime to use for executing the multistep check. Required to be 2023.09 or later for multistep check support.
+
+### Usage
+```ts
+new MultiStepCheck('my-multistep', {
+  runtimeId: '2025.04' // Use latest runtime for best performance
+})
+```
+
+### Examples
+```ts
+// Latest runtime (recommended)
+new MultiStepCheck('modern-workflow', {
+  name: 'Modern User Workflow',
+  runtimeId: '2025.04'
+})
+
+// Stable runtime
+new MultiStepCheck('stable-workflow', {
+  name: 'Stable Production Workflow',
+  runtimeId: '2024.09'
+})
+
+// Minimum required runtime
+new MultiStepCheck('legacy-workflow', {
+  name: 'Legacy Workflow',
+  runtimeId: '2023.09' // Minimum for multistep checks
+})
+```
+
+<Warning>
+Multistep checks require runtime 2023.09 or later. Earlier runtimes do not support multistep functionality.
+</Warning>
+
+**Use cases**: Runtime version management, compatibility requirements, feature availability control.
+</ResponseField>
+
+<ResponseField name="frequency" type="Frequency">
+How often the multistep check should run. Use the `Frequency` enum to set the check interval.
+
+### Usage
+```ts
+import { Frequency } from 'checkly/constructs'
+
+new MultiStepCheck('my-multistep', {
+  frequency: Frequency.EVERY_15M
+})
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Critical User Journeys">
+
+```ts
+// High-value user flows
+new MultiStepCheck('critical-purchase', {
+  name: 'Critical Purchase Flow',
+  frequency: Frequency.EVERY_5M, // Every 5 minutes
+  runtimeId: '2025.04'
+})
+```
+
+</Tab>
+<Tab title="Standard Workflows">
+
+```ts
+// Regular business processes
+new MultiStepCheck('standard-onboarding', {
+  name: 'User Onboarding Process',
+  frequency: Frequency.EVERY_15M, // Every 15 minutes
+  runtimeId: '2025.04'
+})
+```
+
+</Tab>
+<Tab title="Comprehensive E2E">
+
+```ts
+// Full application workflows
+new MultiStepCheck('full-app-journey', {
+  name: 'Complete Application Journey',
+  frequency: Frequency.EVERY_30M, // Every 30 minutes
+  runtimeId: '2025.04'
+})
+```
+
+</Tab>
+</Tabs>
+
+**Available frequencies**: `EVERY_30S`, `EVERY_1M`, `EVERY_2M`, `EVERY_5M`, `EVERY_10M`, `EVERY_15M`, `EVERY_30M`, `EVERY_1H`, `EVERY_2H`, `EVERY_4H`, `EVERY_6H`, `EVERY_8H`, `EVERY_12H`, `EVERY_24H`
+</ResponseField>
+
+<ResponseField name="locations" type="string[]" default="[]">
+Array of public location codes where the multistep check should run. Multiple locations provide geographic coverage and user experience insights.
+
+### Usage
+```ts
+new MultiStepCheck('global-workflow', {
+  locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1']
+})
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Global User Experience">
+
+```ts
+// Worldwide user journey testing
+new MultiStepCheck('global-journey', {
+  name: 'Global User Journey',
+  frequency: Frequency.EVERY_10M,
+  locations: [
+    'us-east-1',      // N. Virginia
+    'us-west-1',      // N. California 
+    'eu-west-1',      // Ireland
+    'ap-southeast-1', // Singapore
+    'ap-northeast-1'  // Tokyo
+  ],
+  runtimeId: '2025.04'
+})
+```
+
+</Tab>
+<Tab title="Regional Focus">
+
+```ts
+// European user focus
+new MultiStepCheck('eu-workflow', {
+  name: 'European User Workflow',
+  frequency: Frequency.EVERY_15M,
+  locations: ['eu-west-1', 'eu-central-1'],
+  runtimeId: '2025.04'
+})
+```
+
+</Tab>
+</Tabs>
+
+**Use cases**: Global user experience monitoring, regional performance testing, geographic compliance validation.
+</ResponseField>
+
+## Examples
 
 <Tabs>
   <Tab title="Complete User Onboarding">

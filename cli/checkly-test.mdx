@@ -6,116 +6,328 @@ sidebarTitle: 'checkly test'
 
 The `checkly test` command executes all checks in your project on the Checkly cloud infrastructure. This command provides a dry-run capability for testing your monitoring setup before deployment, with support for different environments and configurations.
 
+<Accordion title="Prerequisites">
+Before using `checkly test`, ensure you have:
+
+- A Checkly CLI project initialized with `npx checkly init`
+- At least one check file in your project directory
+- Valid Checkly account authentication (run `npx checkly login` if needed)
+- A `checkly.config.ts` or `checkly.config.js` configuration file
+
+For additional setup information, see [CLI overview](/cli/overview).
+</Accordion>
+
 ## Usage
 
-Run all checks in your project as a dry run.
-
-```bash Terminal
-npx checkly test
-```
-
-
-## Extended Usage
-
-Run only checks that contain `product` and `api` in their file names.
+The basic command runs all checks in your project as a test run without deploying them to your account as monitors.
 
 
 ```bash Terminal
-npx checkly test product api
-```
-Record a test session with full logging, videos, and traces in the EU West region.
-
-```bash Terminal
-npx checkly test --record --location eu-west-1
-```
-Run checks with specific environment variables for testing against staging environments.
-
-```bash Terminal
-npx checkly test --env ENVIRONMENT_URL="https://staging.acme.com" --env PASSWORD=secret123
+npx checkly test [file-patterns] [options]
 ```
 
-Run checks matching regex patterns and containing specific tags.
 
-```bash Terminal
-npx checkly test --grep "homepage|checkout" --tags production,critical
-```
+
+<Tabs>
+<Tab title="Unique Options">
+
+| Option | Description | Type | Required |
+|--------|-------------|------|----------|
+| `--list` | Display all checks without executing them | boolean | No |
+| `--grep, -g` | Run checks matching a regular expression pattern | string | No |
+| `--update-snapshots, -u` | Update golden images and reference snapshots | boolean | No |
+| `file-patterns` | Specify file patterns to run specific subsets | string[] | No |
+
+</Tab>
+<Tab title="Common Options">
+
+| Option | Description | Type | Required |
+|--------|-------------|------|----------|
+| `--record` | Record test session | boolean | No |
+| `--reporter, -r` | Specify output format | string | No |
+| `--tags, -t` | Filter by tags | string | No |
+| `--verbose, -v` | Show detailed output | boolean | No |
+
+</Tab>
+<Tab title="All Global Options">
+
+| Option | Description | Type | Required |
+|--------|-------------|------|----------|
+| `--config, -c` | Specify a configuration file | string | No |
+| `--env, -e` | Pass environment variables | string | No |
+| `--env-file` | Load variables from file | string | No |
+| `--location, -l` | Run checks in specific location | string | No |
+| `--private-location` | Use private location | string | No |
+| `--retries` | Set retry attempts | number | No |
+| `--timeout` | Set execution timeout | number | No |
+
+For detailed information about global options, see [global options](/cli/global-options).
+
+</Tab>
+</Tabs>
 
 ## Unique Options
 
-### `--list`
-Display all checks in your project without executing them.
+<ResponseField name="--list" type="boolean">
+Display all checks in your project without executing them. Useful for verifying which checks would be included in a test run.
 
+### Usage
 ```bash Terminal
 npx checkly test --list
 ```
 
-Useful for verifying which checks would be included in a test run.
-
-### `--grep <pattern>` or `-g`
-Run only checks where the check name matches a JavaScript regular expression.
-
+### Examples
 ```bash Terminal
-npx checkly test --grep "api.*test"
-npx checkly test -g "homepage|checkout"
+# List all checks
+npx checkly test --list
+
+# List checks with file patterns
+npx checkly test api --list
+
+# List checks with tags
+npx checkly test --tags production --list
+```
+</ResponseField>
+
+<ResponseField name="--grep, -g" type="string">
+Run only checks where the check name matches a JavaScript regular expression pattern.
+
+### Usage
+```bash Terminal
+npx checkly test --grep <pattern>
+npx checkly test -g <pattern>
 ```
 
-### `--update-snapshots` or `-u`
+### Examples
+```bash Terminal
+# Run checks matching a specific pattern
+npx checkly test --grep "api.*test"
+
+# Run checks with multiple patterns (OR logic)
+npx checkly test -g "homepage|checkout"
+
+# Combine with other options
+npx checkly test --grep "api" --tags production
+```
+</ResponseField>
+
+<ResponseField name="--update-snapshots, -u" type="boolean">
 Update the golden images and reference snapshots for visual comparison and snapshot tests.
 
+<Warning>Only use `--update-snapshots` when you've verified that visual changes are intentional.</Warning>
+
+### Usage
 ```bash Terminal
 npx checkly test --update-snapshots
+npx checkly test -u
 ```
 
-**Warning**: Only use this when you've verified that visual changes are intentional.
+### Examples
+```bash Terminal
+# Update all snapshots
+npx checkly test --update-snapshots
 
-### File Pattern Matching
-You can specify file patterns as arguments to run specific subsets of checks:
+# Update snapshots for specific checks
+npx checkly test api --update-snapshots
+
+# Update snapshots with verbose output
+npx checkly test -u --verbose
+```
+</ResponseField>
+
+<ResponseField name="file-patterns" type="string[]">
+Specify file patterns as arguments to run specific subsets of checks. Supports multiple patterns with OR logic.
+
+### Usage
+```bash Terminal
+npx checkly test <file-pattern> [<file-pattern>...]
+```
+
+### Examples
+```bash Terminal
+# Run specific file
+npx checkly test home.spec.js
+
+# Run files containing 'api'
+npx checkly test api
+
+# Run files containing 'product' OR 'checkout'
+npx checkly test product checkout
+
+# Combine with options
+npx checkly test api --record --location eu-west-1
+```
+</ResponseField>
+
+## Common Options
+
+<ResponseField name="--record" type="boolean">
+Record test results in Checkly as a test session with full logging, videos, and traces.
+
+### Usage
+```bash Terminal
+npx checkly test --record
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Basic Recording">
 
 ```bash Terminal
-npx checkly test home.spec.js          # Run specific file
-npx checkly test api                   # Run files containing 'api'
-npx checkly test product checkout      # Run files containing 'product' OR 'checkout'
+# Record basic test session
+npx checkly test --record
+
+# Output
+Test session recorded: https://app.checklyhq.com/test-sessions/abc123
+✓ All checks passed
 ```
 
-## Environment Variable Targeting
+</Tab>
+<Tab title="With Custom Name">
 
-The `test` command is particularly powerful when combined with environment variables, allowing you to target different environments with specific configurations:
-
-### Staging Environment
 ```bash Terminal
-npx checkly test \
-  --env ENVIRONMENT_URL="https://staging.acme.com" \
-  --env API_KEY="staging_key_123" \
-  --env DATABASE_URL="postgres://staging-db"
+# Record with custom session name
+npx checkly test --record --test-session-name "Pre-deployment validation"
+
+# Output
+Test session recorded: Pre-deployment validation
+✓ All checks passed
 ```
 
-### Using Environment Files
-```bash Terminal    
-# .env.staging
-ENVIRONMENT_URL=https://staging.acme.com
-API_KEY=staging_key_123
-DATABASE_URL=postgres://staging-db
+</Tab>
+</Tabs>
 
-npx checkly test --env-file .env.staging
+**Benefits**: Persistent results, detailed debugging information, team collaboration.
+</ResponseField>
+
+<ResponseField name="--reporter, -r" type="string">
+Specify one or more output formats for test results. You can combine multiple reporters.
+
+### Usage
+```bash Terminal
+npx checkly test --reporter <format>
+npx checkly test -r <format>
 ```
 
-Variables passed via `--env` will override those from `--env-file` and any variables stored in your Checkly account. 
+### Examples
 
-## Global Options
+<Tabs>
+<Tab title="JSON Reporter">
 
-This command supports the following [global options](/cli/checkly-global-options):
+```bash Terminal
+# JSON output for CI/CD
+npx checkly test --reporter json
 
-| Option | Description |
-|--------|-------------|
-| [`--config`](/cli/checkly-global-options#config-or-c) | Specify a configuration file |
-| [`--env`](/cli/checkly-global-options#env-keyvalue-or-e) | Pass environment variables |
-| [`--env-file`](/cli/checkly-global-options#env-file) | Load variables from file |
-| [`--location`](/cli/checkly-global-options#location-location-or-l) | Run checks in specific location |
-| [`--private-location`](/cli/checkly-global-options#private-location-private-location-id) | Use private location |
-| [`--record`](/cli/checkly-global-options#record) | Record test session |
-| [`--reporter`](/cli/checkly-global-options#reporter-or-r) | Specify output format |
-| [`--tags`](/cli/checkly-global-options#tags-or-t) | Filter by tags |
-| [`--retries`](/cli/checkly-global-options#retries) | Set retry attempts |
-| [`--timeout`](/cli/checkly-global-options#timeout) | Set execution timeout |
-| [`--verbose`](/cli/checkly-global-options#verbose-or-v) | Show detailed output |
+# Output
+{"results":[{"name":"Homepage check","status":"passed","duration":1200}]}
+```
+
+</Tab>
+<Tab title="CI Reporter">
+
+```bash Terminal
+# CI-friendly format
+npx checkly test --reporter ci
+
+# Output
+[PASS] Homepage check (1.2s)
+[PASS] API health check (0.8s)
+```
+
+</Tab>
+</Tabs>
+
+**Available reporters**: `list` (default), `dot`, `ci`, `github`, `json`
+</ResponseField>
+
+<ResponseField name="--tags, -t" type="string">
+Filter checks using comma-separated tags. Checks must contain all specified tags to be selected.
+
+### Usage
+```bash Terminal
+npx checkly test --tags <tag1,tag2>
+npx checkly test -t <tag1,tag2>
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Single Tag Filter">
+
+```bash Terminal
+# Run production checks only
+npx checkly test --tags production
+
+# Output
+Running 8 checks tagged with: production
+✓ Homepage check
+✓ API health check
+```
+
+</Tab>
+<Tab title="Multiple Tags">
+
+```bash Terminal
+# Run checks with both production AND api tags
+npx checkly test --tags production,api
+
+# Output
+Running 3 checks tagged with: production,api
+✓ API health check
+✓ User API check
+```
+
+</Tab>
+</Tabs>
+
+**Multiple filters**: Use multiple `--tags` flags for OR logic.
+</ResponseField>
+
+<ResponseField name="--verbose, -v" type="boolean">
+Show detailed logs and output for all operations, including full check execution logs.
+
+### Usage
+```bash Terminal
+npx checkly test --verbose
+npx checkly test -v
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Standard Output">
+
+```bash Terminal
+# Standard test run
+npx checkly test
+
+# Output
+✓ Homepage check (1.2s)
+✓ API health check (0.8s)
+```
+
+</Tab>
+<Tab title="Verbose Output">
+
+```bash Terminal
+# Verbose test run
+npx checkly test --verbose
+
+# Output
+✓ Homepage check (1.2s)
+  - Browser: chromium
+  - Location: us-east-1
+  - Screenshots: 3 captured
+✓ API health check (0.8s)
+  - Response time: 245ms
+  - Status code: 200
+```
+
+</Tab>
+</Tabs>
+
+**Use cases**: Debugging, detailed CI logs, troubleshooting check failures.
+</ResponseField>
+
 

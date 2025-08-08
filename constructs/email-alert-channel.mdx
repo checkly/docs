@@ -37,21 +37,17 @@ const emailChannel = new EmailAlertChannel('ops-email-channel', {
 
 </CodeGroup>
 
-## `EmailAlertChannel` Configuration
+## Options
 
 <Tabs>
-  <Tab title="Unique Configuration">
-
-Configure email-specific settings:
+<Tab title="Unique Options">
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `address` | `string` | ✅ | - | Email address to send notifications to |
 
 </Tab>
-
-<Tab title="Shared Configuration">
-Configure common alert channel properties:
+<Tab title="Common Options">
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
@@ -64,140 +60,370 @@ Configure common alert channel properties:
 </Tab>
 </Tabs>
 
-## Email Alert Channel Examples
+## Unique Options
 
-<Tabs>
-  <Tab title="Basic Team Alerts">
-    ```ts
-    import { EmailAlertChannel, ApiCheck } from 'checkly/constructs'
+<ResponseField name="address" type="string" required>
+Email address to send notifications to. Each EmailAlertChannel supports only one email address.
 
-    const teamEmail = new EmailAlertChannel('team-email', {
-      address: 'dev-team@acme.com'
-    })
+### Usage
+```ts
+new EmailAlertChannel('team-email', {
+  address: 'dev-team@acme.com'
+})
+```
 
-    new ApiCheck('api-health-check', {
-      name: 'API Health Check',
-      alertChannels: [teamEmail],
-      request: {
-        method: 'GET',
-        url: 'https://api.acme.com/health'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="On-Call Notifications">
-    ```ts
-    const onCallEmail = new EmailAlertChannel('oncall-email', {
-      address: 'oncall@acme.com',
-      sendRecovery: true,
-      sendFailure: true,
-      sendDegrade: false // Only critical failures
-    })
+### Examples
 
-    new ApiCheck('critical-api-check', {
-      name: 'Critical API Endpoint',
-      alertChannels: [onCallEmail],
-      request: {
-        method: 'GET',
-        url: 'https://api.acme.com/critical-endpoint'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="SSL Certificate Monitoring">
-    ```ts
-    const securityEmail = new EmailAlertChannel('security-email', {
-      address: 'security@acme.com',
-      sendRecovery: false,
-      sendFailure: true,
-      sslExpiry: true,
-      sslExpiryThreshold: 14 // Alert 14 days before expiry
-    })
+<CodeGroup>
 
-    new ApiCheck('ssl-cert-check', {
-      name: 'SSL Certificate Check',
-      alertChannels: [securityEmail],
-      request: {
-        method: 'GET',
-        url: 'https://secure.acme.com'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Degraded Performance Alerts">
-    ```ts
-    const performanceEmail = new EmailAlertChannel('performance-email', {
-      address: 'performance-team@acme.com',
-      sendRecovery: true,
-      sendFailure: true,
-      sendDegrade: true // Alert on degraded performance
-    })
+```ts Team Notifications
+const teamEmail = new EmailAlertChannel('team-email', {
+  address: 'dev-team@acme.com'
+})
 
-    new ApiCheck('performance-check', {
-      name: 'API Performance Check',
-      maxResponseTime: 5000,
-      degradedResponseTime: 2000,
-      alertChannels: [performanceEmail],
-      request: {
-        method: 'GET',
-        url: 'https://api.acme.com/slow-endpoint'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Multiple Recipients">
-    ```ts
-    // Create separate channels for different recipients
-    const devEmail = new EmailAlertChannel('dev-email', {
-      address: 'dev@acme.com',
-      sendDegrade: true
-    })
+new ApiCheck('api-health-check', {
+  name: 'API Health Check',
+  alertChannels: [teamEmail],
+  request: {
+    method: 'GET',
+    url: 'https://api.acme.com/health'
+  }
+})
+```
 
-    const opsEmail = new EmailAlertChannel('ops-email', {
-      address: 'ops@acme.com',
-      sendFailure: true,
-      sendRecovery: true
-    })
+```ts Individual Developer
+const developerEmail = new EmailAlertChannel('developer-email', {
+  address: 'john.doe@acme.com'
+})
 
-    const managerEmail = new EmailAlertChannel('manager-email', {
-      address: 'manager@acme.com',
-      sendFailure: true,
-      sendRecovery: false
-    })
+new ApiCheck('personal-project-check', {
+  name: 'Personal Project Check',
+  alertChannels: [developerEmail],
+  request: {
+    method: 'GET',
+    url: 'https://johnspersonalapi.com/status'
+  }
+})
+```
 
-    new ApiCheck('important-service', {
-      name: 'Important Service Check',
-      alertChannels: [devEmail, opsEmail, managerEmail],
-      request: {
-        method: 'GET',
-        url: 'https://api.acme.com/important'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Using fromId()">
-    ```ts
-    // Reference an existing email channel by ID
-    const existingEmailChannel = EmailAlertChannel.fromId(123)
+```ts Distribution List
+const distributionEmail = new EmailAlertChannel('dist-email', {
+  address: 'alerts-distribution-list@acme.com' // Distribution list
+})
 
-    new ApiCheck('existing-channel-check', {
-      name: 'Check with Existing Channel',
-      alertChannels: [existingEmailChannel],
-      request: {
-        method: 'GET',
-        url: 'https://api.acme.com/endpoint'
-      }
-    })
-    ```
-  </Tab>
-</Tabs>
+new ApiCheck('company-wide-check', {
+  name: 'Company Wide Service Check',
+  alertChannels: [distributionEmail],
+  request: {
+    method: 'GET',
+    url: 'https://api.acme.com/public'
+  }
+})
+```
 
-## Best Practices
+</CodeGroup>
+
+**Use cases**: Team notifications, individual alerts, distribution lists, role-based alerting.
+</ResponseField>
+
+## Common Options
+
+<ResponseField name="sendRecovery" type="boolean">
+Whether to send notifications when checks recover from failure or degraded state.
+
+### Usage
+```ts
+new EmailAlertChannel('recovery-email', {
+  address: 'ops@acme.com',
+  sendRecovery: true // Send recovery notifications
+})
+```
+
+### Examples
+
+<CodeGroup>
+
+```ts Recovery Notifications
+const opsEmail = new EmailAlertChannel('ops-email', {
+  address: 'ops@acme.com',
+  sendRecovery: true, // Get notified when issues are resolved
+  sendFailure: true
+})
+```
+
+```ts Failure Only
+const alertsEmail = new EmailAlertChannel('alerts-only', {
+  address: 'alerts@acme.com',
+  sendRecovery: false, // Only failures, no recovery notifications
+  sendFailure: true
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Recovery confirmation, operational awareness, noise reduction.
+</ResponseField>
+
+<ResponseField name="sendFailure" type="boolean">
+Whether to send notifications when checks fail.
+
+### Usage
+```ts
+new EmailAlertChannel('failure-email', {
+  address: 'oncall@acme.com',
+  sendFailure: true // Send failure notifications
+})
+```
+
+### Examples
+
+<CodeGroup>
+
+```ts Critical Failures Only
+const criticalEmail = new EmailAlertChannel('critical-email', {
+  address: 'oncall@acme.com',
+  sendFailure: true, // Critical failures
+  sendRecovery: true,
+  sendDegrade: false // No degraded alerts
+})
+```
+
+```ts All Notifications
+const comprehensiveEmail = new EmailAlertChannel('all-notifications', {
+  address: 'monitoring@acme.com',
+  sendFailure: true, // All failures
+  sendRecovery: true,
+  sendDegrade: true
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Incident response, failure monitoring, operational alerting.
+</ResponseField>
+
+<ResponseField name="sendDegrade" type="boolean">
+Whether to send notifications when API checks degrade (performance thresholds exceeded but not failed).
+
+### Usage
+```ts
+new EmailAlertChannel('performance-email', {
+  address: 'performance-team@acme.com',
+  sendDegrade: true // Send degraded performance notifications
+})
+```
+
+### Examples
+
+<CodeGroup>
+
+```ts Performance Monitoring
+const performanceEmail = new EmailAlertChannel('performance-email', {
+  address: 'performance-team@acme.com',
+  sendRecovery: true,
+  sendFailure: true,
+  sendDegrade: true // Alert on degraded performance
+})
+
+new ApiCheck('performance-check', {
+  name: 'API Performance Check',
+  maxResponseTime: 5000,
+  degradedResponseTime: 2000, // Triggers degrade alerts
+  alertChannels: [performanceEmail],
+  request: {
+    method: 'GET',
+    url: 'https://api.acme.com/slow-endpoint'
+  }
+})
+```
+
+```ts Critical Only
+const criticalOnlyEmail = new EmailAlertChannel('critical-only', {
+  address: 'oncall@acme.com',
+  sendFailure: true,
+  sendRecovery: true,
+  sendDegrade: false // Only complete failures, not performance issues
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Performance monitoring, early warning systems, SLA tracking.
+</ResponseField>
+
+<ResponseField name="sslExpiry" type="boolean">
+Whether to send notifications for SSL certificate expiry warnings.
+
+### Usage
+```ts
+new EmailAlertChannel('security-email', {
+  address: 'security@acme.com',
+  sslExpiry: true,
+  sslExpiryThreshold: 30 // Alert 30 days before expiry
+})
+```
+
+### Examples
+
+<CodeGroup>
+
+```ts Security Team Alerts
+const securityEmail = new EmailAlertChannel('security-email', {
+  address: 'security@acme.com',
+  sendRecovery: false,
+  sendFailure: true,
+  sslExpiry: true,
+  sslExpiryThreshold: 14 // Alert 14 days before expiry
+})
+
+new ApiCheck('ssl-cert-check', {
+  name: 'SSL Certificate Check',
+  alertChannels: [securityEmail],
+  request: {
+    method: 'GET',
+    url: 'https://secure.acme.com'
+  }
+})
+```
+
+```ts Early Warning System
+const earlyWarningEmail = new EmailAlertChannel('ssl-early-warning', {
+  address: 'devops@acme.com',
+  sslExpiry: true,
+  sslExpiryThreshold: 60 // Alert 60 days before expiry for planning
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Certificate management, security compliance, proactive maintenance.
+</ResponseField>
+
+<ResponseField name="sslExpiryThreshold" type="number">
+Number of days before SSL certificate expiry to send notifications. Only relevant when `sslExpiry` is enabled.
+
+### Usage
+```ts
+new EmailAlertChannel('ssl-monitoring', {
+  address: 'devops@acme.com',
+  sslExpiry: true,
+  sslExpiryThreshold: 30 // Alert 30 days before expiry
+})
+```
+
+### Examples
+
+<CodeGroup>
+
+```ts Conservative Warning
+// Give plenty of time for certificate renewal
+new EmailAlertChannel('ssl-conservative', {
+  address: 'devops@acme.com',
+  sslExpiry: true,
+  sslExpiryThreshold: 60 // 60 days notice
+})
+```
+
+```ts Last Minute Alert
+// Alert close to expiry for urgent action
+new EmailAlertChannel('ssl-urgent', {
+  address: 'security@acme.com',
+  sslExpiry: true,
+  sslExpiryThreshold: 7 // 7 days notice
+})
+```
+
+```ts Multiple Thresholds
+// Create multiple channels with different thresholds
+const earlyWarning = new EmailAlertChannel('ssl-early', {
+  address: 'planning@acme.com',
+  sslExpiry: true,
+  sslExpiryThreshold: 90 // Planning notification
+})
+
+const urgentWarning = new EmailAlertChannel('ssl-urgent', {
+  address: 'oncall@acme.com',
+  sslExpiry: true,
+  sslExpiryThreshold: 7 // Urgent notification
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Certificate renewal planning, compliance management, operational scheduling.
+</ResponseField>
+
+## Examples
+
+<CodeGroup>
+
+```ts Multiple Recipients
+// Create separate channels for different recipients
+const devEmail = new EmailAlertChannel('dev-email', {
+  address: 'dev@acme.com',
+  sendDegrade: true
+})
+
+const opsEmail = new EmailAlertChannel('ops-email', {
+  address: 'ops@acme.com',
+  sendFailure: true,
+  sendRecovery: true
+})
+
+const managerEmail = new EmailAlertChannel('manager-email', {
+  address: 'manager@acme.com',
+  sendFailure: true,
+  sendRecovery: false
+})
+
+new ApiCheck('important-service', {
+  name: 'Important Service Check',
+  alertChannels: [devEmail, opsEmail, managerEmail],
+  request: {
+    method: 'GET',
+    url: 'https://api.acme.com/important'
+  }
+})
+```
+
+```ts Using Existing Channel
+// Reference an existing email channel by ID
+const existingEmailChannel = EmailAlertChannel.fromId(123)
+
+new ApiCheck('existing-channel-check', {
+  name: 'Check with Existing Channel',
+  alertChannels: [existingEmailChannel],
+  request: {
+    method: 'GET',
+    url: 'https://api.acme.com/endpoint'
+  }
+})
+```
+
+```ts Comprehensive Setup
+// Full configuration example
+const comprehensiveEmail = new EmailAlertChannel('comprehensive-alerts', {
+  address: 'monitoring@acme.com',
+  sendRecovery: true,    // Know when issues are resolved
+  sendFailure: true,     // Critical for incident response
+  sendDegrade: true,     // Early warning for performance issues
+  sslExpiry: true,       // Certificate management
+  sslExpiryThreshold: 30 // One month notice
+})
+
+new ApiCheck('comprehensive-monitoring', {
+  name: 'Comprehensive API Monitoring',
+  maxResponseTime: 10000,
+  degradedResponseTime: 5000,
+  alertChannels: [comprehensiveEmail],
+  request: {
+    method: 'GET',
+    url: 'https://api.acme.com/comprehensive'
+  }
+})
+```
+
+</CodeGroup>
 
 <Info>
 **Single Email Address**: EmailAlertChannel only accepts one email address. For multiple recipients, create separate EmailAlertChannel instances or use distribution lists.

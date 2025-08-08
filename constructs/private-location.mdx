@@ -6,9 +6,17 @@ sidebarTitle: 'Private Location'
 
 Use PrivateLocation to create private locations for running checks from your own infrastructure, VPCs, or segregated networks. This enables monitoring of internal services and applications not accessible from the public internet.
 
-<Info>
-Learn more about private locations in the [Private Locations documentation](/docs/introduction/platform/private-locations/).
-</Info>
+<Accordion title="Prerequisites">
+Before creating private locations, ensure you have:
+
+- A Checkly CLI project initialized with `npx checkly init`
+- Access to the infrastructure where you'll deploy the private location agent
+- Network connectivity from your infrastructure to Checkly's API endpoints
+- Understanding of your internal network topology and security requirements
+- Administrative privileges to deploy and run the private location agent
+
+For additional setup information, see [CLI overview](/cli/overview) and [Private Locations documentation](/docs/introduction/platform/private-locations/).
+</Accordion>
 
 ## `PrivateLocation` Structure
 
@@ -47,12 +55,7 @@ new ApiCheck('internal-api-check', {
 
 </CodeGroup>
 
-## `PrivateLocation` Configuration
-
-<Tabs>
-  <Tab title="Basic Configuration">
-
-Configure essential private location settings:
+## Options
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
@@ -61,10 +64,284 @@ Configure essential private location settings:
 | `icon` | `string` | ❌ | `'server'` | Octicon name to distinguish the location in the UI |
 | `proxyUrl` | `string` | ❌ | - | Proxy URL for outgoing HTTP calls from this location |
 
+## Unique Options
+
+<ResponseField name="name" type="string" required>
+Friendly name for your private location that will be displayed in the Checkly dashboard and used for identification.
+
+### Usage
+```ts
+new PrivateLocation('my-location', {
+  name: 'Corporate Data Center'
+})
+```
+
+### Examples
+```ts
+// Infrastructure-based naming
+new PrivateLocation('datacenter-east', {
+  name: 'East Coast Data Center'
+})
+
+// Environment-based naming
+new PrivateLocation('dev-vpc', {
+  name: 'Development VPC'
+})
+
+// Function-based naming
+new PrivateLocation('api-gateway-zone', {
+  name: 'API Gateway Zone'
+})
+```
+</ResponseField>
+
+<ResponseField name="slugName" type="string" required>
+Unique slug identifier for your private location. This must be unique across your entire Checkly account and is used for referencing the location.
+
+### Usage
+```ts
+new PrivateLocation('my-location', {
+  name: 'My Location',
+  slugName: 'my-unique-location-slug'
+})
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Good Naming Practices">
+
+```ts
+// Descriptive and stable slugs
+new PrivateLocation('corp-vpc-east', {
+  name: 'Corporate VPC East',
+  slugName: 'corporate-vpc-east-1'
+})
+
+new PrivateLocation('k8s-prod', {
+  name: 'Production Kubernetes',
+  slugName: 'k8s-production-cluster'
+})
+
+new PrivateLocation('datacenter-west', {
+  name: 'West Coast Datacenter',
+  slugName: 'datacenter-west-coast'
+})
+```
+
+</Tab>
+<Tab title="Avoid These Patterns">
+
+```ts
+// Too generic or likely to change
+new PrivateLocation('location-1', {
+  name: 'Location 1',
+  slugName: 'location-1' // Too generic
+})
+
+new PrivateLocation('temp-loc', {
+  name: 'Temporary Location',
+  slugName: 'temp-location-2024' // Date-based, will become outdated
+})
+```
+
 </Tab>
 </Tabs>
 
-## Private Location Examples
+<Warning>
+The `slugName` must be unique across your entire Checkly account and cannot be changed after creation. Choose descriptive, stable names.
+</Warning>
+
+### Referencing Existing Locations
+
+You can reference private locations created outside your CLI project by using their slug names:
+
+<Tabs>
+<Tab title="By Slug Name">
+
+```ts
+// Reference existing private location by slug
+new ApiCheck('existing-location-check', {
+  name: 'Check Using Existing Location',
+  privateLocations: ['existing-datacenter-slug'], // String reference
+  request: {
+    method: 'GET',
+    url: 'https://internal.company.local/health'
+  }
+})
+```
+
+</Tab>
+<Tab title="Mixed References">
+
+```ts
+// Combine new and existing private locations
+const newLocation = new PrivateLocation('new-location', {
+  name: 'New Private Location',
+  slugName: 'new-location'
+})
+
+new ApiCheck('mixed-locations-check', {
+  name: 'Check with Mixed Locations',
+  privateLocations: [
+    newLocation,                    // New location object
+    'existing-location-slug'        // Existing location by slug
+  ],
+  request: {
+    method: 'GET',
+    url: 'https://internal.company.local/health'
+  }
+})
+```
+
+</Tab>
+</Tabs>
+
+**Use cases**: Location identification, API references, check configuration.
+</ResponseField>
+
+<ResponseField name="icon" type="string" default="server">
+Octicon name to visually distinguish the location in the Checkly UI. Choose icons that represent your infrastructure type or purpose.
+
+### Usage
+```ts
+new PrivateLocation('my-location', {
+  name: 'Database Zone',
+  icon: 'database',
+  slugName: 'database-zone'
+})
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Infrastructure Icons">
+
+```ts
+// Server infrastructure
+new PrivateLocation('server-farm', {
+  name: 'Server Farm',
+  icon: 'server',
+  slugName: 'server-farm-location'
+})
+
+// Database systems
+new PrivateLocation('db-cluster', {
+  name: 'Database Cluster',
+  icon: 'database',
+  slugName: 'database-cluster'
+})
+
+// Cloud infrastructure
+new PrivateLocation('cloud-vpc', {
+  name: 'Cloud VPC',
+  icon: 'cloud',
+  slugName: 'cloud-vpc-location'
+})
+```
+
+</Tab>
+<Tab title="Security Icons">
+
+```ts
+// Secure environments
+new PrivateLocation('secure-zone', {
+  name: 'Secure Zone',
+  icon: 'shield',
+  slugName: 'secure-zone-location'
+})
+
+// High-security areas
+new PrivateLocation('vault', {
+  name: 'Security Vault',
+  icon: 'shield-lock',
+  slugName: 'security-vault'
+})
+```
+
+</Tab>
+<Tab title="Environment Icons">
+
+```ts
+// Development environments
+new PrivateLocation('dev-env', {
+  name: 'Development Environment',
+  icon: 'tools',
+  slugName: 'development-environment'
+})
+
+// Container platforms
+new PrivateLocation('k8s-cluster', {
+  name: 'Kubernetes Cluster',
+  icon: 'container',
+  slugName: 'kubernetes-cluster'
+})
+```
+
+</Tab>
+</Tabs>
+
+**Available icons**: Any [Octicon](https://primer.style/design/foundations/icons) name (e.g., `server`, `database`, `cloud`, `shield`, `container`, `tools`, `building`)
+</ResponseField>
+
+<ResponseField name="proxyUrl" type="string">
+Proxy URL for outgoing HTTP calls from this private location. Use when your infrastructure requires all external traffic to go through a corporate proxy.
+
+### Usage
+```ts
+new PrivateLocation('corporate-location', {
+  name: 'Corporate Network',
+  slugName: 'corporate-network',
+  proxyUrl: 'http://proxy.company.local:8080'
+})
+```
+
+### Examples
+
+<Tabs>
+<Tab title="HTTP Proxy">
+
+```ts
+new PrivateLocation('corp-proxy-location', {
+  name: 'Corporate Network with Proxy',
+  slugName: 'corporate-with-proxy',
+  proxyUrl: 'http://proxy.company.local:8080'
+})
+```
+
+</Tab>
+<Tab title="HTTPS Proxy">
+
+```ts
+new PrivateLocation('secure-proxy-location', {
+  name: 'Secure Corporate Proxy',
+  slugName: 'secure-corporate-proxy',
+  proxyUrl: 'https://secure-proxy.company.local:8443'
+})
+```
+
+</Tab>
+<Tab title="Authenticated Proxy">
+
+```ts
+new PrivateLocation('auth-proxy-location', {
+  name: 'Authenticated Proxy Location',
+  slugName: 'authenticated-proxy',
+  proxyUrl: 'http://user:password@proxy.company.local:8080'
+})
+```
+
+</Tab>
+</Tabs>
+
+<Info>
+When `proxyUrl` is configured, all HTTP calls from checks running in this private location will route through the specified proxy server.
+</Info>
+
+**Use cases**: Corporate network compliance, security requirements, traffic routing control.
+</ResponseField>
+
+## Examples
 
 <Tabs>
   <Tab title="Corporate VPC">
@@ -343,114 +620,14 @@ Private locations can be used with all check types that support location configu
   </Tab>
 </Tabs>
 
-## Referencing Existing Private Locations
-
-You can reference private locations created outside your CLI project:
-
-<Tabs>
-  <Tab title="By Slug Name">
-    ```ts
-    // Reference existing private location by slug
-    new ApiCheck('existing-location-check', {
-      name: 'Check Using Existing Location',
-      privateLocations: ['existing-datacenter-slug'], // String reference
-      request: {
-        method: 'GET',
-        url: 'https://internal.company.local/health'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Mixed References">
-    ```ts
-    // Combine new and existing private locations
-    const newLocation = new PrivateLocation('new-location', {
-      name: 'New Private Location',
-      slugName: 'new-location'
-    })
-
-    new ApiCheck('mixed-locations-check', {
-      name: 'Check with Mixed Locations',
-      privateLocations: [
-        newLocation,                    // New location object
-        'existing-location-slug'        // Existing location by slug
-      ],
-      request: {
-        method: 'GET',
-        url: 'https://internal.company.local/health'
-      }
-    })
-    ```
-  </Tab>
-</Tabs>
-
-## Icon Options
-
-Use [Octicons](https://primer.style/design/foundations/icons) for your private location icons:
-
-<Tabs>
-  <Tab title="Common Icons">
-    ```ts
-    // Infrastructure icons
-    const serverLocation = new PrivateLocation('server-loc', {
-      name: 'Server Location',
-      icon: 'server',
-      slugName: 'server-location'
-    })
-
-    const databaseLocation = new PrivateLocation('db-loc', {
-      name: 'Database Location',
-      icon: 'database',
-      slugName: 'database-location'
-    })
-
-    const cloudLocation = new PrivateLocation('cloud-loc', {
-      name: 'Cloud Location',
-      icon: 'cloud',
-      slugName: 'cloud-location'
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Security Icons">
-    ```ts
-    // Security-focused icons
-    const secureLocation = new PrivateLocation('secure-loc', {
-      name: 'Secure Zone',
-      icon: 'shield',
-      slugName: 'secure-zone'
-    })
-
-    const lockdownLocation = new PrivateLocation('lockdown-loc', {
-      name: 'Lockdown Environment',
-      icon: 'shield-lock',
-      slugName: 'lockdown-env'
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Environment Icons">
-    ```ts
-    // Environment-specific icons
-    const devLocation = new PrivateLocation('dev-loc', {
-      name: 'Development',
-      icon: 'tools',
-      slugName: 'development'
-    })
-
-    const containerLocation = new PrivateLocation('container-loc', {
-      name: 'Container Platform',
-      icon: 'container',
-      slugName: 'containers'
-    })
-    ```
-  </Tab>
-</Tabs>
 
 ## Agent Deployment
 
 After creating a private location, you'll need to deploy the actual agent:
+
+```bash
+npx checkly deploy
+```
 
 <Info>
 **Agent Installation**: After deploying your private location construct, you'll receive installation instructions and authentication keys through the Checkly UI or CLI output.
@@ -459,45 +636,3 @@ After creating a private location, you'll need to deploy the actual agent:
 <Warning>
 **Unique Slug Names**: The `slugName` must be unique across your entire Checkly account. Choose descriptive, stable names that won't conflict with future locations.
 </Warning>
-
-## Best Practices
-
-<Tabs>
-  <Tab title="Naming Convention">
-    ```ts
-    // Good: Descriptive and consistent
-    const eastDatacenter = new PrivateLocation('datacenter-east-1', {
-      name: 'East Coast Datacenter',
-      slugName: 'datacenter-east-1'
-    })
-
-    const devK8s = new PrivateLocation('k8s-dev-cluster', {
-      name: 'Development Kubernetes',
-      slugName: 'k8s-dev-cluster'
-    })
-
-    // Avoid: Generic or changing names
-    const location1 = new PrivateLocation('loc-1', {
-      name: 'Location 1',
-      slugName: 'location-1'
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Logical Organization">
-    ```ts
-    // Organize by function/purpose
-    const apiGateway = new PrivateLocation('api-gateway-location', {
-      name: 'API Gateway Zone',
-      icon: 'workflow',
-      slugName: 'api-gateway-zone'
-    })
-
-    const databaseCluster = new PrivateLocation('database-cluster-location', {
-      name: 'Database Cluster Zone',
-      icon: 'database',
-      slugName: 'database-cluster-zone'
-    })
-    ```
-  </Tab>
-</Tabs>

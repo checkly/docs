@@ -15,13 +15,13 @@ To enable the Telegram alert channel, you'll need two things:
 
 1. Create a **Telegram Bot** using the [@BotFather](https://t.me/botfather). Detailed instructions can be found [here](https://core.telegram.org/bots), however you can simply message the Telegram user `@BotFather` and send them the command message `/newbot`. Then follow the instructions the bot replies with.
    
-   ![setup checkly telegram_bot step 1](/docs/images/integrations/telegram/telegram_step1.png)
+   ![setup checkly telegram_bot step 1](/images/docs/images/integrations/telegram/telegram_step1.png)
 
 2. As the last step of creating your new bot, the BotFather should reply with a message congratulating you that everything is complete and include a new HTTP API Token for you to use. Alternatively, if you want to reuse an existing Telegram bot you can message the BotFather with the command message `/token` and they will generate a new token. **Make sure to copy this token value out as we'll be using it in the Checkly setup later.**
 
 3. Start your new Telegram bot by opening a chat with it. You can use the **START** button in the UI or type the `/start` command message.
 
-   ![setup checkly telegram_bot step 2](/docs/images/integrations/telegram/telegram_step2.png)
+   ![setup checkly telegram_bot step 2](/images/docs/images/integrations/telegram/telegram_step2.png)
 
 ## Chat ID
 
@@ -39,7 +39,7 @@ Alternatively, we can use the API token we generated with the bot earlier and qu
 
 1. In a browser enter the following URL, `https://api.telegram.org/bot<API_TOKEN>/getUpdates`, of course replacing the `<API_TOKEN>` part with the actual token we obtained previously. Your browser should now display some JSON formatted data which looks like the following:
 
-   ![setup checkly telegram_bot step 5](/docs/images/integrations/telegram/telegram_step5.png)
+   ![setup checkly telegram_bot step 5](/images/docs/images/integrations/telegram/telegram_step5.png)
 
    In the `result` array, you will see the message you sent to your Bot previously to start it, including the `id` of the user who sent it - your own. This should be a 9-digit number. **This is the second and last piece of information we need for the Checkly Telegram integration**.
 
@@ -50,12 +50,12 @@ With the (1) **HTTP API Token** and (2) **Chat ID** in hand, we can go back to C
 1. Log in to Checkly and navigate to [Alert Settings](https://app.checklyhq.com/alert-settings/). 
    Click the "Add more channels" button, find Telegram on the list, and click "Add channel".
 
-   ![setup checkly telegram_bot step 6](/docs/images/integrations/telegram/telegram_step6.png)
+   ![setup checkly telegram_bot step 6](/images/docs/images/integrations/telegram/telegram_step6.png)
 
 2. Give the alert channel a name and **paste the API Token and Chat ID** in the dedicated input fields. Here you can also tweak
 which alerts you want to be notified of and which checks or check groups should trigger this channel.
 
-   ![setup checkly telegram_bot step 7](/docs/images/integrations/telegram/telegram_step7.png)
+   ![setup checkly telegram_bot step 7](/images/docs/images/integrations/telegram/telegram_step7.png)
 
    <Callout type="note">
    Note that we provide a preconfigured message payload, but you may want to edit the payload to modify the Telegram alert message contents. Such as by adding more variables or changing existing variables. Click the "Edit payload" button and reference the "Help & variables" tab.

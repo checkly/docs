@@ -6,64 +6,251 @@ sidebarTitle: 'checkly trigger'
 
 The `checkly trigger` command executes checks that are already deployed in your Checkly account. Unlike the `test` command, `trigger` works with any checks in your account regardless of how they were created - via CLI constructs, the web UI, or Terraform.
 
+<Accordion title="Prerequisites">
+Before using `checkly trigger`, ensure you have:
+
+- Valid Checkly account authentication (run `npx checkly login` if needed)
+- At least one check deployed in your Checkly account
+- Appropriate permissions to run checks in your account
+
+For additional setup information, see [CLI overview](/cli/overview).
+</Accordion>
+
 ## Usage
 
-Trigger all checks in your account.
+The basic command triggers all checks in your account that are already deployed.
 
 ```bash Terminal
-npx checkly trigger
+npx checkly trigger [options]
 ```
 
-## Extended Usage
+## Options
 
-Trigger only checks tagged with both "production" and "api".
+<Tabs>
+<Tab title="Unique Options">
 
-```bash Terminal
-npx checkly trigger --tags production,api
-```
+| Option | Description | Type | Required |
+|--------|-------------|------|----------|
+| `--test-session-name` | Custom name for recorded test sessions | string | No |
 
-Record a named test session running all checks in the EU West region.
+</Tab>
+<Tab title="Common Options">
 
-```bash Terminal
-npx checkly trigger --record --test-session-name="Release validation" --location eu-west-1
-```
+| Option | Description | Type | Required |
+|--------|-------------|------|----------|
+| `--record` | Record test session | boolean | No |
+| `--tags, -t` | Filter by tags | string | No |
+| `--location, -l` | Run checks in specific location | string | No |
+| `--reporter, -r` | Specify output format | string | No |
 
-Run critical checks against a staging environment with custom variables.
+</Tab>
+<Tab title="All Global Options">
 
-```bash Terminal
-npx checkly trigger --tags critical --env ENVIRONMENT_URL="https://staging.acme.com"
-```
+| Option | Description | Type | Required |
+|--------|-------------|------|----------|
+| `--config, -c` | Specify a configuration file | string | No |
+| `--env, -e` | Pass environment variables | string | No |
+| `--env-file` | Load variables from file | string | No |
+| `--private-location` | Use private location | string | No |
+| `--retries` | Set retry attempts | number | No |
+| `--timeout` | Set execution timeout | number | No |
+| `--verbose, -v` | Show detailed output | boolean | No |
+
+For detailed information about global options, see [global options](/cli/global-options).
+
+</Tab>
+</Tabs>
 
 ## Unique Options
 
-### `--test-session-name`
+<ResponseField name="--test-session-name" type="string">
 Provide a custom name for recorded test sessions when using `--record`.
 
+### Usage
 ```bash Terminal
+npx checkly trigger --record --test-session-name "Custom session name"
+```
+
+### Examples
+```bash Terminal
+# Record with custom session name
 npx checkly trigger --record --test-session-name "Pre-deployment validation"
+
+# Record with release information
+npx checkly trigger --record --test-session-name "Release v2.1.0 validation"
+
+# Combine with tags and location
+npx checkly trigger --tags production --record --test-session-name "Prod health check" --location eu-west-1
 ```
 
 If not specified, a default name with timestamp and Git information will be used.
+</ResponseField>
 
-## Global Options
+## Common Options
 
-This command supports the following [global options](/cli/checkly-global-options):
+<ResponseField name="--record" type="boolean">
+Record test results in Checkly as a test session with full logging, videos, and traces.
 
-| Option | Description |
-|--------|-------------|
-| [`--config`](/cli/checkly-global-options#config-or-c) | Specify a configuration file |
-| [`--env`](/cli/checkly-global-options#env-keyvalue-or-e) | Pass environment variables |
-| [`--env-file`](/cli/checkly-global-options#env-file) | Load variables from file |
-| [`--location`](/cli/checkly-global-options#location-location-or-l) | Run checks in specific location |
-| [`--private-location`](/cli/checkly-global-options#private-location-private-location-id) | Use private location |
-| [`--record`](/cli/checkly-global-options#record) | Record test session |
-| [`--reporter`](/cli/checkly-global-options#reporter-or-r) | Specify output format |
-| [`--tags`](/cli/checkly-global-options#tags-or-t) | Filter by tags |
-| [`--retries`](/cli/checkly-global-options#retries) | Set retry attempts |
-| [`--timeout`](/cli/checkly-global-options#timeout) | Set execution timeout |
-| [`--verbose`](/cli/checkly-global-options#verbose-or-v) | Show detailed output |
+### Usage
+```bash Terminal
+npx checkly trigger --record
+```
 
-## Key Differences from `test`
+### Examples
+
+<Tabs>
+<Tab title="Basic Recording">
+
+```bash Terminal
+# Record basic session
+npx checkly trigger --record
+
+# Output
+Test session recorded: https://app.checklyhq.com/test-sessions/def456
+✓ 15 checks triggered from account
+```
+
+</Tab>
+<Tab title="With Session Name">
+
+```bash Terminal
+# Record with custom name
+npx checkly trigger --record --test-session-name "Production health check"
+
+# Output
+Test session recorded: Production health check
+✓ 15 checks triggered from account
+```
+
+</Tab>
+</Tabs>
+
+**Benefits**: Persistent results, detailed debugging information, team collaboration.
+</ResponseField>
+
+<ResponseField name="--tags, -t" type="string">
+Filter checks using comma-separated tags. Only checks with all specified tags will be triggered.
+
+### Usage
+```bash Terminal
+npx checkly trigger --tags <tag1,tag2>
+npx checkly trigger -t <tag1,tag2>
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Production Checks">
+
+```bash Terminal
+# Trigger production checks only
+npx checkly trigger --tags production
+
+# Output
+Triggering 8 checks tagged with: production
+✓ Homepage production check
+✓ API production health
+```
+
+</Tab>
+<Tab title="Critical API Checks">
+
+```bash Terminal
+# Trigger checks with both critical AND api tags
+npx checkly trigger --tags critical,api
+
+# Output
+Triggering 3 checks tagged with: critical,api
+✓ Payment API check
+✓ User authentication API
+```
+
+</Tab>
+</Tabs>
+
+**Multiple filters**: Use multiple `--tags` flags for OR logic.
+</ResponseField>
+
+<ResponseField name="--location, -l" type="string" default="us-east-1">
+Run checks against a specified location instead of the default `us-east-1`.
+
+### Usage
+```bash Terminal
+npx checkly trigger --location <location>
+npx checkly trigger -l <location>
+```
+
+### Examples
+
+<Tabs>
+<Tab title="EU Location">
+
+```bash Terminal
+# Trigger from EU West region
+npx checkly trigger --location eu-west-1
+
+# Output
+Triggering checks from location: eu-west-1
+✓ Latency: 45ms (EU optimized)
+```
+
+</Tab>
+<Tab title="Multiple Regions">
+
+```bash Terminal
+# Test different regions in sequence
+npx checkly trigger --location us-west-1 --record --test-session-name "US West validation"
+npx checkly trigger --location ap-southeast-2 --record --test-session-name "APAC validation"
+```
+
+</Tab>
+</Tabs>
+
+**Available locations**: `us-east-1`, `us-west-1`, `eu-west-1`, `eu-central-1`, `ap-northeast-1`, `ap-southeast-1`, `ap-southeast-2`, and more.
+</ResponseField>
+
+<ResponseField name="--reporter, -r" type="string">
+Specify one or more output formats for test results. Useful for different environments and integrations.
+
+### Usage
+```bash Terminal
+npx checkly trigger --reporter <format>
+npx checkly trigger -r <format>
+```
+
+### Examples
+
+<Tabs>
+<Tab title="CI Integration">
+
+```bash Terminal
+# CI-friendly output
+npx checkly trigger --reporter ci
+
+# Output
+[PASS] Homepage check (850ms)
+[FAIL] Payment API (timeout after 30s)
+[PASS] User dashboard (1.2s)
+```
+
+</Tab>
+<Tab title="JSON for Automation">
+
+```bash Terminal
+# JSON output for parsing
+npx checkly trigger --reporter json --tags production
+
+# Output
+{"total":12,"passed":11,"failed":1,"results":[{"name":"Homepage","status":"passed"}]}
+```
+
+</Tab>
+</Tabs>
+
+**Available reporters**: `list` (default), `dot`, `ci`, `github`, `json`
+</ResponseField>
+
+## Key Differences from `checkly test`
 
 | Feature | `checkly test` | `checkly trigger` |
 |---------|---------------|------------------|
@@ -95,3 +282,4 @@ Test deployed checks against different environments:
 ```bash Terminal
 npx checkly trigger --env ENVIRONMENT_URL="https://preview-branch-123.vercel.app"
 ```
+

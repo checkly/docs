@@ -6,31 +6,100 @@ sidebarTitle: 'checkly login'
 
 The `checkly login` command authenticates with Checkly by signing up for a new account or logging in to your existing account. This command opens a browser window for secure OAuth authentication.
 
+<Accordion title="Prerequisites">
+Before using `checkly login`, ensure you have:
+
+- Checkly CLI installed
+- A web browser available (for OAuth authentication)
+- Internet connection for authentication flow
+
+No existing Checkly account is required - you can sign up during the login process.
+</Accordion>
+
 ## Usage
 
-Initiate the login process and authenticate with your Checkly account.
+The basic command initiates the login process and authenticates with your Checkly account.
 
 ```bash Terminal
 npx checkly login
 ```
 
-## Extended Usage
+<Tabs>
+<Tab title="Common Options">
 
-The login process is interactive and will:
+| Option | Description | Type | Required |
+|--------|-------------|------|----------|
+| `--verbose, -v` | Show detailed authentication process | boolean | No |
 
-1. **Open your default browser** to the Checkly authentication page
-2. **Prompt for account selection** if you have multiple accounts
-3. **Store authentication tokens** locally for future CLI usage
-4. **Display confirmation** with your account information
+</Tab>
+<Tab title="All Global Options">
 
-```bash Terminal    
+| Option | Description | Type | Required |
+|--------|-------------|------|----------|
+| `--config, -c` | Specify a configuration file | string | No |
+
+For detailed information about global options, see [global options](/cli/global-options).
+
+</Tab>
+</Tabs>
+
+## Common Options
+
+<ResponseField name="--verbose, -v" type="boolean">
+Show detailed logs during the authentication process for debugging or troubleshooting.
+
+### Usage
+```bash Terminal
+npx checkly login --verbose
+npx checkly login -v
+```
+
+### Examples
+
+<Tabs>
+<Tab title="Standard Login">
+
+```bash Terminal
+# Standard authentication
 npx checkly login
+
+# Output
 ✓ Opening browser for authentication...
 ✓ Successfully authenticated as user@company.com
 ✓ Active account: My Company (550e8400-e29b-41d4-a716-446655440000)
 ```
 
+</Tab>
+<Tab title="Verbose Login">
+
+```bash Terminal
+# Verbose authentication with details
+npx checkly login --verbose
+
+# Output
+✓ Opening browser for authentication...
+→ Browser opened: https://auth.checklyhq.com/cli/login?session=abc123
+→ Waiting for authentication callback...
+→ Authentication successful: received tokens
+→ Storing credentials in: ~/.config/checkly-cli/auth.json
+✓ Successfully authenticated as user@company.com
+✓ Active account: My Company (550e8400-e29b-41d4-a716-446655440000)
+```
+
+</Tab>
+</Tabs>
+
+**Use cases**: Debugging authentication issues, understanding the login flow.
+</ResponseField>
+
 ## Authentication Flow
+
+The login process is interactive and will:
+
+1. **Open your default browser** to the Checkly authentication page
+2. **Prompt for account selection** if you have multiple accounts  
+3. **Store authentication tokens** locally for future CLI usage
+4. **Display confirmation** with your account information
 
 ### New Users
 If you don't have a Checkly account:
@@ -38,17 +107,11 @@ If you don't have a Checkly account:
 2. Complete account registration
 3. Return to the CLI - you'll be automatically logged in
 
-### Existing Users
+### Existing Users  
 If you already have an account:
 1. Enter your credentials on the authentication page
 2. Complete any two-factor authentication if enabled
 3. Return to the CLI - authentication will complete automatically
-
-## Global Options
-
-This command supports the following [global options](/cli-reference/global-options):
-
-- [`--verbose`](/cli-reference/global-options#verbose-or-v) - Show detailed authentication process
 
 ## Authentication Storage
 
@@ -60,12 +123,6 @@ After successful login, the CLI stores authentication tokens locally in:
 
 These tokens are encrypted and used for subsequent CLI operations without requiring re-authentication.
 
-## Related Commands
-
-- [`checkly logout`](/cli-reference/checkly-logout) - Sign out of your Checkly account
-- [`checkly whoami`](/cli-reference/checkly-whoami) - Display current account information
-- [`checkly switch`](/cli-reference/checkly-switch) - Switch between multiple accounts
-
 ## Troubleshooting
 
 ### Browser doesn't open automatically
@@ -76,3 +133,39 @@ If the authentication browser window doesn't open:
 
 ### Multiple accounts
 If you have access to multiple Checkly accounts, you'll be prompted to select which account to use as the active account for CLI operations.
+
+### Authentication timeout
+If authentication takes too long:
+```bash Terminal
+# Try again with verbose output to see what's happening
+npx checkly login --verbose
+```
+
+## Use Cases
+
+### First-time Setup
+Set up CLI access for new team members:
+
+```bash Terminal
+npx checkly login
+```
+
+### Switching Computers
+Authenticate on a new development machine:
+
+```bash Terminal
+npx checkly login --verbose
+```
+
+### Re-authentication
+If your session expires, log in again:
+
+```bash Terminal
+npx checkly login
+```
+
+## Related Commands
+
+- [`checkly logout`](/cli/checkly-logout) - Sign out of your Checkly account
+- [`checkly whoami`](/cli/checkly-whoami) - Display current account information  
+- [`checkly switch`](/cli/checkly-switch) - Switch between multiple accounts

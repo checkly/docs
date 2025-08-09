@@ -60,9 +60,7 @@ How does this all look like in practice? Let's find out by creating a small moni
 
 A quick way to bootstrap a new project with the Checkly CLI is to run the following command.
 
-```bash
-npm create checkly
-```
+<Snippet file="cli-project-init.mdx" />
 
 But for this guide, we will show you the manual process to show you all the structure and general idea behind the setup.
 
@@ -171,13 +169,13 @@ test('test', async ({ page }) => {
 
 Let's start off by creating a brand new folder:
 
-```bash
+```bash Terminal
 mkdir checkly-mac-cli-example && cd $_
 ```
 
 To keep things easy, we create a subdirectory...
 
-```bash
+```bash Terminal
 mkdir __checks__
 ```
 
@@ -185,20 +183,20 @@ mkdir __checks__
 
 ...install playwright
 
-```bash
+```bash Terminal
 npm init playwright@latest
 ```
 
 First, install the CLI.
 
-```bash
-npm i --save-dev @checkly/cli
+```bash Terminal
+npm install --save-dev checkly
 ```
 
 Since we are using TypeScript, also install ts-node and typescript:
 
-```bash
-npm i --save-dev ts-node typescript
+```bash Terminal
+npm install --save-dev ts-node typescript
 ```
 
 Next up, we want to create our `checkly.config.ts` file and include the basic Checkly configuration as follows:
@@ -237,9 +235,7 @@ export default defineConfig({
 
 We are ready to run the first tests of our project. Use the CLI to authenticate and pick a Checkly account. Make sure you have signed up for a free account on [checklyhq.com](https://app.checklyhq.com/signup). That is achieved by running:
 
-```bash
-npx checkly login
-```
+<Snippet file="cli-auth.mdx" />
 
 After a few seconds, you should see a similar message to the following:
 
@@ -252,7 +248,7 @@ Welcome to @checkly/cli 🦝
 ```
 
 Now it's time to test run your browser checks on Checkly:
-```bash
+```bash Terminal
 npx checkly test
 ```
 

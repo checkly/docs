@@ -1,0 +1,169 @@
+---
+title: Constructs Quickstart
+sidebarTitle: Quickstart
+description: Quick start guide for using Checkly constructs with the CLI
+---
+
+Get started with Checkly constructs by building your first monitoring setup using the CLI.
+
+<AccordionGroup>
+<Accordion title="Prerequisites">
+- Node.js 18+ installed
+- A Checkly account
+</Accordion>
+</AccordionGroup>
+
+## Installation
+
+Install the Checkly CLI as a dev dependency:
+
+<Snippet file="cli-installation.mdx" />
+
+## Project Setup
+
+Create a new directory and initialize your monitoring project:
+
+```bash Terminal
+mkdir my-monitoring-project
+cd my-monitoring-project
+npm init -y
+```
+
+Install Checkly and required dependencies:
+
+```bash Terminal
+npm install --save-dev @playwright/test
+npm install --save-dev typescript
+npm install --save-dev @types/node
+```
+
+
+Create a `checkly.config.ts` file with basic settings:
+
+```ts checkly.config.ts
+import { defineConfig } from 'checkly'
+import { Frequency } from 'checkly/constructs'
+
+export default defineConfig({
+  projectName: 'My Monitoring Project',
+  logicalId: 'my-monitoring-1',
+  repoUrl: 'https://github.com/your-org/monitoring',
+  checks: {
+    activated: true,
+    muted: false,
+    runtimeId: '2025.04',
+    frequency: Frequency.EVERY_5M,
+    locations: ['us-east-1', 'eu-west-1'],
+    tags: ['production'],
+    checkMatch: '**/*.check.{js,ts}',
+    browserChecks: {
+      frequency: Frequency.EVERY_10M,
+      testMatch: '**/*.spec.{js,ts}',
+    }
+  },
+  cli: {
+    runLocation: 'us-east-1'
+  }
+})
+```
+
+## Your First Multi-Construct Example
+
+Create a monitoring setup using multiple constructs. First, create the directory structure:
+
+```bash Terminal
+mkdir -p src/__checks__
+```
+
+Create `src/__checks__/website-monitoring.ts`:
+
+```ts src/__checks__/website-monitoring.ts
+import { 
+  BrowserCheck, 
+  RetryStrategy,
+  Frequency 
+} from 'checkly/constructs'
+
+// Create a retry strategy for resilient monitoring
+const retryStrategy = new RetryStrategy('standard-retry', {
+  type: 'fixed',
+  baseBackoffSeconds: 60,
+  maxRetries: 2,
+  maxDurationSeconds: 600,
+  sameRegion: true
+})
+
+// Create a browser check with retry strategy
+const homepageCheck = new BrowserCheck('homepage-check', {
+  name: 'Homepage Load Test',
+  frequency: Frequency.EVERY_5M,
+  locations: ['us-east-1', 'eu-west-1'],
+  retryStrategy,
+  code: {
+    entrypoint: './homepage.spec.ts'
+  }
+})
+```
+
+Create the browser test file `src/__checks__/homepage.spec.ts`:
+
+```ts src/__checks__/homepage.spec.ts
+import { test, expect } from '@playwright/test'
+
+test('Homepage loads successfully', async ({ page }) => {
+  // Navigate to your website
+  await page.goto('https://your-website.com')
+  
+  // Check the page title
+  await expect(page).toHaveTitle(/Your Site Name/)
+  
+  // Verify main navigation is visible
+  const navigation = page.locator('nav')
+  await expect(navigation).toBeVisible()
+  
+  // Check for key content
+  const mainContent = page.locator('main')
+  await expect(mainContent).toBeVisible()
+  
+  // Verify page loads within reasonable time
+  const performanceEntries = await page.evaluate(() => {
+    const entries = performance.getEntriesByType('navigation')
+    return entries[0]
+  })
+  
+  console.log('Page load time:', performanceEntries.loadEventEnd - performanceEntries.loadEventStart, 'ms')
+})
+```
+
+## Testing Your Setup
+
+Test your configuration locally before deployment:
+
+```bash Terminal
+npx checkly test
+```
+
+This will run your browser check locally and validate your configuration.
+
+## Deployment
+
+Deploy your monitoring to Checkly:
+
+```bash Terminal
+npx checkly deploy
+```
+
+Your browser check with retry strategy is now monitoring your website every 5 minutes from multiple locations, with automatic retries on failures.
+
+## Next Steps
+
+- Add [API checks](/constructs/api-check) to monitor your backend services
+- Set up [alert channels](/constructs/email-alert-channel) for notifications
+- Organize checks with [check groups](/constructs/check-group-v2)
+- Create [dashboards](/constructs/dashboard) for monitoring visualization
+
+## Learn More
+
+- [Project structure](/constructs/structure) - Understand how to organize your monitoring code
+- [Browser checks](/constructs/browser-check) - Deep dive into browser monitoring
+- [Retry strategies](/constructs/retry-strategy) - Configure resilient monitoring

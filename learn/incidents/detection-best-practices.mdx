@@ -27,7 +27,7 @@ Relying on a single monitoring method can lead to blind spots. Instead, use a co
 
 Avoid "alert fatigue" by ensuring alerts are meaningful and actionable:
 
-- **Use Multi-Signal Confirmation**: Trigger alerts only when multiple checks fail (e.g., HTTP status + latency + DNS resolution). For example, Checkly makes it easy to require 2 or more failures before sending alerts in its [retry configuration](https://www.checklyhq.com/docs/alerting-and-retries/retries/).
+- **Use Multi-Signal Confirmation**: Trigger alerts only when multiple checks fail (e.g., HTTP status + latency + DNS resolution). For example, Checkly makes it easy to require 2 or more failures before sending alerts in its [retry configuration](https://www.checklyhq.com/docs/communicate/alerts/configuration).
 - **Prioritize Alerts**: Distinguish between *critical* (full outage) and *warning* (degraded performance). Any time your on-call team gets an alert that doesn’t require action, this should be counted as a false alarm and call for improvements to your alert thresholds.
 - **Avoid Static Thresholds**: When a service that usually responds in 4.98 seconds starts responding after 5.1 seconds, it’s a negative trend that might call for some investigation. But it certainly does *not* call for a midnight alert to the on-call team. As just one example, Playwright’s assertions about page elements use an [auto-waiting](https://www.checklyhq.com/blog/playwright-auto-waiting/) system that is more flexible than static time thresholds.
 

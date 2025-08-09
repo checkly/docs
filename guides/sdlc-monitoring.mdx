@@ -13,7 +13,7 @@ If you’re already excited about Playwright and/or Checkly, you probably don’
 
 In short, we’re all aware that the software development life cycle (SDLC) often breaks down when it comes to finding bugs and solving outages.
 
-![a diagram showing the ideal vs the real SDLC](/guides/images/sdlc-monitoring-01.png)
+![a diagram showing the ideal vs the real SDLC](/images/guides/images/sdlc-monitoring-01.png)
 
 Ideally development should only be getting requirements from planning and design, with any feedback (issues that need fixing) coming in the QA stages before deployment to production. In reality a huge list of failures can result in developers having to fix failures and re-engineer code to keep production running. There are two significant concerns that a more unified testing and monitoring approach can help us address:
 
@@ -28,17 +28,17 @@ By unifying around Checkly, **feedback is delivered directly to developers**, wi
 
 Why do we need to test after staging? After all, if a bug gets through to production, it just means we need to do more testing and better testing before production right?
 
-![a diagram showing the ideal vs the real SDLC](/guides/images/sdlc-monitoring-02.png)
+![a diagram showing the ideal vs the real SDLC](/images/guides/images/sdlc-monitoring-02.png)
 
 In reality no matter how much effort we put into simulating a production environment in our pre-deployment testing (hereafter we’ll refer to the environment before production as ‘Staging’ even though your team might call it something else), there are always large gaps between our testing and production environments. Things like third-party API’s, the real resource requirements of production data, and users abilities to find edge cases where we thought none existed, all serve to keep us well supplied with failures that only happen on production.
 
 All of this doesn’t mean the work we did on testing before deployment was without value. Local testing gives the fastest possible feedback, often in seconds. And testing on Staging provides a consistent environment with detailed feedback. 
 
-![a diagram showing the ideal vs the real SDLC](/guides/images/sdlc-monitoring-03.png)
+![a diagram showing the ideal vs the real SDLC](/images/guides/images/sdlc-monitoring-03.png)
 
 Each phase of the SDLC is a valuable place to run testing. What Checkly adds to the equation is running in-depth end-to-end tests on a cadence, meaning you can monitor your own production app as thoroughly as you do pre-deploy code. How does Checkly integrate throughout the process? The map looks something like this:
 
-![a diagram showing Checkly integrated in dev, deploy, and monitor phases of code diaployment](/guides/images/sdlc-monitoring-04.png)
+![a diagram showing Checkly integrated in dev, deploy, and monitor phases of code diaployment](/images/guides/images/sdlc-monitoring-04.png)
 
 *In this diagram, Checkly uses the power of Playwright and OpenTelemetry to give you insight into how your code is running at every stage of the software development life cycle*
 
@@ -115,11 +115,11 @@ With test fixtures you can share test code across your team, saving them time as
 
 After you’ve done the first extremely-high-speed iterative testing while writing new code, you may want to see how your local build handles requests sent from one or more real-world locations. This would require that your build is available to the internet either through a dev server or a reverse proxy tool like [ngrok](https://ngrok.com/). 
 
-With Checkly you can write your Playwright tests and then run them through the Checkly system, running your test from multiple geographic locations right from your local terminal with the [Checkly CLI](https://www.checklyhq.com/docs/cli/). 
+With Checkly you can write your Playwright tests and then run them through the Checkly system, running your test from multiple geographic locations right from your local terminal with the [Checkly CLI](https://www.checklyhq.com/cli/overview). 
 
 After setting up your tests in a Checkly repisitory, a simple `npx checkly test` will run your Playwright tests, not from your laptop but from the geographic locations defined in your `checkly.config.ts` file.
 
-![The Checkly CLI running playwright tests from the Checkly network](/guides/images/sdlc-monitoring-05.png)
+![The Checkly CLI running playwright tests from the Checkly network](/images/guides/images/sdlc-monitoring-05.png)
 
 *With the Checkly CLI your tests run from all the geographic locations in your configuration.*
 
@@ -208,9 +208,9 @@ This command overrides the `SCREENSHOT_URL` variable for that specific test run,
 
 ### Optional: Private locations for running Checkly within your cloud
 
-For enterprise users, you may want to run Checkly monitors from within your cloud. This is especially helpful if your API isn’t available on the public internet, or you want to run checks from a geographic location not covered by the Checkly system. If your development and staging locations are running on private clouds, a [Checkly Private Location](https://www.checklyhq.com/docs/private-locations/) makes testing easier.
+For enterprise users, you may want to run Checkly monitors from within your cloud. This is especially helpful if your API isn’t available on the public internet, or you want to run checks from a geographic location not covered by the Checkly system. If your development and staging locations are running on private clouds, a [Checkly Private Location](https://www.checklyhq.com/docs/detect/private-locations/overview) makes testing easier.
 
-![a diagram showing A container on your cloud running a Checkly Private Location](/guides/images/sdlc-monitoring-06.png)
+![a diagram showing A container on your cloud running a Checkly Private Location](/images/guides/images/sdlc-monitoring-06.png)
 
 *A container on your cloud running a Checkly Private Location*
 
@@ -234,7 +234,7 @@ unnecessary monitoring data. In most cases the setup will look like this:
 2. Add a configuration to the [OpenTelemetry collector](https://www.checklyhq.com/learn/opentelemetry/what-is-the-otel-collector/) to send only relevant traces to Checkly
 3. Enjoy information on database requests, compute time, third party requests, and other backend processes right in your Checkly dashboard 
 
-![a dashboard showing back-end requests](/guides/images/sdlc-monitoring-06.png)
+![a dashboard showing back-end requests](/images/guides/images/sdlc-monitoring-06.png)
 
 *With Checkly Traces you can see the database calls and other timespans as your backend services handle requests kicked off by a Checkly test.*
 
@@ -247,7 +247,7 @@ Checkly Traces is easy to implement even if you aren’t currently using OpenTel
 Once you’ve moved to production, it’s time to run your tests on a cadence, creating a monitor that tell you within minutes if any part of your service goes down. The process for setting this cadence looks like:
 
 1. [Determine the right check frequency](https://www.checklyhq.com/blog/check-frequency/) based on SLA
-2. Configure your tests either in the web UI or by editing your [test repository’s config](https://www.checklyhq.com/docs/cli/project-structure/) file
+2. Configure your tests either in the web UI or by editing your [test repository’s config](https://www.checklyhq.com/cli/overviewproject-structure/) file
 3. [Group or tag tests](https://www.checklyhq.com/docs/groups/#organizing-checks-with-groups---checkly-docs) by criticality to have consistent cadence for high value services - this also makes it easier to see checks together in the web UI
 
 With alerts running on a cadence, you can ensure that you’re hearing about failures before your users report them. The final step is setting up the alerting your team receives when a monitor detects problems.

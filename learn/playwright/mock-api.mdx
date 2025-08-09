@@ -20,7 +20,7 @@ Playwright is built to interact with web pages the way your users would. Playwri
 
 For this test we’re using the demo Danube web shop, testing a book’s detail page for the correct product information.
 
-![Our e-commerce storefront](/learn/images/mock-api-01.png)
+![Our e-commerce storefront](/images/learn/images/mock-api-01.png)
 
 We started with a very simple test that a particular book’s detail page has all the correct information, but I ran into a problem with dynamic content:
 
@@ -100,7 +100,7 @@ Now we can run this check as often as we like and be sure that the current stock
 
 Note that, if you’re using the Playwright UI, this mocking behavior will show up in the UI, as the API request will have two lines in the ‘Network’ tab
 
-![Our e-commerce storefront](/learn/images/mock-api-02.png)
+![Our e-commerce storefront](/images/learn/images/mock-api-02.png)
 
 The ‘fulfilled’ listing will show the patched version of your response that went to the page.
 
@@ -132,7 +132,7 @@ test('Book has correct details', async ({ page }) => {
 
 Now we no longer wait for this API response to come back and supply the whole response. As mentioned in the section above this has the benefit of delivering consistent results and removing the dependency on the API. In the Checkly UI, we can actually see that removing this API request and supplying a response significantly [speeds up](https://www.checklyhq.com/blog/speed-up-playwright-scripts-request-interception/) the overall test execution. 
 
-![Our e-commerce storefront](/learn/images/mock-api-03.png)
+![Our e-commerce storefront](/images/learn/images/mock-api-03.png)
 
 *Removing the API call makes this test take less than half the time*
 
@@ -142,7 +142,7 @@ The distinct disadvantage is that we’re no longer checking that this API is av
 
 The last use case for API mocking and response editing is simulating an unusual circumstance on a live page. For example, on our page we expect that a book with zero remaining stock should show up as sold out.
 
-![Our e-commerce storefront](/learn/images/mock-api-04.png)
+![Our e-commerce storefront](/images/learn/images/mock-api-04.png)
 
 *Correct UI behavior when an item has zero stock*
 
@@ -167,7 +167,7 @@ test('Book has correct details', async ({ page }) => {
 
 Sure enough, the behavior of our web store isn’t correct, with an out-of-stock item still showing as available to add to the cart.
 
-![Our e-commerce storefront](/learn/images/mock-api-05.png)
+![Our e-commerce storefront](/images/learn/images/mock-api-05.png)
 
 *Whatever happens when you click ‘Add To Cart’ here it won’t be satisfying for the user*
 
@@ -177,7 +177,7 @@ We can also stress test the UI in other ways: returning very large numbers for t
 
 As we find ourselves testing correct rendering of a page under unusual conditions, this does suggest a [visual regression test](https://www.checklyhq.com/docs/browser-checks/visual-regression-snapshot-testing/) to make sure a page looks correct. Visual regression tests shouldn’t be a default mode for functionality testing, but they are part of our toolkit and editing dynamic API responses can be an effective way of making sure that a page is always rendering with identical data for visual comparison.
 
-![Our e-commerce storefront](/learn/images/mock-api-06.png)
+![Our e-commerce storefront](/images/learn/images/mock-api-06.png)
 
 *With fixed responses for dynamic page components, a visual regression test can create a golden file with a screenshot that isn’t expected to change*
 

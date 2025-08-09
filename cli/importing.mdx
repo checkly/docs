@@ -19,10 +19,10 @@ To ensure that you can go through this process safely, and test your setup along
 
 <Steps>
   <Step title="Install the CLI">
-    [Install the CLI](/docs/cli/installation/). At the end of the process ensure you have a `checkly.config.ts/js` file, and that you have logged in to the account you want to import resources from. You can verify the current account with `npx checkly whoami`. If you already have installed the CLI but don't have a Checkly config file, one will be created for you as part of the import process.
+    [Install the CLI](/cli/authentication). At the end of the process ensure you have a `checkly.config.ts/js` file, and that you have logged in to the account you want to import resources from. You can verify the current account with `npx checkly whoami`. If you already have installed the CLI but don't have a Checkly config file, one will be created for you as part of the import process.
   </Step>
   <Step title="Import resources">
-    Run `npx checkly import` and select `import everything` to import all resources from your account. You can also [import individual resources](/docs/cli/import/#importing-individual-resources). You can specify where the generated code should be placed using `--root`. If your Checkly config file is not in the current directory, specify the path using `--config`.
+    Run `npx checkly import` and select `import everything` to import all resources from your account. You can also [import individual resources](#importing-individual-resources). You can specify where the generated code should be placed using `--root`. If your Checkly config file is not in the current directory, specify the path using `--config`.
   </Step>
   <Step title="Review imported code">
     Review the imported code before continuing. You can verify imported checks with `npx checkly test`. At this point, avoid running `npx checkly deploy` as this will duplicate your UI-managed resources as CLI-managed ones.
@@ -40,7 +40,7 @@ Remember that you can cancel your import with `npx checkly import cancel` at any
 ## Importing individual resources
 
 There are two ways to import individual resources:
-- Run `npx checkly import` and in the first step select `Let me choose resources manually`. In the following menu use `space` to select/deselect resources for import and `return` to finalize your selection. From there, follow steps 3 - 5 in the [Importing step-by-step guide](/docs/cli/import#importing-step-by-step).
+- Run `npx checkly import` and in the first step select `Let me choose resources manually`. In the following menu use `space` to select/deselect resources for import and `return` to finalize your selection. From there, follow steps 3 - 5 in the [Importing step-by-step guide](#importing-step-by-step).
 - Specify a single resource as part of the `import` command with the following syntax: `npx checkly import resource-type:resource-id`.
 
 ## Using `export` when creating CLI resources
@@ -82,4 +82,4 @@ If `export` is not used, the CLI code generation will still reference the correc
 
 ## Next steps
 
-Once you have a fully CLI managed setup you are ready to leverage Monitoring as Code to improve your setup. Check our how to [dynamically creating monitors](/docs/cli/dynamic-check-creation/), [combining MaC and Git](/docs/cli/using-git/), and how to [integrate Checkly in your CI/CD process](/docs/cicd/).
+Once you have a fully CLI managed setup you are ready to leverage Monitoring as Code to improve your setup. Check our how to [dynamically creating monitors](/cli/including-checks), [combining MaC and Git](/cli/using-git), and how to [integrate Checkly in your CI/CD process](/docs/integrations/ci-cd/overview).

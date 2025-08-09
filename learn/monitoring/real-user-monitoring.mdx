@@ -89,7 +89,7 @@ The data fire hose problem mentioned above points to a more general issue with R
 
 The issues with RUM are rather well correlated to the story of another ‘total observability’ solution, the classic panopticon. Originally conceived by Jeremy Bentham in the 1780’s, the idea is familiar to anyone who’s noticed hundreds of camera installations at their local Wal-Mart: a prison or factory where everyone could be observed at any time, but cannot see their observer. 
 
-![A diagram of the Real User Monitoring model](/learn/images/rum-01.jpg)
+![A diagram of the Real User Monitoring model](/images/learn/images/rum-01.jpg)
 
 *Jeremy Bentham’s original Panopticon concept. Image by Blue [Ākāśha](https://commons.wikimedia.org/w/index.php?curid=95988220).*
 
@@ -97,7 +97,7 @@ The promise of the panopticon was a kind of social utopia: perfect behavior sinc
 
 In both cases the reality faced problems of practicality: A guard in a panopticon prison can’t actually see everything in the cells he’s guarding, leading to bad behavior only in blind spots. This is comparable to the existence of user categories that don’t run RUM instrumentation well, or don’t successfully transmit data to your monitoring backend, or who experience total crashes of their browser or app: often the users having the worst experience are the ones who don’t show up in real user monitoring.
 
-![A diagram of the Real User Monitoring model](/learn/images/rum-02.jpg)
+![A diagram of the Real User Monitoring model](/images/learn/images/rum-02.jpg)
 
 *The Panopticon, which for nearly a century promised improved conditions for large institutions, proved impractical in reality. Constructions like this one in Cuba are now abandoned. Image by [Friman](https://commons.wikimedia.org/w/index.php?curid=2410607), CC BY-SA 3.0*
 
@@ -116,7 +116,7 @@ Since it is impractical to store every click, scroll, action, and web response f
 
 This issue is best solved by sampling at the time of data measurement, called ‘head-based sampling,’ where users are assigned to be monitored randomly as their session starts. That means we don’t use resources on a session we’re not going to save. 
 
-![A diagram of the Real User Monitoring model](/learn/images/rum-03.png)
+![A diagram of the Real User Monitoring model](/images/learn/images/rum-03.png)
 
 In the diagram above, every sixth session is measured and transmitted, but as you can see in this not-uncommon example, all the slowest sessions have been discarded.
 
@@ -124,7 +124,7 @@ In the diagram above, every sixth session is measured and transmitted, but as yo
 
 Problem sessions are almost always edge cases, and so random sampling means that most of those unusual cases are being thrown out. What would be better is to decide at the end of a session if the data was interesting. This is the much vaunted tail-based sampling.
 
-![A diagram of the Real User Monitoring model](/learn/images/rum-04.png)
+![A diagram of the Real User Monitoring model](/images/learn/images/rum-04.png)
 
 In this example the longest user session is sent (because it was probably frustrating to the user) and the fastest (because it may contain an error), and the others discarded. In the real world things like the number of spans in the trace would also help determine which to send. 
 

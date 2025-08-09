@@ -34,26 +34,23 @@ When asking questions about Checkly, manually add the downloaded rules files to 
 
 ### GitHub Copilot
 
-{{< tabs "GH Copilot" >}}
-
-{{< tab "Mac and Linux" >}}
+<Tabs>
+<Tab title="Mac and Linux">
 
 ```bash
 mkdir -p .github && curl -o .github/copilot-instructions.md "https://www.checklyhq.com/docs/ai/checkly.rules.md" -L
 ```
 
-{{< /tab >}}
-
-{{< tab "Windows" >}}
+</Tab>
+<Tab title="Windows">
 
 ```bash
 New-Item -ItemType Directory -Path ".github\instructions" -Force
 Invoke-WebRequest -Uri "https://www.checklyhq.com/docs/ai/docs/ai/checkly.rules.md" -OutFile ".github\copilot-instructions.md"
 ```
 
-{{< /tab >}}
-
-{{< /tabs >}}
+</Tab>
+</Tabs>
 
 You can ask Copilot to install the `checkly` NPM package and generate code for API Checks, Browser checks, Multistep checks
 and all other constructs.
@@ -61,9 +58,8 @@ and all other constructs.
 
 ### Cursor
 
-{{< tabs "Cursor" >}}
-
-{{< tab "Mac and Linux" >}}
+<Tabs>
+<Tab title="Mac and Linux">
 
 ```bash
 mkdir -p .cursor/rules && curl -o .cursor/rules/checkly.mdc  "https://www.checklyhq.com/docs/ai/checkly.rules.md" -L
@@ -74,65 +70,63 @@ Now make sure to add the new `checkly.mdc` file to your context.
 You can now ask Cursor to install the `checkly` NPM package and generate code for API Checks, Browser checks, Multistep checks
 and all other constructs. Make sure to use the `checkly.mdc` file as context for your questions.
 
-{{< /tab >}}
+</Tab>
+<Tab title="Windows">
 
-{{< tab "Windows" >}}
 ```bash
 New-Item -ItemType Directory -Path ".cursor\rules" -Force
 Invoke-WebRequest -Uri "https://www.checklyhq.com/docs/ai/checkly.rules.md" -OutFile ".cursor\rules\checkly.mdc"
 ```
-{{< /tab >}}
 
-{{< /tabs >}}
+</Tab>
+</Tabs>
 
 You can now reference the `checkly.mdc` using `@checkly.mdc` file in your Cursor chats and ask it to generate code for
 API Checks, Browser checks, Multistep checks and all other constructs.
 
 ### Windsurf
 
-{{< tabs "Windsurf" >}}
-
-{{< tab "Mac and Linux" >}}
+<Tabs>
+<Tab title="Mac and Linux">
 
 ```bash
 mkdir -p .windsurf/rules && curl -o .windsurf/rules/checkly.md "https://www.checklyhq.com/docs/ai/checkly.rules.md" -L
 ```
-{{< /tab >}}
 
-{{< tab "Windows" >}}
+</Tab>
+<Tab title="Windows">
 
 ```bash
 New-Item -ItemType Directory -Path ".windsurf\rules" -Force
 Invoke-WebRequest -Uri "https://www.checklyhq.com/docs/ai/checkly.rules.md" -OutFile ".windsurf\rules\checkly.md"
 ```
-{{< /tab >}}
 
-{{< /tabs >}}
+</Tab>
+</Tabs>
 
 You can now reference the `checkly.md` using `@checkly.md` file in your WindSurf chats and ask it to generate code for 
 API Checks, Browser checks, Multistep checks and all other constructs.
 ### Claude Code 
 
-{{< tabs "Claude Code" >}}
-
-{{< tab "Mac and Linux" >}}
+<Tabs>
+<Tab title="Mac and Linux">
 
 ```bash
-mkdir \p .claude &&
+mkdir -p .claude &&
 curl -o .claude/checkly.rules.md https://www.checklyhq.com/docs/ai/checkly.rules.md -L
 echo "- examine checkly.rules.md for code generation rules" >> .claude/CLAUDE.md
 ```
-{{< /tab >}}
 
-{{< tab "Windows" >}}
+</Tab>
+<Tab title="Windows">
 
 ```bash
 New-Item -ItemType Directory -Path ".claude" -Force
 Invoke-WebRequest -Uri "https://www.checklyhq.com/docs/ai/checkly.rules.md" -OutFile ".claude\checkly.md"
 echo - examine checkly.md for code generation rules >> .claude/CLAUDE.md
 ```
-{{< /tab >}}
 
-{{< /tabs >}}
+</Tab>
+</Tabs>
 
 Exit and restart your Claude Code session to re-read the `CLAUDE.MD` file into Claude Code's context.

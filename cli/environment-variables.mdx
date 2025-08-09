@@ -50,7 +50,7 @@ that SMS channel in your Checkly account.
 ## Remote Environment Variables
 
 Checkly also stores environment variables in your Checkly account. These can exist at the
-[Global, Group or Check level](/docs/browser-checks/variables/). Here is what you need to remember:
+[Global, Group or Check level](/docs/detect/synthetic-monitoring/browser-checks/overview). Here is what you need to remember:
 
 1. Use remote environment variables to dynamically inject or replace values during runtime of a check.
 2. Remote variables can be set and overridden when invoking the `test` command.
@@ -72,7 +72,7 @@ test('Check Home Page', async ({ page }) => {
   await page.screenshot({ path: 'home.jpg' })
 })
 ```
-Here is an example of a Checkly [ApiCheck construct](/docs/cli/constructs-reference/#apicheck) using an `ENVIRONMENT_URL` variable to define the page to visit. Notice the `{{ENVIRONMENT_URL}}` is wrapped in double handlebars and must be written this way for a remote environment variable to be parsed within an ApiCheck construct.
+Here is an example of a Checkly [ApiCheck construct](/constructs/api-check) using an `ENVIRONMENT_URL` variable to define the page to visit. Notice the `{{ENVIRONMENT_URL}}` is wrapped in double handlebars and must be written this way for a remote environment variable to be parsed within an ApiCheck construct.
 
 ```ts Api.check.ts
 import * as path from 'path'
@@ -160,7 +160,7 @@ npx checkly test --env-file="./.env.prod"
 ```
 
 
-[See the reference documentation for the `checkly env` command](/docs/cli/command-line-reference/#npx-checkly-env)
+[See the reference documentation for the `checkly env` command](/cli/checkly-env)
 
 ## Securing Environment Variables
 
@@ -169,7 +169,7 @@ For storing and securing environment variables, we advise the following:
 1. Store local environment variables in your shell or in `.env` files that are not committed to your git repo. Add those
 files to your `.gitignore` file.
 2. In a CI context, e.g. GitHub Actions, store sensitive variables as secrets. Almost all CI providers have such a feature.
-3. For remote variables, store sensitive data as secrets in Checkly. For more information on how to manage secrets in Checkly see [variables and secrets](/docs/browser-checks/variables).
+3. For remote variables, store sensitive data as secrets in Checkly. For more information on how to manage secrets in Checkly see [variables and secrets](/docs/detect/synthetic-monitoring/browser-checks/overview).
 
 All variables are stored encrypted at rest and in transfer.
 

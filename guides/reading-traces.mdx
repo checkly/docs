@@ -21,7 +21,7 @@ To emphasize: none of the patterns mentioned here are proof positive, and you sh
 
 When you’re looking at the pattern of failures, one question you’d like to answer is: ‘did [x] code release cause this failure?’ To answer this quickly, look for a pattern like the one below, where a small problem grows with time:
 
-![a Checkly dashboard](/guides/images/reading-traces-01.png)
+![a Checkly dashboard](/images/guides/images/reading-traces-01.png)
 
 
 *In this case it looks like a problem has been getting worse for a while, with slow performance causes ‘degraded’ results before checks stop passing entirely*
@@ -33,14 +33,14 @@ In this case we can see that degraded results started on or about April 24th. Ev
 In the chart below, this check is currently passing, but an oddly regular pattern of failures has been happening for some time. This indicates a common failure mode:
 
 
-![a Checkly dashboard](/guides/images/reading-traces-02.png)
+![a Checkly dashboard](/images/guides/images/reading-traces-02.png)
 
 *This regular failure that never affects all checks look like it might be a failure in one region.*
 
 What would cause some, but not all, checks to fail with some regularity? Checking the list of failure locations, we see that all the checks are coming from one place.
 
 
-![a Checkly dashboard](/guides/images/reading-traces-03.png)
+![a Checkly dashboard](/images/guides/images/reading-traces-03.png)
 
 *Sure enough one geographic region is failing.*
 
@@ -49,14 +49,14 @@ In this case geo-fencing, localization or some other geographic specific setting
 If you’re often getting failures in one region that’s critical to your business, consider increasing check frequency or setting your checks to ‘parallel runs’ meaning that ever selected geographic region every time 
 
 
-![a Checkly dashboard](/guides/images/reading-traces-04.png)
+![a Checkly dashboard](/images/guides/images/reading-traces-04.png)
 
 *Parallel vs. round-robin checks, each set with a five-minute interval.*
 
 Second, if you’ve selected round-robin checks but still want to detect single-region failures quickly, set your retry strategy to always retry from the same region.
 
 
-![a Checkly dashboard](/guides/images/reading-traces-05.png)
+![a Checkly dashboard](/images/guides/images/reading-traces-05.png)
 
 *Now a failure in Cape Town will run all its check attempts from Cape Town*
 
@@ -67,7 +67,7 @@ To read further about retries, regions, and timing, check out how to [optimize y
 Let’s start with a simple example of a failing test. In this case my web shop’s category view is supposed to look like this:
 
 
-![a Checkly dashboard](/guides/images/reading-traces-06.png)
+![a Checkly dashboard](/images/guides/images/reading-traces-06.png)
 
 *A user expects to be able to find top sellers and hidden gems in the category view.*
 
@@ -78,7 +78,7 @@ But now, my check on this page is failing, and I’d like to figure out why. The
 Reader, I’ll level with you: the purpose of this article is to get you to do more than checking the video on a failed check. But before I offer more routes to check I wish to acknowledge *we all start by checking the video.* A video has the great benefit of showing both the failure and the ‘normal’ behavior of the check up until that point, it reminds us what page we were loading and there’s a good chance that the failure is visual enough to show up right away. 
 
 
-![a Checkly dashboard](/guides/images/reading-traces-07.png)
+![a Checkly dashboard](/images/guides/images/reading-traces-07.png)
 
 *In this example, the gap between the video and what we expect in the screenshot above is significant, the ‘bottom sellers’ section of the page is missing entirely.*
 
@@ -89,7 +89,7 @@ So, of course, we’re all going to check the video capture early in the trouble
 The network tab is often a good next step when the video didn’t have our answer: without loading the full trace it’s a quick way to see if anything failed to load or loaded very slowly.
 
 
-![a Checkly dashboard](/guides/images/reading-traces-08.png)
+![a Checkly dashboard](/images/guides/images/reading-traces-08.png)
 
 *The network tab shows the same details you’d get from a browser’s dev tools*
 
@@ -100,7 +100,7 @@ In this case, the only failed kit was a fontawesome library, which seems unlikel
 If you’re investigating a check with extremely strange or stochastic results, you might wonder ‘this check retried twice before it reported failure, how did those other check runs go?’ We know since we got an alert the other check runs also failed, but to go deeper just use the drop-down on the top left of the check run viewer.
 
 
-![a Checkly dashboard](/guides/images/reading-traces-09.png)
+![a Checkly dashboard](/images/guides/images/reading-traces-09.png)
 
 You can select each attempt in the drop-down.
 
@@ -109,12 +109,12 @@ You can select each attempt in the drop-down.
 When trying to interpret a failure, especially during a late night incident response process, it’s helpful to get a summary of how this failure affects users, written in plain English. Translating technical error messages into a more readable format is something that language models excel at, so you may want to try out our AI Impact Analysis tool. For this failure, the analysis looks pretty spot on: users can’t see a section labelled ‘bottom sellers’
 
 
-![a Checkly dashboard](/guides/images/reading-traces-09a.png)
+![a Checkly dashboard](/images/guides/images/reading-traces-09a.png)
 
 AI Impact analysis is a beta feature, which you can switch on in your account settings.
 
 
-![a Checkly dashboard](/guides/images/reading-traces-10.png)
+![a Checkly dashboard](/images/guides/images/reading-traces-10.png)
 
 While the AI explainer is helpful in figuring out the scope of the problem, to go further we really need the big guns: the full trace of this test session.
 
@@ -123,13 +123,13 @@ While the AI explainer is helpful in figuring out the scope of the problem, to g
 How many times has a user reported a failure somewhere on your site, and you’ve wished they could send a full trace from their dev tools? In some support teams, asking for this browser trace is a common first step in the diagnosis process. For problems detected early with Checkly, the same detailed information is available as soon as you get an alert. Click the trace button to get the whole story.
 
 
-![a Checkly dashboard](/guides/images/reading-traces-11.png)
+![a Checkly dashboard](/images/guides/images/reading-traces-11.png)
 
 *The magic happens under the ‘trace’ button.*
 
 The full trace will load, let’s step through some of the information on the trace view:
 
-![a Checkly dashboard](/guides/images/reading-traces-12.png)
+![a Checkly dashboard](/images/guides/images/reading-traces-12.png)
 
 1. The test is broken down into components, and you can scroll through and see what had loaded as each test was happening.
 2. Screenshots of the page as loads and formats. You can check a screenshot for each assertion.
@@ -137,7 +137,7 @@ The full trace will load, let’s step through some of the information on the tr
 4. The console, errors, and log messages from the browser
 5. The Call tab which shows exactly how the current playwright call was interpreted. This is so interesting it deserves its own screenshot:
 
-![a Checkly dashboard](/guides/images/reading-traces-13.png)
+![a Checkly dashboard](/images/guides/images/reading-traces-13.png)
 
 If you notice that the page took a second or two to fully load, and you’re worried it caused the `expect.toBeVisible` call to fail: probably not! Remember that [Playwright’s auto-waiting](https://www.checklyhq.com/learn/playwright/waits-and-timeouts/) ensures that the element will be found as soon as it loads, and your test won’t fail just because of a flash of unformatted content.
 

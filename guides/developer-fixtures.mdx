@@ -28,7 +28,7 @@ This article will refer repeatedly to an ideal "developer" who understands their
 Though the rest of this guide will refer to our developer as the person we're enabling, feel free to slot in anyone who we want to enable to write monitors, without requiring they become experts in Observability, Monitoring, Checkly, or Playwright.
 
 ## The Checkly CLI and Monitoring as Code for developers
-First off, our developer may not be very excited to log into a web interface to create new monitors. Since developers are used to running and deploying code from the command line, we want to make available the Checkly CLI to our developers. A [full guide to the Checkly CLI](https://www.checklyhq.com/docs/cli/) is on our documentation site, but in general the process would look like:
+First off, our developer may not be very excited to log into a web interface to create new monitors. Since developers are used to running and deploying code from the command line, we want to make available the Checkly CLI to our developers. A [full guide to the Checkly CLI](https://www.checklyhq.com/cli/overview) is on our documentation site, but in general the process would look like:
 
 1. Set up the CLI on the developer's machine - install is easy with npm, then the developer can authenticate their cli with `npx checkly login`.
 2. Create a new project - developers can either grab an existing repository with the team's checks, or use `npm create checkly@latest` to make a new project.
@@ -41,9 +41,9 @@ For small teams just getting started with Checkly, this is all you need to do to
 
 It's a great feature of Checkly that any check can have totally custom settings for every aspect of its running: it can run at a custom cadence, from its own geography, with its own logic for retries. This means that if, for example, you're creating a new test specifically to check localization settings, you can set just that check to run from dozens of geographies, even if most checks only need three or four.
 
-Of course, we don't want to give our fresh developer over a dozen settings that she needs to set just to create her first check. New Checks created either in the web UI or from your code environment via the CLI will default to using the [global configuration](https://docs.checklyhq.com/docs/cli/project-structure/#global-configuration). You can view and edit this global config in `checkly.config.ts`, you can see a reference on this configuration and options under the `project` [construct documentation](https://docs.checklyhq.com/docs/cli/constructs-reference/#project). Some suggestions for default configuration:
+Of course, we don't want to give our fresh developer over a dozen settings that she needs to set just to create her first check. New Checks created either in the web UI or from your code environment via the CLI will default to using the [global configuration](https://docs.checklyhq.com/cli/overviewproject-structure/#global-configuration). You can view and edit this global config in `checkly.config.ts`, you can see a reference on this configuration and options under the `project` [construct documentation](https://docs.checklyhq.com/cli/overviewconstructs-reference/#project). Some suggestions for default configuration:
 
-* Set a generous `RetryStrategy`! Some failures can look extremely worrying even if they happen once, but it's worth double-checking that the problem wasn't entirely ephemeral. Full [documentation of retry configuration is on our docs site](https://docs.checklyhq.com/docs/cli/constructs-reference/#retrystrategy).
+* Set a generous `RetryStrategy`! Some failures can look extremely worrying even if they happen once, but it's worth double-checking that the problem wasn't entirely ephemeral. Full [documentation of retry configuration is on our docs site](https://docs.checklyhq.com/cli/overviewconstructs-reference/#retrystrategy).
 
 * If you're encouraging microservice developers or frontend engineers to add checks, consider setting the default frequency to be relatively low. It's great to test edge cases or unusual scenarios, but someone without exposure to Operations is unlikely to need to run a check every minute.
 
@@ -59,7 +59,7 @@ You may want to go beyond global settings for a larger or more complex team. For
 
 These are all goud reasons to create a check group. Groups have their own set of variables and configuration for all the members of that group. Checks can be added to a group either by configuration at the code level (passing a `checkGroup` object to the config), or in the web UI by creating a group and clicking 'Add Checks to Group'.
 
-<Frame><img src="/guides/images/guide-fixtures01.png" alt="the Checkly Web UI with settings for a group, displaying variables" title="Setting variables that will be available to every check in this group" /></Frame>
+<Frame><img src="/images/guides/images/guide-fixtures01.png" alt="the Checkly Web UI with settings for a group, displaying variables" title="Setting variables that will be available to every check in this group" /></Frame>
 
 Some important things to remember when working with a group of checks:
 
@@ -68,7 +68,7 @@ Some important things to remember when working with a group of checks:
   * For API checks, you can have a 'teardown script' for a group that runs after every check is completed.
 * That said, all the checks in a group can be triggered to run at the same time, this is especially useful if a group is used to run checks after deployments.
 
-<Frame><img src="/guides/images/guide-fixtures02.png" alt="the Checkly Web UI with settings for a group" title="Running a group from the Web UI's 'Schedule Group' option" /></Frame>
+<Frame><img src="/images/guides/images/guide-fixtures02.png" alt="the Checkly Web UI with settings for a group" title="Running a group from the Web UI's 'Schedule Group' option" /></Frame>
 
 * Any settings that are given in two places will be reconciled with the following hierarchy:
   1. individual settings on a check

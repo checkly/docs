@@ -35,13 +35,13 @@ In such a situation, the following can happen:
 
 1. You end up waiting a shorter time than the element takes to load!
 
-![playwright hard wait time too short](/learn/images/over_assumption_01@2x.jpg)
+![playwright hard wait time too short](/images/learn/images/over_assumption_01@2x.jpg)
 
 Your hard wait terminates and your click action is attempted too early. The script terminates with an error, possibly of the ["Element not found"](/learn/playwright/error-element-not-found/) sort.
 
 2. The element loads before your hard wait has expired.
 
-![playwright hard wait time too long](/learn/images/under_assumption_01@2x.jpg)
+![playwright hard wait time too long](/images/learn/images/under_assumption_01@2x.jpg)
 
 While the element is correctly clicked once your wait expires and your script continues executing as planned, you are wasting time. You'll never click the element once it's available, but always rely on a magic number to interact with your UI. This wasted time quickly adds up when your test suite grows and you're running multiple test suites. If you've ever experienced waiting for a test suite taking an hour, you know how painful it can be. Every second counts in browser automation and end-to-end testing!
 
@@ -78,7 +78,7 @@ If you want to click an element, Playwright will only interact with it when the 
 
 When you instruct Playwright to perform an action, it will constantly check if an element matches your locator and is ready to be used. And only if there is an actionable element will it perform your defined action.
 
-![playwright smart wait](/learn/images/auto-wait@2x.jpg)
+![playwright smart wait](/images/learn/images/auto-wait@2x.jpg)
 
 This auto-waiting approach has two main advantages:
 

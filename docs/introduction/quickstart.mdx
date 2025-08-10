@@ -7,7 +7,12 @@ sidebarTitle: 'Quickstart'
 import CliProjectInit from '/snippets/cli-project-init.mdx';
 import CliAuth from '/snippets/cli-auth.mdx';
 
-This  guide will walk you through creating your first browser check using the Checkly CLI. You'll learn how to set up monitoring for a web application, configure alerts, and deploy your checks to run continuously.
+This guide will walk you through creating your first browser check with Checkly. Choose your preferred approach:
+
+<Tabs>
+<Tab title="Monitoring as Code">
+
+Get started with Checkly using the CLI and code-first approach. You'll learn how to set up monitoring for a web application, configure alerts, and deploy your checks to run continuously.
 
 <Accordion title="Prerequisites">
 - Node.js 16+ installed
@@ -186,3 +191,87 @@ Now that you have your first browser check running, explore these advanced featu
 - **Tag Your Checks**: Organize monitoring by feature or team
 
 Congratulations! You've successfully set up automated browser monitoring with Checkly. Your application is now being continuously monitored from multiple global locations.
+
+</Tab>
+<Tab title="Starting in the UI">
+
+Get started with Checkly using the web interface. This approach is perfect for getting up and running quickly without any local setup.
+
+<Accordion title="Prerequisites">
+- A Checkly account (sign up at [checklyhq.com](https://checklyhq.com))
+- The URL of a website you want to monitor
+</Accordion>
+
+<Steps>
+<Step title="Create Your First Check">
+1. **Log in** to your Checkly dashboard at [app.checklyhq.com](https://app.checklyhq.com)
+2. **Click "Create Check"** from the main dashboard
+3. **Choose "Browser Check"** for comprehensive website monitoring
+4. **Enter your website URL** (e.g., `https://your-website.com`)
+5. **Give your check a name** like "Homepage Monitor"
+</Step>
+
+<Step title="Configure Basic Settings">
+Configure your check settings:
+
+- **Locations**: Select 2-3 global locations (e.g., US East, EU West, Asia Pacific)
+- **Frequency**: Start with every 5 minutes for critical pages
+- **Tags**: Add tags like `production` or `homepage` for organization
+
+<Note>
+For your first check, the default settings work well. You can always adjust them later.
+</Note>
+</Step>
+
+<Step title="Set Up Alerts">
+Configure who gets notified when issues are detected:
+
+1. **Click "Alert Settings"** in the check configuration
+2. **Add your email address** for notifications
+3. **Choose alert conditions**: 
+   - Alert after 1 failure (for critical pages)
+   - Alert after 2 failures (for less critical pages)
+4. **Set recovery notifications** to know when issues are resolved
+</Step>
+
+<Step title="Test and Save">
+Before activating your check:
+
+1. **Click "Test Check"** to run it once and verify it works
+2. **Review the results** to ensure your website loads correctly
+3. **Check for any errors** in the console or network tabs
+4. **Click "Save and Activate"** to start continuous monitoring
+</Step>
+
+<Step title="View Results">
+Once your check is active:
+
+1. **Visit your dashboard** to see real-time results
+2. **Check the results page** for detailed performance metrics
+3. **Review screenshots** and timing information
+4. **Set up additional checks** for other critical pages
+</Step>
+</Steps>
+
+## Next Steps
+
+Now that you have your first check running:
+
+- **Add API Checks**: Monitor your backend services and APIs
+- **Create Check Groups**: Organize related checks together
+- **Set up Status Pages**: Share uptime information with users
+- **Explore Integrations**: Connect with Slack, PagerDuty, or other tools
+
+## Upgrading to Monitoring as Code
+
+As your monitoring needs grow, consider upgrading to our CLI approach:
+
+- **Version Control**: Keep your monitoring configuration in Git
+- **Team Collaboration**: Review changes through pull requests  
+- **CI/CD Integration**: Deploy monitoring alongside your applications
+- **Advanced Scripting**: Write custom Playwright tests for complex flows
+
+Ready to make the switch? Check out the **Monitoring as Code** tab above!
+
+</Tab>
+</Tabs>

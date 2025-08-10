@@ -1,0 +1,60 @@
+name: Claude Code Issue Automation
+
+on:
+  issues:
+    types: [opened, edited]
+  issue_comment:
+    types: [created]
+
+jobs:
+  claude-respond:
+    if: contains(github.event.issue.body, '@claude') || contains(github.event.comment.body, '@claude')
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run Claude Code
+      env:
+        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Install Claude Code
+        curl -fsSL https://claude.ai/install.sh | bash
+        
+        # Get issue content
+        ISSUE_BODY="${{ github.event.issue.body || github.event.comment.body }}"
+        ISSUE_NUMBER="${{ github.event.issue.number }}"
+        
+        # Create branch name
+        BRANCH_NAME="claude/issue-${ISSUE_NUMBER}"
+        
+        # Configure git
+        git config user.name "Claude Code Bot"
+        git config user.email "claude@anthropic.com"
+        
+        # Create and checkout new branch
+        git checkout -b "$BRANCH_NAME"
+        
+        # Run Claude Code with the issue content
+        claude -p "Work on GitHub issue #${ISSUE_NUMBER}: ${ISSUE_BODY}"
+        
+        # Push branch if changes were made
+        if ! git diff --quiet HEAD; then
+          git push -u origin "$BRANCH_NAME"
+          
+          # Create PR
+          gh pr create \
+            --title "Fix issue #${ISSUE_NUMBER}" \
+            --body "Addresses #${ISSUE_NUMBER}\n\n🤖 Generated with Claude Code" \
+            --head "$BRANCH_NAME" \
+            --base main
+            
+          # Comment on original issue
+          gh issue comment ${ISSUE_NUMBER} --body "PR created: $(gh pr view --json url --jq .url)"
+        fi

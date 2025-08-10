@@ -17,6 +17,156 @@ new ApiCheck('api-health-check', {
 
 When you run `npx checkly deploy`, constructs become live resources in your Checkly account.
 
+
+
+## Project Structure
+
+The example below shows how a typical Checkly CLI project is organized. Most files, directories and paths are conventions you can tweak to your liking using `import` / `require` and setting `glob` patterns.
+
+
+- `checkly.config.ts` - Mandatory global project and CLI configuration. We recommend using TypeScript.
+- `src/__checks__/*` - TS/JS files defining your checks and other resources.
+- `package.json` - Standard NPM project manifest.
+
+Here is an example directory tree of what that would look like:
+
+```
+.
+|-- checkly.config.ts
+|-- package.json
+`-- src
+    `-- __checks__
+      |-- alert-channels.ts
+      |-- api-check.check.ts
+      `-- homepage.spec.ts
+
+```
+
+The `checkly.config.ts` at the root of your project defines a range of defaults for all your checks.
+
+As your project grows, you will want to override these defaults for specific checks or check groups. The recommended way to tackle this is using a mix of **global** and **local** configuration.
+
+## Project Configuration
+
+<Tabs>
+  <Tab title="Global Configuration">
+    As mentioned, your global `checkly.config.ts` holds a set of defaults for your project, checks and some CLI commands. Use `defineConfig` to configure your Checkly project.
+
+    <CodeGroup dropdown>
+
+```ts checkly.config.ts
+import { defineConfig } from 'checkly'
+import { Frequency } from 'checkly/constructs'
+
+export default defineConfig({
+  projectName: 'Website Monitoring',
+  logicalId: 'website-monitoring-1',
+  repoUrl: 'https://github.com/acme/website',
+  checks: {
+    activated: true,
+    muted: false,
+    runtimeId: '2025.04',
+    frequency: Frequency.EVERY_5M,
+    locations: ['us-east-1', 'eu-west-1'],
+    tags: ['website', 'api'],
+    checkMatch: '**/*.check.js',
+    browserChecks: {
+      frequency: Frequency.EVERY_10M,
+      testMatch: 'browsers/**/*.spec.js',
+    },
+    multiStepChecks: {
+      testMatch: 'multistep/**/*.spec.js',
+    },
+  },
+  cli: {
+    runLocation: 'eu-west-1',
+    privateRunLocation: 'private-dc1'
+  }
+})
+```
+
+```js checkly.config.js
+const { defineConfig } = require('checkly')
+
+const config = defineConfig({
+  projectName: 'Website Monitoring',
+  logicalId: 'website-monitoring-1',
+  repoUrl: 'https://github.com/acme/website',
+  checks: {
+    activated: true,
+    muted: false,
+    runtimeId: '2025.04',
+    frequency: Frequency.EVERY_5M,
+    locations: ['us-east-1', 'eu-west-1'],
+    tags: ['website', 'api'],
+    checkMatch: '**/*.check.js',
+    browserChecks: {
+      frequency: Frequency.EVERY_10M,
+      testMatch: 'browsers/**/*.spec.js',
+    },
+    multiStepChecks: {
+      testMatch: 'multistep/**/*.spec.js',
+    },
+  },
+  cli: {
+    runLocation: 'eu-west-1',
+    privateRunLocation: 'private-dc1'
+  }
+})
+
+module.exports = config;
+```
+
+    </CodeGroup>
+
+    Find a full reference of all project properties in [the `Project` construct section](/docs/cli/constructs-reference/#project).
+  </Tab>
+  
+  <Tab title="Local Configuration">
+    Override any of the settings in the `checks` global configuration section at the individual check level.
+
+    <CodeGroup>
+
+```ts __checks__/api.check.ts
+import { ApiCheck, AssertionBuilder, Frequency } from 'checkly/constructs'
+
+const api = new ApiCheck('hello-api', {
+  name: 'Hello API',
+  locations: ['ap-south-1'], // overrides the locations property
+  frequency: Frequency.EVERY_30M, // overrides the frequency property
+  request: {
+    method: 'GET',
+    url: 'https://api.checklyhq.com/public-stats',
+    assertions: [
+      AssertionBuilder.statusCode().equals(200)
+    ]
+  }
+})
+```
+
+```js __checks__/api.check.js
+const { ApiCheck, AssertionBuilder, Frequency } = require('checkly/constructs')
+
+const api = new ApiCheck('hello-api', {
+  name: 'Hello API',
+  locations: ['ap-south-1'], // overrides the locations property
+  frequency: Frequency.EVERY_30M, // overrides the frequency property
+  request: {
+    method: 'GET',
+    url: 'https://api.checklyhq.com/public-stats',
+    assertions: [
+      AssertionBuilder.statusCode().equals(200)
+    ]
+  }
+})
+```
+
+    </CodeGroup>
+
+    Find a full reference of all check properties in [the `ApiCheck` construct](/docs/cli/constructs-reference/#apicheck) or [`BrowserCheck` construct section](/docs/cli/constructs-reference/#browsercheck).
+  </Tab>
+</Tabs>
+
 ## Logical IDs
 
 Every construct requires a unique `logicalId` as its first parameter. This ID tracks resources across deployments and updates.
@@ -36,25 +186,6 @@ new ApiCheck('user-auth-check', { /* ... */ })
 new ApiCheck('check-1', { /* ... */ })
 new ApiCheck('check-1', { /* ... */ }) // ❌ Duplicate ID
 ```
-
-## Available Constructs
-
-### Monitoring Checks
-- **[ApiCheck](/constructs/api-check)** - Monitor HTTP APIs and endpoints
-- **[BrowserCheck](/constructs/browser-check)** - Run Playwright scripts for E2E testing
-- **[HeartbeatCheck](/constructs/heartbeat-monitor)** - Monitor services via heartbeat signals
-- **[MultistepCheck](/constructs/multistep-check)** - Create complex multi-step scenarios
-
-### Alert Channels  
-- **[EmailAlertChannel](/constructs/email-alert-channel)** - Email notifications
-- **[SlackAlertChannel](/constructs/slack-alert-channel)** - Slack notifications
-- **[SmsAlertChannel](/constructs/sms-alert-channel)** - SMS notifications
-- **[WebhookAlertChannel](/constructs/webhook-alert-channel)** - Custom webhook notifications
-
-### Organization
-- **[CheckGroup](/constructs/check-group-v2)** - Group related checks together
-- **[MaintenanceWindow](/constructs/maintenance-window)** - Schedule maintenance periods
-
 ## Programming with Constructs
 
 Constructs are just TypeScript classes, so you can use standard programming patterns:
@@ -78,6 +209,24 @@ const alertChannel = new EmailAlertChannel('team-alerts', {
 const checks = [check1, check2, check3]
 checks.forEach(check => check.alertChannels = [alertChannel])
 ```
+## Available Constructs
+
+### Monitoring Checks
+- **[ApiCheck](/constructs/api-check)** - Monitor HTTP APIs and endpoints
+- **[BrowserCheck](/constructs/browser-check)** - Run Playwright scripts for E2E testing
+- **[HeartbeatCheck](/constructs/heartbeat-monitor)** - Monitor services via heartbeat signals
+- **[MultistepCheck](/constructs/multistep-check)** - Create complex multi-step scenarios
+
+### Alert Channels  
+- **[EmailAlertChannel](/constructs/email-alert-channel)** - Email notifications
+- **[SlackAlertChannel](/constructs/slack-alert-channel)** - Slack notifications
+- **[SmsAlertChannel](/constructs/sms-alert-channel)** - SMS notifications
+- **[WebhookAlertChannel](/constructs/webhook-alert-channel)** - Custom webhook notifications
+
+### Organization
+- **[CheckGroup](/constructs/check-group-v2)** - Group related checks together
+- **[MaintenanceWindow](/constructs/maintenance-window)** - Schedule maintenance periods
+
 
 ## Next Steps
 

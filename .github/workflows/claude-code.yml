@@ -32,6 +32,7 @@ jobs:
         # Get issue content
         ISSUE_BODY="${{ github.event.issue.body || github.event.comment.body }}"
         ISSUE_NUMBER="${{ github.event.issue.number }}"
+        ISSUE_TITLE="${{ github.event.issue.title }}"
         
         # Create branch name
         BRANCH_NAME="claude/issue-${ISSUE_NUMBER}"
@@ -66,17 +67,15 @@ jobs:
         if ! git diff --quiet HEAD; then
           echo "Changes detected, committing and pushing..."
           git add -A
-          git commit -m "Fix issue #${ISSUE_NUMBER}: Replace Card components with normal headers
-
-Generated with Claude Code
-
-Co-Authored-By: Claude <noreply@anthropic.com>"
+          git commit -m "Fix issue #${ISSUE_NUMBER}: Replace Card components with normal headers" \
+                     -m "Generated with Claude Code" \
+                     -m "Co-Authored-By: Claude <noreply@anthropic.com>"
           git push -u origin "$BRANCH_NAME"
           
           # Create PR
           gh pr create \
-            --title "Fix issue #${ISSUE_NUMBER}" \
-            --body "Addresses #${ISSUE_NUMBER}\n\n🤖 Generated with Claude Code" \
+            --title "${ISSUE_TITLE}" \
+            --body "Addresses #${ISSUE_NUMBER}\n\nGenerated with Claude Code" \
             --head "$BRANCH_NAME" \
             --base main
             

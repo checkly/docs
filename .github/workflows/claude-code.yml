@@ -47,7 +47,7 @@ jobs:
         ls -la
         
         # Run Claude Code with the issue content and explicit working directory context
-        claude -p "Work on GitHub issue #${ISSUE_NUMBER} in the docs repository. Current working directory is the root of the checkly/docs repo. Issue details: ${ISSUE_BODY}" || {
+        claude --non-interactive -p "Work on GitHub issue #${ISSUE_NUMBER} in the docs repository. Current working directory is the root of the checkly/docs repo. Please complete all requested changes automatically without asking for permission. Issue details: ${ISSUE_BODY}" || {
           echo "Claude Code execution failed with exit code $?"
           echo "Checking if any changes were made anyway..."
         }

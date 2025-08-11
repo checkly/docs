@@ -12,31 +12,26 @@ Alert configuration controls **when** and **how often** you receive notification
 
 Checkly provides a three-tier configuration system that allows for flexible alert management across your organization:
 
-<CardGroup cols={3}>
-<Card title="Account Level" icon="building">
+### Account Level
 **Default Settings**
 - Organization-wide defaults
 - Applied to all checks unless overridden
 - Simplifies management at scale
 - Consistent baseline behavior
-</Card>
 
-<Card title="Group Level" icon="users">
+### Group Level
 **Team-Specific Settings**
 - Override account defaults for check groups
 - Team-based alert preferences
 - Service-specific requirements
 - Departmental escalation policies
-</Card>
 
-<Card title="Check Level" icon="check-circle">
+### Check Level
 **Individual Overrides**
 - Fine-tune specific check behavior
 - Handle special requirements
 - Debug and testing scenarios
 - Legacy system accommodations
-</Card>
-</CardGroup>
 
 ### Configuration Inheritance
 Understanding how settings cascade through the hierarchy:
@@ -139,23 +134,19 @@ Alert Settings:
 ### Group Override Strategies
 Configure how group settings interact with individual checks:
 
-<CardGroup cols={2}>
-<Card title="Group settings override individual check settings" icon="shield-check">
+#### Group settings override individual check settings
 **Enforced Group Policy**
 - Group settings take precedence
 - Ensures consistency within teams
 - Prevents individual check drift
 - Simplifies management
-</Card>
 
-<Card title="Individual check settings take precedence" icon="settings">
+#### Individual check settings take precedence
 **Flexible Individual Control**
 - Check-level customization allowed
 - Handle special cases easily
 - Legacy system accommodation
 - Granular control when needed
-</Card>
-</CardGroup>
 
 ## Check-Level Alert Configuration
 
@@ -228,23 +219,19 @@ Legacy System Configuration:
 ### Run-Based Escalation
 Alert after a specific number of consecutive failures:
 
-<CardGroup cols={2}>
-<Card title="How it works" icon="repeat">
+#### How it works
 **Consecutive Failure Counting**
 - Counts failed check runs in sequence
 - Resets counter on successful run
 - Cross-location failures count as one run
 - Retries don't count as separate runs
-</Card>
 
-<Card title="Best for" icon="target">
+#### Best for
 **Stable Systems**
 - Predictable failure patterns
 - Clear success/failure states  
 - Services with known reliability
 - APIs with consistent behavior
-</Card>
-</CardGroup>
 
 ```yaml
 # Example: Alert after 2 consecutive failures
@@ -262,23 +249,19 @@ Scenario:
 ### Time-Based Escalation
 Alert when checks fail continuously for a specific duration:
 
-<CardGroup cols={2}>
-<Card title="How it works" icon="clock">
+#### How it works
 **Duration-Based Triggering**
 - Monitors failure duration, not count
 - Ideal for high-frequency checks
 - Ignores individual run results
 - Focuses on sustained problems
-</Card>
 
-<Card title="Best for" icon="zap">
+#### Best for
 **High-Frequency Monitoring**
 - Checks running every 1-5 minutes
 - Services with intermittent issues
 - Rate-limited APIs
 - Network-dependent services
-</Card>
-</CardGroup>
 
 ```yaml
 # Example: Alert after 10 minutes of failures
@@ -314,34 +297,29 @@ Benefits:
 
 **Location Threshold Examples:**
 
-<CardGroup cols={3}>
-<Card title="Conservative (67%)" icon="shield">
+#### Conservative (67%)
 ```yaml
 Use Case: Critical global services
 Locations: 6
 Threshold: 67% (4 locations)
 Triggers: Major outages only
 ```
-</Card>
 
-<Card title="Balanced (50%)" icon="balance-scale">
+#### Balanced (50%)
 ```yaml
 Use Case: Standard web services
 Locations: 4  
 Threshold: 50% (2 locations)
 Triggers: Significant issues
 ```
-</Card>
 
-<Card title="Sensitive (33%)" icon="eye">
+#### Sensitive (33%)
 ```yaml
 Use Case: Regional services
 Locations: 3
 Threshold: 33% (1 location)
 Triggers: Any location failure
 ```
-</Card>
-</CardGroup>
 
 ## Reminder Configuration
 
@@ -401,31 +379,26 @@ Optional escalation to different teams/channels after maximum reminders
 ### Retry Strategy Overview
 Intelligent retry mechanisms reduce false positives and alert noise:
 
-<CardGroup cols={3}>
-<Card title="Fixed Interval" icon="minus">
+#### Fixed Interval
 **Consistent Timing**
 - Same delay between retries
 - Predictable retry pattern
 - Simple configuration
 - Good for stable networks
-</Card>
 
-<Card title="Linear Backoff" icon="trending-up">
+#### Linear Backoff
 **Gradual Increase**
 - Linearly increasing delays
 - Allows services time to recover
 - Balances speed and patience
 - Good for overloaded services
-</Card>
 
-<Card title="Exponential Backoff" icon="activity">
+#### Exponential Backoff
 **Rapid Increase**
 - Exponentially increasing delays
 - Avoids overwhelming services
 - Industry standard approach
 - Good for rate-limited APIs
-</Card>
-</CardGroup>
 
 ### Fixed Interval Retries
 Consistent retry timing for predictable failure patterns:
@@ -490,8 +463,7 @@ const exponentialRetryConfig = {
 ### Location-Based Retry Logic
 Configure retry behavior based on geographic distribution:
 
-<CardGroup cols={2}>
-<Card title="Same Location Retry" icon="map-pin">
+#### Same Location Retry
 **When to Use:**
 - Investigating location-specific issues
 - Network routing problems
@@ -503,9 +475,8 @@ Configure retry behavior based on geographic distribution:
 sameLocation: true
 useCase: "Diagnose regional problems"
 ```
-</Card>
 
-<Card title="Different Location Retry" icon="globe">
+#### Different Location Retry
 **When to Use:**
 - Validating global service availability
 - Bypassing regional outages  
@@ -517,8 +488,6 @@ useCase: "Diagnose regional problems"
 sameLocation: false
 useCase: "Ensure global availability"
 ```
-</Card>
-</CardGroup>
 
 ### Network-Specific Retries
 Automatic retries for network-related failures only:
@@ -594,23 +563,19 @@ Customize SSL alerts with specific certificate information:
 ### Alert Muting
 Temporarily disable alerts without stopping checks:
 
-<CardGroup cols={2}>
-<Card title="Maintenance muting" icon="tools">
+#### Maintenance muting
 **Planned Maintenance**
 - Schedule muting for known downtime
 - Automatic unmuting after maintenance
 - Maintenance window integration
 - Team notification of muted state
-</Card>
 
-<Card title="Troubleshooting muting" icon="bug">
+#### Troubleshooting muting
 **Active Investigation**
 - Mute noisy alerts during debugging
 - Prevent alert fatigue during incidents
 - Manual unmuting when resolved
 - Audit trail of muting actions
-</Card>
-</CardGroup>
 
 ```yaml
 # Muting configuration options

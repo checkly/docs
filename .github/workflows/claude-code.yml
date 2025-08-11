@@ -10,11 +10,13 @@ jobs:
   claude-respond:
     if: contains(github.event.issue.body, '@claude') || contains(github.event.comment.body, '@claude')
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     
     permissions:
       contents: write
       issues: write
       pull-requests: write
+      actions: read
     
     steps:
     - uses: actions/checkout@v4
@@ -52,8 +54,17 @@ jobs:
           echo "Checking if any changes were made anyway..."
         }
         
+        # Check what files were changed
+        echo "Git status after Claude Code execution:"
+        git status
+        echo "Git diff after Claude Code execution:"
+        git diff --name-only
+        echo "Checking if target file exists:"
+        ls -la docs/communicate/alerts/configuration.mdx
+        
         # Push branch if changes were made
         if ! git diff --quiet HEAD; then
+          echo "Changes detected, pushing branch..."
           git push -u origin "$BRANCH_NAME"
           
           # Create PR

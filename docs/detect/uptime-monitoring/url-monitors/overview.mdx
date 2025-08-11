@@ -9,12 +9,16 @@ sidebarTitle: Overview
 
 URL monitors track the availability of your HTTP-based services by sending requests to specified URLs and validating responses, performance, and content.
 
-**Typical use cases include:**
+
+
+<Accordion title="Typical Use Cases Include">
 
 * Ensuring your marketing site returns a 200 OK
 * Verifying your documentation site loads quickly
 * Checking that your SSL certificate is still valid
 * Confirming that a public pricing endpoint is reachable for customers
+
+</Accordion>
 
 ## Configuration Options
 
@@ -30,283 +34,132 @@ Monitor any URL by specifying the endpoint you want to track. You can configure 
 
 Use assertions to validate the status code of your URL request. When one or more assertions fail, an alert is triggered:
 
+<Frame>
+  <img src="/images/url-monitor-assertions.png" alt="URL monitor assertions interface showing status code configuration" />
+</Frame>
+
 **Status Code**
-Verify your endpoint returns the expected HTTP status code using the comparison dropdown:
+Verify your endpoint returns the expected HTTP status code using the comparison dropdown. Choose from equals, not equals, greater than, or less than.
 
-- **Equals**: Exact status code match (e.g., 200)
-- **Not Equals**: Any status except specified code
-- **Greater Than**: Status code above threshold  
-- **Less Than**: Status code below threshold
-
-```javascript
-const monitor = new UrlMonitor('api-monitor', {
-  name: 'API Health Check',
-  url: 'https://api.example.com/health',
-  assertions: [
-    UrlAssertionBuilder.statusCode().equals(200)
-  ]
-})
-```
 
 ### Response Time Limits
 
 Set performance thresholds to ensure your application meets speed requirements:
 
-<AccordionGroup>
-<Accordion title="Degraded Performance">
-**Degraded After**: Time threshold (in milliseconds) after which the check is marked as degraded but not failed.
+<Frame>
+  <img src="/images/url-monitor-response-times.png" alt="URL monitor response time limits interface showing degraded and failed thresholds" />
+</Frame>
 
-- Default: 5000ms (5 seconds)  
-- Use for: Performance warnings without triggering failure alerts
-- Example: Mark as degraded if response takes longer than 2 seconds
+**Degraded After**: Time threshold (in milliseconds) after which the check is marked as degraded but not failed. Use for performance warnings without triggering failure alerts.
 
-```javascript
-const monitor = new UrlMonitor('fast-api', {
-  name: 'Fast API Monitor',
-  url: 'https://api.example.com/fast-endpoint',
-  degradedResponseTime: 2000, // 2 seconds
-})
-```
-</Accordion>
+**Failed After**: Time threshold after which the check fails completely. Use for hard performance limits where slow responses should trigger alerts.
 
-<Accordion title="Failed Performance">
-**Failed After**: Time threshold after which the check fails completely.
+### Frequency
 
-- Default: 30000ms (30 seconds)
-- Use for: Hard performance limits
-- Example: Fail if response takes longer than 10 seconds
-
-```javascript
-const monitor = new UrlMonitor('timeout-test', {
-  name: 'Critical Service Monitor', 
-  url: 'https://critical-service.com/api',
-  maxResponseTime: 10000, // 10 seconds
-})
-```
-</Accordion>
-</AccordionGroup>
-
-### Frequency & Scheduling
-
-<AccordionGroup>
-<Accordion title="Check Frequency">
 Determine how often your monitors run. Unlike Synthetic Monitors, URL Monitors do not consume "Checks" and can run at any frequency available to your plan:
 
-**Available Frequencies:**
-- Every 10 seconds (High-frequency plans only)
-- Every 30 seconds  
-- Every 1 minute
-- Every 2 minutes
-- Every 5 minutes (recommended for most use cases)
-- Every 10 minutes
-- Every 15 minutes
-- Every 30 minutes
-- Every 1 hour
-- Every 2 hours
-- Every 4 hours
-- Every 8 hours
-- Every 24 hours
+<Frame>
+  <img src="/images/url-monitor-frequency.png" alt="URL monitor frequency selection interface showing available check intervals" />
+</Frame>
 
-```javascript
-import { Frequency } from 'checkly/constructs'
+Choose a frequency that balances monitoring coverage with resource usage. Higher frequencies provide faster detection but may not be necessary for all services.
 
-const monitor = new UrlMonitor('frequent-check', {
-  name: 'High Priority Monitor',
-  url: 'https://critical-app.com',
-  frequency: Frequency.EVERY_1M,
-})
-```
-</Accordion>
+### Scheduling Strategy
 
-<Accordion title="Scheduling Strategy">
-Choose when and how your checks run:
+Choose when and how your checks run across multiple locations:
 
-**Round Robin** (Default)
-- Checks run from one random location each interval
-- Most cost-effective option
-- Good for general availability monitoring
+<Frame>
+  <img src="/images/url-monitor-scheduling.png" alt="URL monitor scheduling strategy interface showing round robin vs fixed schedule options" />
+</Frame>
 
-**Fixed Schedule**
-- Checks run from all selected locations simultaneously
-- Higher consumption but immediate global visibility
-- Best for critical services requiring real-time global status
+**Round Robin** (Default): Checks run from one random location each interval. Most cost-effective option for general availability monitoring.
 
-```javascript
-const monitor = new UrlMonitor('global-check', {
-  name: 'Global Service Monitor',
-  url: 'https://global-service.com',
-  runParallel: true, // Enable fixed schedule
-})
-```
-</Accordion>
-</AccordionGroup>
+**Fixed Schedule**: Checks run from all selected locations simultaneously. Higher consumption but provides immediate global visibility for critical services.
 
 ### Locations
 
-<AccordionGroup>
-<Accordion title="Public Locations">
-Checkly operates monitoring locations worldwide:
+Select from Checkly's global monitoring locations to test your URLs from different regions:
 
-**Americas**
-- Virginia (us-east-1)
-- Ohio (us-east-2)  
-- N. California (us-west-1)
-- Oregon (us-west-2)
-- Montreal (ca-central-1)
-- São Paulo (sa-east-1)
+<Frame>
+  <img src="/images/url-monitor-locations.png" alt="URL monitor locations selection interface showing global monitoring locations" />
+</Frame>
 
-**Europe / Middle East / Africa**
-- Ireland (eu-west-1)
-- Frankfurt (eu-central-1)
-- London (eu-west-2)
-- Paris (eu-west-3)
-- Stockholm (eu-north-1)
-- Milan (eu-south-1)
-- Bahrain (me-south-1)
-- Cape Town (af-south-1)
+Choose 2-3 locations that best represent your user base for optimal monitoring coverage. 
 
-**Asia Pacific**
-- Singapore (ap-southeast-1)
-- Tokyo (ap-northeast-1)
-- Osaka (ap-northeast-3)
-- Hong Kong (ap-east-1)
-- Sydney (ap-southeast-2)
-- Mumbai (ap-south-1)
-- Seoul (ap-northeast-2)
-- Jakarta (ap-southeast-3)
+See [Locations](/docs/introduction/concepts/locations) for the complete list of available regions and guidance on location selection.
 
-```javascript
-const monitor = new UrlMonitor('global-monitor', {
-  name: 'Worldwide Availability Check',
-  url: 'https://global-app.com',
-  locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
-})
-```
-</Accordion>
+<Info>
+**Private Locations**: Run checks from your own infrastructure to monitor internal applications, check services behind firewalls, or maintain data residency compliance. [Set up Private Locations →](/docs/detect/private-locations/overview)
+</Info>
 
-<Accordion title="Private Locations">
-Run checks from your own infrastructure:
+### Retries
 
-- Monitor internal applications and services
-- Check applications behind firewalls or VPNs
-- Maintain compliance with data residency requirements
-- Get insights from the user's actual network perspective
+Select the retry strategy to determine how failed checks are retried:
 
-[Set up Private Locations →](/docs/detect/private-locations/overview)
-</Accordion>
-</AccordionGroup>
+<Frame>
+  <img src="/images/url-monitor-retries.png" alt="URL monitor retries interface showing retry strategy options" />
+</Frame>
 
-### Retry Strategy
-
-Configure how Checkly handles failed checks:
-
-<AccordionGroup>
-<Accordion title="None">
-No retries - fail immediately on first failure:
-- Fastest failure detection
-- May result in false positives from temporary network issues
-- Best for: Non-critical monitors or when immediate alerting is required
-</Accordion>
-
-<Accordion title="Fixed">
-Retry a specific number of times with consistent intervals:
-- Predictable retry behavior
-- Good balance between speed and reliability
-- Configurable retry count and delay
-
-```javascript
-const monitor = new UrlMonitor('reliable-check', {
-  name: 'Stable Service Monitor',
-  url: 'https://stable-service.com',
-  retryStrategy: {
-    type: 'fixed',
-    baseBackoffSeconds: 60,
-    maxRetries: 2,
-  }
-})
-```
-</Accordion>
-
-<Accordion title="Linear">
-Increase retry delay linearly with each attempt:
-- Gradually increases delay between retries
-- Prevents overwhelming failed services
-- Good for services that may need time to recover
-
-```javascript
-retryStrategy: {
-  type: 'linear',
-  baseBackoffSeconds: 60,
-  maxRetries: 3,
-  sameRegion: true
-}
-```
-</Accordion>
-
-<Accordion title="Exponential">
-Double the retry delay with each attempt:
-- Most conservative retry approach
-- Maximum protection against service overload
-- Best for critical services or those with rate limiting
-
-```javascript
-retryStrategy: {
-  type: 'exponential', 
-  baseBackoffSeconds: 60,
-  maxRetries: 3,
-  maxDurationSeconds: 600
-}
-```
-</Accordion>
-</AccordionGroup>
+| Strategy | Description |
+|----------|-------------|
+| **None** | No retries - fail immediately on first failure for fastest detection |
+| **Fixed** | Retry a specific number of times with consistent intervals between attempts |
+| **Linear** | Increase retry delay linearly with each attempt to avoid overwhelming failed services |
+| **Exponential** | Double the retry delay with each attempt for maximum protection against service overload |
 
 ### Alert Settings
 
 Configure notifications for your team:
 
-<AccordionGroup>
-<Accordion title="Global Alert Settings">
-Use your account's default alert configuration:
+<Frame>
+  <img src="/images/url-monitor-alert.png" alt="URL monitor alert settings interface showing notification configuration options" />
+</Frame>
 
-- Inherits all configured alert channels
-- Consistent alerting across all monitors
-- Easier to manage at scale
+#### Notification Scope
 
-```javascript
-const monitor = new UrlMonitor('standard-alerts', {
-  name: 'Standard Monitor',
-  url: 'https://service.com',
-  // Uses global alert settings automatically
-})
-```
-</Accordion>
+Choose how alerts are configured for this monitor:
 
-<Accordion title="Custom Alert Settings">
-Override global settings for specific monitors:
+| Option | Description |
+|--------|-------------|
+| **Use global account notification settings** | Inherit notification preferences from Global Notification Settings |
+| **Use specific notification settings** | Configure alert behavior exclusively for this check |
 
-- Target specific teams or channels
-- Different escalation policies
-- Custom alert thresholds
+#### Escalation Rules
 
-```javascript
-import { EmailAlertChannel } from 'checkly/constructs'
+Control when alerts are triggered:
 
-const criticalAlerts = new EmailAlertChannel('critical-team', {
-  address: 'critical-team@company.com'
-})
+**Primary Trigger** (Choose one):
+- **When a check has failed X time(s)**: Sends alert after specified consecutive failures
+- **When a check is failing for more than Y minutes**: Sends alert if failure duration exceeds threshold
 
-const monitor = new UrlMonitor('critical-service', {
-  name: 'Critical Service Monitor',
-  url: 'https://critical-service.com',
-  alertChannels: [criticalAlerts],
-})
-```
-</Accordion>
-</AccordionGroup>
+**Additional Condition** (Optional):
+- **When a check is failing in Z% of locations**: Only applies to checks running in parallel across multiple locations
+
+#### Reminders
+
+Configure follow-up alerts after initial failure notification:
+
+| Setting | Description |
+|---------|-------------|
+| **Maximum reminders** | Number of follow-up alerts (0 = no reminders) |
+| **Reminder interval** | Time between reminders (only if maximum reminders > 0) |
+
+#### Alert Channels
+
+Define where notifications are sent when checks fail or recover. Additional channels can be configured in global notification settings.
+
+**Alert Types** (per channel):
+- ✅ **Success/Recovery**: Check has recovered from failure
+- ⚠ **Warning**: Check is degraded but not failed  
+- ❌ **Failure**: Check has failed
+- 🔒 **Locked/Restricted**: Channel access limited
+
+<Note>
+**Global Alert Settings**: By default, monitors inherit your account's notification preferences. Select "Use specific notification settings" to customize alerts for individual monitors.
+</Note>
 
 ## Best Practices
 
-<AccordionGroup>
 <Accordion title="Choosing Frequencies">
 - **Critical services**: Every 1-2 minutes
 - **Important services**: Every 5 minutes  
@@ -326,4 +179,7 @@ const monitor = new UrlMonitor('critical-service', {
 - Set appropriate response time thresholds
 - Test assertions thoroughly before deployment
 </Accordion>
-</AccordionGroup>
+
+<Accordion title="Implement as a Construct">
+For monitoring as code workflows, use the URL Monitor construct to version control your monitoring configuration and deploy alongside your application code. [Learn about URL Monitor Construct →](/constructs/url-monitor)
+</Accordion>

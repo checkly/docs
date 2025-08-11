@@ -32,3 +32,58 @@ deliver failure, degradation, and recovery messages to any project in your Disco
    </Callout>
 
 Congratulations! You have successfully integrated Checkly with Discord!
+
+## Advanced Discord Configuration
+
+### Custom Discord Alerts
+
+For more control over Discord alert formatting, you can create custom webhook payloads using Discord's embed format:
+
+```json
+{
+  "embeds": [
+    {
+      "title": "{{ALERT_TITLE}}",
+      "description": "**Check**: {{CHECK_NAME}}\n**Location**: {{RUN_LOCATION}}\n**Response Time**: {{RESPONSE_TIME}}ms",
+      "color": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}15158332{{else}}{{#eq ALERT_TYPE 'ALERT_DEGRADED'}}16776960{{else}}3066993{{/eq}}{{/eq}}",
+      "fields": [
+        {
+          "name": "Error",
+          "value": "{{CHECK_ERROR_MESSAGE}}",
+          "inline": false
+        },
+        {
+          "name": "Started At",
+          "value": "{{STARTED_AT}}",
+          "inline": true
+        },
+        {
+          "name": "Location",
+          "value": "{{RUN_LOCATION}}",
+          "inline": true
+        }
+      ],
+      "footer": {
+        "text": "Checkly Monitoring"
+      },
+      "timestamp": "{{STARTED_AT}}",
+      "url": "{{RESULT_LINK}}"
+    }
+  ]
+}
+```
+
+### Discord Alert Colors
+
+Use different colors to distinguish alert types:
+
+- **Red (15158332)**: Failures and critical alerts
+- **Orange (16776960)**: Degraded performance alerts  
+- **Green (3066993)**: Recovery notifications
+
+### Discord Best Practices
+
+- Use separate channels for different environments (production, staging, development)
+- Configure appropriate notification settings to avoid alert fatigue
+- Use Discord's thread feature for grouping related alerts
+- Set up role mentions (@role) for critical alerts that require immediate attention

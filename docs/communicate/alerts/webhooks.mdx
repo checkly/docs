@@ -827,3 +827,65 @@ Always implement proper error handling and retry logic in your webhook endpoints
 <Tip>
 Use Checkly's webhook testing feature to validate your configurations before deploying them. Test both successful delivery and error scenarios to ensure robust integration.
 </Tip>
+
+## Webhook Integration and Custom Alerts
+
+### Advanced Webhook Configuration
+Create sophisticated integrations with third-party systems:
+
+```json
+{
+  "url": "https://api.incident-system.com/webhooks/{{WEBHOOK_TOKEN}}",
+  "method": "POST",
+  "headers": {
+    "Authorization": "Bearer {{API_TOKEN}}",
+    "Content-Type": "application/json",
+    "X-Checkly-Source": "monitoring"
+  },
+  "body": {
+    "incident": {
+      "title": "{{ALERT_TITLE}}",
+      "severity": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}high{{else}}medium{{/eq}}",
+      "description": "Check {{CHECK_NAME}} failed at {{STARTED_AT}} from {{RUN_LOCATION}}",
+      "metadata": {
+        "check_id": "{{CHECK_ID}}",
+        "response_time": "{{RESPONSE_TIME}}",
+        "result_link": "{{RESULT_LINK}}",
+        "location": "{{RUN_LOCATION}}",
+        "tags": [{{#each TAGS}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}]
+      }
+    }
+  }
+}
+```
+
+### Webhook Security and Validation
+Ensure webhook authenticity with cryptographic signatures:
+
+```javascript
+// Verify webhook signature (Node.js example)
+const crypto = require('crypto')
+
+function verifyWebhookSignature(payload, signature, secret) {
+  const hmac = crypto.createHmac('sha256', secret)
+  const digest = hmac.update(payload).digest('hex')
+  return crypto.timingSafeEqual(
+    Buffer.from(digest), 
+    Buffer.from(signature)
+  )
+}
+
+// Express.js webhook handler
+app.post('/checkly-webhook', (req, res) => {
+  const signature = req.headers['x-checkly-signature']
+  const payload = JSON.stringify(req.body)
+  
+  if (verifyWebhookSignature(payload, signature, process.env.WEBHOOK_SECRET)) {
+    // Process validated webhook
+    handleAlert(req.body)
+    res.status(200).send('OK')
+  } else {
+    res.status(401).send('Unauthorized')
+  }
+})
+```

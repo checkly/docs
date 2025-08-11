@@ -180,3 +180,65 @@ You can further customize the template by:
 - Including links to your internal systems or dashboards
 
 This custom webhook approach gives you complete control over the Slack message format while maintaining all the functionality of Checkly's native Slack integration.
+
+## Advanced Slack Configuration
+
+### Slack Channel Strategy
+
+Organize alerts across different Slack channels based on your team structure and operational needs:
+
+```yaml
+# Example Slack channel organization
+#alerts-critical:
+  Checks: Core production services
+  Alert Types: Failure, Recovery
+  Escalation: @here for immediate attention
+  
+#alerts-performance:
+  Checks: All API and browser checks
+  Alert Types: Degradation, Recovery
+  Escalation: No @here, passive monitoring
+  
+#alerts-security:
+  Checks: SSL certificate monitoring
+  Alert Types: SSL Expiration
+  Escalation: @security-team
+  
+#alerts-staging:
+  Checks: Development and staging environment
+  Alert Types: All
+  Escalation: @dev-team during business hours
+```
+
+### Slack Message Formatting
+
+Slack alerts include rich formatting and interactive elements. Here's what a typical alert looks like:
+
+```text
+🔴 **ALERT: Payment API has failed**
+
+**Check**: Payment API Health Check
+**Location**: N. Virginia
+**Response Time**: 5,234ms
+**Started**: <!date^1642248622^{date_short_pretty} at {time}|2024-01-15 14:30:22 UTC>
+
+**Error**: Connection timeout after 5000ms
+
+[View Results](https://app.checklyhq.com/checks/abc123/results/def456) | [Check Config](https://app.checklyhq.com/checks/abc123)
+```
+
+### Slack Threading and Updates
+
+Configure how Checkly handles related alerts:
+
+- **Thread updates**: Group related alerts (failure → recovery) in threads
+- **Channel posting**: Each alert as separate message for visibility  
+- **Mention strategies**: Use @here/@channel appropriately based on severity
+
+### Slack Best Practices
+
+- Use separate channels for different severity levels (critical, standard, development)
+- Configure @here mentions only for critical production failures
+- Set up channel-specific notification schedules (e.g., mute development alerts after hours)
+- Use threaded conversations to reduce channel noise while maintaining visibility
+- Consider using channel prefixes like #alerts- for easy organization

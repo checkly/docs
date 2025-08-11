@@ -1,0 +1,115 @@
+---
+title: 'SMS and Phone Call Alerts'
+description: 'Configure SMS text messages and phone call notifications for critical alerts and emergency escalation'
+sidebarTitle: 'SMS & Phone'
+---
+
+SMS and phone call notifications provide immediate alert delivery for your most critical monitoring scenarios. These channels are ideal for high-priority alerts that require immediate attention.
+
+## SMS Alert Configuration
+
+Set up text message notifications for critical alerts:
+
+```yaml
+SMS Configuration:
+  Phone Numbers:
+    - "+1-555-0123" # On-call engineer
+    - "+1-555-0456" # Backup engineer
+  
+Message Format: "[CHECKLY] {{CHECK_NAME}} failed at {{RUN_LOCATION}}. {{RESULT_LINK}}"
+
+Alert Conditions:
+  Triggers: ALERT_FAILURE only
+  Checks: Critical production services
+  Time Restrictions: 24/7 or business hours only
+```
+
+## Phone Call Escalation
+
+Configure voice call alerts for highest priority incidents:
+
+```yaml
+Phone Call Configuration:
+  Numbers: Primary and backup on-call
+  Trigger Conditions:
+    - Critical checks (tagged as "P1")
+    - Multiple location failures
+    - Extended outage duration (>10 minutes)
+  
+Message Script:
+  "This is a Checkly alert. The {{CHECK_NAME}} check has failed from {{RUN_LOCATION}}. 
+   Please check your monitoring dashboard immediately."
+  
+Escalation Rules:
+  - Call primary on-call first
+  - If no answer within 5 minutes, call backup
+  - Repeat cycle until acknowledged
+```
+
+## SMS and Phone Best Practices
+
+### When to Use SMS and Phone Alerts
+
+**SMS Alerts are ideal for:**
+- Critical production service failures
+- Security incidents requiring immediate attention
+- Alerts that need to reach on-call staff outside business hours
+- Backup notification when other channels fail
+
+**Phone Calls should be reserved for:**
+- Highest priority incidents only (P1/Critical)
+- Multiple simultaneous failures indicating widespread issues
+- Extended outages lasting more than 10-15 minutes
+- Emergency situations requiring immediate response
+
+### Message Content Optimization
+
+**SMS Message Guidelines:**
+- Keep messages concise (160 characters or less)
+- Include essential information: service name, location, error type
+- Always include a direct link to detailed results
+- Use abbreviations when necessary: "API" instead of "Application Programming Interface"
+
+**Phone Call Scripts:**
+- Keep voice messages brief and clear
+- Speak slowly and repeat critical information
+- Include specific instructions for next steps
+- Mention the monitoring system name for context
+
+### Managing Alert Fatigue
+
+**Frequency Controls:**
+- Set minimum time intervals between SMS alerts for the same check
+- Use escalation policies to avoid overwhelming on-call staff
+- Configure different phone numbers for different severity levels
+
+**Smart Routing:**
+- Route different types of alerts to appropriate personnel
+- Use time-based routing for business hours vs after-hours coverage
+- Implement round-robin calling for distributed on-call teams
+
+### Integration with On-Call Systems
+
+**PagerDuty Integration:**
+- Use PagerDuty's SMS and phone capabilities for more sophisticated on-call management
+- Leverage escalation policies and acknowledgment features
+- Track response times and on-call effectiveness
+
+**Custom On-Call Solutions:**
+- Build webhook integrations that trigger your internal on-call systems
+- Use SMS APIs like Twilio for programmatic message sending
+- Implement custom escalation logic based on your team's needs
+
+### Cost Considerations
+
+**SMS and Phone Alert Costs:**
+- SMS messages typically cost per message sent
+- Phone calls are usually charged by minute
+- International SMS and calls are significantly more expensive
+- Consider cost implications when designing alert frequency
+
+**Cost Optimization:**
+- Use SMS/phone alerts only for truly critical scenarios
+- Implement proper escalation policies to minimize redundant alerts
+- Monitor usage and costs regularly
+- Consider time zones when setting up international on-call rotations

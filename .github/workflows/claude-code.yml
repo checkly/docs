@@ -41,8 +41,16 @@ jobs:
         # Create and checkout new branch
         git checkout -b "$BRANCH_NAME"
         
-        # Run Claude Code with the issue content
-        claude -p "Work on GitHub issue #${ISSUE_NUMBER}: ${ISSUE_BODY}"
+        # Show current directory structure for debugging
+        echo "Current working directory: $(pwd)"
+        echo "Directory contents:"
+        ls -la
+        
+        # Run Claude Code with the issue content and explicit working directory context
+        claude -p "Work on GitHub issue #${ISSUE_NUMBER} in the docs repository. Current working directory is the root of the checkly/docs repo. Issue details: ${ISSUE_BODY}" || {
+          echo "Claude Code execution failed with exit code $?"
+          echo "Checking if any changes were made anyway..."
+        }
         
         # Push branch if changes were made
         if ! git diff --quiet HEAD; then

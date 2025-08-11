@@ -8,6 +8,7 @@
     "dark": "#031834"
   },
   "favicon": "/racoon_favicon.png",
+  "customCSS": "/style.css",
   "integrations": {
     "ga4": {
       "measurementId": "G-XXXXXXXXXX"
@@ -520,7 +521,8 @@
                 "group": "Accounts",
                 "pages": [
                   "api-reference/accounts/list",
-                  "api-reference/accounts/get"
+                  "api-reference/accounts/get",
+                  "api-reference/accounts/me"
                 ]
               },
               {
@@ -528,19 +530,61 @@
                 "pages": [
                   "api-reference/analytics/metrics",
                   "api-reference/analytics/api-checks",
-                  "api-reference/analytics/browser-checks"
+                  "api-reference/analytics/browser-checks",
+                  "api-reference/analytics/heartbeat-checks",
+                  "api-reference/analytics/multistep-checks",
+                  "api-reference/analytics/tcp-checks",
+                  "api-reference/analytics/url-monitors"
                 ]
               },
               {
                 "group": "Environment Variables",
                 "pages": [
-                  "api-reference/environment-variables/list"
+                  "api-reference/environment-variables/list",
+                  "api-reference/environment-variables/get",
+                  "api-reference/environment-variables/create",
+                  "api-reference/environment-variables/update",
+                  "api-reference/environment-variables/delete"
                 ]
               },
               {
                 "group": "Locations",
                 "pages": [
                   "api-reference/locations/list"
+                ]
+              },
+              {
+                "group": "Runtimes",
+                "pages": [
+                  "api-reference/runtimes/list",
+                  "api-reference/runtimes/get"
+                ]
+              },
+              {
+                "group": "Static IPs",
+                "pages": [
+                  "api-reference/static-ips/list",
+                  "api-reference/static-ips/by-region",
+                  "api-reference/static-ips/text-format",
+                  "api-reference/static-ips/ipv6-list",
+                  "api-reference/static-ips/ipv6-by-region",
+                  "api-reference/static-ips/ipv6-text-format"
+                ]
+              },
+              {
+                "group": "Reporting",
+                "pages": [
+                  "api-reference/reporting/generate"
+                ]
+              },
+              {
+                "group": "Snippets",
+                "pages": [
+                  "api-reference/snippets/list",
+                  "api-reference/snippets/get",
+                  "api-reference/snippets/create",
+                  "api-reference/snippets/update",
+                  "api-reference/snippets/delete"
                 ]
               }
             ]
@@ -552,8 +596,43 @@
                 "group": "Checks",
                 "pages": [
                   "api-reference/checks/list",
+                  "api-reference/checks/get",
+                  "api-reference/checks/update",
+                  "api-reference/checks/delete",
+                  "api-reference/checks/api-create",
+                  "api-reference/checks/api-get",
+                  "api-reference/checks/api-update",
+                  "api-reference/checks/api-delete",
+                  "api-reference/checks/browser-create",
+                  "api-reference/checks/browser-get",
+                  "api-reference/checks/browser-update",
+                  "api-reference/checks/browser-delete",
+                  "api-reference/checks/tcp-create",
+                  "api-reference/checks/tcp-get",
+                  "api-reference/checks/tcp-update",
+                  "api-reference/checks/tcp-delete",
+                  "api-reference/checks/url-create",
+                  "api-reference/checks/url-get",
+                  "api-reference/checks/url-update",
+                  "api-reference/checks/url-delete",
+                  "api-reference/checks/multistep-create",
+                  "api-reference/checks/multistep-get",
+                  "api-reference/checks/multistep-update",
+                  "api-reference/checks/multistep-delete",
+                  "api-reference/checks/heartbeat-create",
+                  "api-reference/checks/heartbeat-get",
+                  "api-reference/checks/heartbeat-update",
+                  "api-reference/checks/heartbeat-delete"
+                ]
+              },
+              {
+                "group": "Check Groups",
+                "pages": [
                   "api-reference/check-groups/list",
-                  "api-reference/check-groups/create"
+                  "api-reference/check-groups/create",
+                  "api-reference/check-groups/get",
+                  "api-reference/check-groups/update",
+                  "api-reference/check-groups/delete"
                 ]
               },
               {
@@ -561,6 +640,13 @@
                 "pages": [
                   "api-reference/check-results/list",
                   "api-reference/check-results/get"
+                ]
+              },
+              {
+                "group": "Check Status",
+                "pages": [
+                  "api-reference/check-status/list",
+                  "api-reference/check-status/get"
                 ]
               },
               {
@@ -581,7 +667,54 @@
                 "group": "Private Locations",
                 "pages": [
                   "api-reference/private-locations/list",
-                  "api-reference/private-locations/create"
+                  "api-reference/private-locations/create",
+                  "api-reference/private-locations/get",
+                  "api-reference/private-locations/update",
+                  "api-reference/private-locations/delete",
+                  "api-reference/private-locations/keys-list",
+                  "api-reference/private-locations/keys-create",
+                  "api-reference/private-locations/keys-delete",
+                  "api-reference/private-locations/metrics"
+                ]
+              },
+              {
+                "group": "Badges",
+                "pages": [
+                  "api-reference/badges/check-badge",
+                  "api-reference/badges/group-badge"
+                ]
+              },
+              {
+                "group": "Triggers",
+                "pages": [
+                  "api-reference/triggers/trigger-check",
+                  "api-reference/triggers/trigger-group"
+                ]
+              },
+              {
+                "group": "Heartbeat Events",
+                "pages": [
+                  "api-reference/heartbeat-events/list",
+                  "api-reference/heartbeat-events/get",
+                  "api-reference/heartbeat-events/availability"
+                ]
+              },
+              {
+                "group": "Client Certificates",
+                "pages": [
+                  "api-reference/client-certificates/list",
+                  "api-reference/client-certificates/get",
+                  "api-reference/client-certificates/create",
+                  "api-reference/client-certificates/update",
+                  "api-reference/client-certificates/delete"
+                ]
+              },
+              {
+                "group": "V2 API",
+                "pages": [
+                  "api-reference/v2/check-groups-list",
+                  "api-reference/v2/check-groups-get",
+                  "api-reference/v2/check-results-get"
                 ]
               }
             ]
@@ -594,13 +727,39 @@
                 "pages": [
                   "api-reference/alert-channels/list",
                   "api-reference/alert-channels/create",
-                  "api-reference/alert-channels/get"
+                  "api-reference/alert-channels/get",
+                  "api-reference/alert-channels/update",
+                  "api-reference/alert-channels/delete",
+                  "api-reference/alert-channels/subscriptions"
+                ]
+              },
+              {
+                "group": "Alert Notifications",
+                "pages": [
+                  "api-reference/alert-notifications/list"
                 ]
               },
               {
                 "group": "Dashboards",
                 "pages": [
-                  "api-reference/dashboards/list"
+                  "api-reference/dashboards/list",
+                  "api-reference/dashboards/get",
+                  "api-reference/dashboards/create"
+                ]
+              },
+              {
+                "group": "Status Pages",
+                "pages": [
+                  "api-reference/status-pages/list",
+                  "api-reference/status-pages/create",
+                  "api-reference/status-pages/get",
+                  "api-reference/status-pages/update"
+                ]
+              },
+              {
+                "group": "Incidents",
+                "pages": [
+                  "api-reference/incidents/list"
                 ]
               }
             ]
@@ -612,7 +771,10 @@
                 "group": "Maintenance Windows",
                 "pages": [
                   "api-reference/maintenance-windows/list",
-                  "api-reference/maintenance-windows/create"
+                  "api-reference/maintenance-windows/create",
+                  "api-reference/maintenance-windows/get",
+                  "api-reference/maintenance-windows/update",
+                  "api-reference/maintenance-windows/delete"
                 ]
               }
             ]

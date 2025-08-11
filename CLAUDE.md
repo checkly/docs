@@ -7,23 +7,48 @@
 
 ## Project context
 - Format: MDX files with YAML frontmatter
-- Config: docs.json for navigation, theme, settings
-- Components: Mintlify components
+- Config: docs.json for navigation, theme, settings. Tabs set top level navigation, Groups set sidebar navigation within Tabs.
+- Components: We use Mintlify components and documentation. 
+    -- Headers and text
+    -- Images and embeds
+    -- Lists and tables
+    -- Code
+    -- Reusable snippets
+    -- Accordions
+    -- Callouts
+    -- Cards
+    -- Columns
+    -- Code groups
+    -- Examples
+    -- Expandables
+    -- Fields
+    -- Frames
+    -- Icons
+    -- Mermaid
+    -- Panel
+    -- Steps
+    -- Tabs
+    -- Tooltips
+    -- Update
 
 ## Content strategy
-- Document just enough for user success - not too much, not too little
-- Prioritize accuracy and usability of information
-- Make content evergreen when possible
 - Search for existing information before adding new content. Avoid duplication unless it is done for a strategic reason
 - Check existing patterns for consistency
 - Start by making the smallest reasonable changes
+- Document just enough for user success - not too much. Don't be verbose.
+- Prioritize accuracy and usability of information
+- Make content evergreen
 
 ## docs.json
 
 - Refer to the [docs.json schema](https://mintlify.com/docs.json) when building the docs.json file and site navigation
+- Tabs
+-- Groups
+--- Pages
 
 ## Frontmatter requirements for pages
 - title: Clear, descriptive page title
+- sidebarTitle: Concise title for sidebar
 - description: Concise summary for SEO/navigation
 
 ## Writing standards
@@ -48,4 +73,5 @@
 - Use absolute URLs for internal links
 - Include untested code examples
 - Make assumptions - always ask for clarification
+- overuse components like Cards or Accordion
 ​

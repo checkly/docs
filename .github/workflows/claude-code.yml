@@ -62,9 +62,18 @@ jobs:
         echo "Checking if target file exists:"
         ls -la docs/communicate/alerts/configuration.mdx
         
-        # Push branch if changes were made
+        # Commit and push changes if any were made
         if ! git diff --quiet HEAD; then
-          echo "Changes detected, pushing branch..."
+          echo "Changes detected, committing and pushing..."
+          git add -A
+          git commit -m "$(cat <<'EOF'
+Fix issue #${ISSUE_NUMBER}: Replace Card components with normal headers
+
+🤖 Generated with Claude Code
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+EOF
+)"
           git push -u origin "$BRANCH_NAME"
           
           # Create PR

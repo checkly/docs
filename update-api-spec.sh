@@ -26,6 +26,20 @@ if [ ! -s "$TEMP_CONVERTED" ]; then
     exit 1
 fi
 
+echo "🔧 Cleaning up HTML in descriptions..."
+# Convert common HTML tags to Markdown in the authorization description
+sed -i.tmp 's|<a href="\([^"]*\)" target="_blank">here</a>|[here](\1)|g' "$TEMP_CONVERTED"
+sed -i.tmp 's|</br>|\n|g' "$TEMP_CONVERTED"
+sed -i.tmp 's|<br>|\n|g' "$TEMP_CONVERTED"
+sed -i.tmp 's|<b>\([^<]*\)</b>|**\1**|g' "$TEMP_CONVERTED"
+sed -i.tmp 's|<code>\([^<]*\)</code>|`\1`|g' "$TEMP_CONVERTED"
+
+# Clean up any remaining HTML line breaks and improve formatting for curl examples
+sed -i.tmp '/curl -H/,/\]/c\
+For example, set **Authorization** header while using cURL:\n```bash\ncurl -H "Authorization: Bearer [apiKey]" "X-Checkly-Account: [accountId]"\n```' "$TEMP_CONVERTED"
+
+rm -f "${TEMP_CONVERTED}.tmp"
+
 echo "✅ Validating OpenAPI specification..."
 mintlify openapi-check "$TEMP_CONVERTED"
 

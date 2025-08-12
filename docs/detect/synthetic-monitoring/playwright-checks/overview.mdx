@@ -1,0 +1,112 @@
+---
+title: Overview
+sidebarTitle: Overview
+tags: ['synthetic-monitoring', 'playwright-checks']
+---
+
+
+## What are Playwright Check Suites?
+
+Playwright Check Suites enable you to run entire Playwright suites and projects as both pre-production tests and global production monitors, without any code rewrites.
+
+Unlike [Browser Checks](/docs/browser-checks), Playwright Check Suites are not limited to a single test spec running in an async browser session. You can run Playwright projects with complete with dependencies, private packages, storage, and more. It's a complete native way to run Playwright in production.
+
+Playwright Check Suites support for the full Playwright API and ecosystem, meaning you can use your existing tests and `playwright.config.ts` files as is.
+
+<Note>
+Playwright Check Suites are currently in Beta. Join the [Slack community](https://checklycommunity.slack.com/join/shared_invite/zt-2qc51mpyr-5idwVD4R4izkf5FC4CFk1A#/shared-invite/email) to get live updates on feature development and get help getting started.
+</Note>
+
+**Playwright Check Suites are perfect for:**
+- Converting existing E2E tests into monitoring
+- Testing complex user workflows across multiple browsers
+- Monitoring critical business processes
+- Validating application functionality after deployments
+
+
+## How Playwright Check Suites Work
+
+Playwright Check Suites integrate seamlessly with your existing test projects.
+
+<Steps>
+<Step title="1. Install the Checkly CLI">
+Install the Checkly CLI to get started.
+</Step>
+
+<Step title="2. Create a new Playwright Check Suite">
+Create a new Playwright Check Suite using the Checkly CLI.
+</Step>
+
+<Step title="3. Configure Monitoring">
+Configure test selection, frequency, and alerting for your checks.
+</Step>
+
+<Step title="4. Deploy and Monitor">
+Deploy your checks globally and start monitoring your application.
+</Step>
+</Steps>
+
+## How It Works
+
+Playwright Check Suites integrate seamlessly with your existing test projects through:
+
+1. **Test Discovery** - Analyzes your Playwright configuration and test files
+2. **Selective Monitoring** - Uses tags and projects to define monitoring scope
+3. **Global Deployment** - Runs tests from multiple worldwide locations
+4. **Continuous Monitoring** - Executes on schedules with performance tracking
+5. **Alert Integration** - Notifies teams when tests fail or performance degrades
+
+<Info>
+**Runtime Limits**: During Beta, Playwright Check Suites can run up to 20 minutes per execution. This limit can be adjusted based on feedback.
+</Info>
+
+## Test Selection
+
+Control which tests become monitoring checks using:
+
+- **Tags**: Select tests marked with specific tags (e.g., `@critical`, `@smoke`)
+- **Projects**: Choose browser configurations from your Playwright config
+- **Combinations**: Mix tags and projects for precise test selection
+
+```typescript
+// Example: Monitor critical tests in Chromium
+{
+  name: 'Critical User Flows',
+  pwTags: '@critical',
+  pwProjects: 'chromium',
+  frequency: Frequency.EVERY_1M,
+  locations: ['us-east-1', 'eu-west-1']
+}
+```
+
+## Monitoring Configuration
+
+Customize monitoring behavior with:
+
+- **Frequency**: From every minute to custom schedules
+- **Locations**: Choose from global monitoring regions
+- **Alerting**: Configure team notifications and escalation
+- **Groups**: Organize related checks for management
+- **Dependencies**: Support for private packages and custom registries
+
+## Getting Started
+
+Ready to turn your Playwright tests into monitoring? Start with our quickstart guide to get running in 5 minutes.
+
+<CardGroup cols={2}>
+<Card title="Quickstart Guide" href="/docs/detect/synthetic-monitoring/playwright-checks/quickstart">
+Get from zero to deployed monitoring in 5 minutes
+</Card>
+
+<Card title="CLI Reference" href="/docs/detect/synthetic-monitoring/playwright-checks/reference">
+Complete configuration options and examples
+</Card>
+
+<Card title="Add to Group" href="/docs/detect/synthetic-monitoring/playwright-checks/add-to-group">
+Organize checks with groups for better management
+</Card>
+
+<Card title="Custom Dependencies" href="/docs/detect/synthetic-monitoring/playwright-checks/custom-dependencies">
+Use private packages and custom registries
+</Card>
+</CardGroup>

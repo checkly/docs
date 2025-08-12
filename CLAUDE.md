@@ -6,6 +6,7 @@
 - NEVER lie, guess, or make up information
 
 ## Project context
+- Framework: Mintlify. https://mintlify.com/docs/llms.txt
 - Format: MDX files with YAML frontmatter
 - Config: docs.json for navigation, theme, settings. Tabs set top level navigation, Groups set sidebar navigation within Tabs.
 - Components: We use Mintlify components and documentation. 
@@ -53,13 +54,19 @@
 
 ## Writing standards
 - Second-person voice ("you")
-- Prerequisites at start of procedural content
+- Prerequisites at start of procedural content - ALWAYS wrap prerequisites in an Accordion component
 - Test all code examples before publishing
 - Match style and formatting of existing pages
 - Include both basic and advanced use cases
 - Language tags on all code blocks
 - Alt text on all images
 - Relative paths for internal links
+
+## Component usage rules
+- Prerequisites MUST be wrapped in an Accordion component with title "Prerequisites" or "Before you begin"
+- Use Steps component for sequential procedures
+- Use CardGroup for navigation to related content
+- Use Note/Tip/Warning callouts appropriately
 
 ## Git workflow
 - NEVER use --no-verify when committing

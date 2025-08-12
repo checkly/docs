@@ -19,7 +19,7 @@ You need:
 For Next.js, Vercel has created a wrapper that should get you going very quickly. We're just adding some extra packages
 so we can filter out the Checkly Traces.
 
-```bash
+```bash Terminal
 npm install --save \
   @vercel/otel \
   @opentelemetry/api \
@@ -35,7 +35,7 @@ Make sure to install v1.9.1 or later of the `@vercel/otel` package as it contain
 
 Set the `instrumentationHook` flag to `true` in your Next.js configuration file. This will enable the OpenTelemetry instrumentation.
 
-```js {title="next.config.js"}
+```js next.config.js
 /** @type {import('next').NextConfig} */
 const nextConfig = { 
   experimental: { 
@@ -51,7 +51,7 @@ module.exports = nextConfig
 Create an `instrumentation.ts` file in the root of your project, or, place it in the `src` directory if you are using one.
 And add the following code:
 
-```ts {title="instrumentation.ts"}
+```ts instrumentation.ts
 import { registerOTel } from '@vercel/otel'
 import { SamplingDecision } from '@opentelemetry/sdk-trace-base'
 import { trace, Context } from '@opentelemetry/api'
@@ -99,19 +99,19 @@ Toggle on **Import Traces** and grab your OTel API key in the **OTel API keys** 
 
 Now, export your API key in your shell by setting the `OTEL_EXPORTER_OTLP_HEADERS` environment variable.
 
-```bash
+```bash Terminal
 export OTEL_EXPORTER_OTLP_HEADERS="authorization=<your-api-key>"
 ```
 
 Next, export the endpoint for the region you want to use and give your service a name.
-```bash
+```bash Terminal
 export OTEL_EXPORTER_OTLP_ENDPOINT="https://otel.eu-west-1.checklyhq.com"
 export OTEL_SERVICE_NAME="your-service-name"
 ```
 
 Then, explicitly set the protocol to use for the OTLP exporter.
 
-```bash
+```bash Terminal      
 export OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf"
 ```
 

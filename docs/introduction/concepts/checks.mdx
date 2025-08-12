@@ -56,9 +56,16 @@ Write sophisticated Node.js scripts that run multiple API requests in sequence w
 
 ## How Checks Execute
 
-A cron process picks up each Check based on its individual schedule—which you control completely. The system validates that the Check is not currently in progress to avoid race conditions, then queues it to run from your configured data center locations.
+![monitoring and alerting pipeline](/images/docs/images/monitoring/monitoring-alerting-pipeline.svg)
 
-You can select one or more data center locations to run your Checks from. We recommend at least 2 locations for redundancy and to help distinguish between actual application issues and temporary network problems in specific regions.
+1. A cron process picks up a check based on its schedule, say every 5 minutes. It validates that the check is not in progress at the moment to avoid race conditions. The check is put into a queue to be run from the next configured data center location.
+2. If the check is an API check and has a [setup script](/docs/api-checks/setup-teardown-scripts/), the setup script is executed. 
+3. The check is executed.
+4. If the check is an API check and has a [teardown script](/docs/api-checks/setup-teardown-scripts/), the teardown script is executed.
+Teardown scripts are run *before* any assertions are validated.
+5. The result is stored in our central database.
+6. If the check fails, its retry strategy is executed. Based on the retry strategy, a check is retried one or multiple times. Any setup & teardown scripts are run again as part of the process.
+7. Alerts are sent out in requested channels when the sequence is complete. It's considered complete when the check run was successful or the final attempt was executed. We will send alerts only if the final attempt has failed (no alerts sent for the initial attempts)
 
 
 ## Code-First Philosophy
@@ -68,11 +75,3 @@ Checks treat monitoring as code, meaning your tests live alongside your applicat
 This approach transforms monitoring from a manual, UI-driven process into a programmable, scalable system that grows with your application. You can version control your monitoring logic, collaborate on it through code reviews, and deploy monitoring changes through the same CI/CD pipelines you use for application code.
 
 
-## Flexible Scheduling and Pricing
-
-With Checks, you purchase monitoring capacity as a single unit and decide how to use it:
-
-- **Your Choice of Frequency**: Run individual Checks as often as every 10 seconds or as infrequently as once per day
-- **Unified Billing**: One package covers all your Check types—mix and match Browser, API, and Multistep Checks as needed
-- **Resource Allocation**: Distribute your Check runs across different tests based on your priorities
-- **Scalable**: Add more capacity as your testing needs grow

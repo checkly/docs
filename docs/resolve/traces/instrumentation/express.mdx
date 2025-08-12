@@ -11,7 +11,7 @@ The steps are largely the same as instrumenting any Node.js application with Ope
 
 Install the relevant OpenTelemetry packages:
 
-```bash
+```bash Terminal
 npm install --save \
     @opentelemetry/sdk-node \
     @opentelemetry/exporter-trace-otlp-proto \
@@ -24,7 +24,7 @@ npm install --save \
 
 Create a file called `tracing.js` at the root of your project and add the following code:
 
-```javascript {title="tracing.js"}
+```javascript tracing.js
 const { NodeSDK } = require('@opentelemetry/sdk-node')
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-proto')
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node')
@@ -100,14 +100,14 @@ We are using the standard OpenTelemetry environment variables here to configure 
 Then start your app with the extra `-r` flag to load the `tracing.js` file before any other files are loaded. In this case
 the `index.js` file holds your Express app and typically starts with code like:
 
-```javascript {title="index.js"}
+```javascript index.js
 const express = require('express')
 const PORT = process.env.PORT || '5555'
 const app = express()
 // etc.
 ```
 
-```bash
+```bash Terminal
 node -r ./tracing.js index.js
 ```
 🎉 You are done. Any interactions with your app that are triggered by a Checkly synthetic monitoring check will now generate
@@ -119,7 +119,7 @@ We found the Node.js auto-instrumentation a bit noisy. There can be a lot of fil
 be interested in. Luckily, you can easily tweak that by providing some extra options to the `getNodeAutoInstrumentations()` function.
 We use the following configuration to filter out some of the noise:
 
-```javascript
+```javascript tracing.js      
 instrumentations: [getNodeAutoInstrumentations({
   '@opentelemetry/instrumentation-fs': {
     enabled: false,

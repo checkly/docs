@@ -11,7 +11,7 @@ to Checkly.
 
 Install the relevant OpenTelemetry packages:
 
-```bash
+```bash Terminal
 go get "go.opentelemetry.io/otel" \
   "go.opentelemetry.io/otel/propagation" \
   "go.opentelemetry.io/otel/sdk/trace" \
@@ -24,7 +24,7 @@ go get "go.opentelemetry.io/otel" \
 
 Create a file called `tracing.go` at the root of your project and add the following code:
 
-```go {title="tracing.go"}
+```go tracing.go
 package main
 
 import (
@@ -103,7 +103,7 @@ Add or adapt the following code to your `main.go` file. The key parts are as fol
 1. Wrap the default `http.Handler` with the`otelhttp.NewHandler` function.
 2. Add the `otelChecklyFilter` function to filter out the requests that should be traced and send to Checkly.
 
-```go {title="main.go"}
+```go main.go
 package main
 
 import (
@@ -175,19 +175,19 @@ Toggle on **Import Traces** and grab your OTel API key in the **OTel API keys** 
 
 Now, export your API key in your shell by setting the `OTEL_EXPORTER_OTLP_HEADERS` environment variable.
 
-```bash
+```bash Terminal
 export OTEL_EXPORTER_OTLP_HEADERS="authorization=<your-api-key>"
 ```
 
 Next, export the endpoint for the region you want to use and give your service a name.
-```bash
+```bash Terminal
 export OTEL_EXPORTER_OTLP_ENDPOINT="https://otel.eu-west-1.checklyhq.com"
 export OTEL_SERVICE_NAME="your-service-name"
 ```
 
 Then, explicitly set the protocol to use for the OTLP exporter.
 
-```bash
+```bash Terminal
 export OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf"
 ```
 
@@ -202,6 +202,6 @@ We are using the standard OpenTelemetry environment variables here to configure 
 
 Then run you app as usual:
 
-```bash
+```bash Terminal
 go run .
 ```

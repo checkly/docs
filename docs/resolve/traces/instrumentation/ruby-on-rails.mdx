@@ -13,14 +13,14 @@ have a working Rails application.
 
 Go to the root of your Rails app and add the basic OpenTelemetry SDK, OTLP exporter and instrumentation gems to your Gemfile:
 
-```bash
+```bash Terminal
 bundle add opentelemetry-sdk \
 opentelemetry-exporter-otlp \
 opentelemetry-instrumentation-all
 ```
 
 This should add the following lines:
-```ruby {title="Gemfile"}
+```ruby Gemfile
 gem "opentelemetry-sdk", "~> 1.4"
 gem "opentelemetry-exporter-otlp", "~> 0.26.3"
 gem "opentelemetry-instrumentation-all", "~> 0.60.0"
@@ -30,7 +30,7 @@ gem "opentelemetry-instrumentation-all", "~> 0.60.0"
 
 As per the Ruby on Rails convention, we add an `instrumentation.rb` file to the `config/initializers` directory.
 
-```ruby {title="config/initializers/instrumentation.rb"}
+```ruby config/initializers/instrumentation.rb
 require 'opentelemetry/sdk'
 require 'opentelemetry/instrumentation/all'
 
@@ -68,19 +68,19 @@ Toggle on **Import Traces** and grab your OTel API key in the **OTel API keys** 
 
 Now, export your API key in your shell by setting the `OTEL_EXPORTER_OTLP_HEADERS` environment variable.
 
-```bash
+```bash Terminal
 export OTEL_EXPORTER_OTLP_HEADERS="authorization=<your-api-key>"
 ```
 
 Next, export the endpoint for the region you want to use and give your service a name.
-```bash
+```bash Terminal
 export OTEL_EXPORTER_OTLP_ENDPOINT="https://otel.eu-west-1.checklyhq.com"
 export OTEL_SERVICE_NAME="your-service-name"
 ```
 
 Then, explicitly set the protocol to use for the OTLP exporter.
 
-```bash
+```bash Terminal
 export OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf"
 ```
 
@@ -95,7 +95,7 @@ We are using the standard OpenTelemetry environment variables here to configure 
 
 You can now restart your Rails app with the instrumentation enabled.
 
-```bash
+```bash Terminal
 rails server
 ```
 
@@ -103,13 +103,13 @@ rails server
 
 If you run into any issues, you can also output any traces to the console as follows:
 
-```bash
+```bash Terminal
 env OTEL_TRACES_EXPORTER=console rails server
 ```
 
 Similarly, you can set the `OTEL_LOG_LEVEL` environment variable to `DEBUG` to get more detailed logs.
 
-```bash
+```bash Terminal
 env OTEL_LOG_LEVEL=DEBUG rails server
 ```
 

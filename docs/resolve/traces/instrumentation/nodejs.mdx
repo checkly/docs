@@ -10,7 +10,7 @@ This guide will help you instrument your Node.js application(s) with OpenTelemet
 
 Install the relevant OpenTelemetry packages:
 
-```bash
+```bash Terminal
 npm install --save \
     @opentelemetry/sdk-node \
     @opentelemetry/exporter-trace-otlp-proto \
@@ -23,7 +23,7 @@ npm install --save \
 
 Create a file called `tracing.js` at the root of your project and add the following code:
 
-```javascript {title="tracing.js"}
+```javascript tracing.js
 const { NodeSDK } = require('@opentelemetry/sdk-node')
 const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-proto')
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node')
@@ -71,19 +71,19 @@ Toggle on **Import Traces** and grab your OTel API key in the **OTel API keys** 
 
 Now, export your API key in your shell by setting the `OTEL_EXPORTER_OTLP_HEADERS` environment variable.
 
-```bash
+```bash Terminal
 export OTEL_EXPORTER_OTLP_HEADERS="authorization=<your-api-key>"
 ```
 
 Next, export the endpoint for the region you want to use and give your service a name.
-```bash
+```bash Terminal
 export OTEL_EXPORTER_OTLP_ENDPOINT="https://otel.eu-west-1.checklyhq.com"
 export OTEL_SERVICE_NAME="your-service-name"
 ```
 
 Then, explicitly set the protocol to use for the OTLP exporter.
 
-```bash
+```bash Terminal
 export OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf"
 ```
 
@@ -98,7 +98,7 @@ We are using the standard OpenTelemetry environment variables here to configure 
 
 Then start your app with the extra `-r` flag to load the `tracing.js` file before any other files are loaded.
 
-```bash
+```bash Terminal  
 node -r ./tracing.js index.js
 ```
 🎉 You are done. Any interactions with your app that are triggered by a Checkly synthetic monitoring check will now generate 
@@ -110,7 +110,7 @@ We found the Node.js auto-instrumentation a bit noisy. There can be a lot of fil
 be interested in. Luckily, you can easily tweak that by providing some extra options to the `getNodeAutoInstrumentations()` function.
 We use the following configuration to filter out some of the noise:
 
-```javascript
+```javascript tracing.js  
 instrumentations: [getNodeAutoInstrumentations({
   '@opentelemetry/instrumentation-fs': {
     enabled: false,

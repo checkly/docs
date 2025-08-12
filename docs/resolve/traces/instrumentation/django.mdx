@@ -10,7 +10,7 @@ This guide will help you instrument your Django application(s) with OpenTelemetr
 
 Install the relevant OpenTelemetry packages:
 
-```bash
+```bash Terminal
 pip install opentelemetry-sdk \
   opentelemetry-exporter-otlp \
   opentelemetry-instrumentation-django \
@@ -32,7 +32,7 @@ any other traffic.
 
 Note the code in the `post_fork` function. This will instrument your Django app with OpenTelemetry.
 
-```python {title="gunicorn.config.py"}
+```python gunicorn.config.py
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.trace.sampling import Sampler, SamplingResult, Decision
@@ -64,13 +64,13 @@ def post_fork(server, worker):
 When using uWSGI, you can use the `post_fork` hook to instrument your Django app with OpenTelemetry.
 Note you will need to install the `uwsgidecorators` package.
 
-```bash
+```bash Terminal
 pip install uwsgidecorators
 ```
 
 And then add the following code to your `wsgi.py` file.
 
-```python {title="wsgi.py"}
+```python wsgi.py
 from uwsgidecorators import postfork
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
@@ -137,13 +137,13 @@ Finally, start your app using the relevant command:
 
 For Gunicorn, your startup command will look similar to
 
-```bash
+```bash Terminal
 gunicorn myapp.wsgi -c gunicorn.config.py --workers 2 --threads 2
 ```
 
 For uWSGI, your startup command will look similar to
 
-```bash
+```bash Terminal    
 uwsgi --http :8000 --wsgi-file myapp.wsgi --master --processes 4 --threads 2
 ```
 

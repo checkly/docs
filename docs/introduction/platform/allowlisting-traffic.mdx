@@ -15,37 +15,37 @@ To get the current list of IP addresses, you can use the following endpoints ([A
 
 1. A JSON array of all IPv4s currently used
 
-```bash
+```bash Terminal
 curl https://api.checklyhq.com/v1/static-ips
 ```
 
 2. A JSON object with regions as keys and arrays of all IPv4s of that region as the value
 
-```bash
+```bash Terminal
 curl https://api.checklyhq.com/v1/static-ips-by-region
 ````
 
 3. A simple txt file. One IPv4 per line.
 
-```bash
+```bash Terminal
 curl https://api.checklyhq.com/v1/static-ips.txt
 ```
 
 4. A JSON array of all IPv6s currently used
 
-```bash
+```bash Terminal
 curl https://api.checklyhq.com/v1/static-ipv6s
 ```
 
 5. A JSON object with regions as keys and arrays of all IPv6s of that region as the value
 
-```bash
+```bash Terminal
 curl https://api.checklyhq.com/v1/static-ipv6s-by-region
 ```
 
 6. A simple txt file. One IPv6 per line.
 
-```bash
+```bash Terminal
 curl https://api.checklyhq.com/v1/static-ipv6s.txt
 ```
 
@@ -75,7 +75,7 @@ You will then be able to set up the matching user agent in your browser checks u
 
 <Tabs>
 <Tab title="Typescript">
-```ts {title="user-agent.spec.ts"}
+```ts user-agent.spec.ts
 import { test } from '@playwright/test'
 
 const myUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36 Checkly/abcd1234'
@@ -88,7 +88,7 @@ test('my user agent test', async ({ page }) => {
 ```
 </Tab>
 <Tab title="JavaScript">
-```js {title="user-agent.spec.js"}
+```js UserAgent.spec.js
 const { test } = require('@playwright/test')
 
 const myUserAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36 Checkly/abcd1234'
@@ -114,7 +114,7 @@ If you want to filter Checkly traffic in older Google Analytics versions, here i
 
 1. Add a UTM source tag to the URLs your requesting, i.e.:
 
-```js
+```js 
 await page.goto('https://app.checklyhq.com/login?utm_source=monitoring')
  ```
 

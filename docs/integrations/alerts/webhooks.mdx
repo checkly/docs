@@ -26,43 +26,6 @@ Send test alerts to verify your webhook integration works correctly
 </Step>
 </Steps>
 
-## Advanced Webhook Configuration
-
-Create sophisticated integrations with custom endpoints:
-
-```json
-{
-  "name": "Custom Incident Management",
-  "url": "https://api.internal-system.com/webhooks/checkly",
-  "method": "POST",
-  "headers": {
-    "Authorization": "Bearer {{API_TOKEN}}",
-    "Content-Type": "application/json",
-    "X-Source": "checkly-monitoring",
-    "X-Environment": "{{#contains CHECK_NAME 'staging'}}staging{{else}}production{{/contains}}"
-  },
-  "body": {
-    "timestamp": "{{STARTED_AT}}",
-    "event_type": "{{ALERT_TYPE}}",
-    "severity": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}high{{else}}{{#eq ALERT_TYPE 'ALERT_DEGRADED'}}medium{{else}}low{{/eq}}{{/eq}}",
-    "service": {
-      "name": "{{CHECK_NAME}}",
-      "id": "{{CHECK_ID}}",
-      "type": "{{CHECK_TYPE}}",
-      "tags": [{{#each TAGS}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}]
-    },
-    "incident": {
-      "title": "{{ALERT_TITLE}}",
-      "description": "Check failed from {{RUN_LOCATION}} with {{RESPONSE_TIME}}ms response time",
-      "url": "{{RESULT_LINK}}",
-      "location": "{{RUN_LOCATION}}",
-      "response_time": {{RESPONSE_TIME}},
-      "error_message": "{{CHECK_ERROR_MESSAGE}}"
-    }
-  }
-}
-```
-
 ## Template Variables
 
 Use dynamic variables to create contextual alerts:
@@ -83,7 +46,28 @@ Use dynamic variables to create contextual alerts:
 | `TAGS` | Array of check tags | ["critical", "payment", "api"] |
 | `GROUP_NAME` | Group name if applicable | "Payment Services" |
 
-## Handlebars Helpers and Conditional Logic
+### Handlebars Helpers
+
+| Helper | Description |
+|--------|-------------|
+| `{{REGION}}` | Resolves to the AWS region name (e.g., `us-east-1`) |
+| `{{$UUID}}` | Generates a random UUID/v4 (e.g., `9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d`) |
+| `{{$RANDOM_NUMBER}}` | Generates a random decimal number between 0 and 1000 (e.g., `345`) |
+| `{{moment}}` | Generates dates/times using **moment.js** with formatting:
+
+  • `{{moment "YYYY-MM-DD"}}` → `2020-08-26`  
+  • `{{moment "2 days ago" "YYYY-MM-DD"}}` → `2020-08-24`  
+  • `{{moment "last week" "X"}}` → `1597924480` |
+
+A practical example of using the `{{moment}}` helper would be setting the pagination options on a typical API endpoint:
+
+```
+ GET https://api.acme.com/events?from={{moment "last week" "X"}}&to={{moment "X"}}
+```
+
+> You can find the [full list of helpers in the README.md file](https://github.com/checkly/handlebars) of the underlying library we are using.
+For a full overview of date formatting option, check the [moment.js docs](https://momentjs.com/docs/#/displaying/format/).
+
 
 Create dynamic webhook content with conditional formatting:
 
@@ -98,82 +82,288 @@ Create dynamic webhook content with conditional formatting:
 }
 ```
 
-## Webhook Security and Authentication
+## Webhook Secrets
 
-### Signature Verification
+You can validate each webhook we deliver to your endpoint(s). Using the optional webhook secret, you can:
 
-Implement secure webhook delivery with signature verification:
+1. Check if the webhook was sent by Checkly.
+2. Check if the payload was not altered in any way during transmission.
+
+When you create a webhook secret, we proceed to use that secret token to cryptographically sign the webhook payload using
+the SHA256 hash algorithm. We add the resulting hash to the HTTP header `x-checkly-signature` on each webhook.
+
+On the receiving end, you can then use the value of the `x-checkly-signature` header to assert the validity and authenticity
+of the webhook and its payload.
+
+Have a look at the code examples below on how to use the header and your favourite web framework.
+
+<Tabs>
+<Tab title="Node.js">
 
 ```javascript
-const crypto = require('crypto')
+// We store the webhook secret in an environment variable called CHECKLY_WEBHOOK_SECRET
+const app = require('express')();
+const bodyParser = require('body-parser');
+const crypto = require('crypto');
 
-function verifyChecklyWebhook(payload, signature, secret) {
-  const expectedSignature = crypto
-    .createHmac('sha256', secret)
-    .update(payload)
-    .digest('hex')
-  
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSignature)
-  )
+function isVerifiedPayload (payload, signature) {
+  const secret = process.env.CHECKLY_WEBHOOK_SECRET
+  const hmac = crypto.createHmac('sha256', secret)
+  const digest = hmac.update(payload).digest('hex')
+  return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(signature))
 }
 
-// Express.js webhook endpoint
-app.post('/checkly-webhook', express.raw({type: 'application/json'}), (req, res) => {
-  const signature = req.headers['x-checkly-signature']
-  const timestamp = req.headers['x-checkly-timestamp']
-  
-  // Verify signature
-  if (!verifyChecklyWebhook(req.body, signature, process.env.WEBHOOK_SECRET)) {
-    return res.status(401).send('Invalid signature')
+app.post('/webhook', bodyParser.json({ type: 'application/json' }), (request, response) => {
+
+  const signature = request.headers['x-checkly-signature'];
+  const payload = JSON.stringify(request.body)
+
+  if (isVerifiedPayload(payload, signature)) {
+    console.log('Signature is valid')
+    response.status(200).send();
+  } else {
+    console.error('Signature does not match')
+    response.status(400).send();
   }
-  
-  // Check timestamp to prevent replay attacks
-  const webhookTimestamp = parseInt(timestamp)
-  const currentTime = Math.floor(Date.now() / 1000)
-  
-  if (Math.abs(currentTime - webhookTimestamp) > 300) { // 5 minutes
-    return res.status(401).send('Timestamp too old')
-  }
-  
-  // Process webhook
-  const alertData = JSON.parse(req.body)
-  handleChecklyAlert(alertData)
-  
-  res.status(200).send('OK')
-})
+});
+
+app.listen(4242, () => console.log('Running on port 4242'))
 ```
 
-### Webhook Retry Logic
+</Tab>
 
-Checkly automatically retries failed webhooks:
+<Tab title="Ruby">
 
-```yaml
-Webhook Retry Behavior:
-  Max Retries: 5
-  Retry Trigger: HTTP status >= 400
-  Backoff Strategy: 20 seconds between retries
-  Total Retry Duration: 100 seconds (5 × 20s)
-  
-Timestamp Header: x-checkly-timestamp
-Purpose: Handle late arrivals due to retries
+```ruby
+# We store the webhook secret in an environment variable called CHECKLY_WEBHOOK_SECRET
+require 'sinatra'
+
+set :port, 4242
+
+post '/webhook' do
+  signature = request.env['HTTP_X_CHECKLY_SIGNATURE']
+  payload = request.body.read
+  digest = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), ENV['CHECKLY_WEBHOOK_SECRET'], payload)
+
+  if Rack::Utils.secure_compare(digest, signature)  	
+    status 200
+    return
+  else
+    status 400
+    return
+  end
+end
+```
+</Tab>
+
+<Tab title="Python">
+
+```python
+# This example assumes you use Django
+import hmac
+from hashlib import sha256
+
+from django.conf import settings
+from django.http import HttpResponse, HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.encoding import force_bytes
+import json
+
+@csrf_exempt
+def webhook(request):
+    signature = request.META.get('HTTP_X_CHECKLY_SIGNATURE')
+    mac = hmac.new(settings.CHECKLY_WEBHOOK_SECRET.encode('utf-8'), msg=request.body, digestmod=sha256)
+    print(mac.hexdigest())
+    if not hmac.compare_digest(mac.hexdigest(), signature):
+        return HttpResponseBadRequest()
+
+    return HttpResponse()
+```
+</Tab>
+
+</Tabs>
+
+## Webhook Retries
+
+Checkly will retry your webhook up to **5 times** if we get an HTTP response higher than 399, e.g. a 404 or 503. Each retry
+is backed off 20 seconds for a total retry period of `5 * 20 = 100 seconds`.
+
+This means that for checks on a 1 minute schedule, there is a potential overlap between a failure alert and recovery alert. For this
+reason every webhook we send has a timestamp in the `x-checkly-timestamp` header. You can use this timestamp on the receiving
+end to ignore any webhooks that come in "late".
+
+## Webhook Examples
+
+The following examples give an idea how to integrate Checkly with 3rd party alerting and issue tracking systems.
+
+### OpsGenie
+
+You can create an <a href="https://docs.opsgenie.com/docs/alert-api" target="_blank">OpsGenie</a> alert by POST-ing the following body
+
+```json Webhook 
+{
+  "message": "{{ALERT_TITLE}}",
+  "description": "{{ALERT_TYPE}} <br>{{STARTED_AT}} ({{RESPONSE_TIME}}ms) <br>{{RESULT_LINK}}",
+  "tags": [{{#each TAGS}} "{{this}}" {{#unless @last}},{{/unless}} {{/each}}]
+}
 ```
 
-## Third-Party Integration Examples
+to the OpsGenie `alerts` API endpoint
 
-### Jira Issue Creation
+``` Header
+https://{{OPSGENIE_API_KEY}}@api.opsgenie.com/v2/alerts
+```
 
-Automatically create Jira tickets for check failures:
+Or you can add the OpsGenie API key in the headers, e.g.
+
+```
+Authorization: GenieKey {{OPSGENIE_API_KEY}}
+```
+
+This is an example of a full alert body:
+
+```json Webhook 
+{
+  "message": "{{ALERT_TITLE}}",
+  "description": "{{ALERT_TYPE}}: {{CHECK_NAME}} <br>{{STARTED_AT}} ({{RESPONSE_TIME}}ms) <br>{{RESULT_LINK}}",
+  "responders": [
+        {
+            "id":"4513b7ea-3b91-438f-b7e4-e3e54af9147c",
+            "type":"team"
+        }
+  ],
+  "tags": ["Critical", "Production"],
+  "priority":"P1",
+  "note": "Location: {{RUN_LOCATION}}"
+}
+```
+
+In case you would like different teams to be responsible for different Check Groups, you could add a `CHECK_GROUP_TEAM` variable with a different value for each Group, then modify the above snippet with the following:
+
+```json
+"responders": [
+      {
+          "id":"{{CHECK_GROUP_TEAM}}",
+          "type":"team"
+      }
+]
+```
+
+### PagerDuty
+
+Given an existing service on your PagerDuty account, create an incident for it by posting the following body
+
+```json Webhook
+{
+  "incident": {
+    "type": "incident",
+    "title": "{{ALERT_TITLE}}",
+    "service": {
+      "id": "<YOUR_SERVICE_ID_FROM_PAGERDUTY>",
+      "type": "service_reference"
+    },
+    "body": {
+      "type": "incident_body",
+      "details": "Check {{CHECK_NAME}} with ID {{CHECK_ID}} has failed from location {{RUN_LOCATION}}. See check result for details: {{RESULT_LINK}}"
+    }
+  }
+}
+```
+
+to `https://api.pagerduty.com/incidents`. You will need to set the following headers:
+
+![pagerduty incident headers](/images/docs/images/alerting/webhook-pagerduty-headers.png)
+
+### Pushover
+
+Send a message using [Pushover](https://pushover.net/) by posting this body:
 
 ```json
 {
+  "token":"YOUR_SECRET_TOKEN_FROM_PUSHOVER",
+  "user":"YOUR_USER_FROM_PUSHOVER",
+  "title":"{{ALERT_TITLE}}",
+  "html":1,
+  "priority":2,
+  "retry":30,
+  "expire":10800,
+  "message":"{{ALERT_TYPE}} <br>{{STARTED_AT}} ({{RESPONSE_TIME}}ms) <br>{{RESULT_LINK}}"
+}
+```
+
+
+### Trello
+
+You can create a [Trello](https://trello.com) card using just the URL and no payload:
+
+```
+https://api.trello.com/1/cards?idList=5b28c04aed47522097be8bc4&key={{TRELLO_KEY}}&token={{TRELLO_TOKEN}}&name={{CHECK_NAME}}
+```
+
+### SSL alert
+
+You can send your SSL alerts using webhooks. Using the following body:
+
+```json Webhook 
+{
+  "message": "{{ALERT_TITLE}}",
+  "link":"{{RESULT_LINK}}"
+}
+```
+
+Will yield the following output, where we customize the `ALERT_TITLE` to include the domain and the days remaining till your
+certificate expires.
+
+```json Webhook
+{
+  "message": "The SSL certificate for api.checklyhq.com will expire in 14 days",
+  "link": "http://app-test.checklyhq.com/checks/08437f9c-df8c-45ed-975a-a3f9e24d626d"
+}
+```
+### Twilio
+
+You can configure a webhook to POST to a JavaScript snippet running in a [Twilio Function](https://www.twilio.com/docs/runtime/functions). This code receives the Checkly webhook JSON, then triggers a Twilio "Flow execution":
+
+```js Twilio Function
+//"From" is the sender phone number
+//"To" is the receiver phone number
+exports.handler = async function (context, event, callback) {
+  const { From, To, Event, Link } = event;
+  const client = context.getTwilioClient();
+  try {
+    const execution = await client.studio.flows(FLOW_SID)
+      .executions
+      .create({ to: To, from: From, parameters: { Event, Link } })
+    console.log(`Created execution ${execution.sid}`);
+    return callback(null, "OK");
+  } catch (error) {
+    return callback(error);
+  }
+};
+```
+
+### Jira
+
+A webhook can be used to create a new issue on Jira via the [Jira API](https://developer.atlassian.com/cloud/jira/platform/rest/v3/intro/), for example in the case of a previously passing check that switches to failing state.
+
+We will be creating a POST request to `{{JIRA_INSTANCE_URL}}/rest/api/3/issue`, where the content of your `JIRA_INSTANCE_URL` environment variable would look something like `https://your-jira-instance-name.atlassian.net`.
+
+The required headers will be:
+
+```json Header
+Authorization: Basic <base64 encoded user_email:api_token_string>
+Accept: application/json
+Content-Type: application/json
+```
+
+For more details on authenticating with the Jira API, refer to [Atlassian's guide on basic authentication](https://developer.atlassian.com/cloud/jira/software/basic-auth-for-rest-apis/).
+
+An example body could look as follows:
+
+```json Webhook
+{
   "fields": {
-    "project": {
-      "key": "OPS"
-    },
-    "summary": "{{ALERT_TITLE}}",
-    "description": {
+    "description": { // your Jira issue description, using Atlassian Document Format (ADF)
       "version": 1,
       "type": "doc",
       "content": [
@@ -182,11 +372,7 @@ Automatically create Jira tickets for check failures:
           "content": [
             {
               "type": "text",
-              "text": "Check Details:\n\nName: {{CHECK_NAME}}\nLocation: {{RUN_LOCATION}}\nResponse Time: {{RESPONSE_TIME}}ms\nError: {{CHECK_ERROR_MESSAGE}}\n\n"
-            },
-            {
-              "type": "text",
-              "text": "View results: ",
+              "text": "View check result",
               "marks": [
                 {
                   "type": "link",
@@ -201,34 +387,31 @@ Automatically create Jira tickets for check failures:
       ]
     },
     "issuetype": {
-      "id": "10001"
-    },
-    "priority": {
-      "id": "{{#contains TAGS 'critical'}}1{{else}}3{{/contains}}"
+      "id": "10001" // your Jira issue type id
     },
     "labels": [
-      "checkly",
-      "monitoring",
-      "{{#each TAGS}}{{this}}{{#unless @last}},{{/unless}}{{/each}}"
-    ]
+      "needs_investigation"
+    ],
+    "priority": { // dynamically set the issue priority, based on the check's tags
+      "id": {{#contains TAGS "P1"}} "1"
+        {{else}} {{#contains TAGS "P2"}} "2"
+        {{else}} {{#contains TAGS "P3"}} "3"
+        {{else}} {{#contains TAGS "P4"}} "4"
+        {{else}} {{#contains TAGS "P5"}} "5"
+        {{else}} "3"
+      {{/contains}} {{/contains}} {{/contains}} {{/contains}} {{/contains}}
+    },
+    "project": {
+      "key": "ABC" // your Jira project key
+    },
+    "summary": "{{ALERT_TITLE}}"
   }
 }
 ```
 
-### Trello Card Creation
+For full details on creating issues via the Jira API, see [Atlassian's documentation for this endpoint](https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-post).
 
-Create Trello cards for incident tracking:
-
-```text
-URL: https://api.trello.com/1/cards?key={{TRELLO_KEY}}&token={{TRELLO_TOKEN}}
-
-Parameters:
-- idList: {{TRELLO_LIST_ID}}
-- name: {{ALERT_TITLE}}
-- desc: Check {{CHECK_NAME}} failed from {{RUN_LOCATION}} at {{STARTED_AT}}. Response time: {{RESPONSE_TIME}}ms. View details: {{RESULT_LINK}}
-- due: {{#eq ALERT_TYPE 'ALERT_FAILURE'}}{{addDays STARTED_AT 1}}{{/eq}}
-- labels: red (for failures), orange (for degraded)
-```
+You can also use version 2 of the Jira API (i.e. `{{JIRA_INSTANCE_URL}}/rest/api/2/issue`). The only difference is that version 2 does not support [Atlassian Document Format (ADF)](https://developer.atlassian.com/cloud/jira/platform/apis/document/structure/).
 
 ## Webhook Best Practices
 

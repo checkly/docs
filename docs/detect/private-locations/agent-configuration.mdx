@@ -12,60 +12,32 @@ The Checkly Agent is a lightweight container that executes monitoring checks wit
 
 Configure your Checkly Agent using these environment variables:
 
-<AccordionGroup>
-<Accordion title="Essential Configuration">
-| Variable | Description | Default | Example |
-|----------|-------------|---------|---------|
-| `API_KEY` | **Required.** Private Location API key for agent authentication | - | `pl_abc123...` |
-| `JOB_CONCURRENCY` | Number of concurrent checks (1-10) | `1` | `5` |
-| `LOG_LEVEL` | Agent logging verbosity | `INFO` | `DEBUG`, `WARN` |
+### Essential Configuration
 
-**Basic example:**
-```bash
-docker run \
-  -e API_KEY="pl_abc123def456..." \
-  -e JOB_CONCURRENCY=5 \
-  -e LOG_LEVEL="INFO" \
-  -d checkly/agent:latest
-```
-</Accordion>
-
-<Accordion title="Network and Proxy Configuration">
-| Variable | Description | Example |
+| Variable | Description | Default |
 |----------|-------------|---------|
-| `HTTPS_PROXY` | HTTPS proxy for agent management traffic | `https://user:pass@proxy.company.com:8080` |
-| `HTTP_PROXY` | HTTP proxy for agent management traffic | `http://proxy.company.com:8080` |
-| `USE_OS_DNS_RESOLVER` | Use system DNS instead of network DNS | `true` |
+| `API_KEY` | **Required.** Private Location API key for agent authentication | - |
+| `JOB_CONCURRENCY` | Number of concurrent checks (1-10) | `1` |
+| `LOG_LEVEL` | Agent logging verbosity | `INFO` |
 
-**Proxy example:**
-```bash
-docker run \
-  -e API_KEY="pl_abc123..." \
-  -e HTTPS_PROXY="https://user:password@proxy.internal:8080" \
-  -d checkly/agent:latest
-```
+### Network and Proxy Configuration
+
+| Variable | Description |
+|----------|-------------|
+| `HTTPS_PROXY` | HTTPS proxy for agent management traffic |
+| `HTTP_PROXY` | HTTP proxy for agent management traffic |
+| `USE_OS_DNS_RESOLVER` | Use system DNS instead of network DNS |
 
 <Note>
 These proxy settings apply to agent management traffic to Checkly's API. For check-specific proxy configuration, see the [Proxy Setup guide](/docs/detect/private-locations/proxy-setup).
 </Note>
-</Accordion>
 
-<Accordion title="Security and TLS Configuration">
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `NODE_EXTRA_CA_CERTS` | Path to additional CA certificates | `/certs/company-ca.pem` |
-| `NODE_TLS_REJECT_UNAUTHORIZED` | Allow self-signed certificates (not recommended) | `0` |
+### Security and TLS Configuration
 
-**Enterprise TLS example:**
-```bash
-docker run \
-  -v ~/company-ca.pem:/checkly/company-ca.pem \
-  -e NODE_EXTRA_CA_CERTS=/checkly/company-ca.pem \
-  -e API_KEY="pl_abc123..." \
-  -d checkly/agent:latest
-```
-</Accordion>
-</AccordionGroup>
+| Variable | Description |
+|----------|-------------|
+| `NODE_EXTRA_CA_CERTS` | Path to additional CA certificates |
+| `NODE_TLS_REJECT_UNAUTHORIZED` | Allow self-signed certificates (not recommended) |
 
 ## Production Deployment Examples
 
@@ -400,8 +372,8 @@ docker exec checkly-agent node -e "
 
 ## Troubleshooting
 
-<AccordionGroup>
-<Accordion title="Agent Won't Connect">
+### Agent Won't Connect
+
 **Symptoms**: Agent starts but doesn't appear in Private Locations dashboard
 
 **Solutions**:
@@ -419,9 +391,9 @@ docker exec checkly-agent node -e "
    ```bash
    docker exec checkly-agent env | grep -i proxy
    ```
-</Accordion>
 
-<Accordion title="TLS Certificate Issues">
+### TLS Certificate Issues
+
 **Symptoms**: SSL/TLS connection errors in logs
 
 **Solutions**:
@@ -441,9 +413,9 @@ docker exec checkly-agent node -e "
      -e API_KEY="pl_..." \
      -d checkly/agent:latest
    ```
-</Accordion>
 
-<Accordion title="Resource and Performance Issues">
+### Resource and Performance Issues
+
 **Symptoms**: Slow check execution, out of memory errors
 
 **Solutions**:
@@ -470,9 +442,9 @@ docker exec checkly-agent node -e "
      sleep 30
    done
    ```
-</Accordion>
 
-<Accordion title="Check Execution Issues">
+### Check Execution Issues
+
 **Symptoms**: Checks fail only from private location
 
 **Solutions**:
@@ -494,61 +466,38 @@ docker exec checkly-agent node -e "
      -e API_KEY="pl_..." \
      -d checkly/agent:latest
    ```
-</Accordion>
-</AccordionGroup>
 
 ## Best Practices
 
-<CardGroup cols={2}>
-<Card title="Security" icon="shield">
+<Accordion title="Security">
 - Pin specific agent versions in production
 - Rotate API keys regularly (quarterly)
 - Use secrets management for API keys
 - Enable TLS certificate validation
 - Monitor agent access logs
-</Card>
+</Accordion>
 
-<Card title="Reliability" icon="check-double">
+<Accordion title="Reliability">
 - Deploy at least 2 agents per location
 - Use container restart policies
 - Implement health checks
 - Monitor agent connectivity
 - Plan for rolling updates
-</Card>
+</Accordion>
 
-<Card title="Performance" icon="gauge">
+<Accordion title="Performance" >
 - Right-size job concurrency for your workload
 - Monitor memory usage patterns
 - Use resource limits in production
 - Scale horizontally when needed
 - Profile check execution times
-</Card>
+</Accordion>
 
-<Card title="Operations" icon="tools">
+<Accordion title="Operations">
 - Centralize logging and monitoring
 - Automate agent deployment
 - Document configuration decisions
 - Test updates in staging first
 - Maintain update procedures
-</Card>
-</CardGroup>
+</Accordion>
 
-## Next Steps
-
-<CardGroup cols={2}>
-<Card title="Kubernetes Deployment" href="/docs/detect/private-locations/kubernetes-deployment">
-Deploy agents on Kubernetes for production scale and orchestration
-</Card>
-
-<Card title="Proxy Configuration" href="/docs/detect/private-locations/proxy-setup">
-Configure HTTP proxies for enterprise network environments
-</Card>
-
-<Card title="Scaling Guide" href="/docs/detect/private-locations/scaling-redundancy">
-Plan capacity, implement redundancy, and optimize performance
-</Card>
-
-<Card title="Private Locations API" href="/api-reference/private-locations/list">
-Manage Private Locations programmatically with the Checkly API
-</Card>
-</CardGroup>

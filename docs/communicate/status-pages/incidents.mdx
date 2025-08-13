@@ -4,575 +4,86 @@ description: 'Comprehensive guide to creating, managing, and automating incident
 sidebarTitle: 'Incidents'
 ---
 
+Incidents are used to communicate downtime on one or more services. You can open incidents manually as part of your incident management process, or automatically by connecting a check to a service using incident automation. 
 
+When an incident is posted, a notification will be sent to all users subscribed to the status page, unless you opt out of notifications when creating the incident update.
 
-Incidents are the core communication mechanism for status pages, informing users about service disruptions, maintenance windows, and recovery events. Checkly provides both manual incident creation and automated incident management based on monitoring check results.
-
-## What are Status Page Incidents?
-
-Status page incidents represent any event that affects service availability or performance, including:
-
-<CardGroup cols={2}>
-<Card title="Service disruptions" icon="exclamation-triangle">
-**Unplanned Outages**
-- System failures and errors
-- Performance degradations
-- Third-party service issues
-- Infrastructure problems
-</Card>
-
-<Card title="Planned maintenance" icon="wrench">
-**Scheduled Activities**
-- System updates and deployments
-- Infrastructure maintenance
-- Feature rollouts
-- Security patching
-</Card>
-
-<Card title="Performance issues" icon="gauge">
-**Degraded Performance**
-- Slow response times
-- Partial functionality loss
-- Regional service issues
-- Capacity limitations
-</Card>
-
-<Card title="Recovery events" icon="check-circle">
-**Service Restoration**
-- Issue resolution notifications
-- Performance improvements
-- System health confirmations
-- Preventive measure updates
-</Card>
-</CardGroup>
-
-## Incident Types and Severity Levels
-
-### Incident Classification
-Choose the appropriate incident type based on user impact:
-
-| Incident Type | Description | User Impact | Example |
-|---------------|-------------|-------------|---------|
-| **Major Impact** | Complete service unavailability | High - Core functionality unavailable | Payment processing completely down |
-| **Minor Impact** | Partial service degradation | Medium - Some features affected | Slow API response times |
-| **Maintenance** | Planned service changes | Low - Scheduled downtime | Scheduled database maintenance |
-
-### Service Impact Levels
-For each affected service, specify the impact level:
-
-```yaml
-# Impact level examples
-Complete Outage:
-  Description: Service completely unavailable
-  Status Display: Red indicator
-  User Impact: Cannot access service at all
-
-Partial Outage:
-  Description: Service partially available
-  Status Display: Yellow indicator  
-  User Impact: Some features may not work
-
-Performance Issues:
-  Description: Service slow but functional
-  Status Display: Yellow indicator
-  User Impact: Slower than normal response
-
-Operational:
-  Description: Service working normally
-  Status Display: Green indicator
-  User Impact: Normal service experience
-```
-
-## Manual Incident Creation
-
-### Creating New Incidents
-Manually create incidents for planned maintenance or immediate communication:
-
-<Steps>
-<Step title="Access Incident Creation">
-Navigate to your status page and select "Create Incident"
-</Step>
-
-<Step title="Select Incident Type">
-Choose between Major Impact, Minor Impact, or Maintenance
-</Step>
-
-<Step title="Define Affected Services">
-Select which services are affected and their impact level
-</Step>
-
-<Step title="Set Incident Details">
-Provide incident title, description, and initial status
-</Step>
-
-<Step title="Configure Notifications">
-Choose whether to notify subscribers immediately
-</Step>
-
-<Step title="Publish Incident">
-Create the incident and begin communication workflow
-</Step>
-</Steps>
-
-### Incident Status Progression
-Incidents typically follow a standard progression through various states:
-
-<Steps>
-<Step title="Investigating">
-Initial awareness of the issue, team is looking into the problem
-</Step>
-
-<Step title="Identified">
-Root cause has been determined, solution is being implemented
-</Step>
-
-<Step title="Monitoring">
-Fix has been applied, team is monitoring for stability
-</Step>
-
-<Step title="Resolved">
-Issue is completely resolved and systems are operating normally
-</Step>
-</Steps>
-
-### Detailed Incident Workflow
-
-```yaml
-# Complete incident lifecycle example
-Incident: "Payment API Performance Issues"
-
-Initial Report:
-  Type: Minor Impact
-  Status: Investigating
-  Services Affected:
-    - Payment Processing: Performance Issues
-    - Checkout Flow: Performance Issues
-  Message: "We are experiencing slower than normal response times for payment processing. Our team is investigating the issue."
-  Timestamp: "2024-01-15 14:30 UTC"
-  Notifications: Sent to subscribers
-
-First Update:
-  Status: Identified
-  Message: "We have identified increased database latency as the cause of payment processing delays. Our team is optimizing database queries and scaling resources."
-  Timestamp: "2024-01-15 14:45 UTC"
-  Notifications: Sent to subscribers
-
-Resolution Update:
-  Status: Monitoring
-  Message: "Database optimizations have been applied and response times are returning to normal. We are monitoring system performance to ensure stability."
-  Timestamp: "2024-01-15 15:10 UTC"
-  Notifications: Sent to subscribers
-
-Final Resolution:
-  Status: Resolved
-  Services Affected:
-    - Payment Processing: Operational
-    - Checkout Flow: Operational
-  Message: "Payment processing performance has returned to normal levels. All systems are operating as expected."
-  Timestamp: "2024-01-15 15:30 UTC"
-  Notifications: Sent to subscribers
-```
-
-## Automated Incident Management
-
-### Check-to-Service Connections
-Link monitoring checks to services for automatic incident creation:
-
-<CardGroup cols={2}>
-<Card title="API check automation" icon="api">
-**API Monitoring Integration**
-- Connect API checks to service definitions
-- Automatic incident creation on check failures
-- Service status updates based on check results
-- Automatic resolution when checks recover
-</Card>
-
-<Card title="Browser check automation" icon="browser">
-**Browser Check Integration**
-- Link user journey checks to services
-- Incident creation for user experience failures
-- Multi-step check result evaluation
-- Recovery detection and resolution
-</Card>
-
-<Card title="Heartbeat automation" icon="heartbeat">
-**Heartbeat Monitoring**
-- Connect heartbeat checks to services
-- Ping-based availability monitoring
-- Network connectivity incident detection
-- Simple up/down status automation
-</Card>
-
-<Card title="Multi-check services" icon="layers">
-**Complex Service Monitoring**
-- Multiple checks per service
-- Intelligent incident aggregation
-- Partial vs complete outage detection
-- Coordinated recovery management
-</Card>
-</CardGroup>
-
-### Automation Configuration Process
-
-<Steps>
-<Step title="Service Creation">
-Create services that represent user-facing functionality
-</Step>
-
-<Step title="Check Selection">
-Choose monitoring checks that validate service health
-</Step>
-
-<Step title="Incident Automation">
-Enable automatic incident creation for the service
-</Step>
-
-<Step title="Impact Configuration">
-Define how check failures map to incident severity
-</Step>
-
-<Step title="Testing">
-Verify automation works correctly with test scenarios
-</Step>
-</Steps>
-
-### Automation Configuration Examples
-
-```yaml
-# Single check to service mapping
-User Authentication Service:
-  Description: "User login and authentication"
-  Connected Checks: [Auth API Health Check]
-  Automation Rules:
-    - Check Failure → Major Impact Incident
-    - Check Recovery → Automatic Resolution
-  
-# Multiple checks to single service
-E-commerce Checkout:
-  Description: "Complete checkout and payment flow"
-  Connected Checks: 
-    - Payment API Check
-    - Inventory API Check  
-    - Order Confirmation Check
-  Automation Rules:
-    - Any 1 check failure → Minor Impact Incident
-    - Any 2+ checks failure → Major Impact Incident
-    - All checks recovery → Automatic Resolution
-
-# Complex service dependencies
-Website Availability:
-  Description: "Main website functionality"
-  Connected Checks:
-    - Homepage Load Check
-    - User Registration Check
-    - Search Functionality Check
-  Automation Rules:
-    - Homepage failure → Major Impact
-    - Other check failures → Minor Impact
-    - Gradual recovery → Status updates
-```
-
-<Warning>
-When multiple checks are connected to a single service, Checkly uses intelligent logic to determine incident severity. Consider your check dependencies when configuring automation.
-</Warning>
-
-## Incident Updates and Communication
-
-### Providing Status Updates
-Keep users informed throughout the incident lifecycle:
-
-<Steps>
-<Step title="Regular Updates">
-Provide updates at least every 30-60 minutes during active incidents
-</Step>
-
-<Step title="Status Progression">
-Update incident status as investigation and resolution progress
-</Step>
-
-<Step title="Clear Communication">
-Use plain language to explain what's happening and expected timeline
-</Step>
-
-<Step title="Resolution Details">
-Explain what was fixed and any preventive measures taken
-</Step>
-</Steps>
-
-### Update Best Practices
-
-```text
-# Good incident update examples
-
-Initial Report:
-"We are currently investigating reports of slow page load times on our website. Our engineering team is looking into the issue and we will provide updates as we learn more."
-
-Progress Update:
-"We have identified the issue as increased server load due to a traffic spike. We are scaling our infrastructure to handle the increased demand. Expected resolution time is 15-30 minutes."
-
-Resolution Update:
-"The issue has been resolved. We have successfully scaled our servers and page load times have returned to normal. We are implementing additional monitoring to prevent similar issues in the future."
-```
-
-### Communication Timeline
-Maintain appropriate communication frequency based on incident severity:
-
-| Incident Type | Initial Response | Update Frequency | Resolution Notice |
-|---------------|------------------|------------------|-------------------|
-| **Major Impact** | Within 5 minutes | Every 15-30 minutes | Immediate |
-| **Minor Impact** | Within 15 minutes | Every 30-60 minutes | Within 1 hour |
-| **Maintenance** | Advance notice | As needed | Upon completion |
-
-## Subscriber Notifications
-
-### Email Notification System
-Status page subscribers receive automated email notifications for incident updates:
-
-<CardGroup cols={2}>
-<Card title="Subscription management" icon="mail">
-**User Subscription Process**
-- Email address collection on status page
-- Double opt-in verification process
-- Unsubscribe links in all notifications
-- Preference management options
-</Card>
-
-<Card title="Notification content" icon="message-square">
-**Email Content Structure**
-- Clear incident subject lines
-- Detailed incident information
-- Current status and timeline
-- Direct links to status page
-</Card>
-</CardGroup>
-
-### Email Verification Process
-
-<Steps>
-<Step title="Subscription Request">
-User enters email address on status page
-</Step>
-
-<Step title="Verification Email">
-Automated verification email sent to provided address
-</Step>
-
-<Step title="Confirmation Click">
-User clicks verification link to confirm subscription
-</Step>
-
-<Step title="Subscription Active">
-User added to notification list for future incidents
-</Step>
-</Steps>
-
-### Notification Email Structure
-
-```text
-Subject: [STATUS UPDATE] Payment Processing - Issue Identified
-
-Hello,
-
-This is an update regarding the ongoing issue with our Payment Processing service.
-
-CURRENT STATUS: Identified
-INCIDENT TYPE: Minor Impact
-STARTED: January 15, 2024 at 14:30 UTC
-LAST UPDATE: January 15, 2024 at 14:45 UTC
-
-UPDATE:
-We have identified increased database latency as the cause of payment 
-processing delays. Our team is optimizing database queries and scaling 
-resources. We expect to resolve this issue within the next 15-30 minutes.
-
-AFFECTED SERVICES:
-• Payment Processing - Performance Issues
-• Checkout Flow - Performance Issues
-
-You can view real-time updates at: https://status.yourcompany.com
-
-To unsubscribe from these notifications, click here: [unsubscribe link]
-
-Thank you for your patience.
-
-Best regards,
-Your Company Status Team
-```
-
-### Managing Subscriber Communications
-
-<Tip>
-Consider your audience when writing incident updates. Use clear, non-technical language that your users can understand, and focus on impact rather than technical details.
-</Tip>
-
-```yaml
-# Communication strategy by incident type
-Major Impact Incidents:
-  Tone: Urgent but calm
-  Detail Level: High impact information
-  Technical Details: Minimal
-  Timeline Updates: Frequent
-  
-Minor Impact Incidents:
-  Tone: Informative
-  Detail Level: Moderate impact information  
-  Technical Details: Limited
-  Timeline Updates: Regular
-
-Maintenance Windows:
-  Tone: Informational
-  Detail Level: Clear scope and timing
-  Technical Details: User-relevant only
-  Timeline Updates: As scheduled
-```
-
-## Historical Incident Management
-
-### Incident Backfilling
-Add historical incidents to maintain accurate status page records:
-
-<Steps>
-<Step title="Historical Analysis">
-Review past outages and incidents that should be documented
-</Step>
-
-<Step title="Incident Creation">
-Create incidents with historical dates and times
-</Step>
-
-<Step title="Notification Settings">
-Choose whether to notify current subscribers about historical events
-</Step>
-
-<Step title="Status Impact">
-Historical incidents affect uptime calculations and reporting
-</Step>
-</Steps>
-
-### Backfilling Best Practices
-
-<Warning>
-When backfilling historical incidents, typically disable subscriber notifications to avoid confusion about past events. Users don't need to be notified about incidents that already occurred before they subscribed.
-</Warning>
-
-```yaml
-# Backfilling configuration example
-Historical Incident: "Database Maintenance - December 2023"
-Date: 2023-12-15 02:00 UTC
-Duration: 4 hours
-Type: Maintenance
-Services Affected:
-  - All Services: Maintenance
-Notify Subscribers: false
-Include in Uptime: true
-Purpose: Accurate historical uptime reporting
-```
-
-### Uptime Calculation Impact
-Historical incidents are included in uptime statistics:
-
-- **Monthly uptime**: Calculated including all incidents in the month
-- **Yearly uptime**: Annual statistics reflect all documented incidents  
-- **SLA reporting**: Historical data supports accurate SLA reporting
-- **Trend analysis**: Complete incident history enables better trend analysis
-
-## Advanced Incident Features
-
-### Cross-Page Incident Propagation
-Incidents can affect multiple status pages when services are shared:
-
-```yaml
-# Multi-page incident example
-Shared Service: "Core Authentication API"
-Connected Pages:
-  - Main Product Status Page
-  - Developer Portal Status Page
-  - Customer Support Page
-
-Incident Impact:
-  - Incident created on all connected pages
-  - Updates propagated to all status pages
-  - Resolution synchronized across pages
-  - Subscriber notifications sent from each page
-```
-
-### Incident Analytics and Reporting
-Track incident patterns and performance:
-
-<CardGroup cols={2}>
-<Card title="Incident metrics" icon="chart-bar">
-**Performance Tracking**
-- Mean time to detection (MTTD)
-- Mean time to resolution (MTTR)  
-- Incident frequency analysis
-- Service availability statistics
-</Card>
-
-<Card title="Communication analysis" icon="message-circle">
-**Communication Effectiveness**
-- Subscriber engagement rates
-- Update frequency analysis
-- Resolution communication timing
-- User feedback integration
-</Card>
-</CardGroup>
-
-### API Integration for Incidents
-Programmatically manage incidents through Checkly's API:
-
-```javascript
-// Create incident via API
-const incident = await checkly.incidents.create({
-  title: "Payment API Performance Issues",
-  type: "minor_impact",
-  services: [
-    {
-      id: "payment-service-id",
-      status: "performance_issues"
-    }
-  ],
-  message: "We are experiencing slower than normal response times",
-  notify_subscribers: true
-});
-
-// Update incident status
-await checkly.incidents.update(incident.id, {
-  status: "identified",
-  message: "Issue identified, implementing fix",
-  notify_subscribers: true
-});
-
-// Resolve incident
-await checkly.incidents.resolve(incident.id, {
-  message: "Issue resolved, all systems operational",
-  notify_subscribers: true
-});
-```
-
-## Incident Response Best Practices
-
-### Preparation
-- **Pre-written templates**: Prepare incident message templates for common scenarios
-- **Response team training**: Ensure team knows how to create and update incidents
-- **Escalation procedures**: Define when and how to escalate incident communication
-- **Contact management**: Maintain up-to-date subscriber lists and communication channels
-
-### During Incidents
-- **Rapid initial response**: Acknowledge issues quickly, even without full details
-- **Regular updates**: Provide status updates even if there's no new information
-- **Clear communication**: Use simple language that all users can understand
-- **Honest transparency**: Be direct about issues and expected resolution times
-
-### Post-Incident
-- **Detailed resolution**: Explain what was fixed and preventive measures
-- **Lessons learned**: Document incident response improvements
-- **Process updates**: Refine incident procedures based on experience
-- **Follow-up communication**: Consider additional communication for major incidents
-
-<Note>
-Effective incident management builds trust with your users. Transparent, timely communication during incidents often strengthens customer relationships rather than damaging them.
-</Note>
-
-<Tip>
-Use incident automation to ensure rapid response times, but always be prepared to provide manual updates with context and empathy that automation cannot provide.
-</Tip>
+## Creating an incident
+
+Create an incident when you want to communicate downtime or known issues of your services to users via your status page.
+
+1. Click ‘Status page’ in the sidebar and open your status page.
+2. Click ‘Add incident’
+3. Enter the name of the incident
+4. Select the severity of the incident
+5. Select which services are impacted in the dropdown list.
+
+> Note that incidents will be posted on all status pages where a service is present. [See Services for more details](/docs/status-pages/#services).
+
+6. Provide an incident update message.
+7. Select the status of the incident.
+8. If you want to backfill the incident, select `Use custom date`. See [Backfilling incidents for more information](/docs/status-pages/#backfilling-an-incident).
+9. Select if you want to notify subscribers of your status page about the incident.
+10. Click ‘Create incident’
+
+Your incident will now appear on all status pages that show the selected service(s).
+
+> All times on status pages are displayed in UTC.
+
+
+## Updating an incident
+
+To update an ongoing incident go to the ‘Incidents’ tab on your status page and select the incident to update.
+
+![Incidents view](/images/docs/images/status-pages/status-pages-incidents-1.png)
+
+
+Here you can post a new status update for the incident, or you can edit existing updates. You can also edit the impacted services or the incident severity, and delete the incident.
+
+## Incident notifications
+
+Whenever you post an incident update, Checkly can automatically send email notifications to users subscribed to your status page.
+
+Emails are sent out only when an update is first posted. Notifications are not sent again if the incident update is edited.
+
+If you want to post an incident update without notifying your subscribers you can uncheck the ‘Notifications’ checkbox when updating the incident.
+![Incident notification settings](/images/docs/images/status-pages/status-pages-notifications-2.png)
+
+
+Incident notifications contain information about the incident name, the severity and status as well as which services are impacted.
+![Example notification](/images/docs/images/status-pages/status-pages-notifications-1.png)
+
+
+## Subscribing to incident notifications
+
+Subscribing to incident notifications is done on your status page. To subscribe, a user needs to enter a valid email address. A verification email will be sent to the registered email, and only after confirming the subscription will the user start receiving incident notifications.
+
+## Incident automation
+
+Automatically open incidents whenever a check would alert with incident automation. The incident will be automatically resolved when the check recovers.
+
+Incident automation works by connecting a check to a service. When the check fails and triggers an alert it will also open an incident on the connected service. Multiple checks can be connected to the same service through incident automation.
+
+1. Open your check from the home dashboard.
+2. Click ‘Edit’ in the check overview page.
+3. For API checks, URL monitors and TCP monitors, click the ‘Incident triggers’ tab. For Browser and Multistep checks, first click ‘Settings’ then ‘Incident triggers’.
+4. Check the ‘Enable incident automation’ checkbox.
+5. Fill in the incident name, a first status update and the severity of the incident.
+6. Select which service the incident should be opened on.
+7. Select if the status page subscribers should be notified when the automatic incident updates are posted.
+8. Save your check.
+
+![Incident automation](/images/docs/images/status-pages/status-pages-incident-automation-1.png)
+
+## Backfilling an incident
+
+Backfilling allows you to add incidents for downtime that happened in the past. Use backfilling to provide accurate uptime information to your users.
+
+To backfill an incident, follow the steps 1 - 7 in the [Creating an incident](/docs/status-pages/incidents/#creating-an-incident) process. Next, select ‘Use custom date to backfill incident’ and pick the date and time when the incident started.
+
+![Incident backfilling](/images/docs/images/status-pages/status-pages-backfilling-1.png)
+
+
+We recommend to uncheck notifications when backfilling incidents to avoid notifying customers about resolved incidents.
+
+If you only want to provide the history of the incident, you can set the first incident update to resolved. This will correctly show the incident as having occurred, but without a duration. If you want to have correct uptime on your service you should post two incident updates, with the timestamps for when the incident started and resolved respectively.

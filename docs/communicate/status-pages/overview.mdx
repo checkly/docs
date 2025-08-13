@@ -7,81 +7,38 @@ sidebarTitle: 'Overview'
 
 
 Status pages provide transparent communication about your service health and incidents to customers, users, and stakeholders. Checkly's status pages automatically reflect your monitoring results and create a professional interface for incident communication.
+![Status page example](/images/docs/images/status-pages/status-pages-overview-1.png)
 
 
 ## Core Status Page Components
 
 ### Services
-Services represent functional pieces of your application that users interact with:
 
-```yaml
-# Example service structure
-Payment Processing:
-  Description: "Credit card and payment processing"
-  Connected Checks: [Payment API, Stripe Integration, PayPal API]
-  Incident Automation: Enabled
-  Status: Operational
+A service represents a functional piece of your application or website, such as landing page, API, support portal etc. You manage your services from the service overview page, accessible in the sidebar.
 
-User Authentication:
-  Description: "Login and user management systems"
-  Connected Checks: [Auth API, OAuth Service, User Database]
-  Incident Automation: Enabled
-  Status: Operational
-```
+When naming a service, use a name that is identifiable for your users, as this is used when sending out incident notifications.
 
-### Service Cards
-Organize and group services for better user experience:
+Services are what connect checks and status pages. A service can listen to multiple checks and automatically opening incidents whenever one of these checks trigger a check failure alert. [See incident automation for more details](/docs/status-pages/incidents/#incident-automation).
 
-- **Visual grouping**: Related services displayed together
-- **Custom ordering**: Arrange services by importance or user impact
-- **Status aggregation**: Overall health based on connected checks
-- **Description management**: Clear service explanations for users
-
-### Automatic Incident Management
-Connect monitoring checks directly to services for automated incident handling:
-
-<CardGroup cols={2}>
-<Card title="When Checks Fail" >
-- Incident opened automatically
-- Service status updated to "Major Outage" or "Partial Outage"
-- Subscribers notified via email
-- Status page reflects current state
-</Card>
-
-<Card title="When Checks Recover">
-- Incident automatically resolved
-- Service status returned to "Operational"
-- Resolution notification sent to subscribers
-- Historical record maintained
-</Card>
-</CardGroup>
+A service can be used by multiple status pages. When an incident is opened for a service, it will appear on all pages that use it. Subscribers of each of those pages will receive email notifications for the incident.
 
 
-## Incident Backfilling
-Add historical incidents to maintain accurate status page history:
+![Services diagram](/images/docs/images/status-pages/status-pages-services-1.png)
 
-<Steps>
-<Step title="Historical Accuracy">
-Create incidents for past outages or maintenance windows
-</Step>
 
-<Step title="Custom Date Selection">
-Set specific dates and times for historical incidents
-</Step>
+### Connecting services and status pages
 
-<Step title="Subscriber Management">
-Choose whether to notify current subscribers about historical incidents
-</Step>
+To display a service on a status page, go to the status page editor and open the `Services` dropdown on the card you want to display your service on. 
 
-<Step title="Uptime Calculation">
-Backfilled incidents are included in uptime statistics
-</Step>
-</Steps>
+Select your service from the list and save your status page. The page will now display the selected service. 
 
-<Tip>
-When backfilling historical incidents, consider whether to notify current subscribers. Usually, you want to disable notifications for historical events to avoid confusion.
-</Tip>
+You can also create new services directly from the dropdown by entering a new service name and pressing `Create`.
 
+You can display the same service on multiple pages. An incident declared on that service will be shown on all status pages which contain that service.
+
+### Connecting services and checks
+
+Use incident automation to connect a service and a check to automatically open incidents for services based on check alerts. [See Incident automation for details](/docs/status-pages/incidents/#incident-automation).
 
 ## Status Page Best Practices
 

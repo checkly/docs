@@ -13,412 +13,119 @@ You'll need a web application or website to test. Browser checks work with any p
 
 ## Step-by-Step Setup
 
+
 <Steps>
-<Step title="Navigate to Browser Checks">
-1. Log into your Checkly dashboard
-2. Go to **Checks** in the main navigation
-3. Click **Create Check** and select **Browser Check**
+  <Step title="Create a Browser Check">
+    <Frame>
+      <img 
+        className="block dark:hidden" 
+        src="/images/next/quickstart-welcome-light.png" 
+        alt="Light mode interface"
+      />
+      <img 
+        className="hidden dark:block" 
+        src="/images/next/quickstart-welcome-dark.png" 
+        alt="Dark mode interface"
+      />
+    </Frame>
 
-![Navigate to create browser check](/images/docs/images/browser-checks/create-browser-check-nav.png)
+  -  **Choose "Browser Check"** for comprehensive website monitoring
+  -  **Enter your website URL** (e.g., `https://your-website.com`)
+  -  **Click "Create Check"** 
+  </Step>
 
-**Check Configuration**:
-- **Name**: Descriptive name for your workflow (e.g., "User Login Flow")
-- **Tags**: Organize with labels like "critical", "auth", "e-commerce"
-- **Group**: Assign to a check group for shared settings
+  <Step title="Edit Your Test Script">
+The following test script will check if the homepage is available, performing correctly, and looks visually correct.
+<Frame>
+<img 
+  className="block dark:hidden" 
+  src="/images/next/quickstart-test-light.png" 
+  alt="Light mode interface"
+/>
+<img 
+  className="hidden dark:block" 
+  src="/images/next/quickstart-test-dark.png" 
+  alt="Dark mode interface"
+/>
+</Frame>
+
 </Step>
 
-<Step title="Write Your Test Script">
-Browser checks use Playwright test scripts to define user interactions:
-
-```typescript
-import { test, expect } from '@playwright/test'
-
-test('User login workflow', async ({ page }) => {
-  // Navigate to the login page
-  await page.goto('https://app.example.com/login')
-  
-  // Fill in the email field
-  await page.fill('[data-testid="email-input"]', 'test@example.com')
-  
-  // Fill in the password field
-  await page.fill('[data-testid="password-input"]', 'secure_password')
-  
-  // Click the login button
-  await page.click('[data-testid="login-button"]')
-  
-  // Wait for navigation to dashboard
-  await page.waitForURL('**/dashboard')
-  
-  // Verify successful login
-  await expect(page.locator('[data-testid="user-menu"]')).toBeVisible()
-  await expect(page.locator('.welcome-message')).toContainText('Welcome')
-})
-```
-
-**Key Playwright Concepts**:
-- **page.goto()**: Navigate to URLs
-- **page.fill()**: Enter text in form fields
-- **page.click()**: Click buttons and links
-- **expect()**: Assert expected page states
-- **page.waitFor*()**: Wait for conditions
-
-![Browser check script editor](/images/docs/images/browser-checks/browser-check-script.png)
+<Step title="Configure Check Settings">
+Configure your check settings by clicking the "Settings" button in the top right corner of the check editor
+<Frame>
+<img 
+  className="block dark:hidden" 
+  src="/images/next/quickstart-settings-light.png" 
+  alt="Light mode interface"
+/>
+<img 
+  className="hidden dark:block" 
+  src="/images/next/quickstart-settings-dark.png" 
+  alt="Dark mode interface"
+/>
+</Frame>
+<Note>
+For your first check, the default settings work well. You can always adjust them later.
+</Note>
 </Step>
 
-<Step title="Configure Element Selectors">
-Choose reliable selectors for interacting with page elements:
-
-**Recommended Selector Strategy**:
-```typescript
-// 1. Test IDs (most reliable)
-await page.click('[data-testid="submit-button"]')
-
-// 2. Text content (human-readable)
-await page.click('text=Log In')
-
-// 3. CSS selectors (specific)
-await page.click('button.btn-primary')
-
-// 4. Role-based selectors (accessible)
-await page.click('role=button[name="Submit"]')
-```
-
-**Selector Best Practices**:
-- Use `data-testid` attributes for test stability
-- Avoid brittle selectors like nth-child
-- Prefer semantic selectors when possible
-- Test selectors in browser dev tools first
-
-**Element Interaction Examples**:
-```typescript
-// Form interactions
-await page.fill('input[name="email"]', 'user@example.com')
-await page.selectOption('select[name="country"]', 'United States')
-await page.check('input[type="checkbox"]')
-await page.setInputFiles('input[type="file"]', './document.pdf')
-
-// Navigation and clicks
-await page.click('a[href="/products"]')
-await page.hover('.tooltip-trigger')
-await page.keyboard.press('Enter')
-```
+<Step title="Choose Scheduling Frequency and Locations">
+<Frame>
+<img 
+  className="block dark:hidden" 
+  src="/images/next/quickstart-schedule-light.png" 
+  alt="Light mode interface"
+/>
+<img 
+  className="hidden dark:block" 
+  src="/images/next/quickstart-schedule-dark.png" 
+  alt="Dark mode interface"
+/>
+</Frame>
 </Step>
 
-<Step title="Add Assertions and Validation">
-Verify that your application behaves correctly:
+<Step title="Set Up Alerts">
+Configure who gets notified when issues are detected:
 
-**Page Content Assertions**:
-```typescript
-// Text content validation
-await expect(page.locator('.success-message')).toHaveText('Login successful')
-await expect(page).toHaveTitle('Dashboard - MyApp')
+<Frame>
+<img 
+  className="block dark:hidden" 
+  src="/images/next/quickstart-alerts-light.png" 
+  alt="Light mode interface"
+/>
+<img 
+  className="hidden dark:block" 
+  src="/images/next/quickstart-alerts-dark.png" 
+  alt="Dark mode interface"
+/>
+</Frame>
 
-// Element visibility checks
-await expect(page.locator('.loading-spinner')).toBeHidden()
-await expect(page.locator('.user-dashboard')).toBeVisible()
-
-// URL validation
-await expect(page).toHaveURL('https://app.example.com/dashboard')
-await expect(page).toHaveURL(/.*\/dashboard/)
-```
-
-**Form and Input Validation**:
-```typescript
-// Input values
-await expect(page.locator('input[name="email"]')).toHaveValue('user@example.com')
-
-// Element attributes
-await expect(page.locator('.status-indicator')).toHaveClass('status-active')
-await expect(page.locator('button[type="submit"]')).toBeEnabled()
-
-// Count and collections
-await expect(page.locator('.product-item')).toHaveCount(5)
-```
-
-**Custom Validation Logic**:
-```typescript
-// Complex assertions
-const orderTotal = await page.locator('.order-total').textContent()
-expect(parseFloat(orderTotal.replace('$', ''))).toBeGreaterThan(0)
-
-// Multiple conditions
-const products = page.locator('.product-title')
-await expect(products).toHaveCount(3)
-await expect(products.nth(0)).toContainText('Premium')
-```
-
-![Browser check assertions](/images/docs/images/browser-checks/browser-check-assertions.png)
 </Step>
 
-<Step title="Handle Authentication and Sessions">
-For applications requiring login, set up authentication:
+<Step title="Test and Save">
+Before activating your check:
 
-**Environment Variables for Credentials**:
-```typescript
-// Use secure environment variables
-const testEmail = process.env.TEST_USER_EMAIL
-const testPassword = process.env.TEST_USER_PASSWORD
-
-test('Authenticated user workflow', async ({ page }) => {
-  await page.goto('https://app.example.com/login')
-  await page.fill('[name="email"]', testEmail)
-  await page.fill('[name="password"]', testPassword)
-  await page.click('[type="submit"]')
-  
-  // Wait for successful login
-  await expect(page.locator('.user-menu')).toBeVisible()
-})
-```
-
-**Session State Management**:
-```typescript
-// Login and save session state
-test('Setup authentication', async ({ page }) => {
-  await page.goto('https://app.example.com/login')
-  // ... login steps ...
-  
-  // Save authentication state for reuse
-  await page.context().storageState({ path: 'auth-state.json' })
-})
-
-// Reuse authentication in other tests
-test.use({ storageState: 'auth-state.json' })
-test('Protected workflow', async ({ page }) => {
-  // User is already authenticated
-  await page.goto('https://app.example.com/protected-page')
-})
-```
-
-<Warning>
-Never hardcode credentials in your test scripts. Always use environment variables for sensitive data.
-</Warning>
+1. **Click "Test Check"** to run it once and verify it works
+2. **Review the results** to ensure your website loads correctly
+3. **Check for any errors** in the console or network tabs
+4. **Click "Save and Activate"** to start continuous monitoring
 </Step>
 
-<Step title="Configure Wait Strategies">
-Ensure reliable test execution with proper waiting:
+<Step title="View Results">
+Once your check is active:
 
-**Wait for Elements**:
-```typescript
-// Wait for specific elements
-await page.waitForSelector('[data-testid="dashboard-loaded"]')
-await page.waitForSelector('.search-results', { timeout: 10000 })
-
-// Wait for element to be hidden
-await page.waitForSelector('.loading-spinner', { state: 'hidden' })
-```
-
-**Wait for Navigation**:
-```typescript
-// Wait for URL changes
-await page.waitForURL('**/dashboard')
-await page.waitForURL(/.*checkout\/success/)
-
-// Wait for page load states
-await page.waitForLoadState('networkidle')
-await page.waitForLoadState('domcontentloaded')
-```
-
-**Wait for Custom Conditions**:
-```typescript
-// Wait for JavaScript conditions
-await page.waitForFunction(() => window.dataLoaded === true)
-await page.waitForFunction(() => document.querySelectorAll('.item').length > 0)
-
-// Wait for network responses
-await page.waitForResponse(response => 
-  response.url().includes('/api/user') && response.status() === 200
-)
-```
-
-**Error Handling**:
-```typescript
-// Graceful error handling
-try {
-  await page.waitForSelector('.optional-modal', { timeout: 5000 })
-  await page.click('.modal-close')
-} catch (error) {
-  // Continue if modal doesn't appear
-  console.log('No modal to close')
-}
-```
-</Step>
-
-<Step title="Set Monitoring Schedule and Locations">
-Configure when and where your browser check runs:
-
-**Monitoring Frequency**:
-```yaml
-# Critical user workflows
-Frequency: Every 1-2 minutes
-
-# Important features
-Frequency: Every 5 minutes
-
-# Standard monitoring
-Frequency: Every 15 minutes
-
-# Non-critical workflows
-Frequency: Every 30+ minutes
-```
-
-**Global Monitoring Locations**:
-```yaml
-# Recommended global coverage
-Primary Locations:
-  - us-east-1 (N. Virginia)
-  - eu-west-1 (Ireland)
-  - ap-southeast-1 (Singapore)
-
-Additional Coverage:
-  - us-west-2 (Oregon)
-  - eu-central-1 (Frankfurt)
-  - ap-northeast-1 (Tokyo)
-```
-
-**Browser Configuration**:
-- **Browser Type**: Chromium (default) or Chrome
-- **Device Simulation**: Desktop, mobile, or tablet viewports
-- **Timezone**: Configure for location-specific testing
-
-![Browser check monitoring configuration](/images/docs/images/browser-checks/browser-check-monitoring.png)
-</Step>
-
-<Step title="Configure Performance Monitoring">
-Track user experience metrics and performance:
-
-**Core Web Vitals Monitoring**:
-- **Largest Contentful Paint (LCP)**: Loading performance
-- **First Input Delay (FID)**: Interactivity
-- **Cumulative Layout Shift (CLS)**: Visual stability
-
-**Performance Thresholds**:
-```yaml
-# Page Load Performance
-LCP Threshold: 2.5 seconds
-FID Threshold: 100 milliseconds
-CLS Threshold: 0.1
-
-# Custom Performance Assertions
-Page Load Time: < 3 seconds
-Time to Interactive: < 5 seconds
-```
-
-**Custom Performance Tracking**:
-```typescript
-// Measure specific operations
-const startTime = Date.now()
-await page.click('[data-testid="heavy-operation"]')
-await page.waitForSelector('[data-testid="results"]')
-const operationTime = Date.now() - startTime
-
-// Assert performance requirements
-expect(operationTime).toBeLessThan(10000) // Less than 10 seconds
-```
-</Step>
-
-<Step title="Set Up Alerting and Notifications">
-Configure failure detection and team notifications:
-
-**Alert Conditions**:
-```yaml
-# Immediate Alerts
-- Browser check fails
-- Performance thresholds exceeded
-- Critical assertions fail
-
-# Warning Alerts
-- Performance degradation detected
-- Intermittent failures observed
-```
-
-**Notification Channels**:
-- **Email**: Team distribution lists
-- **Slack**: Development and operations channels
-- **Webhook**: Custom integrations and ticketing systems
-- **PagerDuty**: On-call escalation for critical workflows
-
-**Alert Configuration**:
-```yaml
-# Critical user workflows
-Alert Strategy: Immediate notification on first failure
-Escalation: Manager after 5 minutes
-
-# Standard workflows
-Alert Strategy: Alert after 2 consecutive failures
-Escalation: Team lead after 15 minutes
-```
-
-![Browser check alerting setup](/images/docs/images/browser-checks/browser-check-alerts.png)
-</Step>
-
-<Step title="Test and Validate">
-Run your browser check to ensure it works correctly:
-
-1. **Click "Test Check"** to run a manual execution
-2. **Review the execution log** for each step
-3. **Check screenshots** of the browser during execution
-4. **Validate assertions** passed successfully
-5. **Review performance metrics** collected
-
-**Test Results Include**:
-- **Step-by-step execution log** with timestamps
-- **Screenshots** of key interactions
-- **Performance metrics** and Core Web Vitals
-- **Console logs** and any JavaScript errors
-- **Network activity** and response times
-
-**Debugging Common Issues**:
-- **Element not found**: Check selectors and page timing
-- **Timeout errors**: Increase wait times or improve conditions
-- **Authentication failures**: Verify credentials and login flow
-- **Performance issues**: Optimize page load or adjust thresholds
-
-![Browser check test results](/images/docs/images/browser-checks/browser-check-test.png)
-</Step>
-
-<Step title="Deploy and Monitor">
-Save your browser check and start monitoring:
-
-1. **Click "Save Check"** to create your browser monitoring
-2. **Verify the configuration** in the check summary
-3. **Monitor initial results** on the dashboard
-4. **Review performance trends** over time
-
-**What Happens Next**:
-- Browser checks run on your defined schedule
-- Results include screenshots, logs, and performance data
-- Alerts are sent when failures or degradations occur
-- Historical data builds up for trend analysis
-
-**Monitoring Dashboard Features**:
-- **Real-time status** across all monitoring locations
-- **Response time trends** and performance metrics
-- **Success rate** and availability percentages
-- **Detailed execution logs** with screenshots and videos
-
-![Browser check dashboard results](/images/docs/images/browser-checks/browser-check-dashboard.png)
+<Frame>
+<img 
+  className="block dark:hidden" 
+  src="/images/next/quickstart-reporting-light.png" 
+  alt="Light mode interface"
+/>
+<img 
+  className="hidden dark:block" 
+  src="/images/next/quickstart-reporting-dark.png" 
+  alt="Dark mode interface"
+/>
+</Frame>
 </Step>
 </Steps>
-
-
-
-
-## Expand Your Monitoring
-
-<CardGroup cols={2}>
-<Card title="API Checks" href="/docs/detect/synthetic-monitoring/api-checks/creating-your-first-api-check">
-Monitor backend APIs and services that support your user workflows.
-</Card>
-
-<Card title="Multistep Checks" href="/docs/detect/synthetic-monitoring/multistep-checks/creating-your-first-multistep-check">
-Test complex API workflows that complement your browser tests.
-</Card>
-
-<Card title="Private Locations" href="/docs/detect/private-locations/overview">
-Monitor internal applications with private browser automation.
-</Card>
-
-<Card title="CLI Integration" href="/cli/overview">
-Manage browser checks as code with version control and CI/CD.
-</Card>
-</CardGroup>

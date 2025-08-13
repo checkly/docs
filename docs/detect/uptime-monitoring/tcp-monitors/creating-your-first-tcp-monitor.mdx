@@ -4,207 +4,123 @@ description: 'Step-by-step guide to set up your first TCP monitor and ensure you
 sidebarTitle: 'Creating Your First Monitor'
 ---
 
-
-
 This guide walks you through creating your first TCP monitor to check the availability of your network services, databases, or any TCP-based application.
 
-<Note>
-You'll need a service running on a specific TCP port. If you don't have one ready, you can use a public service like a mail server or database for testing.
-</Note>
+<Tabs>
+<Tab title="Create from UI">
 
-## Step-by-Step Setup
+TCP monitors verify the availability of non-HTTP services by establishing a connection to a specific host and port.
 
-<Steps>
-<Step title="Navigate to Monitors">
-1. Log into your Checkly dashboard
-2. Go to **Monitors** in the main navigation
-3. Click **Create Monitor** and select **TCP Monitor**
+### Basic Setup
 
-![Navigate to create TCP monitor](/images/docs/images/tcp-monitors/create-tcp-monitor-nav.png)
-</Step>
+Configure your TCP monitor by specifying the target service:
 
-<Step title="Configure Basic Settings">
-Enter the essential details for your TCP monitor:
+<Frame>
+  <img src="/images/tcp-request.png" alt="TCP monitor setup interface showing hostname, port, and protocol selection" />
+</Frame>
 
-**Monitor Name**: Give your monitor a descriptive name
-```
-Production MySQL Database
-```
+* **Hostname:** The server you want to monitor (e.g. `db.example.com`)
+* **Port:** The TCP port your service is listening on (e.g. `3306` for MySQL)
+* **IP family:** Defaults to IPv4
 
-**Host/IP Address**: The server you want to monitor
-```
-db.myapp.com
-```
+### Assertions
 
-**Port**: The TCP port your service is listening on
-```
-3306
-```
+Configure connection timeouts and data transmission assertions:
 
-**Protocol**: Choose the appropriate protocol
-- **TCP**: Standard TCP connection
-- **SSL/TLS**: Encrypted connection
-- **Custom**: For specific protocol requirements
+<Frame>
+  <img src="/images/tcp-assertion.png" alt="TCP monitor connection options showing timeout settings and data fields" />
+</Frame>
 
-![Basic TCP monitor configuration](/images/docs/images/tcp-monitors/tcp-monitor-basic-config.png)
-</Step>
+* **Connection timeout:** Maximum time to wait for connection (default: 10 seconds)
+* **Read timeout:** Time to wait for response after connection (default: 10 seconds)
+* **Data to send:** Optional data to transmit after establishing connection
 
-<Step title="Set Connection Options">
-Configure how the monitor connects to your service:
+### Response Validation
 
-**Connection Timeout**: Maximum time to wait for connection (default: 10 seconds)
-```
-15 seconds
-```
+Validate the service response for more precise monitoring:
 
-**Read Timeout**: Time to wait for response after connection (default: 10 seconds)
-```
-10 seconds
-```
+<Frame>
+  <img src="/images/tcp-response.png" alt="TCP monitor assertions interface showing response validation options" />
+</Frame>
 
-<Tip>
-Set timeouts slightly higher than your service's typical response time to avoid false alerts.
-</Tip>
-</Step>
+* **Response data:** Expected text pattern in the response
+* **Response time limits:** Define performance thresholds for degraded or failed states
 
-<Step title="Configure Response Validation (Optional)">
-For more precise monitoring, validate the service response:
+### Frequency
 
-**Expected Response**: Text pattern that should appear in the response
-```
-MySQL Server
-```
+Set how often the monitor runs (every 10 seconds to 24 hours):
 
-**Connection String**: Data to send after establishing connection
-```
-PING\n
-```
+<Frame>
+  <img src="/images/tcp-frequency.png" alt="TCP monitor frequency selection interface" />
+</Frame>
 
-<Warning>
-Be careful with connection strings - some services may close connections after receiving unexpected data.
-</Warning>
+### Scheduling & Locations
 
-![TCP monitor response validation settings](/images/docs/images/tcp-monitors/tcp-monitor-response-config.png)
-</Step>
+<Frame>
+  <img src="/images/tcp-scheduling-strategy.png" alt="TCP monitor scheduling strategy and location selection interface" />
+</Frame>
 
-<Step title="Choose Monitoring Locations">
-Select where to run your TCP monitor from:
+* **Strategy:** Choose between round-robin or parallel execution. Learn more about [scheduling strategies](/docs/monitoring/global-locations#scheduling-strategies)
+* **Locations:** Select one or more [public](/docs/monitoring/global-locations/) or [private](/docs/private-locations/) locations to run the monitor from
 
-1. **Global Locations**: Monitor from multiple continents
-2. **Regional Focus**: Choose locations near your users
-3. **Private Locations**: Use your own monitoring infrastructure
+### Additional Settings
 
-**Recommended setup**: Start with 3-5 locations spread across different regions.
+* **Name:** Give your monitor a clear name to identify it in dashboards and alerts
+* **Tags:** Use tags to organize monitors across dashboards and [maintenance windows](/docs/maintenance-windows/)
+* **Retries:** Define how failed runs should be retried. See [retry strategies](/docs/alerting-and-retries/retries/)
+* **Alerting:** Configure your [alert settings](/docs/alerting-and-retries/alert-settings/), [alert channels](/docs/alerting-and-retries/alert-channels/), or set up [webhooks](/docs/alerting-and-retries/webhooks/) for custom integrations
 
-![Select monitoring locations](/images/docs/images/tcp-monitors/tcp-monitor-locations.png)
-</Step>
+</Tab>
+<Tab title="Create from Code">
 
-<Step title="Set Monitoring Frequency">
-Choose how often to check your service:
+With the [Checkly CLI](/cli/overview), you can define TCP monitors in TypeScript or JavaScript and manage them as code. See [CLI configuration](/docs/detect/uptime-monitoring/cli-configuration) for comprehensive examples and advanced patterns.
 
-- **Every minute**: For critical services requiring immediate detection
-- **Every 5 minutes**: Good balance for most production services  
-- **Every 15 minutes**: For stable services with less critical requirements
-- **Custom interval**: Set specific timing needs
+<Tabs>
+<Tab title="TypeScript">
 
-```
-Every 5 minutes
-```
-</Step>
+```ts {title="hello-tcp.check.ts"}
+import { TcpMonitor, TcpAssertionBuilder } from 'checkly/constructs'
 
-<Step title="Configure SSL/TLS (If Applicable)">
-For encrypted connections, enable SSL/TLS monitoring:
-
-**SSL Certificate Validation**: Check certificate validity and expiration
-- ✅ Verify certificate chain
-- ✅ Check expiration date (alert 30 days before)
-- ✅ Validate hostname matching
-
-**SSL Protocols**: Choose minimum required version
-```
-TLS 1.2 or higher
+new TcpMonitor('hello-tcp-1', {
+  name: 'Hello TCP',
+  activated: true,
+  request: {
+    hostname: 'tcpbin.com',
+    port: 4242,
+    data: 'ping\n',
+    assertions: [
+      TcpAssertionBuilder.responseData().contains('ping')
+    ]
+  }
+})
 ```
 
-![SSL/TLS configuration for TCP monitors](/images/docs/images/tcp-monitors/tcp-monitor-ssl-config.png)
-</Step>
+</Tab>
+<Tab title="JavaScript">
 
-<Step title="Set Up Alerting">
-Configure when and how you'll be notified of issues:
+```js {title="hello-tcp.check.js"}
+const { TcpMonitor, TcpAssertionBuilder } = require('checkly/constructs')
 
-**Alert Conditions**:
-- ✅ Connection failure
-- ✅ Timeout exceeded  
-- ✅ Response validation failed
-- ✅ SSL certificate issues
-
-**Alert Channels**: Choose your notification methods
-- Email alerts
-- Slack notifications  
-- Webhook integrations
-- SMS alerts (premium feature)
-
-![TCP monitor alerting configuration](/images/docs/images/tcp-monitors/tcp-monitor-alerts.png)
-</Step>
-
-<Step title="Test and Save">
-Before saving, test your monitor configuration:
-
-1. Click **Test Monitor** to run a test check
-2. Review the test results for any issues
-3. Adjust configuration if needed
-4. Click **Create Monitor** to save
-
-The test will show:
-- ✅ Connection successful
-- ✅ Response time: 45ms
-- ✅ Response validation passed
-- ✅ SSL certificate valid (if applicable)
-</Step>
-</Steps>
-
-## Common Configuration Examples
-
-### Database Server (MySQL)
-```yaml
-Name: Production MySQL
-Host: db.production.com
-Port: 3306
-Protocol: TCP
-Connection Timeout: 15s
-Expected Response: (leave empty for basic connectivity)
+new TcpMonitor('hello-tcp-1', {
+  name: 'Hello TCP',
+  activated: true,
+  request: {
+    hostname: 'tcpbin.com',
+    port: 4242,
+    data: 'ping\n',
+    assertions: [
+      TcpAssertionBuilder.responseData().contains('ping')
+    ]
+  }
+})
 ```
 
-### SMTP Mail Server
-```yaml
-Name: Mail Server SMTP
-Host: mail.company.com  
-Port: 587
-Protocol: SSL/TLS
-Connection Timeout: 10s
-Expected Response: "220"
-```
+</Tab>
+</Tabs>
 
-### Redis Cache Server
-```yaml
-Name: Redis Cache
-Host: redis.internal.com
-Port: 6379
-Protocol: TCP
-Connection String: "PING\r\n"
-Expected Response: "+PONG"
-```
-
-### SSH Server
-```yaml
-Name: Production SSH
-Host: server.example.com
-Port: 22
-Protocol: TCP
-Expected Response: "SSH-2.0"
-```
-
-
+</Tab>
+</Tabs>
 
 <Note>
-TCP monitors provide network-level connectivity verification. For application-level monitoring, consider adding HTTP/API checks and synthetic monitoring to your monitoring strategy.
+TCP monitors provide network-level connectivity verification. For application-level monitoring, consider adding [synthetic monitoring](/docs/detect/synthetic-monitoring/overview) to your monitoring strategy.
 </Note>

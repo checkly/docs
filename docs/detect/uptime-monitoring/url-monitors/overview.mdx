@@ -9,154 +9,45 @@ sidebarTitle: Overview
 
 URL monitors track the availability of your HTTP-based services by sending requests to specified URLs and validating responses, performance, and content.
 
-
-
-<Accordion title="Typical Use Cases Include">
+**Typical Use Cases Include:**
 
 * Ensuring your marketing site returns a 200 OK
 * Verifying your documentation site loads quickly
 * Checking that your SSL certificate is still valid
 * Confirming that a public pricing endpoint is reachable for customers
 
-</Accordion>
+## How URL Monitors Work
 
-## Configuration Options
+URL monitors send HTTP requests to specified URLs and validate availability and performance. They can be configured to check for specific status codes and response times while running from multiple global locations.
 
-### Basic Setup
-
-Monitor any URL by specifying the endpoint you want to track. You can configure the HTTP method, add request headers, and set SSL/redirect options:
-
-<Frame>
-  <img src="/images/url-monitor-entry.png" alt="URL monitor setup interface showing HTTP method selection, URL input field, and options for Skip SSL and Follow redirects" />
-</Frame>
-
-### Assertions
-
-Use assertions to validate the status code of your URL request. When one or more assertions fail, an alert is triggered:
-
-<Frame>
-  <img src="/images/url-monitor-assertions.png" alt="URL monitor assertions interface showing status code configuration" />
-</Frame>
-
-**Status Code**
-Verify your endpoint returns the expected HTTP status code using the comparison dropdown. Choose from equals, not equals, greater than, or less than.
+<Steps>
+<Step title="Enter your URL">
+Enter the URL you want to monitor.
+</Step>
 
 
-### Response Time Limits
+<Step title="Configure Response Times and Status Codes">
+Configure the response times and status codes you want to check for.
+</Step>
 
-Set performance thresholds to ensure your application meets speed requirements:
+<Step title="Select your locations">
+Select the locations you want to run the monitor from.
+</Step>
 
-<Frame>
-  <img src="/images/url-monitor-response-times.png" alt="URL monitor response time limits interface showing degraded and failed thresholds" />
-</Frame>
 
-**Degraded After**: Time threshold (in milliseconds) after which the check is marked as degraded but not failed. Use for performance warnings without triggering failure alerts.
+<Step title="Configure your alerting">
+Configure your alerting to send you an alert when the monitor fails.
+</Step>
 
-**Failed After**: Time threshold after which the check fails completely. Use for hard performance limits where slow responses should trigger alerts.
+<Step title="Schedule your monitor">
+Schedule your monitor to run at the frequency you want.
+</Step>
 
-### Frequency
 
-Determine how often your monitors run. Unlike Synthetic Monitors, URL Monitors do not consume "Checks" and can run at any frequency available to your plan:
+</Steps>
 
-<Frame>
-  <img src="/images/url-monitor-frequency.png" alt="URL monitor frequency selection interface showing available check intervals" />
-</Frame>
 
-Choose a frequency that balances monitoring coverage with resource usage. Higher frequencies provide faster detection but may not be necessary for all services.
 
-### Scheduling Strategy
-
-Choose when and how your checks run across multiple locations:
-
-<Frame>
-  <img src="/images/url-monitor-scheduling.png" alt="URL monitor scheduling strategy interface showing round robin vs fixed schedule options" />
-</Frame>
-
-**Round Robin** (Default): Checks run from one random location each interval. Most cost-effective option for general availability monitoring.
-
-**Fixed Schedule**: Checks run from all selected locations simultaneously. Higher consumption but provides immediate global visibility for critical services.
-
-### Locations
-
-Select from Checkly's global monitoring locations to test your URLs from different regions:
-
-<Frame>
-  <img src="/images/url-monitor-locations.png" alt="URL monitor locations selection interface showing global monitoring locations" />
-</Frame>
-
-Choose 2-3 locations that best represent your user base for optimal monitoring coverage. 
-
-See [Locations](/docs/introduction/concepts/locations) for the complete list of available regions and guidance on location selection.
-
-<Info>
-**Private Locations**: Run checks from your own infrastructure to monitor internal applications, check services behind firewalls, or maintain data residency compliance. [Set up Private Locations →](/docs/detect/private-locations/overview)
-</Info>
-
-### Retries
-
-Select the retry strategy to determine how failed checks are retried:
-
-<Frame>
-  <img src="/images/url-monitor-retries.png" alt="URL monitor retries interface showing retry strategy options" />
-</Frame>
-
-| Strategy | Description |
-|----------|-------------|
-| **None** | No retries - fail immediately on first failure for fastest detection |
-| **Fixed** | Retry a specific number of times with consistent intervals between attempts |
-| **Linear** | Increase retry delay linearly with each attempt to avoid overwhelming failed services |
-| **Exponential** | Double the retry delay with each attempt for maximum protection against service overload |
-
-### Alert Settings
-
-Configure notifications for your team:
-
-<Frame>
-  <img src="/images/url-monitor-alert.png" alt="URL monitor alert settings interface showing notification configuration options" />
-</Frame>
-
-#### Notification Scope
-
-Choose how alerts are configured for this monitor:
-
-| Option | Description |
-|--------|-------------|
-| **Use global account notification settings** | Inherit notification preferences from Global Notification Settings |
-| **Use specific notification settings** | Configure alert behavior exclusively for this check |
-
-#### Escalation Rules
-
-Control when alerts are triggered:
-
-**Primary Trigger** (Choose one):
-- **When a check has failed X time(s)**: Sends alert after specified consecutive failures
-- **When a check is failing for more than Y minutes**: Sends alert if failure duration exceeds threshold
-
-**Additional Condition** (Optional):
-- **When a check is failing in Z% of locations**: Only applies to checks running in parallel across multiple locations
-
-#### Reminders
-
-Configure follow-up alerts after initial failure notification:
-
-| Setting | Description |
-|---------|-------------|
-| **Maximum reminders** | Number of follow-up alerts (0 = no reminders) |
-| **Reminder interval** | Time between reminders (only if maximum reminders > 0) |
-
-#### Alert Channels
-
-Define where notifications are sent when checks fail or recover. Additional channels can be configured in global notification settings.
-
-**Alert Types** (per channel):
-- ✅ **Success/Recovery**: Check has recovered from failure
-- ⚠ **Warning**: Check is degraded but not failed  
-- ❌ **Failure**: Check has failed
-- 🔒 **Locked/Restricted**: Channel access limited
-
-<Note>
-**Global Alert Settings**: By default, monitors inherit your account's notification preferences. Select "Use specific notification settings" to customize alerts for individual monitors.
-</Note>
 
 ## Best Practices
 

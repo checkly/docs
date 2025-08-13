@@ -9,11 +9,30 @@ sidebarTitle: Test Structure
 **Monitoring as Code**: Learn more about the [Multistep Check Construct](/constructs/multistep-check).
 </Tip>
 
-## Multistep Check Test Structure
+## Multistep Check Structure
+
+
+```ts multistep-check.ts
+import { MultiStepCheck, Frequency } from 'checkly/constructs'
+import * as path from 'path'
+
+new MultiStepCheck('multistep-check-1', {
+  name: 'Multistep Check #1',
+  runtimeId: '2025.04',
+  frequency: Frequency.EVERY_10M,
+  locations: ['us-east-1', 'eu-west-1'],
+  code: {
+    entrypoint: path.join(__dirname, 'onboarding.spec.ts')
+  }
+})
+```
+
+
+## Test Script
 
 Multistep checks use Playwright's `test.step()` function to organize sequential operations:
 
-```typescript
+```typescript onboarding.spec.ts
 import { test, expect } from '@playwright/test'
 
 test('Complete user onboarding workflow', async ({ request }) => {

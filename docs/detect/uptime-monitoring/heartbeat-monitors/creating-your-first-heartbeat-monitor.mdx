@@ -45,23 +45,7 @@ The **grace period** provides extra time before alerting, compensating for natur
 - **Weekly report on Fridays** with 4-hour grace → Alert if no ping by end of Friday
 - **Hourly sync job** with 5-minute grace → Alert if ping is more than 5 minutes late
 
-**How to choose the right grace period:**
 
-<CardGroup cols={2}>
-<Card title="Consider Your Job Variance" icon="clock">
-- How much does your job's runtime vary?
-- Account for network delays and system load
-- Include time for any retry logic
-</Card>
-
-<Card title="Balance Speed vs. False Alerts" icon="alert">
-- Too short: False alerts during normal delays
-- Too long: Slower failure detection
-- Start conservative, adjust based on experience
-</Card>
-</CardGroup>
-
-<AccordionGroup>
 <Accordion title="Understanding Grace Periods">
 Grace periods compensate for natural variance in job execution times. For example:
 
@@ -87,7 +71,21 @@ This means if your job is supposed to run every 6 hours but runs late at hour 7,
 
 ![Understanding how grace periods and timing work in heartbeat monitoring](/images/heartbeat-monitors/heartbeats-grace.jpg)
 </Accordion>
-</AccordionGroup>
+
+<Accordion title="How to Choose the Right Grace Period">
+
+**Consider Your Job Variance**
+- How much does your job's runtime vary?
+- Account for network delays and system load
+- Include time for any retry logic
+
+
+**Balance Speed vs. False Alerts**
+- Too short: False alerts during normal delays
+- Too long: Slower failure detection
+- Start conservative, adjust based on experience
+
+</Accordion>
 
 ## Step 3: Alert Configuration
 

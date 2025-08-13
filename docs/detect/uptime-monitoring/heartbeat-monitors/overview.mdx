@@ -38,103 +38,90 @@ The heartbeat monitoring process is straightforward. Once created, your heartbea
 Always add the heartbeat ping at the very end of your task, after all critical operations have completed successfully. This ensures you only get "success" pings when your job actually finished.
 </Tip>
 
-## Construct
+##s Grace Period
 
-### Heartbeat Example
+The **grace period** provides extra time before alerting, compensating for natural variance in job execution times:
 
-Here's how you'd monitor a backup script:
-
-```bash
-#!/bin/bash
-# backup.sh
-
-# Run your backup process
-pg_dump mydb > backup.sql
-aws s3 cp backup.sql s3://my-backup-bucket/
-
-# Only ping if backup succeeded
-curl -m 5 --retry 3 https://ping.checklyhq.com/your-heartbeat-id
-```
-
-### Request Configuration
-
-When creating heartbeat monitors, you can configure timing parameters to match your task's schedule:
-
-| Parameter | Type | Required | Range | Description |
-|-----------|------|----------|-------|-------------|
-| `period` | `number` | ✅ | 30 seconds - 365 days | The expected period of time between each ping |
-| `periodUnit` | `string` | ✅ | `'seconds'` \| `'minutes'` \| `'hours'` \| `'days'` | The unit of time for the period |
-| `grace` | `number` | ✅ | 0 seconds - 365 days | The grace period to wait for before sending an alert |
-| `graceUnit` | `string` | ✅ | `'seconds'` \| `'minutes'` \| `'hours'` \| `'days'` | The unit of time for the grace period |
-
-<Warning>
-The grace period starts counting after the expected period expires. For example, with a 1-hour period and 5-minute grace, alerts trigger if no ping is received within 65 minutes of the last ping. Set grace periods carefully. Too short and you’ll get false alarms from normal execution variance. Too long and you’ll miss actual failures.
-</Warning>
+**Common grace period examples:**
+- **Daily backup at 2 AM** with 30-minute grace → Alert if no ping by 2:30 AM
+- **Weekly report on Fridays** with 4-hour grace → Alert if no ping by end of Friday
+- **Hourly sync job** with 5-minute grace → Alert if ping is more than 5 minutes late
 
 
-### Example Configurations
+<Accordion title="Understanding Grace Periods">
+Grace periods compensate for natural variance in job execution times. For example:
 
-<Tabs>
-  <Tab title="Daily Backup">
-    ```ts
-    // Daily backup job with 30 minute grace period
-    period: 1,
-    periodUnit: 'days',
-    grace: 30,
-    graceUnit: 'minutes'
-    ```
-  </Tab>
-  
-  <Tab title="Hourly Task">
-    ```ts
-    // Hourly process with 10 minute grace period
-    period: 1,
-    periodUnit: 'hours',
-    grace: 10,
-    graceUnit: 'minutes'
-    ```
-  </Tab>
-  
-  <Tab title="Weekly Report">
-    ```ts
-    // Weekly report with 2 hour grace period
-    period: 7,
-    periodUnit: 'days',
-    grace: 2,
-    graceUnit: 'hours'
-    ```
-  </Tab>
-</Tabs>
+- **Daily backup at 2 AM** with 30-minute grace → Alert if no ping by 2:30 AM
+- **Weekly report on Fridays** with 4-hour grace → Alert if no ping by end of Friday
+- **Hourly sync job** with 5-minute grace → Alert if ping is more than 5 minutes late
 
-## Locations
-Since heartbeat monitors start from your own infrastructure, there is no need to configure locations.
+Choose grace periods based on:
+- Normal variance in your job execution time
+- Acceptable delay before you need to know about failures
+- Time needed for any retries or recovery processes
+</Accordion>
+
+<Accordion title="Timer Behavior">
+The heartbeat timer works predictably:
+
+- **First ping starts the timer** - When you send the first ping, monitoring begins
+- **Each ping resets the timer** - Every successful ping resets the countdown
+- **Alerts also reset the timer** - After an alert fires, the timer restarts
+- **Deactivation resets everything** - Pausing and resuming a monitor restarts timing
+
+This means if your job is supposed to run every 6 hours but runs late at hour 7, the next ping will be expected at hour 13 (7 + 6), not hour 12.
+
+![Understanding how grace periods and timing work in heartbeat monitoring](/images/heartbeat-monitors/heartbeats-grace.jpg)
+</Accordion>
+
+<Accordion title="How to Choose the Right Grace Period">
+
+**Consider Your Job Variance**
+- How much does your job's runtime vary?
+- Account for network delays and system load
+- Include time for any retry logic
 
 
+**Balance Speed vs. False Alerts**
+- Too short: False alerts during normal delays
+- Too long: Slower failure detection
+- Start conservative, adjust based on experience
 
-
-
-
-
+</Accordion>
 
 ## Metrics
-
-Heartbeat monitors provide different metrics andinsights than other types of checks and monitors:
+Heartbeat monitors provide different metrics and insights than other types of checks and monitors:
 
 - **Ping History**: Timeline of when pings were received
 - **Missed Pings**: Gaps where expected pings didn't arrive
 - **Alert Timeline**: When alerts were triggered and resolved
 - **Source Tracking**: Which systems or processes sent pings
 
-Use this data to:
-- Identify patterns in job failures
-- Optimize grace periods based on actual variance
-- Track the reliability of different scheduled processes
-- Coordinate incident response when jobs fail
 
 <Warning>
 Remember: Heartbeat monitors detect when jobs fail to complete, but they can't tell you why a job failed. Combine heartbeat monitoring with application logging and error tracking for complete observability.
 </Warning>
 
+## Manual pings
+
+You can manually send pings via the Checkly UI. Use this to start the check timer when a check is first created or to silence alarms.
+
+![Manually send a ping via the Checkly UI on the check overview page](/images/docs/images/heartbeat-checks/heartbeat-ping-overview-page.png)
+
+"Ping now" is also available in the quick menu in your list of Heartbeat monitors. 
+
+![Manually send a ping via the Checkly UI in the quick menu](/images/docs/images/heartbeat-checks/heartbeat-ping-quick-menu.png)
+
+### How does the timer work?
+The check timer starts when it receives its first ping and will reset after each ping or triggered alert.
+
+If you have a check that expects a ping every 60 minutes starting at 09:30, and it receives a ping at 10:00, it will reset the timer to expect a ping before 11:00. If the check does not receive a ping before 11:00 plus the configured grace period, it will trigger any configured alerts.
+
+<Info>Every ping or triggered alert will reset the timer of the next expected heartbeat ping.</Info>
+
+![Explanation of timer resets. Every ping or alert resets the timer.](/images/docs/images/heartbeat-checks/heartbeats-grace.jpg)
+
+<Info>When a check is deactivated and activated again, the timer will start when the check is saved. This is also the case when changing the period of a check.</Info>
 
 ## Best Practices
 

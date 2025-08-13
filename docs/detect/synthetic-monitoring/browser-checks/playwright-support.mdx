@@ -110,9 +110,51 @@ We currently support the following configuration options. We will update this li
 </Tabs>
 
 
-> [!WARNING]
-> A check using [the Playwright Test Runner (`@playwright/test`)](https://playwright.dev/docs/intro) will currently run around 30-50% longer than [a regular Playwright check (`playwright`)](https://playwright.dev/docs/library). This is caused by the automatic creation of trace and video assets. We are aware of this and are investigating solutions. If this is significantly degrading the performance of your check, we recommend to divide longer tests into multiple checks.
+<Warning>
+A check using [the Playwright Test Runner (`@playwright/test`)](https://playwright.dev/docs/intro) will currently run around 30-50% longer than [a regular Playwright check (`playwright`)](https://playwright.dev/docs/library). This is caused by the automatic creation of trace and video assets. We are aware of this and are investigating solutions. If this is significantly degrading the performance of your check, we recommend to divide longer tests into multiple checks.
+</Warning>
 
+## Hooks
+Playwright Test Runner offers hook functions such as `test.afterEach()` and `test.beforeEach()` that run before or after individual test cases or `test.afterAll()` and `test.beforeAll()` that run before or after all tests have started/finished.
+
+You can find more information on available methods in the [official documentation](https://playwright.dev/docs/api/class-test).
+
+## Viewing trace files
+When a `@playwright/test` test case fails, Checkly will record and make its trace files available via the UI. You can download the trace files for manual inspection or view them directly with [trace.playwright.dev](https://trace.playwright.dev).
+
+Using the Playwright Trace Viewer you can effortlessly view your test, skip back and forth between actions, view snapshots and metadata, and more. This makes it very easy to inspect individual traces and debug failing tests.
+
+<video
+  controls
+  className="w-full aspect-video rounded-xl"
+  src="/images/docs/images/browser-checks/pwt_traces.mp4"
+></video>
+
+When running tests from the editor page, trace files are always available for download and preview,
+regardless of whether the check is passing or failing. For scheduled check runs traces are only preserved when the check failed.
+
+## Video recordings
+When a `@playwright/test` test case fails, Checkly will record a video for each page navigation and make it available in the UI. It is a great tool to get a first look of the actions and their outcome to quickly identify what failed, and to visualize regressions.
+
+Here's an example of a Playwright Test script that fails, and provides a video of the test sequence.
+
+<video
+  controls
+  className="w-full aspect-video rounded-xl"
+  src="/images/docs/images/browser-checks/pwt_videos.mp4"
+></video>
+
+When running tests from the editor page, video files are always available for download and preview, regardless of whether
+the check is passing or failing. For scheduled check runs videos are only preserved when the check failed.
+
+## PageObject Model (POM)
+
+If you are structuring your test codebase following the [PageObject pattern](https://martinfowler.com/bliki/PageObject.html), you can use the [Checkly CLI](/docs/cli) out of the box. Just make sure that:
+
+- the folder you initialize your CLI in when building your project sits above your test spec files and their dependencies
+- your `testMatch` is pointing to the path(s) where your test specs live
+
+To see one way this can look like, see our [example repository](https://github.com/checkly/checkly-sample-pom).
 
 ## Global configuration
 
@@ -207,7 +249,7 @@ module.exports = config;
   </Tab>
 </Tabs>
 
-## Checks with multiple test cases
+## Multi Test Checks
 One of the key benefits of using Playwright Test is that you can split your check into multiple independent test cases, and group them using the `test.describe` function. Your Checkly check will fail if **at least one** of the test cases fails.
 
 <Tabs>
@@ -244,3 +286,147 @@ test.describe('two tests', () => {
 </Tabs>
 
 <Note> An executed browser check that includes multiple Playwright test cases still counts as a single check run towards your pricing plan's defined limits.</Note>
+
+
+## Interactions & Navigations
+
+### Page Interactions
+```typescript
+// Navigation
+await page.goto('https://example.com')
+await page.goBack()
+await page.reload()
+
+// Element interactions
+await page.click('button[type="submit"]')
+await page.fill('input[name="email"]', 'test@example.com')
+await page.selectOption('select[name="country"]', 'US')
+await page.check('input[type="checkbox"]')
+
+// Keyboard and mouse actions
+await page.keyboard.press('Enter')
+await page.mouse.click(100, 200)
+await page.hover('.tooltip-trigger')
+
+// File operations
+await page.setInputFiles('input[type="file"]', './document.pdf')
+```
+
+### Element Selection Strategies
+```typescript
+// By test ID (recommended)
+await page.click('[data-testid="submit-button"]')
+
+// By text content
+await page.click('text=Submit Order')
+
+// By CSS selector
+await page.click('.btn-primary')
+
+// By XPath
+await page.click('//button[@class="submit-btn"]')
+
+// By role and name
+await page.click('role=button[name="Submit"]')
+```
+
+## Assertions and Validation
+
+### Page Content Assertions
+```typescript
+// Text content validation
+await expect(page.locator('.success-message')).toHaveText('Order confirmed')
+await expect(page).toHaveTitle('Dashboard - MyApp')
+
+// Element visibility
+await expect(page.locator('.loading-spinner')).toBeHidden()
+await expect(page.locator('.user-profile')).toBeVisible()
+
+// URL validation
+await expect(page).toHaveURL('https://app.example.com/dashboard')
+await expect(page).toHaveURL(/.*checkout\/success/)
+
+// Element attributes
+await expect(page.locator('input[name="email"]')).toHaveValue('user@example.com')
+await expect(page.locator('.status-badge')).toHaveClass('status-active')
+```
+
+### Custom Validation Logic
+```typescript
+// Complex assertions with custom logic
+const orderTotal = await page.locator('[data-testid="order-total"]').textContent()
+const expectedTotal = '$99.99'
+expect(orderTotal).toBe(expectedTotal)
+
+
+// Validate array of elements
+
+const productTitles = await page.locator('.product-title').allTextContents()
+expect(productTitles).toContain('Premium Plan')
+expect(productTitles).toHaveLength(3)
+
+```
+## Advanced Features
+
+### Screenshots and Visual Testing
+
+Browser checks can take screenshots of the page and compare them to a baseline. This is useful for visual regression testing.
+
+```typescript
+// Full page screenshot
+await page.screenshot({ path: 'dashboard.png', fullPage: true })
+
+// Element screenshot
+await page.locator('.product-card').screenshot({ path: 'product.png' })
+
+// Visual comparison (with setup)
+await expect(page).toHaveScreenshot('homepage.png')
+```
+
+### Mobile Device Simulation
+```typescript
+// Test responsive design
+test('Mobile checkout workflow', async ({ page }) => {
+  // Simulate iPhone 12
+  await page.setViewportSize({ width: 390, height: 844 })
+  
+  // Test mobile-specific interactions
+  await page.goto('https://shop.example.com')
+  await page.click('[data-testid="mobile-menu-toggle"]')
+  await expect(page.locator('.mobile-nav')).toBeVisible()
+})
+```
+
+### Multi-Tab and Context Handling
+```typescript
+// Handle multiple tabs
+const [newPage] = await Promise.all([
+  context.waitForEvent('page'),
+  page.click('a[target="_blank"]')
+])
+
+await newPage.waitForLoadState()
+await expect(newPage).toHaveTitle('External Service')
+```
+
+### Authentication and Session Management
+```typescript
+// Login once and reuse session
+test('Setup authentication', async ({ page }) => {
+  await page.goto('https://app.example.com/login')
+  await page.fill('[name="email"]', process.env.TEST_EMAIL)
+  await page.fill('[name="password"]', process.env.TEST_PASSWORD)
+  await page.click('[type="submit"]')
+  
+  // Save authentication state
+  await page.context().storageState({ path: 'auth-state.json' })
+})
+
+// Use saved authentication
+test.use({ storageState: 'auth-state.json' })
+test('Authenticated user workflow', async ({ page }) => {
+  // User is already logged in
+  await page.goto('https://app.example.com/dashboard')
+  await expect(page.locator('.welcome-message')).toBeVisible()
+})
+```

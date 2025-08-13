@@ -8,6 +8,10 @@ sidebarTitle: 'Overview'
 **Monitoring as Code**: Learn more about the [Browser Check Construct](/constructs/browser-check).
 </Tip>
 
+<Frame>
+  <img src="/images/browser-check-ide.png" alt="Browser check overview" />
+</Frame>
+
 ## What are Browser Checks?
 
 Browser checks are automated tests that use real browsers to interact with your web applications. They simulate user journeys like logging in, filling forms, making purchases, or navigating through complex workflows, ensuring your critical user paths work correctly.
@@ -49,14 +53,39 @@ Checkly uses Playwright to power your Browser checks. [Playwright](https://playw
 4. **Assertions** - Validates page content, elements, and user experience
 5. **Performance Monitoring** - Captures Core Web Vitals and timing metrics
 6. **Results Collection** - Records screenshots, videos, and detailed logs
-7. ** Alerts** - Triggers alerts if any of the assertions fail
+7. **Alerts** - Triggers alerts if any of the assertions fail
 
 
-## Test Structure
+## Check Structure
 
-Browser checks use Playwright's test framework with a familiar structure:
+<Tabs>
+<Tab title="Structure in the Checkly UI">
+<Frame>
+  <img src="/images/browser-check-settings.png" alt="Browser check dashboard" />
+</Frame>
 
-```typescript
+Create your Playwright test file in the Checkly IDE, then configure the check settings in the Checkly UI.
+</Tab>
+<Tab title="Structure in Code">
+Browser checks use Playwright's test framework with a familiar structure. 
+
+It works by connecting constructs to handle the configuration of your Browser Check, and then referencing the test file in your repository.
+
+```ts browser-check.ts
+import { BrowserCheck, Frequency } from 'checkly/constructs'
+import * as path from 'path'
+
+new BrowserCheck('browser-check-1', {
+  name: 'Browser check #1',
+  frequency: Frequency.EVERY_10M,
+  locations: ['us-east-1', 'eu-west-1'],
+  code: {
+    entrypoint: path.join(__dirname, 'home.spec.js')
+  }
+})
+```
+
+```typescript home.spec.ts
 import { test, expect } from '@playwright/test'
 
 test('User login workflow', async ({ page }) => {
@@ -75,68 +104,9 @@ test('User login workflow', async ({ page }) => {
   await expect(page).toHaveURL(/.*dashboard/)
 })
 ```
+</Tab>
 
-## Metrics
-
-### Execution Details
-- **Step-by-step logs**: Detailed trace of every action
-- **Screenshots**: Visual documentation of each key step
-- **Performance timing**: Page load and interaction speeds
-- **Console logs**: JavaScript errors and warnings
-- **Network activity**: API calls and resource loading
-
-### Performance Metrics
-- **Core Web Vitals**: LCP, FID, CLS measurements
-- **Custom timing**: Application-specific performance markers
-- **Resource loading**: Images, scripts, and stylesheets
-- **Third-party services**: External dependencies and integrations
-
-### Error Analysis
-- **Assertion failures**: Which validations failed and why
-- **Element location issues**: Selector problems and solutions
-- **Network errors**: Failed API calls or resource loading
-- **JavaScript errors**: Client-side exceptions and warnings
-
-
-## Locations
-
-Run browser checks from multiple global locations:
-
-| Region | Locations |
-|--------|-----------|
-| **North America** | US East, US West, Canada Central |
-| **Europe** | Ireland, Frankfurt, London, Stockholm |
-| **Asia Pacific** | Singapore, Tokyo, Sydney, Mumbai |
-| **Private Locations** | Your own infrastructure |
-
-## Scheduling Options
-
-| Frequency | Use Case |
-|-----------|----------|
-| **Every 1 minute** | Critical user workflows |
-| **Every 5 minutes** | Standard monitoring frequency |
-| **Every 15 minutes** | Non-critical workflows |
-| **Custom schedules** | Specific timing requirements |
-
-
-## Getting Started
-
-Ready to monitor your user workflows? Create your first browser check and ensure your critical user journeys work flawlessly.
-
-<CardGroup cols={2}>
-<Card title="Creating Your First Browser Check" href="/docs/detect/synthetic-monitoring/browser-checks/creating-a-browser-check">
-Step-by-step guide to set up browser monitoring
-</Card>
-
-<Card title="Browser Check Examples" href="/docs/detect/synthetic-monitoring/browser-checks/examples">
-Explore real-world examples and implementation patterns
-</Card>
-
-<Card title="Browser Check Best Practices" href="/docs/detect/synthetic-monitoring/browser-checks/best-practices">
-Learn optimization strategies and reliable test patterns
-</Card>
-
-<Card title="Playwright Documentation" href="https://playwright.dev/docs">
-Complete Playwright API reference and guides
-</Card>
-</CardGroup>
+</Tabs>
+<Info>
+To learn more about Playwright, see the our [Playwright documentation](/learn/playwright).
+</Info>

@@ -10,7 +10,7 @@ sidebarTitle: Overview
 
 TCP monitors perform low-level connectivity checks by establishing TCP connections to your services. They verify that your services are listening on the expected ports and can accept connections, making them essential for monitoring infrastructure components and backend services.
 
-![TCP monitor interface showing connection status](/images/docs/images/tcp-monitors/tcp-monitor-overview.png)
+![TCP monitor interface showing connection status](/images/docs/images/tcp-monitors/tcp-check-overview.png)
 
 **TCP Monitors are perfect for detecting downtime and performance issues in:**
 - Database servers (MySQL, PostgreSQL, MongoDB)
@@ -47,34 +47,9 @@ For services using SSL/TLS, TCP monitors automatically check:
 Certificate monitoring is only available when using SSL/TLS protocol options.
 </Warning>
 
-## Locations
-
-TCP monitors can run from multiple global locations to ensure your services are accessible worldwide. See [monitoring locations](/docs/detect/uptime-monitoring/locations) for detailed configuration guidance:
-
-
-## Metrics
-
-TCP monitors track several timing metrics. Once your TCP monitor is running, you'll see:
-
-
-- **Connection Time**: Time to establish the TCP connection
-- **First Byte Time**: Time to receive first response byte
-- **Total Response Time**: Complete request/response cycle
-- **DNS Resolution Time**: Time to resolve the hostname
-- **SSL Handshake Time**: Certificate validation time (if applicable)
-
-
-## Alerting 
-
-Configure alerts for various metric conditions. See [alerting configuration](/docs/detect/uptime-monitoring/alerting) for comprehensive setup guidance:
-- **Connection Failures**: When the service doesn't accept connections
-- **Timeout Exceeded**: When responses take too long
-- **Response Validation**: When expected responses don't match
-- **Certificate Issues**: When SSL certificates are invalid or expiring
-
-
 
 ## Best Practices
+
 
 ### Configuration
 - Use descriptive monitor names that identify the service and environment
@@ -96,7 +71,6 @@ Configure alerts for various metric conditions. See [alerting configuration](/do
 
 ## Troubleshooting Common Issues
 
-<AccordionGroup>
 <Accordion title="Connection Refused">
 **Symptom**: Monitor shows "Connection refused" errors
 **Causes**:
@@ -138,8 +112,6 @@ Configure alerts for various metric conditions. See [alerting configuration](/do
 3. Update certificates before expiration
 
 </Accordion>
-
-</AccordionGroup>
 
 
 

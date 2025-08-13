@@ -14,183 +14,183 @@ This guide will walk you through creating your first browser check with Checkly.
 
 Get started with Checkly using the CLI and code-first approach. You'll learn how to set up monitoring for a web application, configure alerts, and deploy your checks to run continuously.
 
-<Accordion title="Prerequisites">
-- Node.js 16+ installed
-- A Checkly account (sign up at [checklyhq.com](https://checklyhq.com))
-</Accordion>
+  <Accordion title="Prerequisites">
+  - Node.js 16+ installed
+  - A Checkly account (sign up at [checklyhq.com](https://checklyhq.com))
+  </Accordion>
 
-<Steps>
-<Step title="Install and Setup">
-Create a new Checkly project using our CLI:
+  <Steps>
+  <Step title="Install and Setup">
+  Create a new Checkly project using our CLI:
 
-<CliProjectInit/>
+  <CliProjectInit/>
 
-```bash Terminal
-cd my-checkly-project
-```
+  ```bash Terminal
+  cd my-checkly-project
+  ```
 
-This creates a project with example checks and all necessary configuration files.
+  This creates a project with example checks and all necessary configuration files.
 
-Login to your Checkly account:
+  Login to your Checkly account:
 
-<CliAuth/>
-</Step>
+  <CliAuth/>
+  </Step>
 
-<Step title="Create Your First Browser Check">
-Let's create a browser check that monitors a login flow. Create a new file `src/login-check.spec.ts`:
+  <Step title="Create Your First Browser Check">
+  Let's create a browser check that monitors a login flow. Create a new file `src/login-check.spec.ts`:
 
-```typescript
-import { test, expect } from '@playwright/test'
+  ```typescript
+  import { test, expect } from '@playwright/test'
 
-test('User can login successfully', async ({ page }) => {
-  // Navigate to login page
-  await page.goto('https://app.checklyhq.com/login')
-  
-  // Fill in login credentials
-  await page.getByLabel('Email address').fill('john@example.com')
-  await page.getByLabel('Password').fill('mypassword')
-  
-  // Submit the form
-  await page.getByRole('button', { name: 'Log In' }).click()
-  
-  // Verify successful login
-  await expect(page).toHaveURL(/.*dashboard/)
-  await expect(page.getByText('Welcome back')).toBeVisible()
-  
-  // Take a screenshot for verification
-  await page.screenshot({ path: 'dashboard.png', fullPage: true })
-})
-```
-</Step>
+  test('User can login successfully', async ({ page }) => {
+    // Navigate to login page
+    await page.goto('https://app.checklyhq.com/login')
+    
+    // Fill in login credentials
+    await page.getByLabel('Email address').fill('john@example.com')
+    await page.getByLabel('Password').fill('mypassword')
+    
+    // Submit the form
+    await page.getByRole('button', { name: 'Log In' }).click()
+    
+    // Verify successful login
+    await expect(page).toHaveURL(/.*dashboard/)
+    await expect(page.getByText('Welcome back')).toBeVisible()
+    
+    // Take a screenshot for verification
+    await page.screenshot({ path: 'dashboard.png', fullPage: true })
+  })
+  ```
+  </Step>
 
-<Step title="Configure Your Check">
-Update the check configuration in `checkly.config.ts`:
+  <Step title="Configure Your Check">
+  Update the check configuration in `checkly.config.ts`:
 
-```typescript
-import { ChecklyConfig } from 'checkly'
+  ```typescript
+  import { ChecklyConfig } from 'checkly'
 
-const config: ChecklyConfig = {
-  projectName: 'My Web App Monitoring',
-  logicalId: 'my-web-app',
-  repoUrl: 'https://github.com/your-org/your-repo',
-  checks: {
-    locations: ['us-east-1', 'eu-west-1'],
-    tags: ['login', 'critical'],
-    runtimeId: '2024.02',
-    browserChecks: {
-      frequency: 10, // Run every 10 minutes
-      testMatch: '**/login-check.spec.ts'
+  const config: ChecklyConfig = {
+    projectName: 'My Web App Monitoring',
+    logicalId: 'my-web-app',
+    repoUrl: 'https://github.com/your-org/your-repo',
+    checks: {
+      locations: ['us-east-1', 'eu-west-1'],
+      tags: ['login', 'critical'],
+      runtimeId: '2024.02',
+      browserChecks: {
+        frequency: 10, // Run every 10 minutes
+        testMatch: '**/login-check.spec.ts'
+      }
+    },
+    cli: {
+      runLocation: 'eu-west-1'
     }
-  },
-  cli: {
-    runLocation: 'eu-west-1'
   }
-}
 
-export default config
-```
-</Step>
+  export default config
+  ```
+  </Step>
 
-<Step title="Add Environment Variables">
-For sensitive data like credentials, use environment variables. Create a `.env` file:
+  <Step title="Add Environment Variables">
+  For sensitive data like credentials, use environment variables. Create a `.env` file:
 
-```bash
-LOGIN_EMAIL=john@example.com
-LOGIN_PASSWORD=mypassword
-```
+  ```bash
+  LOGIN_EMAIL=john@example.com
+  LOGIN_PASSWORD=mypassword
+  ```
 
-Update your test to use these variables:
+  Update your test to use these variables:
 
-```typescript
-test('User can login successfully', async ({ page }) => {
-  await page.goto('https://app.checklyhq.com/login')
-  
-  await page.getByLabel('Email address').fill(process.env.LOGIN_EMAIL!)
-  await page.getByLabel('Password').fill(process.env.LOGIN_PASSWORD!)
-  
-  await page.getByRole('button', { name: 'Log In' }).click()
-  await expect(page).toHaveURL(/.*dashboard/)
-})
-```
-</Step>
+  ```typescript
+  test('User can login successfully', async ({ page }) => {
+    await page.goto('https://app.checklyhq.com/login')
+    
+    await page.getByLabel('Email address').fill(process.env.LOGIN_EMAIL!)
+    await page.getByLabel('Password').fill(process.env.LOGIN_PASSWORD!)
+    
+    await page.getByRole('button', { name: 'Log In' }).click()
+    await expect(page).toHaveURL(/.*dashboard/)
+  })
+  ```
+  </Step>
 
-<Step title="Configure Alerts">
-Add alert channels to get notified when checks fail. Update your `checkly.config.ts`:
+  <Step title="Configure Alerts">
+  Add alert channels to get notified when checks fail. Update your `checkly.config.ts`:
 
-```typescript
-import { EmailAlertChannel, SlackAlertChannel } from 'checkly'
+  ```typescript
+  import { EmailAlertChannel, SlackAlertChannel } from 'checkly'
 
-// Create alert channels
-const emailChannel = new EmailAlertChannel('email-alerts', {
-  address: 'alerts@yourcompany.com'
-})
+  // Create alert channels
+  const emailChannel = new EmailAlertChannel('email-alerts', {
+    address: 'alerts@yourcompany.com'
+  })
 
-const slackChannel = new SlackAlertChannel('slack-alerts', {
-  url: process.env.SLACK_WEBHOOK_URL!,
-  channel: '#monitoring'
-})
+  const slackChannel = new SlackAlertChannel('slack-alerts', {
+    url: process.env.SLACK_WEBHOOK_URL!,
+    channel: '#monitoring'
+  })
 
-const config: ChecklyConfig = {
-  // ... previous config
-  alertChannels: [emailChannel, slackChannel],
-  checks: {
+  const config: ChecklyConfig = {
     // ... previous config
-    alertChannels: [emailChannel, slackChannel]
+    alertChannels: [emailChannel, slackChannel],
+    checks: {
+      // ... previous config
+      alertChannels: [emailChannel, slackChannel]
+    }
   }
-}
-```
-</Step>
+  ```
+  </Step>
 
-<Step title="Test Locally">
-Before deploying, test your check locally:
+  <Step title="Test Locally">
+  Before deploying, test your check locally:
 
-```bash Terminal
-npx checkly test
-```
+  ```bash Terminal
+  npx checkly test
+  ```
 
-This runs your browser check using Playwright and shows you exactly what will run in production.
-</Step>
+  This runs your browser check using Playwright and shows you exactly what will run in production.
+  </Step>
 
-<Step title="Deploy Your Checks">
-Deploy your checks to Checkly's global infrastructure:
+  <Step title="Deploy Your Checks">
+  Deploy your checks to Checkly's global infrastructure:
 
-```bash Terminal
-npx checkly deploy
-```
+  ```bash Terminal
+  npx checkly deploy
+  ```
 
-Your checks will now run automatically according to your schedule and alert you if anything fails.
-</Step>
+  Your checks will now run automatically according to your schedule and alert you if anything fails.
+  </Step>
 
-<Step title="Monitor and Iterate">
-Visit your Checkly dashboard to:
+  <Step title="Monitor and Iterate">
+  Visit your Checkly dashboard to:
 
-- View check results and performance metrics
-- Analyze screenshots and traces from failed checks
-- Configure additional alert channels
-- Set up status pages for your users
-</Step>
-</Steps>
+  - View check results and performance metrics
+  - Analyze screenshots and traces from failed checks
+  - Configure additional alert channels
+  - Set up status pages for your users
+  </Step>
+  </Steps>
 
-## Next Steps
+  ## Next Steps
 
-Now that you have your first browser check running, explore these advanced features:
+  Now that you have your first browser check running, explore these advanced features:
 
-- **API Checks**: Monitor your REST APIs and GraphQL endpoints
-- **Visual Regression Testing**: Catch UI changes automatically
-- **Private Locations**: Run checks from your own infrastructure
-- **CI/CD Integration**: Integrate checks into your deployment pipeline
-- **Rocky AI**: Get AI-powered insights into check failures
+  - **API Checks**: Monitor your REST APIs and GraphQL endpoints
+  - **Visual Regression Testing**: Catch UI changes automatically
+  - **Private Locations**: Run checks from your own infrastructure
+  - **CI/CD Integration**: Integrate checks into your deployment pipeline
+  - **Rocky AI**: Get AI-powered insights into check failures
 
-## Best Practices
+  ## Best Practices
 
-- **Start Simple**: Begin with basic page load and navigation tests
-- **Use Page Object Model**: Structure complex tests for maintainability
-- **Monitor Critical Paths**: Focus on user journeys that impact revenue
-- **Set Appropriate Frequencies**: Balance coverage with resource usage
-- **Use Environment Variables**: Keep sensitive data secure
-- **Tag Your Checks**: Organize monitoring by feature or team
+  - **Start Simple**: Begin with basic page load and navigation tests
+  - **Use Page Object Model**: Structure complex tests for maintainability
+  - **Monitor Critical Paths**: Focus on user journeys that impact revenue
+  - **Set Appropriate Frequencies**: Balance coverage with resource usage
+  - **Use Environment Variables**: Keep sensitive data secure
+  - **Tag Your Checks**: Organize monitoring by feature or team
 
-Congratulations! You've successfully set up automated browser monitoring with Checkly. Your application is now being continuously monitored from multiple global locations.
+  Congratulations! You've successfully set up automated browser monitoring with Checkly. Your application is now being continuously monitored from multiple global locations.
 
 </Tab>
 <Tab title="Starting in the UI">
@@ -202,36 +202,96 @@ Get started with Checkly using the web interface. This approach is perfect for g
 - The URL of a website you want to monitor
 </Accordion>
 
+
+
+
 <Steps>
-<Step title="Create Your First Check">
-1. **Log in** to your Checkly dashboard at [app.checklyhq.com](https://app.checklyhq.com)
-2. **Click "Create Check"** from the main dashboard
-3. **Choose "Browser Check"** for comprehensive website monitoring
-4. **Enter your website URL** (e.g., `https://your-website.com`)
-5. **Give your check a name** like "Homepage Monitor"
+  <Step title="Create a Browser Check">
+    <Frame>
+      <img 
+        className="block dark:hidden" 
+        src="/images/next/quickstart-welcome-light.png" 
+        alt="Light mode interface"
+      />
+      <img 
+        className="hidden dark:block" 
+        src="/images/next/quickstart-welcome-dark.png" 
+        alt="Dark mode interface"
+      />
+    </Frame>
+
+  -  **Choose "Browser Check"** for comprehensive website monitoring
+  -  **Enter your website URL** (e.g., `https://your-website.com`)
+  -  **Click "Create Check"** 
+  </Step>
+
+<Step title="Edit Your Test Script">
+The following test script will check if the homepage is available, performing correctly, and looks visually correct.
+<Frame>
+<img 
+  className="block dark:hidden" 
+  src="/images/next/quickstart-test-light.png" 
+  alt="Light mode interface"
+/>
+<img 
+  className="hidden dark:block" 
+  src="/images/next/quickstart-test-dark.png" 
+  alt="Dark mode interface"
+/>
+</Frame>
+
 </Step>
 
-<Step title="Configure Basic Settings">
-Configure your check settings:
-
-- **Locations**: Select 2-3 global locations (e.g., US East, EU West, Asia Pacific)
-- **Frequency**: Start with every 5 minutes for critical pages
-- **Tags**: Add tags like `production` or `homepage` for organization
-
+<Step title="Configure Check Settings">
+Configure your check settings by clicking the "Settings" button in the top right corner of the check editor
+<Frame>
+<img 
+  className="block dark:hidden" 
+  src="/images/next/quickstart-settings-light.png" 
+  alt="Light mode interface"
+/>
+<img 
+  className="hidden dark:block" 
+  src="/images/next/quickstart-settings-dark.png" 
+  alt="Dark mode interface"
+/>
+</Frame>
 <Note>
 For your first check, the default settings work well. You can always adjust them later.
 </Note>
 </Step>
 
+<Step title="Choose Scheduling Frequency and Locations">
+<Frame>
+<img 
+  className="block dark:hidden" 
+  src="/images/next/quickstart-schedule-light.png" 
+  alt="Light mode interface"
+/>
+<img 
+  className="hidden dark:block" 
+  src="/images/next/quickstart-schedule-dark.png" 
+  alt="Dark mode interface"
+/>
+</Frame>
+</Step>
+
 <Step title="Set Up Alerts">
 Configure who gets notified when issues are detected:
 
-1. **Click "Alert Settings"** in the check configuration
-2. **Add your email address** for notifications
-3. **Choose alert conditions**: 
-   - Alert after 1 failure (for critical pages)
-   - Alert after 2 failures (for less critical pages)
-4. **Set recovery notifications** to know when issues are resolved
+<Frame>
+<img 
+  className="block dark:hidden" 
+  src="/images/next/quickstart-alerts-light.png" 
+  alt="Light mode interface"
+/>
+<img 
+  className="hidden dark:block" 
+  src="/images/next/quickstart-alerts-dark.png" 
+  alt="Dark mode interface"
+/>
+</Frame>
+
 </Step>
 
 <Step title="Test and Save">
@@ -246,6 +306,18 @@ Before activating your check:
 <Step title="View Results">
 Once your check is active:
 
+<Frame>
+<img 
+  className="block dark:hidden" 
+  src="/images/next/quickstart-reporting-light.png" 
+  alt="Light mode interface"
+/>
+<img 
+  className="hidden dark:block" 
+  src="/images/next/quickstart-reporting-dark.png" 
+  alt="Dark mode interface"
+/>
+</Frame>
 1. **Visit your dashboard** to see real-time results
 2. **Check the results page** for detailed performance metrics
 3. **Review screenshots** and timing information
@@ -275,3 +347,9 @@ Ready to make the switch? Check out the **Monitoring as Code** tab above!
 
 </Tab>
 </Tabs>
+
+
+
+
+
+

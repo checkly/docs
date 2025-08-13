@@ -81,7 +81,7 @@ First, create a new test file or use an existing one. Here, we're testing a web 
 
 To create a custom fixture, extend the `test` object provided by Playwright:
 
-```js {title="fixture.js"}
+```js fixture.js
 
 import { test as baseTest } from '@playwright/test';
 
@@ -129,7 +129,7 @@ Debugging is crucial to ensure your fixture works as expected. Playwright's insp
 
 To share your custom fixture across different test files, encapsulate it in a separate module:
 
-```js {title="setup.js"}
+```js setup.js
 
 import { test as baseTest, expect } from '@playwright/test';
 
@@ -139,7 +139,7 @@ export { expect };
 
 Then, in your test files, import this extended `test` and use the custom fixtures:
 
-```js {title="tests/your-test.spec.js"}
+```js tests/your-test.spec.js
 import { test, expect } from './setup';
 ```
 
@@ -175,7 +175,7 @@ This approach works fine, but if you want to run the same code for **every test*
 
 A more convenient way to implement global test hooks is relying on automatic fixtures. Like the `webApp` fixture defined in the previous section, you must extend the `test` object to use automatic fixtures.
 
-```js {title="base.js"}
+```js base.js
 import { test as baseTest } from '@playwright/test';
 
 export const test = baseTest.extend({

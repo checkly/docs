@@ -38,7 +38,7 @@ For web and applications and APIs, you will typically have to run through some i
 Any flow that relies on the Basic Authentication standard or typing in a username and password will tend to look 
 very similar to example test below.
 
-```ts {title="basic-auth.spec.ts"}
+```ts basic-auth.spec.ts
 import { test, expect } from '@playwright/test'
 
 test('login', async ({ page }) => {
@@ -69,7 +69,7 @@ cases Playwright is smart enough to handle these redirects. Awesome.
 
 Here is an example of using Google login on stackoverflow.com. 👇
 
-```ts {title="google-login.spec.ts"}
+```ts google-login.spec.ts
 import { test } from '@playwright/test'
 
 test('Google login', async ({ page }) => {
@@ -96,7 +96,7 @@ don’t. To solve this we need to use the excellent [otpauth NPM package](https:
 
 We wrote a full article on [using the `otpauth` package to login to a GitHub account protected by 2FA](https://www.checklyhq.com/learn/playwright/bypass-totp/), so please check out that article for all the details. Below is the eventual `.spec.ts` file you will end up with.
 
-```ts {title="2fa.spec.ts"}
+```ts 2fa.spec.ts
 import { expect, test } from '@playwright/test'
 import * as OTPAuth from 'otpauth'
 
@@ -144,7 +144,7 @@ Let’s look at an E2E example. We will use the [https://webauthn.io/](https://w
 2. Sign up with a username + passkey.
 3. Login with that passkey.
 
-```ts {title="webauthn.spec.ts"}
+```ts webauthn.spec.ts
 import { test, expect } from '@playwright/test'
 
 test('test webauthn', async ({ page }) => {
@@ -184,7 +184,7 @@ authentication steps.
 When working with APIs, you most often need to authenticate using some Bearer token / API key. There is no magic here, 
 as Playwright makes it easy to include these tokens in your request headers.
 
-```ts {title="api-token.spec.ts"}
+```ts api-token.spec.ts
 import { test, expect } from '@playwright/test'
 
 test('API token auth', async ({ request }) => {
@@ -215,7 +215,7 @@ It requires a little setup 👇
 
 The recommended way to reuse auth state is by setting up **projects** in your `playwright.config.ts` file and defining a `setup` step that references file — `auth.setup.ts` for example — that takes care of the necessary authentication flow.
 
-```ts {title="playwright.config.ts"}
+```ts playwright.config.ts
 import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
@@ -242,7 +242,7 @@ correctly in subsequent tests.
 
 The example below shows how to use the basic authentication login flow from above in the `auth.setup.ts` file.
 
-```ts {title="auth.setup.ts"}
+```ts auth.setup.ts
 import { test as setup, expect } from '@playwright/test'
 import path from 'path'
 

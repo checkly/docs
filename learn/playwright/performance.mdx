@@ -50,9 +50,10 @@ With Google pushing for a faster web, [the Web Vitals metrics](https://web.dev/v
 
 Google recommends focusing on the three most important ones – Largest Contentful Paint (LCP), First Input Delay (FID) and Cumulative Layout Shift (CLS). **These three metrics are considered the Core Web Vitals** and give a good idea of a page’s loading behavior, interactivity, and visual stability.
 
->[!NOTE]
-> Not all of Google's Web Vitals are suitable for synthetic monitoring and performance testing.
-> **First Input Delay** relies on user interactions, and it's best measured using real user monitoring. Use **Total Blocking Time** as an interactivity metric in a lab setting instead.
+<Note>
+Not all of Google's Web Vitals are suitable for synthetic monitoring and performance testing.
+**First Input Delay** relies on user interactions, and it's best measured using real user monitoring. Use **Total Blocking Time** as an interactivity metric in a lab setting instead.
+</Note>
 
 ## Web Performance evaluation with headless tools
 
@@ -75,7 +76,7 @@ The Navigation Timing and the Resource Timing performance APIs are W3C specifica
 [The Navigation Timing API](https://developer.mozilla.org/en-US/docs/Web/API/Navigation_timing_API) allows us to retrieve timestamps of key events in the page load timeline. A Navigation Timing entry includes metrics such as the navigation response time, the used protocol and document load time.
 
 
-```ts {title="basic-performance-navigation.spec.ts"}
+```ts basic-performance-navigation.spec.ts
 // Example code - see original file for details
 ```
 
@@ -122,7 +123,7 @@ The Navigation Timing and the Resource Timing performance APIs are W3C specifica
 [The Resource Timing API](https://developer.mozilla.org/en-US/docs/Web/API/Resource_Timing_API/Using_the_Resource_Timing_API) allows us to zoom in on single resources and get accurate information about how quickly they loaded. For example, we could specifically look at our website's logo:
 
 
-```ts {title="basic-performance-resource.spec.ts"}
+```ts basic-performance-resource.spec.ts
 // Example code - see original file for details
 ```
 
@@ -159,7 +160,7 @@ The Navigation Timing and the Resource Timing performance APIs are W3C specifica
 
 [The Paint Timing API](https://developer.mozilla.org/en-US/docs/Web/API/PerformancePaintTiming) provides information on the first paint and the first contentful paint. Access the entries via `performance.getEntriesByType('paint')` or `performance.getEntriesByName('first-contentful-paint')`.
 
-```ts {title="basic-performance-paint-timing.spec.ts"}
+```ts basic-performance-paint-timing.spec.ts
 // Example code - see original file for details
 ```
 
@@ -179,7 +180,7 @@ The Navigation Timing and the Resource Timing performance APIs are W3C specifica
 > Large contentful paints are not a single event but rather event streams. A large paint can always be followed by an even larger one.
 > To evaluate the LCP initialize a `PerformanceObserver`, observe `largest-contentful-paint` entries and access the last emitted paint.
 
-```ts {title="largest-contentful-paint.spec.ts"}
+```ts largest-contentful-paint.spec.ts
 // Example code - see original file for details
 ```
 
@@ -190,7 +191,7 @@ The Navigation Timing and the Resource Timing performance APIs are W3C specifica
 
 > Layout shifts are no single event but event streams. To calculate CLS initialize a `PerformanceObserver`, observe `layout-shift` entries and sum all shifts.
 
-```ts {title="basic-performance-layout-shift.spec.ts"}
+```ts basic-performance-layout-shift.spec.ts
 // Example code - see original file for details
 ```
 
@@ -201,7 +202,7 @@ The Navigation Timing and the Resource Timing performance APIs are W3C specifica
 
 > Long Tasks are no single event but event streams. To calculate TBT initialize a `PerformanceObserver`, observe `longtasks` entries and sum the differences to the maximal JavaScript execution time of 50 milliseconds.
 
-```ts {title="basic-performance-long-task.spec.ts"}
+```ts basic-performance-long-task.spec.ts
 // Example code - see original file for details
 ```
 
@@ -213,7 +214,7 @@ If the browser performance APIs are not enough, the Chrome DevTools Protocol off
 
 One important example is network throttling, through which we can simulate the experience of users accessing our page with different network conditions.
 
-```ts {title="basic-performance-emulation.spec.ts"}
+```ts basic-performance-emulation.spec.ts
 // Example code - see original file for details
 ```
 

@@ -234,8 +234,9 @@ const response = await responsePromise;
 
 We can now make assertions about this response when it arrives.
 
-> [!NOTE]
-> Note that `waitForResponse()` isn’t limited to URL matching, as it also accepts patterns.
+<Note>
+Note that `waitForResponse()` isn't limited to URL matching, as it also accepts patterns.
+</Note>
 
 But sometimes, there will be multiple requests to a URL. For example, when polling to see if a transaction was successful, and we probably want to evaluate many responses and only continue the test when the transaction came through.
 
@@ -254,8 +255,9 @@ await page.getByText('trigger response').click();
 const response = await responsePromise;
 ```
 
-> [!NOTE]
-> A note on code reading: for myself, and many other users on Stack Overflow, it’s quite difficult to get the promise structure here right: there is no await in the `responsePromise` definition, rather `await` is used only when we create a variable with the return from `responsePromise`.
+<Note>
+A note on code reading: for myself, and many other users on Stack Overflow, it's quite difficult to get the promise structure here right: there is no await in the `responsePromise` definition, rather `await` is used only when we create a variable with the return from `responsePromise`.
+</Note>
 
 See response body waiting in action as demonstrated by Stefan here:
 

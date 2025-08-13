@@ -70,7 +70,7 @@ Your folder structure would look as follows:
 
 The API check performs a `GET` on an authenticated API endpoint, in this case `https://api.acme.com/v1.products`.
 
-```ts {title="api.check.ts"}
+```ts api.check.ts
 import { ApiCheck } from '@checkly/cli/constructs'
 import * as path from 'path'
 
@@ -90,7 +90,7 @@ The setup script uses the auth client and sets the `Authorization` header with a
 - The `request` object is a global variable, injected at runtime. See the [request reference](#request) below for more details
 - You need to use a top-level `await` statement as the `getToken()` function returns a `Promise`.
 
-```ts {title="setup.ts",
+```ts setup.ts
 import { getToken } from './common/auth-client'
 const token = await getToken()
 request.headers['Authorization'] = `Bearer ${token}`
@@ -100,7 +100,7 @@ The actual auth client doesn't do anything Checkly specific, besides reading a s
 that authenticates the request to the server issuing session tokens. You should store that static token in [your global
 environment variables](/docs/api-checks/variables/#managing-variables).
 
-```ts {title="common/auth-client.ts"}
+```ts common/auth-client.ts
 import axios from 'axios'
 
 export async function getToken () {

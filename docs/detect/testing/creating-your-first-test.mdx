@@ -101,24 +101,12 @@ test('Homepage loads successfully', async ({ page }) => {
   expect(title).toContain('Checkly')
   
   // Verify key elements are present
-  await expect(page.locator('h1')).toBeVisible()
+  await expect(page.locator('p')).toBeVisible()
   
   // Take a screenshot for debugging
   await page.screenshot({ path: 'homepage.jpg' })
 })
 
-test('Navigation works correctly', async ({ page }) => {
-  await page.goto('https://www.checklyhq.com')
-  
-  // Click on a navigation link
-  await page.click('text=Docs')
-  
-  // Verify we navigated to the docs page
-  await expect(page).toHaveURL(/.*docs.*/)
-  
-  // Check that the docs page loaded
-  await expect(page.locator('h1')).toContainText('Documentation')
-})
 ```
 
 ## Step 5: Test Locally

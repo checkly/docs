@@ -1,771 +1,89 @@
 ---
-title: 'Snippets and Environment Variables'
-description: 'Manage reusable code snippets and environment variables using Terraform'
-sidebarTitle: 'Snippets & Variables'
+title: 'Snippets and environment variables in Terraform'
+sidebarTitle: 'Snippets and environment variables'
+description: 'Manage reusable code snippets and environment variables to reduce duplication in your monitoring setup'
 ---
 
+Checkly exposes handy resources to avoid code duplication and reduce the maintenance load on whoever is maintaining checks and scripts.
 
-Checkly provides resources to avoid code duplication and reduce maintenance overhead through reusable code snippets and environment variables that can be shared across checks and groups.
+## Code snippets
 
-<Callout type="info" emoji="🔄">
-Code snippets and environment variables help you maintain DRY (Don't Repeat Yourself) principles in your monitoring setup, making configurations more maintainable and consistent.
-</Callout>
+[Code snippets](/docs/browser-checks/partials-code-snippets/) are useful for reusing bits of code without duplication. They can be used for [setup & teardown scripts](/docs/api-checks/setup-teardown-scripts/#reusable-code-snippets) in API checks, as well as in [browser checks](/docs/browser-checks/partials-code-snippets/) and come as standalone resources:
 
-## Overview
-
-<CardGroup cols={2}>
-<Card title="Code Snippets" icon="code">
-**Reusable Code Blocks**
-- Share common functions across checks
-- Implement setup and teardown procedures
-- Create consistent page object models
-- Reduce code duplication
-</Card>
-
-<Card title="Environment Variables" icon="key">
-**Configuration Management**
-- Store credentials securely
-- Manage environment-specific values
-- Share configuration across checks
-- Centralize setting management
-</Card>
-
-<Card title="Maintainability" icon="wrench">
-**Easier Updates**
-- Update code in one place
-- Consistent behavior across checks
-- Centralized configuration changes
-- Version control integration
-</Card>
-
-<Card title="Security" icon="shield-check">
-**Safe Credential Storage**
-- Secure environment variable storage
-- Avoid hardcoded secrets
-- Environment-specific configurations
-- Access control through groups
-</Card>
-</CardGroup>
-
-## Code Snippets
-
-[Code snippets](/docs/browser-checks/partials-code-snippets/) are reusable pieces of code that can be used in [setup & teardown scripts](/docs/api-checks/setup-teardown-scripts/#reusable-code-snippets) for API checks and in [browser checks](/docs/browser-checks/partials-code-snippets/).
-
-### Basic Snippet Creation
-
-<Tabs>
-<Tab title="Inline Snippet">
 ```terraform
-resource "checkly_snippet" "login_procedure" {
-  name = "Login Procedure"
-  
-  script = <<EOT
-// Common login procedure for all tests
-async function login(page, email, password) {
-  await page.fill('#field-email', email);
-  await page.fill('#field-password', password);
-  await page.click('#btn-login');
-  
-  // Wait for login to complete
-  await page.waitForSelector('.user-dashboard');
-}
+resource "checkly_snippet" "procedure-login" {
+  name   = "Login"  // The snippet name
+  script   = <<EOT  // The content of the snippet
+    page.fill('#field-email')
+    page.fill('#field-password')
+    page.click('#btn-login')
 EOT
 }
 ```
-</Tab>
 
-<Tab title="External File (Recommended)">
+For tidiness and ease of use, it is recommended to store scripts in separate files, instead of using the inline option:
+
 ```terraform
-resource "checkly_snippet" "login_procedure" {
-  name   = "Login Procedure"
-  script = file("${path.module}/snippets/login.js")
+resource "checkly_snippet" "procedure-login" {
+  name   = "Login"
+  script = file("${path.module}/snippets/login.spec.js") // Our script is contained in this file
 }
 ```
-</Tab>
-</Tabs>
 
-### Common Snippet Patterns
+## Environment variables
 
-<Tabs>
-<Tab title="Authentication Snippet">
+[Environment variables](/docs/browser-checks/variables/) help you store data (like credentials or other strings) on Checkly that you might need to use in one or more checks and groups. They can exist as arguments in check or group type resources:
+
 ```terraform
-# Authentication helper snippet
-resource "checkly_snippet" "auth_helpers" {
-  name   = "Authentication Helpers"
-  script = file("${path.module}/snippets/auth-helpers.js")
-}
-
-# File: snippets/auth-helpers.js
-/*
-async function loginWithCredentials(page, email, password) {
-  await page.goto('/login');
-  await page.fill('[data-testid="email"]', email);
-  await page.fill('[data-testid="password"]', password);
-  await page.click('[data-testid="login-button"]');
-  await page.waitForURL('/dashboard');
-}
-
-async function logout(page) {
-  await page.click('[data-testid="user-menu"]');
-  await page.click('[data-testid="logout"]');
-  await page.waitForURL('/');
-}
-
-async function getAuthToken(page) {
-  return await page.evaluate(() => {
-    return localStorage.getItem('authToken');
-  });
-}
-*/
-```
-</Tab>
-
-<Tab title="API Helper Snippet">
-```terraform
-# API testing helpers
-resource "checkly_snippet" "api_helpers" {
-  name   = "API Testing Helpers"
-  script = file("${path.module}/snippets/api-helpers.js")
-}
-
-# File: snippets/api-helpers.js
-/*
-function createApiHeaders(token) {
-  return {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  };
-}
-
-function validateApiResponse(response, expectedStatus = 200) {
-  if (response.status !== expectedStatus) {
-    throw new Error(`Expected status ${expectedStatus}, got ${response.status}`);
+// In a check:
+resource "checkly_check" "e2e-login" {
+  name                      = "Login Flow"
+  type                      = "BROWSER"
+  activated                 = true
+  should_fail               = false
+  frequency                 = 1
+  ssl_check                 = false
+  use_global_alert_settings = true
+  
+  environment_variables = {         // This sets check-level environment variables
+    TEST_EMAIL = "user@email.com",
+    TEST_USER_ID = "7d8d8288-43a6-44b0-ba08-4c5736c1b6ed"
   }
   
-  const contentType = response.headers['content-type'];
-  if (!contentType || !contentType.includes('application/json')) {
-    throw new Error('Response is not JSON');
-  }
-}
-
-async function makeAuthenticatedRequest(url, options = {}) {
-  const token = process.env.API_TOKEN;
-  const defaultOptions = {
-    headers: createApiHeaders(token),
-    ...options
-  };
+  locations = [
+    "us-west-1",
+    "eu-central-1"
+  ]
   
-  const response = await fetch(url, defaultOptions);
-  validateApiResponse(response);
-  return response;
-}
-*/
-```
-</Tab>
-
-<Tab title="Page Object Model">
-```terraform
-# Shopping cart page object model
-resource "checkly_snippet" "shopping_cart_pom" {
-  name   = "ShoppingCart"
-  script = file("${path.module}/snippets/shopping-cart.js")
-}
-
-# File: snippets/shopping-cart.js
-/*
-class ShoppingCart {
-  constructor(page) {
-    this.page = page;
-    this.cartButton = page.locator('#cart-button');
-    this.cartItems = page.locator('.cart-item');
-    this.totalPrice = page.locator('[data-testid="total-price"]');
-    this.checkoutButton = page.locator('[data-testid="checkout"]');
-  }
-
-  async openCart() {
-    await this.cartButton.click();
-    await this.page.waitForSelector('.cart-drawer');
-  }
-
-  async addItem(productId) {
-    await this.page.locator(`[data-product-id="${productId}"] .add-to-cart`).click();
-    await this.page.waitForSelector('.cart-notification');
-  }
-
-  async getItemCount() {
-    return await this.cartItems.count();
-  }
-
-  async proceedToCheckout() {
-    await this.checkoutButton.click();
-    await this.page.waitForURL('**/checkout');
-  }
-}
-*/
-```
-</Tab>
-</Tabs>
-
-### Multiple Related Snippets
-
-<Tabs>
-<Tab title="Snippet Collection">
-```terraform
-# Common utilities
-resource "checkly_snippet" "utils" {
-  name   = "Utils"
-  script = file("${path.module}/snippets/utils.js")
-}
-
-# Database helpers
-resource "checkly_snippet" "database_helpers" {
-  name   = "DatabaseHelpers"
-  script = file("${path.module}/snippets/database-helpers.js")
-}
-
-# Test data generators
-resource "checkly_snippet" "test_data" {
-  name   = "TestData"
-  script = file("${path.module}/snippets/test-data.js")
-}
-
-# Navigation helpers
-resource "checkly_snippet" "navigation" {
-  name   = "Navigation"
-  script = file("${path.module}/snippets/navigation.js")
-}
-
-# Form helpers
-resource "checkly_snippet" "form_helpers" {
-  name   = "FormHelpers"
-  script = file("${path.module}/snippets/form-helpers.js")
-}
-```
-</Tab>
-</Tabs>
-
-## Environment Variables
-
-[Environment variables](/docs/browser-checks/variables/) help you store configuration data and credentials that can be used across multiple checks and groups.
-
-### Check-Level Environment Variables
-
-<Tabs>
-<Tab title="Single Check Variables">
-```terraform
-resource "checkly_check" "user_login_flow" {
-  name      = "User Login Flow"
-  type      = "BROWSER"
-  activated = true
-  frequency = 5
-
-  # Check-specific environment variables
-  environment_variables = {
-    TEST_EMAIL    = "test.user@example.com"
-    TEST_PASSWORD = "secure_test_password"
-    TEST_USER_ID  = "7d8d8288-43a6-44b0-ba08-4c5736c1b6ed"
-    API_BASE_URL  = "https://api.example.com"
-    TIMEOUT_MS    = "30000"
-  }
-
-  locations = ["us-west-1", "eu-central-1"]
-
-  script = file("${path.module}/scripts/login.spec.js")
-  
-  tags = ["authentication", "critical"]
-}
-```
-</Tab>
-
-<Tab title="API Check Variables">
-```terraform
-resource "checkly_check" "api_health_check" {
-  name      = "API Health Check"
-  type      = "API"
-  activated = true
-  frequency = 1
-
-  # API-specific environment variables
-  environment_variables = {
-    API_TOKEN     = var.api_token
-    API_BASE_URL  = "https://api.example.com"
-    TIMEOUT_MS    = "5000"
-    RETRY_COUNT   = "3"
-  }
-
-  locations = ["us-west-1", "eu-central-1"]
-
-  request {
-    url = "https://api.example.com/health"
-    
-    headers = {
-      "Authorization" = "Bearer ${var.api_token}"
-    }
-    
-    assertion {
-      source     = "STATUS_CODE"
-      comparison = "EQUALS"
-      target     = "200"
-    }
-  }
-  
-  tags = ["api", "health"]
-}
-```
-</Tab>
-</Tabs>
-
-### Group-Level Environment Variables
-
-<Tabs>
-<Tab title="Group Variables">
-```terraform
-resource "checkly_check_group" "e2e_test_suite" {
-  name      = "E2E Test Suite"
-  activated = true
-
-  # Group-level environment variables (inherited by all checks in group)
-  environment_variables = {
-    TEST_EMAIL       = "group.test@example.com"
-    TEST_PASSWORD    = "group_secure_password"
-    API_BASE_URL     = "https://api.example.com"
-    TIMEOUT_LONG     = "60000"
-    TIMEOUT_SHORT    = "10000"
-    BROWSER_TIMEOUT  = "30000"
-    DEBUG_MODE       = "false"
-  }
-
-  locations = ["us-west-1", "eu-central-1"]
-  concurrency = 3
-
   retry_strategy = {
     type = "LINEAR"
   }
-  
-  tags = ["e2e", "integration"]
+
+  script = file("${path.module}/scripts/login.spec.js")
 }
 
-# Checks in the group inherit environment variables
-resource "checkly_check" "checkout_flow" {
-  name     = "Checkout Flow"
-  type     = "BROWSER"
-  group_id = checkly_check_group.e2e_test_suite.id
-  
-  # These will be merged with group-level variables
-  environment_variables = {
-    PAYMENT_TEST_CARD = "4242424242424242"
-    CVV_CODE         = "123"
-  }
-
-  script = file("${path.module}/scripts/checkout.spec.js")
-}
-```
-</Tab>
-</Tabs>
-
-### Environment-Specific Variables
-
-<Tabs>
-<Tab title="Environment Configuration">
-```terraform
-# Variables for different environments
-variable "environment" {
-  description = "Environment name"
-  type        = string
-  default     = "staging"
-}
-
-locals {
-  # Environment-specific configuration
-  env_config = {
-    staging = {
-      api_base_url     = "https://staging-api.example.com"
-      test_email       = "staging.test@example.com"
-      debug_mode       = "true"
-      timeout_ms       = "30000"
-      enable_logging   = "true"
-    }
-    production = {
-      api_base_url     = "https://api.example.com"
-      test_email       = "prod.test@example.com"
-      debug_mode       = "false"
-      timeout_ms       = "10000"
-      enable_logging   = "false"
-    }
-  }
-  
-  current_env = local.env_config[var.environment]
-}
-
-resource "checkly_check_group" "api_monitoring" {
-  name      = "API Monitoring - ${title(var.environment)}"
+// In a group:
+resource "checkly_check_group" "key-shop-flows" {
+  name      = "Key Shop Flows"
   activated = true
+  muted     = false
 
-  # Environment-specific variables
-  environment_variables = {
-    API_BASE_URL      = local.current_env.api_base_url
-    TEST_EMAIL        = local.current_env.test_email
-    DEBUG_MODE        = local.current_env.debug_mode
-    TIMEOUT_MS        = local.current_env.timeout_ms
-    ENABLE_LOGGING    = local.current_env.enable_logging
-    ENVIRONMENT       = var.environment
+  environment_variables = {         // This sets group-level environment variables
+    TEST_EMAIL = "user@email.com",
+    TEST_USER_ID = "7d8d8288-43a6-44b0-ba08-4c5736c1b6ed"
   }
 
-  locations = var.environment == "production" ? [
-    "us-west-1", "eu-central-1", "ap-southeast-1"
-  ] : ["us-west-1"]
-  
-  tags = [var.environment, "api-monitoring"]
+  locations = [
+    "eu-west-1",
+    "eu-central-1"
+  ]
+
+  concurrency               = 3
+  retry_strategy = {
+    type = "LINEAR"
+  }
+  use_global_alert_settings = false
 }
 ```
-</Tab>
-</Tabs>
 
-## Advanced Patterns
-
-### Combining Snippets and Variables
-
-<Tabs>
-<Tab title="Integrated Setup">
-```terraform
-# Common configuration snippet that uses environment variables
-resource "checkly_snippet" "test_config" {
-  name = "TestConfig"
-  
-  script = <<EOT
-// Configuration helper that reads environment variables
-class TestConfig {
-  static get apiBaseUrl() {
-    return process.env.API_BASE_URL || 'http://localhost:3000';
-  }
-  
-  static get testCredentials() {
-    return {
-      email: process.env.TEST_EMAIL || 'test@example.com',
-      password: process.env.TEST_PASSWORD || 'password123'
-    };
-  }
-  
-  static get timeouts() {
-    return {
-      short: parseInt(process.env.TIMEOUT_SHORT || '5000'),
-      long: parseInt(process.env.TIMEOUT_LONG || '30000'),
-      navigation: parseInt(process.env.TIMEOUT_NAVIGATION || '60000')
-    };
-  }
-  
-  static get isDebugMode() {
-    return process.env.DEBUG_MODE === 'true';
-  }
-}
-
-// Export for use in checks
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { TestConfig };
-}
-EOT
-}
-
-# Group with environment variables
-resource "checkly_check_group" "comprehensive_tests" {
-  name      = "Comprehensive Test Suite"
-  activated = true
-
-  environment_variables = {
-    API_BASE_URL         = "https://api.example.com"
-    TEST_EMAIL           = "comprehensive.test@example.com"
-    TEST_PASSWORD        = var.test_password
-    TIMEOUT_SHORT        = "5000"
-    TIMEOUT_LONG         = "30000"
-    TIMEOUT_NAVIGATION   = "60000"
-    DEBUG_MODE           = "false"
-    RETRY_ATTEMPTS       = "3"
-    SCREENSHOT_ON_FAIL   = "true"
-  }
-
-  locations = ["us-west-1", "eu-central-1"]
-  concurrency = 5
-  
-  tags = ["comprehensive", "automated"]
-}
-
-# Check using both snippet and variables
-resource "checkly_check" "comprehensive_workflow" {
-  name     = "Comprehensive User Workflow"
-  type     = "BROWSER"
-  group_id = checkly_check_group.comprehensive_tests.id
-
-  script = <<EOT
-const { test, expect } = require('@playwright/test');
-
-test('Complete user workflow', async ({ page }) => {
-  // Use configuration from snippet
-  const config = TestConfig;
-  
-  // Set timeouts based on environment
-  page.setDefaultTimeout(config.timeouts.navigation);
-  
-  // Navigate to application
-  await page.goto(config.apiBaseUrl);
-  
-  // Login using environment credentials
-  const creds = config.testCredentials;
-  await page.fill('[data-testid="email"]', creds.email);
-  await page.fill('[data-testid="password"]', creds.password);
-  await page.click('[data-testid="login"]');
-  
-  // Verify login success
-  await expect(page.locator('[data-testid="dashboard"]')).toBeVisible({
-    timeout: config.timeouts.short
-  });
-  
-  // Additional workflow steps...
-  if (config.isDebugMode) {
-    console.log('Debug: Login successful');
-  }
-});
-EOT
-}
-```
-</Tab>
-</Tabs>
-
-### Dynamic Variable Management
-
-<Tabs>
-<Tab title="Dynamic Configuration">
-```terraform
-# Variable definitions
-variable "environments" {
-  description = "Environment configurations"
-  type = map(object({
-    api_base_url    = string
-    database_url    = string
-    redis_url       = string
-    test_user_email = string
-    debug_enabled   = bool
-    feature_flags   = map(string)
-  }))
-}
-
-variable "shared_secrets" {
-  description = "Shared secrets across environments"
-  type = object({
-    api_key        = string
-    webhook_secret = string
-    encryption_key = string
-  })
-  sensitive = true
-}
-
-# Create groups with dynamic variables
-resource "checkly_check_group" "env_specific_tests" {
-  for_each = var.environments
-
-  name      = "Tests - ${title(each.key)}"
-  activated = true
-
-  # Merge environment-specific and shared variables
-  environment_variables = merge(
-    {
-      ENVIRONMENT      = each.key
-      API_BASE_URL     = each.value.api_base_url
-      DATABASE_URL     = each.value.database_url
-      REDIS_URL        = each.value.redis_url
-      TEST_USER_EMAIL  = each.value.test_user_email
-      DEBUG_ENABLED    = tostring(each.value.debug_enabled)
-    },
-    # Add feature flags as environment variables
-    {
-      for flag_name, flag_value in each.value.feature_flags :
-      "FEATURE_${upper(flag_name)}" => flag_value
-    },
-    # Add shared secrets
-    {
-      API_KEY        = var.shared_secrets.api_key
-      WEBHOOK_SECRET = var.shared_secrets.webhook_secret
-      ENCRYPTION_KEY = var.shared_secrets.encryption_key
-    }
-  )
-
-  locations = each.key == "production" ? [
-    "us-west-1", "eu-central-1", "ap-southeast-1"
-  ] : ["us-west-1"]
-  
-  tags = [each.key, "dynamic"]
-}
-```
-</Tab>
-</Tabs>
-
-## Best Practices
-
-<CardGroup cols={2}>
-<Card title="Code Organization" icon="folder">
-**File Structure**
-- Store snippets in dedicated directories
-- Use consistent naming conventions
-- Group related snippets together
-- Version control all snippet files
-</Card>
-
-<Card title="Variable Management" icon="key">
-**Secure Configuration**
-- Use Terraform variables for secrets
-- Separate environment-specific values
-- Avoid hardcoding sensitive data
-- Document variable purposes
-</Card>
-
-<Card title="Reusability" icon="recycle">
-**DRY Principles**
-- Create modular, reusable snippets
-- Share common configurations
-- Parameterize snippet behavior
-- Test snippets independently
-</Card>
-
-<Card title="Maintainability" icon="wrench">
-**Long-term Success**
-- Document snippet interfaces
-- Use clear variable names
-- Regular code reviews
-- Update dependencies consistently
-</Card>
-</CardGroup>
-
-## Complete Example
-
-Here's a comprehensive example showing snippets and variables working together:
-
-<Tabs>
-<Tab title="Complete Setup">
-```terraform
-# Shared utilities snippet
-resource "checkly_snippet" "shared_utils" {
-  name   = "SharedUtils"
-  script = file("${path.module}/snippets/shared-utils.js")
-}
-
-# Authentication snippet
-resource "checkly_snippet" "auth_module" {
-  name   = "AuthModule"
-  script = file("${path.module}/snippets/auth-module.js")
-}
-
-# Page object models
-resource "checkly_snippet" "page_objects" {
-  name   = "PageObjects"
-  script = file("${path.module}/snippets/page-objects.js")
-}
-
-# Environment-specific group
-resource "checkly_check_group" "full_stack_tests" {
-  name      = "Full Stack Test Suite"
-  activated = true
-
-  environment_variables = {
-    # Application URLs
-    WEB_APP_URL       = "https://app.example.com"
-    API_BASE_URL      = "https://api.example.com"
-    ADMIN_PANEL_URL   = "https://admin.example.com"
-    
-    # Test credentials
-    TEST_USER_EMAIL   = "test.user@example.com"
-    TEST_USER_PASS    = var.test_user_password
-    ADMIN_EMAIL       = "admin@example.com"
-    ADMIN_PASS        = var.admin_password
-    
-    # API configuration
-    API_TOKEN         = var.api_token
-    API_TIMEOUT       = "10000"
-    API_RETRY_COUNT   = "3"
-    
-    # Browser configuration
-    BROWSER_TIMEOUT   = "30000"
-    SCREENSHOT_MODE   = "failure"
-    VIDEO_MODE        = "retain-on-failure"
-    
-    # Feature flags
-    ENABLE_NEW_UI     = "true"
-    ENABLE_ANALYTICS  = "false"
-    ENABLE_DEBUG      = "false"
-    
-    # Environment metadata
-    ENVIRONMENT       = "production"
-    BUILD_VERSION     = var.build_version
-    DEPLOYMENT_ID     = var.deployment_id
-  }
-
-  locations = ["us-west-1", "eu-central-1", "ap-southeast-1"]
-  concurrency = 10
-  
-  tags = ["full-stack", "comprehensive", "production"]
-}
-
-# Browser check using snippets and variables
-resource "checkly_check" "user_journey" {
-  name     = "Complete User Journey"
-  type     = "BROWSER"
-  group_id = checkly_check_group.full_stack_tests.id
-  
-  # Additional check-specific variables
-  environment_variables = {
-    JOURNEY_TYPE    = "complete"
-    STEPS_TO_RUN    = "all"
-    VALIDATION_MODE = "strict"
-  }
-
-  script = file("${path.module}/scripts/user-journey.spec.js")
-  
-  tags = ["user-journey", "e2e"]
-}
-
-# API check using variables
-resource "checkly_check" "api_integration" {
-  name     = "API Integration Test"
-  type     = "API"
-  group_id = checkly_check_group.full_stack_tests.id
-
-  request {
-    url = "https://api.example.com/health"
-    
-    headers = {
-      "Authorization" = "Bearer ${var.api_token}"
-      "User-Agent"    = "Checkly-Monitor/1.0"
-    }
-    
-    assertion {
-      source     = "STATUS_CODE"
-      comparison = "EQUALS"
-      target     = "200"
-    }
-    
-    assertion {
-      source     = "JSON_BODY"
-      property   = "$.status"
-      comparison = "EQUALS"
-      target     = "healthy"
-    }
-  }
-  
-  tags = ["api", "health-check"]
-}
-```
-</Tab>
-</Tabs>
-
-<Note>
-Account-level environment variables are planned for future releases. Currently, environment variables can be set at the check and group level.
-</Note>
-
-<Warning>
-Environment variables are stored securely by Checkly, but avoid committing sensitive values directly to your Terraform configuration. Use Terraform variables and external secret management systems.
-</Warning>
-
-## Additional Resources
-
-- [Code snippets documentation](/docs/browser-checks/partials-code-snippets/)
-- [Environment variables documentation](/docs/browser-checks/variables/)
-- [Setup & teardown scripts with snippets](/docs/api-checks/setup-teardown-scripts/#reusable-code-snippets)
+> We are working on enabling Terraform users to set up environment variables at account level, too.

@@ -68,7 +68,7 @@ from a different region are not considered "consecutive".
 
 Here's an example. You want to be alerted after two failures, so you set the escalation to:
 
-![escalation when a check has failed 2 time(s)](/docs/images/alerting/escalation-1.png)
+![escalation when a check has failed 2 time(s)](/images/docs/images/alerting/escalation-1.png)
 
 Your check runs in Frankfurt and Tokyo. It fails from both regions because your server is down. We consider this
 one run. Five minutes later, the check fails again - assuming the check runs on a 5 minute schedule. Now we alert you.
@@ -80,7 +80,7 @@ This option should mostly be used when checks are run very regularly, i.e. once 
 
 Here's an example. You want to be alerted if your check is failing for more than 10 minutes. You set escalation to:
 
-![escalation when a check is failing for more than 10 minutes](/docs/images/alerting/escalation-2.png)
+![escalation when a check is failing for more than 10 minutes](/images/docs/images/alerting/escalation-2.png)
 
 Your check runs every minute. It starts failing at 15:00. Failing check results come in and are visible in the dashboard.
 After 10 minutes, the clock strikes 15:10. Any failing check results that come in now trigger an alert. If the check has
@@ -92,7 +92,7 @@ This option can be selected in addition to the run or time-based escalation sett
 
 When enabled, alerts will only be sent when the specified percentage of locations are failing. Use this setting to reduce alert noise and fatigue for services that can handle being unavailable from some locations before action is required. 
 
-![escalation when a check is failing at more than 50% of locations](/docs/images/alerting/escalation-3.png)
+![escalation when a check is failing at more than 50% of locations](/images/docs/images/alerting/escalation-3.png)
 
 In the example above, an alert will only be sent when the check has failed once, and at least 50% of the locations the check is running from are failing during a check run. If the check is set to run from 10 locations, and it fails in 3, no alert will be sent. If it later fails in 7 of the 10 locations an alert will be sent.
 
@@ -102,7 +102,7 @@ People are busy, life is complex. For this reason you can set up one or more rem
 would send you two reminders: the first reminder five minutes after the first alert is triggered and the second five minutes
 after that.
 
-![send reminder two times over ten minutes](/docs/images/alerting/reminders-1.png)
+![send reminder two times over ten minutes](/images/docs/images/alerting/reminders-1.png)
 
 > When a check failure is resolved, we cancel any outstanding reminders so you don't get mixed signals.
 
@@ -214,151 +214,6 @@ Determine **how** alert notifications reach your team:
 </Accordion>
 </AccordionGroup>
 
-## Alert States and Transitions
-
-Understanding how Checkly tracks check states helps you configure appropriate alerting:
-
-<Steps>
-<Step title="Check Execution">
-Your check runs according to its schedule from configured locations
-</Step>
-
-<Step title="State Evaluation">
-Checkly evaluates the check result against performance thresholds and assertions
-</Step>
-
-<Step title="State Transition">
-If the check state changes (pass → fail, fail → pass, normal → degraded), the alert system activates
-</Step>
-
-<Step title="Retry Logic">
-If configured, failed checks are automatically retried according to your retry strategy
-</Step>
-
-<Step title="Alert Escalation">
-If retries don't resolve the issue, alerts are sent based on your escalation settings
-</Step>
-
-<Step title="Recovery Notification">
-When checks recover, recovery alerts are sent according to your notification preferences
-</Step>
-</Steps>
-
-### Alert Types and States
-
-| Alert Type | Description | When Triggered |
-|------------|-------------|----------------|
-| `ALERT_FAILURE` | Check hard failure | Check encounters error or assertion failure |
-| `ALERT_DEGRADED` | Performance degradation | Check succeeds but exceeds response time thresholds |
-| `ALERT_RECOVERY` | Service recovery | Failed or degraded check returns to passing state |
-| `ALERT_DEGRADED_RECOVERY` | Performance improvement | Degraded check returns to normal performance |
-| `ALERT_SSL` | SSL certificate expiration | Certificate expires within warning threshold |
-
-## Comprehensive Alert Configuration
-
-### Account-Level Defaults
-Set organization-wide alerting defaults that apply to all checks unless overridden:
-
-```yaml
-# Account-level alert settings
-Escalation Strategy: Run-based (2 consecutive failures)
-Reminder Schedule: 
-  - First reminder: 5 minutes
-  - Second reminder: 15 minutes
-Alert Channels:
-  - Email: team@company.com
-  - Slack: #ops-alerts
-Location Threshold: 50% of locations must fail
-```
-
-### Group-Level Overrides
-Configure specific alerting behavior for related checks:
-
-```yaml
-# Production API Group
-Escalation Strategy: Time-based (5 minutes)
-Alert Channels:
-  - PagerDuty: Production escalation policy
-  - Slack: #production-alerts
-Mute Alerts: During maintenance windows
-
-# Development Group
-Escalation Strategy: Run-based (3 consecutive failures)
-Alert Channels:
-  - Email: dev-team@company.com
-Reminder Schedule: None
-```
-
-### Check-Level Customization
-Fine-tune alerting for individual checks with specific requirements:
-
-```yaml
-# Critical payment API
-Escalation Strategy: Immediate (first failure)
-Alert Channels:
-  - PagerDuty: Payment team escalation
-  - SMS: On-call engineer
-Retry Strategy: Fixed (3 retries, 10 second intervals)
-
-# Internal monitoring dashboard
-Escalation Strategy: Run-based (5 consecutive failures)
-Alert Channels:
-  - Email: Internal team
-Mute Alerts: Enabled during development
-```
-
-
-
-
-
-
-## Getting Started with Alerting
-
-<Steps>
-<Step title="Configure Account Defaults">
-Set up organization-wide alert settings that work for most of your checks
-</Step>
-
-<Step title="Set Up Alert Channels">
-Configure email, Slack, PagerDuty, or custom webhook integrations
-</Step>
-
-<Step title="Define Retry Strategies">
-Choose appropriate retry mechanisms to reduce false positives
-</Step>
-
-<Step title="Configure Group Overrides">
-Set specific alerting for different teams or service categories
-</Step>
-
-<Step title="Test Your Configuration">
-Use Checkly's test features to validate your alerting setup
-</Step>
-
-<Step title="Monitor and Optimize">
-Review alert patterns and adjust configurations to reduce noise
-</Step>
-</Steps>
-
-## Alert Management Resources
-
-<CardGroup cols={2}>
-<Card title="Alert Channels" href="/docs/communicate/alerts/channels">
-Complete guide to setting up notification channels and integrations
-</Card>
-
-<Card title="Alert Configuration" href="/docs/communicate/alerts/configuration">
-Detailed configuration options for escalation, retries, and thresholds
-</Card>
-
-<Card title="Webhook Integration" href="/docs/communicate/alerts/webhooks">
-Advanced webhook patterns and third-party system integrations
-</Card>
-
-<Card title="Best Practices" href="/docs/communicate/alerts/best-practices">
-Proven strategies for effective alerting and incident response
-</Card>
-</CardGroup>
 
 <Note>
 Effective alerting balances timely notification with alert fatigue prevention. Start with conservative settings and gradually tune based on your team's response patterns and service reliability requirements.

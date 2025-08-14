@@ -4,471 +4,91 @@ description: 'Step-by-step guide to creating your first API check in Checkly usi
 sidebarTitle: 'Creating An API Check'
 ---
 
+## Creating an API check
 
+![Screenshot of the create API check page](/images/docs/images/api-checks/overview-create-check.png)
 
-API checks in Checkly are powerful tools that allow you to monitor your APIs for correctness, uptime, and performance. In this comprehensive guide, you'll create your first API check using the Checkly web UI—step by step.
-
-## Before You Start
-
-API checks are ideal for monitoring:
-- REST API endpoints and health checks
-- Authentication and authorization flows
-- Data retrieval and submission endpoints
-- Third-party API integrations
-- Microservice communications
-
-<Note>
-You'll need an API endpoint to monitor. If you don't have one ready, you can use a public API like `https://httpbin.org/get` for testing purposes.
-</Note>
-
-## Step-by-Step Setup
-
-<Steps>
-<Step title="Navigate to API Checks">
-1. Log into your Checkly dashboard
-2. Go to **Checks** in the main navigation
-3. Click **Create Check** and select **API Check**
-
-![Navigate to create API check](/images/docs/images/api-checks/create-api-check-nav.png)
-
-**Check Details**:
-- **Name**: Give your check a descriptive name (e.g., "User API Health Check")
-- **Tags**: Add optional tags for organization (e.g., "production", "user-service")
-- **Group**: Assign to a check group for shared settings and alerting
-</Step>
-
-<Step title="Configure the HTTP Request">
-Set up the HTTP request that Checkly will send on a schedule.
-
-```json
-{
-  "method": "POST",
-  "url": "https://api.example.com/v1/auth/login",
-  "headers": {
-    "Content-Type": "application/json",
-    "User-Agent": "Checkly-Monitor/1.0"
-  },
-  "body": {
-    "email": "test@example.com",
-    "password": "secure_password"
-  }
-}
-```
-
-**Configuration Options**:
-- **HTTP Method**: GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS
-- **URL**: The complete endpoint URL with protocol
-- **Headers**: Authentication tokens, content type, custom headers
-- **Request Body**: JSON, XML, form data, or raw text
-- **Query Parameters**: URL parameters for GET requests
-- **Authentication**: Basic Auth, Bearer tokens, API keys
-
-**Import Options**:
-- Import from cURL commands
-- Generate from OpenAPI/Swagger specifications
-- Copy from browser network tabs
-
-![API check request configuration](/images/docs/images/api-checks/api-check-request-config.png)
-
-</Step>
-
-<Step title="Configure Authentication (If Required)">
-For protected endpoints, set up authentication:
-
-**Bearer Token Authentication**:
-```yaml
-Headers:
-  Authorization: "Bearer {{API_TOKEN}}"
-```
-
-**Basic Authentication**:
-```yaml
-Username: api_user
-Password: secure_password
-```
-
-**API Key Authentication**:
-```yaml
-Headers:
-  X-API-Key: "{{API_KEY}}"
-  X-Client-ID: "client-123"
-```
-
-<Warning>
-Use environment variables for sensitive credentials. Never hardcode passwords or tokens in your checks.
-</Warning>
-
-![API check authentication setup](/images/docs/images/api-checks/api-check-auth.png)
-</Step>
-
-<Step title="Add Setup and Teardown Scripts (Optional)">
-Need to fetch a token before sending the request? Use a setup script.
-
-```javascript
-// Setup script - fetch authentication token
-const tokenResponse = await fetch('https://api.example.com/v1/auth/token', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    client_id: process.env.CLIENT_ID,
-    client_secret: process.env.CLIENT_SECRET,
-    grant_type: 'client_credentials'
-  })
-})
-
-const tokenData = await tokenResponse.json()
-process.env.ACCESS_TOKEN = tokenData.access_token
-```
-
-**Setup Script Use Cases**:
-- Fetch authentication tokens
-- Generate test data
-- Set dynamic variables
-- Prepare request context
-
-**Teardown Script Example**:
-```javascript
-// Cleanup script - remove test data
-if (response.status === 201) {
-  const data = JSON.parse(response.body)
-  await fetch(`https://api.example.com/v1/users/${data.id}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${process.env.ACCESS_TOKEN}`
-    }
-  })
-}
-
-// Clear sensitive data from logs
-delete process.env.ACCESS_TOKEN
-```
-
-**Teardown Script Use Cases**:
-- Clean up test data
-- Remove sensitive information
-- Log additional metrics
-- Trigger notifications
-
-</Step>
-
-<Step title="Configure Response Validation">
-Set up validation rules to verify your API responses:
-
-**Status Code Assertions**:
-```javascript
-// Expect successful response
-expect(response.status).to.equal(200)
-
-// Accept multiple success codes
-expect(response.status).to.be.oneOf([200, 201, 202])
-
-// Ensure no client/server errors
-expect(response.status).to.be.below(400)
-```
-
-**Response Content Validation**:
-```javascript
-// JSON response validation
-const data = JSON.parse(response.body)
-expect(data.success).to.be.true
-expect(data.user.id).to.be.a('number')
-expect(data.user.email).to.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
-
-// Text content validation
-expect(response.body).to.include('"status":"active"')
-expect(response.body).to.not.include('error')
-```
-
-**Header Validation**:
-```javascript
-// Verify response headers
-expect(response.headers['content-type']).to.include('application/json')
-expect(response.headers['x-rate-limit-remaining']).to.exist
-expect(response.headers['cache-control']).to.include('no-cache')
-```
-
-**Performance Assertions**:
-```javascript
-// Response time validation
-expect(response.responseTime).to.be.below(2000) // Less than 2 seconds
-```
-
-![API check assertions configuration](/images/docs/images/api-checks/api-check-assertions.png)
-
-</Step>
-
-<Step title="Set Performance Thresholds">
-Configure performance expectations for your API:
-
-**Response Time Thresholds**:
-- **Degraded Threshold**: 1000ms (Warning level - check passes but indicates slowness)
-- **Failed Threshold**: 5000ms (Critical level - check fails)
-
-**Why Set Thresholds?**
-- Track performance regressions over time
-- Get early warnings before critical failures
-- Fine-tune alerting sensitivity
-- Monitor SLA compliance
-
-**Threshold Examples by API Type**:
-```yaml
-# Fast APIs (authentication, simple queries)
-Degraded: 500ms
-Failed: 2000ms
-
-# Standard APIs (data retrieval, processing)
-Degraded: 1000ms
-Failed: 5000ms
-
-# Complex APIs (reports, analytics)
-Degraded: 3000ms
-Failed: 10000ms
-```
-
-![API check performance thresholds](/images/docs/images/api-checks/api-check-thresholds.png)
-</Step>
-
-<Step title="Configure Monitoring Schedule and Locations">
-Set up when and where your API check runs:
-
-**Monitoring Frequency**:
-- **Every 10 seconds**: Critical production APIs
-- **Every 1 minute**: Important user-facing APIs
-- **Every 5 minutes**: Standard monitoring frequency
-- **Every 15+ minutes**: Non-critical or development APIs
-
-**Global Monitoring Locations**:
-```yaml
-# Recommended global coverage
-Primary Locations:
-  - us-east-1 (N. Virginia)
-  - eu-west-1 (Ireland)
-  - ap-southeast-1 (Singapore)
-
-Additional Coverage:
-  - us-west-2 (Oregon)
-  - eu-central-1 (Frankfurt)
-  - ap-northeast-1 (Tokyo)
-```
-
-**Private Locations**:
-- Monitor internal APIs behind firewalls
-- Test from your own infrastructure
-- Validate private network performance
-
-**Benefits of Multi-Location Monitoring**:
-- Detect regional outages
-- Compare global performance
-- Validate CDN effectiveness
-- Test geographic load balancing
-
-![API check locations and scheduling](/images/docs/images/api-checks/api-check-schedule.png)
-</Step>
-
-<Step title="Configure Retries and Alerting">
-Set up failure handling and notification preferences:
-
-**Retry Configuration**:
-```yaml
-# Recommended retry settings
-Retry Strategy: "Retry once before failing"
-Retry Delay: 10 seconds
-
-# For flaky APIs
-Retry Strategy: "Retry twice before failing"
-Retry Delay: 15 seconds
-```
-
-**Alert Channel Options**:
-- **Email**: Immediate notifications to team members
-- **Slack**: Integration with team communication channels
-- **Webhook**: Custom integrations with external systems
-- **PagerDuty**: On-call rotation and escalation
-- **SMS**: Critical alert notifications (premium feature)
-
-**Alert Configuration Strategies**:
-```yaml
-# Inherit from check group
-Alert Settings: Use group defaults
-
-# Custom configuration
-Alert Conditions:
-  - API check fails
-  - Response time exceeds degraded threshold
-  - SSL certificate expires in 30 days
-
-Notification Channels:
-  - #api-alerts (Slack)
-  - api-team@company.com (Email)
-  - On-call engineer (PagerDuty)
-```
-
-![API check alerting configuration](/images/docs/images/api-checks/api-check-alerts.png)
-</Step>
-
-<Step title="Test Your Configuration">
-Validate your API check before deploying:
-
-1. **Click "Test Request"** to run a manual test
-2. **Review the response data**:
-   - HTTP status code
-   - Response headers
-   - Response body content
-   - Response time
-3. **Validate assertions**: Ensure all validation rules pass
-4. **Check authentication**: Verify credentials work correctly
-
-**Test Results Example**:
-```json
-{
-  "status": 200,
-  "responseTime": 234,
-  "headers": {
-    "content-type": "application/json",
-    "x-rate-limit-remaining": "999"
-  },
-  "body": {
-    "success": true,
-    "data": {
-      "user_id": 12345,
-      "status": "active"
-    }
-  },
-  "assertions": {
-    "passed": 4,
-    "failed": 0
-  }
-}
-```
-
-**Troubleshooting Common Issues**:
-- **401 Unauthorized**: Check authentication credentials
-- **Timeout**: Verify endpoint URL and network connectivity
-- **Assertion Failures**: Review response format and validation rules
-- **SSL Errors**: Validate certificate configuration
-
-![API check test results](/images/docs/images/api-checks/api-check-test.png)
-</Step>
-
-<Step title="Save and Deploy">
-Finalize your API check configuration:
-
-1. **Click "Save Check"** to create your monitoring check
-2. **Verify the schedule**: Confirm monitoring frequency and locations
-3. **Check the dashboard**: Your new API check will appear in the main dashboard
-4. **Monitor initial results**: Watch the first few runs to ensure everything works correctly
-
-**What Happens Next**:
-- Checkly begins running your check on the defined schedule
-- Results are collected from all configured locations
-- Alerts are sent according to your notification settings
-- Performance data is tracked for trend analysis
-
-![API check dashboard view](/images/docs/images/api-checks/api-check-dashboard.png)
-</Step>
-
-<Step title="Manage as Code with Checkly CLI (Optional)">
-For teams using infrastructure as code, define your API checks programmatically:
-
-```typescript
+### Name and tags
+
+A meaningful name will not only help you and others identify your checks within Checkly, but it will help provide a better alerting experience if your checks fall into an alert state.
+
+Tags can relate your checks together. They also determine which checks are shown on your [dashboards](/docs/dashboards/).
+
+
+### HTTP request
+
+This is where you configure the API endpoint. The most important part of your API check is its URL and method. Optionally, you can define body data, headers, query parameters and authentication for the API check. These [request settings](request-settings) determine the actions taken by the API and the response sent back. 
+
+Endpoints can be accessed and manipulated through [HTTP methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods). Not all methods are valid for all endpoints.
+
+You can import a cURL command, Swagger.json or OpenAPI specification here too.
+
+### Setup and teardown scripts
+
+Setup scripts allow you to do last minute processing of test data and request options. These scripts execute before any requests are made. Teardown scripts are run after the HTTP request has finished, but before any assertions are validated. With a maximum execution time of 10 seconds, these scripts are useful for things like signing HMAC requests, requesting tokens, setting up or cleaning up test data and scrubbing sensitive response data for regulatory reasons.
+
+[Read more about setup and teardown scripts](setup-teardown-scripts/)
+
+### Response time limits
+
+Sometimes APIs can be slow, but not broken. We call this degraded. You can set [response time limits](/docs/api-checks/limits/) to specify when an API check should be marked as degraded and when it should be marked as failed.
+
+### Assertions
+
+This is where you determine whether the response of the HTTP request is correct or not.
+You can assert on different sources. These could be:
+
+- The HTTP status code returned from the API
+- Something missing or required within the response body
+- A specific response header
+- A specific response time
+
+[Read more about assertions](assertions)
+
+### Scheduling & locations
+
+You can configure your checks to run from our [public](/docs/monitoring/global-locations/) locations, or use a Checkly Agent to host your own [private](/docs/private-locations/) locations. If you don't select more than one location and you've disabled retrying checks from the same location, we will pick a random location when retrying checks.
+
+Checkly runs your API checks based on an interval you set. The shortest interval you can run is every 10 seconds and the longest is every 24 hours.
+
+ℹ️ A 1-second interval is available upon request — [contact us](mailto:support@checklyhq.com) if you'd like to learn more.
+
+### Retries & alerting
+
+Select your preferred [retry strategy](/docs/alerting-and-retries/retries/) for failed checks.
+
+Choose which [alert channels](/docs/alerting-and-retries/alert-channels/) to get notified through when your check runs into issues. If we don't have your preferred alert method, why not try out our [webhooks](/docs/alerting-and-retries/webhooks/)?
+
+### Testing
+
+You can run your check as an [E2E test](/docs/testing) locally or from your CI/CD pipeline to validate your freshly deployed application. Use the Checkly CLI, or configure integrations with Vercel and GitHub.
+
+## CLI example
+
+The [Checkly CLI](/guides/getting-started-with-monitoring-as-code/) gives you a JavaScript/TypeScript-native workflow for coding, testing and deploying synthetic monitoring at scale, from your code base.
+
+You can define an API check via the CLI. For example:
+
+```ts {title="hello-api.check.ts"}
 import { ApiCheck, AssertionBuilder, Frequency } from 'checkly/constructs'
 
-new ApiCheck('user-api-health', {
-  name: 'User API Health Check',
-  frequency: Frequency.EVERY_5M,
+new ApiCheck('hello-api-1', {
+  name: 'Hello API',
+  activated: true,
+  frequency: Frequency.EVERY_1M,
   request: {
     method: 'GET',
-    url: 'https://api.example.com/v1/users/health',
-    headers: {
-      'Authorization': 'Bearer {{API_TOKEN}}',
-      'Content-Type': 'application/json'
-    },
+    url: 'https://mac-demo-repo.vercel.app/api/hello',
     assertions: [
-      AssertionBuilder.statusCode().equals(200),
-      AssertionBuilder.responseTime().lessThan(2000),
-      AssertionBuilder.jsonBody('$.status').equals('healthy'),
-      AssertionBuilder.header('content-type').contains('application/json')
-    ]
-  },
-  locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1']
+      AssertionBuilder.statusCode().equals(200)
+    ],
+  }
 })
 ```
 
-**Benefits of Managing as Code**:
-- Version control for monitoring configurations
-- Consistent deployments across environments
-- Integration with CI/CD pipelines
-- Collaborative review processes
-- Automated rollbacks and updates
+The above example defines:
+- The basic check properties like `name`, `activated` etc.
+- The `GET` HTTP method and target `url` of the request.
+- An array of assertions to assert the HTTP response status is correct.
 
-</Step>
-
-</Steps>
-
-## Common Configuration Examples
-
-### Basic Health Check
-```typescript
-// Simple API health monitoring
-Method: GET
-URL: https://api.example.com/health
-Expected Status: 200
-Content Contains: "status":"healthy"
-```
-
-### Authenticated User API
-```typescript
-// API with Bearer token authentication
-Method: GET
-URL: https://api.example.com/v1/user/profile
-Headers:
-  Authorization: "Bearer {{ACCESS_TOKEN}}"
-  Accept: "application/json"
-Expected Status: 200
-JSON Schema: user-profile-schema.json
-```
-
-### POST API with Data Validation
-```typescript
-// Create resource with validation
-Method: POST
-URL: https://api.example.com/v1/users
-Headers:
-  Content-Type: "application/json"
-Body: |
-  {
-    "name": "Test User",
-    "email": "test@example.com"
-  }
-Expected Status: 201
-Assertions:
-  - Response contains user ID
-  - Email format is valid
-```
-
-## Understanding Results
-
-Once your API check is running, you'll see comprehensive monitoring data:
-### Dashboard Metrics
-- **Response Time**: Latest request duration and trends
-- **Status Code Distribution**: Success/error rate patterns
-- **Availability**: Uptime percentage across time periods
-- **Global Performance**: Response times from each location
-
-### Detailed Response Analysis
-- **Request/Response Headers**: Complete HTTP transaction details
-- **Response Body**: Full API response content
-- **Assertion Results**: Pass/fail status for each validation rule
-- **Performance Breakdown**: DNS, connection, and transfer timing
-
-### Alerting and Notifications
-- **Real-time Alerts**: Immediate notification of failures
-- **Performance Degradation**: Warnings when response times increase
-- **Recovery Notifications**: Automatic alerts when issues resolve
-- **Trend Analysis**: Long-term performance and reliability insights
-
-<Note>
-API checks provide excellent coverage for REST APIs, GraphQL endpoints, and microservices. Combine them with browser checks for complete application monitoring coverage.
-</Note>
+For more options, see the [Check construct reference](/docs/cli/constructs-reference/#check).

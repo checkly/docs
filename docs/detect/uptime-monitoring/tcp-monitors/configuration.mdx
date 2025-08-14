@@ -5,32 +5,68 @@ sidebarTitle: 'Configuration'
 ---
 
 
-## Locations
+TCP monitors verify the availability of non-HTTP services by establishing a connection to a specific host and port.
 
-TCP monitors can run from multiple global locations to ensure your services are accessible worldwide. See [monitoring locations](/docs/detect/uptime-monitoring/locations) for detailed configuration guidance:
+### Basic Setup
+
+Configure your TCP monitor by specifying the target service:
+
+<Frame>
+  <img src="/images/tcp-request.png" alt="TCP monitor setup interface showing hostname, port, and protocol selection" />
+</Frame>
+
+* **Hostname:** The server you want to monitor (e.g. `db.example.com`)
+* **Port:** The TCP port your service is listening on (e.g. `3306` for MySQL)
+* **IP family:** Defaults to IPv4
+
+### Assertions
+
+Configure connection timeouts and data transmission assertions:
+
+<Frame>
+  <img src="/images/tcp-assertion.png" alt="TCP monitor connection options showing timeout settings and data fields" />
+</Frame>
+
+* **Connection timeout:** Maximum time to wait for connection (default: 10 seconds)
+* **Read timeout:** Time to wait for response after connection (default: 10 seconds)
+* **Data to send:** Optional data to transmit after establishing connection
+
+### Response Validation
+
+Validate the service response for more precise monitoring:
+
+<Frame>
+  <img src="/images/tcp-response.png" alt="TCP monitor assertions interface showing response validation options" />
+</Frame>
+
+* **Response data:** Expected text pattern in the response
+* **Response time limits:** Define performance thresholds for degraded or failed states
+
+### Frequency
+
+Set how often the monitor runs (every 10 seconds to 24 hours):
+
+<Frame>
+  <img src="/images/tcp-frequency.png" alt="TCP monitor frequency selection interface" />
+</Frame>
+
+### Scheduling & Locations
+
+<Frame>
+  <img src="/images/tcp-scheduling-strategy.png" alt="TCP monitor scheduling strategy and location selection interface" />
+</Frame>
+
+* **Strategy:** Choose between round-robin or parallel execution. Learn more about [scheduling strategies](/docs/monitoring/global-locations#scheduling-strategies)
+* **Locations:** Select one or more [public](/docs/monitoring/global-locations/) or [private](/docs/private-locations/) locations to run the monitor from
+
+### Additional Settings
+
+* **Name:** Give your monitor a clear name to identify it in dashboards and alerts
+* **Tags:** Use tags to organize monitors across dashboards and [maintenance windows](/docs/maintenance-windows/)
+* **Retries:** Define how failed runs should be retried. See [retry strategies](/docs/alerting-and-retries/retries/)
+* **Alerting:** Configure your [alert settings](/docs/alerting-and-retries/alert-settings/), [alert channels](/docs/alerting-and-retries/alert-channels/), or set up [webhooks](/docs/alerting-and-retries/webhooks/) for custom integrations
 
 
-## Metrics
-
-TCP monitors track several timing metrics. Once your TCP monitor is running, you'll see:
-
-
-- **Connection Time**: Time to establish the TCP connection
-- **First Byte Time**: Time to receive first response byte
-- **Total Response Time**: Complete request/response cycle
-- **DNS Resolution Time**: Time to resolve the hostname
-- **SSL Handshake Time**: Certificate validation time (if applicable)
-
-
-## Alerting 
-
-Configure alerts for various metric conditions. See [alerting configuration](/docs/detect/uptime-monitoring/alerting) for comprehensive setup guidance:
-- **Connection Failures**: When the service doesn't accept connections
-- **Timeout Exceeded**: When responses take too long
-- **Response Validation**: When expected responses don't match
-- **Certificate Issues**: When SSL certificates are invalid or expiring
-
-
-
-
-
+<Note>
+TCP monitors provide network-level connectivity verification. For application-level monitoring, consider adding [synthetic monitoring](/docs/detect/synthetic-monitoring/overview) to your monitoring strategy.
+</Note>

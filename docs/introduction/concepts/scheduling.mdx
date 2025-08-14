@@ -25,16 +25,18 @@ Use **Parallel Scheduling** to reduce detection times for regional outages and r
 ## Frequencies Available At Checkly
 | Interval | Description |
 |----------|-------------|
-| Every Second | Real-time monitoring for critical services |
-| Every 10 seconds | Ultra-high frequency for critical services |
-| Every 30 seconds | High frequency monitoring |
-| Every minute | Standard high-frequency monitoring |
-| Every 5 minutes | Balanced monitoring (most common) |
-| Every 10 minutes | Moderate frequency |
-| Every 15 minutes | Lower frequency monitoring |
-| Every 30 minutes | Infrequent monitoring |
-| Every hour | Low frequency monitoring |
-| Custom intervals | Up to 24 hours for specific needs |
+| 1 min | High-frequency monitoring for critical services |
+| 2 mins | High-frequency monitoring |
+| 5 mins | Balanced monitoring (most common) |
+| 10 mins | Moderate frequency monitoring |
+| 15 mins | Lower frequency monitoring |
+| 30 mins | Infrequent monitoring |
+| 1 hr | Hourly monitoring |
+| 2 hrs | Bi-hourly monitoring |
+| 3 hrs | Every 3 hours |
+| 6 hrs | Every 6 hours |
+| 12 hrs | Twice daily monitoring |
+| 24 hrs | Daily monitoring |
 
 ## Frequency Selection Guidelines
 
@@ -86,56 +88,10 @@ Read Replicas: Every 5 minutes
 Backup Systems: Every 15 minutes
 ```
 
-**Load Balancers and Proxies:**
-```yaml
-Production Load Balancer: Every 1 minute
-Staging Environment: Every 10 minutes
-Development Proxies: Every 30 minutes
-```
 
-**Daily Jobs:**
-```yaml
-Period: 24 hours
-Grace Period: 30-60 minutes
-Example: Nightly backups, daily reports
-```
 
-**Hourly Jobs:**
-```yaml
-Period: 1 hour  
-Grace Period: 10-15 minutes
-Example: Data sync, cache refresh
-```
 
-**High-Frequency Jobs:**
-```yaml
-Period: 5-15 minutes
-Grace Period: 2-5 minutes  
-Example: Real-time data processing, monitoring tasks
-```
-
-## Cost and Performance Optimization
-
-### Balancing Coverage and Cost
-
-**High-Value Optimization:**
-```yaml
-Strategy: Monitor critical paths frequently, everything else moderately
-Implementation:
-  - User-facing services: Every 1-2 minutes
-  - Internal APIs: Every 5-10 minutes
-  - Dev/staging: Every 15-30 minutes
-```
-
-**Cost-Conscious Approach:**
-```yaml
-Strategy: Focus on essential monitoring with smart frequency
-Implementation:
-  - Core services only: Every 5 minutes
-  - Reduce locations for non-critical services
-  - Use longer intervals during off-peak hours
-```
-
+## Best Practices
 ### Resource Impact Considerations
 
 **Server Load Management:**
@@ -148,8 +104,6 @@ Implementation:
 - More frequent checks = higher monitoring costs
 - Balance detection speed with budget constraints
 - Review and adjust frequencies based on actual value
-
-## Best Practices
 
 ### Initial Configuration
 1. **Start conservative** with 5-10 minute intervals

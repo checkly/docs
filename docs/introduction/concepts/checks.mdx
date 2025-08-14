@@ -14,18 +14,34 @@ Checks proactively experience your application the same way real users would—c
 Checkly's flexible offering includes several types of Checks, each designed for different levels of complexity and testing scenarios:
 
 <AccordionGroup>
-
-<Accordion title="Browser Checks">
-Simulate real user interactions in a headless browser using TypeScript/JavaScript with @playwright/test. Navigate, screenshot, and assert your key webapp flows. Browser Checks can handle complex scenarios that simple uptime monitoring cannot.
+<Accordion title="URL Monitors">
+Monitor HTTP/HTTPS endpoints for availability and basic performance. URL Monitors check if your websites and APIs are responding correctly by making HTTP requests and validating the response.
 
 **Perfect for:**
-- Complete user journey testing
-- Login flows and authentication
-- Checkout processes and e-commerce flows
-- Form submissions and data entry
-- Visual regression testing
-- Mobile device emulation
+- Website uptime monitoring
+- API endpoint availability
+- Basic performance tracking
+- SSL certificate monitoring
 </Accordion>
+<Accordion title="TCP Monitors">
+Verify connectivity to any TCP service by establishing connections to specific hosts and ports. TCP Monitors test the availability of non-HTTP services and infrastructure components.
+
+**Perfect for:**
+- Database connectivity
+- Custom application services
+- Network service availability
+- Port accessibility testing
+</Accordion>
+<Accordion title="Heartbeat Monitors">
+Monitor scheduled processes, cron jobs, and batch operations that should "check in" at regular intervals. Instead of actively testing your service, Heartbeat Monitors wait to receive a signal from your system.
+
+**Perfect for:**
+- Backup job verification
+- Scheduled task monitoring
+- Batch process oversight
+- Data pipeline health
+</Accordion>
+
 
 <Accordion title="API Checks">
 Advanced API testing that goes beyond basic uptime monitoring. Use setup and teardown scripts, complex assertions, and custom request handling. Validate that your backend services respond correctly, perform within acceptable timeframes, and return the right data structures.
@@ -50,7 +66,27 @@ Write sophisticated Node.js scripts that run multiple API requests in sequence w
 - Workflow orchestration testing
 - Cross-service data validation
 </Accordion>
+<Accordion title="Browser Checks">
+Simulate real user interactions in a headless browser using TypeScript/JavaScript with @playwright/test. Navigate, screenshot, and assert your key webapp flows. Browser Checks can handle complex scenarios that simple uptime monitoring cannot.
 
+**Perfect for:**
+- Complete user journey testing
+- Login flows and authentication
+- Checkout processes and e-commerce flows
+- Form submissions and data entry
+- Visual regression testing
+- Mobile device emulation
+</Accordion>
+
+<Accordion title="Playwright Checks">
+Run entire Playwright test suites and projects as production monitors without code rewrites. Playwright Check Suites support the full Playwright API and ecosystem, enabling you to use existing tests and configuration files as-is.
+
+**Perfect for:**
+- Converting existing E2E tests into monitoring
+- Testing complex user workflows across multiple browsers
+- Monitoring critical business processes
+- Validating application functionality after deployments
+</Accordion>
 </AccordionGroup>
 
 
@@ -70,7 +106,7 @@ Teardown scripts are run *before* any assertions are validated.
 
 ## Code-First Philosophy
 
-Checks treat monitoring as code, meaning your tests live alongside your application code and follow the same development practices. Your checks should live in your codebase and be managed as any other application code, making full use of code reviews, versioning, and your general software development lifecycle.
+All check types at Checkly have a Construct or API endpoint - meaning you can use Checkly to bring your monitoring process right into your repository. We call this [Monitoring as Code](/docs/introduction/concepts/monitoring-as-code).
 
 This approach transforms monitoring from a manual, UI-driven process into a programmable, scalable system that grows with your application. You can version control your monitoring logic, collaborate on it through code reviews, and deploy monitoring changes through the same CI/CD pipelines you use for application code.
 

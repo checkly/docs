@@ -1,0 +1,117 @@
+---
+title: 'Environment variables'
+sidebarTitle: 'Variables'
+description: 'Securely store and manage sensitive data like credentials and configuration values across your monitoring checks'
+---
+
+Environment variables allow you to store sensitive data like credentials and configuration values that can be reused across your monitoring setup. This keeps secrets out of your code and enables flexible configuration management.
+
+## Managing variables
+
+You can create environment variables at three hierarchical levels, with check-level variables taking precedence over group and global variables.
+
+<Accordion title="Check-level variables">
+Variables defined at the check level are only available to that specific check. Use these for check-specific configuration or to override group/global variables.
+
+**Supported by:** API, Browser, Multistep & Playwright checks
+
+Add variables on the **Variables** tab when editing a check.
+
+![check environment variables](/images/docs/images/browser-checks/check-environment-variables.png)
+
+**Example use cases:**
+- Test-specific credentials
+- Different API endpoints per check
+- Override default timeout values
+</Accordion>
+
+<Accordion title="Group-level variables">
+Variables defined at the group level are inherited by all checks within that group. This is ideal for sharing common configuration across related checks.
+
+**Benefits:**
+- Reduces duplication across checks in the same group
+- Consistent configuration for related monitoring scenarios
+- Easy maintenance when credentials or endpoints change
+
+**Example use cases:**
+- Shared service credentials for all checks in a group
+- Common API base URLs
+- Environment-specific configuration (staging vs production)
+</Accordion>
+
+<Accordion title="Global variables">
+Variables defined at the global level are available to all checks across your entire account. Use these for organization-wide configuration.
+
+**Best practice:** Store variables at the global level whenever possible to follow the DRY (Don't Repeat Yourself) principle.
+
+**Example use cases:**
+- Organization-wide credentials
+- Global configuration values
+- Default timeout and retry settings
+</Accordion>
+
+## Variable hierarchy
+
+When checks run, Checkly merges variables from all three levels into a single dataset. Variables at more specific levels override those at broader levels:
+
+**Check variables** > **Group variables** > **Global variables**
+
+This hierarchy allows you to:
+- Set default values at the global or group level
+- Override specific values at the check level when needed
+- Maintain flexible configuration with minimal duplication
+
+## Accessing variables
+
+Environment variables are accessible in your code using the standard Node.js `process.env.VARIABLE_NAME` notation.
+
+<Accordion title="Example: GitHub login">
+<Tabs>
+<Tab title="TypeScript">
+```ts variables.spec.ts
+import { test } from '@playwright/test'
+
+test('GitHub login', async ({ page }) => {
+  await page.goto('https://github.com/login')
+  await page.getByLabel('Username or email address').type(process.env.GITHUB_USER)
+  await page.getByLabel('Password').type(process.env.GITHUB_PWD)
+  await page.getByRole('button', { name: 'Sign in' }).click()
+})
+```
+</Tab>
+<Tab title="JavaScript">
+```js variables.spec.js
+const { test } = require('@playwright/test')
+
+test('GitHub login', async ({ page }) => {
+  await page.goto('https://github.com/login')
+  await page.getByLabel('Username or email address').type(process.env.GITHUB_USER)
+  await page.getByLabel('Password').type(process.env.GITHUB_PWD)
+  await page.getByRole('button', { name: 'Sign in' }).click()
+})
+```
+</Tab>
+</Tabs>
+</Accordion>
+
+## Built-in variables
+
+Checkly provides several built-in environment variables that are automatically available in your checks:
+
+<Accordion title="Runtime variables">
+- `CHECK_NAME` - The name of the current check
+- `CHECK_TYPE` - The type of check (API, BROWSER, etc.)
+- `CHECK_ID` - The unique identifier of the check
+- `REGION` - The current data center location (e.g., `us-east-1`)
+- `RUN_ID` - Unique identifier for the current check run
+</Accordion>
+
+## Security
+
+- **Encryption:** All variable data is encrypted at rest and in transit
+- **Access control:** Locked variables can only be accessed by team members with Read & Write access or above
+- **Best practices:** Avoid logging sensitive variables in your check results to prevent exposure to Read Only team members
+
+<Note>
+For more login scenarios and examples, see our [login scenarios documentation](/docs/browser-checks/login-scenarios/).
+</Note>

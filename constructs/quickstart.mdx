@@ -15,13 +15,9 @@ Get started with Checkly constructs by building your first monitoring setup usin
 </Accordion>
 </AccordionGroup>
 
+<Note>Use this guide to manually set up your Checkly configuration. [Follow the quickstart guide](/docs/introduction/quickstart) and `npm create checkly` for an automatic setup.</Note>
+
 ## Installation
-
-Install the Checkly CLI as a dev dependency:
-
-<CliInstallation/>
-
-## Project Setup
 
 Create a new directory and initialize your monitoring project:
 
@@ -31,14 +27,19 @@ cd my-monitoring-project
 npm init -y
 ```
 
-Install Checkly and required dependencies:
+Install the Checkly CLI.
 
 ```bash Terminal
-npm install --save-dev @playwright/test
-npm install --save-dev typescript
-npm install --save-dev @types/node
+npm install --save-dev checkly
 ```
 
+Recommended: Install [jiti](https://www.npmjs.com/package/jiti) to use TypeScript for your Checkly monitoring setup.
+
+```bash Terminal
+npm i --save-dev jiti
+```
+
+## Project Setup
 
 Create a `checkly.config.ts` file with basic settings:
 
@@ -60,7 +61,6 @@ export default defineConfig({
     checkMatch: '**/*.check.{js,ts}',
     browserChecks: {
       frequency: Frequency.EVERY_10M,
-      testMatch: '**/*.spec.{js,ts}',
     }
   },
   cli: {
@@ -69,7 +69,9 @@ export default defineConfig({
 })
 ```
 
-## Your First Multi-Construct Example
+Learn more about the general Checkly settings at [Project and Configuration](/constructs/project).
+
+## Your First Checkly CLI Construct
 
 Create a monitoring setup using multiple constructs. First, create the directory structure:
 
@@ -77,30 +79,19 @@ Create a monitoring setup using multiple constructs. First, create the directory
 mkdir -p src/__checks__
 ```
 
-Create `src/__checks__/website-monitoring.ts`:
+Create `src/__checks__/website-monitoring.check.ts`:
 
-```ts src/__checks__/website-monitoring.ts
-import { 
-  BrowserCheck, 
-  RetryStrategy,
-  Frequency 
+```ts src/__checks__/website-monitoring.check.ts
+import {
+  BrowserCheck,
+  Frequency
 } from 'checkly/constructs'
 
-// Create a retry strategy for resilient monitoring
-const retryStrategy = new RetryStrategy('standard-retry', {
-  type: 'fixed',
-  baseBackoffSeconds: 60,
-  maxRetries: 2,
-  maxDurationSeconds: 600,
-  sameRegion: true
-})
-
-// Create a browser check with retry strategy
-const homepageCheck = new BrowserCheck('homepage-check', {
+// Create a browser check running a Playwright Test script
+new BrowserCheck('homepage-check', {
   name: 'Homepage Load Test',
   frequency: Frequency.EVERY_5M,
   locations: ['us-east-1', 'eu-west-1'],
-  retryStrategy,
   code: {
     entrypoint: './homepage.spec.ts'
   }
@@ -115,25 +106,17 @@ import { test, expect } from '@playwright/test'
 test('Homepage loads successfully', async ({ page }) => {
   // Navigate to your website
   await page.goto('https://your-website.com')
-  
+
   // Check the page title
   await expect(page).toHaveTitle(/Your Site Name/)
-  
+
   // Verify main navigation is visible
   const navigation = page.locator('nav')
   await expect(navigation).toBeVisible()
-  
+
   // Check for key content
-  const mainContent = page.locator('main')
+  const mainContent = page.getByRole('main')
   await expect(mainContent).toBeVisible()
-  
-  // Verify page loads within reasonable time
-  const performanceEntries = await page.evaluate(() => {
-    const entries = performance.getEntriesByType('navigation')
-    return entries[0]
-  })
-  
-  console.log('Page load time:', performanceEntries.loadEventEnd - performanceEntries.loadEventStart, 'ms')
 })
 ```
 
@@ -145,7 +128,7 @@ Test your configuration locally before deployment:
 npx checkly test
 ```
 
-This will run your browser check locally and validate your configuration.
+This command will run your browser check in the Checkly infrastructure. Use this flow to test your monitoring configuration and validate preview environments.
 
 ## Deployment
 
@@ -155,7 +138,7 @@ Deploy your monitoring to Checkly:
 npx checkly deploy
 ```
 
-Your browser check with retry strategy is now monitoring your website every 5 minutes from multiple locations, with automatic retries on failures.
+Turn your browser check into a synthetic monitor checking your website every 5 minutes from multiple locations.
 
 ## Next Steps
 

@@ -5,6 +5,7 @@ description: Quick start guide for using Checkly constructs with the CLI
 ---
 
 import CliInstallation from '/snippets/cli-installation.mdx';
+import ChecklyConfigCodeBlock from '/snippets/checkly-config-example-code-block.mdx';
 
 Get started with Checkly constructs by building your first monitoring setup using the CLI.
 
@@ -41,39 +42,15 @@ npm i --save-dev jiti
 
 ## Project Setup
 
-Create a `checkly.config.ts` file with basic settings:
+Create a `checkly.config` file with basic settings:
 
-```ts checkly.config.ts
-import { defineConfig } from 'checkly'
-import { Frequency } from 'checkly/constructs'
-
-export default defineConfig({
-  projectName: 'My Monitoring Project',
-  logicalId: 'my-monitoring-1',
-  repoUrl: 'https://github.com/your-org/monitoring',
-  checks: {
-    activated: true,
-    muted: false,
-    runtimeId: '2025.04',
-    frequency: Frequency.EVERY_5M,
-    locations: ['us-east-1', 'eu-west-1'],
-    tags: ['production'],
-    checkMatch: '**/*.check.{js,ts}',
-    browserChecks: {
-      frequency: Frequency.EVERY_10M,
-    }
-  },
-  cli: {
-    runLocation: 'us-east-1'
-  }
-})
-```
+<ChecklyConfigCodeBlock />
 
 Learn more about the general Checkly settings at [Project and Configuration](/constructs/project).
 
 ## Your First Checkly CLI Construct
 
-Create a monitoring setup using multiple constructs. First, create the directory structure:
+Create a monitoring setup using monitoring as code constructs. First, create the directory structure:
 
 ```bash Terminal
 mkdir -p src/__checks__
@@ -89,7 +66,7 @@ import {
 
 // Create a browser check running a Playwright Test script
 new BrowserCheck('homepage-check', {
-  name: 'Homepage Load Test',
+  name: 'Homepage Test',
   frequency: Frequency.EVERY_5M,
   locations: ['us-east-1', 'eu-west-1'],
   code: {
@@ -120,6 +97,8 @@ test('Homepage loads successfully', async ({ page }) => {
 })
 ```
 
+<Tip>If you're unfamiliar with Playwright Test, [learn more about Microsoft's end-to-end testing framework in the `/learn` section](/learn/playwright/what-is-playwright).</Tip>
+
 ## Testing Your Setup
 
 Test your configuration locally before deployment:
@@ -128,7 +107,7 @@ Test your configuration locally before deployment:
 npx checkly test
 ```
 
-This command will run your browser check in the Checkly infrastructure. Use this flow to test your monitoring configuration and validate preview environments.
+[This `test` command](/cli/checkly-test) will run your browser check in the Checkly infrastructure. Use this flow to test your monitoring configuration and validate preview environments.
 
 ## Deployment
 
@@ -138,7 +117,7 @@ Deploy your monitoring to Checkly:
 npx checkly deploy
 ```
 
-Turn your browser check into a synthetic monitor checking your website every 5 minutes from multiple locations.
+[The `deploy` command](/cli/checkly-deploy) turns your browser check into a synthetic monitor checking your website every 5 minutes from multiple locations.
 
 ## Next Steps
 
@@ -149,6 +128,6 @@ Turn your browser check into a synthetic monitor checking your website every 5 m
 
 ## Learn More
 
-- [Project structure](/constructs/structure) - Understand how to organize your monitoring code
+- [Project configuration](/constructs/project) - Understand how to configure your monitoring project
 - [Browser checks](/constructs/browser-check) - Deep dive into browser monitoring
 - [Retry strategies](/constructs/retry-strategy) - Configure resilient monitoring

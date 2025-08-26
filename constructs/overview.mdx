@@ -4,11 +4,15 @@ description: 'Build monitoring infrastructure with reusable TypeScript classes'
 sidebarTitle: 'Overview'
 ---
 
-Constructs are JavaScript/TypeScript classes that represent your monitoring resources. Import them from `checkly/constructs` to create checks, alert channels, and other resources in code.
+import JsTsNote from '/snippets/js-ts-note.mdx';
+import ChecklyConfigCodeBlock from '/snippets/checkly-config-example-code-block.mdx';
 
-<Note>The Checkly CLI works with JavaScript and TypeScript. The following documentation focuses on TypeScript, because we recommend using TypeScript for a better developer experience.</Note>
+Constructs are JavaScript/TypeScript classes that represent your all monitoring resources. Import them from `checkly/constructs` to create checks, alert channels, and other resources in code.
 
-```ts api-check.ts
+
+<CodeGroup dropdown>
+
+```ts api.check.ts
 import { ApiCheck, AssertionBuilder } from 'checkly/constructs'
 
 new ApiCheck('api-health-check', {
@@ -23,11 +27,29 @@ new ApiCheck('api-health-check', {
 })
 ```
 
+```js api.check.js
+const { ApiCheck, AssertionBuilder } = require('checkly/constructs')
+
+new ApiCheck('api-health-check', {
+  name: 'API Health Check',
+  request: {
+    url: 'https://danube-web.shop/api/books',
+    method: 'GET',
+    assertions: [
+      AssertionBuilder.statusCode().equals(200),
+    ],
+  },
+})
+```
+</CodeGroup>
+
+<JsTsNote />
+
 Test this API check with `npx checkly test` and transform it to production monitoring with `npx checkly deploy`.
 
 ## Project Structure
 
-Configure your Checkly project by creating and editing the `checkly.config.ts`. The configuration file enables you to set default settings like monitoring locations, configure alert settings and to organize your Checkly files to match your project structure.
+Configure your Checkly project by creating and editing the `checkly.config.ts`. The configuration file enables you to set default settings like monitoring locations, configure alert settings and organize your Checkly files to match your project requirements.
 
 Here is an example directory tree of what that would look like:
 
@@ -43,7 +65,7 @@ Here is an example directory tree of what that would look like:
 
 ```
 
-We recommend separating your monitoring resources from your application code using the `__checks__` path convention, but it's up to you to define where your monitoring will be defined.
+We recommend separating your monitoring resources from your application code using the `__checks__` path convention. However, it's up to you to define where your monitoring setup will be configured.
 
 ## Project Configuration
 
@@ -51,114 +73,45 @@ As your project grows, you will want to override these defaults for specific che
 
 <Tabs>
   <Tab title="Global Configuration">
-    Your global `checkly.config.ts` holds a set of defaults for your project.
+    Your global `checkly.config` holds a set of defaults for your project.
 
-    <CodeGroup dropdown>
-
-```ts checkly.config.ts
-import { defineConfig } from 'checkly'
-import { Frequency } from 'checkly/constructs'
-
-export default defineConfig({
-  projectName: 'Website Monitoring',
-  logicalId: 'website-monitoring-1',
-  repoUrl: 'https://github.com/acme/website',
-  checks: {
-    activated: true,
-    muted: false,
-    runtimeId: '2025.04',
-    frequency: Frequency.EVERY_5M,
-    locations: ['us-east-1', 'eu-west-1'],
-    tags: ['website', 'api'],
-    checkMatch: '**/*.check.js',
-    browserChecks: {
-      frequency: Frequency.EVERY_10M,
-      testMatch: 'browsers/**/*.spec.js',
-    },
-    multiStepChecks: {
-      testMatch: 'multistep/**/*.spec.js',
-    },
-  },
-  cli: {
-    runLocation: 'eu-west-1',
-    privateRunLocation: 'private-dc1'
-  }
-})
-```
-
-```js checkly.config.js
-const { defineConfig } = require('checkly')
-
-const config = defineConfig({
-  projectName: 'Website Monitoring',
-  logicalId: 'website-monitoring-1',
-  repoUrl: 'https://github.com/acme/website',
-  checks: {
-    activated: true,
-    muted: false,
-    runtimeId: '2025.04',
-    frequency: Frequency.EVERY_5M,
-    locations: ['us-east-1', 'eu-west-1'],
-    tags: ['website', 'api'],
-    checkMatch: '**/*.check.js',
-    browserChecks: {
-      frequency: Frequency.EVERY_10M,
-      testMatch: 'browsers/**/*.spec.js',
-    },
-    multiStepChecks: {
-      testMatch: 'multistep/**/*.spec.js',
-    },
-  },
-  cli: {
-    runLocation: 'eu-west-1',
-    privateRunLocation: 'private-dc1'
-  }
-})
-
-module.exports = config;
-```
-
-    </CodeGroup>
+    <ChecklyConfigCodeBlock />
 
     Find a full reference of all project properties in [the `Project` configuration section](/constructs/project).
   </Tab>
 
   <Tab title="Local Configuration">
-    Override any of the settings in the `checks` global configuration section at the individual check level.
+    Override any of the `checkly.config` settings at the individual check level.
 
-    <CodeGroup>
+    <CodeGroup dropdown>
 
 ```ts __checks__/api.check.ts
-import { ApiCheck, AssertionBuilder, Frequency } from 'checkly/constructs'
+import { ApiCheck, AssertionBuilder, Frequency } from "checkly/constructs"
 
-const api = new ApiCheck('hello-api', {
-  name: 'Hello API',
-  locations: ['ap-south-1'], // overrides the locations property
+new ApiCheck("books-api", {
+  name: "Books API",
+  locations: ["ap-south-1"], // overrides the locations property
   frequency: Frequency.EVERY_30M, // overrides the frequency property
   request: {
-    method: 'GET',
-    url: 'https://api.checklyhq.com/public-stats',
-    assertions: [
-      AssertionBuilder.statusCode().equals(200)
-    ]
-  }
+    method: "GET",
+    url: "https://danube-web.shop/api/books",
+    assertions: [AssertionBuilder.statusCode().equals(200)],
+  },
 })
 ```
 
 ```js __checks__/api.check.js
-const { ApiCheck, AssertionBuilder, Frequency } = require('checkly/constructs')
+const { ApiCheck, AssertionBuilder, Frequency } = require("checkly/constructs")
 
-const api = new ApiCheck('hello-api', {
-  name: 'Hello API',
-  locations: ['ap-south-1'], // overrides the locations property
+new ApiCheck("books-api", {
+  name: "Books API",
+  locations: ["ap-south-1"], // overrides the locations property
   frequency: Frequency.EVERY_30M, // overrides the frequency property
   request: {
-    method: 'GET',
-    url: 'https://api.checklyhq.com/public-stats',
-    assertions: [
-      AssertionBuilder.statusCode().equals(200)
-    ]
-  }
+    method: "GET",
+    url: "https://danube-web.shop/api/books",
+    assertions: [AssertionBuilder.statusCode().equals(200)],
+  },
 })
 ```
 
@@ -182,7 +135,7 @@ Every construct requires a unique `logicalId` as its first parameter. This ID tr
 new ApiCheck('homepage-api-check', { /* ... */ })
 new ApiCheck('user-auth-check', { /* ... */ })
 
-// Bad: duplicate IDs will cause conflicts
+// Bad: duplicate IDs will cause errors
 new ApiCheck('check-1', { /* ... */ })
 new ApiCheck('check-1', { /* ... */ }) // ❌ Duplicate ID
 ```
@@ -191,25 +144,28 @@ new ApiCheck('check-1', { /* ... */ }) // ❌ Duplicate ID
 Constructs are JavaScript/TypeScript classes that you can initialize programmatically. Use standard programming patterns:
 
 ```ts api-check.ts
-// Use loops to create multiple checks
-const endpoints = ['/api/users', '/api/orders', '/api/products']
-endpoints.forEach(endpoint =>
-  new ApiCheck(`${endpoint.replace('/', '-')}-check`, {
-    name: `${endpoint} Check`,
-    request: { url: `https://api.example.com${endpoint}` }
-  })
-)
-
 // Share alert channels across checks
-const alertChannel = new EmailAlertChannel('team-alerts', {
-  address: 'team@example.com'
+const alertChannel = new EmailAlertChannel("team-alerts", {
+  address: "team@example.com",
 })
 
-// Apply to multiple checks
-const checks = [check1, check2, check3]
-checks.forEach(check => check.alertChannels = [alertChannel])
+// Define your endpoints
+const endpoints = ["/api/books", "/api/books/22"]
+
+// Create a new check for each endpoint
+endpoints.forEach(
+  (endpoint) =>
+    new ApiCheck(`${endpoint.replace("/", "-")}-check`, {
+      name: `${endpoint} Check`,
+      request: {
+        method: "GET",
+        url: `https://danube-web.shop/${endpoint}`,
+      },
+      alertChannels: [alertChannel],
+    })
+)
 ```
 
 ## Next Steps
 
-Each construct has detailed documentation with examples, configuration options, and best practices. Start with the construct type you need, or browse the complete constructs reference above.
+Each construct has detailed documentation with examples, configuration options, and best practices. Start with the construct type you need, and start configuring your monitoring infrastructure in code.

@@ -56,6 +56,8 @@ Create a monitoring setup using monitoring as code constructs. First, create the
 mkdir -p src/__checks__
 ```
 
+// TODO add tabs for different constructs...
+
 Create `src/__checks__/website-monitoring.check.ts`:
 
 ```ts src/__checks__/website-monitoring.check.ts
@@ -65,12 +67,12 @@ import {
 } from 'checkly/constructs'
 
 // Create a browser check running a Playwright Test script
-new BrowserCheck('homepage-check', {
-  name: 'Homepage Test',
+new BrowserCheck("homepage-check", {
+  name: "Homepage Test",
   frequency: Frequency.EVERY_5M,
-  locations: ['us-east-1', 'eu-west-1'],
+  locations: ["us-east-1", "eu-west-1"],
   code: {
-    entrypoint: './homepage.spec.ts'
+    entrypoint: "./homepage.spec.ts"
   }
 })
 ```

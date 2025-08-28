@@ -4,6 +4,12 @@ description: 'Learn how to configure URL monitors with the Checkly CLI.'
 sidebarTitle: 'URL Monitor'
 ---
 
+import GeneralMonitorOptionsTable from '/snippets/general-monitor-options-table.mdx';
+
+<Tip>
+Learn more about URL monitors in [the URL monitor overview](/docs/detect/uptime-monitoring/url-monitors/overview).
+</Tip>
+
 Use URL monitors to track basic availability and HTTP status codes of your services and websites. The examples below show how to configure monitoring for different types of HTTP endpoints.
 
 <Accordion title="Prerequisites">
@@ -14,10 +20,8 @@ Before creating URL monitors, ensure you have:
 - Understanding of HTTP status codes and response behavior
 - Network access to the URLs you want to monitor
 
-For additional setup information, see [CLI overview](/cli/overview) and [URL Monitors overview](/docs/detect/uptime-monitoring/url-monitors/overview).
+For additional setup information, see [CLI overview](/cli/overview).
 </Accordion>
-
-## `UrlMonitor` Structure
 
 <CodeGroup>
 
@@ -59,10 +63,12 @@ new UrlMonitor("advanced-url-monitor", {
 
 </CodeGroup>
 
-## Options
+## Configuration
+
+The URL Monitoring configuration consists of specific URL monitoring options and inherited general monitoring options.
 
 <Tabs>
-<Tab title="Unique Options">
+<Tab title="URL Monitor">
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
@@ -71,37 +77,25 @@ new UrlMonitor("advanced-url-monitor", {
 | `maxResponseTime` | `number` | ❌ | `5000` | Maximum response time in milliseconds before marking as failed |
 
 </Tab>
-<Tab title="Common Options">
+<Tab title="General Monitor">
 
-| Property | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `name` | `string` | ✅ | - | Friendly name for your monitor |
-| `frequency` | `Frequency` | ❌ | `EVERY_10M` | How often to run your monitor |
-| `locations` | `string[]` | ❌ | `[]` | Array of public location codes |
-| `activated` | `boolean` | ❌ | `true` | Whether the monitor is enabled |
-| `privateLocations` | `string[]` | ❌ | `[]` | Array of Private Location slugs |
-| `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
-| `group` | `CheckGroupV1` `CheckGroupV2` | ❌ | - | The CheckGroup this monitor belongs to |
-| `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Array of AlertChannel objects for notifications |
-| `tags` | `string[]` | ❌ | `[]` | Array of tags to organize monitors |
-| `testOnly` | `boolean` | ❌ | `false` | Only run with test, not during deploy |
-| `retryStrategy` | `RetryStrategy` | ❌ | - | Strategy for configuring retries |
-| `runParallel` | `boolean` | ❌ | `false` | Run monitors in parallel or round-robin |
-| `alertEscalationPolicy` | `AlertEscalationPolicy` | ❌ | - | Advanced alert settings |
+  <GeneralMonitorOptionsTable />
 
 </Tab>
 </Tabs>
 
-## Unique Options
+### `UrlMonitor` Options
 
-<ResponseField name="request" type="object" required>
+<ResponseField name="request" type="object" required >
+
 HTTP request configuration that defines the URL to monitor and how to handle the request.
 
-### Usage
+**Usage:**
+
 ```ts
-new UrlMonitor('url-monitor', {
+new UrlMonitor("url-monitor", {
   request: {
-    url: 'https://example.com',
+    url: "https://example.com",
     followRedirects: true,
     assertions: [
       UrlAssertionBuilder.statusCode().equals(200)
@@ -110,7 +104,8 @@ new UrlMonitor('url-monitor', {
 })
 ```
 
-### Parameters
+**Parameters:**
+
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `url` | `string` | ✅ | - | The HTTP(S) URL to monitor |
@@ -119,7 +114,16 @@ new UrlMonitor('url-monitor', {
 | `skipSSL` | `boolean` | ❌ | `false` | Whether to skip validation of SSL certificates |
 | `assertions` | `UrlAssertion[]` | ❌ | `[]` | Response assertions using `UrlAssertionBuilder` |
 
-### Examples
+Define assertions using the `UrlAssertionBuilder` to validate HTTP status codes:
+
+```ts
+UrlAssertionBuilder.statusCode().equals(200)
+UrlAssertionBuilder.statusCode().notEquals(404)
+UrlAssertionBuilder.statusCode().greaterThan(200)
+UrlAssertionBuilder.statusCode().lessThan(300)
+```
+
+**Examples:**
 
 <Tabs>
 <Tab title="Simple Website">
@@ -176,7 +180,7 @@ new UrlMonitor("dev-endpoint", {
 <ResponseField name="degradedResponseTime" type="number" default="3000">
 Response time threshold in milliseconds for marking the monitor as degraded (warning state).
 
-### Usage
+**Usage:**
 
 ```ts
 // Progressive performance monitoring
@@ -197,7 +201,8 @@ new UrlMonitor("performance-tiers", {
 <ResponseField name="maxResponseTime" type="number" default="5000">
 Maximum response time in milliseconds before the monitor is marked as failed.
 
-### Usage
+**Usage:**
+
 ```ts
 new UrlMonitor("fast-site", {
   name: "Fast site",
@@ -208,7 +213,8 @@ new UrlMonitor("fast-site", {
 })
 ```
 
-### Examples
+**Examples:**
+
 ```ts
 // Fast website requirement
 new UrlMonitor("performance-critical", {
@@ -233,12 +239,13 @@ new UrlMonitor("api-timeout", {
 **Use cases**: Performance monitoring, SLA compliance, user experience optimization.
 </ResponseField>
 
-## Common Options
+### General Monitor Options
 
 <ResponseField name="name" type="string" required>
 Friendly name for your URL monitor that will be displayed in the Checkly dashboard and used in notifications.
 
-### Usage
+**Usage:**
+
 ```ts
 new UrlMonitor("my-monitor", {
   name: "Website Uptime Monitor",
@@ -251,7 +258,8 @@ new UrlMonitor("my-monitor", {
 <ResponseField name="frequency" type="Frequency">
 How often the URL monitor should run. Use the `Frequency` enum to set the check interval.
 
-### Usage
+**Usage:**
+
 ```ts
 new UrlMonitor("my-monitor", {
   frequency: Frequency.EVERY_1M,
@@ -259,7 +267,7 @@ new UrlMonitor("my-monitor", {
 })
 ```
 
-### Examples
+**Examples:**
 
 <Tabs>
 <Tab title="High Frequency">
@@ -306,14 +314,15 @@ new UrlMonitor("background-service", {
 <ResponseField name="locations" type="string[]" default="[]">
 Array of public location codes where the URL monitor should run from. Multiple locations provide geographic coverage.
 
-### Usage
+**Usage:**
+
 ```ts
 new UrlMonitor("global-monitor", {
   locations: ["us-east-1", "eu-west-1", "ap-southeast-1"]
 })
 ```
 
-### Examples
+**Examples:**
 
 <Tabs>
 <Tab title="Global Coverage">
@@ -355,14 +364,16 @@ new UrlMonitor("eu-service", {
 <ResponseField name="activated" type="boolean" default="true">
 Whether the URL monitor is enabled and will run according to its schedule.
 
-### Usage
+**Usage:**
+
 ```ts
 new UrlMonitor("my-monitor", {
   activated: false // Disabled monitor
 })
 ```
 
-### Examples
+**Examples:**
+
 ```ts
 // Temporarily disable a monitor
 new UrlMonitor("maintenance-site", {
@@ -374,17 +385,6 @@ new UrlMonitor("maintenance-site", {
 })
 ```
 </ResponseField>
-
-## `assertions` Configuration
-
-You can define assertions using the `UrlAssertionBuilder` to validate HTTP status codes:
-
-```ts
-UrlAssertionBuilder.statusCode().equals(200)
-UrlAssertionBuilder.statusCode().notEquals(404)
-UrlAssertionBuilder.statusCode().greaterThan(200)
-UrlAssertionBuilder.statusCode().lessThan(300)
-```
 
 ## Examples
 

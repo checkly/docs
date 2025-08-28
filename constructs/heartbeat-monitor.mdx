@@ -4,57 +4,61 @@ description: 'Learn how to configure heartbeat monitors with the Checkly CLI.'
 sidebarTitle: 'Heartbeat Monitor'
 ---
 
+<Tip>
+Learn more about Heartbeat monitors in [the Heartbeat monitor overview](/docs/detect/uptime-monitoring/heartbeat-monitors/overview).
+</Tip>
+
 Use heartbeat monitors to track passive monitoring scenarios where external services ping Checkly at regular intervals. The examples below show how to configure monitoring for different types of scheduled jobs and services.
 
 <Accordion title="Prerequisites">
 Before creating heartbeat monitors, ensure you have:
 
-- A Checkly CLI project initialized with `npx checkly init`
+- An initialized Checkly CLI project
 - External services, cron jobs, or scripts that can send HTTP POST requests
 - Understanding of your scheduled job intervals and expected timing
 - Network access from your services to Checkly's ping endpoints
 
-For additional setup information, see [CLI overview](/cli/overview) and [Heartbeat Monitors overview](/docs/detect/uptime-monitoring/heartbeat-monitors/overview).
+For additional setup information, see [CLI overview](/cli/overview).
 </Accordion>
-
-## `HeartbeatMonitor` Structure
 
 <CodeGroup>
 
 ```ts Basic Example
-import { HeartbeatMonitor } from 'checkly/constructs'
+import { HeartbeatMonitor } from "checkly/constructs"
 
-new HeartbeatMonitor('daily-backup-heartbeat', {
-  name: 'Daily Backup Job',
+new HeartbeatMonitor("daily-backup-heartbeat", {
+  name: "Daily Backup Job",
   period: 1,
-  periodUnit: 'days',
+  periodUnit: "days",
   grace: 2,
-  graceUnit: 'hours'
+  graceUnit: "hours",
 })
 ```
 
 ```ts Advanced Example
-import { HeartbeatMonitor } from 'checkly/constructs'
+import { HeartbeatMonitor } from "checkly/constructs"
 
-new HeartbeatMonitor('newsletter-heartbeat', {
-  name: 'Weekly Newsletter Job',
+new HeartbeatMonitor("newsletter-heartbeat", {
+  name: "Weekly Newsletter Job",
   activated: true,
   muted: false,
   period: 7,
-  periodUnit: 'days',
+  periodUnit: "days",
   grace: 4,
-  graceUnit: 'hours',
-  tags: ['newsletter', 'marketing', 'weekly'],
-  alertChannels: [emailChannel, slackChannel]
+  graceUnit: "hours",
+  tags: ["newsletter", "marketing", "weekly"],
+  alertChannels: [emailChannel, slackChannel],
 })
 ```
 
 </CodeGroup>
 
-## Options
+## Configuration
+
+The Heartbeat Monitoring configuration consists of specific heartbeat monitoring options and inherited general monitoring options.
 
 <Tabs>
-<Tab title="Unique Options">
+<Tab title="Heartbeat Monitor">
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
@@ -64,17 +68,11 @@ new HeartbeatMonitor('newsletter-heartbeat', {
 | `graceUnit` | `string` | ✅ | - | Grace time unit: `'seconds'` \| `'minutes'` \| `'hours'` \| `'days'` |
 
 </Tab>
-<Tab title="Common Options">
+<Tab title="General Monitor">
 
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `name` | `string` | ✅ | - | Friendly name for your monitor |
-
-</Tab>
-<Tab title="Global Options">
-
-| Property | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
 | `activated` | `boolean` | ❌ | `true` | Whether the monitor is enabled |
 | `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
 | `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Array of AlertChannel objects for notifications |
@@ -83,32 +81,35 @@ new HeartbeatMonitor('newsletter-heartbeat', {
 </Tab>
 </Tabs>
 
-## Unique Options
+### `HeartbeatMonitor` Options
 
 <ResponseField name="period" type="number" required>
 The expected period between pings from your external service. This defines how often your job or service should check in.
 
-### Usage
+**Usage:**
+
 ```ts
 new HeartbeatMonitor('my-heartbeat', {
+  name: "My heartbeat",
   period: 1,
   periodUnit: 'days' // Daily check-in expected
+  /* More options ... */
 })
 ```
 
-### Examples
+**Examples:**
 
 <Tabs>
 <Tab title="Daily Jobs">
 
 ```ts
 // Daily backup job
-new HeartbeatMonitor('backup-job', {
-  name: 'Daily Database Backup',
+new HeartbeatMonitor("backup-job", {
+  name: "Daily Database Backup",
   period: 1,
-  periodUnit: 'days',
+  periodUnit: "days",
   grace: 2,
-  graceUnit: 'hours'
+  graceUnit: "hours",
 })
 ```
 
@@ -117,12 +118,12 @@ new HeartbeatMonitor('backup-job', {
 
 ```ts
 // Hourly data sync
-new HeartbeatMonitor('data-sync', {
-  name: 'Hourly Data Sync',
+new HeartbeatMonitor("data-sync", {
+  name: "Hourly Data Sync",
   period: 1,
-  periodUnit: 'hours',
+  periodUnit: "hours",
   grace: 15,
-  graceUnit: 'minutes'
+  graceUnit: "minutes",
 })
 ```
 
@@ -131,12 +132,12 @@ new HeartbeatMonitor('data-sync', {
 
 ```ts
 // Every 5 minutes
-new HeartbeatMonitor('frequent-task', {
-  name: 'Frequent Health Check',
+new HeartbeatMonitor("frequent-task", {
+  name: "Frequent Health Check",
   period: 5,
-  periodUnit: 'minutes',
+  periodUnit: "minutes",
   grace: 2,
-  graceUnit: 'minutes'
+  graceUnit: "minutes",
 })
 ```
 
@@ -149,30 +150,14 @@ new HeartbeatMonitor('frequent-task', {
 <ResponseField name="periodUnit" type="string" required>
 The time unit for the period. Defines whether the period is in seconds, minutes, hours, or days.
 
-### Usage
+**Usage:**
+
 ```ts
-new HeartbeatMonitor('my-heartbeat', {
+new HeartbeatMonitor("my-heartbeat", {
+  name: "My heartbeat",
   period: 2,
-  periodUnit: 'hours' // Every 2 hours
-})
-```
-
-### Examples
-```ts
-// Various time units
-new HeartbeatMonitor('quick-check', {
-  period: 30,
-  periodUnit: 'seconds'  // Every 30 seconds
-})
-
-new HeartbeatMonitor('regular-task', {
-  period: 15,
-  periodUnit: 'minutes'  // Every 15 minutes
-})
-
-new HeartbeatMonitor('daily-report', {
-  period: 1,
-  periodUnit: 'days'     // Every day
+  periodUnit: "hours" // Every 2 hours
+  /* More options ... */
 })
 ```
 
@@ -182,7 +167,8 @@ new HeartbeatMonitor('daily-report', {
 <ResponseField name="grace" type="number" required>
 The grace period to wait before alerting after the expected ping time has passed. This allows for slight delays in job execution.
 
-### Usage
+**Usage:**
+
 ```ts
 new HeartbeatMonitor('my-heartbeat', {
   period: 1,
@@ -192,19 +178,19 @@ new HeartbeatMonitor('my-heartbeat', {
 })
 ```
 
-### Examples
+**Examples:**
 
 <Tabs>
 <Tab title="Short Grace Period">
 
 ```ts
 // Strict timing requirements
-new HeartbeatMonitor('critical-task', {
-  name: 'Critical System Task',
+new HeartbeatMonitor("critical-task", {
+  name: "Critical System Task",
   period: 5,
-  periodUnit: 'minutes',
-  grace: 1,              // Only 1 minute grace
-  graceUnit: 'minutes'
+  periodUnit: "minutes",
+  grace: 1, // Only 1 minute grace
+  graceUnit: "minutes",
 })
 ```
 
@@ -213,12 +199,12 @@ new HeartbeatMonitor('critical-task', {
 
 ```ts
 // Standard tolerance
-new HeartbeatMonitor('standard-job', {
-  name: 'Standard Processing Job',
+new HeartbeatMonitor("standard-job", {
+  name: "Standard Processing Job",
   period: 1,
-  periodUnit: 'hours',
-  grace: 15,             // 15 minute grace period
-  graceUnit: 'minutes'
+  periodUnit: "hours",
+  grace: 15, // 15 minute grace period
+  graceUnit: "minutes",
 })
 ```
 
@@ -227,12 +213,12 @@ new HeartbeatMonitor('standard-job', {
 
 ```ts
 // Flexible timing for complex jobs
-new HeartbeatMonitor('complex-job', {
-  name: 'Complex Data Processing',
+new HeartbeatMonitor("complex-job", {
+  name: "Complex Data Processing",
   period: 1,
-  periodUnit: 'days',
-  grace: 4,              // 4 hour grace period
-  graceUnit: 'hours'
+  periodUnit: "days",
+  grace: 4, // 4 hour grace period
+  graceUnit: "hours",
 })
 ```
 
@@ -245,7 +231,8 @@ new HeartbeatMonitor('complex-job', {
 <ResponseField name="graceUnit" type="string" required>
 The time unit for the grace period. Defines whether the grace period is in seconds, minutes, hours, or days.
 
-### Usage
+**Usage:**
+
 ```ts
 new HeartbeatMonitor('my-heartbeat', {
   period: 6,
@@ -255,56 +242,23 @@ new HeartbeatMonitor('my-heartbeat', {
 })
 ```
 
-### Examples
-```ts
-// Different grace time units
-new HeartbeatMonitor('quick-response', {
-  period: 2,
-  periodUnit: 'minutes',
-  grace: 30,
-  graceUnit: 'seconds'   // 30 second grace
-})
-
-new HeartbeatMonitor('weekly-job', {
-  period: 7,
-  periodUnit: 'days',
-  grace: 1,
-  graceUnit: 'days'      // 1 day grace period
-})
-```
-
 **Available units**: `'seconds'`, `'minutes'`, `'hours'`, `'days'`
 </ResponseField>
 
-## Common Options
+### General Monitor Options
 
 <ResponseField name="name" type="string" required>
 Friendly name for your heartbeat monitor that will be displayed in the Checkly dashboard and used in notifications.
 
-### Usage
+**Usage:**
+
 ```ts
 new HeartbeatMonitor('my-heartbeat', {
-  name: 'Daily Backup Job Monitor'
+  name: 'Daily Backup Job Monitor',
+  /* More options ... */
 })
 ```
 
-### Examples
-```ts
-// Job-based naming
-new HeartbeatMonitor('backup-heartbeat', {
-  name: 'Daily Database Backup'
-})
-
-// Service-based naming
-new HeartbeatMonitor('sync-heartbeat', {
-  name: 'Hourly Data Synchronization'
-})
-
-// Pipeline-based naming
-new HeartbeatMonitor('deploy-heartbeat', {
-  name: 'Production Deployment Pipeline'
-})
-```
 </ResponseField>
 
 ## Examples
@@ -312,29 +266,29 @@ new HeartbeatMonitor('deploy-heartbeat', {
 <Tabs>
   <Tab title="Daily Backup Job">
     ```ts
-    new HeartbeatMonitor('backup-job-heartbeat', {
-      name: 'Daily Database Backup',
+    new HeartbeatMonitor("backup-job-heartbeat", {
+      name: "Daily Database Backup",
       period: 1,
-      periodUnit: 'days',
+      periodUnit: "days",
       grace: 2,
-      graceUnit: 'hours',
-      tags: ['backup', 'database', 'critical']
+      graceUnit: "hours",
+      tags: ["backup", "database", "critical"],
     })
 
     // Example cron job that would ping this heartbeat:
-    // 0 2 * * * curl -X POST https://ping.checklyhq.com/[heartbeat-id] && /scripts/backup-database.sh
+    // 0 2 * * * /scripts/backup-database.sh && curl -X POST https://ping.checklyhq.com/[heartbeat-id]
     ```
   </Tab>
-  
+
   <Tab title="Hourly Data Sync">
     ```ts
-    new HeartbeatMonitor('sync-job-heartbeat', {
-      name: 'Hourly Data Synchronization',
+    new HeartbeatMonitor("sync-job-heartbeat", {
+      name: "Hourly Data Synchronization",
       period: 1,
-      periodUnit: 'hours',
+      periodUnit: "hours",
       grace: 15,
-      graceUnit: 'minutes',
-      tags: ['sync', 'data', 'hourly']
+      graceUnit: "minutes",
+      tags: ["sync", "data", "hourly"],
     })
 
     // Example Node.js job:
@@ -348,33 +302,7 @@ new HeartbeatMonitor('deploy-heartbeat', {
     // }, 60 * 60 * 1000) // Every hour
     ```
   </Tab>
-  
-  <Tab title="Weekly Report">
-    ```ts
-    new HeartbeatMonitor('weekly-report-heartbeat', {
-      name: 'Weekly Analytics Report',
-      period: 7,
-      periodUnit: 'days',
-      grace: 4,
-      graceUnit: 'hours',
-      tags: ['reports', 'analytics', 'weekly']
-    })
 
-    // Example Python script that runs weekly:
-    // import requests
-    // 
-    // def generate_weekly_report():
-    //     try:
-    //         # Generate report logic here
-    //         generate_report()
-    //         
-    //         # Ping Checkly on success
-    //         requests.post('https://ping.checklyhq.com/[heartbeat-id]')
-    //     except Exception as e:
-    //         print(f"Report generation failed: {e}")
-    ```
-  </Tab>
-  
   <Tab title="CI/CD Pipeline">
     ```ts
     new HeartbeatMonitor('deployment-heartbeat', {
@@ -393,7 +321,7 @@ new HeartbeatMonitor('deploy-heartbeat', {
     //     curl -X POST https://ping.checklyhq.com/${{ secrets.HEARTBEAT_ID }}
     ```
   </Tab>
-  
+
   <Tab title="Log Processing">
     ```ts
     new HeartbeatMonitor('log-processing-heartbeat', {
@@ -409,7 +337,7 @@ new HeartbeatMonitor('deploy-heartbeat', {
     // const processLogs = async () => {
     //   try {
     //     await processLogFiles()
-    //     
+    //
     //     // Ping heartbeat on successful processing
     //     await fetch(process.env.CHECKLY_HEARTBEAT_URL, {
     //       method: 'POST',
@@ -419,12 +347,12 @@ new HeartbeatMonitor('deploy-heartbeat', {
     //     console.error('Log processing failed:', error)
     //   }
     // }
-    // 
+    //
     // // Run every 30 minutes
     // setInterval(processLogs, 30 * 60 * 1000)
     ```
   </Tab>
-  
+
   <Tab title="Short Interval Check">
     ```ts
     new HeartbeatMonitor('frequent-task-heartbeat', {
@@ -449,7 +377,7 @@ new HeartbeatMonitor('deploy-heartbeat', {
   </Tab>
 </Tabs>
 
-## Getting the Ping URL
+## Getting the heartbeat Ping URL
 
 After deploying your heartbeat monitor, you can obtain the ping URL in several ways:
 
@@ -459,21 +387,12 @@ After deploying your heartbeat monitor, you can obtain the ping URL in several w
     npx checkly deploy
 
     # Output will include:
-    # ✅ HeartbeatMonitor 'daily-backup-heartbeat' deployed
-    # 📍 Ping URL: https://ping.checklyhq.com/hb_abc123def456
+    # Ping URL of heartbeat check "[YOUR_HEARTBEAT_MONITOR_NAME]" is https://ping.checklyhq.com/...
     ```
   </Tab>
-  
+
   <Tab title="Web UI">
     Navigate to your heartbeat monitor in the [Checkly web UI](https://app.checklyhq.com/heartbeats) to copy the ping URL.
-  </Tab>
-  
-  <Tab title="API">
-    ```bash
-    curl -H "Authorization: Bearer YOUR_API_KEY" \
-         -H "X-Checkly-Account: YOUR_ACCOUNT_ID" \
-         https://api.checklyhq.com/v1/heartbeats/
-    ```
   </Tab>
 </Tabs>
 

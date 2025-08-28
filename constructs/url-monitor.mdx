@@ -9,7 +9,7 @@ Use URL monitors to track basic availability and HTTP status codes of your servi
 <Accordion title="Prerequisites">
 Before creating URL monitors, ensure you have:
 
-- A Checkly CLI project initialized with `npx checkly init`
+- An initialized Checkly CLI project
 - URLs or HTTP endpoints you want to monitor
 - Understanding of HTTP status codes and response behavior
 - Network access to the URLs you want to monitor
@@ -22,44 +22,38 @@ For additional setup information, see [CLI overview](/cli/overview) and [URL Mon
 <CodeGroup>
 
 ```ts Basic Example
-import { UrlMonitor, UrlAssertionBuilder } from 'checkly/constructs'
+import { Frequency, UrlAssertionBuilder, UrlMonitor } from "checkly/constructs"
 
-new UrlMonitor('hello-url-1', {
-  name: 'Hello URL',
+new UrlMonitor("url-monitor", {
+  name: "Url Monitor",
   activated: true,
   maxResponseTime: 10000,
   degradedResponseTime: 5000,
+  frequency: Frequency.EVERY_5M,
   request: {
-    url: 'https://httpbin.org/get',
-    skipSSL: false,
-    followRedirects: true,
-    assertions: [
-        UrlAssertionBuilder.statusCode().equals(200),
-    ]
-  }
+    url: "https://httpbin.org/get",
+    assertions: [UrlAssertionBuilder.statusCode().equals(200)],
+  },
 })
 ```
 
 ```ts Advanced Example
-import { UrlMonitor, UrlAssertionBuilder, Frequency } from 'checkly/constructs'
+import { Frequency, UrlAssertionBuilder, UrlMonitor } from "checkly/constructs"
 
-new UrlMonitor('advanced-url-monitor', {
-  name: 'Advanced URL Monitor',
+new UrlMonitor("advanced-url-monitor", {
+  name: "Advanced URL Monitor",
   activated: true,
   frequency: Frequency.EVERY_5M,
-  locations: ['us-east-1', 'eu-west-1'],
+  locations: ["us-east-1", "eu-west-1"],
   maxResponseTime: 5000,
   degradedResponseTime: 2000,
-  tags: ['api', 'production', 'critical'],
+  tags: ["api", "production", "critical"],
   request: {
-    url: 'https://api.example.com/health',
+    url: "https://api.example.com/health",
     skipSSL: false,
     followRedirects: true,
-    assertions: [
-        UrlAssertionBuilder.statusCode().equals(200),
-        UrlAssertionBuilder.statusCode().between(200, 299)
-    ]
-  }
+    assertions: [UrlAssertionBuilder.statusCode().equals(200)],
+  },
 })
 ```
 
@@ -73,8 +67,8 @@ new UrlMonitor('advanced-url-monitor', {
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `request` | `object` | ✅ | - | HTTP request configuration object |
-| `maxResponseTime` | `number` | ❌ | `30000` | Maximum response time in milliseconds before marking as failed |
-| `degradedResponseTime` | `number` | ❌ | `15000` | Response time threshold in milliseconds for degraded status |
+| `degradedResponseTime` | `number` | ❌ | `3000` | Response time threshold in milliseconds for degraded status |
+| `maxResponseTime` | `number` | ❌ | `5000` | Maximum response time in milliseconds before marking as failed |
 
 </Tab>
 <Tab title="Common Options">
@@ -82,18 +76,12 @@ new UrlMonitor('advanced-url-monitor', {
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `name` | `string` | ✅ | - | Friendly name for your monitor |
-| `frequency` | `Frequency` | ❌ | - | How often to run your monitor |
+| `frequency` | `Frequency` | ❌ | `EVERY_10M` | How often to run your monitor |
 | `locations` | `string[]` | ❌ | `[]` | Array of public location codes |
 | `activated` | `boolean` | ❌ | `true` | Whether the monitor is enabled |
-
-</Tab>
-<Tab title="Global Options">
-
-| Property | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
 | `privateLocations` | `string[]` | ❌ | `[]` | Array of Private Location slugs |
 | `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
-| `group` | `CheckGroup` | ❌ | - | The CheckGroup this monitor belongs to |
+| `group` | `CheckGroupV1` `CheckGroupV2` | ❌ | - | The CheckGroup this monitor belongs to |
 | `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Array of AlertChannel objects for notifications |
 | `tags` | `string[]` | ❌ | `[]` | Array of tags to organize monitors |
 | `testOnly` | `boolean` | ❌ | `false` | Only run with test, not during deploy |
@@ -127,8 +115,9 @@ new UrlMonitor('url-monitor', {
 |-----------|------|----------|---------|-------------|
 | `url` | `string` | ✅ | - | The HTTP(S) URL to monitor |
 | `followRedirects` | `boolean` | ❌ | `true` | Whether to automatically follow 30x redirects |
+| `ipFamily` | `IPFamily` | ❌ | `IPv4` | IP family version to use for the connection |
 | `skipSSL` | `boolean` | ❌ | `false` | Whether to skip validation of SSL certificates |
-| `assertions` | `array` | ❌ | `[]` | Response assertions using `UrlAssertionBuilder` |
+| `assertions` | `UrlAssertion[]` | ❌ | `[]` | Response assertions using `UrlAssertionBuilder` |
 
 ### Examples
 
@@ -152,16 +141,14 @@ new UrlMonitor('website-check', {
 <Tab title="API Endpoint">
 
 ```ts
-new UrlMonitor('api-health', {
-  name: 'API Health Check',
+new UrlMonitor("api-health", {
+  name: "API Health Check",
   request: {
-    url: 'https://api.example.com/health',
+    url: "https://api.example.com/health",
     followRedirects: false,
     skipSSL: false,
-    assertions: [
-      UrlAssertionBuilder.statusCode().between(200, 299)
-    ]
-  }
+    assertions: [UrlAssertionBuilder.statusCode().equals(200)],
+  },
 })
 ```
 
@@ -169,16 +156,14 @@ new UrlMonitor('api-health', {
 <Tab title="Development Environment">
 
 ```ts
-new UrlMonitor('dev-endpoint', {
-  name: 'Development Environment',
+new UrlMonitor("dev-endpoint", {
+  name: "Development Environment",
   request: {
-    url: 'https://dev.example.com',
+    url: "https://dev.example.com",
     followRedirects: true,
     skipSSL: true, // Skip SSL for dev environment
-    assertions: [
-      UrlAssertionBuilder.statusCode().equals(200)
-    ]
-  }
+    assertions: [UrlAssertionBuilder.statusCode().equals(200)],
+  },
 })
 ```
 
@@ -188,75 +173,64 @@ new UrlMonitor('dev-endpoint', {
 **Use cases**: Website availability, API health checks, service uptime monitoring.
 </ResponseField>
 
-<ResponseField name="maxResponseTime" type="number" default="30000">
+<ResponseField name="degradedResponseTime" type="number" default="3000">
+Response time threshold in milliseconds for marking the monitor as degraded (warning state).
+
+### Usage
+
+```ts
+// Progressive performance monitoring
+new UrlMonitor("performance-tiers", {
+  name: "Website Performance Tiers",
+  degradedResponseTime: 1500, // Warn at 1.5s
+  maxResponseTime: 3000, // Fail at 3s
+  request: {
+    url: "https://example.com",
+    assertions: [UrlAssertionBuilder.statusCode().equals(200)],
+  },
+})
+```
+
+**Use cases**: Early performance warnings, gradual degradation detection.
+</ResponseField>
+
+<ResponseField name="maxResponseTime" type="number" default="5000">
 Maximum response time in milliseconds before the monitor is marked as failed.
 
 ### Usage
 ```ts
-new UrlMonitor('fast-site', {
+new UrlMonitor("fast-site", {
+  name: "Fast site",
   maxResponseTime: 3000, // 3 seconds max
   request: {
-    url: 'https://fast.example.com'
-  }
+    url: "https://fast.example.com",
+  },
 })
 ```
 
 ### Examples
 ```ts
 // Fast website requirement
-new UrlMonitor('performance-critical', {
-  name: 'Performance Critical Site',
-  maxResponseTime: 1000,        // Fail at 1 second
-  degradedResponseTime: 500,    // Warning at 500ms
+new UrlMonitor("performance-critical", {
+  name: "Performance Critical Site",
+  maxResponseTime: 1000, // Fail at 1 second
+  degradedResponseTime: 500, // Warning at 500ms
   request: {
-    url: 'https://critical.example.com'
-  }
+    url: "https://critical.example.com",
+  },
 })
 
 // API with reasonable timeout
-new UrlMonitor('api-timeout', {
-  name: 'API with Timeout',
-  maxResponseTime: 10000,       // 10 seconds
+new UrlMonitor("api-timeout", {
+  name: "API with Timeout",
+  maxResponseTime: 10000, // 10 seconds
   request: {
-    url: 'https://api.example.com/slow-operation'
-  }
+    url: "https://api.example.com/slow-operation",
+  },
 })
 ```
 
 **Use cases**: Performance monitoring, SLA compliance, user experience optimization.
-</ResponseField>
-
-<ResponseField name="degradedResponseTime" type="number" default="15000">
-Response time threshold in milliseconds for marking the monitor as degraded (warning state).
-
-### Usage
-```ts
-new UrlMonitor('tiered-alerts', {
-  degradedResponseTime: 2000,   // Warning at 2 seconds
-  maxResponseTime: 5000,        // Fail at 5 seconds
-  request: {
-    url: 'https://example.com'
-  }
-})
-```
-
-### Examples
-```ts
-// Progressive performance monitoring
-new UrlMonitor('performance-tiers', {
-  name: 'Website Performance Tiers',
-  degradedResponseTime: 1500,   // Warn at 1.5s
-  maxResponseTime: 3000,        // Fail at 3s
-  request: {
-    url: 'https://website.example.com',
-    assertions: [
-      UrlAssertionBuilder.statusCode().equals(200)
-    ]
-  }
-})
-```
-
-**Use cases**: Early performance warnings, gradual degradation detection.
 </ResponseField>
 
 ## Common Options
@@ -266,28 +240,12 @@ Friendly name for your URL monitor that will be displayed in the Checkly dashboa
 
 ### Usage
 ```ts
-new UrlMonitor('my-monitor', {
-  name: 'Website Uptime Monitor'
+new UrlMonitor("my-monitor", {
+  name: "Website Uptime Monitor",
+  /* More options ... */
 })
 ```
 
-### Examples
-```ts
-// Website monitoring
-new UrlMonitor('homepage', {
-  name: 'Homepage Availability'
-})
-
-// API endpoint monitoring
-new UrlMonitor('api-health', {
-  name: 'API Health Endpoint'
-})
-
-// Service-specific monitoring
-new UrlMonitor('payment-service', {
-  name: 'Payment Service Status'
-})
-```
 </ResponseField>
 
 <ResponseField name="frequency" type="Frequency">
@@ -295,10 +253,9 @@ How often the URL monitor should run. Use the `Frequency` enum to set the check 
 
 ### Usage
 ```ts
-import { Frequency } from 'checkly/constructs'
-
-new UrlMonitor('my-monitor', {
-  frequency: Frequency.EVERY_1M
+new UrlMonitor("my-monitor", {
+  frequency: Frequency.EVERY_1M,
+  /* More options ... */
 })
 ```
 
@@ -309,8 +266,8 @@ new UrlMonitor('my-monitor', {
 
 ```ts
 // Critical service monitoring
-new UrlMonitor('critical-service', {
-  name: 'Critical Service Uptime',
+new UrlMonitor("critical-service", {
+  name: "Critical Service Uptime",
   frequency: Frequency.EVERY_30S, // Every 30 seconds
   maxResponseTime: 2000
 })
@@ -321,8 +278,8 @@ new UrlMonitor('critical-service', {
 
 ```ts
 // Regular website monitoring
-new UrlMonitor('website-monitor', {
-  name: 'Website Availability',
+new UrlMonitor("website-monitor", {
+  name: "Website Availability",
   frequency: Frequency.EVERY_5M, // Every 5 minutes
   maxResponseTime: 5000
 })
@@ -333,8 +290,8 @@ new UrlMonitor('website-monitor', {
 
 ```ts
 // Background service monitoring
-new UrlMonitor('background-service', {
-  name: 'Background Service Health',
+new UrlMonitor("background-service", {
+  name: "Background Service Health",
   frequency: Frequency.EVERY_30M, // Every 30 minutes
   maxResponseTime: 10000
 })
@@ -343,7 +300,7 @@ new UrlMonitor('background-service', {
 </Tab>
 </Tabs>
 
-**Available frequencies**: `EVERY_30S`, `EVERY_1M`, `EVERY_2M`, `EVERY_5M`, `EVERY_10M`, `EVERY_15M`, `EVERY_30M`, `EVERY_1H`, `EVERY_2H`, `EVERY_4H`, `EVERY_6H`, `EVERY_8H`, `EVERY_12H`, `EVERY_24H`
+**Available frequencies**: `EVERY_10S`, `EVERY_20S`, `EVERY_30S`, `EVERY_1M`, `EVERY_2M`, `EVERY_5M`, `EVERY_10M`, `EVERY_15M`, `EVERY_30M`, `EVERY_1H`, `EVERY_2H`, `EVERY_3H`, `EVERY_6H`, `EVERY_12H`, `EVERY_24H`
 </ResponseField>
 
 <ResponseField name="locations" type="string[]" default="[]">
@@ -351,8 +308,8 @@ Array of public location codes where the URL monitor should run from. Multiple l
 
 ### Usage
 ```ts
-new UrlMonitor('global-monitor', {
-  locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1']
+new UrlMonitor("global-monitor", {
+  locations: ["us-east-1", "eu-west-1", "ap-southeast-1"]
 })
 ```
 
@@ -363,15 +320,15 @@ new UrlMonitor('global-monitor', {
 
 ```ts
 // Worldwide monitoring
-new UrlMonitor('global-website', {
-  name: 'Global Website Monitoring',
+new UrlMonitor("global-website", {
+  name: "Global Website Monitoring",
   frequency: Frequency.EVERY_2M,
   locations: [
-    'us-east-1',      // N. Virginia
-    'us-west-1',      // N. California 
-    'eu-west-1',      // Ireland
-    'ap-southeast-1', // Singapore
-    'ap-northeast-1'  // Tokyo
+    "us-east-1",      // N. Virginia
+    "us-west-1",      // N. California
+    "eu-west-1",      // Ireland
+    "ap-southeast-1", // Singapore
+    "ap-northeast-1"  // Tokyo
   ],
   maxResponseTime: 5000
 })
@@ -382,10 +339,10 @@ new UrlMonitor('global-website', {
 
 ```ts
 // European users focus
-new UrlMonitor('eu-service', {
-  name: 'European Service Monitor',
+new UrlMonitor("eu-service", {
+  name: "European Service Monitor",
   frequency: Frequency.EVERY_1M,
-  locations: ['eu-west-1', 'eu-central-1']
+  locations: ["eu-west-1", "eu-central-1"]
 })
 ```
 
@@ -400,7 +357,7 @@ Whether the URL monitor is enabled and will run according to its schedule.
 
 ### Usage
 ```ts
-new UrlMonitor('my-monitor', {
+new UrlMonitor("my-monitor", {
   activated: false // Disabled monitor
 })
 ```
@@ -408,20 +365,11 @@ new UrlMonitor('my-monitor', {
 ### Examples
 ```ts
 // Temporarily disable a monitor
-new UrlMonitor('maintenance-site', {
-  name: 'Site Under Maintenance',
+new UrlMonitor("maintenance-site", {
+  name: "Site Under Maintenance",
   activated: false,
   request: {
-    url: 'https://maintenance.example.com'
-  }
-})
-
-// Conditional activation
-new UrlMonitor('prod-only', {
-  name: 'Production Only Monitor',
-  activated: process.env.NODE_ENV === 'production',
-  request: {
-    url: 'https://prod.example.com'
+    url: "https://maintenance.example.com"
   }
 })
 ```
@@ -431,79 +379,46 @@ new UrlMonitor('prod-only', {
 
 You can define assertions using the `UrlAssertionBuilder` to validate HTTP status codes:
 
-<Tabs>
-  <Tab title="Status Code Equals">
-    ```ts
-    // Assert HTTP status code equals 200
-    UrlAssertionBuilder.statusCode().equals(200)
-    ```
-    
-    Renders to:
-    ```json
-    { 
-      "source": "STATUS_CODE", 
-      "regex": "", 
-      "property": "", 
-      "comparison": "EQUALS", 
-      "target": "200" 
-    }
-    ```
-  </Tab>
-  
-  <Tab title="Status Code Range">
-    ```ts
-    // Assert HTTP status code is between 200 and 299
-    UrlAssertionBuilder.statusCode().between(200, 299)
-    ```
-    
-    Renders to:
-    ```json
-    { 
-      "source": "STATUS_CODE", 
-      "regex": "", 
-      "property": "", 
-      "comparison": "BETWEEN", 
-      "target": "200,299" 
-    }
-    ```
-  </Tab>
-</Tabs>
+```ts
+UrlAssertionBuilder.statusCode().equals(200)
+UrlAssertionBuilder.statusCode().notEquals(404)
+UrlAssertionBuilder.statusCode().greaterThan(200)
+UrlAssertionBuilder.statusCode().lessThan(300)
+```
 
 ## Examples
 
 <Tabs>
   <Tab title="Website Availability">
     ```ts
-    new UrlMonitor('website-availability', {
-      name: 'Main Website Availability',
+    new UrlMonitor("website-availability", {
+      name: "Main Website Availability",
       frequency: Frequency.EVERY_1M,
-      locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
+      locations: ["us-east-1", "eu-west-1", "ap-southeast-1"],
       maxResponseTime: 3000,
       degradedResponseTime: 1500,
-      tags: ['website', 'critical'],
+      tags: ["website", "critical"],
       request: {
-        url: 'https://example.com',
+        url: "https://example.com",
         followRedirects: true,
         skipSSL: false,
-        assertions: [
-          UrlAssertionBuilder.statusCode().equals(200)
-        ]
-      }
+        assertions: [UrlAssertionBuilder.statusCode().equals(200)],
+      },
     })
     ```
   </Tab>
-  
+
   <Tab title="API Health Check">
     ```ts
-    new UrlMonitor('api-health-check', {
-      name: 'API Health Endpoint',
+    new UrlMonitor("api-health-check", {
+      name: "API Health Endpoint",
       frequency: Frequency.EVERY_30S,
-      locations: ['us-east-1', 'eu-west-1'],
+      locations: ["us-east-1", "eu-west-1"],
       maxResponseTime: 2000,
       degradedResponseTime: 1000,
-      tags: ['api', 'health', 'critical'],
+      tags: ["api", "health", "critical"],
       request: {
-        url: 'https://api.example.com/health',
+        url: "https://api.example.com/health",
         followRedirects: false,
         assertions: [
           UrlAssertionBuilder.statusCode().equals(200)
@@ -512,37 +427,35 @@ You can define assertions using the `UrlAssertionBuilder` to validate HTTP statu
     })
     ```
   </Tab>
-  
+
   <Tab title="CDN Performance">
     ```ts
-    new UrlMonitor('cdn-performance', {
-      name: 'CDN Asset Performance',
+    new UrlMonitor("cdn-performance", {
+      name: "CDN Asset Performance",
       frequency: Frequency.EVERY_5M,
-      locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
+      locations: ["us-east-1", "eu-west-1", "ap-southeast-1"],
       maxResponseTime: 5000,
       degradedResponseTime: 2000,
-      tags: ['cdn', 'assets', 'performance'],
+      tags: ["cdn", "assets", "performance"],
       request: {
-        url: 'https://cdn.example.com/assets/main.css',
+        url: "https://cdn.example.com/assets/main.css",
         followRedirects: true,
-        assertions: [
-          UrlAssertionBuilder.statusCode().between(200, 299)
-        ]
-      }
+        assertions: [UrlAssertionBuilder.statusCode().equals(200)],
+      },
     })
     ```
   </Tab>
-  
+
   <Tab title="Redirect Chain">
     ```ts
-    new UrlMonitor('redirect-chain', {
-      name: 'Redirect Chain Monitor',
+    new UrlMonitor("redirect-chain", {
+      name: "Redirect Chain Monitor",
       frequency: Frequency.EVERY_10M,
       maxResponseTime: 4000,
       degradedResponseTime: 2000,
-      tags: ['redirects', 'seo'],
+      tags: ["redirects", "seo"],
       request: {
-        url: 'https://old.example.com/page',
+        url: "https://old.example.com/page",
         followRedirects: true,
         assertions: [
           UrlAssertionBuilder.statusCode().equals(200)
@@ -551,38 +464,36 @@ You can define assertions using the `UrlAssertionBuilder` to validate HTTP statu
     })
     ```
   </Tab>
-  
+
   <Tab title="SSL Certificate Check">
     ```ts
-    new UrlMonitor('ssl-certificate-check', {
-      name: 'SSL Certificate Validity',
+    new UrlMonitor("ssl-certificate-check", {
+      name: "SSL Certificate Validity",
       frequency: Frequency.EVERY_1H,
-      locations: ['us-east-1'],
+      locations: ["us-east-1"],
       maxResponseTime: 10000,
       degradedResponseTime: 5000,
-      tags: ['ssl', 'security'],
+      tags: ["ssl", "security"],
       request: {
-        url: 'https://secure.example.com',
+        url: "https://secure.example.com",
         followRedirects: false,
         skipSSL: false, // Ensure SSL validation
-        assertions: [
-          UrlAssertionBuilder.statusCode().between(200, 399)
-        ]
-      }
+        assertions: [UrlAssertionBuilder.statusCode().equals(200)],
+      },
     })
     ```
   </Tab>
-  
+
   <Tab title="Multiple Status Codes">
     ```ts
-    new UrlMonitor('maintenance-page', {
-      name: 'Maintenance Page Check',
+    new UrlMonitor("maintenance-page", {
+      name: "Maintenance Page Check",
       frequency: Frequency.EVERY_5M,
       maxResponseTime: 3000,
       degradedResponseTime: 1500,
-      tags: ['maintenance', 'status'],
+      tags: ["maintenance", "status"],
       request: {
-        url: 'https://status.example.com',
+        url: "https://status.example.com",
         followRedirects: true,
         assertions: [
           // Accept both 200 (normal) and 503 (maintenance)

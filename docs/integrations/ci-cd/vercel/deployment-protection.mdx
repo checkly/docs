@@ -69,8 +69,8 @@ You can tweak this setting in the Vercel dashboard under *Settings > General > D
 2. You can add some extra code to a browser check to actually log in to Vercel. Here is an example of how that would work 
 if you are authenticating using GitHub. Note: if you have 2FA enabled on your GitHub account, this will not work.
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
+
 ```typescript visit-protected.spec.ts
 import { expect, test } from '@playwright/test'
 test('visit protected deployment', async ({ page }) => {
@@ -89,8 +89,7 @@ test('visit protected deployment', async ({ page }) => {
   expect(response.status(), 'should respond with correct status code').toBeLessThan(400)
 })
 ```
-</Tab>
-<Tab title="JavaScript">
+
 ```javascript visit-protected.spec.js
 const { expect, test } = require('@playwright/test')
 test('visit protected deployment', async ({ page }) => {
@@ -109,8 +108,8 @@ test('visit protected deployment', async ({ page }) => {
   expect(response.status(), 'should respond with correct status code').toBeLessThan(400)
 })
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 You will have to supply your GitHub username and password as environment variables (e.g. `GITHUB_USER` and `GITHUB_PASSWORD` in 
 the code example) to your Checkly account or as part of the [browser check's environment variables](/docs/browser-checks/variables/).
@@ -127,53 +126,52 @@ a bit to check if we are targeting a Preview deployment or not.
 We just need to check if the automatically injected `ENVIRONMENT_URL` environment variable is set. If it is,
 we know we are checking a Preview deployment and we can run the authentication code. If it is not set, we just proceed as normal.
 
-    <Tabs>
-    <Tab title="TypeScript">
-    ```typescript visit-protected.spec.ts
-    import { expect, test } from '@playwright/test'
-    test('visit protected deployment', async ({ page }) => {
-    const response = await page.goto(process.env.ENVIRONMENT_URL || 'https://my-production-url.vercel.app/')
+<CodeGroup dropdown>
 
-    if (!!process.env.ENVIRONMENT_URL) {
-        // Auth dialog is a pop up
-        const popupPromise = page.waitForEvent('popup');
-        await page.getByText('Continue with GitHub').click()
-        const popup = await popupPromise;
-        await popup.waitForLoadState();
-        await popup.locator('input[name="login"]').type(process.env.GITHUB_USER)
-        await popup.locator('input[name="password"]').type(process.env.GITHUB_PASSWORD)
-        await popup.getByText('Sign in', {exact: true}).click()
-    }
-        
-    await page.screenshot({ path: 'screenshot.jpg' })
-    expect(response.status(), 'should respond with correct status code').toBeLessThan(400)
-    })
-    ```
-    </Tab>
-    <Tab title="JavaScript">
-    ```javascript visit-protected.spec.js
-    const { expect, test } = require('@playwright/test')
-    test('visit protected deployment', async ({ page }) => {
-    const response = await page.goto(process.env.ENVIRONMENT_URL || 'https://my-production-url.vercel.app/')
+```typescript visit-protected.spec.ts
+import { expect, test } from '@playwright/test'
+test('visit protected deployment', async ({ page }) => {
+const response = await page.goto(process.env.ENVIRONMENT_URL || 'https://my-production-url.vercel.app/')
 
-    // If we 
-    if (!!process.env.ENVIRONMENT_URL) {
-        // Auth dialog is a pop up
-        const popupPromise = page.waitForEvent('popup');
-        await page.getByText('Continue with GitHub').click()
-        const popup = await popupPromise;
-        await popup.waitForLoadState();
-        await popup.locator('input[name="login"]').type(process.env.GITHUB_USER)
-        await popup.locator('input[name="password"]').type(process.env.GITHUB_PASSWORD)
-        await popup.getByText('Sign in', { exact: true }).click()
-    }
+if (!!process.env.ENVIRONMENT_URL) {
+    // Auth dialog is a pop up
+    const popupPromise = page.waitForEvent('popup');
+    await page.getByText('Continue with GitHub').click()
+    const popup = await popupPromise;
+    await popup.waitForLoadState();
+    await popup.locator('input[name="login"]').type(process.env.GITHUB_USER)
+    await popup.locator('input[name="password"]').type(process.env.GITHUB_PASSWORD)
+    await popup.getByText('Sign in', {exact: true}).click()
+}
+    
+await page.screenshot({ path: 'screenshot.jpg' })
+expect(response.status(), 'should respond with correct status code').toBeLessThan(400)
+})
+```
 
-    await page.screenshot({ path: 'screenshot.jpg' })
-    expect(response.status(), 'should respond with correct status code').toBeLessThan(400)
-    })
-    ```
-    </Tab>
-    </Tabs>
+```javascript visit-protected.spec.js
+const { expect, test } = require('@playwright/test')
+test('visit protected deployment', async ({ page }) => {
+const response = await page.goto(process.env.ENVIRONMENT_URL || 'https://my-production-url.vercel.app/')
+
+// If we 
+if (!!process.env.ENVIRONMENT_URL) {
+    // Auth dialog is a pop up
+    const popupPromise = page.waitForEvent('popup');
+    await page.getByText('Continue with GitHub').click()
+    const popup = await popupPromise;
+    await popup.waitForLoadState();
+    await popup.locator('input[name="login"]').type(process.env.GITHUB_USER)
+    await popup.locator('input[name="password"]').type(process.env.GITHUB_PASSWORD)
+    await popup.getByText('Sign in', { exact: true }).click()
+}
+
+await page.screenshot({ path: 'screenshot.jpg' })
+expect(response.status(), 'should respond with correct status code').toBeLessThan(400)
+})
+```
+
+</CodeGroup>
 
 <Warning>
 If you have 2FA enabled on your GitHub or other Vercel authentication methods, the above example will not work. You can

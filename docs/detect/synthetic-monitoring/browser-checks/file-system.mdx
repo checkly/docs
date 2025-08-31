@@ -16,8 +16,8 @@ the contents and metadata of the downloaded file(s).
 In some cases, you immediately want to also test a related upload functionality using the downloaded file. In that case, 
 you can for instance spawn a new page, and use the `.setInputFiles()` method to upload the downloaded file.
 
-<Tabs>
-<TabItem value="Typescript">
+<CodeGroup dropdown>
+
 ```ts download.spec.ts
 import { test } from '@playwright/test'
 
@@ -37,8 +37,7 @@ test('Downloads a PDF file', async ({ page, context }) => {
   await inputFile!.setInputFiles(download.suggestedFilename())
 })
 ```
-</TabItem>
-<TabItem value="Javascript">
+
 ```js download.spec.js
 const { test } = require('@playwright/test')
 
@@ -58,8 +57,8 @@ test('Downloads a PDF file', async ({ page, context }) => {
   await inputFile.setInputFiles(download.suggestedFilename())  
 })
 ```
-</TabItem>
-</Tabs>
+
+</CodeGroup>
 
 [Check the official docs right here](https://playwright.dev/docs/downloads)
 
@@ -75,8 +74,8 @@ In the example below, we do not need to interact with the file system. We can ju
 2. Pass the resulting `Buffer` into the `.setInputFiles()` method.
 3. Wait for the upload to finish.
 
-<Tabs>
-<TabItem value="Typescript">
+<CodeGroup dropdown>
+
 ```ts upload.spec.ts
 import { test, expect } from '@playwright/test'
 
@@ -98,8 +97,7 @@ test('upload a file', async ({ page, request }) => {
   await page.screenshot({ path: 'filebin.png' })
 })
 ```
-</TabItem>
-<TabItem value="Javascript">
+
 ```js upload.spec.js
 const { test, expect } = require('@playwright/test')
 
@@ -121,8 +119,8 @@ test('upload a file', async ({ page, request }) => {
   await page.screenshot({ path: 'filebin.png' })
 })
 ```
-</TabItem>
-</Tabs>
+
+</CodeGroup>
 
 Notice we don't need to interact with the file system, we can just pass buffers around.
 
@@ -132,8 +130,8 @@ You can also "upload" files using a simple HTTP POST request with a (binary) bod
 You would use this when you want to test a file upload feature that is not using the browser's File API, but just an HTTP/REST endpoint
 that accepts a file upload.
 
-<Tabs>
-<TabItem value="Typescript">
+<CodeGroup dropdown>
+
 ```ts http-upload.spec.ts
 import { test, expect } from '@playwright/test'
 
@@ -146,8 +144,7 @@ test('Upload a file using a POST request', async ({ request }) => {
   await expect(response).toBeOK()
 })
 ```
-</TabItem>
-<TabItem value="Javascript">
+
 ```js http-upload.spec.js
 const { test, expect } = require('@playwright/test')
 
@@ -160,8 +157,8 @@ test('Upload a file using a POST request', async ({ request }) => {
   await expect(response).toBeOK()
 })
 ```
-</TabItem>
-</Tabs>
+
+</CodeGroup>
   
 ## Using the file system
 Sometimes, you do want to explicitly save a file to disk. This is what you need to know.
@@ -169,8 +166,8 @@ Sometimes, you do want to explicitly save a file to disk. This is what you need 
 Checkly creates a sandboxed directory for each check run. During the run you can use this directory to save or upload
 artifacts. This directory is destroyed after a check is finished.
 
-<Tabs>
-<TabItem value="Typescript">
+<CodeGroup dropdown>
+
 ```ts
 import path from 'path'
 import fs from 'fs'
@@ -184,8 +181,7 @@ test('Save file in directory', async ({ page }) => {
   const readFileFromDisk = fs.readFileSync(imagePath)
 })
 ```
-</TabItem>
-<TabItem value="Javascript">
+
 ```js
 const path = require('path')
 const fs = require('fs')
@@ -199,8 +195,8 @@ test('Save file in directory', async ({ page }) => {
   const readFileFromDisk = fs.readFileSync(imagePath)
 })
 ```
-</TabItem>
-</Tabs>
+
+</CodeGroup>
 
 Due to this sandbox, certain Node.js variables are adapted to our platform and have values we set for them. The behaviour
 is slightly different when creating a browser check in the Web UI or using the Checkly CLI.

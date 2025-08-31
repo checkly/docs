@@ -15,8 +15,8 @@ Dropbox or any other file hosting service.
 
 Having done that, you can "upload" files using a simple HTTP POST request with a (binary) body using Playwright's built-in `request` object.
 
-<Tabs>
-<Tab title="Typescript">
+<CodeGroup dropdown>
+
 ```ts http-upload.spec.ts
 import { test, expect } from '@playwright/test'
 
@@ -34,8 +34,7 @@ test('Upload a file using a POST request', async ({ request }) => {
   })
 })
 ```
-</Tab>
-<Tab title="Javascript">
+
 ```js http-upload.spec.js
 const { test, expect } = require('@playwright/test')
 
@@ -53,8 +52,8 @@ test('Upload a file using a POST request', async ({ request }) => {
   })
 })
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 ## Using the file system
 
@@ -63,8 +62,8 @@ Sometimes, you do want to explicitly save a file to disk. This is what you need 
 Checkly creates a sandboxed directory for each check run. During the run you can use this directory to save or upload
 artifacts. This directory is destroyed after a check is finished.
 
-<Tabs>
-<Tab title="Typescript">
+<CodeGroup dropdown>
+
 ```ts
 import path from 'path'
 import fs from 'fs'
@@ -78,10 +77,8 @@ test('Save file in directory', async ({ page }) => {
   const readFileFromDisk = fs.readFileSync(imagePath)
 })
 ```
-        </Tab>
-<Tab title="Javascript">
+
 ```js save-file.spec.js
-```js
 const path = require('path')
 const fs = require('fs')
 const { test } = require('@playwright/test')
@@ -94,8 +91,8 @@ test('Save file in directory', async ({ page }) => {
   const readFileFromDisk = fs.readFileSync(imagePath)
 })
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 Due to this sandbox, certain Node.js variables are adapted to our platform and have values we set for them. The behaviour
 is slightly different when creating a browser check in the Web UI or using the Checkly CLI.

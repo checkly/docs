@@ -32,8 +32,8 @@ resource "checkly_check" "e2e-checkout" {
 
 Basic checks written with `@playwright/test` will run locally with `npx playwright test` and remotely on Checkly without any modifications: 
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
+
 ```ts basic.spec.ts
 import { test, expect } from '@playwright/test'
 
@@ -43,8 +43,7 @@ test('Should load the web store', async ({ page }) => {
   await expect(page).toHaveTitle('danube-store')
 })
 ```
-</Tab>
-<Tab title="JavaScript">
+
 ```js basic.spec.js
 const { test, expect } = require('@playwright/test')
 
@@ -54,8 +53,8 @@ test('Should load the web store', async ({ page }) => {
   await expect(page).toHaveTitle('danube-store')
 })
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 If your script is using [Page Object Models](https://playwright.dev/docs/pom) or imports other files, you can take advantage of Checkly's [code snippets](/docs/terraform-provider/snippets-variables/). Consider the following directory structure:
 
@@ -69,8 +68,8 @@ scripts /
 
 `scripts/snippets/shoppingCart.{js,ts}` contains a Page Object Model class encapsulating the logic for the store's shopping cart page:
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
+
 ```ts shopping.spec.ts
 import { type Locator, type Page } from '@playwright/test'
 
@@ -88,8 +87,7 @@ export class ShoppingCart {
   }
 }
 ```
-</Tab>
-<Tab title="JavaScript">
+
 ```js shopping.spec.js
 export class ShoppingCart {
   constructor ({ page }) {
@@ -103,13 +101,13 @@ export class ShoppingCart {
   }
 }
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 `scripts/checkout.spec.{js,ts}` file is your Checkly check with the following content:
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
+
 ```ts checkout.spec.ts
 import { test, expect } from '@playwright/test'
 import { ShoppingCart } from './snippets/shoppingCart'
@@ -124,8 +122,7 @@ test('Shopping cart should be empty by default', async ({ page }) => {
   await expect(shoppingCart.summary).toContainText('Your shopping cart is empty')
 })
 ```
-</Tab>
-<Tab title="JavaScript">
+
 ```js checkout.spec.js
 const { test, expect } = require('@playwright/test')
 const { ShoppingCart } = require('./snippets/shoppingCart')
@@ -140,8 +137,8 @@ test('Shopping cart should be empty by default', async ({ page }) => {
   await expect(shoppingCart.summary).toContainText('Your shopping cart is empty')
 })
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 As you can see, it imports the `ShoppingCart` class from the `./snippets/shoppingCart` directory and uses its methods and locators within the test. This setup will work out of the box locally with `npx playwright test`. If you'd like to use the external files in Checkly, you'll need to declare them as a `checkly_snippet` resource in your `.tf` file:
 

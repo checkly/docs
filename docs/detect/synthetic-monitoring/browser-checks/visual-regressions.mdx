@@ -29,8 +29,8 @@ Starting with visual regression testing takes just three easy steps:
 1. Add a single `expect(page).toHaveScreenshot()` line of code to
    your browser check script, like the example below.
 
-   <Tabs>
-   <Tab title="Typescript">
+   <CodeGroup dropdown>
+
    ```ts visual-comparison.spec.ts
    import { test, expect } from '@playwright/test';
    
@@ -39,8 +39,7 @@ Starting with visual regression testing takes just three easy steps:
       await expect(page).toHaveScreenshot()
    })
    ```
-   </Tab>
-   <Tab title="Javascript">
+
    ```js visual-comparison.spec.js
    const { expect, test } = require('@playwright/test')
    
@@ -49,8 +48,8 @@ Starting with visual regression testing takes just three easy steps:
       await expect(page).toHaveScreenshot()
    })
    ```
-   </Tab>
-   </Tabs>
+
+   </CodeGroup>
 
 2. Run your browser check. The first time you run it, you will get an error indicating that no golden image / reference
    snapshot exists yet.
@@ -107,32 +106,31 @@ options:
 the same pixel in compared images, between `0` (strict) and `1` (lax).
 
 
-<Tabs>
-<Tab title="Typescript">
-   ```ts thresholds.spec.ts
-   import { test, expect } from '@playwright/test';
-   
-   test('Playwright homepage', async ({ page }) => {
-      await page.goto('https://playwright.dev')
-      await expect(page).toHaveScreenshot({ maxDiffPixelRatio: 0.2 })
-      await expect(page).toHaveScreenshot({ maxDiffPixels: 1000 })
-      await expect(page).toHaveScreenshot({ threshold: 0.2 })
-   })
-   ```
-</Tab>
-<Tab title="Javascript">
-   ```js thresholds.spec.js
-   const { test, expect } = require('@playwright/test')
-   
-   test('Playwright homepage', async ({ page }) => {
-      await page.goto('https://playwright.dev')
-      await expect(page).toHaveScreenshot({ maxDiffPixelRatio: 0.2 })
-      await expect(page).toHaveScreenshot({ maxDiffPixels: 1000 })
-      await expect(page).toHaveScreenshot({ threshold: 0.2 })
-   })
-   ```
-</Tab>
-</Tabs>
+<CodeGroup dropdown>
+
+```ts thresholds.spec.ts
+import { test, expect } from '@playwright/test';
+
+test('Playwright homepage', async ({ page }) => {
+   await page.goto('https://playwright.dev')
+   await expect(page).toHaveScreenshot({ maxDiffPixelRatio: 0.2 })
+   await expect(page).toHaveScreenshot({ maxDiffPixels: 1000 })
+   await expect(page).toHaveScreenshot({ threshold: 0.2 })
+})
+```
+
+```js thresholds.spec.js
+const { test, expect } = require('@playwright/test')
+
+test('Playwright homepage', async ({ page }) => {
+   await page.goto('https://playwright.dev')
+   await expect(page).toHaveScreenshot({ maxDiffPixelRatio: 0.2 })
+   await expect(page).toHaveScreenshot({ maxDiffPixels: 1000 })
+   await expect(page).toHaveScreenshot({ threshold: 0.2 })
+})
+```
+
+</CodeGroup>
 
 ### Example 2: ignoring specific screen elements
 
@@ -142,94 +140,91 @@ these elements when doing a visual comparison using the `mask` option and using 
 
 The example below hides the cookie banner and optional CTA popup from Intercom on the Checkly docs pages.
 
-<Tabs>
-<Tab title="Typescript">
-   ```ts ignoring.spec.ts
-   import { test, expect } from '@playwright/test';
-   
-   test('Ignore cookie banner & cta popup', async ({ page }) => {
-      await page.goto('https://docs.checklyhq.com')
-      await expect(page).toHaveScreenshot({
-         mask: [
-            page.locator('.optanon-alert-box-wrapper'),
-            page.locator('#intercom-container-body')
-         ]
-      })
+<CodeGroup dropdown>
+
+```ts ignoring.spec.ts
+import { test, expect } from '@playwright/test';
+
+test('Ignore cookie banner & cta popup', async ({ page }) => {
+   await page.goto('https://docs.checklyhq.com')
+   await expect(page).toHaveScreenshot({
+      mask: [
+         page.locator('.optanon-alert-box-wrapper'),
+         page.locator('#intercom-container-body')
+      ]
    })
-   ```
-</Tab>
-<Tab title="Javascript">
-   ```js ignoring.spec.js
-   const { test, expect } = require('@playwright/test')
-   
-   test('Playwright homepage', async ({ page }) => {
-      await page.goto('https://docs.checklyhq.com')
-      await expect(page).toHaveScreenshot({
-         mask: [
-            page.locator('.optanon-alert-box-wrapper'),
-            page.locator('#intercom-container-body')
-         ]
-      })
+})
+```
+
+```js ignoring.spec.js
+const { test, expect } = require('@playwright/test')
+
+test('Playwright homepage', async ({ page }) => {
+   await page.goto('https://docs.checklyhq.com')
+   await expect(page).toHaveScreenshot({
+      mask: [
+         page.locator('.optanon-alert-box-wrapper'),
+         page.locator('#intercom-container-body')
+      ]
    })
-   ```
-</Tab>
-</Tabs>
+})
+```
+
+</CodeGroup>
 
 ### Example 3: disabling animations
 
 In some cases, any ongoing animations can cause a visual difference between your golden image and the actual screenshot.
 You can disable any CSS animations and transitions using the `animations` option.
 
-<Tabs>
-<Tab title="Typescript">
-   ```ts disable-anims.spec.ts
-   import { test, expect } from '@playwright/test';
-   
-   test('Disable animations', async ({ page }) => {
-      await page.goto('https://playwright.dev')
-      await expect(page).toHaveScreenshot({ animations: 'disabled' })
-   })
-   ```
-</Tab>
-<Tab title="Javascript">
-   ```js disable-anims.spec.js
-   const { test, expect } = require('@playwright/test')
-   
-   test('Disable animations', async ({ page }) => {
-      await page.goto('https://playwright.dev')
-      await expect(page).toHaveScreenshot({ animations: 'disabled' })
-   })
-   ```
-</Tab>
-</Tabs>
+<CodeGroup dropdown>
+
+```ts disable-anims.spec.ts
+import { test, expect } from '@playwright/test';
+
+test('Disable animations', async ({ page }) => {
+   await page.goto('https://playwright.dev')
+   await expect(page).toHaveScreenshot({ animations: 'disabled' })
+})
+```
+
+```js disable-anims.spec.js
+const { test, expect } = require('@playwright/test')
+
+test('Disable animations', async ({ page }) => {
+   await page.goto('https://playwright.dev')
+   await expect(page).toHaveScreenshot({ animations: 'disabled' })
+})
+```
+
+</CodeGroup>
 
 ## Snapshot testing
 
 Snapshot testing, using the `expect().toMatchSnapshot(snapshotName)` assertion, is a great way to test the output of
 any arbitrary `string` or `Buffer` value. Note that it is not optimized for visual regression testing.
 
-<Tabs>
-<Tab title="Typescript">
-   ```ts snapshot.spec.ts
-   import { test, expect } from '@playwright/test'
-   
-   test('Match hero text', async ({ page }) => {
-      await page.goto('https://playwright.dev')
-      expect(await page.textContent('.hero__title')).toMatchSnapshot('hero.txt')
-   })
-   ```
-</Tab>
-<Tab title="Javascript">
-   ```js snapshot.spec.js
-   const { test, expect } = require('@playwright/test')
-   
-   test('Match hero text', async ({ page }) => {
-      await page.goto('https://playwright.dev')
-      expect(await page.textContent('.hero__title')).toMatchSnapshot('hero.txt')
-   })
-   ```
-</Tab>
-</Tabs>
+<CodeGroup dropdown>
+
+```ts snapshot.spec.ts
+import { test, expect } from '@playwright/test'
+
+test('Match hero text', async ({ page }) => {
+   await page.goto('https://playwright.dev')
+   expect(await page.textContent('.hero__title')).toMatchSnapshot('hero.txt')
+})
+```
+
+```js snapshot.spec.js
+const { test, expect } = require('@playwright/test')
+
+test('Match hero text', async ({ page }) => {
+   await page.goto('https://playwright.dev')
+   expect(await page.textContent('.hero__title')).toMatchSnapshot('hero.txt')
+})
+```
+
+</CodeGroup>
 
 Creating or updating the golden image / reference snapshot works the same as with visual regression testing.
 

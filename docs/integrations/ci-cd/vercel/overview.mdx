@@ -67,8 +67,8 @@ available, but otherwise just defaults to the stable **production URL**.
 
 Here is a full example that we use ourselves to monitor checklyhq.com which is actually also deployed to Vercel.
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
+
 ```typescript vercel.spec.ts
 import { expect, test } from '@playwright/test'
 
@@ -79,8 +79,7 @@ test('assert response status of page', async ({ page }) => {
   expect(response.status()).toBeLessThan(400)
 })
 ```
-</Tab>
-<Tab title="JavaScript">
+
 ```javascript vercel.spec.js
 const { expect, test } = require('@playwright/test')
 
@@ -91,8 +90,8 @@ test('assert response status of page', async ({ page }) => {
   expect(response.status()).toBeLessThan(400)
 })
 ```
-</Tab>
-</Tabs>
+
+</CodeGroup>
 
 This way we are setting the `targetUrl` variable to either the `ENVIRONMENT_URL` or just our main production URL.
 

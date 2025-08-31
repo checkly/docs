@@ -30,8 +30,7 @@ This creates the basic project structure with configuration files and example mo
 
 ### Basic URL Monitor
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
 
 ```ts url-monitor.check.ts
 import { UrlMonitor, UrlAssertionBuilder } from 'checkly/constructs'
@@ -54,9 +53,6 @@ new UrlMonitor('homepage-check', {
 })
 ```
 
-</Tab>
-<Tab title="JavaScript">
-
 ```js url-monitor.check.js
 const { UrlMonitor, UrlAssertionBuilder } = require('checkly/constructs')
 
@@ -78,13 +74,11 @@ new UrlMonitor('homepage-check', {
 })
 ```
 
-</Tab>
-</Tabs>
+</CodeGroup>
 
 ### Advanced URL Monitor with Authentication
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
 
 ```ts api-monitor.check.ts
 import { UrlMonitor, UrlAssertionBuilder } from 'checkly/constructs'
@@ -114,9 +108,6 @@ new UrlMonitor('api-health-check', {
 })
 ```
 
-</Tab>
-<Tab title="JavaScript">
-
 ```js api-monitor.check.js
 const { UrlMonitor, UrlAssertionBuilder } = require('checkly/constructs')
 
@@ -145,15 +136,13 @@ new UrlMonitor('api-health-check', {
 })
 ```
 
-</Tab>
-</Tabs>
+</CodeGroup>
 
 ## TCP Monitor Configuration
 
 ### Basic TCP Monitor
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
 
 ```ts database-monitor.check.ts
 import { TcpMonitor } from 'checkly/constructs'
@@ -172,9 +161,6 @@ new TcpMonitor('database-tcp-check', {
 })
 ```
 
-</Tab>
-<Tab title="JavaScript">
-
 ```js database-monitor.check.js
 const { TcpMonitor } = require('checkly/constructs')
 
@@ -192,13 +178,11 @@ new TcpMonitor('database-tcp-check', {
 })
 ```
 
-</Tab>
-</Tabs>
+</CodeGroup>
 
 ### TCP Monitor with SSL and Response Validation
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
 
 ```ts mail-server-monitor.check.ts
 import { TcpMonitor } from 'checkly/constructs'
@@ -222,9 +206,6 @@ new TcpMonitor('mail-server-check', {
 })
 ```
 
-</Tab>
-<Tab title="JavaScript">
-
 ```js mail-server-monitor.check.js
 const { TcpMonitor } = require('checkly/constructs')
 
@@ -247,15 +228,13 @@ new TcpMonitor('mail-server-check', {
 })
 ```
 
-</Tab>
-</Tabs>
+</CodeGroup>
 
 ## Heartbeat Monitor Configuration
 
 ### Basic Heartbeat Monitor
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
 
 ```ts backup-heartbeat.check.ts
 import { HeartbeatMonitor } from 'checkly/constructs'
@@ -269,9 +248,6 @@ new HeartbeatMonitor('daily-backup-heartbeat', {
 })
 ```
 
-</Tab>
-<Tab title="JavaScript">
-
 ```js backup-heartbeat.check.js
 const { HeartbeatMonitor } = require('checkly/constructs')
 
@@ -284,13 +260,11 @@ new HeartbeatMonitor('daily-backup-heartbeat', {
 })
 ```
 
-</Tab>
-</Tabs>
+</CodeGroup>
 
 ### Heartbeat Monitor with Custom Configuration
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
 
 ```ts sync-job-heartbeat.check.ts
 import { HeartbeatMonitor } from 'checkly/constructs'
@@ -305,9 +279,6 @@ new HeartbeatMonitor('hourly-sync-heartbeat', {
 })
 ```
 
-</Tab>
-<Tab title="JavaScript">
-
 ```js sync-job-heartbeat.check.js
 const { HeartbeatMonitor } = require('checkly/constructs')
 
@@ -321,8 +292,7 @@ new HeartbeatMonitor('hourly-sync-heartbeat', {
 })
 ```
 
-</Tab>
-</Tabs>
+</CodeGroup>
 
 ## Shared Configuration and Groups
 
@@ -330,8 +300,7 @@ new HeartbeatMonitor('hourly-sync-heartbeat', {
 
 Organize related monitors using groups:
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
 
 ```ts api-monitoring-group.ts
 import { MonitorGroup } from 'checkly/constructs'
@@ -365,9 +334,6 @@ new UrlMonitor('orders-api', {
 })
 ```
 
-</Tab>
-<Tab title="JavaScript">
-
 ```js api-monitoring-group.js
 const { MonitorGroup, UrlMonitor } = require('checkly/constructs')
 
@@ -400,15 +366,13 @@ new UrlMonitor('orders-api', {
 })
 ```
 
-</Tab>
-</Tabs>
+</CodeGroup>
 
 ### Environment Variables and Secrets
 
 Use environment variables for configuration:
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
 
 ```ts environment-config.ts
 import { UrlMonitor, UrlAssertionBuilder } from 'checkly/constructs'
@@ -440,9 +404,6 @@ new UrlMonitor(`${environment}-api-check`, {
 })
 ```
 
-</Tab>
-<Tab title="JavaScript">
-
 ```js environment-config.js
 const { UrlMonitor, UrlAssertionBuilder } = require('checkly/constructs')
 
@@ -473,8 +434,7 @@ new UrlMonitor(`${environment}-api-check`, {
 })
 ```
 
-</Tab>
-</Tabs>
+</CodeGroup>
 
 ## Deployment and CI/CD Integration
 
@@ -544,8 +504,7 @@ jobs:
 
 Generate monitors programmatically:
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
 
 ```ts dynamic-monitors.ts
 import { UrlMonitor, UrlAssertionBuilder } from 'checkly/constructs'
@@ -579,9 +538,6 @@ endpoints.forEach((endpoint, index) => {
 })
 ```
 
-</Tab>
-<Tab title="JavaScript">
-
 ```js dynamic-monitors.js
 const { UrlMonitor, UrlAssertionBuilder } = require('checkly/constructs')
 
@@ -614,15 +570,13 @@ endpoints.forEach((endpoint, index) => {
 })
 ```
 
-</Tab>
-</Tabs>
+</CodeGroup>
 
 ### Configuration Management
 
 Centralized configuration management:
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
 
 ```ts config/monitoring.ts
 interface MonitoringConfig {
@@ -646,9 +600,6 @@ export const config: MonitoringConfig = {
 }
 ```
 
-</Tab>
-<Tab title="JavaScript">
-
 ```js config/monitoring.js
 const config = {
   baseUrl: process.env.BASE_URL || 'https://api.myapp.com',
@@ -665,8 +616,7 @@ const config = {
 module.exports = { config }
 ```
 
-</Tab>
-</Tabs>
+</CodeGroup>
 
 ## Best Practices
 

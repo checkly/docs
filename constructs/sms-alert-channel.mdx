@@ -4,34 +4,34 @@ description: 'Learn how to configure SMS alert channels with the Checkly CLI.'
 sidebarTitle: 'SMS Alert Channel'
 ---
 
-Use SmsAlertChannel to send SMS notifications to phone numbers when checks fail or recover. SMS alerts are ideal for critical alerts that require immediate attention.
+import AlertChannelOptionsTable from '/snippets/alert-channel-options-table.mdx';
 
-<Info>
-Learn more about SMS alerts in the [SMS Delivery documentation](/docs/communicate/alerts/channels).
-</Info>
+<Tip>
+Learn more about SMS alerts in [the SMS alert documentation](/docs/integrations/alerts/sms).
+</Tip>
 
-## `SmsAlertChannel` Structure
+Use SMS Alert Channels to send SMS notifications to phone numbers when checks fail or recover. SMS alerts are ideal for critical alerts that require immediate attention.
 
 <CodeGroup>
 
 ```ts Basic Example
 import { SmsAlertChannel } from 'checkly/constructs'
 
-const smsChannel = new SmsAlertChannel('sms-channel-1', {
-  phoneNumber: '+1234567890'
+const smsChannel = new SmsAlertChannel("sms-channel-1", {
+  phoneNumber: "+1234567890",
 })
 ```
 
 ```ts Advanced Example
 import { SmsAlertChannel } from 'checkly/constructs'
 
-const oncallSms = new SmsAlertChannel('oncall-sms-channel', {
-  phoneNumber: '+1234567890',
+const oncallSms = new SmsAlertChannel("oncall-sms-channel", {
+  phoneNumber: "+1234567890",
   sendRecovery: true,
   sendFailure: true,
-  sendDegrade: false, // Only critical failures
+  sendDegraded: false, // Only critical failures
   sslExpiry: true,
-  sslExpiryThreshold: 7 // Alert 7 days before SSL expires
+  sslExpiryThreshold: 7, // Alert 7 days before SSL expires
 })
 ```
 
@@ -40,197 +40,315 @@ const oncallSms = new SmsAlertChannel('oncall-sms-channel', {
 ## `SmsAlertChannel` Configuration
 
 <Tabs>
-  <Tab title="Unique Configuration">
+  <Tab title="SMS Alert Channel">
 
 Configure SMS-specific settings:
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `phoneNumber` | `string` | ✅ | - | Phone number in international format (e.g., +1234567890) |
+| `name` | `string` | ❌ | - | Friendly name for the SMS alert channel (e.g. "Tim's phone") |
 
 </Tab>
 
-<Tab title="Shared Configuration">
-Configure common alert channel properties:
+<Tab title="General Alert Channel">
 
-| Property | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `sendRecovery` | `boolean` | ❌ | `true` | Send notifications when checks recover |
-| `sendFailure` | `boolean` | ❌ | `true` | Send notifications when checks fail |
-| `sendDegrade` | `boolean` | ❌ | `false` | Send notifications when checks degrade (API checks only) |
-| `sslExpiry` | `boolean` | ❌ | `false` | Send notifications for SSL certificate expiry |
-| `sslExpiryThreshold` | `number` | ❌ | `30` | Days before SSL expiry to send notification |
+  <AlertChannelOptionsTable />
 
 </Tab>
 </Tabs>
+
+### SMS Alert Channel Options
+
+<ResponseField name="phoneNumber" type="string" required>
+Phone number to send SMS notifications to. Each SmsAlertChannel supports only one phone number.
+
+**Usage:**
+
+```ts
+new SmsAlertChannel("team-sms", {
+  phoneNumber: "+1234567890",
+})
+```
+
+**Use cases**: Team notifications, individual alerts, role-based alerting.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+Friendly name for the SMS alert channel (e.g. "Tim's phone").
+
+**Usage:**
+
+```ts
+new SmsAlertChannel("team-sms", {
+  phoneNumber: "+1234567890",
+  name: "Tim's phone",
+})
+```
+
+**Use cases**: Personalization, user-friendly identification, role-based alerting.
+</ResponseField>
+
+### General Alert Channel Options
+
+<ResponseField name="sendRecovery" type="boolean">
+Whether to send notifications when checks recover from failure or degraded state.
+
+**Usage:**
+
+```ts
+new SmsAlertChannel("recovery-sms", {
+  phoneNumber: "+1234567890",
+  sendRecovery: true, // Send recovery notifications
+})
+```
+
+**Examples:**
+
+<CodeGroup>
+
+```ts Recovery Notifications
+const opsSms = new SmsAlertChannel("ops-sms", {
+  phoneNumber: "+1234567890",
+  sendRecovery: true, // Get notified when issues are resolved
+  sendFailure: true,
+})
+```
+
+```ts Failure Only
+const alertsSms = new SmsAlertChannel("alerts-only", {
+  phoneNumber: "+1234567890",
+  sendRecovery: false, // Only failures, no recovery notifications
+  sendFailure: true,
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Recovery confirmation, operational awareness, noise reduction.
+</ResponseField>
+
+<ResponseField name="sendFailure" type="boolean">
+Whether to send notifications when checks fail.
+
+**Usage:**
+
+```ts
+new SmsAlertChannel("failure-sms", {
+  phoneNumber: "+1234567890",
+  sendFailure: true, // Send failure notifications
+})
+```
+
+**Examples:**
+
+<CodeGroup>
+
+```ts Failures Only
+const criticalSms = new SmsAlertChannel("critical-sms", {
+  phoneNumber: "+1234567890",
+  sendFailure: true,
+  sendRecovery: false,
+  sendDegraded: false,
+})
+```
+
+```ts All Notifications
+const comprehensiveSms = new SmsAlertChannel("all-notifications", {
+  phoneNumber: "+1234567890",
+  sendFailure: true,
+  sendRecovery: true,
+  sendDegraded: true,
+})
+```
+
+</CodeGroup>
+
+**Use cases**: Incident response, failure monitoring, operational alerting.
+</ResponseField>
+
+<ResponseField name="sendDegraded" type="boolean">
+
+Whether to send notifications when API checks degrade (performance thresholds exceeded but not failed).
+
+**Usage:**
+
+```ts
+new SmsAlertChannel("performance-sms", {
+  phoneNumber: "+1234567890",
+  sendDegraded: true, // Send degraded performance notifications
+})
+```
+
+**Use cases**: Performance monitoring, early warning systems, SLA tracking.
+</ResponseField>
+
+<ResponseField name="sslExpiry" type="boolean">
+Whether to send notifications for SSL certificate expiry warnings.
+
+**Usage:**
+
+```ts
+new SmsAlertChannel("security-sms", {
+  phoneNumber: "+1234567890",
+  sslExpiry: true,
+  sslExpiryThreshold: 30, // Alert 30 days before expiry
+})
+```
+
+**Use cases**: Certificate management, security compliance, proactive maintenance.
+</ResponseField>
+
+<ResponseField name="sslExpiryThreshold" type="number">
+Number of days before SSL certificate expiry to send notifications. Only relevant when `sslExpiry` is enabled.
+
+Usage:
+```ts
+new SmsAlertChannel("ssl-monitoring", {
+  phoneNumber: "+1234567890",
+  sslExpiry: true,
+  sslExpiryThreshold: 30, // Alert 30 days before expiry
+})
+```
+
+**Use cases**: Certificate renewal planning, compliance management, operational scheduling.
+</ResponseField>
+
 
 ## SMS Alert Channel Examples
 
 <Tabs>
   <Tab title="On-Call Team">
     ```ts
-    import { SmsAlertChannel, ApiCheck } from 'checkly/constructs'
+    import { ApiCheck, SmsAlertChannel } from "checkly/constructs"
 
-    const oncallSms = new SmsAlertChannel('oncall-sms', {
-      phoneNumber: '+1555123456'
+    const oncallSms = new SmsAlertChannel("oncall-sms", {
+      phoneNumber: "+1555123456",
     })
 
-    new ApiCheck('critical-api-check', {
-      name: 'Critical API Endpoint',
+    new ApiCheck("critical-api-check", {
+      name: "Critical API Endpoint",
       alertChannels: [oncallSms],
-      tags: ['critical', 'production'],
+      tags: ["critical", "production"],
       request: {
-        method: 'GET',
-        url: 'https://api.example.com/critical'
-      }
+        method: "GET",
+        url: "https://api.example.com/critical",
+      },
     })
     ```
   </Tab>
-  
+
   <Tab title="Multiple Team Members">
     ```ts
-    const primaryOncall = new SmsAlertChannel('primary-oncall', {
-      phoneNumber: '+1555123456'
+    import { ApiCheck, SmsAlertChannel } from "checkly/constructs"
+
+    const primaryOncall = new SmsAlertChannel("primary-oncall", {
+      phoneNumber: "+1555123456",
     })
 
-    const secondaryOncall = new SmsAlertChannel('secondary-oncall', {
-      phoneNumber: '+1555654321'
+    const secondaryOncall = new SmsAlertChannel("secondary-oncall", {
+      phoneNumber: "+1555654321",
     })
 
-    const teamLead = new SmsAlertChannel('team-lead', {
-      phoneNumber: '+1555999888',
+    const teamLead = new SmsAlertChannel("team-lead", {
+      phoneNumber: "+1555999888",
       sendFailure: true,
-      sendRecovery: false // Only failures
+      sendRecovery: false, // Only failures
     })
 
-    new ApiCheck('payment-api-check', {
-      name: 'Payment API Check',
+    new ApiCheck("payment-api-check", {
+      name: "Payment API Check",
       alertChannels: [primaryOncall, secondaryOncall, teamLead],
       request: {
-        method: 'GET',
-        url: 'https://api.example.com/payments/health'
-      }
+        method: "GET",
+        url: "https://api.example.com/payments/health",
+      },
     })
     ```
   </Tab>
-  
+
   <Tab title="Regional On-Call">
     ```ts
+    import { ApiCheck, SmsAlertChannel } from "checkly/constructs"
+
     // US on-call
-    const usOncall = new SmsAlertChannel('us-oncall', {
-      phoneNumber: '+15551234567'
+    const usOncall = new SmsAlertChannel("us-oncall", {
+      phoneNumber: "+15551234567",
     })
 
     // Europe on-call
-    const euOncall = new SmsAlertChannel('eu-oncall', {
-      phoneNumber: '+44123456789'
+    const euOncall = new SmsAlertChannel("eu-oncall", {
+      phoneNumber: "+44123456789",
     })
 
     // Asia-Pacific on-call
-    const apacOncall = new SmsAlertChannel('apac-oncall', {
-      phoneNumber: '+81312345678'
+    const apacOncall = new SmsAlertChannel("apac-oncall", {
+      phoneNumber: "+81312345678",
     })
 
     // Regional API checks
-    new ApiCheck('us-api-check', {
-      name: 'US API Check',
-      locations: ['us-east-1', 'us-west-2'],
+    new ApiCheck("us-api-check", {
+      name: "US API Check",
+      locations: ["us-east-1", "us-west-2"],
       alertChannels: [usOncall],
       request: {
-        method: 'GET',
-        url: 'https://us-api.example.com/health'
-      }
+        method: "GET",
+        url: "https://us-api.example.com/health",
+      },
     })
 
-    new ApiCheck('eu-api-check', {
-      name: 'EU API Check',
-      locations: ['eu-west-1'],
+    new ApiCheck("eu-api-check", {
+      name: "EU API Check",
+      locations: ["eu-west-1"],
       alertChannels: [euOncall],
       request: {
-        method: 'GET',
-        url: 'https://eu-api.example.com/health'
-      }
+        method: "GET",
+        url: "https://eu-api.example.com/health",
+      },
     })
     ```
   </Tab>
-  
+
   <Tab title="Severity-Based Alerting">
     ```ts
-    const criticalSms = new SmsAlertChannel('critical-sms', {
-      phoneNumber: '+1555CRITICAL',
+    import { ApiCheck, SmsAlertChannel } from "checkly/constructs"
+
+    const criticalSms = new SmsAlertChannel("critical-sms", {
+      phoneNumber: "+1555CRITICAL",
       sendFailure: true,
       sendRecovery: true,
-      sendDegrade: false // Only for failures
+      sendDegraded: false, // Only for failures
     })
 
-    const warningSms = new SmsAlertChannel('warning-sms', {
-      phoneNumber: '+1555WARNING',
+    const warningSms = new SmsAlertChannel("warning-sms", {
+      phoneNumber: "+1555WARNING",
       sendFailure: true,
       sendRecovery: false,
-      sendDegrade: true // Include degraded performance
+      sendDegraded: true, // Include degraded performance
     })
 
     // Critical service
-    new ApiCheck('critical-service', {
-      name: 'Critical Payment Service',
+    new ApiCheck("critical-service", {
+      name: "Critical Payment Service",
       alertChannels: [criticalSms],
-      tags: ['critical', 'payment'],
+      tags: ["critical", "payment"],
       request: {
-        method: 'GET',
-        url: 'https://payment.example.com/health'
-      }
+        method: "GET",
+        url: "https://payment.example.com/health",
+      },
     })
 
     // Warning-level service
-    new ApiCheck('analytics-service', {
-      name: 'Analytics Service',
+    new ApiCheck("analytics-service", {
+      name: "Analytics Service",
       alertChannels: [warningSms],
       maxResponseTime: 5000,
       degradedResponseTime: 2000,
-      tags: ['analytics', 'non-critical'],
+      tags: ["analytics", "non-critical"],
       request: {
-        method: 'GET',
-        url: 'https://analytics.example.com/health'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="SSL Certificate Monitoring">
-    ```ts
-    const securitySms = new SmsAlertChannel('security-sms', {
-      phoneNumber: '+1555SECURE',
-      sendFailure: true,
-      sendRecovery: false,
-      sslExpiry: true,
-      sslExpiryThreshold: 14 // Alert 2 weeks before expiry
-    })
-
-    new ApiCheck('ssl-cert-monitor', {
-      name: 'SSL Certificate Monitor',
-      alertChannels: [securitySms],
-      request: {
-        method: 'GET',
-        url: 'https://secure.example.com'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Environment Variables">
-    ```ts
-    // Store phone numbers securely
-    const productionSms = new SmsAlertChannel('prod-sms', {
-      phoneNumber: process.env.ONCALL_PHONE_NUMBER!
-    })
-
-    new ApiCheck('production-check', {
-      name: 'Production API Check',
-      alertChannels: [productionSms],
-      request: {
-        method: 'GET',
-        url: 'https://api.example.com/health'
-      }
+        method: "GET",
+        url: "https://analytics.example.com/health",
+      },
     })
     ```
   </Tab>
@@ -238,7 +356,11 @@ Configure common alert channel properties:
 
 ## Phone Number Format
 
-SMS alert channels require phone numbers in international format:
+The phone numbers used for SMS alerting need to be in [E.164 format format](https://www.twilio.com/docs/glossary/what-e164). Stick to the following rules and you'll be fine:
+
+- Prepend international access codes with a + sign
+- Do not use any white spaces
+- Use up to 15 characters
 
 <Tabs>
   <Tab title="Correct Format">
@@ -259,20 +381,20 @@ SMS alert channels require phone numbers in international format:
     })
     ```
   </Tab>
-  
+
   <Tab title="Incorrect Format">
     ```ts
     // ❌ Don't use these formats:
-    
+
     // Missing country code
     phoneNumber: '5551234567'
-    
+
     // With spaces or dashes
     phoneNumber: '+1 555-123-4567'
-    
+
     // With parentheses
     phoneNumber: '+1 (555) 123-4567'
-    
+
     // Domestic format
     phoneNumber: '(555) 123-4567'
     ```
@@ -284,40 +406,41 @@ SMS alert channels require phone numbers in international format:
 SMS works well in combination with other notification methods:
 
 ```ts
-import { SmsAlertChannel, EmailAlertChannel, SlackAlertChannel } from 'checkly/constructs'
+import {
+  ApiCheck,
+  EmailAlertChannel,
+  SlackAlertChannel,
+  SmsAlertChannel,
+} from "checkly/constructs"
 
-const criticalSms = new SmsAlertChannel('critical-sms', {
-  phoneNumber: '+1555CRITICAL'
+const criticalSms = new SmsAlertChannel("critical-sms", {
+  phoneNumber: "+1555CRITICAL",
 })
 
-const teamEmail = new EmailAlertChannel('team-email', {
-  address: 'dev-team@example.com'
+const teamEmail = new EmailAlertChannel("team-email", {
+  address: "dev-team@example.com",
 })
 
-const slackChannel = new SlackAlertChannel('team-slack', {
-  url: new URL('https://hooks.slack.com/services/YOUR/WEBHOOK/URL'),
-  channel: '#alerts'
+const slackChannel = new SlackAlertChannel("team-slack", {
+  url: new URL("https://hooks.slack.com/services/YOUR/WEBHOOK/URL"),
+  channel: "#alerts",
 })
 
-new ApiCheck('multi-channel-alerts', {
-  name: 'Multi-Channel Alert Check',
+new ApiCheck("multi-channel-alerts", {
+  name: "Multi-Channel Alert Check",
   alertChannels: [
-    criticalSms,    // Immediate SMS for critical issues
-    teamEmail,      // Email for documentation
-    slackChannel    // Slack for team visibility
+    criticalSms, // Immediate SMS for critical issues
+    teamEmail, // Email for documentation
+    slackChannel, // Slack for team visibility
   ],
   request: {
-    method: 'GET',
-    url: 'https://api.example.com/critical-service'
-  }
+    method: "GET",
+    url: "https://api.example.com/critical-service",
+  },
 })
 ```
 
 ## Best Practices
-
-<Warning>
-**Phone Number Validation**: Always use the correct international format (+country code + number) without spaces, dashes, or other formatting characters.
-</Warning>
 
 <Info>
 **SMS Limits**: Be mindful of SMS costs and potential rate limits. Use SMS for truly critical alerts and combine with other notification methods for comprehensive coverage.
@@ -326,55 +449,63 @@ new ApiCheck('multi-channel-alerts', {
 <Tabs>
   <Tab title="Critical Alerts Only">
     ```ts
+    import { ApiCheck, SmsAlertChannel } from "checkly/constructs"
+
     // Use SMS sparingly for the most critical alerts
-    const emergencySms = new SmsAlertChannel('emergency-sms', {
-      phoneNumber: '+1555EMERGENCY',
+    const emergencySms = new SmsAlertChannel("emergency-sms", {
+      phoneNumber: "+1555EMERGENCY",
       sendFailure: true,
       sendRecovery: false, // Reduce SMS volume
-      sendDegrade: false   // Only failures
+      sendDegraded: false, // Only failures
     })
 
-    new ApiCheck('life-critical-system', {
-      name: 'Life Critical System',
+    new ApiCheck("life-critical-system", {
+      name: "Life Critical System",
       alertChannels: [emergencySms],
-      tags: ['life-critical', 'emergency'],
+      tags: ["life-critical", "emergency"],
       request: {
-        method: 'GET',
-        url: 'https://life-critical.example.com/health'
-      }
+        method: "GET",
+        url: "https://life-critical.example.com/health",
+      },
     })
     ```
   </Tab>
-  
+
   <Tab title="Escalation Pattern">
     ```ts
+    import {
+      ApiCheck,
+      EmailAlertChannel,
+      SmsAlertChannel,
+    } from "checkly/constructs"
+
     // Start with less intrusive methods, escalate to SMS
-    const teamEmail = new EmailAlertChannel('team-email', {
-      address: 'team@example.com'
+    const teamEmail = new EmailAlertChannel("team-email", {
+      address: "team@example.com",
     })
 
-    const urgentSms = new SmsAlertChannel('urgent-sms', {
-      phoneNumber: '+1555URGENT'
+    const urgentSms = new SmsAlertChannel("urgent-sms", {
+      phoneNumber: "+1555URGENT",
     })
 
     // Regular monitoring with email
-    new ApiCheck('regular-service', {
-      name: 'Regular Service',
+    new ApiCheck("regular-service", {
+      name: "Regular Service",
       alertChannels: [teamEmail],
       request: {
-        method: 'GET',
-        url: 'https://api.example.com/regular'
-      }
+        method: "GET",
+        url: "https://api.example.com/regular",
+      },
     })
 
     // Critical service with SMS escalation
-    new ApiCheck('critical-service', {
-      name: 'Critical Service',
+    new ApiCheck("critical-service", {
+      name: "Critical Service",
       alertChannels: [teamEmail, urgentSms], // Both email and SMS
       request: {
-        method: 'GET',
-        url: 'https://api.example.com/critical'
-      }
+        method: "GET",
+        url: "https://api.example.com/critical",
+      },
     })
     ```
   </Tab>

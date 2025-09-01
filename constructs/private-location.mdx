@@ -4,128 +4,116 @@ description: 'Learn how to configure private locations with the Checkly CLI.'
 sidebarTitle: 'Private Location'
 ---
 
-Use PrivateLocation to create private locations for running checks from your own infrastructure, VPCs, or segregated networks. This enables monitoring of internal services and applications not accessible from the public internet.
+<Tip>
+Learn more about Private Locations in [the Private Locations overview](/docs/introduction/platform/private-locations/overview).
+</Tip>
+
+Use Private Location to create private locations for running checks from your own infrastructure, VPCs, or segregated networks. This enables monitoring of internal services and applications not accessible from the public internet.
 
 <Accordion title="Prerequisites">
 Before creating private locations, ensure you have:
 
-- A Checkly CLI project initialized with `npx checkly init`
+- An initialized Checkly CLI project
 - Access to the infrastructure where you'll deploy the private location agent
 - Network connectivity from your infrastructure to Checkly's API endpoints
 - Understanding of your internal network topology and security requirements
 - Administrative privileges to deploy and run the private location agent
 
-For additional setup information, see [CLI overview](/cli/overview) and [Private Locations documentation](/docs/detect/private-locations/overview).
+For additional setup information, see [CLI overview](/cli/overview).
 </Accordion>
-
-## `PrivateLocation` Structure
 
 <CodeGroup>
 
 ```ts Basic Example
-import { PrivateLocation } from 'checkly/constructs'
+import { PrivateLocation } from "checkly/constructs"
 
-const myPrivateLocation = new PrivateLocation('private-location-1', {
-  name: 'My Private Location',
-  icon: 'server',
-  slugName: 'my-private-location'
+const myPrivateLocation = new PrivateLocation("private-location-1", {
+  name: "My Private Location",
+  icon: "server",
+  slugName: "my-private-location"
 })
 ```
 
-```ts Advanced Example
-import { PrivateLocation, ApiCheck } from 'checkly/constructs'
+```ts Check using a private location
+import { ApiCheck, PrivateLocation } from "checkly/constructs"
 
-const datacenterLocation = new PrivateLocation('datacenter-east-1', {
-  name: 'East Coast Datacenter',
-  icon: 'building',
-  slugName: 'datacenter-east-1',
-  proxyUrl: 'http://proxy.datacenter.local:8080'
+const datacenterLocation = new PrivateLocation("datacenter-east-1", {
+  name: "East Coast Datacenter",
+  icon: "building",
+  slugName: "datacenter-east-1",
+  proxyUrl: "http://proxy.datacenter.local:8080",
 })
 
 // Use the private location in a check
-new ApiCheck('internal-api-check', {
-  name: 'Internal API Check',
+new ApiCheck("internal-api-check", {
+  name: "Internal API Check",
   privateLocations: [datacenterLocation],
   request: {
-    method: 'GET',
-    url: 'https://internal-api.company.local/health'
-  }
+    method: "GET",
+    url: "https://internal-api.company.local/health",
+  },
 })
 ```
 
 </CodeGroup>
 
-## Options
+## Configuration
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `name` | `string` | ✅ | - | Friendly name for your private location |
 | `slugName` | `string` | ✅ | - | Unique slug identifier (must be unique across your account) |
-| `icon` | `string` | ❌ | `'server'` | Octicon name to distinguish the location in the UI |
+| `icon` | `string` | ❌ | - | [Octicon name](https://primer.style/octicons/) to distinguish the location in the UI |
 | `proxyUrl` | `string` | ❌ | - | Proxy URL for outgoing HTTP calls from this location |
 
-## Unique Options
+## Private Location Options
 
 <ResponseField name="name" type="string" required>
 Friendly name for your private location that will be displayed in the Checkly dashboard and used for identification.
 
-### Usage
+**Usage:**
+
 ```ts
-new PrivateLocation('my-location', {
-  name: 'Corporate Data Center'
+new PrivateLocation("my-location", {
+  name: "Corporate Data Center",
+  slugName: "corporate-data-center"
 })
 ```
 
-### Examples
-```ts
-// Infrastructure-based naming
-new PrivateLocation('datacenter-east', {
-  name: 'East Coast Data Center'
-})
-
-// Environment-based naming
-new PrivateLocation('dev-vpc', {
-  name: 'Development VPC'
-})
-
-// Function-based naming
-new PrivateLocation('api-gateway-zone', {
-  name: 'API Gateway Zone'
-})
-```
 </ResponseField>
 
 <ResponseField name="slugName" type="string" required>
 Unique slug identifier for your private location. This must be unique across your entire Checkly account and is used for referencing the location.
 
-### Usage
+**Usage:**
+
 ```ts
-new PrivateLocation('my-location', {
-  name: 'My Location',
-  slugName: 'my-unique-location-slug'
+new PrivateLocation("my-location", {
+  name: "My Location",
+  slugName: "my-unique-location-slug",
 })
 ```
 
-### Examples
+**Examples:**
 
 <Tabs>
 <Tab title="Good Naming Practices">
 
 ```ts
 // Descriptive and stable slugs
-new PrivateLocation('corp-vpc-east', {
-  name: 'Corporate VPC East',
-  slugName: 'corporate-vpc-east-1'
+new PrivateLocation("corp-vpc-east", {
+  name: "Corporate VPC East",
+  slugName: "corporate-vpc-east-1",
 })
 
-new PrivateLocation('k8s-prod', {
-  name: 'Production Kubernetes',
-  slugName: 'k8s-production-cluster'
+new PrivateLocation("k8s-prod", {
+  name: "Production Kubernetes",
+  slugName: "k8s-production-cluster"
 })
 
-new PrivateLocation('datacenter-west', {
-  name: 'West Coast Datacenter',
-  slugName: 'datacenter-west-coast'
+new PrivateLocation("datacenter-west", {
+  name: "West Coast Datacenter",
+  slugName: "datacenter-west-coast"
 })
 ```
 
@@ -134,14 +122,14 @@ new PrivateLocation('datacenter-west', {
 
 ```ts
 // Too generic or likely to change
-new PrivateLocation('location-1', {
-  name: 'Location 1',
-  slugName: 'location-1' // Too generic
+new PrivateLocation("location-1", {
+  name: "Location 1",
+  slugName: "location-1" // Too generic
 })
 
-new PrivateLocation('temp-loc', {
-  name: 'Temporary Location',
-  slugName: 'temp-location-2024' // Date-based, will become outdated
+new PrivateLocation("temp-loc", {
+  name: "Temporary Location",
+  slugName: "temp-location-2024" // Date-based, will become outdated
 })
 ```
 
@@ -152,21 +140,69 @@ new PrivateLocation('temp-loc', {
 The `slugName` must be unique across your entire Checkly account and cannot be changed after creation. Choose descriptive, stable names.
 </Warning>
 
-### Referencing Existing Locations
+</ResponseField>
 
-You can reference private locations created outside your CLI project by using their slug names:
+<ResponseField name="icon" type="string">
+Octicon name to visually distinguish the location in the Checkly UI. Choose icons that represent your infrastructure type or purpose.
+
+Usage:
+```ts
+new PrivateLocation("my-location", {
+  name: "Database Zone",
+  icon: "database",
+  slugName: "database-zone"
+})
+```
+
+**Available icons**: Any [Octicon](https://primer.style/design/foundations/icons) name (e.g., `server`, `database`, `cloud`, `shield`, `container`, `tools`, `building`)
+</ResponseField>
+
+<ResponseField name="proxyUrl" type="string">
+Proxy URL for outgoing HTTP calls from this private location. Use when your infrastructure requires all external traffic to go through a corporate proxy.
+
+Usage:
+```ts
+new PrivateLocation('corporate-location', {
+  name: 'Corporate Network',
+  slugName: 'corporate-network',
+  proxyUrl: 'http://proxy.company.local:8080'
+})
+```
+
+## Referencing Existing Locations
+
+Reference private locations by using their construct reference or by slug names if they were created outside your CLI project:
 
 <Tabs>
+<Tab title="By Construct Reference">
+
+```ts
+const privateLocationVpcEast = new PrivateLocation("corp-vpc-east", {
+  name: "Corporate VPC East",
+  slugName: "corporate-vpc-east-1",
+})
+
+new ApiCheck("existing-location-reference", {
+  name: "Check Using Existing Reference",
+  privateLocations: [privateLocationVpcEast], // Construct reference
+  request: {
+    method: "GET",
+    url: "https://internal.company.local/health"
+  }
+})
+```
+
+</Tab>
+
 <Tab title="By Slug Name">
 
 ```ts
-// Reference existing private location by slug
-new ApiCheck('existing-location-check', {
-  name: 'Check Using Existing Location',
-  privateLocations: ['existing-datacenter-slug'], // String reference
+new ApiCheck("existing-location-check", {
+  name: "Check Using Existing Location",
+  privateLocations: ["existing-datacenter-slug"], // String reference
   request: {
-    method: 'GET',
-    url: 'https://internal.company.local/health'
+    method: "GET",
+    url: "https://internal.company.local/health"
   }
 })
 ```
@@ -176,20 +212,20 @@ new ApiCheck('existing-location-check', {
 
 ```ts
 // Combine new and existing private locations
-const newLocation = new PrivateLocation('new-location', {
-  name: 'New Private Location',
-  slugName: 'new-location'
+const newLocation = new PrivateLocation("new-location", {
+  name: "New Private Location",
+  slugName: "new-location"
 })
 
-new ApiCheck('mixed-locations-check', {
-  name: 'Check with Mixed Locations',
+new ApiCheck("mixed-locations-check", {
+  name: "Check with Mixed Locations",
   privateLocations: [
-    newLocation,                    // New location object
-    'existing-location-slug'        // Existing location by slug
+    newLocation,              // Construct reference
+    "existing-location-slug"  // Existing location by slug
   ],
   request: {
-    method: 'GET',
-    url: 'https://internal.company.local/health'
+    method: "GET",
+    url: "https://internal.company.local/health"
   }
 })
 ```
@@ -197,115 +233,18 @@ new ApiCheck('mixed-locations-check', {
 </Tab>
 </Tabs>
 
-**Use cases**: Location identification, API references, check configuration.
-</ResponseField>
+<Tip>All checks and monitors that support the `privateLocations` option can run in your private location</Tip>
 
-<ResponseField name="icon" type="string" default="server">
-Octicon name to visually distinguish the location in the Checkly UI. Choose icons that represent your infrastructure type or purpose.
-
-### Usage
-```ts
-new PrivateLocation('my-location', {
-  name: 'Database Zone',
-  icon: 'database',
-  slugName: 'database-zone'
-})
-```
-
-### Examples
-
-<Tabs>
-<Tab title="Infrastructure Icons">
-
-```ts
-// Server infrastructure
-new PrivateLocation('server-farm', {
-  name: 'Server Farm',
-  icon: 'server',
-  slugName: 'server-farm-location'
-})
-
-// Database systems
-new PrivateLocation('db-cluster', {
-  name: 'Database Cluster',
-  icon: 'database',
-  slugName: 'database-cluster'
-})
-
-// Cloud infrastructure
-new PrivateLocation('cloud-vpc', {
-  name: 'Cloud VPC',
-  icon: 'cloud',
-  slugName: 'cloud-vpc-location'
-})
-```
-
-</Tab>
-<Tab title="Security Icons">
-
-```ts
-// Secure environments
-new PrivateLocation('secure-zone', {
-  name: 'Secure Zone',
-  icon: 'shield',
-  slugName: 'secure-zone-location'
-})
-
-// High-security areas
-new PrivateLocation('vault', {
-  name: 'Security Vault',
-  icon: 'shield-lock',
-  slugName: 'security-vault'
-})
-```
-
-</Tab>
-<Tab title="Environment Icons">
-
-```ts
-// Development environments
-new PrivateLocation('dev-env', {
-  name: 'Development Environment',
-  icon: 'tools',
-  slugName: 'development-environment'
-})
-
-// Container platforms
-new PrivateLocation('k8s-cluster', {
-  name: 'Kubernetes Cluster',
-  icon: 'container',
-  slugName: 'kubernetes-cluster'
-})
-```
-
-</Tab>
-</Tabs>
-
-**Available icons**: Any [Octicon](https://primer.style/design/foundations/icons) name (e.g., `server`, `database`, `cloud`, `shield`, `container`, `tools`, `building`)
-</ResponseField>
-
-<ResponseField name="proxyUrl" type="string">
-Proxy URL for outgoing HTTP calls from this private location. Use when your infrastructure requires all external traffic to go through a corporate proxy.
-
-### Usage
-```ts
-new PrivateLocation('corporate-location', {
-  name: 'Corporate Network',
-  slugName: 'corporate-network',
-  proxyUrl: 'http://proxy.company.local:8080'
-})
-```
-
-### Examples
+**Examples:**
 
 <Tabs>
 <Tab title="HTTP Proxy">
 
 ```ts
-new PrivateLocation('corp-proxy-location', {
-  name: 'Corporate Network with Proxy',
-  slugName: 'corporate-with-proxy',
-  proxyUrl: 'http://proxy.company.local:8080'
+new PrivateLocation("corp-proxy-location", {
+  name: "Corporate Network with Proxy",
+  slugName: "corporate-with-proxy",
+  proxyUrl: "http://proxy.company.local:8080"
 })
 ```
 
@@ -313,10 +252,10 @@ new PrivateLocation('corp-proxy-location', {
 <Tab title="HTTPS Proxy">
 
 ```ts
-new PrivateLocation('secure-proxy-location', {
-  name: 'Secure Corporate Proxy',
-  slugName: 'secure-corporate-proxy',
-  proxyUrl: 'https://secure-proxy.company.local:8443'
+new PrivateLocation("secure-proxy-location", {
+  name: "Secure Corporate Proxy",
+  slugName: "secure-corporate-proxy",
+  proxyUrl: "https://secure-proxy.company.local:8443"
 })
 ```
 
@@ -324,10 +263,10 @@ new PrivateLocation('secure-proxy-location', {
 <Tab title="Authenticated Proxy">
 
 ```ts
-new PrivateLocation('auth-proxy-location', {
-  name: 'Authenticated Proxy Location',
-  slugName: 'authenticated-proxy',
-  proxyUrl: 'http://user:password@proxy.company.local:8080'
+new PrivateLocation("auth-proxy-location", {
+  name: "Authenticated Proxy Location",
+  slugName: "authenticated-proxy",
+  proxyUrl: "http://user:password@proxy.company.local:8080"
 })
 ```
 
@@ -335,7 +274,7 @@ new PrivateLocation('auth-proxy-location', {
 </Tabs>
 
 <Info>
-When `proxyUrl` is configured, all HTTP calls from checks running in this private location will route through the specified proxy server.
+When `proxyUrl` is configured, all HTTP calls from API checks running in this private location will route through the specified proxy server.
 </Info>
 
 **Use cases**: Corporate network compliance, security requirements, traffic routing control.
@@ -346,293 +285,132 @@ When `proxyUrl` is configured, all HTTP calls from checks running in this privat
 <Tabs>
   <Tab title="Corporate VPC">
     ```ts
-    import { PrivateLocation, ApiCheck } from 'checkly/constructs'
+    import { PrivateLocation, ApiCheck } from "checkly/constructs"
 
-    const corporateVpc = new PrivateLocation('corporate-vpc', {
-      name: 'Corporate VPC',
-      icon: 'shield',
-      slugName: 'corporate-vpc'
+    const corporateVpc = new PrivateLocation("corporate-vpc", {
+      name: "Corporate VPC",
+      icon: "shield",
+      slugName: "corporate-vpc"
     })
 
     // Monitor internal services
-    new ApiCheck('intranet-check', {
-      name: 'Corporate Intranet',
+    new ApiCheck("intranet-check", {
+      name: "Corporate Intranet",
       privateLocations: [corporateVpc],
       request: {
-        method: 'GET',
-        url: 'https://intranet.company.local'
+        method: "GET",
+        url: "https://intranet.company.local"
       }
     })
 
-    new ApiCheck('ldap-health-check', {
-      name: 'LDAP Service Health',
+    new ApiCheck("ldap-health-check", {
+      name: "LDAP Service Health",
       privateLocations: [corporateVpc],
       request: {
-        method: 'GET',
-        url: 'https://ldap-health.company.local/status'
+        method: "GET",
+        url: "https://ldap-health.company.local/status"
       }
     })
     ```
   </Tab>
-  
+
   <Tab title="Multiple Datacenters">
     ```ts
-    const eastDatacenter = new PrivateLocation('dc-east', {
-      name: 'East Coast Datacenter',
-      icon: 'server',
-      slugName: 'datacenter-east'
+    const eastDatacenter = new PrivateLocation("dc-east", {
+      name: "East Coast Datacenter",
+      icon: "server",
+      slugName: "datacenter-east"
     })
 
-    const westDatacenter = new PrivateLocation('dc-west', {
-      name: 'West Coast Datacenter',
-      icon: 'server',
-      slugName: 'datacenter-west'
+    const westDatacenter = new PrivateLocation("dc-west", {
+      name: "West Coast Datacenter",
+      icon: "server",
+      slugName: "datacenter-west"
     })
 
-    const centralDatabase = new PrivateLocation('central-db', {
-      name: 'Central Database Location',
-      icon: 'database',
-      slugName: 'central-database'
+    const centralDatabase = new PrivateLocation("central-db", {
+      name: "Central Database Location",
+      icon: "database",
+      slugName: "central-database"
     })
 
     // Monitor cross-datacenter connectivity
-    new ApiCheck('east-west-connectivity', {
-      name: 'East-West Datacenter Connectivity',
+    new ApiCheck("east-west-connectivity", {
+      name: "East-West Datacenter Connectivity",
       privateLocations: [eastDatacenter, westDatacenter],
       request: {
-        method: 'GET',
-        url: 'https://connectivity-test.internal/ping'
+        method: "GET",
+        url: "https://connectivity-test.internal/ping"
       }
     })
 
     // Database health check from central location
-    new ApiCheck('database-health', {
-      name: 'Database Health Check',
+    new ApiCheck("database-health", {
+      name: "Database Health Check",
       privateLocations: [centralDatabase],
       request: {
-        method: 'GET',
-        url: 'https://db-health.internal:5432/health'
+        method: "GET",
+        url: "https://db-health.internal:5432/health"
       }
     })
     ```
   </Tab>
-  
+
   <Tab title="Development Environments">
     ```ts
-    const devEnvironment = new PrivateLocation('dev-env', {
-      name: 'Development Environment',
-      icon: 'tools',
-      slugName: 'development-environment'
+    const devEnvironment = new PrivateLocation("dev-env", {
+      name: "Development Environment",
+      icon: "tools",
+      slugName: "development-environment"
     })
 
-    const stagingEnvironment = new PrivateLocation('staging-env', {
-      name: 'Staging Environment',
-      icon: 'staging',
-      slugName: 'staging-environment'
+    const stagingEnvironment = new PrivateLocation("staging-env", {
+      name: "Staging Environment",
+      icon: "staging",
+      slugName: "staging-environment"
     })
 
     // Development API monitoring
-    new ApiCheck('dev-api-check', {
-      name: 'Development API',
+    new ApiCheck("dev-api-check", {
+      name: "Development API",
       privateLocations: [devEnvironment],
-      testOnly: true, // Only run during tests, not in production
       request: {
-        method: 'GET',
-        url: 'https://dev-api.company.local/health'
+        method: "GET",
+        url: "https://dev-api.company.local/health"
       }
     })
 
     // Staging environment checks
-    new ApiCheck('staging-integration-check', {
-      name: 'Staging Integration Test',
+    new ApiCheck("staging-integration-check", {
+      name: "Staging Integration Test",
       privateLocations: [stagingEnvironment],
       request: {
-        method: 'POST',
-        url: 'https://staging-api.company.local/integration-test',
+        method: "POST",
+        url: "https://staging-api.company.local/integration-test",
         body: JSON.stringify({ test: true })
       }
     })
     ```
   </Tab>
-  
+
   <Tab title="With Proxy Configuration">
     ```ts
-    const corporateLocation = new PrivateLocation('corporate-with-proxy', {
-      name: 'Corporate Network with Proxy',
-      icon: 'shield-lock',
-      slugName: 'corporate-with-proxy',
-      proxyUrl: 'http://proxy.company.local:8080'
+    const corporateLocation = new PrivateLocation("corporate-with-proxy", {
+      name: "Corporate Network with Proxy",
+      icon: "shield-lock",
+      slugName: "corporate-with-proxy",
+      proxyUrl: "http://proxy.company.local:8080"
     })
 
-    // All HTTP calls from this location will go through the proxy
-    new ApiCheck('proxied-external-check', {
-      name: 'External API via Corporate Proxy',
+    // All API Check HTTP calls from this location will go through the proxy
+    new ApiCheck("proxied-external-check", {
+      name: "External API via Corporate Proxy",
       privateLocations: [corporateLocation],
       request: {
-        method: 'GET',
-        url: 'https://api.external-service.com/health'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Kubernetes Clusters">
-    ```ts
-    const k8sProd = new PrivateLocation('k8s-production', {
-      name: 'Production Kubernetes Cluster',
-      icon: 'container',
-      slugName: 'k8s-prod-cluster'
-    })
-
-    const k8sStaging = new PrivateLocation('k8s-staging', {
-      name: 'Staging Kubernetes Cluster',
-      icon: 'container',
-      slugName: 'k8s-staging-cluster'
-    })
-
-    // Monitor internal Kubernetes services
-    new ApiCheck('k8s-internal-service', {
-      name: 'Internal Microservice Health',
-      privateLocations: [k8sProd],
-      request: {
-        method: 'GET',
-        url: 'http://microservice.default.svc.cluster.local:8080/health'
-      }
-    })
-
-    // Monitor ingress controller
-    new ApiCheck('k8s-ingress-check', {
-      name: 'Kubernetes Ingress Health',
-      privateLocations: [k8sProd, k8sStaging],
-      request: {
-        method: 'GET',
-        url: 'http://ingress-controller.kube-system.svc.cluster.local/healthz'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Cloud VPC Monitoring">
-    ```ts
-    const awsVpc = new PrivateLocation('aws-vpc-us-east', {
-      name: 'AWS VPC US East',
-      icon: 'cloud',
-      slugName: 'aws-vpc-us-east-1'
-    })
-
-    const azureVnet = new PrivateLocation('azure-vnet-east', {
-      name: 'Azure VNet East',
-      icon: 'cloud',
-      slugName: 'azure-vnet-east-us'
-    })
-
-    // Monitor AWS internal services
-    new ApiCheck('aws-internal-lb', {
-      name: 'AWS Internal Load Balancer',
-      privateLocations: [awsVpc],
-      request: {
-        method: 'GET',
-        url: 'http://internal-lb.us-east-1.elb.amazonaws.com/health'
-      }
-    })
-
-    // Monitor Azure internal services
-    new ApiCheck('azure-internal-service', {
-      name: 'Azure Internal Service',
-      privateLocations: [azureVnet],
-      request: {
-        method: 'GET',
-        url: 'https://internal-service.eastus.azure.company.com/status'
+        method: "GET",
+        url: "https://api.external-service.com/health"
       }
     })
     ```
   </Tab>
 </Tabs>
-
-## Using Private Locations in Checks
-
-Private locations can be used with all check types that support location configuration:
-
-<Tabs>
-  <Tab title="API Checks">
-    ```ts
-    new ApiCheck('private-api-check', {
-      name: 'Private API Check',
-      privateLocations: [privateLocation],
-      // Can also combine with public locations
-      locations: ['us-east-1'],
-      request: {
-        method: 'GET',
-        url: 'https://internal.company.local/api/health'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Browser Checks">
-    ```ts
-    new BrowserCheck('private-browser-check', {
-      name: 'Private Web App Check',
-      privateLocations: [privateLocation],
-      code: {
-        entrypoint: path.join(__dirname, 'internal-app.spec.ts')
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Multistep Checks">
-    ```ts
-    new MultiStepCheck('private-multistep-check', {
-      name: 'Private Multistep Flow',
-      privateLocations: [privateLocation],
-      runtimeId: '2025.04',
-      code: {
-        entrypoint: path.join(__dirname, 'internal-workflow.spec.ts')
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="URL Monitors">
-    ```ts
-    new UrlMonitor('private-url-monitor', {
-      name: 'Private URL Monitor',
-      privateLocations: [privateLocation],
-      request: {
-        url: 'https://internal.company.local'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="TCP Monitors">
-    ```ts
-    new TcpMonitor('private-tcp-monitor', {
-      name: 'Private Database Connection',
-      privateLocations: [privateLocation],
-      request: {
-        hostname: 'db.company.local',
-        port: 5432
-      }
-    })
-    ```
-  </Tab>
-</Tabs>
-
-
-## Agent Deployment
-
-After creating a private location, you'll need to deploy the actual agent:
-
-```bash
-npx checkly deploy
-```
-
-<Info>
-**Agent Installation**: After deploying your private location construct, you'll receive installation instructions and authentication keys through the Checkly UI or CLI output.
-</Info>
-
-<Warning>
-**Unique Slug Names**: The `slugName` must be unique across your entire Checkly account. Choose descriptive, stable names that won't conflict with future locations.
-</Warning>

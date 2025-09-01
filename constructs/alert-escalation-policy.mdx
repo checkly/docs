@@ -4,79 +4,83 @@ description: 'Learn how to configure alert escalation policies with the Checkly 
 sidebarTitle: 'Alert Escalation Policy'
 ---
 
-Use AlertEscalationPolicy to control when and how often you receive notifications when checks start failing, degrade, or recover. This helps you fine-tune your alerting to reduce noise and ensure timely notifications.
+<Tip>
+Learn more about alert escalation policies in [the alerts configuration](/docs/communicate/alerts/configuration#escalation-strategies).
+</Tip>
 
-<Info>
-Learn more about alert escalation policies in the [Alert Settings documentation](/docs/communicate/alerts/configuration).
-</Info>
-
-## `AlertEscalationPolicy` Structure
+Use alert escalation policies to control when and how often you receive alerts when checks start failing, degrade, or recover. This helps you fine-tune your alerting to reduce noise and ensure timely alerts.
 
 <CodeGroup>
 
 ```ts Run-Based Escalation
-import { ApiCheck, AlertEscalationBuilder } from 'checkly/constructs'
+import { AlertEscalationBuilder, ApiCheck } from "checkly/constructs"
 
-new ApiCheck('run-based-alert-check', {
-  name: 'Check With Run-Based Escalation',
+new ApiCheck("run-based-alert-check", {
+  name: "Check With Run-Based Escalation",
   alertEscalationPolicy: AlertEscalationBuilder.runBasedEscalation(
     2, // Alert after 2 consecutive failures
     { interval: 5, amount: 2 }, // Send 2 reminders, 5 minutes apart
     { enabled: true, percentage: 50 } // Alert if 50% of parallel runs fail
   ),
   request: {
-    method: 'GET',
-    url: 'https://api.example.com/health'
-  }
+    method: "GET",
+    url: "https://api.example.com/health",
+  },
 })
 ```
 
 ```ts Time-Based Escalation
-import { ApiCheck, AlertEscalationBuilder } from 'checkly/constructs'
+import { ApiCheck, AlertEscalationBuilder } from "checkly/constructs"
 
-new ApiCheck('time-based-alert-check', {
-  name: 'Check With Time-Based Escalation',
+new ApiCheck("time-based-alert-check", {
+  name: "Check With Time-Based Escalation",
   alertEscalationPolicy: AlertEscalationBuilder.timeBasedEscalation(
     10, // Alert after 10 minutes of failures
     { interval: 15, amount: 3 }, // Send 3 reminders, 15 minutes apart
     { enabled: false, percentage: 30 } // Parallel run threshold disabled
   ),
   request: {
-    method: 'GET',
-    url: 'https://api.example.com/critical-endpoint'
-  }
+    method: "GET",
+    url: "https://api.example.com/critical-endpoint",
+  },
 })
 ```
 
 </CodeGroup>
 
-## `AlertEscalationPolicy` Configuration
+## Configuration
 
-AlertEscalationPolicy objects are built using the `AlertEscalationBuilder` which provides helper methods for different escalation strategies:
+Configure your alert escalation policies using the `AlertEscalationBuilder`, which provides helper methods for the different escalation strategies:
 
 | Method | Description | Parameters |
 |--------|-------------|------------|
 | `runBasedEscalation()` | Alert after N consecutive failed runs | `(failedRuns, reminders, parallelRunFailureThreshold)` |
 | `timeBasedEscalation()` | Alert after N minutes of continuous failures | `(minutesFailing, reminders, parallelRunFailureThreshold)` |
 
-## Builder Methods
+## Alert Escalation Builder Methods
 
 <ResponseField name="runBasedEscalation" type="function" required>
 Creates an alert escalation policy that triggers after a specified number of consecutive failed runs.
 
-### Usage
+**Usage:**
+
 ```ts
-AlertEscalationBuilder.runBasedEscalation(failedRuns, reminders, parallelRunFailureThreshold)
+AlertEscalationBuilder.runBasedEscalation(
+  failedRuns,
+  reminders,
+  parallelRunFailureThreshold
+)
 ```
 
-### Parameters
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `failedRuns` | `number` | ✅ | Number of consecutive failed runs before alerting |
-| `reminders` | `object` | ❌ | Reminder notification configuration |
-| `parallelRunFailureThreshold` | `object` | ❌ | Parallel run failure percentage threshold |
+**Parameters:**
 
-### Examples
+| Parameter | Type | Required | Default |Description |
+|-----------|------|----------|---------|------------|
+| `failedRuns` | `number` | ✅ | 1 | Number of consecutive failed runs before alerting |
+| `reminders` | `object` | ❌ | - | Reminder notification configuration |
+| `parallelRunFailureThreshold` | `object` | ❌ | - | Parallel run failure percentage threshold |
+
+**Examples:**
 
 <CodeGroup>
 
@@ -85,16 +89,15 @@ AlertEscalationBuilder.runBasedEscalation(failedRuns, reminders, parallelRunFail
 const immediateAlert = AlertEscalationBuilder.runBasedEscalation(
   1, // Alert after 1 failed run
   { interval: 5, amount: 0 }, // No reminders
-  { enabled: false, percentage: 50 }
 )
 
-new ApiCheck('critical-service-check', {
-  name: 'Critical Service Check',
+new ApiCheck("critical-service-check", {
+  name: "Critical Service Check",
   alertEscalationPolicy: immediateAlert,
   request: {
-    method: 'GET',
-    url: 'https://api.example.com/critical'
-  }
+    method: "GET",
+    url: "https://api.example.com/critical",
+  },
 })
 ```
 
@@ -106,104 +109,64 @@ const conservativeAlert = AlertEscalationBuilder.runBasedEscalation(
   { enabled: true, percentage: 80 } // Only if 80% of parallel runs fail
 )
 
-new ApiCheck('flaky-service-check', {
-  name: 'Flaky Service Check',
+new ApiCheck("flaky-service-check", {
+  name: "Flaky Service Check",
   alertEscalationPolicy: conservativeAlert,
-  locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
+  locations: ["us-east-1", "eu-west-1", "ap-southeast-1"],
   runParallel: true,
   request: {
-    method: 'GET',
-    url: 'https://api.example.com/sometimes-flaky'
-  }
-})
-```
-
-```ts High Frequency
-// For very frequent checks
-const highFrequencyAlert = AlertEscalationBuilder.runBasedEscalation(
-  10, // Alert after 10 failures (about 5 minutes with 30s frequency)
-  { interval: 5, amount: 5 }, // 5 reminders, 5 minutes apart
-  { enabled: true, percentage: 70 }
-)
-
-new ApiCheck('high-frequency-check', {
-  name: 'High Frequency Health Check',
-  frequency: Frequency.EVERY_30S,
-  alertEscalationPolicy: highFrequencyAlert,
-  locations: ['us-east-1', 'eu-west-1'],
-  runParallel: true,
-  request: {
-    method: 'GET',
-    url: 'https://api.example.com/health'
-  }
+    method: "GET",
+    url: "https://api.example.com/sometimes-flaky",
+  },
 })
 ```
 
 </CodeGroup>
 
-**Use cases**: Immediate alerting, noise reduction for flaky services, high-frequency monitoring.
+**Use cases**: Immediate alerting and noise reduction for flaky services.
 </ResponseField>
 
 <ResponseField name="timeBasedEscalation" type="function" required>
+
 Creates an alert escalation policy that triggers after a specified duration of continuous failures.
 
-### Usage
+**Usage:**
+
 ```ts
-AlertEscalationBuilder.timeBasedEscalation(minutesFailing, reminders, parallelRunFailureThreshold)
+AlertEscalationBuilder.timeBasedEscalation(
+  minutesFailing,
+  reminders,
+  parallelRunFailureThreshold
+)
 ```
 
-### Parameters
+**Parameters:**
+
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `minutesFailing` | `number` | ✅ | Minutes of continuous failures before alerting |
 | `reminders` | `object` | ❌ | Reminder notification configuration |
 | `parallelRunFailureThreshold` | `object` | ❌ | Parallel run failure percentage threshold |
 
-### Examples
+**Examples:**
 
 <CodeGroup>
 
-```ts Long Processes
-// Good for batch jobs or slow services
+```ts Alert after 15 minutes
+// Wait for batch jobs or slow services
 const timeBasedAlert = AlertEscalationBuilder.timeBasedEscalation(
   15, // Alert after 15 minutes of failures
-  { interval: 10, amount: 3 }, // 3 reminders, 10 minutes apart
-  { enabled: false, percentage: 50 }
+  { interval: 10, amount: 3 } // 3 reminders, 10 minutes apart
 )
 
-new ApiCheck('batch-job-check', {
-  name: 'Batch Job Monitoring',
+new ApiCheck("batch-job-check", {
+  name: "Batch Job Monitoring",
   frequency: Frequency.EVERY_5M,
   alertEscalationPolicy: timeBasedAlert,
   request: {
-    method: 'GET',
-    url: 'https://api.example.com/batch-status'
-  }
-})
-```
-
-```ts Environment Aware
-const isProduction = process.env.NODE_ENV === 'production'
-
-const alertPolicy = isProduction
-  ? AlertEscalationBuilder.timeBasedEscalation(
-      5, // Production: alert quickly after 5 minutes
-      { interval: 5, amount: 5 },
-      { enabled: true, percentage: 50 }
-    )
-  : AlertEscalationBuilder.timeBasedEscalation(
-      30, // Staging: be more tolerant, 30 minutes
-      { interval: 60, amount: 1 },
-      { enabled: true, percentage: 80 }
-    )
-
-new ApiCheck('environment-aware-check', {
-  name: `${isProduction ? 'Production' : 'Staging'} API Check`,
-  alertEscalationPolicy: alertPolicy,
-  request: {
-    method: 'GET',
-    url: `https://${isProduction ? 'api' : 'staging-api'}.example.com/health`
-  }
+    method: "GET",
+    url: "https://api.example.com/batch-status",
+  },
 })
 ```
 
@@ -213,9 +176,11 @@ new ApiCheck('environment-aware-check', {
 </ResponseField>
 
 <ResponseField name="reminders" type="object">
+
 Configure reminder notifications while an alert is active.
 
-### Usage
+**Usage:**
+
 ```ts
 reminders: {
   interval: 10, // Send reminder every 10 minutes
@@ -223,13 +188,14 @@ reminders: {
 }
 ```
 
-### Parameters
+**Parameters:**
+
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `interval` | `number` | ✅ | - | Minutes between reminder notifications |
-| `amount` | `number` | ✅ | - | Number of reminder notifications to send |
+| `interval` | `number` | ✅ | `5` | Minutes between reminder notifications: `5`, `10`, `15`, `30` |
+| `amount` | `number` | ✅ | `0` | Number of reminder notifications to send: `0`, `1`, `2`, `3`, `4`, `5`, `100000` |
 
-### Examples
+**Examples:**
 
 <CodeGroup>
 
@@ -244,8 +210,8 @@ reminders: {
 ```ts Frequent Reminders
 // Aggressive reminder schedule
 reminders: {
-  interval: 5, // Every 5 minutes
-  amount: 10   // Up to 10 reminders
+  interval: 15, // Every 15 minutes
+  amount: 5   // Up to 5 reminders
 }
 ```
 
@@ -265,7 +231,8 @@ reminders: {
 <ResponseField name="parallelRunFailureThreshold" type="object">
 Configure threshold for checks running in parallel across multiple locations.
 
-### Usage
+**Usage:**
+
 ```ts
 parallelRunFailureThreshold: {
   enabled: true,
@@ -273,13 +240,14 @@ parallelRunFailureThreshold: {
 }
 ```
 
-### Parameters
+**Parameters:**
+
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `enabled` | `boolean` | ✅ | - | Whether to use parallel run failure threshold |
-| `percentage` | `number` | ❌ | - | Percentage of parallel runs that must fail (10-100, in increments of 10) |
+| `enabled` | `boolean` | ✅ | `false` | Whether to use parallel run failure threshold |
+| `percentage` | `number` | ❌ | `10` | Percentage of parallel runs that must fail (10-100, in increments of 10) |
 
-### Examples
+**Examples:**
 
 <CodeGroup>
 
@@ -291,43 +259,35 @@ const regionalAlert = AlertEscalationBuilder.runBasedEscalation(
   { enabled: true, percentage: 70 } // 70% of regions must fail
 )
 
-new ApiCheck('global-service-check', {
-  name: 'Global Service Check',
-  locations: ['us-east-1', 'us-west-2', 'eu-west-1', 'ap-southeast-1'],
+new ApiCheck("global-service-check", {
+  name: "Global Service Check",
+  locations: ["us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1"],
   runParallel: true,
   alertEscalationPolicy: regionalAlert,
   request: {
-    method: 'GET',
-    url: 'https://global-api.example.com/health'
-  }
+    method: "GET",
+    url: "https://global-api.example.com/health",
+  },
 })
 ```
 
 ```ts CDN Monitoring
-// Alert if half of CDN edges are failing
+// Alert if 10% of CDN edges are failing
 const cdnAlert = AlertEscalationBuilder.runBasedEscalation(
   1, // Immediate on failure
   { interval: 5, amount: 2 },
-  { enabled: true, percentage: 50 } // 50% of edges must fail
+  { enabled: true, percentage: 10 } // 10% of edges must fail
 )
 
-new UrlMonitor('cdn-availability', {
-  name: 'CDN Edge Availability',
-  locations: ['us-east-1', 'us-west-2', 'eu-west-1', 'ap-southeast-1'],
+new UrlMonitor("cdn-availability", {
+  name: "CDN Edge Availability",
+  locations: ["us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1"],
   runParallel: true,
   alertEscalationPolicy: cdnAlert,
   request: {
-    url: 'https://cdn.example.com/health'
-  }
+    url: "https://cdn.example.com/health",
+  },
 })
-```
-
-```ts Disabled Threshold
-// Don't use parallel run thresholds
-parallelRunFailureThreshold: {
-  enabled: false,
-  percentage: 50 // Ignored when disabled
-}
 ```
 
 </CodeGroup>
@@ -340,7 +300,11 @@ parallelRunFailureThreshold: {
 <CodeGroup>
 
 ```ts Group-Level Policy
-import { CheckGroupV2, AlertEscalationBuilder } from 'checkly/constructs'
+import {
+  AlertEscalationBuilder,
+  ApiCheck,
+  CheckGroupV2,
+} from "checkly/constructs"
 
 const groupAlertPolicy = AlertEscalationBuilder.runBasedEscalation(
   3, // Alert after 3 consecutive failures
@@ -348,62 +312,20 @@ const groupAlertPolicy = AlertEscalationBuilder.runBasedEscalation(
   { enabled: true, percentage: 60 }
 )
 
-const monitoringGroup = new CheckGroupV2('monitoring-group', {
-  name: 'Production Monitoring',
+const monitoringGroup = new CheckGroupV2("monitoring-group", {
+  name: "Production Monitoring",
   alertEscalationPolicy: groupAlertPolicy, // Applies to all checks in group
-  locations: ['us-east-1', 'eu-west-1'],
-  runParallel: true
+  locations: ["us-east-1", "eu-west-1"],
+  runParallel: true,
 })
 
-new ApiCheck('group-api-check', {
-  name: 'API Check with Group Alert Policy',
+new ApiCheck("group-api-check", {
+  name: "API Check with Group Alert Policy",
   group: monitoringGroup, // Inherits alert policy from group
   request: {
-    method: 'GET',
-    url: 'https://api.example.com/endpoint'
-  }
-})
-```
-
-```ts Override Individual Check
-// Individual check overrides group settings
-new ApiCheck('override-alert-check', {
-  name: 'Check with Override Alert Policy',
-  group: groupWithAlertPolicy,
-  alertEscalationPolicy: AlertEscalationBuilder.runBasedEscalation(
-    1, // More aggressive than group setting
-    { interval: 2, amount: 10 }
-  ),
-  request: {
-    method: 'GET',
-    url: 'https://api.example.com/endpoint'
-  }
-})
-```
-
-```ts Complex Regional Setup
-// Different thresholds for different service tiers
-const criticalServiceAlert = AlertEscalationBuilder.runBasedEscalation(
-  1, // Immediate alert for critical services
-  { interval: 2, amount: 10 }, // Frequent reminders
-  { enabled: true, percentage: 30 } // Alert if any region has issues
-)
-
-const standardServiceAlert = AlertEscalationBuilder.runBasedEscalation(
-  3, // Wait for 3 failures for standard services
-  { interval: 15, amount: 3 }, // Less frequent reminders
-  { enabled: true, percentage: 60 } // Alert if majority of regions fail
-)
-
-new ApiCheck('critical-payment-api', {
-  name: 'Critical Payment API',
-  alertEscalationPolicy: criticalServiceAlert,
-  locations: ['us-east-1', 'us-west-2', 'eu-west-1'],
-  runParallel: true,
-  request: {
-    method: 'GET',
-    url: 'https://payment-api.example.com/health'
-  }
+    method: "GET",
+    url: "https://api.example.com/endpoint",
+  },
 })
 ```
 
@@ -416,13 +338,3 @@ new ApiCheck('critical-payment-api', {
 <Info>
 **Parallel Run Thresholds**: Only use parallel run failure thresholds for checks that run in multiple locations simultaneously (`runParallel: true`).
 </Info>
-
-## Configuration Hierarchy
-
-Alert escalation policies follow the same hierarchy as other check properties:
-
-1. **Individual Check** (highest priority)
-2. **Check Group**
-3. **Project** (not supported at project level)
-
-Individual check settings will always override group-level alert escalation policies.

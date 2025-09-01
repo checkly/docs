@@ -15,7 +15,7 @@ Before creating multistep checks, ensure you have:
 
 - An initialized Checkly CLI project
 - Public endpoints you want to monitor
-- Runtime 2023.09 or later (Multistep Checks require [newer runtimes](/docs/introduction/platform/runtimes/runtime-specification))
+- Runtime `2023.09` or later (Multistep Checks require [newer runtimes](/docs/introduction/platform/runtimes/runtime-specification))
 
 For additional setup information, see [CLI overview](/cli/overview).
 </Accordion>
@@ -110,7 +110,7 @@ code: {
   content: `
     import { test, expect } from "@playwright/test"
 
-    test("complete workflow", async ({ page }) => {
+    test("complete workflow", async ({ request }) => {
       // Multistep logic here
     })
   `
@@ -131,69 +131,117 @@ You must provide either `entrypoint` or `content`, but not both.
 **Examples:**
 
 <Tabs>
-<Tab title="User Onboarding Flow">
+<Tab title="CRUD API">
 
 ```ts
-new MultiStepCheck('onboarding-flow', {
-  name: 'Complete User Onboarding',
-  runtimeId: '2025.04',
+new MultiStepCheck("onboarding-flow", {
+  name: "Complete User Onboarding",
+  runtimeId: "2025.04",
   code: {
-    entrypoint: path.join(__dirname, 'onboarding.spec.ts')
+    entrypoint: path.join(__dirname, "group.spec.ts")
   }
 })
 
-// onboarding.spec.ts
-import { test, expect } from '@playwright/test'
+// group.spec.ts
+import { test, expect } from "@playwright/test"
 
-test('user onboarding journey', async ({ page }) => {
-  // Step 1: Registration
-  await page.goto('https://app.example.com/signup')
-  await page.fill('[data-testid="email"]', 'user@example.com')
+const baseUrl = "https://api.checklyhq.com/v1"
 
-  // Step 2: Profile setup
-  await page.fill('[data-testid="first-name"]', 'John')
+const headers = {
+  Authorization: `Bearer ${process.env.API_KEY}`,
+  "x-checkly-account": process.env.ACCOUNT_ID,
+}
 
-  // Step 3: Verify completion
-  await expect(page).toHaveURL(/dashboard/)
+test("Verify Group API", async ({ request }) => {
+  /**
+   * Create a group
+   */
+  const group = await test.step("POST /check-groups", async () => {
+    const response = await request.post(`${baseUrl}/check-groups/`, {
+      data: {
+        locations: ["eu-west-1"],
+        name: "createdViaApiCheck",
+      },
+      headers,
+    })
+    expect(response).toBeOK()
+
+    return response.json()
+  })
+
+  /**
+   * Get the newly created group
+   */
+  await test.step("GET /check-groups/{id}", async () => {
+    const response = await request.get(`${baseUrl}/check-groups/${group.id}`, {
+      headers,
+    })
+    expect(response).toBeOK()
+
+    const receivedGroup = await response.json()
+    expect(receivedGroup.id).toEqual(group.id)
+  })
+
+  /**
+   * Update the new group
+   */
+  await test.step("PUT /check-groups/{id}", async () => {
+    const response = await request.put(`${baseUrl}/check-groups/${group.id}`, {
+      data: {
+        tags: ["public-api", "added-by-check"],
+      },
+      headers,
+    })
+    expect(response).toBeOK()
+  })
+
+  /**
+   * Delete the new group
+   */
+  await test.step("DELETE /check-group/{id}", async () => {
+    const response = await request.delete(
+      `${baseUrl}/check-groups/${group.id}`,
+      { headers },
+    )
+    expect(response).toBeOK()
+  })
 })
 ```
 
 </Tab>
-<Tab title="E-commerce Journey">
+<Tab title="Degraded state">
 
 ```ts
-new MultiStepCheck('purchase-flow', {
-  name: 'Complete Purchase Flow',
-  runtimeId: '2025.04',
+new MultiStepCheck("degraded-example", {
+  name: "Degraded Example",
+  runtimeId: "2025.04",
   code: {
-    entrypoint: path.join(__dirname, 'purchase.spec.ts')
+    entrypoint: path.join(__dirname, "degraded.spec.ts")
   },
-  environmentVariables: [
-    { key: 'CUSTOMER_EMAIL', value: 'test@example.com' }
-  ]
 })
-```
 
-</Tab>
-<Tab title="Inline Workflow">
+// degraded.spec.ts
+import { test, expect } from "@playwright/test"
+import { getAPIResponseTime, markCheckAsDegraded } from "@checkly/playwright-helpers"
 
-```ts
-new MultiStepCheck('quick-workflow', {
-  name: 'Quick Multistep Test',
-  runtimeId: '2025.04',
-  code: {
-    content: `
-      import { test, expect } from '@playwright/test'
+const baseUrl = "https://api.spacexdata.com/v3"
 
-      test('multi-page workflow', async ({ page }) => {
-        await page.goto('https://example.com')
-        await page.click('a[href="/about"]')
-        await expect(page).toHaveURL(/about/)
+test("SpaceX-API Dragon Capsules & Next Launch", async ({ request }) => {
+  await test.step("get all capsules", async () => {
+    const response = await request.get(`${baseUrl}/dragons`)
 
-        await page.click('a[href="/contact"]')
-        await expect(page).toHaveURL(/contact/)
-      })
-    `
+    // Check 200 status code
+    expect(response).toBeOK()
+
+    // Check degraded status
+    expect.soft(getAPIResponseTime(response), 'GET /dragons too slow').toBeLessThanOrEqual(200)
+
+    return response.json()
+  })
+
+  // Trigger degraded state if check failed due to soft assertion
+  if (test.info().errors.length) {
+    markCheckAsDegraded('Check degraded due to soft assertion failure.')
   }
 })
 ```
@@ -201,7 +249,7 @@ new MultiStepCheck('quick-workflow', {
 </Tab>
 </Tabs>
 
-**Use cases**: Complex user journeys, end-to-end workflows, multi-page testing, business process validation.
+**Use cases**: Complex API journeys, end-to-end API workflows, business process validation.
 </ResponseField>
 
 ### General Check Options
@@ -209,68 +257,31 @@ new MultiStepCheck('quick-workflow', {
 <ResponseField name="name" type="string" required>
 Friendly name for your multistep check that will be displayed in the Checkly dashboard and used in notifications.
 
-Usage:
+**Usage:**
+
 ```ts
-new MultiStepCheck('my-multistep', {
-  name: 'Complete User Journey Test'
+new MultiStepCheck("my-multistep", {
+  name: "Complete User Journey Test"
 })
 ```
 
-Examples:
-```ts
-// User journey naming
-new MultiStepCheck('onboarding-flow', {
-  name: 'User Onboarding Flow'
-})
-
-// Business process naming
-new MultiStepCheck('purchase-journey', {
-  name: 'E-commerce Purchase Journey'
-})
-
-// Workflow-specific naming
-new MultiStepCheck('saas-workflow', {
-  name: 'SaaS Application Workflow'
-})
-```
 </ResponseField>
 
 <ResponseField name="runtimeId" type="string">
-The ID of the runtime to use for executing the multistep check. Required to be 2023.09 or later for multistep check support.
+The ID of the runtime to use for executing the multistep check. Required to be `2023.09` or later for multistep check support.
 
 Usage:
 ```ts
-new MultiStepCheck('my-multistep', {
-  runtimeId: '2025.04' // Use latest runtime for best performance
-})
-```
-
-Examples:
-```ts
-// Latest runtime (recommended)
-new MultiStepCheck('modern-workflow', {
-  name: 'Modern User Workflow',
-  runtimeId: '2025.04'
-})
-
-// Stable runtime
-new MultiStepCheck('stable-workflow', {
-  name: 'Stable Production Workflow',
-  runtimeId: '2024.09'
-})
-
-// Minimum required runtime
-new MultiStepCheck('legacy-workflow', {
-  name: 'Legacy Workflow',
-  runtimeId: '2023.09' // Minimum for multistep checks
+new MultiStepCheck("my-multistep", {
+  name: 'My Multistep Check',
+  runtimeId: "2025.04" // Use latest runtime for best performance
+  /* More options... */
 })
 ```
 
 <Warning>
-Multistep checks require runtime 2023.09 or later. Earlier runtimes do not support multistep functionality.
+Multistep checks require runtime `2023.09` or later. Earlier runtimes do not support multistep functionality.
 </Warning>
-
-**Use cases**: Runtime version management, compatibility requirements, feature availability control.
 </ResponseField>
 
 <ResponseField name="frequency" type="Frequency">
@@ -280,53 +291,14 @@ Usage:
 ```ts
 import { Frequency } from 'checkly/constructs'
 
-new MultiStepCheck('my-multistep', {
-  frequency: Frequency.EVERY_15M
+new MultiStepCheck("my-multistep", {
+  name: "My Multistep Check",
+  frequency: Frequency.EVERY_15M,
+  /* More options... */
 })
 ```
 
-Examples:
-
-<Tabs>
-<Tab title="Critical User Journeys">
-
-```ts
-// High-value user flows
-new MultiStepCheck('critical-purchase', {
-  name: 'Critical Purchase Flow',
-  frequency: Frequency.EVERY_5M, // Every 5 minutes
-  runtimeId: '2025.04'
-})
-```
-
-</Tab>
-<Tab title="Standard Workflows">
-
-```ts
-// Regular business processes
-new MultiStepCheck('standard-onboarding', {
-  name: 'User Onboarding Process',
-  frequency: Frequency.EVERY_15M, // Every 15 minutes
-  runtimeId: '2025.04'
-})
-```
-
-</Tab>
-<Tab title="Comprehensive E2E">
-
-```ts
-// Full application workflows
-new MultiStepCheck('full-app-journey', {
-  name: 'Complete Application Journey',
-  frequency: Frequency.EVERY_30M, // Every 30 minutes
-  runtimeId: '2025.04'
-})
-```
-
-</Tab>
-</Tabs>
-
-**Available frequencies**: `EVERY_30S`, `EVERY_1M`, `EVERY_2M`, `EVERY_5M`, `EVERY_10M`, `EVERY_15M`, `EVERY_30M`, `EVERY_1H`, `EVERY_2H`, `EVERY_4H`, `EVERY_6H`, `EVERY_12H`, `EVERY_24H`
+**Available frequencies**: `EVERY_1M`, `EVERY_2M`, `EVERY_5M`, `EVERY_10M`, `EVERY_15M`, `EVERY_30M`, `EVERY_1H`, `EVERY_2H`, `EVERY_3H`, `EVERY_6H`, `EVERY_12H`, `  EVERY_24H`
 </ResponseField>
 
 <ResponseField name="locations" type="string[]" default="[]">
@@ -334,8 +306,10 @@ Array of public location codes where the multistep check should run. Multiple lo
 
 Usage:
 ```ts
-new MultiStepCheck('global-workflow', {
-  locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1']
+new MultiStepCheck("global-check", {
+  name: "Global Multistep Check"
+  locations: ["us-east-1", "eu-west-1", "ap-southeast-1"]
+  /* More options... */
 })
 ```
 
@@ -345,18 +319,17 @@ Examples:
 <Tab title="Global User Experience">
 
 ```ts
-// Worldwide user journey testing
-new MultiStepCheck('global-journey', {
-  name: 'Global User Journey',
-  frequency: Frequency.EVERY_10M,
+// Worldwide API testing
+new MultiStepCheck("global-journey", {
+  name: "Global API Journey",
   locations: [
-    'us-east-1',      // N. Virginia
-    'us-west-1',      // N. California
-    'eu-west-1',      // Ireland
-    'ap-southeast-1', // Singapore
-    'ap-northeast-1'  // Tokyo
+    "us-east-1",      // N. Virginia
+    "us-west-1",      // N. California
+    "eu-west-1",      // Ireland
+    "ap-southeast-1", // Singapore
+    "ap-northeast-1"  // Tokyo
   ],
-  runtimeId: '2025.04'
+  /* More options... */
 })
 ```
 
@@ -365,172 +338,19 @@ new MultiStepCheck('global-journey', {
 
 ```ts
 // European user focus
-new MultiStepCheck('eu-workflow', {
-  name: 'European User Workflow',
-  frequency: Frequency.EVERY_15M,
-  locations: ['eu-west-1', 'eu-central-1'],
-  runtimeId: '2025.04'
+new MultiStepCheck("eu-workflow", {
+  name: "European API Journey",
+  locations: ["eu-west-1", "eu-central-1"],
+  /* More options... */
 })
 ```
 
 </Tab>
 </Tabs>
 
-**Use cases**: Global user experience monitoring, regional performance testing, geographic compliance validation.
+**Use cases**: Global API monitoring, regional API testing, geographic compliance validation.
 </ResponseField>
 
-## Examples
-
-<Tabs>
-  <Tab title="Complete User Onboarding">
-    ```ts
-    new MultiStepCheck('user-onboarding-flow', {
-      name: 'Complete User Onboarding Flow',
-      runtimeId: '2025.04',
-      frequency: Frequency.EVERY_30M,
-      locations: ['us-east-1', 'eu-west-1'],
-      tags: ['onboarding', 'critical-path'],
-      code: {
-        entrypoint: path.join(__dirname, 'onboarding.spec.ts')
-      }
-    })
-
-    // onboarding.spec.ts
-    import { test, expect } from '@playwright/test'
-
-    test('user onboarding journey', async ({ page }) => {
-      // Step 1: Registration
-      await page.goto('https://app.example.com/signup')
-      await page.fill('[data-testid="email"]', 'newuser@example.com')
-      await page.fill('[data-testid="password"]', 'SecurePass123!')
-      await page.click('[data-testid="signup-button"]')
-
-      // Step 2: Email verification (simulate)
-      await expect(page.locator('[data-testid="verify-email-message"]')).toBeVisible()
-
-      // Step 3: Profile setup
-      await page.goto('https://app.example.com/profile/setup')
-      await page.fill('[data-testid="first-name"]', 'John')
-      await page.fill('[data-testid="last-name"]', 'Doe')
-      await page.selectOption('[data-testid="country"]', 'US')
-      await page.click('[data-testid="save-profile"]')
-
-      // Step 4: Welcome dashboard
-      await expect(page).toHaveURL(/dashboard/)
-      await expect(page.locator('[data-testid="welcome-message"]')).toContainText('Welcome, John!')
-    })
-    ```
-  </Tab>
-
-  <Tab title="E-commerce Full Journey">
-    ```ts
-    new MultiStepCheck('ecommerce-journey', {
-      name: 'Complete E-commerce Journey',
-      runtimeId: '2025.04',
-      frequency: Frequency.EVERY_20M,
-      code: {
-        entrypoint: path.join(__dirname, 'ecommerce-journey.spec.ts')
-      }
-    })
-
-    // ecommerce-journey.spec.ts
-    import { test, expect } from '@playwright/test'
-
-    test('complete purchase journey', async ({ page }) => {
-      // Step 1: Browse products
-      await page.goto('https://shop.example.com')
-      await page.click('[data-testid="category-electronics"]')
-
-      // Step 2: Product selection
-      await page.click('[data-testid="product-laptop"]')
-      await expect(page.locator('[data-testid="product-title"]')).toContainText('Laptop')
-
-      // Step 3: Add to cart
-      await page.click('[data-testid="add-to-cart"]')
-      await expect(page.locator('[data-testid="cart-count"]')).toContainText('1')
-
-      // Step 4: Guest checkout
-      await page.click('[data-testid="cart-button"]')
-      await page.click('[data-testid="checkout-button"]')
-      await page.click('[data-testid="guest-checkout"]')
-
-      // Step 5: Fill shipping information
-      await page.fill('[data-testid="email"]', 'customer@example.com')
-      await page.fill('[data-testid="first-name"]', 'Jane')
-      await page.fill('[data-testid="last-name"]', 'Smith')
-      await page.fill('[data-testid="address"]', '123 Main St')
-      await page.fill('[data-testid="city"]', 'New York')
-      await page.fill('[data-testid="zip"]', '10001')
-
-      // Step 6: Payment information
-      await page.fill('[data-testid="card-number"]', '4242424242424242')
-      await page.fill('[data-testid="card-expiry"]', '12/25')
-      await page.fill('[data-testid="card-cvc"]', '123')
-
-      // Step 7: Complete order
-      await page.click('[data-testid="place-order"]')
-      await expect(page.locator('[data-testid="order-confirmation"]')).toBeVisible()
-      await expect(page.locator('[data-testid="order-number"]')).toMatch(/ORD-\d+/)
-    })
-    ```
-  </Tab>
-
-  <Tab title="SaaS App Workflow">
-    ```ts
-    new MultiStepCheck('saas-workflow', {
-      name: 'SaaS Application Workflow',
-      runtimeId: '2025.04',
-      frequency: Frequency.EVERY_15M,
-      code: {
-        entrypoint: path.join(__dirname, 'saas-workflow.spec.ts')
-      }
-    })
-
-    // saas-workflow.spec.ts
-    import { test, expect } from '@playwright/test'
-
-    test('complete saas workflow', async ({ page }) => {
-      // Step 1: Login
-      await page.goto('https://app.example.com/login')
-      await page.fill('[data-testid="email"]', process.env.TEST_EMAIL)
-      await page.fill('[data-testid="password"]', process.env.TEST_PASSWORD)
-      await page.click('[data-testid="login-button"]')
-
-      // Step 2: Create new project
-      await page.click('[data-testid="new-project-button"]')
-      await page.fill('[data-testid="project-name"]', 'Test Project')
-      await page.fill('[data-testid="project-description"]', 'Automated test project')
-      await page.click('[data-testid="create-project"]')
-
-      // Step 3: Configure project settings
-      await page.click('[data-testid="project-settings"]')
-      await page.check('[data-testid="enable-notifications"]')
-      await page.selectOption('[data-testid="timezone"]', 'America/New_York')
-      await page.click('[data-testid="save-settings"]')
-
-      // Step 4: Invite team member
-      await page.click('[data-testid="team-tab"]')
-      await page.click('[data-testid="invite-member"]')
-      await page.fill('[data-testid="member-email"]', 'teammate@example.com')
-      await page.selectOption('[data-testid="member-role"]', 'editor')
-      await page.click('[data-testid="send-invitation"]')
-
-      // Step 5: Create and publish content
-      await page.click('[data-testid="content-tab"]')
-      await page.click('[data-testid="new-content"]')
-      await page.fill('[data-testid="content-title"]', 'Test Content')
-      await page.fill('[data-testid="content-body"]', 'This is test content')
-      await page.click('[data-testid="publish-content"]')
-
-      // Step 6: Verify dashboard
-      await page.click('[data-testid="dashboard-tab"]')
-      await expect(page.locator('[data-testid="project-count"]')).toContainText('1')
-      await expect(page.locator('[data-testid="team-size"]')).toContainText('2')
-    })
-    ```
-  </Tab>
-</Tabs>
-
 <Warning>
-Multistep checks are only supported on runtime 2023.09 or later. Make sure to specify a compatible `runtimeId` in your check configuration.
+Multistep checks are only supported on runtime `2023.09` or later. Make sure to specify a compatible `runtimeId` in your check configuration.
 </Warning>

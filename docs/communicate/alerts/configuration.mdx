@@ -41,7 +41,7 @@ graph TD
     A[Account Settings] --> B[Group Settings]
     B --> C[Check Settings]
     A -.-> C
-    
+
     style A fill:#e1f5fe
     style B fill:#f3e5f5
     style C fill:#e8f5e8
@@ -68,13 +68,13 @@ Account Alert Settings:
     - First reminder: 5 minutes after alert
     - Second reminder: 15 minutes after first
     - Maximum reminders: 2
-  
+
   Location Threshold: 50% of locations must fail
-  
+
   Default Channels:
     - Email: ops-team@company.com
     - Slack: #monitoring-alerts
-  
+
   SSL Certificate Alerts:
     - Warning: 30 days before expiration
     - Critical: 7 days before expiration
@@ -102,31 +102,31 @@ Alert Settings:
     - First reminder: 2 minutes
     - Second reminder: 5 minutes
     - Third reminder: 10 minutes
-  
+
   Location Threshold: 67% (more sensitive)
-  
+
   Override Channels:
     - PagerDuty: Production escalation policy
     - Slack: #production-alerts
     - SMS: On-call engineer
-  
+
   Mute During: Maintenance windows
   Priority: Critical
 
 ---
 
-# Development Environment Group  
+# Development Environment Group
 Group: "Development Checks"
 Alert Settings:
   Escalation Strategy: Run-based (5 consecutive failures)
   Reminder Schedule: None
-  
+
   Location Threshold: 100% (single location)
-  
+
   Override Channels:
     - Email: dev-team@company.com
     - Slack: #dev-alerts
-  
+
   Business Hours Only: true
   Priority: Low
 ```
@@ -164,30 +164,30 @@ Alert Settings:
     - First reminder: 1 minute
     - Second reminder: 3 minutes
     - Escalate to manager: 5 minutes
-  
+
   Location Threshold: 33% (very sensitive)
-  
+
   Custom Channels:
     - PagerDuty: Payment team escalation
     - SMS: Primary and backup engineers
     - Webhook: Internal incident system
-  
+
   Tags: ["critical", "payment", "p1"]
   Never Mute: true
 
 ---
 
 # Internal Dashboard Check
-Check: "Admin Dashboard Monitoring"  
+Check: "Admin Dashboard Monitoring"
 Alert Settings:
   Escalation Strategy: Run-based (10 consecutive failures)
   Reminder Schedule: None
-  
+
   Location Threshold: 100%
-  
+
   Minimal Channels:
     - Email: admin-team@company.com
-  
+
   Mute Enabled: true (for maintenance)
   Business Hours Only: true
 ```
@@ -216,6 +216,10 @@ Legacy System Configuration:
 
 ## Escalation Strategies
 
+<Tip>
+**Monitoring as Code**: Learn more about [configuring escalation strategies for your Checkly constructs](/constructs/alert-escalation-policy).
+</Tip>
+
 ### Run-Based Escalation
 Alert after a specific number of consecutive failures:
 
@@ -229,7 +233,7 @@ Alert after a specific number of consecutive failures:
 #### Best for
 **Stable Systems**
 - Predictable failure patterns
-- Clear success/failure states  
+- Clear success/failure states
 - Services with known reliability
 - APIs with consistent behavior
 
@@ -237,7 +241,7 @@ Alert after a specific number of consecutive failures:
 # Example: Alert after 2 consecutive failures
 Run-Based Configuration:
   Trigger: 2 consecutive failures
-  
+
 Scenario:
   15:00 - Check fails in Frankfurt and Tokyo (Run 1)
   15:05 - Check fails again from both locations (Run 2) → ALERT SENT
@@ -267,7 +271,7 @@ Alert when checks fail continuously for a specific duration:
 # Example: Alert after 10 minutes of failures
 Time-Based Configuration:
   Trigger: 10 minutes of continuous failures
-  
+
 Scenario:
   15:00 - Check starts failing (Timer starts)
   15:01-15:09 - Continued failures (Timer continues)
@@ -285,7 +289,7 @@ Location Threshold Configuration:
   Total Locations: 6 worldwide
   Threshold: 50% must fail
   Result: Alert only when 3+ locations fail simultaneously
-  
+
 Benefits:
   - Reduces false positives from regional issues
   - Focuses on global service problems
@@ -308,7 +312,7 @@ Triggers: Major outages only
 #### Balanced (50%)
 ```yaml
 Use Case: Standard web services
-Locations: 4  
+Locations: 4
 Threshold: 50% (2 locations)
 Triggers: Significant issues
 ```
@@ -415,7 +419,7 @@ const fixedRetryConfig = {
 
 // Use cases:
 // - Network connectivity issues
-// - DNS resolution problems  
+// - DNS resolution problems
 // - Simple service restarts
 // - Known intermittent failures
 ```
@@ -426,7 +430,7 @@ Gradually increasing intervals for services that need recovery time:
 ```typescript
 // Linear retry configuration
 const linearRetryConfig = {
-  strategy: "linear", 
+  strategy: "linear",
   maxRetries: 4,
   baseIntervalSeconds: 5,     // 5s, 10s, 15s, 20s
   maxDurationSeconds: 120,    // Maximum 2 minutes total
@@ -444,7 +448,7 @@ const linearRetryConfig = {
 Rapidly increasing intervals for rate-limited or overloaded services:
 
 ```typescript
-// Exponential retry configuration  
+// Exponential retry configuration
 const exponentialRetryConfig = {
   strategy: "exponential",
   maxRetries: 3,
@@ -479,7 +483,7 @@ useCase: "Diagnose regional problems"
 #### Different Location Retry
 **When to Use:**
 - Validating global service availability
-- Bypassing regional outages  
+- Bypassing regional outages
 - Load balancer health checks
 - CDN failover testing
 
@@ -525,12 +529,12 @@ SSL Alert Configuration:
   Default Warning: 30 days before expiration
   Critical Warning: 7 days before expiration
   Emergency Warning: 1 day before expiration
-  
+
 Alert Channels:
   30 Days: Email to security team
   7 Days: Email + Slack + SIEM integration
   1 Day: PagerDuty + SMS + Email + Slack
-  
+
 Check Frequency: Daily at 2 AM UTC
 Coverage: All HTTPS checks automatically monitored
 ```
@@ -584,7 +588,7 @@ Muting Options:
   Scheduled Mute: Plan maintenance windows
   Auto-Unmute: Automatic restoration
   Mute Inheritance: Group-level muting affects all checks
-  
+
 Mute Indicators:
   Dashboard: Visual mute status
   API: Programmatic mute control
@@ -599,11 +603,11 @@ Coordinate muting with planned maintenance:
 Maintenance Window Setup:
   Schedule: Weekly Sunday 2-4 AM UTC
   Auto-Mute: All production checks
-  Notifications: 
+  Notifications:
     - Pre-maintenance: Team notification
     - During: Muted status visible
     - Post-maintenance: Auto-unmute + summary
-  
+
 Emergency Override: Critical checks can break through muting
 ```
 
@@ -647,7 +651,7 @@ Retries: Fixed (2 retries, 5s interval)
 Location Threshold: 33%
 Tags: ["p1", "payment", "critical"]
 
-# Standard API Services Profile  
+# Standard API Services Profile
 Profile: "api-standard"
 Escalation: Run-based (2 failures)
 Channels: [Slack-alerts, Email-team]
@@ -673,12 +677,12 @@ Conditional Alerting Rules:
     - Business Hours: Standard escalation
     - After Hours: Critical escalation only
     - Weekends: Reduced sensitivity
-    
+
   Tag-Based:
     - "critical": Immediate escalation
     - "performance": Degradation alerts only
     - "security": Separate security team channel
-    
+
   Location-Based:
     - Single location: More aggressive retries
     - Multi-location: Location threshold filtering
@@ -722,7 +726,7 @@ Alert Configuration Metrics:
   Response Time: Time from alert to acknowledgment
   Channel Success Rate: Delivery success per channel
   Escalation Effectiveness: Percentage reaching on-call team
-  
+
 Regular Reviews:
   Weekly: Alert volume and patterns
   Monthly: Configuration adjustments

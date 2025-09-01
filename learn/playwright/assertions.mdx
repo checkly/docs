@@ -170,7 +170,7 @@ Custom matchers can be added using `expect.extend`, allowing developers to defin
 
 Here's a quick example of how to create a custom matcher for checking specific conditions:
 
-```ts
+```ts custom-matchers.spec.ts
 expect.extend({
   toBeWithinRange(received, floor, ceiling) {
     const pass = received >= floor && received <= ceiling;
@@ -202,7 +202,7 @@ Understanding how to diagnose assertion failures can save significant debugging 
 
 *Hard waits should be avoided.* A ‘hard wait’ refers to giving an exact period of time before going on to the next step of a test. Generally using code like:
 
-```ts
+```ts bad-practice.spec.ts
 await page.waitForTimeout(3000);
 ```
 
@@ -214,14 +214,14 @@ After that fixed period, if the next step doesn’t work, the test will fail. Ha
 
 While a hard wait is problematic since it doesn’t benefit from Playwright’s auto-waiting, an improperly structured assertion doesn’t include waiting at all. By wrapping the `await` inside the `expect()` instead of vice versa, and by using a non-web-first assertion, we get no waiting. In this case we’re checking that there is some text inside an element.
 
-```ts
+```ts manual-assertion-bad.spec.ts
 // expects the text to be visible instantly
 expect(await targetPage.locatorToSomeElement.innerText()).toBeTruthy();
 ```
 
 Use web-first assertions such as `toBeEmpty()` instead.
 
-```ts
+```ts web-first-assertion-good.spec.ts
 // uses auto-waiting, defaulting to five seconds max
 await expect(targetPage.locatorToSomeElement).not.toBeEmpty();
 ```

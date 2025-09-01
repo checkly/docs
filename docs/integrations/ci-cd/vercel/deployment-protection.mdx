@@ -21,7 +21,7 @@ With this feature, you can provide a secret in an HTTP header or query parameter
 For any Playwright-powered check, like Browser checks and Multistep checks, you can add the secret to the required HTTP header 
 using the `test.use()` method.
 
-```ts
+```ts browser-check.spec.ts
 test.use({
     extraHTTPHeaders: {
         'x-vercel-protection-bypass': process.env.VERCEL_BYPASS_TOKEN
@@ -31,7 +31,7 @@ test.use({
 
 Alternatively, when using the `request` API, you can add the header to the request.
 
-```ts
+```ts api-request.spec.ts
 await request.get('https://my-production-url.vercel.app/', {
   'x-vercel-protection-bypass': process.env.VERCEL_BYPASS_TOKEN
 })
@@ -43,7 +43,7 @@ For an API check you can do something similar
 2. Add a query parameter to the request with the token.
 3. Or use a setup script to manipulate the request before it is sent.
 
-```bash
+```bash setup-script.js
 request.headers['x-vercel-protection-bypass'] = process.env.VERCEL_BYPASS_TOKEN
 ```
 

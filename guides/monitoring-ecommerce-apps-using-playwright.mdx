@@ -71,7 +71,7 @@ For our example we will be creating Browser Checks using [Playwright](https://pl
 
 <Tabs>
 <Tab title="Login">
-```ts
+```ts login.spec.ts
 import { test, expect } from '@playwright/test';
 
 test('test', async ({ page }) => {
@@ -91,7 +91,7 @@ test('test', async ({ page }) => {
 ```
 </Tab>
 <Tab title="Search">
- ```ts
+ ```ts search.spec.ts
 import { test, expect } from '@playwright/test';
 
 test('test', async ({ page }) => {
@@ -137,7 +137,7 @@ test('test', async ({ page }) => {
 ```
 </Tab>
 <Tab title="Checkout">
- ```ts
+ ```ts checkout.spec.ts
 import { test, expect } from '@playwright/test';
 
 test('test', async ({ page }) => {
@@ -172,13 +172,13 @@ test('test', async ({ page }) => {
 
 Let's start off by creating a brand new folder:
 
-```bash Terminal
+```bash create-project
 mkdir checkly-mac-cli-example && cd $_
 ```
 
 To keep things easy, we create a subdirectory...
 
-```bash Terminal
+```bash create-checks-directory
 mkdir __checks__
 ```
 
@@ -186,19 +186,19 @@ mkdir __checks__
 
 ...install playwright
 
-```bash Terminal
+```bash install-playwright
 npm init playwright@latest
 ```
 
 First, install the CLI.
 
-```bash Terminal
+```bash install-checkly-cli
 npm install --save-dev checkly
 ```
 
 Since we are using TypeScript, also install ts-node and typescript:
 
-```bash Terminal
+```bash install-typescript-dependencies
 npm install --save-dev ts-node typescript
 ```
 
@@ -206,7 +206,7 @@ Next up, we want to create our `checkly.config.ts` file and include the basic Ch
 
 <Tabs>
 <Tab title="checkly.config.ts">
-```ts
+```ts checkly.config.ts
 import { defineConfig } from '@checkly/cli'
 
 export default defineConfig({
@@ -251,7 +251,7 @@ Welcome to @checkly/cli 🦝
 ```
 
 Now it's time to test run your browser checks on Checkly:
-```bash Terminal
+```bash run-tests
 npx checkly test
 ```
 
@@ -294,7 +294,7 @@ Browser Checks are now there to keep us informed on the status of our key websit
 
 <Tabs>
 <Tab title="API check resource">
-```ts
+```ts api.check.ts
 // __check__/api.check.ts
 import { ApiCheck, AssertionBuilder } from '@checkly/cli/constructs'
 
@@ -326,7 +326,7 @@ We can now once more run `checkly deploy` to see the new Check on Checkly:
 
 Now that we have our Checks in place, we want to set up alerting to ensure we are informed as soon as a failure takes place. Alert channels can be declared as constructs, just like the Checks. Let's add the following to our `alert-channels.ts` file:
 
-```ts
+```ts alert-channels.ts
 // alert-channels.ts
 import { EmailAlertChannel } from '@checkly/cli/constructs'
 
@@ -344,7 +344,7 @@ export const emailChannel = new EmailAlertChannel('email-channel-1', {
 
 We are setting up things so that we are alerted when our Check starts failing, as well as when it recovers. But we still need to decide which Checks will subscribe to this channel, and therefore be able to trigger the alerts. This is done by adding the following inside the resource declaration of each check, e.g.:
 
-```ts
+```ts api.check.ts
 // __check__/api.check.ts
 import { ApiCheck, AssertionBuilder } from '@checkly/cli/constructs'
 import { emailChannel } from './alert-Channels'

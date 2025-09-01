@@ -73,7 +73,7 @@ For our example we will be creating browser checks using [Playwright](https://pl
 
 <Tabs>
 <Tab title="Login">
-```js
+```js login.spec.js
 const { chromium } = require("playwright");
 
 (async () => {
@@ -100,7 +100,7 @@ const { chromium } = require("playwright");
 ```
 </Tab>
 <Tab title="Search">
- ```js
+ ```js search.spec.js
 const { chromium } = require("playwright");
 const assert = require("chai").assert;
 
@@ -152,7 +152,7 @@ const assert = require("chai").assert;
 ```
 </Tab>
 <Tab title="Checkout">
- ```js
+ ```js checkout.spec.js
 const { chromium } = require("playwright");
 
 (async () => {
@@ -216,7 +216,7 @@ Next up, we want to create our `main.tf` file and include the basic configuratio
 
 <Tabs>
 <Tab title="main.tf">
-```terraform
+```terraform main.tf
 variable "checkly_api_key" {}
 
 terraform {
@@ -268,7 +268,7 @@ In the same file, right below our initial instructions, we can now add resources
 
 <Tabs>
 <Tab title="Login resource">
-```terraform
+```terraform main.tf
 resource "checkly_check" "login" {
 
   name                      = "Login E2E"
@@ -292,7 +292,7 @@ resource "checkly_check" "login" {
 ```
 </Tab>
 <Tab title="Search resource">
-```terraform
+```terraform main.tf
 resource "checkly_check" "search" {
 
   name                      = "Search E2E"
@@ -316,7 +316,7 @@ resource "checkly_check" "search" {
 ```
 </Tab>
 <Tab title="Checkout resource">
-```terraform
+```terraform main.tf
 resource "checkly_check" "checkout" {
 
   name                      = "Checkout E2E"
@@ -410,7 +410,7 @@ Browser checks are now there to keep us informed on the status of our key websit
 
 <Tabs>
 <Tab title="API check resource">
-```terraform
+```terraform main.tf
 resource "checkly_check" "webstore-list-books" {
   name                      = "list-books"
   type                      = "API"
@@ -459,7 +459,7 @@ We can now once more run `terraform plan`, followed by `terraform apply` to see 
 
 Now that we have our checks in place, we want to set up alerting to ensure we are informed as soon as a failure takes place. Alert channels can be declared as resources, just like the checks. Let's add the following to our `main.tf` file:
 
-```terraform
+```terraform main.tf
 resource "checkly_alert_channel" "alert-email" {
   email {
     address = "<YOUR_EMAIL_ADDRESS>"
@@ -472,7 +472,7 @@ resource "checkly_alert_channel" "alert-email" {
 
 We are setting up things so that we are alerted when our check starts failing, as well as when it recovers. But we still need to decide which checks will subscribe to this channel, and therefore be able to trigger the alerts. This is done by adding the following inside the resource declaration of each check, e.g.:
 
-```terraform
+```terraform main.tf
 resource "checkly_check" "login" {
 
   name                      = "Login E2E"

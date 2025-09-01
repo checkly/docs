@@ -17,7 +17,7 @@ The reason not to add hard waits is simple: Playwright provides better ways to t
 
 Every time you tell Playwright to do something like:
 
-```ts Playwright.test.ts
+```ts bad-example.spec.ts
   await page.waitForTimeout(10000);
 ```
 
@@ -104,7 +104,7 @@ But if you try again after five seconds, the modal opens as expected.
 
 A test relying on Playwright's auto-waiting will fail with this page.
 
-```ts Playwright.test.ts
+```ts failing-test.spec.ts
 
 import { test, expect } from '@playwright/test';
 
@@ -120,7 +120,7 @@ test('test', async ({ page }) => {
 
 As a quick fix, we might be tempted to make this test functional by adding a hardcoded timeout:
 
-```ts Playwright.test.ts
+```ts fixed-with-timeout.spec.ts
 import { test, expect } from '@playwright/test';
 
 test('test', async ({ page }) => {
@@ -150,7 +150,7 @@ As the team writing synthetic monitoring, testing the final rendered page, we ma
 
 In this case, I recommend disabling the `<button>` until the underlying modal is available.
 
-```html
+```html modalLoader.html
 <button onclick="showModal('modal1')" disabled>Toolbar 1</button>
 ```
 
@@ -158,7 +158,7 @@ This approach avoids telling users that they can click the button, but also "fix
 
 For example, `locator.click()` will wait for the button to be enabled and only click it once it's ready.
 
-```ts
+```ts modalLoader.html
 let modalsReady = false;
 
 function wait() {
@@ -179,7 +179,7 @@ This change isn’t just fixing the end-to-end test; it has the knock-on benefit
 
 Once this change is made, Playwright's auto-waiting will work as expected, since it’s waiting for the buttons to become active and enabled.
 
-```ts Playwright.test.ts
+```ts auto-waiting.spec.ts
 import { test, expect } from '@playwright/test';
 
 test('test', async ({ page }) => {
@@ -223,7 +223,7 @@ Playwright has built-in functions to wait for an event before continuing with ex
 
 This example waits for any response matching the given pattern:
 
-```ts Playwright.test.ts
+```ts network-waiting.spec.ts
 // Attach network event listener
 const responsePromise = page.waitForResponse('site.example/modalBackend');
 // Trigger network request
@@ -242,7 +242,7 @@ But sometimes, there will be multiple requests to a URL. For example, when polli
 
 In these cases, `waitForResponse` lets us access and wait for response details, too.
 
-```ts Playwright.test.ts
+```ts advanced-network-waiting.spec.ts
 // Attach network event listener and
 // wait for PUT requests receiving a 200 status code
 const responsePromise = page.waitForResponse(response =>
@@ -281,7 +281,7 @@ If we consider the modal example, you can try to repeat your actions until they 
 
 Playwright's `toPass` assertion allows you to implement precisely this functionality.
 
-```ts Playwright.test.ts
+```ts retry-with-topass.spec.ts
 import { test, expect } from '@playwright/test';
 
 test('test', async ({ page }) => {

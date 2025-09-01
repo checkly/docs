@@ -28,7 +28,7 @@ Unstructured logs (raw text logs) can be difficult to parse and analyze, especia
 
 For example, rather than storing a plain log message, structure it to include relevant metadata:
 
-```json
+```json structured-log-example.json
 {
   "timestamp": "2024-05-01T12:00:00Z",
   "level": "error",
@@ -50,7 +50,7 @@ Logging everything can quickly lead to storage and performance issues, especiall
 
 In Fluent Bit, you can apply filters to drop debug-level logs in production. For instance:
 
-```yaml
+```yaml fluent-bit-filter.conf
 [FILTER]
     Name    grep
     Match   *
@@ -64,7 +64,7 @@ Logs can sometimes contain sensitive information, such as user IDs or payment da
 
 Example: Use a Lua script or regular expressions in Fluent Bit to mask sensitive information like credit card numbers.
 
-```yaml
+```yaml fluent-bit-redaction.conf
 [FILTER]
     Name    modify
     Match   *
@@ -84,7 +84,7 @@ In high-throughput environments, the risk of back pressure increases, especially
 
 Configure Fluent Bit with file-based buffering for resilience:
 
-```yaml
+```yaml fluent-bit-output.conf
 [OUTPUT]
     Name  es
     Match *

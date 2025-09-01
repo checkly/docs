@@ -25,7 +25,7 @@ Get started with Checkly using the CLI and code-first approach. You'll learn how
 
   <CliProjectInit/>
 
-  ```bash Terminal
+  ```bash navigate-to-project
   cd my-checkly-project
   ```
 
@@ -39,7 +39,7 @@ Get started with Checkly using the CLI and code-first approach. You'll learn how
   <Step title="Create Your First Browser Check">
   Let's create a browser check that monitors a login flow. Create a new file `src/login-check.spec.ts`:
 
-  ```typescript
+  ```typescript src/login-check.spec.ts
   import { test, expect } from '@playwright/test'
 
   test('User can login successfully', async ({ page }) => {
@@ -66,7 +66,7 @@ Get started with Checkly using the CLI and code-first approach. You'll learn how
   <Step title="Configure Your Check">
   Update the check configuration in `checkly.config.ts`:
 
-  ```typescript
+  ```typescript checkly.config.ts
   import { ChecklyConfig } from 'checkly'
 
   const config: ChecklyConfig = {
@@ -94,14 +94,14 @@ Get started with Checkly using the CLI and code-first approach. You'll learn how
   <Step title="Add Environment Variables">
   For sensitive data like credentials, use environment variables. Create a `.env` file:
 
-  ```bash
+  ```bash .env
   LOGIN_EMAIL=john@example.com
   LOGIN_PASSWORD=mypassword
   ```
 
   Update your test to use these variables:
 
-  ```typescript
+  ```typescript src/login-check.spec.ts
   test('User can login successfully', async ({ page }) => {
     await page.goto('https://app.checklyhq.com/login')
     
@@ -117,7 +117,7 @@ Get started with Checkly using the CLI and code-first approach. You'll learn how
   <Step title="Configure Alerts">
   Add alert channels to get notified when checks fail. Update your `checkly.config.ts`:
 
-  ```typescript
+  ```typescript checkly.config.ts
   import { EmailAlertChannel, SlackAlertChannel } from 'checkly'
 
   // Create alert channels
@@ -144,7 +144,7 @@ Get started with Checkly using the CLI and code-first approach. You'll learn how
   <Step title="Test Locally">
   Before deploying, test your check locally:
 
-  ```bash Terminal
+  ```bash test-locally
   npx checkly test
   ```
 
@@ -154,7 +154,7 @@ Get started with Checkly using the CLI and code-first approach. You'll learn how
   <Step title="Deploy Your Checks">
   Deploy your checks to Checkly's global infrastructure:
 
-  ```bash Terminal
+  ```bash deploy-checks
   npx checkly deploy
   ```
 

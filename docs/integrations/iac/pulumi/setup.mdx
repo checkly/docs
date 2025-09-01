@@ -35,26 +35,26 @@ Confirm Pulumi CLI is working correctly
 ### Installation Options
 
 <CodeGroup>
-```bash npm
+```bash install-pulumi-npm
 npm install -g @pulumi/pulumi
 ```
 
-```bash yarn
+```bash install-pulumi-yarn
 yarn global add @pulumi/pulumi
 ```
 
-```bash brew
+```bash install-pulumi-brew
 brew install pulumi/tap/pulumi
 ```
 
-```bash curl
+```bash install-pulumi-curl
 curl -fsSL https://get.pulumi.com | sh
 ```
 </CodeGroup>
 
 ### Verify Installation
 
-```bash
+```bash verify-installation
 pulumi version
 ```
 
@@ -84,7 +84,7 @@ Store your access token securely. You can use environment variables or a passwor
 
 ### Login to Pulumi
 
-```bash
+```bash login-pulumi
 pulumi login
 ```
 
@@ -92,7 +92,7 @@ When prompted, paste your access token or press Enter to use browser-based authe
 
 Verify your login:
 
-```bash
+```bash verify-login
 pulumi whoami
 ```
 
@@ -119,13 +119,13 @@ API keys have full access to your Checkly account. Keep them secure and never co
 
 ### Create Project Directory
 
-```bash
+```bash create-project
 mkdir my-checkly-monitoring && cd my-checkly-monitoring
 ```
 
 ### Initialize Pulumi Project
 
-```bash
+```bash init-pulumi-project
 pulumi new javascript
 ```
 
@@ -137,11 +137,11 @@ Follow the prompts:
 ### Install Checkly Provider
 
 <CodeGroup>
-```bash npm
+```bash install-checkly-npm
 npm install @checkly/pulumi
 ```
 
-```bash yarn
+```bash install-checkly-yarn
 yarn add @checkly/pulumi
 ```
 </CodeGroup>
@@ -152,20 +152,20 @@ yarn add @checkly/pulumi
 
 Add to your shell profile (`.bashrc`, `.zshrc`, etc.):
 
-```bash
+```bash setup-env-vars
 export CHECKLY_ACCOUNT_ID=your_account_id
 export CHECKLY_API_KEY=your_api_key
 ```
 
 Reload your shell or source the profile:
 
-```bash
+```bash reload-shell
 source ~/.bashrc  # or ~/.zshrc
 ```
 
 ### Option 2: Pulumi Configuration (Recommended for Teams)
 
-```bash
+```bash setup-pulumi-config
 pulumi config set checkly:apiKey your_api_key --secret
 pulumi config set checkly:accountId your_account_id
 ```
@@ -178,14 +178,14 @@ Using Pulumi configuration is better for team environments as it stores settings
 
 Test that your credentials are accessible:
 
-```bash
+```bash verify-env-vars
 echo $CHECKLY_ACCOUNT_ID
 echo $CHECKLY_API_KEY
 ```
 
 Or check Pulumi config:
 
-```bash
+```bash check-pulumi-config
 pulumi config
 ```
 
@@ -195,7 +195,7 @@ pulumi config
 
 Replace the contents of `index.js` with:
 
-```javascript
+```javascript index.js
 const checkly = require('@checkly/pulumi')
 
 // Create a simple API check
@@ -225,7 +225,7 @@ new checkly.Check('hello-world-api', {
 
 ### Preview Changes
 
-```bash
+```bash preview-changes
 pulumi preview
 ```
 
@@ -233,7 +233,7 @@ This shows you what resources will be created without making changes.
 
 ### Deploy
 
-```bash
+```bash deploy-infrastructure
 pulumi up
 ```
 

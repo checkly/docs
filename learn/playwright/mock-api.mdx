@@ -24,7 +24,7 @@ For this test we’re using the demo Danube web shop, testing a book’s detail 
 
 We started with a very simple test that a particular book’s detail page has all the correct information, but I ran into a problem with dynamic content:
 
-```typescript
+```typescript book-details.spec.ts
 import { test, expect } from '@playwright/test';
 
 test('Book has correct details', async ({ page }) => {
@@ -62,7 +62,7 @@ Here are some of the paths we could take with dynamic information like a book’
 
 Let’s start by looking at the API response in full, from the network tab of either our browser or the Playwright UI mode. The body looks as follows
 
-```json
+```json book-api-response.json
 {
   "id": 23,
   "title": "Achilles",
@@ -78,7 +78,7 @@ What we’d like to do is fix that `"stock"` value to be the same every time. Th
 
 Before we load this page, let’s add a call to `page.route()` to modify the network requests made by the page:
 
-```typescript
+```typescript mock-book-details.spec.ts
 import { test, expect } from '@playwright/test';
 
 test('Book has correct details', async ({ page }) => {
@@ -108,7 +108,7 @@ The ‘fulfilled’ listing will show the patched version of your response that 
 
 If we’re able to intercept a request and change a single key/value pair, can we replace an entire payload from an API request? Sure, in fact we don’t need to wait for the real API to respond. the new version would look something like this:
 
-```typescript
+```typescript full-mock-api.spec.ts
 import { test, expect } from '@playwright/test';
 
 test('Book has correct details', async ({ page }) => {
@@ -148,7 +148,7 @@ The last use case for API mocking and response editing is simulating an unusual 
 
 However, how can we test this behavior without setting up special ‘test’ conditions in the database? With our ability to patch API responses, we can force the stock response to be zero, and make sure the ‘add to cart’ button is *not* visible.
 
-```typescript
+```typescript out-of-stock-test.spec.ts
 import { test, expect } from '@playwright/test';
 
 test('Book has correct details', async ({ page }) => {

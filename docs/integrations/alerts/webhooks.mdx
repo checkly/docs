@@ -61,7 +61,7 @@ Use dynamic variables to create contextual alerts:
 
 A practical example of using the `{{moment}}` helper would be setting the pagination options on a typical API endpoint:
 
-```
+```bash api-request
  GET https://api.acme.com/events?from={{moment "last week" "X"}}&to={{moment "X"}}
 ```
 
@@ -71,7 +71,7 @@ For a full overview of date formatting option, check the [moment.js docs](https:
 
 Create dynamic webhook content with conditional formatting:
 
-```json
+```json webhook-payload.json
 {
   "priority": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}P1{{else}}{{#eq ALERT_TYPE 'ALERT_DEGRADED'}}P2{{else}}P3{{/eq}}{{/eq}}",
   "environment": "{{#contains CHECK_NAME 'prod'}}production{{else}}{{#contains CHECK_NAME 'staging'}}staging{{else}}development{{/contains}}{{/contains}}",
@@ -100,7 +100,7 @@ Have a look at the code examples below on how to use the header and your favouri
 <Tabs>
 <Tab title="Node.js">
 
-```javascript
+```javascript webhook-server.js
 // We store the webhook secret in an environment variable called CHECKLY_WEBHOOK_SECRET
 const app = require('express')();
 const bodyParser = require('body-parser');
@@ -134,7 +134,7 @@ app.listen(4242, () => console.log('Running on port 4242'))
 
 <Tab title="Ruby">
 
-```ruby
+```ruby webhook-server.rb
 # We store the webhook secret in an environment variable called CHECKLY_WEBHOOK_SECRET
 require 'sinatra'
 
@@ -158,7 +158,7 @@ end
 
 <Tab title="Python">
 
-```python
+```python webhook-handler.py
 # This example assumes you use Django
 import hmac
 from hashlib import sha256
@@ -200,7 +200,7 @@ The following examples give an idea how to integrate Checkly with 3rd party aler
 
 You can create an <a href="https://docs.opsgenie.com/docs/alert-api" target="_blank">OpsGenie</a> alert by POST-ing the following body
 
-```json Webhook 
+```json opsgenie-webhook.json
 {
   "message": "{{ALERT_TITLE}}",
   "description": "{{ALERT_TYPE}} <br>{{STARTED_AT}} ({{RESPONSE_TIME}}ms) <br>{{RESULT_LINK}}",
@@ -210,7 +210,7 @@ You can create an <a href="https://docs.opsgenie.com/docs/alert-api" target="_bl
 
 to the OpsGenie `alerts` API endpoint
 
-``` Header
+```bash endpoint-url
 https://{{OPSGENIE_API_KEY}}@api.opsgenie.com/v2/alerts
 ```
 
@@ -222,7 +222,7 @@ Authorization: GenieKey {{OPSGENIE_API_KEY}}
 
 This is an example of a full alert body:
 
-```json Webhook 
+```json opsgenie-full-webhook.json
 {
   "message": "{{ALERT_TITLE}}",
   "description": "{{ALERT_TYPE}}: {{CHECK_NAME}} <br>{{STARTED_AT}} ({{RESPONSE_TIME}}ms) <br>{{RESULT_LINK}}",
@@ -240,7 +240,7 @@ This is an example of a full alert body:
 
 In case you would like different teams to be responsible for different Check Groups, you could add a `CHECK_GROUP_TEAM` variable with a different value for each Group, then modify the above snippet with the following:
 
-```json
+```json team-responders.json
 "responders": [
       {
           "id":"{{CHECK_GROUP_TEAM}}",
@@ -253,7 +253,7 @@ In case you would like different teams to be responsible for different Check Gro
 
 Given an existing service on your PagerDuty account, create an incident for it by posting the following body
 
-```json Webhook
+```json pagerduty-webhook.json
 {
   "incident": {
     "type": "incident",
@@ -278,7 +278,7 @@ to `https://api.pagerduty.com/incidents`. You will need to set the following hea
 
 Send a message using [Pushover](https://pushover.net/) by posting this body:
 
-```json
+```json pushover-webhook.json
 {
   "token":"YOUR_SECRET_TOKEN_FROM_PUSHOVER",
   "user":"YOUR_USER_FROM_PUSHOVER",
@@ -304,7 +304,7 @@ https://api.trello.com/1/cards?idList=5b28c04aed47522097be8bc4&key={{TRELLO_KEY}
 
 You can send your SSL alerts using webhooks. Using the following body:
 
-```json Webhook 
+```json ssl-alert-webhook.json
 {
   "message": "{{ALERT_TITLE}}",
   "link":"{{RESULT_LINK}}"
@@ -314,7 +314,7 @@ You can send your SSL alerts using webhooks. Using the following body:
 Will yield the following output, where we customize the `ALERT_TITLE` to include the domain and the days remaining till your
 certificate expires.
 
-```json Webhook
+```json ssl-alert-response.json
 {
   "message": "The SSL certificate for api.checklyhq.com will expire in 14 days",
   "link": "http://app-test.checklyhq.com/checks/08437f9c-df8c-45ed-975a-a3f9e24d626d"
@@ -324,7 +324,7 @@ certificate expires.
 
 You can configure a webhook to POST to a JavaScript snippet running in a [Twilio Function](https://www.twilio.com/docs/runtime/functions). This code receives the Checkly webhook JSON, then triggers a Twilio "Flow execution":
 
-```js Twilio Function
+```javascript twilio-function.js
 //"From" is the sender phone number
 //"To" is the receiver phone number
 exports.handler = async function (context, event, callback) {
@@ -350,7 +350,7 @@ We will be creating a POST request to `{{JIRA_INSTANCE_URL}}/rest/api/3/issue`, 
 
 The required headers will be:
 
-```json Header
+```bash jira-headers
 Authorization: Basic <base64 encoded user_email:api_token_string>
 Accept: application/json
 Content-Type: application/json
@@ -360,7 +360,7 @@ For more details on authenticating with the Jira API, refer to [Atlassian's guid
 
 An example body could look as follows:
 
-```json Webhook
+```json jira-webhook.json
 {
   "fields": {
     "description": { // your Jira issue description, using Atlassian Document Format (ADF)

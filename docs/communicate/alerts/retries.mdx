@@ -4,6 +4,10 @@ title: 'Alert Retries'
 sidebarTitle: 'Retries'
 ---
 
+<Tip>
+**Monitoring as Code**: Learn more about [configuring retries for your Checkly constructs](/constructs/retry-strategy).
+</Tip>
+
 Sometimes the internet is flaky, or your app is just having a hiccup not worth pinging your on-call team about. Retries are your first line of defense against these types of false positives, leading to alert fatigue.
 
 Whether you need to retry a check or a test session, there are different retries available.
@@ -53,9 +57,9 @@ Of course, picking the right strategy depends on your use case, tolerance for in
 
 ### Location-based check retries
 
-You can decide if a check should be retried from the same location or not with the checkbox: 
+You can decide if a check should be retried from the same location or not with the checkbox:
 **Always retry from the same location the check failed in**
-- If enabled, a check that fails will be retried in the same location. 
+- If enabled, a check that fails will be retried in the same location.
 - If disabled, a check that fails will be retried in a different location, from the locations your check runs at.
 
 There are some tradeoffs to consider:
@@ -91,7 +95,7 @@ cli: {
 }
 ```
 
-Using the CLI and the `--retries=` flag takes precedence over your Checkly configuration file. 
+Using the CLI and the `--retries=` flag takes precedence over your Checkly configuration file.
 
 ```bash
 # retry npx checkly test twice
@@ -108,9 +112,9 @@ All retry attempts are be visible on the web interface at Checkly and in your co
 ```
 
 ### Test session retries in your CI/CD pipeline
-Use the ``--reporter=ci`` flag to run test session retries from your CI/CD pipeline. The `ci` reporter will print out all retry attempts in the prompt output, instead of live-updating the prompt. 
+Use the ``--reporter=ci`` flag to run test session retries from your CI/CD pipeline. The `ci` reporter will print out all retry attempts in the prompt output, instead of live-updating the prompt.
 
-For example: 
+For example:
 
 ```bash
 npx checkly test --retries=2 --reporter=ci

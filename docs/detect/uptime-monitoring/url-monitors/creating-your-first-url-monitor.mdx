@@ -6,12 +6,12 @@ sidebarTitle: 'Creating Your First Monitor'
 
 This guide walks you through creating your first URL monitor to check the availability and performance of your websites, APIs, or any HTTP-based service.
 
-<Tabs>
-<Tab title="Create from UI">
-
 Each URL monitor is defined by its request configuration, which includes the target URL and how its availability and performance should be validated.
 
-### Basic Setup
+<Tip>
+**Monitoring as Code**: To get started with your first URL Monitor using code, learn more about the [URL Monitor Construct](/constructs/url-monitor).
+</Tip>
+## Basic Setup
 
 Configure your URL monitor by specifying the endpoint and request method:
 
@@ -23,23 +23,23 @@ Configure your URL monitor by specifying the endpoint and request method:
 * **URL:** The HTTP(S) URL to monitor (e.g. `https://api.example.com`)
 * **IP family:** Defaults to IPv4
 
-### Response Validation
+## Response Validation
 
-#### Assertions
+### Assertions
 Validate the returned response status code:
 
 <Frame>
   <img src="/images/url-monitor-assertions.png" alt="URL monitor assertions interface showing status code configuration" />
 </Frame>
 
-#### Response Time Limits
+### Response Performance
 Define performance thresholds for degraded or failed states:
 
 <Frame>
   <img src="/images/url-monitor-response-times.png" alt="URL monitor response time limits interface showing degraded and failed thresholds" />
 </Frame>
 
-### Frequency
+## Frequency
 
 Set how often the monitor runs (every 10 seconds to 24 hours).
 
@@ -48,7 +48,7 @@ Set how often the monitor runs (every 10 seconds to 24 hours).
 </Frame>
 
 
-### Scheduling & Locations
+## Scheduling & Locations
 
 <Frame>
   <img src="/images/url-monitor-scheduling-strategy.png" alt="URL monitor scheduling strategy interface showing round robin vs fixed schedule options" />
@@ -57,59 +57,14 @@ Set how often the monitor runs (every 10 seconds to 24 hours).
 * **Scheduling:** Choose between round-robin or parallel execution. Learn more about [scheduling strategies](/docs/monitoring/global-locations#scheduling-strategies)
 * **Locations:** Select one or more [public](/docs/monitoring/global-locations/) or [private](/docs/private-locations/) locations to run the monitor from
 
-### Additional Settings
+## Additional Settings
 
 * **Name:** Give your monitor a clear name to identify it in dashboards and alerts
 * **Tags:** Use tags to organize monitors across dashboards and [maintenance windows](/docs/maintenance-windows/)
 * **Retries:** Define how failed runs should be retried. See [retry strategies](/docs/alerting-and-retries/retries/)
 * **Alerting:** Configure your [alert settings](/docs/alerting-and-retries/alert-settings/), [alert channels](/docs/alerting-and-retries/alert-channels/), or set up [webhooks](/docs/alerting-and-retries/webhooks/) for custom integrations
 
-</Tab>
-<Tab title="Create from Code">
 
-With the [Checkly CLI](/cli/overview), you can define URL monitors in TypeScript or JavaScript and manage them as code. See [CLI configuration](/docs/detect/uptime-monitoring/cli-configuration) for comprehensive examples and advanced patterns.
-
-
-<CodeGroup dropdown>
-
-```ts hello-url.check.ts
-import { UrlMonitor, UrlAssertionBuilder } from 'checkly/constructs'
-
-new UrlMonitor('hello-url-1', {
-  name: 'Hello URL',
-  activated: true,
-  request: {
-    method: 'GET',
-    url: 'https://welcome.checklyhq.com',
-    assertions: [
-      UrlAssertionBuilder.statusCode().equals(200),
-    ]
-  }
-})
-```
-
-```js hello-url.check.js
-const { UrlMonitor, UrlAssertionBuilder } = require('checkly/constructs')
-
-new UrlMonitor('hello-url-1', {
-  name: 'Hello URL',
-  activated: true,
-  request: {
-    method: 'GET',
-    url: 'https://welcome.checklyhq.com',
-    assertions: [
-      UrlAssertionBuilder.statusCode().equals(200),
-    ]
-  }
-})
-```
-
-</CodeGroup>
-
-See the full [Url monitor construct reference](/constructs/url-monitor) for more context.
-
-</Tab>
-</Tabs>
 
 
 

@@ -1,0 +1,144 @@
+name: Update Runtime Specification
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  update-runtime-spec:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Update runtime specification
+        run: |
+          node -e "
+          const fs = require('fs');
+          const path = require('path');
+
+          async function fetchRuntimes() {
+            try {
+              const response = await fetch('https://api.checklyhq.com/v1/runtimes');
+              if (!response.ok) {
+                throw new Error(\`HTTP error! status: \${response.status}\`);
+              }
+              return await response.json();
+            } catch (error) {
+              console.error('Error fetching runtimes:', error);
+              process.exit(1);
+            }
+          }
+
+          function generateRuntimeContent(runtimes) {
+            let content = '';
+            
+            runtimes.forEach(runtime => {
+              // Skip BETA runtimes (equivalent to Hugo's \`{{ if ne .stage \"BETA\" }}\`)
+              if (runtime.stage === 'BETA') {
+                return;
+              }
+              
+              // Add runtime name header
+              content += \`### \\\`\${runtime.name}\\\`\\n\`;
+              
+              // Add deprecated notice if applicable
+              if (runtime.stage === 'DEPRECATED') {
+                content += \`(\${runtime.stage})\\n\\n\`;
+                content += \`This runtime will be available until \${runtime.runtimeEndOfLife}. Please update your checks' runtimes and account settings to avoid failures due to automatic change to the next supported runtime.\\n\\n\`;
+              } else {
+                content += '\\n';
+              }
+              
+              // Add Node.js version
+              content += \`Node.js Version: \\\`\${runtime.nodeJsVersion}\\\`\\n\\n\`;
+              
+              // Add description
+              content += \`\${runtime.description}\\n\\n\`;
+              
+              // Add dependencies
+              if (runtime.dependencies) {
+                Object.entries(runtime.dependencies).forEach(([key, value]) => {
+                  content += \`- [\${key}](https://npmjs.com/package/\${key}/v/\${value}) \${value}\\n\`;
+                });
+              }
+              
+              content += '\\n';
+            });
+            
+            return content;
+          }
+
+          async function updateRuntimeSpecFile(generatedContent) {
+            const filePath = path.join(process.cwd(), 'docs/platform/runtimes/runtime-specification.mdx');
+            
+            try {
+              const fileContent = fs.readFileSync(filePath, 'utf8');
+              
+              // Find where to insert the generated content (after \"## NPM packages\" section)
+              const insertionPoint = fileContent.indexOf('> and \`mocha\`.\\n\\n');
+              
+              if (insertionPoint === -1) {
+                console.error('Could not find insertion point in the file');
+                process.exit(1);
+              }
+              
+              const beforeInsertion = fileContent.substring(0, insertionPoint + '> and \`mocha\`.\\n\\n'.length);
+              
+              // Create new content with updated runtimes
+              const newContent = beforeInsertion + '\\n' + generatedContent;
+              
+              fs.writeFileSync(filePath, newContent);
+              console.log('Runtime specification updated successfully!');
+              
+            } catch (error) {
+              console.error('Error updating file:', error);
+              process.exit(1);
+            }
+          }
+
+          async function main() {
+            console.log('Fetching runtime data...');
+            const runtimes = await fetchRuntimes();
+            
+            console.log(\`Found \${runtimes.length} runtimes\`);
+            
+            console.log('Generating content...');
+            const generatedContent = generateRuntimeContent(runtimes);
+            
+            console.log('Updating runtime specification file...');
+            await updateRuntimeSpecFile(generatedContent);
+          }
+
+          main().catch(console.error);
+          "
+          
+      - name: Check for changes
+        id: verify-changed-files
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Commit and push changes
+        if: steps.verify-changed-files.outputs.changed == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add docs/platform/runtimes/runtime-specification.mdx
+          git commit -m "🤖 Update runtime specification
+
+          🤖 Generated with [Claude Code](https://claude.ai/code)
+
+          Co-Authored-By: Claude <noreply@anthropic.com>"
+          git push

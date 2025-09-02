@@ -1,891 +1,416 @@
 ---
-title: 'Webhook Integration'
-description: 'Advanced webhook configuration, custom payloads, security patterns, and third-party integrations for sophisticated Checkly alert handling.'
-sidebarTitle: 'Webhooks'
+title: Alerting with Webhooks 
+sidebarTitle: Webhooks
 ---
 
+Webhooks allow you to POST custom payloads to any endpoint in your own infrastructure or a third party provider. In a
+nutshell, you can:
+
+- Create a **custom URL** by adding in authentication tokens or other secrets.
+- Create a **custom payload body** using any environment variables and specific instance variables per event. Note: that means that if you are attaching the webhook to a Group, you will be able to access Group-level variables, too.
+- **Debug and test the webhook** in the editor by sending test messages.
+
+## Using variables
+
+![webhook jira example](/images/docs/images/alerting/webhook-jira.png)
+
+The example above shows a webhook configured to create a Jira ticket on each event. Notice the following:
+
+- We use the variable `JIRA_INSTANCE_URL` in the URL. We previously stored this variable in the [environment variables section](https://app.checklyhq.com/environment-variables). Alerting configurations only support the use of environment variables, secrets are not supported.
+- We use the variable `CHECK_ID` in the payload. This is one of many event-based variables that will change with each call. See below for the complete list.
+
+In both cases we use the familiar Handlebars templating braces, i.e. `{{ }}` to insert the variable.
+
+> To avoid encoding, you can access your environment variables with triple brackets, i.e. `{{{USER_API_KEY}}}`
+
+You can use the following event-related variables in both URL and payload.
+
+| Variable            | Description                                                  |
+|---------------------|--------------------------------------------------------------|
+| `CHECK_NAME`        | Full name of the check                                       |
+| `CHECK_ID`          | The UUID of the check                                        |
+| `CHECK_TYPE`        | The check type, i.e. API or BROWSER.                         |
+| `ALERT_TITLE`       | Human readable title, e.g. 'Check "My API check" has failed' |
+| `ALERT_TYPE`        | Type of alert, e.g. "ALERT_FAILURE", "ALERT_RECOVERY", "ALERT_DEGRADED", "ALERT_DEGRADED_RECOVERY". See [alert states](/docs/alerting-and-retries/alert-states/#alert-states--transitions) for all options. |
+| `CHECK_RESULT_ID`   | The UUID of the result that triggered this message           |
+| `CHECK_ERROR_MESSAGE` | The check error message                                    |
+| `RESPONSE_TIME`     | The reported response time for this result                   |
+| `API_CHECK_RESPONSE_STATUS_CODE`     | The response status code, e.g. 200. Only populated for API checks.                  |
+| `API_CHECK_RESPONSE_STATUS_TEXT`     | The response status text, e.g. "OK". Only populated for API checks.                  |
+| `RUN_LOCATION`      | The location where the check ran, i.e. "N. California"       |
+| `RESULT_LINK`       | The full link to the check result                            |
+| `SSL_DAYS_REMAINING`| How many days remain on the SSL certificate. For ALERT_SSL only.|
+| `SSL_CHECK_DOMAIN`  | The domain of the SSL certificate. For ALERT_SSL only.       |
+| `STARTED_AT`        | The ISO timestamp from when this check run started           |
+| `TAGS`              | An array of tags assigned to the check. Have a look at our Opsgenie example below on how to render this to a JSON array. |
+| `GROUP_NAME`        | The name of the group, if the check belongs to one.          |
+
+## Using Handlebars helpers
+
+We've extended the [Handlebars](https://handlebarsjs.com/) templating system with some handy helpers to make our webhooks
+even more powerful.
+
+| helpers              | description                                                                                                                                                                                                                                                                                                                                                                                                                        |
+|----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `{{REGION}}`         | Resolves to the AWS region name, i.e. us-east-1.                                                                                                                                                                                                                                                                                                                                                                                 |
+| `{{$UUID}}`          | Generates a random UUID/v4, i.e.  9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d.                                                                                                                                                                                                                                                                                                                                                          |
+| `{{$RANDOM_NUMBER}}` | Generates a random decimal number between 0 and 1000, i.e. 345.                                                                                                                                                                                                                                                                                                                                                                 |
+| `{{moment}}`         | Generates a date or time using **moment.js** and allows for formatting:<ul> <li>`{{moment "YYYY-MM-DD"}}` generates a date, i.e. 2020-08-26</li> <li>`{{moment "2 days ago" "YYYY-MM-DD"}}` generates the date two days ago: 2020-08-24</li> <li>`{{moment "last week" "X"}}` generates a UNIX timestamp from last week: 1597924480</li> </ul> |
+
+A practical example of using the `{{moment}}` helper would be setting the pagination options on a typical API endpoint:
+
+```
+ GET https://api.acme.com/events?from={{moment "last week" "X"}}&to={{moment "X"}}
+```
+
+> You can find the [full list of helpers in the README.md file](https://github.com/checkly/handlebars) of the underlying library we are using.
+For a full overview of date formatting option, check the [moment.js docs](https://momentjs.com/docs/#/displaying/format/).
 
 
-Webhooks provide powerful, flexible integration capabilities that allow you to POST custom payloads to any endpoint in your infrastructure or third-party services. Create sophisticated alert workflows that integrate seamlessly with your existing tools and processes.
-
-## Webhook Capabilities
-
-Checkly webhooks offer advanced features for complex integration scenarios:
-
-<CardGroup cols={2}>
-<Card title="Dynamic configuration" icon="settings">
-- **Custom URLs** with authentication tokens and secrets
-- **Custom payload bodies** using environment variables
-- **Conditional logic** with Handlebars templating
-- **Debug and testing** capabilities in the editor
-</Card>
-
-<Card title="Secure delivery" icon="shield">
-- **Cryptographic signatures** for payload verification
-- **Retry logic** with exponential backoff
-- **Timestamp headers** for replay attack prevention
-- **Environment variable** support for secrets
-</Card>
-</CardGroup>
-
-## Webhook Configuration
-
-### Basic Webhook Setup
-Configure webhooks with dynamic URLs and custom payloads:
-
-![Webhook configuration example](/images/docs/images/alerting/webhook-jira.png)
+You can also use conditional helpers like `{{#eq}}` statements. Here is an example:
 
 ```json
 {
-  "name": "Custom Incident Management Integration",
-  "url": "https://api.incident-system.com/webhooks/{{WEBHOOK_TOKEN}}",
-  "method": "POST",
-  "headers": {
-    "Authorization": "Bearer {{API_TOKEN}}",
-    "Content-Type": "application/json",
-    "X-Checkly-Source": "monitoring",
-    "X-Environment": "{{ENVIRONMENT_NAME}}"
-  },
-  "secret": "{{WEBHOOK_SECRET}}",
-  "body": {
-    "timestamp": "{{STARTED_AT}}",
-    "event_type": "{{ALERT_TYPE}}",
-    "service": {
-      "name": "{{CHECK_NAME}}",
-      "id": "{{CHECK_ID}}",
-      "type": "{{CHECK_TYPE}}"
-    },
-    "incident": {
-      "title": "{{ALERT_TITLE}}",
-      "description": "{{CHECK_ERROR_MESSAGE}}",
-      "location": "{{RUN_LOCATION}}",
-      "response_time": {{RESPONSE_TIME}},
-      "result_url": "{{RESULT_LINK}}"
-    }
-  }
+  "message": "Check is {{#eq ALERT_TYPE 'ALERT_FAILURE'}}DOWN{{/eq}} {{#eq ALERT_TYPE 'ALERT_RECOVERY'}}UP{{/eq}}"
 }
 ```
 
-### Environment Variables in Webhooks
-Use environment variables for secure credential management:
+The above webhook body uses the `{{#eq}}` helper to execute the logic
 
-<Warning>
-Alerting configurations only support environment variables, not secrets. Store sensitive data in environment variables for webhook access.
-</Warning>
+*If the ALERT_TYPE variable equals 'ALERT_FAILURE', print 'DOWN', if it equals 'ALERT_RECOVERY' print 'UP'*
+
+So in the case of a failure event, the body would render to:
 
 ```json
 {
-  "url": "https://{{JIRA_INSTANCE_URL}}/rest/api/3/issue",
-  "headers": {
-    "Authorization": "Basic {{JIRA_AUTH_TOKEN}}",
-    "Accept": "application/json",
-    "Content-Type": "application/json"
-  },
-  "body": {
-    "fields": {
-      "project": {
-        "key": "{{JIRA_PROJECT_KEY}}"
-      },
-      "summary": "{{ALERT_TITLE}}",
-      "description": "Check {{CHECK_NAME}} failed from {{RUN_LOCATION}}"
-    }
-  }
+  "message": "Check is DOWN"
 }
 ```
 
-<Tip>
-To avoid URL encoding issues with special characters in environment variables, use triple brackets: `{{{USER_API_KEY}}}` instead of double brackets.
-</Tip>
+Two clear benefits here:
+- You only need to create one webhook to inform a 3rd party system.
+- You can translate Checkly terms to your 3rd party tool's term for the same concept, i.e. the "up status" of a check.
 
-## Available Webhook Variables
+You can find the [full list of helpers in the README.md file](https://github.com/checkly/handlebars) of the underlying library we are using.
 
-### Core Check Variables
-Essential information about the check and alert:
+## Webhook secrets
 
-| Variable | Description | Example Value |
-|----------|-------------|---------------|
-| `CHECK_NAME` | Full name of the check | "Payment API Health Check" |
-| `CHECK_ID` | UUID of the check | "abc123-def456-ghi789" |
-| `CHECK_TYPE` | Type of check | "API", "BROWSER", "HEARTBEAT" |
-| `ALERT_TITLE` | Human-readable alert title | "Check 'Payment API' has failed" |
-| `ALERT_TYPE` | Alert event type | "ALERT_FAILURE", "ALERT_RECOVERY" |
-| `CHECK_RESULT_ID` | UUID of the check result | "result-123-456-789" |
-| `CHECK_ERROR_MESSAGE` | Detailed error message | "Connection timeout after 5000ms" |
-| `RESPONSE_TIME` | Response time in milliseconds | 1234 |
-| `RUN_LOCATION` | Location where check executed | "N. Virginia" |
-| `RESULT_LINK` | Direct link to check results | "https://app.checklyhq.com/..." |
-| `STARTED_AT` | ISO timestamp of check start | "2024-01-15T14:30:22.000Z" |
-| `TAGS` | Array of check tags | ["critical", "payment", "api"] |
-| `GROUP_NAME` | Check group name (if applicable) | "Payment Services" |
+You can validate each webhook we deliver to your endpoint(s). Using the optional webhook secret, you can:
 
-### API Check-Specific Variables
-Additional variables available for API checks:
+1. Check if the webhook was sent by Checkly.
+2. Check if the payload was not altered in any way during transmission.
 
-| Variable | Description | Example Value |
-|----------|-------------|---------------|
-| `API_CHECK_RESPONSE_STATUS_CODE` | HTTP status code | 200, 404, 500 |
-| `API_CHECK_RESPONSE_STATUS_TEXT` | HTTP status text | "OK", "Not Found", "Internal Server Error" |
+When you create a webhook secret, we proceed to use that secret token to cryptographically sign the webhook payload using
+the SHA256 hash algorithm. We add the resulting hash to the HTTP header `x-checkly-signature` on each webhook.
 
-### SSL Certificate Variables
-Variables available for SSL certificate alerts:
+On the receiving end, you can then use the value of the `x-checkly-signature` header to assert the validity and authenticity
+of the webhook and its payload.
 
-| Variable | Description | Example Value |
-|----------|-------------|---------------|
-| `SSL_DAYS_REMAINING` | Days until certificate expires | 14 |
-| `SSL_CHECK_DOMAIN` | Certificate domain | "api.example.com" |
+Have a look at the code examples below on how to use the header and your favourite web framework.
 
-## Handlebars Templating and Helpers
+<CodeGroup>
 
-### Conditional Logic
-Use Handlebars helpers for dynamic webhook content:
+```javascript Node.js
+// We store the webhook secret in an environment variable called CHECKLY_WEBHOOK_SECRET
+const app = require('express')();
+const bodyParser = require('body-parser');
+const crypto = require('crypto');
 
-```json
-{
-  "severity": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}critical{{else}}{{#eq ALERT_TYPE 'ALERT_DEGRADED'}}warning{{else}}info{{/eq}}{{/eq}}",
-  "priority": "{{#contains TAGS 'critical'}}P1{{else}}{{#contains TAGS 'high'}}P2{{else}}P3{{/contains}}{{/contains}}",
-  "environment": "{{#contains CHECK_NAME 'prod'}}production{{else}}{{#contains CHECK_NAME 'staging'}}staging{{else}}development{{/contains}}{{/contains}}",
-  "escalation_needed": {{#and (eq ALERT_TYPE 'ALERT_FAILURE') (contains TAGS 'critical')}}true{{else}}false{{/and}},
-  "message": "Check is {{#eq ALERT_TYPE 'ALERT_FAILURE'}}DOWN{{/eq}}{{#eq ALERT_TYPE 'ALERT_RECOVERY'}}UP{{/eq}}"
-}
-```
-
-### Advanced Handlebars Helpers
-Checkly extends Handlebars with additional helpers:
-
-```json
-{
-  "formatted_tags": [{{#each TAGS}}"{{uppercase this}}"{{#unless @last}},{{/unless}}{{/each}}],
-  "response_time_category": "{{#gt RESPONSE_TIME 5000}}slow{{else}}{{#gt RESPONSE_TIME 2000}}medium{{else}}fast{{/gt}}{{/gt}}",
-  "alert_color": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}#ff0000{{else}}{{#eq ALERT_TYPE 'ALERT_DEGRADED'}}#ffa500{{else}}#00ff00{{/eq}}{{/eq}}",
-  "human_readable_time": "{{dateFormat STARTED_AT 'YYYY-MM-DD HH:mm:ss'}}",
-  "relative_time": "{{timeAgo STARTED_AT}}",
-  "check_url_slug": "{{slugify CHECK_NAME}}"
-}
-```
-
-### Complex Conditional Examples
-Build sophisticated logic for different scenarios:
-
-```json
-{
-  "incident_type": "{{#eq CHECK_TYPE 'API'}}api_failure{{else}}{{#eq CHECK_TYPE 'BROWSER'}}user_journey_failure{{else}}heartbeat_failure{{/eq}}{{/eq}}",
-  "notification_channels": [
-    {{#contains TAGS 'critical'}}"pagerduty",{{/contains}}
-    {{#eq ALERT_TYPE 'ALERT_FAILURE'}}"slack",{{/eq}}
-    "email"
-  ],
-  "auto_assign": {{#and (contains TAGS 'payment') (eq ALERT_TYPE 'ALERT_FAILURE')}}true{{else}}false{{/and}},
-  "sla_impact": "{{#contains TAGS 'customer-facing'}}high{{else}}{{#contains TAGS 'internal'}}low{{else}}medium{{/contains}}{{/contains}}"
-}
-```
-
-## Webhook Security
-
-### Cryptographic Signatures
-Verify webhook authenticity using SHA256 signatures:
-
-```javascript
-// Node.js webhook verification
-const crypto = require('crypto')
-
-function verifyChecklyWebhook(payload, signature, secret) {
+function isVerifiedPayload (payload, signature) {
+  const secret = process.env.CHECKLY_WEBHOOK_SECRET
   const hmac = crypto.createHmac('sha256', secret)
   const digest = hmac.update(payload).digest('hex')
-  
-  return crypto.timingSafeEqual(
-    Buffer.from(digest),
-    Buffer.from(signature)
-  )
+  return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(signature))
 }
 
-// Express.js webhook handler
-app.post('/checkly-webhook', express.raw({type: 'application/json'}), (req, res) => {
-  const signature = req.headers['x-checkly-signature']
-  const timestamp = req.headers['x-checkly-timestamp']
-  const payload = req.body
-  
-  // Verify signature
-  if (!verifyChecklyWebhook(payload, signature, process.env.CHECKLY_WEBHOOK_SECRET)) {
-    return res.status(401).send('Invalid signature')
+app.post('/webhook', bodyParser.json({ type: 'application/json' }), (request, response) => {
+
+  const signature = request.headers['x-checkly-signature'];
+  const payload = JSON.stringify(request.body)
+
+  if (isVerifiedPayload(payload, signature)) {
+    console.log('Signature is valid')
+    response.status(200).send();
+  } else {
+    console.error('Signature does not match')
+    response.status(400).send();
   }
-  
-  // Verify timestamp (prevent replay attacks)
-  const webhookTime = parseInt(timestamp)
-  const currentTime = Math.floor(Date.now() / 1000)
-  
-  if (Math.abs(currentTime - webhookTime) > 300) { // 5 minutes tolerance
-    return res.status(401).send('Timestamp too old')
-  }
-  
-  // Process verified webhook
-  const alertData = JSON.parse(payload)
-  handleAlert(alertData)
-  
-  res.status(200).send('OK')
-})
+});
+
+app.listen(4242, () => console.log('Running on port 4242'))
 ```
 
-### Webhook Security in Other Languages
+```ruby Ruby
+# We store the webhook secret in an environment variable called CHECKLY_WEBHOOK_SECRET
+require 'sinatra'
 
-<Steps>
-<Step title="Ruby Implementation">
-```ruby
-require 'openssl'
-require 'rack'
+set :port, 4242
 
-def verify_checkly_webhook(payload, signature, secret)
-  digest = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), secret, payload)
-  Rack::Utils.secure_compare(digest, signature)
-end
-
-# Sinatra webhook handler
-post '/checkly-webhook' do
+post '/webhook' do
   signature = request.env['HTTP_X_CHECKLY_SIGNATURE']
-  timestamp = request.env['HTTP_X_CHECKLY_TIMESTAMP']
   payload = request.body.read
-  
-  unless verify_checkly_webhook(payload, signature, ENV['CHECKLY_WEBHOOK_SECRET'])
-    halt 401, 'Invalid signature'
+  digest = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), ENV['CHECKLY_WEBHOOK_SECRET'], payload)
+
+  if Rack::Utils.secure_compare(digest, signature)  	
+    status 200
+    return
+  else
+    status 400
+    return
   end
-  
-  # Verify timestamp
-  webhook_time = timestamp.to_i
-  current_time = Time.now.to_i
-  
-  if (current_time - webhook_time).abs > 300
-    halt 401, 'Timestamp too old'
-  end
-  
-  # Process webhook
-  alert_data = JSON.parse(payload)
-  handle_alert(alert_data)
-  
-  status 200
 end
 ```
-</Step>
 
-<Step title="Python Implementation">
-```python
+```python Python
+# This example assumes you use Django
 import hmac
-import hashlib
-import time
-import json
+from hashlib import sha256
+
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
-
-def verify_checkly_webhook(payload, signature, secret):
-    mac = hmac.new(
-        secret.encode('utf-8'),
-        msg=payload,
-        digestmod=hashlib.sha256
-    )
-    return hmac.compare_digest(mac.hexdigest(), signature)
+from django.utils.encoding import force_bytes
+import json
 
 @csrf_exempt
-def checkly_webhook(request):
+def webhook(request):
     signature = request.META.get('HTTP_X_CHECKLY_SIGNATURE')
-    timestamp = request.META.get('HTTP_X_CHECKLY_TIMESTAMP')
-    payload = request.body
-    
-    if not verify_checkly_webhook(payload, signature, settings.CHECKLY_WEBHOOK_SECRET):
-        return HttpResponseBadRequest('Invalid signature')
-    
-    # Verify timestamp
-    webhook_time = int(timestamp)
-    current_time = int(time.time())
-    
-    if abs(current_time - webhook_time) > 300:
-        return HttpResponseBadRequest('Timestamp too old')
-    
-    # Process webhook
-    alert_data = json.loads(payload)
-    handle_alert(alert_data)
-    
-    return HttpResponse('OK')
+    mac = hmac.new(settings.CHECKLY_WEBHOOK_SECRET.encode('utf-8'), msg=request.body, digestmod=sha256)
+    print(mac.hexdigest())
+    if not hmac.compare_digest(mac.hexdigest(), signature):
+        return HttpResponseBadRequest()
+
+    return HttpResponse()
 ```
-</Step>
 
-<Step title="Go Implementation">
-```go
-package main
+</CodeGroup>
 
-import (
-    "crypto/hmac"
-    "crypto/sha256"
-    "encoding/hex"
-    "encoding/json"
-    "math"
-    "net/http"
-    "os"
-    "strconv"
-    "time"
-)
+## Webhook retries
 
-func verifyChecklyWebhook(payload []byte, signature, secret string) bool {
-    mac := hmac.New(sha256.New, []byte(secret))
-    mac.Write(payload)
-    expectedSignature := hex.EncodeToString(mac.Sum(nil))
-    return hmac.Equal([]byte(signature), []byte(expectedSignature))
-}
+Checkly will retry your webhook up to **5 times** if we get an HTTP response higher than 399, e.g. a 404 or 503. Each retry
+is backed off 20 seconds for a total retry period of `5 * 20 = 100 seconds`.
 
-func checklyWebhookHandler(w http.ResponseWriter, r *http.Request) {
-    signature := r.Header.Get("X-Checkly-Signature")
-    timestamp := r.Header.Get("X-Checkly-Timestamp")
-    
-    payload, err := ioutil.ReadAll(r.Body)
-    if err != nil {
-        http.Error(w, "Error reading body", http.StatusBadRequest)
-        return
-    }
-    
-    secret := os.Getenv("CHECKLY_WEBHOOK_SECRET")
-    if !verifyChecklyWebhook(payload, signature, secret) {
-        http.Error(w, "Invalid signature", http.StatusUnauthorized)
-        return
-    }
-    
-    // Verify timestamp
-    webhookTime, _ := strconv.ParseInt(timestamp, 10, 64)
-    currentTime := time.Now().Unix()
-    
-    if math.Abs(float64(currentTime-webhookTime)) > 300 {
-        http.Error(w, "Timestamp too old", http.StatusUnauthorized)
-        return
-    }
-    
-    // Process webhook
-    var alertData map[string]interface{}
-    json.Unmarshal(payload, &alertData)
-    handleAlert(alertData)
-    
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte("OK"))
+This means that for checks on a 1 minute schedule, there is a potential overlap between a failure alert and recovery alert. For this
+reason every webhook we send has a timestamp in the `x-checkly-timestamp` header. You can use this timestamp on the receiving
+end to ignore any webhooks that come in "late".
+
+## Webhook examples
+
+The following examples give an idea how to integrate Checkly with 3rd party alerting and issue tracking systems.
+
+## OpsGenie
+
+You can create an <a href="https://docs.opsgenie.com/docs/alert-api" target="_blank">OpsGenie</a> alert by POST-ing the following body
+
+```
+{
+  "message": "{{ALERT_TITLE}}",
+  "description": "{{ALERT_TYPE}} <br>{{STARTED_AT}} ({{RESPONSE_TIME}}ms) <br>{{RESULT_LINK}}",
+  "tags": [{{#each TAGS}} "{{this}}" {{#unless @last}},{{/unless}} {{/each}}]
 }
 ```
-</Step>
-</Steps>
 
-## Webhook Retry Logic
+to the OpsGenie `alerts` API endpoint
 
-### Automatic Retry Behavior
-Checkly automatically retries failed webhook deliveries:
-
-```yaml
-Webhook Retry Configuration:
-  Max Retries: 5
-  Retry Trigger: HTTP status >= 400
-  Backoff Strategy: Fixed 20-second intervals
-  Total Retry Duration: 100 seconds (5 × 20s)
-  
-Headers Added:
-  x-checkly-timestamp: Original webhook timestamp
-  x-checkly-retry-count: Current retry attempt number
+```
+https://{{OPSGENIE_API_KEY}}@api.opsgenie.com/v2/alerts
 ```
 
-### Handling Retry Scenarios
-Design your webhook endpoints to handle retries gracefully:
+Or you can add the OpsGenie API key in the headers, e.g.
 
-```javascript
-// Idempotent webhook handler
-const processedWebhooks = new Set()
-
-app.post('/webhook', (req, res) => {
-  const webhookId = req.headers['x-checkly-webhook-id'] || 
-                   `${req.body.CHECK_ID}-${req.body.CHECK_RESULT_ID}`
-  
-  // Check if already processed
-  if (processedWebhooks.has(webhookId)) {
-    console.log(`Webhook ${webhookId} already processed, ignoring`)
-    return res.status(200).send('Already processed')
-  }
-  
-  try {
-    // Process webhook
-    handleAlert(req.body)
-    
-    // Mark as processed
-    processedWebhooks.add(webhookId)
-    
-    res.status(200).send('OK')
-  } catch (error) {
-    console.error('Webhook processing failed:', error)
-    res.status(500).send('Processing failed')
-  }
-})
+```
+Authorization: GenieKey {{OPSGENIE_API_KEY}}
 ```
 
-### Timestamp-Based Ordering
-Handle out-of-order webhook delivery:
-
-```javascript
-// Handle potential ordering issues
-const alertStates = new Map()
-
-app.post('/webhook', (req, res) => {
-  const checkId = req.body.CHECK_ID
-  const timestamp = new Date(req.body.STARTED_AT).getTime()
-  const alertType = req.body.ALERT_TYPE
-  
-  // Get last processed timestamp for this check
-  const lastTimestamp = alertStates.get(checkId) || 0
-  
-  // Ignore webhooks that arrive out of order
-  if (timestamp < lastTimestamp) {
-    console.log(`Ignoring out-of-order webhook for ${checkId}`)
-    return res.status(200).send('Out of order, ignored')
-  }
-  
-  // Update state and process
-  alertStates.set(checkId, timestamp)
-  handleAlert(req.body)
-  
-  res.status(200).send('OK')
-})
-```
-
-## Third-Party Integration Examples
-
-### Jira Issue Creation
-Automatically create Jira tickets for check failures:
+This is an example of a full alert body:
 
 ```json
 {
-  "url": "https://{{JIRA_INSTANCE_URL}}/rest/api/3/issue",
-  "headers": {
-    "Authorization": "Basic {{JIRA_AUTH_TOKEN}}",
-    "Accept": "application/json",
-    "Content-Type": "application/json"
-  },
-  "body": {
-    "fields": {
-      "project": {
-        "key": "{{JIRA_PROJECT_KEY}}"
-      },
-      "summary": "{{ALERT_TITLE}}",
-      "description": {
-        "version": 1,
-        "type": "doc",
-        "content": [
-          {
-            "type": "paragraph",
-            "content": [
-              {
-                "type": "text",
-                "text": "Service Incident Details:\n\n"
-              },
-              {
-                "type": "text",
-                "text": "Check Name: {{CHECK_NAME}}\n",
-                "marks": [{"type": "strong"}]
-              },
-              {
-                "type": "text",
-                "text": "Location: {{RUN_LOCATION}}\n"
-              },
-              {
-                "type": "text",
-                "text": "Response Time: {{RESPONSE_TIME}}ms\n"
-              },
-              {
-                "type": "text",
-                "text": "Error: {{CHECK_ERROR_MESSAGE}}\n\n"
-              },
-              {
-                "type": "text",
-                "text": "View detailed results",
-                "marks": [
-                  {
-                    "type": "link",
-                    "attrs": {
-                      "href": "{{RESULT_LINK}}"
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      "issuetype": {
-        "id": "{{JIRA_ISSUE_TYPE_ID}}"
-      },
-      "priority": {
-        "id": "{{#contains TAGS 'critical'}}1{{else}}{{#contains TAGS 'high'}}2{{else}}3{{/contains}}{{/contains}}"
-      },
-      "labels": [
-        "checkly",
-        "monitoring",
-        "{{#each TAGS}}{{this}}{{#unless @last}},{{/unless}}{{/each}}"
-      ],
-      "customfield_10001": "{{CHECK_ID}}",
-      "assignee": {
-        "id": "{{#contains TAGS 'payment'}}{{PAYMENT_TEAM_LEAD}}{{else}}{{DEFAULT_ASSIGNEE}}{{/contains}}"
-      }
-    }
-  }
-}
-```
-
-### PagerDuty Incident Creation
-Create PagerDuty incidents with detailed context:
-
-```json
-{
-  "url": "https://api.pagerduty.com/incidents",
-  "headers": {
-    "Authorization": "Token token={{PAGERDUTY_API_TOKEN}}",
-    "Accept": "application/vnd.pagerduty+json;version=2",
-    "Content-Type": "application/json",
-    "From": "{{PAGERDUTY_FROM_EMAIL}}"
-  },
-  "body": {
-    "incident": {
-      "type": "incident",
-      "title": "{{ALERT_TITLE}}",
-      "service": {
-        "id": "{{#contains CHECK_NAME 'payment'}}{{PAYMENT_SERVICE_ID}}{{else}}{{DEFAULT_SERVICE_ID}}{{/contains}}",
-        "type": "service_reference"
-      },
-      "priority": {
-        "id": "{{#contains TAGS 'critical'}}{{HIGH_PRIORITY_ID}}{{else}}{{MEDIUM_PRIORITY_ID}}{{/contains}}",
-        "type": "priority_reference"
-      },
-      "urgency": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}high{{else}}low{{/eq}}",
-      "body": {
-        "type": "incident_body",
-        "details": "Check {{CHECK_NAME}} with ID {{CHECK_ID}} has failed from location {{RUN_LOCATION}}.\n\nResponse Time: {{RESPONSE_TIME}}ms\nError: {{CHECK_ERROR_MESSAGE}}\n\nSee check result for details: {{RESULT_LINK}}"
-      },
-      "escalation_policy": {
-        "id": "{{#contains TAGS 'payment'}}{{PAYMENT_ESCALATION_POLICY}}{{else}}{{DEFAULT_ESCALATION_POLICY}}{{/contains}}",
-        "type": "escalation_policy_reference"
-      }
-    }
-  }
-}
-```
-
-### Slack Rich Message Integration
-Send formatted Slack messages with interactive elements:
-
-```json
-{
-  "url": "{{SLACK_WEBHOOK_URL}}",
-  "headers": {
-    "Content-Type": "application/json"
-  },
-  "body": {
-    "text": "{{ALERT_TITLE}}",
-    "blocks": [
-      {
-        "type": "header",
-        "text": {
-          "type": "plain_text",
-          "text": "🚨 {{#eq ALERT_TYPE 'ALERT_FAILURE'}}Service Alert{{else}}{{#eq ALERT_TYPE 'ALERT_RECOVERY'}}Service Recovery{{else}}Performance Warning{{/eq}}{{/eq}}"
+  "message": "{{ALERT_TITLE}}",
+  "description": "{{ALERT_TYPE}}: {{CHECK_NAME}} <br>{{STARTED_AT}} ({{RESPONSE_TIME}}ms) <br>{{RESULT_LINK}}",
+  "responders": [
+        {
+            "id":"4513b7ea-3b91-438f-b7e4-e3e54af9147c",
+            "type":"team"
         }
-      },
-      {
-        "type": "section",
-        "fields": [
-          {
-            "type": "mrkdwn",
-            "text": "*Check:*\n{{CHECK_NAME}}"
-          },
-          {
-            "type": "mrkdwn",
-            "text": "*Location:*\n{{RUN_LOCATION}}"
-          },
-          {
-            "type": "mrkdwn",
-            "text": "*Response Time:*\n{{RESPONSE_TIME}}ms"
-          },
-          {
-            "type": "mrkdwn",
-            "text": "*Status:*\n{{#eq ALERT_TYPE 'ALERT_FAILURE'}}❌ Failed{{else}}{{#eq ALERT_TYPE 'ALERT_RECOVERY'}}✅ Recovered{{else}}⚠️ Degraded{{/eq}}{{/eq}}"
-          }
-        ]
-      },
-      {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": "*Error Details:*\n```{{CHECK_ERROR_MESSAGE}}```"
-        }
-      },
-      {
-        "type": "actions",
-        "elements": [
-          {
-            "type": "button",
-            "text": {
-              "type": "plain_text",
-              "text": "View Results"
-            },
-            "url": "{{RESULT_LINK}}",
-            "style": "primary"
-          },
-          {
-            "type": "button",
-            "text": {
-              "type": "plain_text",
-              "text": "Edit Check"
-            },
-            "url": "https://app.checklyhq.com/checks/{{CHECK_ID}}"
-          }
-        ]
-      }
-    ]
-  }
+  ],
+  "tags": ["Critical", "Production"],
+  "priority":"P1",
+  "note": "Location: {{RUN_LOCATION}}"
 }
 ```
 
-### ServiceNow Incident Creation
-Integrate with ServiceNow for enterprise incident management:
+In case you would like different teams to be responsible for different Check Groups, you could add a `CHECK_GROUP_TEAM` variable with a different value for each Group, then modify the above snippet with the following:
+
+```json
+"responders": [
+      {
+          "id":"{{CHECK_GROUP_TEAM}}",
+          "type":"team"
+      }
+]
+```
+
+## PagerDuty
+
+Given an existing service on your PagerDuty account, create an incident for it by posting the following body
 
 ```json
 {
-  "url": "https://{{SERVICENOW_INSTANCE}}.service-now.com/api/now/table/incident",
-  "headers": {
-    "Authorization": "Basic {{SERVICENOW_AUTH}}",
-    "Accept": "application/json",
-    "Content-Type": "application/json"
-  },
-  "body": {
-    "short_description": "{{ALERT_TITLE}}",
-    "description": "Monitoring Alert Details:\n\nCheck Name: {{CHECK_NAME}}\nCheck ID: {{CHECK_ID}}\nAlert Type: {{ALERT_TYPE}}\nLocation: {{RUN_LOCATION}}\nResponse Time: {{RESPONSE_TIME}}ms\nError Message: {{CHECK_ERROR_MESSAGE}}\n\nResult Link: {{RESULT_LINK}}",
-    "priority": "{{#contains TAGS 'critical'}}1{{else}}{{#contains TAGS 'high'}}2{{else}}3{{/contains}}{{/contains}}",
-    "urgency": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}1{{else}}3{{/eq}}",
-    "impact": "{{#contains TAGS 'customer-facing'}}1{{else}}2{{/contains}}",
-    "category": "Software",
-    "subcategory": "Application",
-    "assignment_group": "{{#contains TAGS 'payment'}}Payment Operations{{else}}Platform Operations{{/contains}}",
-    "caller_id": "{{SERVICENOW_CALLER_ID}}",
-    "u_monitoring_source": "Checkly",
-    "u_check_id": "{{CHECK_ID}}",
-    "u_location": "{{RUN_LOCATION}}"
-  }
-}
-```
-
-### Microsoft Teams Integration
-Send alerts to Microsoft Teams channels:
-
-```json
-{
-  "url": "{{TEAMS_WEBHOOK_URL}}",
-  "headers": {
-    "Content-Type": "application/json"
-  },
-  "body": {
-    "@type": "MessageCard",
-    "@context": "http://schema.org/extensions",
-    "themeColor": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}FF0000{{else}}{{#eq ALERT_TYPE 'ALERT_RECOVERY'}}00FF00{{else}}FFA500{{/eq}}{{/eq}}",
-    "summary": "{{ALERT_TITLE}}",
-    "sections": [
-      {
-        "activityTitle": "{{ALERT_TITLE}}",
-        "activitySubtitle": "Checkly Monitoring Alert",
-        "activityImage": "https://app.checklyhq.com/images/checkly-logo.png",
-        "facts": [
-          {
-            "name": "Check Name",
-            "value": "{{CHECK_NAME}}"
-          },
-          {
-            "name": "Location",
-            "value": "{{RUN_LOCATION}}"
-          },
-          {
-            "name": "Response Time",
-            "value": "{{RESPONSE_TIME}}ms"
-          },
-          {
-            "name": "Timestamp",
-            "value": "{{STARTED_AT}}"
-          }
-        ],
-        "markdown": true
-      }
-    ],
-    "potentialAction": [
-      {
-        "@type": "OpenUri",
-        "name": "View Results",
-        "targets": [
-          {
-            "os": "default",
-            "uri": "{{RESULT_LINK}}"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-## Advanced Webhook Patterns
-
-### Conditional Webhook Routing
-Route different alert types to different endpoints:
-
-```json
-{
-  "url": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}{{INCIDENT_WEBHOOK_URL}}{{else}}{{#eq ALERT_TYPE 'ALERT_SSL'}}{{SECURITY_WEBHOOK_URL}}{{else}}{{GENERAL_WEBHOOK_URL}}{{/eq}}{{/eq}}",
-  "headers": {
-    "Authorization": "Bearer {{#eq ALERT_TYPE 'ALERT_FAILURE'}}{{INCIDENT_TOKEN}}{{else}}{{GENERAL_TOKEN}}{{/eq}}",
-    "Content-Type": "application/json",
-    "X-Alert-Type": "{{ALERT_TYPE}}",
-    "X-Severity": "{{#contains TAGS 'critical'}}high{{else}}medium{{/contains}}"
-  },
-  "body": {
-    "routing_key": "{{#contains TAGS 'payment'}}payment-team{{else}}{{#contains TAGS 'auth'}}security-team{{else}}platform-team{{/contains}}{{/contains}}",
-    "event_type": "{{ALERT_TYPE}}",
-    "payload": "{{json this}}"
-  }
-}
-```
-
-### Webhook Aggregation and Batching
-Combine multiple alerts into summary notifications:
-
-```javascript
-// Webhook aggregation service
-const alertBuffer = new Map()
-const BATCH_INTERVAL = 300000 // 5 minutes
-
-app.post('/aggregate-webhook', (req, res) => {
-  const alert = req.body
-  const checkId = alert.CHECK_ID
-  
-  // Add to buffer
-  if (!alertBuffer.has(checkId)) {
-    alertBuffer.set(checkId, [])
-  }
-  alertBuffer.get(checkId).push(alert)
-  
-  res.status(200).send('Buffered')
-})
-
-// Periodic batch processing
-setInterval(() => {
-  for (const [checkId, alerts] of alertBuffer.entries()) {
-    if (alerts.length > 0) {
-      sendAggregatedAlert(checkId, alerts)
-      alertBuffer.set(checkId, [])
-    }
-  }
-}, BATCH_INTERVAL)
-
-function sendAggregatedAlert(checkId, alerts) {
-  const summary = {
-    check_id: checkId,
-    alert_count: alerts.length,
-    alert_types: [...new Set(alerts.map(a => a.ALERT_TYPE))],
-    time_range: {
-      start: Math.min(...alerts.map(a => new Date(a.STARTED_AT).getTime())),
-      end: Math.max(...alerts.map(a => new Date(a.STARTED_AT).getTime()))
+  "incident": {
+    "type": "incident",
+    "title": "{{ALERT_TITLE}}",
+    "service": {
+      "id": "<YOUR_SERVICE_ID_FROM_PAGERDUTY>",
+      "type": "service_reference"
     },
-    locations: [...new Set(alerts.map(a => a.RUN_LOCATION))],
-    avg_response_time: alerts.reduce((sum, a) => sum + a.RESPONSE_TIME, 0) / alerts.length
-  }
-  
-  // Send aggregated notification
-  sendToSlack(summary)
-}
-```
-
-### Dynamic Webhook Configuration
-Modify webhook behavior based on external conditions:
-
-```json
-{
-  "url": "{{WEBHOOK_BASE_URL}}/{{#eq CHECK_TYPE 'API'}}api-alerts{{else}}{{#eq CHECK_TYPE 'BROWSER'}}ui-alerts{{else}}generic-alerts{{/eq}}{{/eq}}",
-  "headers": {
-    "Authorization": "Bearer {{API_TOKEN}}",
-    "X-Environment": "{{#contains CHECK_NAME 'prod'}}production{{else}}{{#contains CHECK_NAME 'staging'}}staging{{else}}development{{/contains}}{{/contains}}",
-    "X-Business-Hours": "{{#between (dateFormat STARTED_AT 'H') 9 17}}true{{else}}false{{/between}}",
-    "X-Escalation-Level": "{{#gt RESPONSE_TIME 10000}}high{{else}}{{#gt RESPONSE_TIME 5000}}medium{{else}}low{{/gt}}{{/gt}}"
-  },
-  "body": {
-    "metadata": {
-      "check_frequency": "{{#lt 300000 (sub (now) (dateToTimestamp STARTED_AT))}}high{{else}}standard{{/lt}}",
-      "geographic_impact": "{{#gt (length (split RUN_LOCATION ',')) 1}}multi-region{{else}}single-region{{/gt}}",
-      "business_impact": "{{#and (contains TAGS 'customer-facing') (eq ALERT_TYPE 'ALERT_FAILURE')}}high{{else}}low{{/and}}"
+    "body": {
+      "type": "incident_body",
+      "details": "Check {{CHECK_NAME}} with ID {{CHECK_ID}} has failed from location {{RUN_LOCATION}}. See check result for details: {{RESULT_LINK}}"
     }
   }
 }
 ```
 
-<Note>
-Webhooks provide unlimited flexibility for integration scenarios. Start with simple configurations and gradually add complexity as your monitoring and incident response processes mature.
-</Note>
+to `https://api.pagerduty.com/incidents`. You will need to set the following headers:
 
-<Warning>
-Always implement proper error handling and retry logic in your webhook endpoints. Failed webhook processing can result in missed alerts and delayed incident response.
-</Warning>
+![pagerduty incident headers](/docs/images/alerting/webhook-pagerduty-headers.png)
 
-<Tip>
-Use Checkly's webhook testing feature to validate your configurations before deploying them. Test both successful delivery and error scenarios to ensure robust integration.
-</Tip>
+## Pushover
 
-## Webhook Integration and Custom Alerts
-
-### Advanced Webhook Configuration
-Create sophisticated integrations with third-party systems:
+Send a message using [Pushover](https://pushover.net/) by posting this body:
 
 ```json
 {
-  "url": "https://api.incident-system.com/webhooks/{{WEBHOOK_TOKEN}}",
-  "method": "POST",
-  "headers": {
-    "Authorization": "Bearer {{API_TOKEN}}",
-    "Content-Type": "application/json",
-    "X-Checkly-Source": "monitoring"
-  },
-  "body": {
-    "incident": {
-      "title": "{{ALERT_TITLE}}",
-      "severity": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}high{{else}}medium{{/eq}}",
-      "description": "Check {{CHECK_NAME}} failed at {{STARTED_AT}} from {{RUN_LOCATION}}",
-      "metadata": {
-        "check_id": "{{CHECK_ID}}",
-        "response_time": "{{RESPONSE_TIME}}",
-        "result_link": "{{RESULT_LINK}}",
-        "location": "{{RUN_LOCATION}}",
-        "tags": [{{#each TAGS}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}]
-      }
-    }
+  "token":"YOUR_SECRET_TOKEN_FROM_PUSHOVER",
+  "user":"YOUR_USER_FROM_PUSHOVER",
+  "title":"{{ALERT_TITLE}}",
+  "html":1,
+  "priority":2,
+  "retry":30,
+  "expire":10800,
+  "message":"{{ALERT_TYPE}} <br>{{STARTED_AT}} ({{RESPONSE_TIME}}ms) <br>{{RESULT_LINK}}"
+}
+```
+
+
+## Trello
+
+You can create a [Trello](https://trello.com) card using just the URL and no payload:
+
+```
+https://api.trello.com/1/cards?idList=5b28c04aed47522097be8bc4&key={{TRELLO_KEY}}&token={{TRELLO_TOKEN}}&name={{CHECK_NAME}}
+```
+
+## SSL alert
+
+You can send your SSL alerts using webhooks. Using the following body:
+
+```json
+{
+  "message": "{{ALERT_TITLE}}",
+  "link":"{{RESULT_LINK}}"
+}
+```
+
+Will yield the following output, where we customize the `ALERT_TITLE` to include the domain and the days remaining till your
+certificate expires.
+
+```json
+{
+  "message": "The SSL certificate for api.checklyhq.com will expire in 14 days",
+  "link": "http://app-test.checklyhq.com/checks/08437f9c-df8c-45ed-975a-a3f9e24d626d"
+}
+```
+## Twilio
+
+You can configure a webhook to POST to a JavaScript snippet running in a [Twilio Function](https://www.twilio.com/docs/runtime/functions). This code receives the Checkly webhook JSON, then triggers a Twilio "Flow execution":
+
+```js
+//"From" is the sender phone number
+//"To" is the receiver phone number
+exports.handler = async function (context, event, callback) {
+  const { From, To, Event, Link } = event;
+  const client = context.getTwilioClient();
+  try {
+    const execution = await client.studio.flows(FLOW_SID)
+      .executions
+      .create({ to: To, from: From, parameters: { Event, Link } })
+    console.log(`Created execution ${execution.sid}`);
+    return callback(null, "OK");
+  } catch (error) {
+    return callback(error);
+  }
+};
+```
+
+## Jira
+
+A webhook can be used to create a new issue on Jira via the [Jira API](https://developer.atlassian.com/cloud/jira/platform/rest/v3/intro/), for example in the case of a previously passing check that switches to failing state.
+
+We will be creating a POST request to `{{JIRA_INSTANCE_URL}}/rest/api/3/issue`, where the content of your `JIRA_INSTANCE_URL` environment variable would look something like `https://your-jira-instance-name.atlassian.net`.
+
+The required headers will be:
+
+```
+Authorization: Basic <base64 encoded user_email:api_token_string>
+Accept: application/json
+Content-Type: application/json
+```
+
+For more details on authenticating with the Jira API, refer to [Atlassian's guide on basic authentication](https://developer.atlassian.com/cloud/jira/software/basic-auth-for-rest-apis/).
+
+An example body could look as follows:
+
+``` {title="Webhook Body"}
+{
+  "fields": {
+    "description": { // your Jira issue description, using Atlassian Document Format (ADF)
+      "version": 1,
+      "type": "doc",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "text": "View check result",
+              "marks": [
+                {
+                  "type": "link",
+                  "attrs": {
+                    "href": "{{RESULT_LINK}}"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "issuetype": {
+      "id": "10001" // your Jira issue type id
+    },
+    "labels": [
+      "needs_investigation"
+    ],
+    "priority": { // dynamically set the issue priority, based on the check's tags
+      "id": {{#contains TAGS "P1"}} "1"
+        {{else}} {{#contains TAGS "P2"}} "2"
+        {{else}} {{#contains TAGS "P3"}} "3"
+        {{else}} {{#contains TAGS "P4"}} "4"
+        {{else}} {{#contains TAGS "P5"}} "5"
+        {{else}} "3"
+      {{/contains}} {{/contains}} {{/contains}} {{/contains}} {{/contains}}
+    },
+    "project": {
+      "key": "ABC" // your Jira project key
+    },
+    "summary": "{{ALERT_TITLE}}"
   }
 }
 ```
 
-### Webhook Security and Validation
-Ensure webhook authenticity with cryptographic signatures:
+For full details on creating issues via the Jira API, see [Atlassian's documentation for this endpoint](https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-post).
 
-```javascript
-// Verify webhook signature (Node.js example)
-const crypto = require('crypto')
-
-function verifyWebhookSignature(payload, signature, secret) {
-  const hmac = crypto.createHmac('sha256', secret)
-  const digest = hmac.update(payload).digest('hex')
-  return crypto.timingSafeEqual(
-    Buffer.from(digest), 
-    Buffer.from(signature)
-  )
-}
-
-// Express.js webhook handler
-app.post('/checkly-webhook', (req, res) => {
-  const signature = req.headers['x-checkly-signature']
-  const payload = JSON.stringify(req.body)
-  
-  if (verifyWebhookSignature(payload, signature, process.env.WEBHOOK_SECRET)) {
-    // Process validated webhook
-    handleAlert(req.body)
-    res.status(200).send('OK')
-  } else {
-    res.status(401).send('Unauthorized')
-  }
-})
-```
+You can also use version 2 of the Jira API (i.e. `{{JIRA_INSTANCE_URL}}/rest/api/2/issue`). The only difference is that version 2 does not support [Atlassian Document Format (ADF)](https://developer.atlassian.com/cloud/jira/platform/apis/document/structure/).

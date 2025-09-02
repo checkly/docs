@@ -4,229 +4,184 @@ description: 'Learn how to configure Microsoft Teams alert channels with the Che
 sidebarTitle: 'MS Teams Alert Channel'
 ---
 
-Use MSTeamsAlertChannel to send notifications to Microsoft Teams channels when checks fail or recover. Teams alerts help keep your team informed and enable quick collaboration on issues.
+import AlertChannelOptionsTable from '/snippets/alert-channel-options-table.mdx';
 
-<Info>
-Learn more about Microsoft Teams alerts in the [Microsoft Teams documentation](/docs/integrations/alerts/msteams).
-</Info>
+<Tip>
+Learn more about Microsoft Teams alerts in [the Microsoft Teams Alerts documentation](/docs/integrations/alerts/msteams).
+</Tip>
 
-## `MSTeamsAlertChannel` Structure
+Use Microsoft Teams Alert Channels to send notifications to Microsoft Teams channels when checks fail or recover. Teams alerts help keep your team informed and enable quick collaboration on issues.
 
 <CodeGroup>
 
 ```ts Basic Example
-import { MSTeamsAlertChannel } from 'checkly/constructs'
+import { MSTeamsAlertChannel } from "checkly/constructs"
 
-const teamsChannel = new MSTeamsAlertChannel('teams-channel-1', {
-  name: 'Dev Team Alerts',
-  url: 'https://prod-24.westus.logic.azure.com:443/workflows/xxxxx'
+const teamsChannel = new MSTeamsAlertChannel("teams-channel-1", {
+  name: "Dev Team Alerts",
+  url: "https://prod-24.westus.logic.azure.com:443/workflows/xxxxx",
 })
 ```
 
 ```ts Advanced Example
-import { MSTeamsAlertChannel } from 'checkly/constructs'
+import { MSTeamsAlertChannel } from "checkly/constructs"
 
-const teamsChannel = new MSTeamsAlertChannel('advanced-teams-channel', {
-  name: 'Production Monitoring Alerts',
-  url: 'https://prod-24.westus.logic.azure.com:443/workflows/xxxxx',
+const teamsChannel = new MSTeamsAlertChannel("advanced-teams-channel", {
+  name: "Production Monitoring Alerts",
+  url: "https://prod-24.westus.logic.azure.com:443/workflows/xxxxx",
   sendRecovery: true,
   sendFailure: true,
-  sendDegrade: true,
+  sendDegraded: true,
   sslExpiry: true,
-  sslExpiryThreshold: 14
+  sslExpiryThreshold: 14,
 })
 ```
 
 </CodeGroup>
 
-## `MSTeamsAlertChannel` Configuration
+## Configuration
 
 <Tabs>
-  <Tab title="Unique Configuration">
+  <Tab title="Microsoft Teams Alert Channel">
 
 Configure Microsoft Teams-specific settings:
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `name` | `string` | ❌ | - | Friendly name to recognize the integration |
 | `url` | `string` | ✅ | - | Microsoft Teams webhook URL created by the Workflow |
+| `name` | `string` | ❌ | - | Friendly name to recognize the integration |
+| `payload` | `string` | ❌ | - | Custom payload for the alert message |
 
 </Tab>
 
-<Tab title="Shared Configuration">
-Configure common alert channel properties:
+<Tab title="General Alert Channel">
 
-| Property | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `sendRecovery` | `boolean` | ❌ | `true` | Send notifications when checks recover |
-| `sendFailure` | `boolean` | ❌ | `true` | Send notifications when checks fail |
-| `sendDegrade` | `boolean` | ❌ | `false` | Send notifications when checks degrade (API checks only) |
-| `sslExpiry` | `boolean` | ❌ | `false` | Send notifications for SSL certificate expiry |
-| `sslExpiryThreshold` | `number` | ❌ | `30` | Days before SSL expiry to send notification |
+  <AlertChannelOptionsTable />
 
 </Tab>
 </Tabs>
 
-## MS Teams Alert Channel Examples
+## Examples
 
 <Tabs>
   <Tab title="Development Team">
     ```ts
-    import { MSTeamsAlertChannel, ApiCheck } from 'checkly/constructs'
+    import { MSTeamsAlertChannel, ApiCheck } from "checkly/constructs"
 
-    const devTeamsAlert = new MSTeamsAlertChannel('dev-team-alerts', {
-      name: 'Development Team Alerts',
-      url: 'https://prod-24.westus.logic.azure.com:443/workflows/dev-team-webhook'
+    const devTeamsAlert = new MSTeamsAlertChannel("dev-team-alerts", {
+      name: "Development Team Alerts",
+      url: "https://prod-24.westus.logic.azure.com:443/workflows/dev-team-webhook",
     })
 
-    new ApiCheck('dev-api-check', {
-      name: 'Development API Health',
+    new ApiCheck("dev-api-check", {
+      name: "Development API Health",
       alertChannels: [devTeamsAlert],
-      tags: ['development', 'api'],
+      tags: ["development", "api"],
       request: {
-        method: 'GET',
-        url: 'https://dev-api.example.com/health'
-      }
+        method: "GET",
+        url: "https://dev-api.example.com/health",
+      },
     })
     ```
   </Tab>
-  
+
   <Tab title="Operations Team">
     ```ts
-    const opsTeamsAlert = new MSTeamsAlertChannel('ops-team-alerts', {
-      name: 'Operations Team Alerts',
-      url: 'https://prod-24.westus.logic.azure.com:443/workflows/ops-team-webhook',
+    import { ApiCheck, MSTeamsAlertChannel } from "checkly/constructs"
+
+    const opsTeamsAlert = new MSTeamsAlertChannel("ops-team-alerts", {
+      name: "Operations Team Alerts",
+      url: "https://prod-24.westus.logic.azure.com:443/workflows/ops-team-webhook",
       sendRecovery: true,
       sendFailure: true,
-      sendDegrade: true // Ops team wants to know about degraded performance
+      sendDegraded: true, // Ops team wants to know about degraded performance
     })
 
-    new ApiCheck('infrastructure-check', {
-      name: 'Infrastructure Health Check',
+    new ApiCheck("infrastructure-check", {
+      name: "Infrastructure Health Check",
       alertChannels: [opsTeamsAlert],
       maxResponseTime: 5000,
       degradedResponseTime: 2000,
-      tags: ['infrastructure', 'operations'],
+      tags: ["infrastructure", "operations"],
       request: {
-        method: 'GET',
-        url: 'https://infrastructure.example.com/health'
-      }
+        method: "GET",
+        url: "https://infrastructure.example.com/health",
+      },
     })
     ```
   </Tab>
-  
-  <Tab title="Executive Notifications">
-    ```ts
-    const executiveTeams = new MSTeamsAlertChannel('executive-alerts', {
-      name: 'Executive Team Notifications',
-      url: 'https://prod-24.westus.logic.azure.com:443/workflows/executive-webhook',
-      sendFailure: true,
-      sendRecovery: true,
-      sendDegrade: false // Only notify executives of complete failures
-    })
 
-    new ApiCheck('revenue-critical-check', {
-      name: 'Revenue Critical System',
-      alertChannels: [executiveTeams],
-      tags: ['revenue-critical', 'executive-visibility'],
-      request: {
-        method: 'GET',
-        url: 'https://payments.example.com/health'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Security Team">
-    ```ts
-    const securityTeams = new MSTeamsAlertChannel('security-alerts', {
-      name: 'Security Team Alerts',
-      url: 'https://prod-24.westus.logic.azure.com:443/workflows/security-webhook',
-      sendFailure: true,
-      sendRecovery: false,
-      sslExpiry: true,
-      sslExpiryThreshold: 30 // 30 days notice for SSL certificates
-    })
-
-    new ApiCheck('security-endpoint-check', {
-      name: 'Security Endpoint Monitor',
-      alertChannels: [securityTeams],
-      tags: ['security', 'authentication'],
-      request: {
-        method: 'GET',
-        url: 'https://auth.example.com/health'
-      }
-    })
-    ```
-  </Tab>
-  
   <Tab title="Multi-Team Notifications">
     ```ts
-    const devTeams = new MSTeamsAlertChannel('dev-teams', {
-      name: 'Development Team',
-      url: 'https://prod-24.westus.logic.azure.com:443/workflows/dev-webhook'
+    import { ApiCheck, MSTeamsAlertChannel } from "checkly/constructs"
+
+    const devTeams = new MSTeamsAlertChannel("dev-teams", {
+      name: "Development Team",
+      url: "https://prod-24.westus.logic.azure.com:443/workflows/dev-webhook",
     })
 
-    const opsTeams = new MSTeamsAlertChannel('ops-teams', {
-      name: 'Operations Team',
-      url: 'https://prod-24.westus.logic.azure.com:443/workflows/ops-webhook'
+    const opsTeams = new MSTeamsAlertChannel("ops-teams", {
+      name: "Operations Team",
+      url: "https://prod-24.westus.logic.azure.com:443/workflows/ops-webhook",
     })
 
-    const businessTeams = new MSTeamsAlertChannel('business-teams', {
-      name: 'Business Team',
-      url: 'https://prod-24.westus.logic.azure.com:443/workflows/business-webhook',
+    const businessTeams = new MSTeamsAlertChannel("business-teams", {
+      name: "Business Team",
+      url: "https://prod-24.westus.logic.azure.com:443/workflows/business-webhook",
       sendFailure: true,
       sendRecovery: true,
-      sendDegrade: false // Business team only needs to know about failures
+      sendDegraded: false, // Business team only needs to know about failures
     })
 
-    new ApiCheck('multi-team-check', {
-      name: 'Cross-Team Critical Service',
+    new ApiCheck("multi-team-check", {
+      name: "Cross-Team Critical Service",
       alertChannels: [devTeams, opsTeams, businessTeams],
-      tags: ['cross-team', 'critical'],
+      tags: ["cross-team", "critical"],
       request: {
-        method: 'GET',
-        url: 'https://critical-service.example.com/health'
-      }
+        method: "GET",
+        url: "https://critical-service.example.com/health",
+      },
     })
     ```
   </Tab>
-  
+
   <Tab title="Environment-Specific">
     ```ts
-    const prodTeams = new MSTeamsAlertChannel('prod-teams', {
-      name: 'Production Alerts',
-      url: 'https://prod-24.westus.logic.azure.com:443/workflows/prod-webhook'
+    import { ApiCheck, MSTeamsAlertChannel } from "checkly/constructs"
+
+    const prodTeams = new MSTeamsAlertChannel("prod-teams", {
+      name: "Production Alerts",
+      url: "https://prod-24.westus.logic.azure.com:443/workflows/prod-webhook",
     })
 
-    const stagingTeams = new MSTeamsAlertChannel('staging-teams', {
-      name: 'Staging Environment Alerts',
-      url: 'https://prod-24.westus.logic.azure.com:443/workflows/staging-webhook',
-      sendDegrade: true // More tolerant for staging
+    const stagingTeams = new MSTeamsAlertChannel("staging-teams", {
+      name: "Staging Environment Alerts",
+      url: "https://prod-24.westus.logic.azure.com:443/workflows/staging-webhook",
+      sendDegraded: true, // More tolerant for staging
     })
 
     // Production monitoring
-    new ApiCheck('prod-api-check', {
-      name: 'Production API',
+    new ApiCheck("prod-api-check", {
+      name: "Production API",
       alertChannels: [prodTeams],
-      tags: ['production'],
+      tags: ["production"],
       request: {
-        method: 'GET',
-        url: 'https://api.example.com/health'
-      }
+        method: "GET",
+        url: "https://api.example.com/health",
+      },
     })
 
     // Staging monitoring
-    new ApiCheck('staging-api-check', {
-      name: 'Staging API',
+    new ApiCheck("staging-api-check", {
+      name: "Staging API",
       alertChannels: [stagingTeams],
-      tags: ['staging'],
+      tags: ["staging"],
       maxResponseTime: 10000, // More lenient for staging
       degradedResponseTime: 5000,
       request: {
-        method: 'GET',
-        url: 'https://staging-api.example.com/health'
-      }
+        method: "GET",
+        url: "https://staging-api.example.com/health",
+      },
     })
     ```
   </Tab>
@@ -234,55 +189,16 @@ Configure common alert channel properties:
 
 ## Setting Up Microsoft Teams Webhooks
 
-To use Microsoft Teams alert channels, you need to create a Workflow in Teams:
-
-<Tabs>
-  <Tab title="Create Workflow">
-    1. Open Microsoft Teams
-    2. Go to the channel where you want to receive alerts
-    3. Click on "..." (More options) → **Workflows**
-    4. Search for "Post to a channel when a webhook request is received"
-    5. Click **Add workflow**
-    6. Configure the workflow and click **Create flow**
-    7. Copy the webhook URL provided
-  </Tab>
-  
-  <Tab title="Configure Workflow">
-    1. Name your workflow (e.g., "Checkly Alerts")
-    2. Select the Team and Channel
-    3. Customize the message format if needed
-    4. Test the workflow
-    5. Save and activate
-  </Tab>
-  
-  <Tab title="Test Connection">
-    ```ts
-    // Test your Teams webhook
-    const testTeams = new MSTeamsAlertChannel('test-teams', {
-      name: 'Test Teams Channel',
-      url: 'https://prod-24.westus.logic.azure.com:443/workflows/YOUR_WEBHOOK_URL'
-    })
-
-    new ApiCheck('test-check', {
-      name: 'Test Check for Teams',
-      alertChannels: [testTeams],
-      request: {
-        method: 'GET',
-        url: 'https://httpbin.org/status/500' // Will trigger a failure
-      }
-    })
-    ```
-  </Tab>
-</Tabs>
+Find more information on how to set up a Microsoft Teams workflows in [the Microsoft Teams documentation](/docs/integrations/alerts/msteams).
 
 ## Environment Variables
 
 Store your Teams webhook URLs securely using environment variables:
 
 ```ts
-const teamsChannel = new MSTeamsAlertChannel('teams-alerts', {
-  name: 'Team Notifications', 
-  url: process.env.TEAMS_WEBHOOK_URL!
+const teamsChannel = new MSTeamsAlertChannel("teams-alerts", {
+  name: "Team Notifications",
+  url: process.env.TEAMS_WEBHOOK_URL!,
 })
 ```
 
@@ -300,71 +216,3 @@ TEAMS_WEBHOOK_URL=https://prod-24.westus.logic.azure.com:443/workflows/xxxxx
 <Info>
 **Channel Selection**: Choose appropriate Teams channels for different types of alerts. Consider creating dedicated monitoring channels to avoid noise in general discussion channels.
 </Info>
-
-<Tabs>
-  <Tab title="Dedicated Channels">
-    ```ts
-    // Create dedicated channels for different alert types
-    const criticalAlerts = new MSTeamsAlertChannel('critical-teams', {
-      name: 'Critical System Alerts',
-      url: process.env.TEAMS_CRITICAL_WEBHOOK!
-    })
-
-    const warningAlerts = new MSTeamsAlertChannel('warning-teams', {
-      name: 'Warning Level Alerts',
-      url: process.env.TEAMS_WARNING_WEBHOOK!,
-      sendDegrade: true
-    })
-
-    const infoAlerts = new MSTeamsAlertChannel('info-teams', {
-      name: 'Information Alerts',
-      url: process.env.TEAMS_INFO_WEBHOOK!,
-      sendRecovery: true,
-      sendFailure: false // Only recovery notifications
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Team-Based Alerts">
-    ```ts
-    // Different teams get different alerts
-    const frontendTeams = new MSTeamsAlertChannel('frontend-teams', {
-      name: 'Frontend Team Alerts',
-      url: process.env.FRONTEND_TEAMS_WEBHOOK!
-    })
-
-    const backendTeams = new MSTeamsAlertChannel('backend-teams', {
-      name: 'Backend Team Alerts', 
-      url: process.env.BACKEND_TEAMS_WEBHOOK!
-    })
-
-    const infraTeams = new MSTeamsAlertChannel('infra-teams', {
-      name: 'Infrastructure Team Alerts',
-      url: process.env.INFRA_TEAMS_WEBHOOK!,
-      sendDegrade: true // Infrastructure team cares about performance
-    })
-
-    // Frontend service alerts
-    new ApiCheck('frontend-check', {
-      name: 'Frontend Service',
-      alertChannels: [frontendTeams],
-      tags: ['frontend'],
-      request: {
-        method: 'GET',
-        url: 'https://app.example.com/health'
-      }
-    })
-
-    // Backend API alerts
-    new ApiCheck('backend-check', {
-      name: 'Backend API',
-      alertChannels: [backendTeams],
-      tags: ['backend', 'api'],
-      request: {
-        method: 'GET',
-        url: 'https://api.example.com/health'
-      }
-    })
-    ```
-  </Tab>
-</Tabs>

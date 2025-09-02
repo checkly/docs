@@ -4,6 +4,10 @@ description: 'Create custom webhook integrations to send Checkly alerts to any A
 sidebarTitle: 'Webhooks'
 ---
 
+<Tip>
+**Monitoring as Code**: Learn more about the [Webhook Alert Channel Construct](/constructs/webhook-alert-channel).
+</Tip>
+
 Webhooks provide the most flexible way to integrate Checkly with any system that accepts HTTP requests. Create sophisticated integrations with custom endpoints using templating, conditional logic, and security features.
 
 ## Basic Webhook Setup
@@ -55,9 +59,9 @@ Use dynamic variables to create contextual alerts:
 | `{{$RANDOM_NUMBER}}` | Generates a random decimal number between 0 and 1000 (e.g., `345`) |
 | `{{moment}}` | Generates dates/times using **moment.js** with formatting:
 
-  • `{{moment "YYYY-MM-DD"}}` → `2020-08-26`  
-  • `{{moment "2 days ago" "YYYY-MM-DD"}}` → `2020-08-24`  
-  • `{{moment "last week" "X"}}` → `1597924480` |
+- `{{moment "YYYY-MM-DD"}}` → `2020-08-26`
+- `{{moment "2 days ago" "YYYY-MM-DD"}}` → `2020-08-24`
+- `{{moment "last week" "X"}}` → `1597924480`
 
 A practical example of using the `{{moment}}` helper would be setting the pagination options on a typical API endpoint:
 
@@ -145,7 +149,7 @@ post '/webhook' do
   payload = request.body.read
   digest = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), ENV['CHECKLY_WEBHOOK_SECRET'], payload)
 
-  if Rack::Utils.secure_compare(digest, signature)  	
+  if Rack::Utils.secure_compare(digest, signature)
     status 200
     return
   else

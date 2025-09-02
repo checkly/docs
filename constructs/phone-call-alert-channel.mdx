@@ -4,62 +4,58 @@ description: 'Learn how to configure phone call alert channels with the Checkly 
 sidebarTitle: 'Phone Call Alert Channel'
 ---
 
-Use PhoneCallAlertChannel to make voice calls when checks fail or recover. Phone call alerts are the most immediate form of notification, ideal for critical systems requiring instant attention.
+import AlertChannelOptionsTable from '/snippets/alert-channel-options-table.mdx';
 
-<Info>
-Learn more about phone call alerts in the [Phone Calls documentation](/docs/communicate/alerts/channels).
-</Info>
+<Tip>
+Learn more about Phone Call alerts in [the Phone Call Alerts documentation](/docs/integrations/alerts/phone-calls).
+</Tip>
 
-## `PhoneCallAlertChannel` Structure
+Use Phone Call Alerts to make voice calls when checks fail or recover. Phone call alerts are the most immediate form of notification, ideal for critical systems requiring instant attention.
 
 <CodeGroup>
 
 ```ts Basic Example
-import { PhoneCallAlertChannel } from 'checkly/constructs'
+import { PhoneCallAlertChannel } from "checkly/constructs"
 
-const callChannel = new PhoneCallAlertChannel('call-channel-1', {
-  phoneNumber: '+1234567890'
+const callChannel = new PhoneCallAlertChannel("call-channel-1", {
+  phoneNumber: "+1234567890",
+  name: "Tim's phone",
 })
 ```
 
 ```ts Advanced Example
-import { PhoneCallAlertChannel } from 'checkly/constructs'
+import { PhoneCallAlertChannel } from "checkly/constructs"
 
-const emergencyCall = new PhoneCallAlertChannel('emergency-call-channel', {
-  phoneNumber: '+1234567890',
+const emergencyCall = new PhoneCallAlertChannel("emergency-call-channel", {
+  phoneNumber: "+1234567890",
+  name: "Tim's phone",
   sendRecovery: false, // Only call for failures, not recoveries
   sendFailure: true,
-  sendDegrade: false,  // Only for complete failures
+  sendDegraded: false, // Only for complete failures
   sslExpiry: true,
-  sslExpiryThreshold: 3 // Call 3 days before SSL expires
+  sslExpiryThreshold: 3, // Call 3 days before SSL expires
 })
 ```
 
 </CodeGroup>
 
-## `PhoneCallAlertChannel` Configuration
+## Configuration
 
 <Tabs>
-  <Tab title="Unique Configuration">
+  <Tab title="Phone Call Alert Channel">
 
 Configure phone call-specific settings:
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `phoneNumber` | `string` | ✅ | - | Phone number in international format (e.g., +1234567890) |
+| `name` | `string` | ❌ | - | Friendly name for the phone call alert channel (e.g. "Tim's phone") |
 
 </Tab>
 
-<Tab title="Shared Configuration">
-Configure common alert channel properties:
+<Tab title="General Alert Channel">
 
-| Property | Type | Required | Default | Description |
-|----------|------|----------|---------|-------------|
-| `sendRecovery` | `boolean` | ❌ | `true` | Make calls when checks recover |
-| `sendFailure` | `boolean` | ❌ | `true` | Make calls when checks fail |
-| `sendDegrade` | `boolean` | ❌ | `false` | Make calls when checks degrade (API checks only) |
-| `sslExpiry` | `boolean` | ❌ | `false` | Make calls for SSL certificate expiry |
-| `sslExpiryThreshold` | `number` | ❌ | `30` | Days before SSL expiry to make call |
+  <AlertChannelOptionsTable />
 
 </Tab>
 </Tabs>
@@ -69,161 +65,70 @@ Configure common alert channel properties:
 <Tabs>
   <Tab title="Emergency Response">
     ```ts
-    import { PhoneCallAlertChannel, ApiCheck } from 'checkly/constructs'
+    import { PhoneCallAlertChannel, ApiCheck } from "checkly/constructs"
 
-    const emergencyCall = new PhoneCallAlertChannel('emergency-response', {
-      phoneNumber: '+1555EMERGENCY',
+    const emergencyCall = new PhoneCallAlertChannel("emergency-response", {
+      phoneNumber: "+1555EMERGENCY",
       sendFailure: true,
       sendRecovery: false, // Don't call for recoveries
-      sendDegrade: false   // Only complete failures
+      sendDegraded: false, // Only complete failures
     })
 
-    new ApiCheck('life-safety-system', {
-      name: 'Life Safety System',
+    new ApiCheck("life-safety-system", {
+      name: "Life Safety System",
       alertChannels: [emergencyCall],
-      tags: ['life-safety', 'critical'],
+      tags: ["life-safety", "critical"],
       request: {
-        method: 'GET',
-        url: 'https://life-safety.example.com/health'
-      }
+        method: "GET",
+        url: "https://life-safety.example.com/health",
+      },
     })
     ```
   </Tab>
-  
+
   <Tab title="Executive Notifications">
     ```ts
-    const executiveCall = new PhoneCallAlertChannel('executive-call', {
-      phoneNumber: '+1555EXEC', // Executive phone number
+    import { ApiCheck, PhoneCallAlertChannel } from "checkly/constructs"
+
+    const executiveCall = new PhoneCallAlertChannel("executive-call", {
+      phoneNumber: "+1555EXEC", // Executive phone number
       sendFailure: true,
       sendRecovery: true, // Notify of both failures and recoveries
-      sendDegrade: false
+      sendDegraded: false,
     })
 
-    new ApiCheck('revenue-critical-api', {
-      name: 'Revenue Critical API',
+    new ApiCheck("revenue-critical-api", {
+      name: "Revenue Critical API",
       alertChannels: [executiveCall],
-      tags: ['revenue-critical', 'executive-level'],
+      tags: ["revenue-critical", "executive-level"],
       request: {
-        method: 'GET',
-        url: 'https://payments.example.com/health'
-      }
+        method: "GET",
+        url: "https://payments.example.com/health",
+      },
     })
     ```
   </Tab>
-  
-  <Tab title="On-Call Escalation">
-    ```ts
-    const primaryCall = new PhoneCallAlertChannel('primary-oncall-call', {
-      phoneNumber: '+1555PRIMARY'
-    })
 
-    const secondaryCall = new PhoneCallAlertChannel('secondary-oncall-call', {
-      phoneNumber: '+1555SECONDARY'
-    })
-
-    const managerCall = new PhoneCallAlertChannel('manager-call', {
-      phoneNumber: '+1555MANAGER',
-      sendFailure: true,
-      sendRecovery: false // Manager only needs to know about failures
-    })
-
-    new ApiCheck('escalation-api-check', {
-      name: 'Critical System with Escalation',
-      alertChannels: [primaryCall, secondaryCall, managerCall],
-      tags: ['critical', 'escalation'],
-      request: {
-        method: 'GET',
-        url: 'https://critical.example.com/health'
-      }
-    })
-    ```
-  </Tab>
-  
   <Tab title="Security Incident Response">
     ```ts
-    const securityCall = new PhoneCallAlertChannel('security-incident', {
-      phoneNumber: '+1555SECURITY',
+    import { ApiCheck, PhoneCallAlertChannel } from "checkly/constructs"
+
+    const securityCall = new PhoneCallAlertChannel("security-incident", {
+      phoneNumber: "+1555SECURITY",
       sendFailure: true,
       sendRecovery: false,
       sslExpiry: true,
-      sslExpiryThreshold: 1 // Call immediately for SSL expiry
+      sslExpiryThreshold: 1, // Call immediately for SSL expiry
     })
 
-    new ApiCheck('security-endpoint', {
-      name: 'Security Endpoint Monitor',
+    new ApiCheck("security-endpoint", {
+      name: "Security Endpoint Monitor",
       alertChannels: [securityCall],
-      tags: ['security', 'authentication'],
+      tags: ["security", "authentication"],
       request: {
-        method: 'GET',
-        url: 'https://auth.example.com/security-health'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Financial Services">
-    ```ts
-    const tradingCall = new PhoneCallAlertChannel('trading-desk-call', {
-      phoneNumber: '+1555TRADING'
-    })
-
-    const riskCall = new PhoneCallAlertChannel('risk-management-call', {
-      phoneNumber: '+1555RISK'
-    })
-
-    // Trading system monitoring
-    new ApiCheck('trading-system', {
-      name: 'Trading System Health',
-      alertChannels: [tradingCall],
-      tags: ['trading', 'financial'],
-      request: {
-        method: 'GET',
-        url: 'https://trading.example.com/health'
-      }
-    })
-
-    // Risk management system
-    new ApiCheck('risk-system', {
-      name: 'Risk Management System',
-      alertChannels: [riskCall],
-      tags: ['risk', 'financial'],
-      request: {
-        method: 'GET',
-        url: 'https://risk.example.com/health'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Healthcare Systems">
-    ```ts
-    const medicalCall = new PhoneCallAlertChannel('medical-oncall', {
-      phoneNumber: '+1555MEDICAL',
-      sendFailure: true,
-      sendRecovery: true, // Important to know when systems recover
-      sendDegrade: true   // Even degraded performance matters in healthcare
-    })
-
-    new ApiCheck('patient-records-system', {
-      name: 'Patient Records System',
-      alertChannels: [medicalCall],
-      tags: ['healthcare', 'patient-records'],
-      request: {
-        method: 'GET',
-        url: 'https://records.hospital.com/health'
-      }
-    })
-
-    new ApiCheck('medical-devices-api', {
-      name: 'Medical Devices API',
-      alertChannels: [medicalCall],
-      tags: ['healthcare', 'medical-devices'],
-      maxResponseTime: 2000, // Very strict performance requirements
-      degradedResponseTime: 1000,
-      request: {
-        method: 'GET',
-        url: 'https://devices.hospital.com/health'
-      }
+        method: "GET",
+        url: "https://auth.example.com/security-health",
+      },
     })
     ```
   </Tab>
@@ -231,7 +136,11 @@ Configure common alert channel properties:
 
 ## Phone Number Format
 
-Phone call alert channels require phone numbers in international format:
+The phone numbers used for SMS alerting need to be in [E.164 format](https://www.twilio.com/docs/glossary/what-e164). Stick to the following rules and you'll be fine:
+
+- Prepend international access codes with a + sign
+- Do not use any white spaces
+- Use up to 15 characters
 
 <Tabs>
   <Tab title="Correct Format">
@@ -257,66 +166,72 @@ Phone call alert channels require phone numbers in international format:
     })
     ```
   </Tab>
-  
+
   <Tab title="Incorrect Format">
     ```ts
     // ❌ Don't use these formats:
-    
+
     // Missing country code
     phoneNumber: '5551234567'
-    
+
     // With spaces or dashes
     phoneNumber: '+1 555-123-4567'
-    
+
     // With parentheses
     phoneNumber: '+1 (555) 123-4567'
-    
+
     // Domestic format
     phoneNumber: '(555) 123-4567'
     ```
   </Tab>
 </Tabs>
 
-## Combining with Other Alert Methods
+## Combining with Other Alert Channels
 
 Phone calls should be used as part of a comprehensive alerting strategy:
 
 ```ts
-import { PhoneCallAlertChannel, SmsAlertChannel, EmailAlertChannel, SlackAlertChannel } from 'checkly/constructs'
+import {
+  PhoneCallAlertChannel,
+  SmsAlertChannel,
+  EmailAlertChannel,
+  SlackAlertChannel,
+  ApiCheck,
+} from "checkly/constructs"
 
 // Layered alerting approach
-const teamSlack = new SlackAlertChannel('team-slack', {
-  url: new URL('https://hooks.slack.com/services/YOUR/WEBHOOK/URL'),
-  channel: '#alerts'
+const teamSlack = new SlackAlertChannel("team-slack", {
+  url: new URL("https://hooks.slack.com/services/YOUR/WEBHOOK/URL"),
+  channel: "#alerts",
 })
 
-const oncallEmail = new EmailAlertChannel('oncall-email', {
-  address: 'oncall@example.com'
+const oncallEmail = new EmailAlertChannel("oncall-email", {
+  address: "oncall@example.com",
 })
 
-const oncallSms = new SmsAlertChannel('oncall-sms', {
-  phoneNumber: '+1555ONCALL'
+const oncallSms = new SmsAlertChannel("oncall-sms", {
+  phoneNumber: "+1555ONCALL",
 })
 
-const emergencyCall = new PhoneCallAlertChannel('emergency-call', {
-  phoneNumber: '+1555EMERGENCY',
+const emergencyCall = new PhoneCallAlertChannel("emergency-call", {
+  phoneNumber: "+1555EMERGENCY",
   sendFailure: true,
-  sendRecovery: false // Only call for failures
+  sendRecovery: false, // Only call for failures
 })
 
-new ApiCheck('comprehensive-alerting', {
-  name: 'Critical System with Comprehensive Alerting',
+new ApiCheck("comprehensive-alerting", {
+  name: "Critical System with Comprehensive Alerting",
   alertChannels: [
-    teamSlack,      // Immediate team visibility
-    oncallEmail,    // Documentation and detail
-    oncallSms,      // Mobile notification
-    emergencyCall   // Immediate voice alert
+    teamSlack, // Immediate team visibility
+    oncallEmail, // Documentation and detail
+    oncallSms, // Mobile notification
+    emergencyCall, // Immediate voice alert
   ],
-  tags: ['critical', 'comprehensive'],
+  tags: ["critical", "comprehensive"],
   request: {
-    method: 'GET',
-    url: 'https://critical.example.com/health'
-  }
+    method: "GET",
+    url: "https://critical.example.com/health",
+  },
 })
 ```
 
@@ -329,90 +244,3 @@ new ApiCheck('comprehensive-alerting', {
 <Info>
 **Recovery Notifications**: Consider whether recovery calls are necessary. For some critical systems, knowing when the system recovers is as important as knowing when it fails.
 </Info>
-
-<Tabs>
-  <Tab title="Critical Systems Only">
-    ```ts
-    // Only use calls for systems where immediate response is critical
-    const criticalCall = new PhoneCallAlertChannel('critical-only', {
-      phoneNumber: '+1555CRITICAL',
-      sendFailure: true,
-      sendRecovery: false, // Reduce call frequency
-      sendDegrade: false   // Only complete failures
-    })
-
-    new ApiCheck('mission-critical-system', {
-      name: 'Mission Critical System',
-      alertChannels: [criticalCall],
-      tags: ['mission-critical', 'immediate-response'],
-      request: {
-        method: 'GET',
-        url: 'https://mission-critical.example.com/health'
-      }
-    })
-    ```
-  </Tab>
-  
-  <Tab title="Time-Based Alerting">
-    ```ts
-    // Different alerting during business hours vs. off-hours
-    const businessHoursCall = new PhoneCallAlertChannel('business-hours', {
-      phoneNumber: '+1555BUSINESS'
-    })
-
-    const afterHoursCall = new PhoneCallAlertChannel('after-hours', {
-      phoneNumber: '+1555AFTERHOURS'
-    })
-
-    // You might use different checks or logic to determine which channel to use
-    // based on time of day or other factors
-    ```
-  </Tab>
-  
-  <Tab title="Gradual Escalation">
-    ```ts
-    // Start with less intrusive methods, escalate to calls
-    const teamEmail = new EmailAlertChannel('team-email', {
-      address: 'team@example.com'
-    })
-
-    const urgentSms = new SmsAlertChannel('urgent-sms', {
-      phoneNumber: '+1555SMS'
-    })
-
-    const emergencyCall = new PhoneCallAlertChannel('emergency-call', {
-      phoneNumber: '+1555CALL'
-    })
-
-    // Less critical: email only
-    new ApiCheck('standard-service', {
-      name: 'Standard Service',
-      alertChannels: [teamEmail],
-      request: {
-        method: 'GET',
-        url: 'https://api.example.com/standard'
-      }
-    })
-
-    // Important: email + SMS
-    new ApiCheck('important-service', {
-      name: 'Important Service',
-      alertChannels: [teamEmail, urgentSms],
-      request: {
-        method: 'GET',
-        url: 'https://api.example.com/important'
-      }
-    })
-
-    // Critical: all methods including phone call
-    new ApiCheck('critical-service', {
-      name: 'Critical Service',
-      alertChannels: [teamEmail, urgentSms, emergencyCall],
-      request: {
-        method: 'GET',
-        url: 'https://api.example.com/critical'
-      }
-    })
-    ```
-  </Tab>
-</Tabs>

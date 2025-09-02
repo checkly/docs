@@ -63,9 +63,10 @@
 - Relative paths for internal links
 
 ## Component usage rules
-- Prerequisites MUST be wrapped in an Accordion component with title "Prerequisites" or "Before you begin"
-- Use Steps component for sequential procedures
-- Use CardGroup for navigation to related content
+- Prerequisites Should Always be wrapped in an Accordion component with title "Prerequisites" or "Before you begin"
+- Use Steps component for sequential procedures sparingly.
+- Don't use Cards to display information. Only for navigation on Overview type pages
+- Use CodeGroups and Dropdowns for code examples that show the same example in different languages
 - Use Note/Tip/Warning callouts appropriately
 
 ## Git workflow

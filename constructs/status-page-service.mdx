@@ -4,58 +4,79 @@ description: 'Learn how to configure status page services with the Checkly CLI.'
 sidebarTitle: 'Status Page Service'
 ---
 
-Use StatusPageService to create service definitions that can be displayed on status pages. Services represent individual components or systems that you want to show uptime information for.
+<Tip>
+Learn more about Status Pages in [the Status Pages overview](/docs/communicate/status-pages/overview).
+</Tip>
 
-<Info>
-Learn more about status page services in the [Status Pages documentation](/docs/communicate/status-pages/).
-</Info>
-
-## `StatusPageService` Structure
+Use Status Page Services to allow monitors and checks to trigger incidents and to be displayed on status pages. Services represent individual components or systems that you want to show uptime information for.
 
 <CodeGroup>
 
 ```ts Basic Example
-import { StatusPageService } from 'checkly/constructs'
+import { StatusPage, StatusPageService } from "checkly/constructs"
 
-const apiService = new StatusPageService('api-service', {
-  name: 'API Service'
+const apiService = new StatusPageService("api-service", {
+  name: "API Service",
+})
+
+new StatusPage("company-status", {
+  name: "Company Status",
+  url: "company-status",
+  cards: [
+    {
+      name: "Core Services",
+      services: [apiService],
+    },
+  ],
 })
 ```
 
-```ts Multiple Services
-import { StatusPageService, StatusPage } from 'checkly/constructs'
+```ts Complete Example
+import { BrowserCheck, StatusPage, StatusPageService } from "checkly/constructs"
 
-const webApp = new StatusPageService('web-app', {
-  name: 'Web Application'
+const webService = new StatusPageService("web-app", {
+  name: "Web Application",
 })
 
-const mobileApi = new StatusPageService('mobile-api', {
-  name: 'Mobile API'
+new BrowserCheck("homepage-check", {
+  name: "Homepage Check",
+  code: {
+    entrypoint: "home.spec.ts",
+  },
+  triggerIncident: {
+    // trigger an incident by using a status page service
+    service: webService,
+    severity: "MEDIUM",
+    name: "Homepage Disruption",
+    description: "The homepage check has failed.",
+    notifySubscribers: true,
+  },
 })
 
-const database = new StatusPageService('database', {
-  name: 'Database'
-})
-
-// Use services in a status page
-new StatusPage('company-status', {
-  name: 'Company Status',
-  url: 'company-status',
+new StatusPage("acme-status", {
+  name: "A.C.M.E Status",
+  url: "acme-status",
+  customDomain: "status.acme.com",
+  logo: "https://acme.com/logo.png",
+  redirectTo: "https://acme.com",
+  favicon: "https://acme.com/favicon.ico",
+  defaultTheme: "DARK",
   cards: [
+    // add a status page service to a status page
     {
-      name: 'Core Services',
-      services: [webApp, mobileApi, database]
-    }
-  ]
+      name: "User-Facing Services",
+      services: [webService],
+    },
+  ],
 })
 ```
 
 </CodeGroup>
 
-## Options
+## Configuration
 
 <Tabs>
-<Tab title="Unique Options">
+<Tab title="Status Page Service">
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
@@ -64,65 +85,18 @@ new StatusPage('company-status', {
 </Tab>
 </Tabs>
 
-## Unique Options
+## `StatusPageService` Options
 
 <ResponseField name="name" type="string" required>
 Display name for the service on the status page. This name appears in the status page cards and helps users identify which service component is being monitored.
 
-### Usage
+**Usage:**
+
 ```ts
-new StatusPageService('api-service', {
-  name: 'API Service'
+new StatusPageService("api-service", {
+  name: "API Service",
 })
 ```
-
-### Examples
-
-<CodeGroup>
-
-```ts Clear Service Names
-const userAuth = new StatusPageService('user-auth', {
-  name: 'User Authentication' // Clear, descriptive name
-})
-
-const paymentApi = new StatusPageService('payment-api', {
-  name: 'Payment Processing API' // Specific functionality
-})
-
-const database = new StatusPageService('main-db', {
-  name: 'Primary Database' // Infrastructure component
-})
-```
-
-```ts Customer-Friendly Names
-const webApp = new StatusPageService('web-application', {
-  name: 'Web Application' // User-facing service
-})
-
-const mobileApp = new StatusPageService('mobile-app', {
-  name: 'Mobile App' // Customer understands impact
-})
-
-const emailService = new StatusPageService('email-notifications', {
-  name: 'Email Notifications' // Clear user impact
-})
-```
-
-```ts Regional Services
-const usEast = new StatusPageService('us-east-api', {
-  name: 'US East API' // Regional identifier
-})
-
-const europe = new StatusPageService('europe-api', {
-  name: 'Europe API' // Consistent naming pattern
-})
-
-const asiaPacific = new StatusPageService('asia-pacific-api', {
-  name: 'Asia Pacific API' // Geographic clarity
-})
-```
-
-</CodeGroup>
 
 **Use cases**: User-facing service identification, infrastructure monitoring, regional service tracking, team-specific services.
 </ResponseField>
@@ -131,238 +105,114 @@ const asiaPacific = new StatusPageService('asia-pacific-api', {
 
 <CodeGroup>
 
-```ts API Services
-import { StatusPageService } from 'checkly/constructs'
+```ts Application Status
+import { ApiCheck, StatusPage, StatusPageService } from "checkly/constructs"
 
-const restApi = new StatusPageService('rest-api', {
-  name: 'REST API'
+// Define status page services
+const webAppService = new StatusPageService("web-app", {
+  name: "Web Application",
 })
 
-const graphqlApi = new StatusPageService('graphql-api', {
-  name: 'GraphQL API'
-})
-
-const webhookApi = new StatusPageService('webhook-api', {
-  name: 'Webhook API'
-})
-
-const authApi = new StatusPageService('auth-api', {
-  name: 'Authentication API'
-})
-```
-
-```ts Infrastructure Services
-const database = new StatusPageService('primary-database', {
-  name: 'Primary Database'
-})
-
-const cache = new StatusPageService('redis-cache', {
-  name: 'Redis Cache'
-})
-
-const messageQueue = new StatusPageService('message-queue', {
-  name: 'Message Queue'
-})
-
-const fileStorage = new StatusPageService('file-storage', {
-  name: 'File Storage'
-})
-
-const cdn = new StatusPageService('cdn', {
-  name: 'Content Delivery Network'
-})
-```
-
-```ts User-Facing Services
-const webApplication = new StatusPageService('web-app', {
-  name: 'Web Application'
-})
-
-const mobileApp = new StatusPageService('mobile-app', {
-  name: 'Mobile Application'
-})
-
-const customerPortal = new StatusPageService('customer-portal', {
-  name: 'Customer Portal'
-})
-
-const adminDashboard = new StatusPageService('admin-dashboard', {
-  name: 'Admin Dashboard'
-})
-```
-
-```ts Third-Party Integrations
-const paymentProcessing = new StatusPageService('payment-processing', {
-  name: 'Payment Processing'
-})
-
-const emailDelivery = new StatusPageService('email-delivery', {
-  name: 'Email Delivery'
-})
-
-const smsNotifications = new StatusPageService('sms-notifications', {
-  name: 'SMS Notifications'
-})
-
-const socialLogin = new StatusPageService('social-login', {
-  name: 'Social Media Login'
-})
-```
-
-```ts Regional Services
-const usEastService = new StatusPageService('us-east-api', {
-  name: 'US East API'
-})
-
-const usWestService = new StatusPageService('us-west-api', {
-  name: 'US West API'
-})
-
-const europeService = new StatusPageService('europe-api', {
-  name: 'Europe API'
-})
-
-const asiaPacificService = new StatusPageService('asia-pacific-api', {
-  name: 'Asia Pacific API'
-})
-```
-
-```ts E-commerce Services
-const productCatalog = new StatusPageService('product-catalog', {
-  name: 'Product Catalog'
-})
-
-const shoppingCart = new StatusPageService('shopping-cart', {
-  name: 'Shopping Cart'
-})
-
-const checkout = new StatusPageService('checkout', {
-  name: 'Checkout Process'
-})
-
-const orderTracking = new StatusPageService('order-tracking', {
-  name: 'Order Tracking'
-})
-
-const inventory = new StatusPageService('inventory-management', {
-  name: 'Inventory Management'
-})
-```
-
-</CodeGroup>
-
-## Organizing Services in Status Pages
-
-Services can be organized into logical groups using cards on status pages:
-
-<CodeGroup>
-
-```ts By Function
-import { StatusPage, StatusPageService } from 'checkly/constructs'
-
-// Define services
-const webApp = new StatusPageService('web-app', {
-  name: 'Web Application'
-})
-
-const mobileApi = new StatusPageService('mobile-api', {
-  name: 'Mobile API'
-})
-
-const database = new StatusPageService('database', {
-  name: 'Database'
-})
-
-const cache = new StatusPageService('cache', {
-  name: 'Cache Layer'
-})
-
-// Organize by function
-new StatusPage('functional-status', {
-  name: 'Service Status by Function',
-  url: 'functional-status',
+// Include service status on status page
+new StatusPage("saas-company-status", {
+  name: "SaaS Company Service Status",
+  url: "saas-company-status",
+  customDomain: "status.saascompany.com",
+  logo: "https://saascompany.com/assets/logo.png",
+  redirectTo: "https://saascompany.com",
+  favicon: "https://saascompany.com/favicon.ico",
+  defaultTheme: "AUTO",
   cards: [
     {
-      name: 'User-Facing Services',
-      services: [webApp, mobileApi]
+      name: "Core Platform",
+      services: [webAppService],
     },
-    {
-      name: 'Data Layer',
-      services: [database, cache]
-    }
-  ]
+  ],
+})
+
+new ApiCheck("web-api-check", {
+  name: "Web API Check",
+  request: {
+    url: "app.example.com/api/status",
+    method: "GET",
+  },
+  // Trigger service incidents from your checks and monitors
+  triggerIncident: {
+    service: webAppService,
+    name: "Web API Outage",
+    description: "Web API is down",
+    severity: "MAJOR",
+    notifySubscribers: true,
+  },
 })
 ```
 
-```ts By Team
-const frontendApp = new StatusPageService('frontend-app', {
-  name: 'Frontend Application'
+```ts E-commerce Platform
+import { StatusPage, StatusPageService, UrlMonitor } from "checkly/constructs"
+
+// Define services for all the core parts of your infrastructure
+const storefrontService = new StatusPageService("storefront", {
+  name: "Online Store",
 })
 
-const backendApi = new StatusPageService('backend-api', {
-  name: 'Backend API'
+const checkoutApiService = new StatusPageService("checkout-api", {
+  name: "Checkout & Cart",
 })
 
-const paymentService = new StatusPageService('payment-service', {
-  name: 'Payment Service'
+const cdnService = new StatusPageService("cdn", {
+  name: "Image & Asset Delivery",
 })
 
-const notificationService = new StatusPageService('notification-service', {
-  name: 'Notification Service'
-})
-
-// Organize by team ownership
-new StatusPage('team-status', {
-  name: 'Service Status by Team',
-  url: 'team-status',
+new StatusPage("ecommerce-status", {
+  name: "E-commerce Platform Status",
+  url: "ecommerce-platform-status",
+  logo: "https://shop.example.com/logo.png",
+  redirectTo: "https://shop.example.com",
+  defaultTheme: "LIGHT",
+  // Group and display your services in your status page
   cards: [
     {
-      name: 'Frontend Team',
-      services: [frontendApp]
+      name: "Shopping Experience",
+      services: [storefrontService, checkoutApiService],
     },
     {
-      name: 'Backend Team',
-      services: [backendApi]
+      name: "Content Delivery",
+      services: [cdnService],
     },
-    {
-      name: 'Platform Team',
-      services: [paymentService, notificationService]
-    }
-  ]
+  ],
+})
+
+new UrlMonitor("storefront-monitor", {
+  name: "Storefront Monitor",
+  request: {
+    url: "https://shop.example.com",
+  },
+  triggerIncident: {
+    name: "Storefront Uptime",
+    description: "The storefront is down",
+    severity: "MAJOR",
+    notifySubscribers: true,
+    service: storefrontService,
+  },
 })
 ```
 
-```ts By Priority
-const coreApi = new StatusPageService('core-api', {
-  name: 'Core API'
+```ts Minimal Status Page
+import { StatusPage, StatusPageService } from "checkly/constructs"
+
+const mainService = new StatusPageService("main-service", {
+  name: "Main Service",
 })
 
-const authService = new StatusPageService('auth-service', {
-  name: 'Authentication'
-})
-
-const reportingService = new StatusPageService('reporting-service', {
-  name: 'Reporting Service'
-})
-
-const analyticsService = new StatusPageService('analytics-service', {
-  name: 'Analytics Service'
-})
-
-// Organize by business priority
-new StatusPage('priority-status', {
-  name: 'Service Status by Priority',
-  url: 'priority-status',
+new StatusPage("simple-status", {
+  name: "Simple Status Page",
+  url: "simple-status",
   cards: [
     {
-      name: 'Critical Services',
-      services: [coreApi, authService]
+      name: "Service Status",
+      services: [mainService],
     },
-    {
-      name: 'Supporting Services',
-      services: [reportingService, analyticsService]
-    }
-  ]
+  ],
 })
 ```
 
@@ -374,116 +224,79 @@ StatusPageService instances can be reused across multiple status pages:
 
 ```ts
 // Define services once
-const apiService = new StatusPageService('api-service', {
-  name: 'API Service'
+const apiService = new StatusPageService("api-service", {
+  name: "API Service",
 })
 
-const databaseService = new StatusPageService('database-service', {
-  name: 'Database Service'
+const databaseService = new StatusPageService("database-service", {
+  name: "Database Service",
 })
 
 // Use in multiple status pages
-new StatusPage('public-status', {
-  name: 'Public Status Page',
-  url: 'public-status',
+new StatusPage("public-status", {
+  name: "Public Status Page",
+  url: "public-status",
   cards: [
     {
-      name: 'Core Services',
-      services: [apiService, databaseService]
-    }
-  ]
+      name: "Core Services",
+      services: [apiService, databaseService],
+    },
+  ],
 })
 
-new StatusPage('internal-status', {
-  name: 'Internal Status Page',
-  url: 'internal-status',
+new StatusPage("internal-status", {
+  name: "Internal Status Page",
+  url: "internal-status",
   cards: [
     {
-      name: 'Infrastructure',
-      services: [databaseService] // Same service, different page
+      name: "Infrastructure",
+      services: [databaseService], // Same service, different page
     },
     {
-      name: 'APIs',
-      services: [apiService] // Same service, different page
-    }
-  ]
+      name: "APIs",
+      services: [apiService], // Same service, different page
+    },
+  ],
 })
 ```
 
-## Naming Best Practices
+## Integration with Checks and Monitors
 
-<CodeGroup>
+Status Page Services represent logical groupings of functionality. You'll typically have multiple checks monitoring different aspects of each service, but the service itself provides a high-level view for your status page visitors. Enable checks and monitors to trigger incidents by using the `triggerIncident` property.
 
-```ts Clear and Descriptive
-// Good: Clear and specific
-const userAuthenticationApi = new StatusPageService('user-auth-api', {
-  name: 'User Authentication API'
+```ts highlight=12,27
+import { ApiCheck, StatusPageService, UrlMonitor } from "checkly/constructs"
+
+const criticalAppService = new StatusPageService("critical-app-service", {
+  name: "Critical Application Infrastructure",
 })
 
-const orderProcessingService = new StatusPageService('order-processing', {
-  name: 'Order Processing Service'
+new UrlMonitor("storefront-monitor", {
+  name: "Storefront Monitor",
+  request: {
+    url: "https://shop.example.com",
+  },
+  triggerIncident: {
+    name: "Storefront Uptime",
+    description: "The storefront is down",
+    severity: "MAJOR",
+    notifySubscribers: true,
+    service: criticalAppService,
+  },
 })
 
-// Avoid: Vague or technical
-const service1 = new StatusPageService('svc-1', {
-  name: 'Service 1'
-})
-```
-
-```ts Customer-Friendly Names
-// Good: Customer understands the impact
-const webApplication = new StatusPageService('web-app', {
-  name: 'Web Application'
-})
-
-const mobileApp = new StatusPageService('mobile-app', {
-  name: 'Mobile App'
-})
-
-const emailNotifications = new StatusPageService('email-notifications', {
-  name: 'Email Notifications'
-})
-
-// Avoid: Technical jargon
-const kubePods = new StatusPageService('k8s-pods', {
-  name: 'Kubernetes Pods'
-})
-```
-
-```ts Consistent Naming
-// Good: Consistent pattern
-const usEastApi = new StatusPageService('us-east-api', {
-  name: 'US East API'
-})
-
-const usWestApi = new StatusPageService('us-west-api', {
-  name: 'US West API'
-})
-
-const europeApi = new StatusPageService('europe-api', {
-  name: 'Europe API'
-})
-
-// Avoid: Inconsistent naming
-const eastCoast = new StatusPageService('east-api', {
-  name: 'East Coast'
-})
-
-const westRegion = new StatusPageService('west-region-api', {
-  name: 'Western Region API'
+new ApiCheck("web-api-check", {
+  name: "Web API Check",
+  request: {
+    url: "app.example.com/api/status",
+    method: "GET",
+  },
+  triggerIncident: {
+    service: criticalAppService,
+    name: "Web API Outage",
+    description: "Web API is down",
+    severity: "MAJOR",
+    notifySubscribers: true,
+  },
 })
 ```
-
-</CodeGroup>
-
-<Info>
-**Service Names**: Use clear, customer-friendly names that help users understand which part of your service might be affected.
-</Info>
-
-<Warning>
-**Logical IDs**: Keep logical IDs stable across deployments. Changing a service's logical ID will create a new service and lose historical data.
-</Warning>
-
-## Integration with Checks
-
-StatusPageServices represent logical groupings of functionality. You'll typically have multiple checks monitoring different aspects of each service, but the service itself provides a high-level view for your status page visitors.

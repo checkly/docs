@@ -1,67 +1,70 @@
 ---
-title: 'RetryStrategy Construct'
+title: 'RetryStrategyBuilder Construct'
 description: 'Learn how to configure retry strategies with the Checkly CLI.'
 sidebarTitle: 'Retry Strategy'
 ---
 
-Use RetryStrategy to configure automatic retries for failed check runs. This helps reduce false positives and ensures that temporary network issues don't trigger unnecessary alerts.
+<Tip>
+Learn more about retry strategies in [the Alert Retries overview](/docs/communicate/alerts/retries).
+</Tip>
+
+Use retry strategies to configure automatic retries for failed check runs. This helps reduce false positives and ensures that temporary network issues don't trigger unnecessary alerts.
 
 <Accordion title="Prerequisites">
 Before configuring retry strategies, ensure you have:
 
-- A Checkly CLI project initialized with `npx checkly init`
+- An initialized Checkly CLI project
 - Understanding of your service's reliability characteristics and expected failure patterns
 - Knowledge of appropriate retry intervals for your specific use case
 - Awareness of how retries affect alert timing and incident response workflows
 
-For additional setup information, see [CLI overview](/cli/overview) and [Retries documentation](/docs/communicate/alerts/configuration).
+For additional setup information, see [CLI overview](/cli/overview).
 </Accordion>
-
-## `RetryStrategy` Structure
 
 <CodeGroup>
 
-```ts Linear Strategy
-import { ApiCheck, RetryStrategyBuilder } from 'checkly/constructs'
+```ts Linear Strategy highlight={5-9}
+import { ApiCheck, RetryStrategyBuilder } from "checkly/constructs"
 
-new ApiCheck('retrying-check', {
-  name: 'Check With Linear Retries',
+new ApiCheck("retrying-check", {
+  name: "Check With Linear Retries",
   retryStrategy: RetryStrategyBuilder.linearStrategy({
     baseBackoffSeconds: 30,
     maxRetries: 4,
-    sameRegion: false
+    sameRegion: false,
   }),
   request: {
-    method: 'GET',
-    url: 'https://api.example.com/health'
-  }
+    method: "GET",
+    url: "https://api.example.com/health",
+  },
 })
 ```
 
-```ts Exponential Strategy
-import { ApiCheck, RetryStrategyBuilder } from 'checkly/constructs'
+```ts Exponential Strategy highlight={5-9}
+import { ApiCheck, RetryStrategyBuilder } from "checkly/constructs"
 
-new ApiCheck('exponential-retry-check', {
-  name: 'Check With Exponential Backoff',
+new ApiCheck("exponential-retry-check", {
+  name: "Check With Exponential Backoff",
   retryStrategy: RetryStrategyBuilder.exponentialStrategy({
     baseBackoffSeconds: 5,
     maxRetries: 3,
     maxDurationSeconds: 300,
-    sameRegion: true
+    sameRegion: true,
   }),
   request: {
-    method: 'GET',
-    url: 'https://api.example.com/unstable-endpoint'
-  }
+    method: "GET",
+    url: "https://api.example.com/unstable-endpoint",
+  },
 })
 ```
 
 </CodeGroup>
 
-## Options
+## Configuration
 
-<Tabs>
-<Tab title="Unique Options">
+### Retry Strategy Methods
+
+Use the `RetryStrategyBuilder` methods to apply different retry strategies to your checks and monitors.
 
 | Method | Description | Use Case |
 |--------|-------------|----------|
@@ -70,58 +73,21 @@ new ApiCheck('exponential-retry-check', {
 | `linearStrategy(options)` | Linearly increasing intervals (e.g., 5s, 10s, 15s) | Gradual backoff |
 | `exponentialStrategy(options)` | Exponentially increasing intervals (e.g., 5s, 25s, 125s) | Aggressive backoff for overloaded services |
 
-</Tab>
-<Tab title="Common Options">
-
-All retry strategy methods accept the same configuration options:
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `baseBackoffSeconds` | `number` | ❌ | `60` | Time to wait before first retry (also used for calculations) |
-| `maxRetries` | `number` | ❌ | `2` | Maximum number of retry attempts (1-10) |
-| `maxDurationSeconds` | `number` | ❌ | `600` | Maximum total time to spend retrying (max 600s) |
-| `sameRegion` | `boolean` | ❌ | `true` | Whether retries run in the same region as the failed check |
-
-</Tab>
-<Tab title="Global Options">
-
-Retry strategies have no additional global options.
-
-</Tab>
-</Tabs>
-
-## Unique Options
 
 <ResponseField name="noRetries()" type="method">
 Disables all retries for a check. When a check fails, it immediately triggers an alert without attempting any retries.
 
-### Usage
-```ts
-import { RetryStrategyBuilder } from 'checkly/constructs'
+**Usage:**
 
-retryStrategy: RetryStrategyBuilder.noRetries()
-```
-
-### Examples
-```ts
+```ts highlight={4}
 // Critical endpoint that should alert immediately
-new ApiCheck('critical-endpoint', {
-  name: 'Critical Payment API',
+new ApiCheck("critical-endpoint", {
+  name: "Critical Payment API",
   retryStrategy: RetryStrategyBuilder.noRetries(),
   request: {
-    method: 'GET',
-    url: 'https://api.example.com/payments/health'
-  }
-})
-
-// Security-sensitive check
-new ApiCheck('auth-check', {
-  name: 'Authentication Service',
-  retryStrategy: RetryStrategyBuilder.noRetries(),
-  request: {
-    method: 'GET',
-    url: 'https://auth.example.com/health'
-  }
+    method: "GET",
+    url: "https://api.example.com/payments/health",
+  },
 })
 ```
 
@@ -131,29 +97,23 @@ new ApiCheck('auth-check', {
 <ResponseField name="fixedStrategy(options)" type="method">
 Retries with fixed intervals between attempts. Each retry waits the same amount of time as specified by `baseBackoffSeconds`.
 
-### Usage
-```ts
-retryStrategy: RetryStrategyBuilder.fixedStrategy({
-  baseBackoffSeconds: 30,
-  maxRetries: 3,
-  sameRegion: true
-})
-```
+Time between retries with five seconds `baseBackoffSeconds` and three retries: `5s`, `5s`, `5s`.
 
-### Examples
+**Usage:**
 
 <Tabs>
 <Tab title="Stable API">
 
-```ts
+```ts highlight={4-8}
 // Stable API with predictable retry pattern
-new ApiCheck('stable-api', {
-  name: 'Stable API Endpoint',
+new ApiCheck("stable-api", {
+  name: "Stable API Endpoint",
   retryStrategy: RetryStrategyBuilder.fixedStrategy({
     baseBackoffSeconds: 30, // Wait 30s between retries
     maxRetries: 2,
-    sameRegion: true
-  })
+    sameRegion: true,
+  }),
+  /* More options... */
 })
 // Retry pattern: 30s, 30s (total: ~60s)
 ```
@@ -161,15 +121,16 @@ new ApiCheck('stable-api', {
 </Tab>
 <Tab title="Database Check">
 
-```ts
+```ts highlight={4-8}
 // Database connectivity with consistent intervals
-new ApiCheck('database-health', {
-  name: 'Database Health Check',
+new ApiCheck("database-health", {
+  name: "Database Health Check",
   retryStrategy: RetryStrategyBuilder.fixedStrategy({
     baseBackoffSeconds: 45,
     maxRetries: 3,
-    sameRegion: true
-  })
+    sameRegion: true,
+  }),
+  /* More options... */
 })
 // Retry pattern: 45s, 45s, 45s (total: ~135s)
 ```
@@ -181,31 +142,25 @@ new ApiCheck('database-health', {
 </ResponseField>
 
 <ResponseField name="linearStrategy(options)" type="method">
-Retries with linearly increasing intervals. Each subsequent retry waits longer: baseBackoffSeconds × retry_number.
+Retries with linearly increasing intervals. Each subsequent retry waits longer: `baseBackoffSeconds × retry_number`.
 
-### Usage
-```ts
-retryStrategy: RetryStrategyBuilder.linearStrategy({
-  baseBackoffSeconds: 20,
-  maxRetries: 4,
-  sameRegion: false
-})
-```
+Time between retries with five seconds `baseBackoffSeconds` and three retries: `5s`, `10s`, `15s`.
 
-### Examples
+**Usage:**
 
 <Tabs>
 <Tab title="Gradual Backoff">
 
-```ts
+```ts highlight={4-8}
 // API with gradual backoff strategy
-new ApiCheck('gradual-backoff', {
-  name: 'API with Gradual Backoff',
+new ApiCheck("gradual-backoff", {
+  name: "API with Gradual Backoff",
   retryStrategy: RetryStrategyBuilder.linearStrategy({
     baseBackoffSeconds: 15, // First retry after 15s
     maxRetries: 3,
-    sameRegion: false // Try different regions
-  })
+    sameRegion: false, // Try different regions
+  }),
+  /* More options... */
 })
 // Retry pattern: 15s, 30s, 45s (total: ~90s)
 ```
@@ -213,15 +168,16 @@ new ApiCheck('gradual-backoff', {
 </Tab>
 <Tab title="Service Recovery">
 
-```ts
+```ts highlight={4-8}
 // Service that might need time to recover
-new ApiCheck('recovering-service', {
-  name: 'Recovering Service Check',
+new ApiCheck("recovering-service", {
+  name: "Recovering Service Check",
   retryStrategy: RetryStrategyBuilder.linearStrategy({
     baseBackoffSeconds: 30,
     maxRetries: 4,
-    maxDurationSeconds: 300 // Cap at 5 minutes
-  })
+    maxDurationSeconds: 300, // Cap at 5 minutes
+  }),
+  /* More options... */
 })
 // Retry pattern: 30s, 60s, 90s, 120s (total: ~300s)
 ```
@@ -233,51 +189,46 @@ new ApiCheck('recovering-service', {
 </ResponseField>
 
 <ResponseField name="exponentialStrategy(options)" type="method">
-Retries with exponentially increasing intervals. Each retry waits exponentially longer: baseBackoffSeconds × (5^retry_number).
+Retries with exponentially increasing intervals. Each retry waits exponentially longer: `baseBackoffSeconds^retry_number`.
 
-### Usage
-```ts
-retryStrategy: RetryStrategyBuilder.exponentialStrategy({
-  baseBackoffSeconds: 5,
-  maxRetries: 4,
-  maxDurationSeconds: 300
-})
-```
+Time between retries with five seconds `baseBackoffSeconds` and three retries: `5s`, `25s`, `125s`.
 
-### Examples
+**Usage:**
 
 <Tabs>
 <Tab title="Overloaded Service">
 
-```ts
+```ts highlight={4-9}
 // Service that might be overloaded
-new ApiCheck('overloaded-api', {
-  name: 'Potentially Overloaded API',
+new ApiCheck("overloaded-api", {
+  name: "Potentially Overloaded API",
   retryStrategy: RetryStrategyBuilder.exponentialStrategy({
     baseBackoffSeconds: 5, // First retry after 5s
-    maxRetries: 4,
+    maxRetries: 3,
     maxDurationSeconds: 300, // Stop after 5 minutes total
-    sameRegion: true
-  })
+    sameRegion: true,
+  }),
+  /* More options... */
 })
-// Retry pattern: 5s, 25s, 125s, 625s (limited by maxDurationSeconds)
+// Retry pattern: 5s, 25s, 125s
 ```
 
 </Tab>
 <Tab title="Rate-Limited API">
 
-```ts
+```ts highlight={4-9}
 // API with rate limiting
-new ApiCheck('rate-limited-api', {
-  name: 'Rate Limited Service',
+new ApiCheck("rate-limited-api", {
+  name: "Rate Limited Service",
   retryStrategy: RetryStrategyBuilder.exponentialStrategy({
-    baseBackoffSeconds: 10,
-    maxRetries: 3,
+    baseBackoffSeconds: 4,
+    maxRetries: 4,
     maxDurationSeconds: 600,
-    sameRegion: false
-  })
+    sameRegion: false,
+  }),
+  /* More options... */
 })
-// Retry pattern: 10s, 50s, 250s (total: ~310s)
+// Retry pattern: 4s, 16s, 64s, 256s (total: ~340s)
 ```
 
 </Tab>
@@ -286,64 +237,39 @@ new ApiCheck('rate-limited-api', {
 **Use cases**: Overloaded services, rate-limited APIs, aggressive backoff scenarios, circuit breaker patterns.
 </ResponseField>
 
-## Common Options
+### Retry Strategy Options
 
 <ResponseField name="baseBackoffSeconds" type="number" default="60">
 Time to wait before the first retry attempt. Also used as the base value for calculating subsequent retry intervals in linear and exponential strategies.
 
-### Usage
-```ts
-RetryStrategyBuilder.fixedStrategy({
-  baseBackoffSeconds: 30 // Wait 30 seconds before first retry
-})
-```
+**Usage:**
 
-### Examples
 ```ts
 // Quick retries for fast services
 RetryStrategyBuilder.fixedStrategy({
-  baseBackoffSeconds: 10 // 10 second intervals
+  baseBackoffSeconds: 30, // Fixed: 30s, 30s, 30s
 })
 
 // Slower retries for heavy operations
 RetryStrategyBuilder.linearStrategy({
-  baseBackoffSeconds: 60 // Start with 60 seconds
+  baseBackoffSeconds: 10, // Linear: 10s, 20s, 30s
 })
 
 // Very quick retries for lightweight checks
 RetryStrategyBuilder.exponentialStrategy({
-  baseBackoffSeconds: 5 // Start with 5 seconds
+  baseBackoffSeconds: 5, // Exponential: 5s, 25s, 125s
 })
 ```
-
-**Range**: 5-600 seconds
 </ResponseField>
 
 <ResponseField name="maxRetries" type="number" default="2">
 Maximum number of retry attempts after the initial failure. The total number of check attempts will be maxRetries + 1.
 
-### Usage
+**Usage:**
+
 ```ts
 RetryStrategyBuilder.linearStrategy({
-  maxRetries: 3 // 3 retry attempts after initial failure
-})
-```
-
-### Examples
-```ts
-// Minimal retries for critical alerts
-RetryStrategyBuilder.fixedStrategy({
-  maxRetries: 1 // Only 1 retry (2 total attempts)
-})
-
-// Standard retry count
-RetryStrategyBuilder.linearStrategy({
-  maxRetries: 3 // 3 retries (4 total attempts)
-})
-
-// Maximum retries for unreliable services
-RetryStrategyBuilder.exponentialStrategy({
-  maxRetries: 10 // 10 retries (11 total attempts)
+  maxRetries: 3, // 3 retry attempts after initial failure
 })
 ```
 
@@ -351,33 +277,15 @@ RetryStrategyBuilder.exponentialStrategy({
 </ResponseField>
 
 <ResponseField name="maxDurationSeconds" type="number" default="600">
-Maximum total time to spend on all retry attempts. If the calculated retry schedule would exceed this duration, retries stop early.
+Maximum total time to spend on all retry attempts. If the calculated retry schedule would exceed this duration, retries stop early. The maximum value is 600 seconds (10 minutes).
 
-### Usage
+**Usage:**
+
 ```ts
 RetryStrategyBuilder.exponentialStrategy({
-  maxDurationSeconds: 300 // Stop retrying after 5 minutes total
+  maxDurationSeconds: 300, // Stop retrying after 5 minutes total
 })
 ```
-
-### Examples
-```ts
-// Quick timeout for fast-failing scenarios
-RetryStrategyBuilder.linearStrategy({
-  baseBackoffSeconds: 30,
-  maxRetries: 5,
-  maxDurationSeconds: 180 // Stop after 3 minutes max
-})
-
-// Standard timeout
-RetryStrategyBuilder.exponentialStrategy({
-  baseBackoffSeconds: 10,
-  maxRetries: 4,
-  maxDurationSeconds: 600 // Default 10 minutes
-})
-```
-
-**Range**: 60-600 seconds (1-10 minutes)
 </ResponseField>
 
 <ResponseField name="sameRegion" type="boolean" default="true">
@@ -386,38 +294,9 @@ Whether retry attempts should run from the same region as the original failed ch
 ### Usage
 ```ts
 RetryStrategyBuilder.linearStrategy({
-  sameRegion: false // Try different regions for retries
+  sameRegion: false, // Try different regions for retries
 })
 ```
-
-### Examples
-
-<Tabs>
-<Tab title="Same Region (default)">
-
-```ts
-// Keep retries in same region - good for consistent networking
-RetryStrategyBuilder.fixedStrategy({
-  baseBackoffSeconds: 30,
-  maxRetries: 2,
-  sameRegion: true // Default behavior
-})
-```
-
-</Tab>
-<Tab title="Different Regions">
-
-```ts
-// Use different regions - good for detecting regional issues
-RetryStrategyBuilder.linearStrategy({
-  baseBackoffSeconds: 45,
-  maxRetries: 3,
-  sameRegion: false // Try different regions
-})
-```
-
-</Tab>
-</Tabs>
 
 <Info>
 When `sameRegion: false`, retries are attempted from different regions to help distinguish between regional networking issues and actual service problems.
@@ -431,21 +310,23 @@ When `sameRegion: false`, retries are attempted from different regions to help d
 <Tabs>
   <Tab title="No Retries">
     ```ts
-    import { ApiCheck, RetryStrategyBuilder } from 'checkly/constructs'
+    import { ApiCheck, RetryStrategyBuilder } from "checkly/constructs"
 
-    new ApiCheck('fail-fast-check', {
-      name: 'Fail Fast Check',
+    new ApiCheck("fail-fast-check", {
+      name: "Fail Fast Check",
       retryStrategy: RetryStrategyBuilder.noRetries(),
       request: {
-        method: 'GET',
-        url: 'https://api.example.com/critical-endpoint'
-      }
+        method: "GET",
+        url: "https://api.example.com/critical-endpoint",
+      },
     })
     ```
   </Tab>
-  
+
   <Tab title="Fixed Interval Retries">
     ```ts
+    import { ApiCheck, RetryStrategyBuilder } from "checkly/constructs"
+
     const fixedRetryStrategy = RetryStrategyBuilder.fixedStrategy({
       baseBackoffSeconds: 30, // Wait 30s between each retry
       maxRetries: 3,
@@ -464,187 +345,166 @@ When `sameRegion: false`, retries are attempted from different regions to help d
     // Retry pattern: 30s, 30s, 30s (total: ~90s)
     ```
   </Tab>
-  
+
   <Tab title="Linear Backoff">
     ```ts
+    import { ApiCheck, RetryStrategyBuilder } from "checkly/constructs"
+
     const linearRetryStrategy = RetryStrategyBuilder.linearStrategy({
       baseBackoffSeconds: 20, // First retry after 20s
       maxRetries: 4,
-      sameRegion: false // Try different regions
+      sameRegion: false, // Try different regions
     })
 
-    new ApiCheck('linear-retry-check', {
-      name: 'Linear Backoff Retries',
+    new ApiCheck("linear-retry-check", {
+      name: "Linear Backoff Retries",
       retryStrategy: linearRetryStrategy,
       request: {
-        method: 'GET',
-        url: 'https://api.example.com/unstable'
-      }
+        method: "GET",
+        url: "https://api.example.com/unstable",
+      },
     })
 
     // Retry pattern: 20s, 40s, 60s, 80s (total: ~200s)
     ```
   </Tab>
-  
+
   <Tab title="Exponential Backoff">
     ```ts
+    import { ApiCheck, RetryStrategyBuilder } from "checkly/constructs"
+
     const exponentialRetryStrategy = RetryStrategyBuilder.exponentialStrategy({
       baseBackoffSeconds: 5, // First retry after 5s
-      maxRetries: 5,
+      maxRetries: 3,
       maxDurationSeconds: 300, // Stop after 5 minutes total
-      sameRegion: true
+      sameRegion: true,
     })
 
-    new ApiCheck('exponential-retry-check', {
-      name: 'Exponential Backoff Retries',
+    new ApiCheck("exponential-retry-check", {
+      name: "Exponential Backoff Retries",
       retryStrategy: exponentialRetryStrategy,
       request: {
-        method: 'GET',
-        url: 'https://api.example.com/overloaded'
-      }
+        method: "GET",
+        url: "https://api.example.com/overloaded",
+      },
     })
 
-    // Retry pattern: 5s, 25s, 125s, 625s (but limited by maxDurationSeconds)
+    // Retry pattern: 5s, 25s, 125s
     ```
   </Tab>
-  
+
   <Tab title="Group-Level Retry Strategy">
     ```ts
-    import { CheckGroupV2, RetryStrategyBuilder } from 'checkly/constructs'
+    import {
+      ApiCheck,
+      CheckGroupV2,
+      Frequency,
+      RetryStrategyBuilder,
+    } from "checkly/constructs"
 
     const groupRetryStrategy = RetryStrategyBuilder.linearStrategy({
       baseBackoffSeconds: 30,
       maxRetries: 3,
-      sameRegion: false
+      sameRegion: false,
     })
 
-    const apiGroup = new CheckGroupV2('api-group', {
-      name: 'API Monitoring Group',
+    const apiGroup = new CheckGroupV2("api-group", {
+      name: "API Monitoring Group",
       retryStrategy: groupRetryStrategy, // Applies to all checks in group
       frequency: Frequency.EVERY_5M,
-      locations: ['us-east-1', 'eu-west-1']
+      locations: ["us-east-1", "eu-west-1"],
     })
 
-    new ApiCheck('group-api-check', {
-      name: 'API Check with Group Retry Strategy',
+    new ApiCheck("group-api-check", {
+      name: "API Check with Group Retry Strategy",
       group: apiGroup, // Inherits retry strategy from group
       request: {
-        method: 'GET',
-        url: 'https://api.example.com/endpoint'
-      }
+        method: "GET",
+        url: "https://api.example.com/endpoint",
+      },
     })
+
+    // Retry pattern: 30s, 60s, 90s
     ```
   </Tab>
-  
+
   <Tab title="Project-Level Default">
-    ```ts
-    // checkly.config.ts
-    import { defineConfig } from 'checkly'
-    import { RetryStrategyBuilder, Frequency } from 'checkly/constructs'
+    ```ts checkly.config.ts
+    import { defineConfig } from "checkly"
+    import { Frequency, RetryStrategyBuilder } from "checkly/constructs"
 
     export default defineConfig({
-      projectName: 'Resilient Monitoring',
-      logicalId: 'resilient-monitoring',
+      projectName: "Resilient Monitoring",
+      logicalId: "resilient-monitoring",
       checks: {
         activated: true,
         frequency: Frequency.EVERY_10M,
-        locations: ['us-east-1', 'eu-west-1'],
+        locations: ["us-east-1", "eu-west-1"],
         retryStrategy: RetryStrategyBuilder.linearStrategy({
           baseBackoffSeconds: 60,
           maxRetries: 2,
-          sameRegion: false
-        })
-      }
+          sameRegion: false,
+        }),
+      },
     })
     ```
   </Tab>
 </Tabs>
 
-## Retry Behavior
-
-<Info>
-**Region Selection**: When `sameRegion: false`, retries are attempted from different regions to help distinguish between regional issues and actual service problems.
-</Info>
-
-<Warning>
-**Duration Limits**: The `maxDurationSeconds` parameter caps the total retry time. If the calculated backoff would exceed this limit, retries stop early.
-</Warning>
-
 ## Best Practices
 
 <Tabs>
-  <Tab title="API Endpoints">
+  <Tab title="Stable vs Non-Stable">
     ```ts
     // For stable APIs - minimal retries
     const stableApiRetry = RetryStrategyBuilder.fixedStrategy({
       baseBackoffSeconds: 30,
       maxRetries: 2,
-      sameRegion: true
+      sameRegion: true,
     })
 
     // For unstable APIs - more aggressive retries
     const unstableApiRetry = RetryStrategyBuilder.exponentialStrategy({
       baseBackoffSeconds: 10,
       maxRetries: 4,
-      sameRegion: false
+      sameRegion: false,
     })
     ```
   </Tab>
-  
+
   <Tab title="Critical vs Non-Critical">
     ```ts
     // Critical endpoints - fail fast to alert quickly
     const criticalRetry = RetryStrategyBuilder.fixedStrategy({
       baseBackoffSeconds: 15,
       maxRetries: 1, // Minimal retries
-      sameRegion: true
+      sameRegion: true,
     })
 
     // Non-critical endpoints - more tolerant
     const nonCriticalRetry = RetryStrategyBuilder.linearStrategy({
       baseBackoffSeconds: 60,
       maxRetries: 3,
-      sameRegion: false
+      sameRegion: false,
     })
     ```
   </Tab>
-  
+
   <Tab title="By Check Type">
     ```ts
     // Browser checks - longer backoff due to complexity
     const browserRetry = RetryStrategyBuilder.linearStrategy({
       baseBackoffSeconds: 90,
       maxRetries: 2,
-      sameRegion: false
+      sameRegion: false,
     })
 
     // API checks - faster retries
     const apiRetry = RetryStrategyBuilder.fixedStrategy({
       baseBackoffSeconds: 30,
       maxRetries: 3,
-      sameRegion: false
+      sameRegion: false,
     })
     ```
   </Tab>
 </Tabs>
-
-## Configuration Hierarchy
-
-Retry strategies follow the same hierarchy as other check properties:
-
-1. **Individual Check** (highest priority)
-2. **Check Group**
-3. **Project** (lowest priority)
-
-```ts
-// Individual check overrides group and project settings
-new ApiCheck('override-retry-check', {
-  name: 'Check with Override Retry',
-  group: groupWithRetryStrategy,
-  retryStrategy: RetryStrategyBuilder.noRetries(), // Overrides group strategy
-  request: {
-    method: 'GET',
-    url: 'https://api.example.com/endpoint'
-  }
-})
-```

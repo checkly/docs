@@ -4,469 +4,205 @@ description: 'Learn how to configure status pages with the Checkly CLI.'
 sidebarTitle: 'Status Page'
 ---
 
-Use StatusPage to create public status pages that show the uptime of your services through organized cards. Status pages help communicate service availability to your users and stakeholders.
+<Tip>
+Learn more about Status Pages in [the Status Pages overview](/docs/communicate/status-pages/overview).
+</Tip>
 
-<Info>
-Learn more about status pages in the [Status Pages documentation](/docs/communicate/status-pages/).
-</Info>
-
-## `StatusPage` Structure
+Use public Status Pages to show the uptime of your services through organized cards. Status pages help communicate service availability to your users and stakeholders.
 
 <CodeGroup>
 
 ```ts Basic Example
-import { StatusPage, StatusPageService } from 'checkly/constructs'
+import { StatusPage, StatusPageService } from "checkly/constructs"
 
-const apiService = new StatusPageService('api-service', {
-  name: 'API Service'
+const apiService = new StatusPageService("api-service", {
+  name: "API Service",
 })
 
-new StatusPage('company-status', {
-  name: 'Company Status',
-  url: 'company-status',
+new StatusPage("company-status", {
+  name: "Company Status",
+  url: "company-status",
   cards: [
     {
-      name: 'Core Services',
-      services: [apiService]
-    }
-  ]
+      name: "Core Services",
+      services: [apiService],
+    },
+  ],
 })
 ```
 
-```ts Advanced Example
-import { StatusPage, StatusPageService } from 'checkly/constructs'
+```ts Complete Example
+import { BrowserCheck, StatusPage, StatusPageService } from "checkly/constructs"
 
-const apiService = new StatusPageService('api-endpoints', {
-  name: 'API Endpoints'
+const webService = new StatusPageService("web-app", {
+  name: "Web Application",
 })
 
-const webService = new StatusPageService('web-app', {
-  name: 'Web Application'
+new BrowserCheck("homepage-check", {
+  name: "Homepage Check",
+  code: {
+    entrypoint: "home.spec.ts",
+  },
+  triggerIncident: {
+    // trigger an incident by using a status page service
+    service: webService,
+    severity: "MEDIUM",
+    name: "Homepage Disruption",
+    description: "The homepage check has failed.",
+    notifySubscribers: true,
+  },
 })
 
-const databaseService = new StatusPageService('database', {
-  name: 'Database'
-})
-
-new StatusPage('acme-status', {
-  name: 'A.C.M.E Status',
-  url: 'acme-status',
-  customDomain: 'status.acme.com',
-  logo: 'https://acme.com/logo.png',
-  redirectTo: 'https://acme.com',
-  favicon: 'https://acme.com/favicon.ico',
-  defaultTheme: 'DARK',
+new StatusPage("acme-status", {
+  name: "A.C.M.E Status",
+  url: "acme-status",
+  customDomain: "status.acme.com",
+  logo: "https://acme.com/logo.png",
+  redirectTo: "https://acme.com",
+  favicon: "https://acme.com/favicon.ico",
+  defaultTheme: "DARK",
   cards: [
+    // add a status page service to a status page
     {
-      name: 'Core Infrastructure',
-      services: [apiService, databaseService]
+      name: "User-Facing Services",
+      services: [webService],
     },
-    {
-      name: 'User-Facing Services',
-      services: [webService]
-    }
-  ]
+  ],
 })
 ```
 
 </CodeGroup>
 
-## Options
+## Configuration
 
 <Tabs>
-<Tab title="Unique Options">
+<Tab title="Status Page">
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `name` | `string` | ✅ | - | Name of the status page |
-| `url` | `string` | ❌ | - | Subdomain under "checkly-status-page.com" (unique across all accounts) |
-| `customDomain` | `string` | ❌ | - | Custom domain (e.g., "status.example.com") |
+| `cards` | `StatusPageCardProps[]` | ✅ | - | Array of card objects containing services |
+| `url` | `string` | ✅ | - | Subdomain under `checkly-status-page.com` (unique across all accounts) |
+| `customDomain` | `string` | ❌ | - | Custom domain (e.g., `status.example.com`) |
 | `logo` | `string` | ❌ | - | URL to logo image for the header |
 | `redirectTo` | `string` | ❌ | - | URL to redirect when logo is clicked |
 | `favicon` | `string` | ❌ | - | URL to favicon image |
-| `defaultTheme` | `string` | ❌ | `'LIGHT'` | Theme: `'DARK'` \| `'LIGHT'` \| `'AUTO'` |
-| `cards` | `array` | ✅ | - | Array of card objects containing services |
+| `defaultTheme` | `string` | ❌ | `'AUTO'` | Theme: `'DARK'` \| `'LIGHT'` \| `'AUTO'` |
 
 </Tab>
 </Tabs>
 
-## Unique Options
+### `StatusPage` Options
 
 <ResponseField name="name" type="string" required>
 Name of the status page displayed in the header and browser title.
 
-### Usage
+**Usage:**
+
 ```ts
-new StatusPage('company-status', {
-  name: 'Company Status Page'
+new StatusPage("company-status", {
+  name: "Company Status Page",
+  /* More options... */
 })
 ```
-
-### Examples
-
-<CodeGroup>
-
-```ts Company Branding
-const companyStatus = new StatusPage('acme-status', {
-  name: 'ACME Service Status' // Company brand visible
-})
-```
-
-```ts Service-Specific
-const apiStatus = new StatusPage('api-status', {
-  name: 'API Platform Status' // Platform-specific status page
-})
-```
-
-```ts Regional Status
-const regionStatus = new StatusPage('us-east-status', {
-  name: 'US East Region Status' // Regional service status
-})
-```
-
-</CodeGroup>
 
 **Use cases**: Brand visibility, service identification, regional status pages, internal team pages.
 </ResponseField>
 
-<ResponseField name="url" type="string">
-Subdomain under "checkly-status-page.com" that must be unique across all Checkly accounts.
-
-### Usage
-```ts
-new StatusPage('company-status', {
-  name: 'Company Status',
-  url: 'company-status' // Creates company-status.checkly-status-page.com
-})
-```
-
-### Examples
-
-<CodeGroup>
-
-```ts Company Subdomain
-const companyPage = new StatusPage('acme-status', {
-  name: 'ACME Status',
-  url: 'acme-corp-status' // acme-corp-status.checkly-status-page.com
-})
-```
-
-```ts Service-Specific URL
-const apiPage = new StatusPage('api-platform-status', {
-  name: 'API Platform Status',
-  url: 'api-platform' // api-platform.checkly-status-page.com
-})
-```
-
-```ts Team-Specific URL
-const teamPage = new StatusPage('frontend-team-status', {
-  name: 'Frontend Team Status',
-  url: 'frontend-team-internal' // frontend-team-internal.checkly-status-page.com
-})
-```
-
-</CodeGroup>
-
-**Use cases**: Public status pages, team-specific status pages, service-specific monitoring, temporary status pages.
-</ResponseField>
-
-<ResponseField name="customDomain" type="string">
-Custom domain for your status page (e.g., "status.example.com"). Requires DNS configuration and domain verification.
-
-### Usage
-```ts
-new StatusPage('company-status', {
-  name: 'Company Status',
-  customDomain: 'status.example.com'
-})
-```
-
-### Examples
-
-<CodeGroup>
-
-```ts Brand Consistency
-const brandedStatus = new StatusPage('branded-status', {
-  name: 'Brand Status',
-  customDomain: 'status.brand.com' // Matches company domain
-})
-```
-
-```ts Subdomain Organization
-const serviceStatus = new StatusPage('service-status', {
-  name: 'Service Status',
-  customDomain: 'api-status.company.com' // Service-specific subdomain
-})
-```
-
-```ts Regional Domain
-const regionalStatus = new StatusPage('eu-status', {
-  name: 'Europe Status',
-  customDomain: 'status-eu.company.com' // Regional subdomain
-})
-```
-
-</CodeGroup>
-
-**Use cases**: Brand consistency, SEO benefits, professional appearance, domain ownership.
-</ResponseField>
-
-<ResponseField name="logo" type="string">
-URL to logo image displayed in the status page header. Must be publicly accessible.
-
-### Usage
-```ts
-new StatusPage('company-status', {
-  name: 'Company Status',
-  logo: 'https://company.com/logo.png'
-})
-```
-
-### Examples
-
-<CodeGroup>
-
-```ts Company Logo
-const companyStatus = new StatusPage('company-status', {
-  name: 'Company Status',
-  logo: 'https://company.com/assets/brand/logo-light.png' // Company branding
-})
-```
-
-```ts Service Logo
-const serviceStatus = new StatusPage('api-status', {
-  name: 'API Platform Status',
-  logo: 'https://api.company.com/assets/api-logo.svg' // Service-specific logo
-})
-```
-
-```ts Team Logo
-const teamStatus = new StatusPage('devops-status', {
-  name: 'DevOps Team Status',
-  logo: 'https://company.com/teams/devops/logo.png' // Team-specific branding
-})
-```
-
-</CodeGroup>
-
-**Use cases**: Brand recognition, visual consistency, professional presentation, team identification.
-</ResponseField>
-
-<ResponseField name="redirectTo" type="string">
-URL to redirect users when they click the logo. Typically your main website or service.
-
-### Usage
-```ts
-new StatusPage('company-status', {
-  name: 'Company Status',
-  logo: 'https://company.com/logo.png',
-  redirectTo: 'https://company.com' // Redirect to main site
-})
-```
-
-### Examples
-
-<CodeGroup>
-
-```ts Main Website
-const mainStatus = new StatusPage('company-status', {
-  name: 'Company Status',
-  logo: 'https://company.com/logo.png',
-  redirectTo: 'https://company.com' // Back to homepage
-})
-```
-
-```ts Service Dashboard
-const serviceStatus = new StatusPage('api-status', {
-  name: 'API Status',
-  logo: 'https://api.company.com/logo.png',
-  redirectTo: 'https://api.company.com/dashboard' // To service dashboard
-})
-```
-
-```ts Documentation
-const devStatus = new StatusPage('dev-status', {
-  name: 'Developer API Status',
-  logo: 'https://dev.company.com/logo.png',
-  redirectTo: 'https://docs.company.com' // To documentation
-})
-```
-
-</CodeGroup>
-
-**Use cases**: Navigation flow, user engagement, brand consistency, service discovery.
-</ResponseField>
-
-<ResponseField name="favicon" type="string">
-URL to favicon image displayed in browser tabs. Must be publicly accessible.
-
-### Usage
-```ts
-new StatusPage('company-status', {
-  name: 'Company Status',
-  favicon: 'https://company.com/favicon.ico'
-})
-```
-
-### Examples
-
-<CodeGroup>
-
-```ts Company Favicon
-const companyStatus = new StatusPage('company-status', {
-  name: 'Company Status',
-  favicon: 'https://company.com/favicon.ico' // Company brand in tabs
-})
-```
-
-```ts Status-Specific Icon
-const statusPage = new StatusPage('service-status', {
-  name: 'Service Status',
-  favicon: 'https://company.com/status-favicon.png' // Status-specific icon
-})
-```
-
-```ts Team Favicon
-const teamStatus = new StatusPage('team-status', {
-  name: 'Team Status',
-  favicon: 'https://company.com/team-favicon.svg' // Team-specific icon
-})
-```
-
-</CodeGroup>
-
-**Use cases**: Browser tab identification, brand consistency, visual organization, professional appearance.
-</ResponseField>
-
-<ResponseField name="defaultTheme" type="string">
-Default color theme for the status page. Options: 'LIGHT', 'DARK', or 'AUTO' (follows system preference).
-
-### Usage
-```ts
-new StatusPage('company-status', {
-  name: 'Company Status',
-  defaultTheme: 'DARK' // Dark theme by default
-})
-```
-
-### Examples
-
-<CodeGroup>
-
-```ts Dark Theme
-const darkStatus = new StatusPage('dev-status', {
-  name: 'Developer Status',
-  defaultTheme: 'DARK' // Developer-friendly dark theme
-})
-```
-
-```ts Light Theme
-const lightStatus = new StatusPage('customer-status', {
-  name: 'Customer Status',
-  defaultTheme: 'LIGHT' // Clean, professional light theme
-})
-```
-
-```ts Auto Theme
-const autoStatus = new StatusPage('flexible-status', {
-  name: 'Flexible Status',
-  defaultTheme: 'AUTO' // Follows user's system preference
-})
-```
-
-</CodeGroup>
-
-**Use cases**: User preference accommodation, brand consistency, accessibility, professional appearance.
-</ResponseField>
-
 <ResponseField name="cards" type="array" required>
+
 Array of card objects that organize services into logical groups on the status page.
 
-### Usage
+**Usage:**
+
 ```ts
-new StatusPage('company-status', {
-  name: 'Company Status',
+new StatusPage("company-status", {
+  name: "Company Status",
   cards: [
     {
-      name: 'Core Services',
-      services: [apiService, webService]
-    }
-  ]
+      name: "Core Services",
+      services: [apiService, webService],
+    },
+  ],
+  /* More options... */
 })
 ```
 
-### Parameters
+**Parameters:**
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `name` | `string` | ✅ | Display name for the card |
 | `services` | `StatusPageService[]` | ✅ | Array of services to display on this card |
 
-### Examples
+**Examples:**
 
 <CodeGroup>
 
 ```ts Functional Organization
-const webApp = new StatusPageService('web-app', { name: 'Web Application' })
-const mobileApi = new StatusPageService('mobile-api', { name: 'Mobile API' })
-const database = new StatusPageService('database', { name: 'Database' })
+const webAppService = new StatusPageService("web-app", { name: "Web Application" })
+const mobileApiService = new StatusPageService("mobile-api", { name: "Mobile API" })
+const databaseService = new StatusPageService("database", { name: "Database" })
 
-new StatusPage('functional-status', {
-  name: 'Functional Status',
+new StatusPage("functional-status", {
+  name: "Functional Status",
+  url: "functional-status",
   cards: [
     {
-      name: 'User-Facing Services', // Customer impact grouped together
-      services: [webApp, mobileApi]
+      name: "User-Facing Services", // Customer impact grouped together
+      services: [webApp, mobileApi],
     },
     {
-      name: 'Infrastructure', // Backend services grouped
-      services: [database]
-    }
-  ]
+      name: "Infrastructure", // Backend services grouped
+      services: [database],
+    },
+  ],
 })
 ```
 
 ```ts Team Organization
-const frontendApp = new StatusPageService('frontend', { name: 'Frontend App' })
-const backendApi = new StatusPageService('backend', { name: 'Backend API' })
-const paymentService = new StatusPageService('payments', { name: 'Payments' })
+const frontendAppService = new StatusPageService("frontend", { name: "Frontend App" })
+const backendApiService = new StatusPageService("backend", { name: "Backend API" })
+const paymentService = new StatusPageService("payments", { name: "Payments" })
 
-new StatusPage('team-status', {
-  name: 'Team Status',
+new StatusPage("team-status", {
+  name: "Team Status",
+  url: "team-status",
   cards: [
     {
-      name: 'Frontend Team', // Team-based grouping
-      services: [frontendApp]
+      name: "Frontend Team", // Team-based grouping
+      services: [frontendApp],
     },
     {
-      name: 'Backend Team',
-      services: [backendApi]
+      name: "Backend Team",
+      services: [backendApi],
     },
     {
-      name: 'Platform Team',
-      services: [paymentService]
-    }
-  ]
+      name: "Platform Team",
+      services: [paymentService],
+    },
+  ],
 })
 ```
 
 ```ts Priority Organization
-const coreApi = new StatusPageService('core-api', { name: 'Core API' })
-const authService = new StatusPageService('auth', { name: 'Authentication' })
-const reportingService = new StatusPageService('reports', { name: 'Reporting' })
+const coreApiService = new StatusPageService("core-api", { name: "Core API" })
+const authService = new StatusPageService("auth", { name: "Authentication" })
+const reportingService = new StatusPageService("reports", { name: "Reporting" })
 
-new StatusPage('priority-status', {
-  name: 'Priority Status',
+new StatusPage("priority-status", {
+  name: "Priority Status",
+  url: "priority-status",
   cards: [
     {
-      name: 'Critical Services', // High-priority services
-      services: [coreApi, authService]
+      name: "Critical Services", // High-priority services
+      services: [coreApi, authService],
     },
     {
-      name: 'Supporting Services', // Lower-priority services
-      services: [reportingService]
-    }
-  ]
+      name: "Supporting Services", // Lower-priority services
+      services: [reportingService],
+    },
+  ],
 })
 ```
 
@@ -475,257 +211,226 @@ new StatusPage('priority-status', {
 **Use cases**: Service organization, user experience optimization, incident communication, operational clarity.
 </ResponseField>
 
+<ResponseField name="url" type="string" required>
+
+Subdomain under `checkly-status-page.com` that must be unique across all Checkly accounts.
+
+**Usage:**
+
+```ts
+new StatusPage("company-status", {
+  name: "Company Status",
+  url: "company-status", // Creates company-status.checkly-status-page.com
+  /* More options... */
+})
+```
+
+**Use cases**: Public status pages, team-specific status pages, service-specific monitoring, temporary status pages.
+</ResponseField>
+
+<ResponseField name="customDomain" type="string">
+
+Custom domain for your status page (e.g., `status.example.com`). Requires DNS configuration and domain verification.
+
+**Usage:**
+
+```ts
+new StatusPage("company-status", {
+  name: "Company Status",
+  url: "status.example.com",
+  customDomain: "status.example.com",
+  /* More options... */
+})
+```
+
+**Use cases**: Brand consistency, SEO benefits, professional appearance, domain ownership.
+</ResponseField>
+
+<ResponseField name="logo" type="string">
+
+URL to logo image displayed in the status page header. Must be publicly accessible.
+
+**Usage:**
+
+```ts
+new StatusPage("company-status", {
+  name: "Company Status",
+  logo: "https://company.com/logo.png",
+  /* More options... */
+})
+```
+
+**Use cases**: Brand recognition, visual consistency, professional presentation, team identification.
+</ResponseField>
+
+<ResponseField name="redirectTo" type="string">
+URL to redirect users when they click the logo. Typically your main website or service.
+
+**Usage:**
+
+```ts
+new StatusPage("company-status", {
+  name: "Company Status",
+  logo: "https://company.com/logo.png",
+  redirectTo: "https://company.com", // Redirect to main site on logo click
+  /* More options... */
+})
+```
+
+**Use cases**: Navigation flow, user engagement, brand consistency, service discovery.
+</ResponseField>
+
+<ResponseField name="favicon" type="string">
+
+URL to favicon image displayed in browser tabs. Must be publicly accessible.
+
+**Usage:**
+
+```ts
+new StatusPage("company-status", {
+  name: "Company Status",
+  favicon: "https://company.com/favicon.ico",
+  /* More options... */
+})
+```
+
+**Use cases**: Browser tab identification, brand consistency, visual organization, professional appearance.
+</ResponseField>
+
+<ResponseField name="defaultTheme" type="string">
+
+Default color theme for the status page. Options: 'LIGHT', 'DARK', or 'AUTO' (follows system preference).
+
+**Usage:**
+
+```ts
+new StatusPage("company-status", {
+  name: "Company Status",
+  defaultTheme: "DARK", // Dark theme by default
+  /* More options... */
+})
+```
+
+**Use cases**: User preference accommodation, brand consistency, accessibility, professional appearance.
+</ResponseField>
 
 ## Examples
 
 <CodeGroup>
 
-```ts SaaS Company Status
-import { StatusPage, StatusPageService } from 'checkly/constructs'
+```ts Application Status
+import { ApiCheck, StatusPage, StatusPageService } from "checkly/constructs"
 
-// Define services
-const webApp = new StatusPageService('web-app', {
-  name: 'Web Application'
+// Define status page services
+const webAppService = new StatusPageService("web-app", {
+  name: "Web Application",
 })
 
-const mobileApi = new StatusPageService('mobile-api', {
-  name: 'Mobile API'
-})
-
-const authService = new StatusPageService('authentication', {
-  name: 'Authentication Service'
-})
-
-const paymentService = new StatusPageService('payments', {
-  name: 'Payment Processing'
-})
-
-const notificationService = new StatusPageService('notifications', {
-  name: 'Email & SMS Notifications'
-})
-
-new StatusPage('saas-company-status', {
-  name: 'SaaS Company Service Status',
-  url: 'saas-company-status',
-  customDomain: 'status.saascompany.com',
-  logo: 'https://saascompany.com/assets/logo.png',
-  redirectTo: 'https://saascompany.com',
-  favicon: 'https://saascompany.com/favicon.ico',
-  defaultTheme: 'AUTO',
+// Include service status on status page
+new StatusPage("saas-company-status", {
+  name: "SaaS Company Service Status",
+  url: "saas-company-status",
+  customDomain: "status.saascompany.com",
+  logo: "https://saascompany.com/assets/logo.png",
+  redirectTo: "https://saascompany.com",
+  favicon: "https://saascompany.com/favicon.ico",
+  defaultTheme: "AUTO",
   cards: [
     {
-      name: 'Core Platform',
-      services: [webApp, mobileApi, authService]
+      name: "Core Platform",
+      services: [webAppService],
     },
-    {
-      name: 'Payment & Billing',
-      services: [paymentService]
-    },
-    {
-      name: 'Communication',
-      services: [notificationService]
-    }
-  ]
+  ],
+})
+
+new ApiCheck("web-api-check", {
+  name: "Web API Check",
+  request: {
+    url: "app.example.com/api/status",
+    method: "GET",
+  },
+  // Trigger service incidents from your checks and monitors
+  triggerIncident: {
+    service: webAppService,
+    name: "Web API Outage",
+    description: "Web API is down",
+    severity: "MAJOR",
+    notifySubscribers: true,
+  },
 })
 ```
 
 ```ts E-commerce Platform
-const storefront = new StatusPageService('storefront', {
-  name: 'Online Store'
+import { StatusPage, StatusPageService, UrlMonitor } from "checkly/constructs"
+
+// Define services for all the core parts of your infrastructure
+const storefrontService = new StatusPageService("storefront", {
+  name: "Online Store",
 })
 
-const checkoutApi = new StatusPageService('checkout-api', {
-  name: 'Checkout & Cart'
+const checkoutApiService = new StatusPageService("checkout-api", {
+  name: "Checkout & Cart",
 })
 
-const inventoryApi = new StatusPageService('inventory-api', {
-  name: 'Product Catalog'
+const cdnService = new StatusPageService("cdn", {
+  name: "Image & Asset Delivery",
 })
 
-const orderApi = new StatusPageService('order-api', {
-  name: 'Order Management'
-})
-
-const cdnService = new StatusPageService('cdn', {
-  name: 'Image & Asset Delivery'
-})
-
-new StatusPage('ecommerce-status', {
-  name: 'E-commerce Platform Status',
-  url: 'ecommerce-platform-status',
-  logo: 'https://shop.example.com/logo.png',
-  redirectTo: 'https://shop.example.com',
-  defaultTheme: 'LIGHT',
+new StatusPage("ecommerce-status", {
+  name: "E-commerce Platform Status",
+  url: "ecommerce-platform-status",
+  logo: "https://shop.example.com/logo.png",
+  redirectTo: "https://shop.example.com",
+  defaultTheme: "LIGHT",
+  // Group and display your services in your status page
   cards: [
     {
-      name: 'Shopping Experience',
-      services: [storefront, checkoutApi, inventoryApi]
+      name: "Shopping Experience",
+      services: [storefrontService, checkoutApiService],
     },
     {
-      name: 'Order Processing',
-      services: [orderApi]
+      name: "Content Delivery",
+      services: [cdnService],
     },
-    {
-      name: 'Content Delivery',
-      services: [cdnService]
-    }
-  ]
-})
-```
-
-```ts API Platform Status
-const restApi = new StatusPageService('rest-api', {
-  name: 'REST API'
+  ],
 })
 
-const graphqlApi = new StatusPageService('graphql-api', {
-  name: 'GraphQL API'
-})
-
-const webhooks = new StatusPageService('webhooks', {
-  name: 'Webhook Delivery'
-})
-
-const documentation = new StatusPageService('api-docs', {
-  name: 'API Documentation'
-})
-
-const rateLimit = new StatusPageService('rate-limiting', {
-  name: 'Rate Limiting'
-})
-
-new StatusPage('api-platform-status', {
-  name: 'API Platform Status',
-  url: 'api-platform-status',
-  customDomain: 'status.api-platform.com',
-  logo: 'https://api-platform.com/images/logo.svg',
-  redirectTo: 'https://api-platform.com',
-  defaultTheme: 'DARK',
-  cards: [
-    {
-      name: 'API Endpoints',
-      services: [restApi, graphqlApi]
-    },
-    {
-      name: 'Developer Tools',
-      services: [webhooks, documentation]
-    },
-    {
-      name: 'Platform Services',
-      services: [rateLimit]
-    }
-  ]
-})
-```
-
-```ts Multi-Region Services
-const usEastApi = new StatusPageService('us-east-api', {
-  name: 'US East API'
-})
-
-const usWestApi = new StatusPageService('us-west-api', {
-  name: 'US West API'
-})
-
-const europeApi = new StatusPageService('europe-api', {
-  name: 'Europe API'
-})
-
-const asiaPacificApi = new StatusPageService('asia-pacific-api', {
-  name: 'Asia Pacific API'
-})
-
-const globalCdn = new StatusPageService('global-cdn', {
-  name: 'Global CDN'
-})
-
-new StatusPage('global-platform-status', {
-  name: 'Global Platform Status',
-  url: 'global-platform-status',
-  customDomain: 'status.globalcompany.com',
-  logo: 'https://globalcompany.com/brand/logo.png',
-  redirectTo: 'https://globalcompany.com',
-  defaultTheme: 'AUTO',
-  cards: [
-    {
-      name: 'North America',
-      services: [usEastApi, usWestApi]
-    },
-    {
-      name: 'Europe',
-      services: [europeApi]
-    },
-    {
-      name: 'Asia Pacific',
-      services: [asiaPacificApi]
-    },
-    {
-      name: 'Global Infrastructure',
-      services: [globalCdn]
-    }
-  ]
+new UrlMonitor("storefront-monitor", {
+  name: "Storefront Monitor",
+  request: {
+    url: "https://shop.example.com",
+  },
+  triggerIncident: {
+    name: "Storefront Uptime",
+    description: "The storefront is down",
+    severity: "MAJOR",
+    notifySubscribers: true,
+    service: storefrontService,
+  },
 })
 ```
 
 ```ts Minimal Status Page
-const mainService = new StatusPageService('main-service', {
-  name: 'Main Service'
+import { StatusPage, StatusPageService } from "checkly/constructs"
+
+const mainService = new StatusPageService("main-service", {
+  name: "Main Service",
 })
 
-new StatusPage('simple-status', {
-  name: 'Simple Status Page',
-  url: 'simple-status',
+new StatusPage("simple-status", {
+  name: "Simple Status Page",
+  url: "simple-status",
   cards: [
     {
-      name: 'Service Status',
-      services: [mainService]
-    }
-  ]
+      name: "Service Status",
+      services: [mainService],
+    },
+  ],
 })
 ```
 
 </CodeGroup>
-
-## Custom Domains
-
-To use a custom domain for your status page:
-
-<CodeGroup>
-
-```bash DNS Configuration
-# Add a CNAME record pointing to Checkly
-status.example.com CNAME checkly-status-page.com
-```
-
-```ts SSL Certificate
-// After configuring DNS, verify your domain through the Checkly UI to enable SSL certificates.
-// This process ensures secure HTTPS access to your status page.
-```
-
-```ts Verification
-new StatusPage('custom-domain-status', {
-  name: 'Custom Domain Status',
-  customDomain: 'status.example.com', // Must be verified
-  cards: [
-    {
-      name: 'Services',
-      services: [service]
-    }
-  ]
-})
-```
-
-</CodeGroup>
-
-
-<Warning>
-**Domain Verification**: Custom domains must be verified through the Checkly UI before they can be used. DNS changes may take time to propagate.
-</Warning>
 
 <Info>
 **Service Reuse**: A single `StatusPageService` can be used across multiple status pages and cards, making it easy to maintain consistent service definitions.
-</Info>
-
-<Info>
-**Logo Requirements**: Use publicly accessible URLs for logos and favicons. Recommended formats are PNG, SVG, or JPG.
 </Info>

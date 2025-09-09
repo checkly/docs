@@ -1,0 +1,113 @@
+---
+title: checkly pw-test
+description: 'Run Playwright tests with Checkly monitoring features'
+sidebarTitle: 'checkly pw-test'
+---
+
+The `checkly pw-test` command runs Playwright tests with Checkly monitoring features and reuses the Playwright CLI arguments. 
+This command automatically records test sessions without requiring the `--record` flag.
+
+<Accordion title="Prerequisites">
+Before using `checkly pw-test`, ensure you have:
+
+- Playwright tests in your project
+- A `playwright.config.ts` or `playwright.config.js` file.
+
+</Accordion>
+
+## Basic Usage
+
+Use `--` to separate Checkly flags from Playwright flags.
+
+```bash Terminal
+npx checkly pw-test [checkly flags] -- [playwright flags]
+```
+
+## Extended Usage
+
+<Tabs>
+<Tab title="Basic Examples">
+
+### Run tests in multiple browsers
+
+```bash Terminal
+# Using different Playwright projects
+npx checkly pw-test -- --project=chromium --project=firefox
+```
+
+### Run tests by pattern
+
+```bash Terminal
+# Filter tests by grep pattern
+npx checkly pw-test -- --grep="login"
+
+# Exclude tests by pattern
+npx checkly pw-test -- --grep-invert="skip|todo"
+```
+
+### Run tests by file
+
+```bash Terminal
+# Run a specific test file
+npx checkly pw-test -- test.spec.ts
+
+```
+
+## Creating Scheduled Checks
+
+Using `pw-test` with the `--create-check` flag will create a check with the Playwright `testCommand` you used 
+and with a default monitoring configuration, allowing you to tweak the monitoring configuration for your check. 
+If there's no `checkly.config.ts` file, it will create one.
+
+### Regression tests in multiple locations
+
+```bash Terminal
+npx checkly pw-test --create-check --location=us-east-1 --location=eu-west-1 --frequency=5m -- --grep="@regression"
+```
+
+### Mobile tests every 10 minutes
+
+```bash Terminal
+npx checkly pw-test --create-check --frequency=10m -- --project="Mobile Chrome" --grep="@critical"
+```
+
+## Supported Options
+
+### Checkly Flags
+
+| Flag | Description | Type | Required |
+|------|-------------|------|----------|
+| `--create-check` | Create a monitor from test results | boolean | No |
+| `--frequency` | Set monitor frequency (`5m`, `10m`, `30m`, `1h`) | string | No |
+| `--location` | Add monitor locations (use multiple times) | string | No |
+| `--test-session-name` | Name your test session | string | No |
+| `--env` | Pass environment variables | string | No |
+| `--env-file` | Load variables from file | string | No |
+
+All other [`checkly test` flags](/cli/checkly-test) are supported except `--record` (recording happens automatically).
+
+
+### Playwright Flags
+
+After the `--` separator, you can use any Playwright test runner flags:
+
+| Flag | Description | Type |
+|------|-------------|------|
+| `--project` | Select Playwright projects | string |
+| `--grep` | Filter tests by pattern | string |
+| `--grep-invert` | Exclude tests by pattern | string |
+| `--workers` | Specify the number of workers you want to use, specially helpful in private locations | string |
+| `--global-timeout=[ms]` | Set a global timeout for the whole suite run | string |
+| `--timeout` | Set a test-level timeout | string |
+| `-trace` | Set a test-level timeout | string |
+| `--max-failures=[n] | Set a test-level timeout | string |
+
+Most other [Playwright test runner](https://playwright.dev/docs/test-cli) flags are supported, except for `--reporter`, `--list`, `--headed`. 
+
+
+## Key Features
+
+- `pw-test` automatically records test sessions (no `--record` flag needed)
+- Your Playwright configuration applies automatically (traces, videos, screenshots)
+- View all artifacts in Checkly's UI
+

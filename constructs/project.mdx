@@ -185,7 +185,6 @@ export default defineConfig({
 | `activated` | `boolean` | ❌ | `true` | Whether checks are enabled by default |
 | `alertChannels` | `Array<AlertChannel \| AlertChannelRef>` | ❌ | `[]` | Default alert channels for all checks |
 | `checkMatch` | `string` | ❌ | - | Glob pattern to find check construct files |
-| `doubleCheck` (deprecated) | `boolean` | ❌ | `false` | Retry failed checks before triggering an alert (use `retryStrategy` instead) |
 | `environmentVariables` | `EnvironmentVariable[]` | ❌ | `[]` | Default environment variables for all checks |
 | `frequency` | `Frequency` | ❌ | - | Default frequency for all checks |
 | `ignoreDirectoriesMatch` | `string[]` | - | - | Glob patterns for directories to ignore |
@@ -265,26 +264,6 @@ export default defineConfig({
 ```
 
 <Tip>We recommend to establish a clear file convention like `*.check.ts` to easily identify files containing Checkly constructs.</Tip>
-
-</ResponseField>
-
-<ResponseField name="checks.doubleCheck" type="boolean" deprecated>
-
-Trigger a retry when a check fails from the failing region and another randomly selected region before marking the check as failed.
-
-**Usage:**
-
-```ts highlight={5}
-export default defineConfig({
-  projectName: "Website Monitoring",
-  logicalId: "website-monitoring-1",
-  checks: {
-    doubleCheck: true,
-  },
-})
-```
-
-<Warning>The `doubleCheck` option was deprecated. [Use `RetryStrategy` instead](/constructs/retry-strategy).</Warning>
 
 </ResponseField>
 

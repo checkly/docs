@@ -450,16 +450,45 @@ new PlaywrightCheck("feature-test", {
 
 <CodeGroup>
 
-```ts A
-// TODO
+```ts Multi-browser Support highlight={4}
+const playwrightChecks = new PlaywrightCheck("multi-browser-check", {
+  name: "Multi-browser check suite",
+  playwrightConfigPath: "./playwright.config.ts",
+  // Playwright Check Suites support all browsers
+  // defined in your `playwight.config`
+  pwProjects: ["chromium", "firefox", "webkit"],
+})
 ```
 
-```ts B
-// TODO
-```
+```ts Project-dependency Support highlight={4}
+// Often, it makes sense to define different Playwright projects
+// in your `playwright.config` and make them depend on each other
+// to perform setup tasks:
+//
+// projects: [
+//   {
+//     name: "setup",
+//     use: { ...devices["Desktop Chrome"] },
+//     testMatch: /.*\.setup\.ts/,
+//   },
+//   {
+//     name: "e2e",
+//     use: { ...devices["Desktop Chrome"] },
+//     dependencies: ["setup"],
+//     testMatch: /.*\.spec\.ts/,
+//   },
+// ]
 
-```ts C
-// TODO
+// Playwright Check Suites support, detect and run your
+// Playwright project dependencies.
+//
+// Learn more in the Playwright docs:
+const playwrightChecks = new PlaywrightCheck("multi-browser-check", {
+  name: "Multi-browser check suite",
+  playwrightConfigPath: "./playwright.config.ts",
+  // https://playwright.dev/docs/test-projects#dependencies
+  pwProjects: ["e2e"], // this will run `setup` and then `e2e`
+})
 ```
 
 </CodeGroup>

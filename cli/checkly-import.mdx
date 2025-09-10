@@ -1,10 +1,19 @@
 ---
 title: checkly import
 description: 'Import existing resources into your CLI-managed project.'
-sidebarTitle: 'checkly import'
+sidebarTitle: 'checkly import TODO'
 ---
 
 The `checkly import` command imports existing resources from your Checkly account into your CLI-managed project. This allows you to bring existing checks, alert channels, and other resources under code management using a structured three-phase workflow.
+
+<Accordion title="Prerequisites">
+Before using `checkly import`, ensure you have:
+
+- An initialized Checkly CLI project
+- A Checkly account with existing resources to import
+- Valid Checkly account authentication (run `npx checkly login` if needed)
+
+</Accordion>
 
 ## Usage
 
@@ -54,7 +63,7 @@ npx checkly import check:abc123 alert-channel:def456
 
 **Available resource types**:
 - `check` - Individual monitoring checks
-- `check-group` - Collections of related checks  
+- `check-group` - Collections of related checks
 - `alert-channel` - Notification channels
 - `maintenance-window` - Scheduled maintenance periods
 - `private-location` - Custom monitoring locations
@@ -74,7 +83,7 @@ Analyze your account and generate an import plan showing what will be imported.
 npx checkly import
 ```
 
-### 2. Plan Application  
+### 2. Plan Application
 Apply the generated plan, creating code files for your resources.
 
 ```bash Terminal
@@ -85,7 +94,7 @@ npx checkly import apply
 Commit the applied changes and mark resources as CLI-managed.
 
 ```bash Terminal
-npx checkly import commit  
+npx checkly import commit
 ```
 
 ## Subcommands
@@ -115,7 +124,7 @@ npx checkly import cancel
 
 Complete example showing the full three-phase workflow:
 
-```bash Terminal        
+```bash Terminal
 # 1. Generate import plan
 npx checkly import
 # Output shows: "Found 15 checks, 3 alert channels, 1 check group"
@@ -217,4 +226,4 @@ For accounts with many resources, consider using the selective import approach t
 ## Related Commands
 
 - [`checkly deploy`](/cli/checkly-deploy) - Deploy imported resources
-- [`checkly test`](/cli/checkly-test) - Test imported checks locally 
+- [`checkly test`](/cli/checkly-test) - Test imported checks locally

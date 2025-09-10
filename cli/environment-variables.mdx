@@ -12,6 +12,14 @@ There are two types of environment variables (env vars) in the Checkly CLI conte
 
 To get a quick overview of when to use which, checkout this video 👇
 
+<iframe
+  className="w-full aspect-video rounded-xl"
+  src="https://www.youtube.com/embed/nEIOBRSbjAk"
+  title="YouTube video player"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
 
 ## Local Environment Variables
 
@@ -37,7 +45,8 @@ export const smsChannel = new SmsAlertChannel('sms-channel-1', {
   // phoneNumber: `${process.env.PHONE_NUMBER}` this also works
 })
 ```
-Now, when you execute `test` or `deploy` the variable needs to part of the parent process `env` object. This is typically
+
+When you execute `test` or `deploy` the variable needs to part of the parent process `env` object. This is typically
 done by just prepending the variable to the command.
 
 ```
@@ -49,8 +58,8 @@ that SMS channel in your Checkly account.
 
 ## Remote Environment Variables
 
-Checkly also stores environment variables in your Checkly account. These can exist at the
-[Global, Group or Check level](/docs/detect/synthetic-monitoring/browser-checks/overview). Here is what you need to remember:
+Checkly also stores environment variables in your Checkly account. These can exist at [the
+Global, Group or Check level](/docs/platform/variables). Here is what you need to remember:
 
 1. Use remote environment variables to dynamically inject or replace values during runtime of a check.
 2. Remote variables can be set and overridden when invoking the `test` command.
@@ -64,7 +73,7 @@ a check executes on the Checkly cloud.
 Here is an example of a Playwright script using an `ENVIRONMENT_URL` variable to define the page to visit. We also added
 a fallback value in case that variable is not defined for some reason.
 
-```ts Home.check.ts
+```ts home.check.ts
 import { test } from '@playwright/test'
 
 test('Check Home Page', async ({ page }) => {
@@ -74,7 +83,7 @@ test('Check Home Page', async ({ page }) => {
 ```
 Here is an example of a Checkly [ApiCheck construct](/constructs/api-check) using an `ENVIRONMENT_URL` variable to define the page to visit. Notice the `{{ENVIRONMENT_URL}}` is wrapped in double handlebars and must be written this way for a remote environment variable to be parsed within an ApiCheck construct.
 
-```ts Api.check.ts
+```ts api.check.ts
 import * as path from 'path'
 import { ApiCheck, AssertionBuilder } from 'checkly/constructs'
 import { websiteGroup } from './website-group.check'
@@ -127,13 +136,35 @@ You can reference that file in the `test` as follows:
 npx checkly test --env-file="./.env"
 ```
 
-You can also pull in the variables from your account and store them in a file using the `npx checkly env pull` command.
+You can also pull in the variables from your account and store them in a file using [the `npx checkly env pull` command](/cli/checkly-env#pull).
 See the examples below.
 
-### Using the CLI
+### Managing Remote Environment Variables
 
-Manage your remote environment variables with the CLI using the [`checkly env` command](/cli/checkly-env). You can list, add, update, remove 
-and export your global variables. 
+Manage your remote environment variables with the CLI using the [`checkly env` command](/cli/checkly-env). You can list, add, update, remove
+and export your global variables.
+
+List all your stored variables and lock it.
+
+```bash
+npx checkly env ls
+```
+
+Create a new variable.
+
+```bash
+npx checkly env add MY_PASSWORD 123test
+```
+
+Pull in the variables from your account and store them in a file.
+
+```bash
+npx checkly env pull .env.prod
+```
+
+Reference that file in your `test` command.
+
+<Tip>[See the full reference documentation for the `checkly env` command](/cli/checkly-env).</Tip>
 
 ## Securing Environment Variables
 
@@ -142,7 +173,7 @@ For storing and securing environment variables, we advise the following:
 1. Store local environment variables in your shell or in `.env` files that are not committed to your git repo. Add those
 files to your `.gitignore` file.
 2. In a CI context, e.g. GitHub Actions, store sensitive variables as secrets. Almost all CI providers have such a feature.
-3. For remote variables, store sensitive data as secrets in Checkly. For more information on how to manage secrets in Checkly see [variables and secrets](/docs/detect/synthetic-monitoring/browser-checks/overview).
+3. For remote variables, store sensitive data as secrets in Checkly. For more information on how to manage secrets in Checkly see [variables and secrets](/docs/platform/variables).
 
 All variables are stored encrypted at rest and in transfer.
 

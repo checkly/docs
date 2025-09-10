@@ -9,8 +9,8 @@ The `checkly logout` command signs out of your current Checkly account and remov
 <Accordion title="Prerequisites">
 Before using `checkly logout`, ensure you have:
 
-- Currently authenticated with Checkly CLI (check with `npx checkly whoami`)
-- Access to the terminal/command line
+- Checkly CLI installed
+- Currently authenticated with Checkly CLI
 
 No internet connection is required as logout works locally.
 </Accordion>
@@ -20,130 +20,60 @@ No internet connection is required as logout works locally.
 The basic command logs out of your current Checkly account and removes stored authentication tokens.
 
 ```bash Terminal
-npx checkly logout
+npx checkly logout [options]
 ```
 
-<Tabs>
-<Tab title="Common Options">
+| Option | Description |
+|--------|-------------|
+| `--force, -f` | Force mode. Skips the confirmation dialog. |
 
-| Option | Description | Type | Required |
-|--------|-------------|------|---------|
-| `--verbose, -v` | Show detailed logout process | boolean | No |
+## Command Options
 
-</Tab>
-<Tab title="All Global Options">
+<ResponseField name="--force, -f" type="boolean">
 
-| Option | Description | Type | Required |
-|--------|-------------|------|---------|
-| `--config, -c` | Specify a configuration file | string | No |
+Skip confirmation dialogs and proceed with the operation.
 
-For detailed information about global options, see [global options](/cli/global-options).
+Usage:
 
-</Tab>
-</Tabs>
-
-## Common Options
-
-<ResponseField name="--verbose, -v" type="boolean">
-Show detailed information about the logout process for debugging or understanding what happens during logout.
-
-### Usage
 ```bash Terminal
-npx checkly logout --verbose
-npx checkly logout -v
+npx checkly logout --force
+npx checkly logout -f
 ```
 
-### Examples
-
-<Tabs>
-<Tab title="Standard Logout">
+**Examples:**
 
 ```bash Terminal
 # Standard logout
-npx checkly logout
+npx checkly logout --force
 
 # Output
-✓ Successfully logged out from user@company.com
-✓ Authentication tokens removed
+See you soon! 👋
 ```
-
-</Tab>
-<Tab title="Verbose Logout">
-
-```bash Terminal
-# Verbose logout with details
-npx checkly logout --verbose
-
-# Output
-→ Invalidating session on Checkly servers...
-→ Removing authentication tokens from: ~/.config/checkly-cli/auth.json
-→ Clearing cached user information
-✓ Successfully logged out from user@company.com
-✓ Authentication tokens removed
-```
-
-</Tab>
-</Tabs>
-
-**Use cases**: Understanding the logout process, debugging authentication issues.
 </ResponseField>
 
 ## What Happens During Logout
 
 ### Session Invalidation
+
 The logout process will:
-1. **Invalidate your session** on Checkly servers
-2. **Remove local tokens** from your machine
-3. **Require re-authentication** for future CLI usage
+
+1. **Remove local tokens** from your machine
+2. **Require re-authentication** for future CLI usage
 
 ### Token Removal
+
 The command removes authentication tokens stored locally in:
 
-- **macOS**: `~/Library/Application Support/checkly-cli/`
-- **Linux**: `~/.config/checkly-cli/`
-- **Windows**: `%APPDATA%\checkly-cli\`
+- **macOS**: `~/Library/Preferences/@checkly/cli-nodejs/auth.json`
+- **Linux**: `~/.config/@checkly/cli-nodejs/auth.json`
+- **Windows**: `%APPDATA%\@checkly\cli-nodejs\auth.json`
 
 ## After Logout
 
 Once logged out, you'll need to run [`checkly login`](/cli/checkly-login) before using other CLI commands that require authentication.
-
-Commands that require authentication include:
-- `checkly deploy`
-- `checkly test --record`
-- `checkly trigger`
-- `checkly env`
-- `checkly import`
 
 ## Related Commands
 
 - [`checkly login`](/cli/checkly-login) - Authenticate with your Checkly account
 - [`checkly whoami`](/cli/checkly-whoami) - Display current account information
 - [`checkly switch`](/cli/checkly-switch) - Switch between multiple accounts
-
-## Use Cases
-
-### Security Best Practice
-Log out when using shared or public computers:
-
-```bash Terminal
-npx checkly logout
-```
-
-### Account Switching
-Log out before switching to a different account:
-
-```bash Terminal
-npx checkly logout
-npx checkly login
-```
-
-### CI/CD Cleanup
-Include logout in CI/CD scripts for security:
-
-```bash Terminal
-# Deploy checks
-npx checkly deploy
-
-# Clean up authentication
-npx checkly logout
-```

@@ -1,198 +1,87 @@
 ---
 title: checkly destroy
 description: 'Destroy all project resources from your Checkly account.'
-sidebarTitle: 'checkly destroy TODO'
+sidebarTitle: 'checkly destroy'
 ---
+
+import CliCommandPrerequisites from '/snippets/cli-command-prerequisites.mdx';
 
 The `checkly destroy` command removes all resources associated with your project from your Checkly account, including checks, check groups, alert channels, maintenance windows, and other project-defined resources.
 
-<Accordion title="Prerequisites">
-Before using `checkly destroy`, ensure you have:
-
-- A Checkly CLI project initialized with `npx checkly init`
-- Valid Checkly account authentication (run `npx checkly login` if needed)
-- Understanding of which resources will be deleted (see "What Gets Destroyed" section)
+<CliCommandPrerequisites command="checkly destroy" />
 
 <Warning>
-**Destructive Operation**: This command permanently deletes resources from your Checkly account. This action cannot be undone.
+This command permanently deletes resources from your Checkly account. This action cannot be undone.
 </Warning>
-</Accordion>
 
-## Basic Usage
+## Usage
 
 The basic command destroys all project resources with a confirmation prompt.
-
-```bash Terminal
-npx checkly destroy
-```
-
-## Extended Usage
 
 ```bash Terminal
 npx checkly destroy [options]
 ```
 
-<Tabs>
-<Tab title="Common Options">
+| Option | Description |
+|--------|-------------|
+| `--config, -c` | The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts\|js` file in the current directory. |
+| `--force, -f` | Force mode. Skips the confirmation dialog. |
 
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `--config, -c` | Specify a configuration file | string | No |
-| `--force, -f` | Skip confirmation dialogs | boolean | No |
-
-</Tab>
-<Tab title="All Global Options">
-
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `--env, -e` | Pass environment variables | string | No |
-| `--env-file` | Load variables from file | string | No |
-| `--verbose, -v` | Show detailed output | boolean | No |
-
-For detailed information about global options, see [global options](/cli/global-options).
-
-</Tab>
-</Tabs>
-
-## Common Options
+## Command Options
 
 <ResponseField name="--config, -c" type="string">
+
 Specify a particular configuration file to use instead of the default `checkly.config.ts` or `checkly.config.js`.
 
-### Usage
-```bash Terminal
-npx checkly destroy --config <file-path>
-npx checkly destroy -c <file-path>
-```
-
-### Examples
-
-<Tabs>
-<Tab title="Staging Environment">
+**Usage:**
 
 ```bash Terminal
-# Destroy staging resources
-npx checkly destroy --config ./checkly.staging.config.ts
-
-# Output
-⚠️  This will destroy all resources from staging project.
-Are you sure you want to continue? (y/N)
+npx checkly destroy --config=<file-path>
+npx checkly destroy -c=<file-path>
 ```
 
-</Tab>
-<Tab title="Production Environment">
+**Examples:**
 
 ```bash Terminal
-# Destroy production resources (be very careful!)
-npx checkly destroy --config ./checkly.production.config.ts
-
-# Output
-⚠️  This will destroy all resources from production project.
-Are you sure you want to continue? (y/N)
+$ npx checkly destroy --config="./checkly.staging.config.ts"
 ```
 
-</Tab>
-</Tabs>
-
-**Default**: Looks for `checkly.config.ts` or `checkly.config.js` in the current directory.
 </ResponseField>
 
 <ResponseField name="--force, -f" type="boolean">
-Skip confirmation dialogs and proceed with the operation automatically. Especially useful in CI/CD environments.
 
-### Usage
+Skip confirmation dialogs and proceed with the operation.
+
+**Usage:**
+
 ```bash Terminal
 npx checkly destroy --force
 npx checkly destroy -f
 ```
 
-### Examples
-
-<Tabs>
-<Tab title="CI/CD Pipeline">
-
-```bash Terminal
-# Automated destruction in pipeline
-npx checkly destroy --force
-
-# Output
-Destroying resources without confirmation...
-✓ 12 checks destroyed
-✓ 3 alert channels destroyed
-✓ 2 check groups destroyed
-```
-
-</Tab>
-<Tab title="With Config File">
-
-```bash Terminal
-# Force destroy staging environment
-npx checkly destroy --force --config ./checkly.staging.config.ts
-
-# Destroy with verbose output
-npx checkly destroy -f --verbose
-```
-
-</Tab>
-</Tabs>
-
-**Warning**: Use with extreme caution as this bypasses safety prompts.
+<Warning>Use with extreme caution as this command option bypasses safety prompts.</Warning>
 </ResponseField>
 
 ## What Gets Destroyed
 
-The destroy command removes the following resources that were created by your project:
+The `destroy` command removes the all the resources managed by the specified project. These resources could include:
 
 - **Checks** (API, Browser, Heartbeat, etc.)
+- **Monitors** (URL, TCP, DNC, etc.)
 - **Check Groups** and their configurations
 - **Alert Channels** defined in your project
 - **Maintenance Windows** created via CLI
-- **Environment Variables** at the project level
 - **Private Locations** (if managed by the project)
-- **Snippets** and reusable code blocks
-
-<Warning>
-**Shared Resources**: Be careful with shared resources like alert channels that might be used by other projects or manually created checks.
-</Warning>
 
 ## Safety Considerations
 
-### Confirmation Dialog
 By default, the command prompts for confirmation:
 
 ```bash Terminal
-⚠️  This will destroy all resources in your Checkly project.
-Are you sure you want to continue? (y/N)
-```
+$ npx checkly destroy
 
-### Backup Recommendation
-Before destroying, consider:
-1. **Exporting configuration** to preserve setup
-2. **Documenting dependencies** on shared resources
-3. **Checking team coordination** to avoid conflicts
-
-## Use Cases
-
-### Clean Up Test Environment
-Remove all test resources after development:
-
-```bash Terminal
-npx checkly destroy --config ./checkly.test.config.ts
-```
-
-### CI/CD Pipeline Cleanup
-Automated cleanup in deployment pipelines:
-
-```bash Terminal
-npx checkly destroy --force --config ./checkly.preview.config.ts
-```
-
-### Project Migration
-Remove old resources when migrating to new setup:
-
-```bash Terminal
-# Backup first, then destroy
-npx checkly destroy --verbose
+? Are you sure you want to delete all resources in project "Website Monitoring" for account "Monitoring as Code"?
+Please confirm by typing the project name "Website Monitoring":
 ```
 
 ## Related Commands

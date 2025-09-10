@@ -1,20 +1,14 @@
 ---
 title: checkly env
 description: 'Manage the global variables of a Checkly account.'
-sidebarTitle: 'checkly env TODO'
+sidebarTitle: 'checkly env'
 ---
+
+import CliCommandPrerequisites from '/snippets/cli-command-prerequisites.mdx';
 
 The `checkly env` command manages global environment variables in your Checkly account. Create, update, list, export, and remove variables that are available across all checks in your account.
 
-<Accordion title="Prerequisites">
-Before using `checkly env`, ensure you have:
-
-- Valid Checkly account authentication (run `npx checkly login` if needed)
-- Appropriate permissions to manage environment variables in your account
-- Editor or admin role for creating/updating variables
-
-For additional setup information, see [CLI overview](/cli/overview).
-</Accordion>
+<CliCommandPrerequisites command="checkly env" />
 
 ## Usage
 
@@ -28,126 +22,31 @@ npx checkly env <subcommand> [arguments] [options]
 
 | Subcommand | Description |
 |------------|-------------|
-| `pull` | Export variables to a local file |
-| `ls` | List all global variables |
-| `add` | Create a new variable |
-| `update` | Update an existing variable |
-| `rm` | Remove a variable |
+| `add` | Create and add a new environment variable. |
+| `update` | Update an existing environment variable. |
+| `ls` | List all global environment variables. |
+| `pull` | Export variables to a local file. |
+| `rm` | Remove an environment variable. |
 
-## `pull`
-
-Export global variables from your Checkly account to a local file.
-
-### Usage
-```bash Terminal
-npx checkly env pull [filename]
-```
-
-### Options
-
-<Tabs>
-<Tab title="Unique Options">
-
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `filename` | Target file path | string | No |
-| `--force, -f` | Overwrite existing file without confirmation | boolean | No |
-
-</Tab>
-<Tab title="All Global Options">
-
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `--config, -c` | Specify a configuration file | string | No |
-| `--verbose, -v` | Show detailed output | boolean | No |
-
-For detailed information about global options, see [global options](/cli/global-options).
-
-</Tab>
-</Tabs>
-
-### Examples
-```bash Terminal
-# Pull to default .env file
-npx checkly env pull
-
-# Pull to specific file
-npx checkly env pull .env.production
-
-# Force overwrite existing file
-npx checkly env pull .env.local --force
-```
-
-## `ls`
-
-List all global environment variables in your account.
-
-### Usage
-```bash Terminal
-npx checkly env ls
-```
-
-### Options
-
-<Tabs>
-<Tab title="All Global Options">
-
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `--config, -c` | Specify a configuration file | string | No |
-| `--verbose, -v` | Show detailed output | boolean | No |
-
-For detailed information about global options, see [global options](/cli/global-options).
-
-</Tab>
-</Tabs>
-
-### Examples
-```bash Terminal
-# List all variables
-npx checkly env ls
-
-# List with verbose output
-npx checkly env ls --verbose
-```
-
-Shows variable keys and types. Secret values are hidden for security.
-
-## `add`
+## `checkly env add`
 
 Create a new global environment variable.
 
-### Usage
+**Usage:**
+
 ```bash Terminal
 npx checkly env add <key> <value> [options]
 ```
 
-### Options
+**Options:**
 
-<Tabs>
-<Tab title="Unique Options">
+| Option | Description |
+|--------|-------------|
+| `--locked, -l` | Lock variable. |
+| `--secret, -s` | Store as secret. |
 
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `key` | Variable name | string | Yes |
-| `value` | Variable value | string | Yes |
-| `--locked, -l` | Make variable private to read-only users | boolean | No |
-| `--secret, -s` | Store as encrypted secret | boolean | No |
+**Examples:**
 
-</Tab>
-<Tab title="All Global Options">
-
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `--config, -c` | Specify a configuration file | string | No |
-| `--verbose, -v` | Show detailed output | boolean | No |
-
-For detailed information about global options, see [global options](/cli/global-options).
-
-</Tab>
-</Tabs>
-
-### Examples
 ```bash Terminal
 # Add regular variable
 npx checkly env add ENVIRONMENT "production"
@@ -157,107 +56,116 @@ npx checkly env add INTERNAL_API_URL "https://internal.api.com" --locked
 
 # Add secret variable
 npx checkly env add API_SECRET "super-secret-key" --secret
-
-# Add both locked and secret
-npx checkly env add DATABASE_URL "postgres://prod-db:5432/app" --locked --secret
 ```
 
-## `update`
+## `checkly env update`
 
 Update an existing global environment variable.
 
-### Usage
+**Usage:**
+
 ```bash Terminal
 npx checkly env update <key> <value> [options]
 ```
 
-### Options
+**Options:**
 
-<Tabs>
-<Tab title="Unique Options">
+| Option | Description |
+|--------|-------------|
+| `--locked, -l` | Lock variable. |
+| `--secret, -s` | Store as secret. |
 
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `key` | Variable name to update | string | Yes |
-| `value` | New variable value | string | Yes |
-| `--locked, -l` | Make variable locked/private | boolean | No |
-| `--secret, -s` | Convert to secret (cannot revert) | boolean | No |
+**Examples:**
 
-</Tab>
-<Tab title="All Global Options">
-
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `--config, -c` | Specify a configuration file | string | No |
-| `--verbose, -v` | Show detailed output | boolean | No |
-
-For detailed information about global options, see [global options](/cli/global-options).
-
-</Tab>
-</Tabs>
-
-### Examples
 ```bash Terminal
 # Update regular variable
 npx checkly env update ENVIRONMENT "staging"
 
-# Update and convert to secret
-npx checkly env update API_KEY "new-secret-key" --secret
+# Update and convert to locked
+npx checkly env update API_KEY "new-secret-key" --locked
 
-# Update existing secret (must include --secret flag)
+# Update existing secret
 npx checkly env update DATABASE_PASSWORD "new-password" --secret
 ```
 
-<Warning>When updating secrets, always include the `--secret` flag.</Warning>
+## `checkly env ls`
 
-## `rm`
+List all global environment variables in your account.
+
+**Usage:**
+
+```bash Terminal
+npx checkly env ls
+```
+
+**Examples:**
+
+```bash Terminal
+# List all variables
+npx checkly env ls
+```
+
+Shows variable keys and their values. Secret values are hidden for security.
+
+## `checkly env pull`
+
+Export global variables from your Checkly account to a local file.
+
+**Usage:**
+
+```bash Terminal
+npx checkly env pull [filename] [options]
+```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--force, -f` | Overwrite existing file without confirmation |
+
+**Examples:**
+
+```bash Terminal
+# Pull to default .env file
+npx checkly env pull
+
+# Pull to specific file
+npx checkly env pull .env.production
+
+# Force overwrite existing file
+npx checkly env pull .env.production --force
+```
+
+## `checkly env rm`
 
 Remove a global environment variable.
 
-### Usage
+**Usage:**
+
 ```bash Terminal
 npx checkly env rm <key> [options]
 ```
 
-### Options
+**Options:**
 
-<Tabs>
-<Tab title="Unique Options">
+| Option | Description |
+|--------|-------------|
+| `--force, -f` | Skip confirmation dialog |
 
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `key` | Variable name to remove | string | Yes |
-| `--force, -f` | Skip confirmation dialog | boolean | No |
+**Examples:**
 
-</Tab>
-<Tab title="All Global Options">
-
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `--config, -c` | Specify a configuration file | string | No |
-| `--verbose, -v` | Show detailed output | boolean | No |
-
-For detailed information about global options, see [global options](/cli/global-options).
-
-</Tab>
-</Tabs>
-
-### Examples
 ```bash Terminal
 # Remove with confirmation
-npx checkly env rm OLD_VARIABLE
+npx checkly env rm ENVIRONMENT
 
 # Remove without confirmation
 npx checkly env rm OLD_VARIABLE --force
-
-# Remove multiple variables
-npx checkly env rm VAR1 --force
-npx checkly env rm VAR2 --force
 ```
 
 ## Variable Types
 
 ### Regular Variables
+
 Standard key-value pairs visible to all team members:
 
 ```bash Terminal
@@ -265,14 +173,16 @@ npx checkly env add ENVIRONMENT "production"
 ```
 
 ### Locked Variables
-Private to read-only users, visible to editors and admins:
+
+Locked environment variables can only be accessed by team members with "Read & Write" access or above.
 
 ```bash Terminal
 npx checkly env add INTERNAL_API_URL "https://internal.api.com" --locked
 ```
 
 ### Secrets
-Encrypted storage, values never displayed after creation:
+
+Once saved, secrets are never shown in the UI or in logs. The secret value cannot be accessed via the CLI or API.
 
 ```bash Terminal
 npx checkly env add API_SECRET "super-secret-key" --secret
@@ -281,6 +191,7 @@ npx checkly env add API_SECRET "super-secret-key" --secret
 ## Variable Scope
 
 Environment variables managed by `checkly env` are **global** and available to:
+
 - All checks in your account
 - All check groups
 - All team members (unless locked)
@@ -295,3 +206,7 @@ For check-specific or group-specific variables, use the web UI or configure them
 4. **Document variables** and their purposes for team collaboration
 5. **Regular cleanup** of unused variables to maintain security
 
+## Related Commands
+
+- [`checkly test`](/cli/checkly-test) - Test your setup before deployment
+- [`checkly deploy`](/cli/checkly-deploy) - Deploy your Checkly configuration

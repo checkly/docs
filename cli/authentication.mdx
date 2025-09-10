@@ -1,11 +1,11 @@
 ---
 title: Authentication
 description: 'How to authenticate with the Checkly CLI'
-sidebarTitle: 'Authentication TODO'
+sidebarTitle: 'Authentication'
 ---
 Before you can use the Checkly CLI, you need to authenticate with your Checkly account.
 
-## Login Process
+## Login
 
 The primary way to authenticate is using the interactive login command:
 
@@ -19,40 +19,7 @@ This command will:
 - Generate an API key that the CLI will use for authentication
 - Store the credentials securely on your local machine
 
-## Authentication Options
-
-### Environment Variables
-
-You can also authenticate using environment variables, which is useful for CI/CD pipelines and automated environments:
-
-```bash Terminal
-# Set your Checkly API key
-export CHECKLY_API_KEY=your_api_key_here
-
-# Set your Checkly account ID (optional, CLI will detect automatically)
-export CHECKLY_ACCOUNT_ID=your_account_id_here
-```
-
-### API Key Management
-
-To get your API key:
-
-1. Log in to your Checkly dashboard
-2. Navigate to **Account Settings** → **API Keys**
-3. Create a new API key or copy an existing one
-4. Use the key in your environment variables or CLI configuration
-
-## Verifying Authentication
-
-To verify you're properly authenticated:
-
-```bash Terminal
-npx checkly whoami
-```
-
-This will display your account information and confirm your authentication status.
-
-## Logging Out
+## Log Out
 
 To log out and clear your stored credentials:
 
@@ -62,12 +29,46 @@ npx checkly logout
 
 This will remove the stored API key from your local machine.
 
+## Other Authentication Options
+
+### Environment Variables
+
+You can also authenticate using environment variables, which is useful for CI/CD pipelines and automated environments:
+
+To get your API key:
+
+1. Log in to your Checkly dashboard
+2. Navigate to **Account Settings** → **API Keys**
+3. Create a new API key
+4. Use the key in your environment variables or CLI configuration
+
+Set the account id and API key as follows:
+
+```bash Terminal
+# Set your Checkly API key
+export CHECKLY_API_KEY=your_api_key_here
+
+# Set your Checkly account ID (optional, CLI will detect automatically)
+export CHECKLY_ACCOUNT_ID=your_account_id_here
+```
+
+To verify you're properly authenticated:
+
+```bash Terminal
+npx checkly whoami
+```
+
+This will display your account information and confirm your authentication status.
+
 ## Multiple Accounts
 
 If you work with multiple Checkly accounts, you can switch between them:
 
 ```bash Terminal
-# Switch to a different account
+# Switch to a different account using interactive prompt
+npx checkly switch
+
+# Switch to a different account using the account id
 npx checkly switch --account-id your_account_id
 
 # View current account
@@ -79,8 +80,6 @@ npx checkly whoami
 - **Never commit API keys** to version control
 - **Use environment variables** in production environments
 - **Rotate API keys** regularly for security
-- **Use least privilege** - create API keys with minimal required permissions
-- **Monitor API key usage** in your Checkly dashboard
 
 ## Troubleshooting
 
@@ -92,9 +91,5 @@ npx checkly whoami
 - Ensure your API key hasn't expired
 
 **"Browser didn't open" error:**
-- Manually navigate to the authentication URL shown in the terminal
+- Decline to open the browser automatically and navigate to the authentication URL shown in the terminal
 - Copy and paste the URL into your browser
-
-**"Permission denied" error:**
-- Verify your API key has the necessary permissions
-- Check if your account has the required features enabled

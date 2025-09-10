@@ -1,12 +1,12 @@
 ---
 title: Basic Workflow
 description: 'Complete workflow for using the Checkly CLI - from testing to deployment'
-sidebarTitle: 'Basic Workflow TODO'
+sidebarTitle: 'Basic Workflow'
 ---
 
-The Checkly CLI follows a simple workflow that enables you to test and deploy your monitoring checks. First run `npx checkly test` to test your checks locally, then run `npx checkly deploy` to deploy them to Checkly's infrastructure.
-
 <Note>Before using the CLI, you'll need to [authenticate with your Checkly account](/cli/authentication).</Note>
+
+The Checkly CLI follows a simple workflow that enables you to test and deploy your monitoring checks. First run `npx checkly test` to test your checks locally, then run `npx checkly deploy` to deploy them to Checkly's infrastructure.
 
 ## Step 1: Testing Checks Locally
 
@@ -29,16 +29,32 @@ This command will:
 You can test individual checks or groups:
 
 <CodeGroup>
-```bash Test Specific Check
-npx checkly test --check "My API Check"
+```bash Test by Check Name
+# Match parts of the check name via regular expression
+# This will run checks names "Home page check suite" or "API check suite"
+npx checkly test --grep=".*check suite"
+```
+
+```bash Test by File Name
+# Specify the entire file name
+npx checkly test api.check.ts
+
+# Match parts of the file name
+# This will run api.check.ts and home.check.ts
+npx checkly test api home
 ```
 
 ```bash Test by Tags
-npx checkly test --tags "api,production"
-```
+# Specify a single tag
+npx checkly test --tags api
 
-```bash Test by Group
-npx checkly test --group "E-commerce Monitoring"
+# Specify multiple tags
+# This will run checks tagged with "api" and "multistep"
+npx checkly test --tags "api,multistep"
+
+# Specify multiple tag groups
+# This will run checks tagged with "api" and "multistep" or "browser"
+npx checkly test --tags "api,multistep" --tags "browser"
 ```
 </CodeGroup>
 
@@ -61,13 +77,12 @@ npx checkly test --reporter json
 ### Local Testing Benefits
 
 - **Fast Feedback**: Get immediate results without waiting for scheduled runs
-- **Cost Effective**: No consumption of your Checkly plan's check runs
 - **Development Friendly**: Perfect for debugging and development workflows
-- **CI/CD Integration**: Can be used in automated testing pipelines
+- **CI/CD Integration**: Can be used in automated testing pipelines to verify preview deployments
 
 ## Step 2: Deploying to Checkly
 
-Once you've tested your checks locally and are satisfied with the results, deploy them to Checkly's global infrastructure.
+Once you've tested your checks locally and are satisfied with the results, deploy them to Checkly's global infrastructure to run as scheduled checks.
 
 ### Basic Deployment
 
@@ -76,7 +91,7 @@ npx checkly deploy
 ```
 
 This command will:
-- Upload your check configurations to Checkly
+- Parse and validate your Checkly configurations
 - Create or update checks in your Checkly account
 - Set up the monitoring schedule based on your configuration
 - Deploy to all specified locations
@@ -88,16 +103,12 @@ This command will:
 npx checkly deploy --preview
 ```
 
-```bash Deploy to Environment
-npx checkly deploy --environment production
+```bash Display Changes after
+npx checkly deploy --output
 ```
 
 ```bash Force Deployment
 npx checkly deploy --force
-```
-
-```bash Dry Run
-npx checkly deploy --dry-run
 ```
 </CodeGroup>
 
@@ -106,69 +117,9 @@ npx checkly deploy --dry-run
 The deployment process includes:
 
 1. **Validation**: CLI validates your check configurations
-2. **Upload**: Check files and dependencies are uploaded to Checkly
-3. **Creation/Update**: Checks are created or updated in your account
-4. **Scheduling**: Monitoring schedules are configured
-5. **Activation**: Checks become active and start monitoring
-
-### Post-Deployment Verification
-
-After deployment, you can verify your checks are running:
-
-<CodeGroup>
-```bash List Checks
-npx checkly list
-```
-
-```bash Check Status
-npx checkly status
-```
-
-```bash View Results
-npx checkly results
-```
-</CodeGroup>
-
-## Monitoring Across Environments
-
-<CodeGroup>
-```bash Switch to Staging
-npx checkly switch --environment staging
-```
-
-```bash Switch to Production
-npx checkly switch --environment production
-```
-
-```bash View Current Environment
-npx checkly env
-```
-</CodeGroup>
-
-## Integrating with CI/CD
-
-```yaml
-# Example GitHub Actions workflow
-name: Deploy Monitoring
-on:
-  push:
-    branches: [main]
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - run: npm install
-      - run: npx checkly test
-      - run: npx checkly deploy
-        env:
-          CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
-```
-
-
+2. **Creation/Update**: Checks are created or updated in your account
+3. **Scheduling**: Monitoring schedules are configured
+4. **Activation**: Checks become active and start monitoring
 
 ## Workflow Best Practices
 

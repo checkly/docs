@@ -9,10 +9,9 @@ The `checkly test` command executes all checks in your project on the Checkly cl
 <Accordion title="Prerequisites">
 Before using `checkly test`, ensure you have:
 
-- A Checkly CLI project initialized with `npx checkly init`
-- At least one check file in your project directory
-- Valid Checkly account authentication (run `npx checkly login` if needed)
+- A Checkly CLI project initialized with `npm create checkly@latest`
 - A `checkly.config.ts` or `checkly.config.js` configuration file
+- [Valid Checkly account authentication](/cli/authentication)
 
 For additional setup information, see [CLI overview](/cli/overview).
 </Accordion>
@@ -33,44 +32,121 @@ npx checkly test [file-patterns] [options]
 ```
 
 <Tabs>
-<Tab title="Unique Options">
+<Tab title="Command Options">
 
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `--list` | Display all checks without executing them | boolean | No |
-| `--grep, -g` | Run checks matching a regular expression pattern | string | No |
-| `--update-snapshots, -u` | Update golden images and reference snapshots | boolean | No |
-| `file-patterns` | Specify file patterns to run specific subsets | string[] | No |
-
-</Tab>
-<Tab title="Common Options">
-
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `--record` | Record test session | boolean | No |
-| `--reporter, -r` | Specify output format | string | No |
-| `--tags, -t` | Filter by tags | string | No |
-| `--verbose, -v` | Show detailed output | boolean | No |
-
-</Tab>
-<Tab title="All Global Options">
-
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `--config, -c` | Specify a configuration file | string | No |
-| `--env, -e` | Pass environment variables | string | No |
-| `--env-file` | Load variables from file | string | No |
-| `--location, -l` | Run checks in specific location | string | No |
-| `--private-location` | Use private location | string | No |
-| `--retries` | Set retry attempts | number | No |
-| `--timeout` | Set execution timeout | number | No |
-
-For detailed information about global options, see [global options](/cli/global-options).
+| Option | Description |
+|--------|-------------|
+| `--config, -c` | The Checkly CLI configuration file. If not passed, uses the checkly.config.ts\|js file in the current directory. |
+| `--env, -e` | Env vars to be passed to the test run. |
+| `--grep, -g` | Only run checks where the check name matches a regular expression. |
+| `--reporter, -r` | A list of custom reporters for the test output. |
+| `--tags, -t` | Filter the checks to be run using a comma separated list of tags. |
+| `--test-session-name, -n` | A name to use when storing results in Checkly with `--record`. |
+| `--update-snapshots, -u` | Update any snapshots using the actual result of this test run. |
+| `--\[no-\]verbose, -v` | Always show the full logs of the checks |
+| `--env-file` | dotenv file path to be passed. |
+| `--list` | List all checks but don't run them. |
+| `--private-location` | The private location to run checks at. |
+| `--record` | Record test results in Checkly as a test session with full logs, traces and videos. |
+| `--retries` | How many times to retry a failing test run. |
+| `--timeout` | A timeout (in seconds) to wait for checks to complete. |
+| `--\[no-\]verify-runtime-dependencies` | Return an error if checks import dependencies that are not supported by the selected runtime. |
 
 </Tab>
 </Tabs>
 
-## Unique Options
+## Command Options
+
+<ResponseField name="--config" type="string">
+
+The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts|js` file in the current directory.
+
+**Usage:**
+
+```bash Terminal
+npx checkly test --config="./checkly.staging.config.ts"
+npx checkly test -c="./checkly.staging.config.ts"
+```
+
+</ResponseField>
+
+<ResponseField name="--env" type="string">
+
+Environment variables to be passed to the test run.
+
+**Usage:**
+
+```bash Terminal
+npx checkly test --env ENVIRONMENT_URL="https://preview.acme.com" --env PASSWORD=doremiabc123
+npx checkly test -e ENVIRONMENT_URL="https://preview.acme.com" -e PASSWORD=doremiabc123
+```
+
+</ResponseField>
+
+<ResponseField name="--grep, -g" type="string">
+
+Only run checks where **the check name** matches a regular expression.
+
+**Usage:**
+
+```bash Terminal
+npx checkly test --grep <pattern>
+npx checkly test -g <pattern>
+```
+
+**Examples:**
+
+```bash Terminal
+# Run checks matching a specific pattern
+npx checkly test --grep "api.*test"
+
+# Run checks with multiple patterns (OR logic)
+npx checkly test --grep "homepage|checkout"
+
+# Combine with other options
+npx checkly test --grep "api" --tags production
+```
+</ResponseField>
+
+<ResponseField name="--reporter, -r" type="string">
+Specify one or more output formats for test results. You can combine multiple reporters.
+
+### Usage
+```bash Terminal
+npx checkly test --reporter <format>
+npx checkly test -r <format>
+```
+
+### Examples
+
+<Tabs>
+<Tab title="JSON Reporter">
+
+```bash Terminal
+# JSON output for CI/CD
+npx checkly test --reporter json
+
+# Output
+{"results":[{"name":"Homepage check","status":"passed","duration":1200}]}
+```
+
+</Tab>
+<Tab title="CI Reporter">
+
+```bash Terminal
+# CI-friendly format
+npx checkly test --reporter ci
+
+# Output
+[PASS] Homepage check (1.2s)
+[PASS] API health check (0.8s)
+```
+
+</Tab>
+</Tabs>
+
+**Available reporters**: `list`, `dot`, `ci`, `github`, `json`
+</ResponseField>
 
 <ResponseField name="--list" type="boolean">
 Display all checks in your project without executing them. Useful for verifying which checks would be included in a test run.
@@ -90,28 +166,6 @@ npx checkly test api --list
 
 # List checks with tags
 npx checkly test --tags production --list
-```
-</ResponseField>
-
-<ResponseField name="--grep, -g" type="string">
-Run only checks where the check name matches a JavaScript regular expression pattern.
-
-### Usage
-```bash Terminal
-npx checkly test --grep <pattern>
-npx checkly test -g <pattern>
-```
-
-### Examples
-```bash Terminal
-# Run checks matching a specific pattern
-npx checkly test --grep "api.*test"
-
-# Run checks with multiple patterns (OR logic)
-npx checkly test -g "homepage|checkout"
-
-# Combine with other options
-npx checkly test --grep "api" --tags production
 ```
 </ResponseField>
 
@@ -203,46 +257,6 @@ Test session recorded: Pre-deployment validation
 </Tabs>
 
 **Benefits**: Persistent results, detailed debugging information, team collaboration.
-</ResponseField>
-
-<ResponseField name="--reporter, -r" type="string">
-Specify one or more output formats for test results. You can combine multiple reporters.
-
-### Usage
-```bash Terminal
-npx checkly test --reporter <format>
-npx checkly test -r <format>
-```
-
-### Examples
-
-<Tabs>
-<Tab title="JSON Reporter">
-
-```bash Terminal
-# JSON output for CI/CD
-npx checkly test --reporter json
-
-# Output
-{"results":[{"name":"Homepage check","status":"passed","duration":1200}]}
-```
-
-</Tab>
-<Tab title="CI Reporter">
-
-```bash Terminal
-# CI-friendly format
-npx checkly test --reporter ci
-
-# Output
-[PASS] Homepage check (1.2s)
-[PASS] API health check (0.8s)
-```
-
-</Tab>
-</Tabs>
-
-**Available reporters**: `list` (default), `dot`, `ci`, `github`, `json`
 </ResponseField>
 
 <ResponseField name="--tags, -t" type="string">

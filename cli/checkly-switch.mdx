@@ -1,7 +1,7 @@
 ---
 title: checkly switch
 description: 'Switch between multiple Checkly accounts.'
-sidebarTitle: 'checkly switch TODO'
+sidebarTitle: 'checkly switch'
 ---
 
 The `checkly switch` command switches between multiple Checkly accounts that you have access to with your current credentials. Useful when you need to manage monitoring across different organizations or environments.
@@ -11,7 +11,6 @@ Before using `checkly switch`, ensure you have:
 
 - Valid Checkly account authentication (run `npx checkly login` if needed)
 - Access to multiple Checkly accounts (team memberships, client projects, etc.)
-- Permissions to access the accounts you want to switch between
 
 If you only have access to one account, this command will indicate no alternative accounts are available.
 </Accordion>
@@ -21,40 +20,28 @@ If you only have access to one account, this command will indicate no alternativ
 The basic command displays available accounts and provides an interactive selection interface.
 
 ```bash Terminal
-npx checkly switch
+npx checkly switch [options]
 ```
 
-<Tabs>
-<Tab title="Common Options">
+| Option | Description |
+|--------|-------------|
+| `--account-id, -a` | The id of the account you want to switch to. |
 
-| Option | Description | Type | Required |
-|--------|-------------|------|---------|
-| `--verbose, -v` | Show detailed account information | boolean | No |
 
-</Tab>
-<Tab title="All Global Options">
+## Command Options
 
-| Option | Description | Type | Required |
-|--------|-------------|------|---------|
-| `--config, -c` | Specify a configuration file | string | No |
+<ResponseField name="--account-id, -a" type="string">
 
-For detailed information about global options, see [global options](/cli/global-options).
+The `switch` command asks you to select an account interactively by default. Use this option to switch accounts non-interactively by specifying the target account ID directly.
 
-</Tab>
-</Tabs>
+**Usage:**
 
-## Common Options
-
-<ResponseField name="--verbose, -v" type="boolean">
-Show detailed account information during the selection process, including subscription plans, roles, and additional metadata.
-
-### Usage
 ```bash Terminal
-npx checkly switch --verbose
-npx checkly switch -v
+npx checkly switch --account-id="a43....."
+npx checkly switch -a="a43....."
 ```
 
-### Examples
+## Examples
 
 <Tabs>
 <Tab title="Standard Switch">
@@ -64,108 +51,28 @@ npx checkly switch -v
 npx checkly switch
 
 # Output
-? Select account to switch to:
-❯ Acme Corp (550e8400-e29b-41d4-a716-446655440000)
-  Personal Account (660f9511-f3ac-52e5-b827-557766551111)
-  Client Project (770g0622-g4bd-63f6-c938-668877662222)
+? Which account do you want to use?
+  Production
+  Staging
+  Demo
+  ...
 ```
 
 </Tab>
-<Tab title="Verbose Switch">
+<Tab title="Automatic Switch">
 
 ```bash Terminal
 # Verbose account switching with details
-npx checkly switch --verbose
+npx checkly switch --account-id="a43....."
 
 # Output
-? Select account to switch to:
-❯ Acme Corp (550e8400-e29b-41d4-a716-446655440000) - Team Plan - Admin
-  Personal Account (660f9511-f3ac-52e5-b827-557766551111) - Free Plan - Owner
-  Client Project (770g0622-g4bd-63f6-c938-668877662222) - Enterprise Plan - Editor
-
-✓ Switched to account: Acme Corp
-→ Account: Acme Corp
-→ Role: Admin
-→ Plan: Team Plan
-→ Checks: 24 active
+Account switched to "a43....."
 ```
 
 </Tab>
 </Tabs>
 
-**Use cases**: Understanding account details, verifying permissions, team collaboration.
 </ResponseField>
-
-## Account Selection Interface
-
-### Interactive Selection
-The switch command provides an interactive account selection interface:
-
-```bash Terminal
-? Select account to switch to:
-❯ Acme Corp (550e8400-e29b-41d4-a716-446655440000) - Team Plan
-  Personal Account (660f9511-f3ac-52e5-b827-557766551111) - Free Plan
-  Client Project (770g0622-g4bd-63f6-c938-668877662222) - Enterprise Plan
-
-✓ Switched to account: Acme Corp
-✓ Active account updated
-```
-
-### Account Information Display
-For each available account, the selection interface shows:
-
-- **Account name** and organization
-- **Account ID** (unique identifier)
-- **Subscription plan** (Free, Developer, Team, Enterprise)
-- **Your role** in that account (Owner, Admin, Editor, Viewer)
-- **Current status** (active account is marked)
-
-## Account Access Requirements
-
-### Multiple Account Access
-To use the switch command, you must have access to multiple Checkly accounts through:
-
-- **Team memberships** across different organizations
-- **Client projects** where you're added as a collaborator
-- **Personal accounts** plus organizational accounts
-- **Service accounts** with cross-organization permissions
-
-### Authentication Requirements
-You must be logged in with credentials that have access to multiple accounts. If you only have access to one account, the switch command will display a message indicating no alternative accounts are available.
-
-
-## Use Cases
-
-### Multi-Client Management
-Switch between client accounts when managing multiple projects:
-
-```bash Terminal
-npx checkly switch
-# Select client account
-npx checkly deploy --config client-config.ts
-```
-
-### Environment Separation
-Switch between accounts for different environments:
-
-```bash Terminal
-# Switch to staging account
-npx checkly switch
-npx checkly deploy --config staging.config.ts
-
-# Switch to production account
-npx checkly switch
-npx checkly deploy --config production.config.ts
-```
-
-### Team Collaboration
-Switch to shared team accounts for collaborative work:
-
-```bash Terminal
-npx checkly switch
-# Select team account
-npx checkly test --record --test-session-name "Team validation"
-```
 
 ## Troubleshooting
 
@@ -181,8 +88,7 @@ If an expected account doesn't appear:
 - Check that your user hasn't been removed from the account
 - Try logging out and back in to refresh account permissions
 
-### Permission Issues
-After switching accounts, you may encounter different permissions:
-- Each account has its own role-based access controls
-- Verify your role in the new account supports your intended operations
-- Some operations may require higher privileges in different accounts
+## Related Commands
+
+- [`checkly login`](/cli/checkly-login) - Sign in to your Checkly account
+- [`checkly whoami`](/cli/checkly-whoami) - Display current account information

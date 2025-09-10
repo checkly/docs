@@ -1,19 +1,12 @@
 ---
 title: checkly whoami
 description: 'Display current account and user information.'
-sidebarTitle: 'checkly whoami TODO'
+sidebarTitle: 'checkly whoami'
 ---
 
 The `checkly whoami` command displays detailed information about your current Checkly authentication, including the logged-in user account and active Checkly account details.
 
-<Accordion title="Prerequisites">
-Before using `checkly whoami`, ensure you have:
-
-- Checkly CLI installed
-- Previous authentication attempt (successful or failed)
-
-This command can be run without authentication to check your current status.
-</Accordion>
+This command can also be run without authentication to check your current status.
 
 ## Usage
 
@@ -24,134 +17,27 @@ npx checkly whoami
 ```
 
 
-<Tabs>
-<Tab title="Common Options">
+### Authenticated
 
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `--verbose, -v` | Show additional account details | boolean | No |
-
-</Tab>
-<Tab title="All Global Options">
-
-| Option | Description | Type | Required |
-|--------|-------------|------|----------|
-| `--config, -c` | Specify a configuration file | string | No |
-
-For detailed information about global options, see [global options](/cli/global-options).
-
-</Tab>
-</Tabs>
-
-
-## Options
-<ResponseField name="--verbose, -v" type="boolean">
-Show additional account details including user role, configuration file location, token expiry, and account usage limits.
-
-### Usage
-```bash Terminal
-npx checkly whoami --verbose
-```
-
-### Examples
-
-<Tabs>
-<Tab title="Standard">
+If you're logged in, you'll see:
 
 ```bash Terminal
-# Standard command
 npx checkly whoami
 
-# Output
-✓ Logged in as: john.doe@company.com
-✓ Active account: Acme Corp (550e8400-e29b-41d4-a716-446655440000)
-✓ Account plan: Team
-✓ Account region: US East
-✓ CLI version: 4.15.0
+You are currently on account "Monitoring as Code" (b2f...) as raccoon@checklyhq.com.
 ```
-
-</Tab>
-<Tab title="Verbose">
-
-```bash Terminal
-# Verbose command
-npx checkly whoami --verbose
-
-# Output
-✓ Logged in as: john.doe@company.com
-✓ Active account: Acme Corp (550e8400-e29b-41d4-a716-446655440000)
-✓ Account plan: Team
-✓ Account region: US East
-✓ User role: Admin
-✓ CLI version: 4.15.0
-✓ Config file: /Users/john/.checkly/config.json
-✓ Last login: 2024-01-15T10:30:45Z
-✓ Token expires: 2024-01-22T10:30:45Z
-✓ Account limits:
-  • Checks: 50/100 used
-  • Alert channels: 5/10 used
-  • Private locations: 2/3 used
-```
-
-</Tab>
-</Tabs>
-</ResponseField>
-
-## Troubleshooting
-
-
-<Note>
-If you have access to multiple Checkly accounts, `whoami` shows the currently active account. Use [`checkly switch`](/cli/checkly-switch) to change accounts if needed.
-</Note>
 
 ### Not Authenticated
+
 If not logged in, you'll see:
 
 ```bash Terminal
-❌ Not authenticated
-Please run 'npx checkly login' to authenticate
-```
-
-### Expired Token
-For expired authentication:
-
-```bash Terminal
-⚠️ Authentication token expired
-Please run 'npx checkly login' to re-authenticate
-```
-
-## Use Cases
-
-### Verify Authentication
-Check if you're logged in before running other commands:
-
-```bash Terminal
-npx checkly whoami && npx checkly deploy
-```
-
-### Account Validation
-Confirm you're using the correct account for deployments:
-
-```bash Terminal
-npx checkly whoami
-# Verify account matches your intended deployment target
-npx checkly deploy --preview
-```
-
-### Troubleshooting
-Diagnose authentication issues:
-
-```bash Terminal
-npx checkly whoami --verbose
-```
-
-### CI/CD Verification
-Validate service account authentication in pipelines:
-
-```bash Terminal
-# Verify CI authentication
 npx checkly whoami
 
-# Proceed with deployment
-npx checkly deploy --force
+Error: Run `npx checkly login` or manually set `CHECKLY_API_KEY` & `CHECKLY_ACCOUNT_ID`
+environment variables to setup authentication.
 ```
+
+## Related Commands
+
+- [`checkly login`](/cli/checkly-login) - Sign in to your Checkly account

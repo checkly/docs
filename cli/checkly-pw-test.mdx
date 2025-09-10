@@ -1,7 +1,7 @@
 ---
 title: checkly pw-test
 description: 'Run Playwright tests with Checkly monitoring features'
-sidebarTitle: 'checkly pw-test ALMOST'
+sidebarTitle: 'checkly pw-test'
 ---
 
 The `checkly pw-test` command runs Playwright tests with Checkly monitoring features and reuses the Playwright CLI arguments.
@@ -77,9 +77,7 @@ npx checkly pw-test --config="./checkly.staging.config.ts"
 
 <ResponseField name="--create-check" type="boolean">
 
-TODO
-
-Create a [Checkly Check Suite](/docs/detect/synthetic-monitoring/playwright-checks/overview) from your defined Playwright test suite. This will automatically convert your test into a monitoring check that runs on Checkly's infrastructure.
+Add a new [Playwright Check Suite](/docs/detect/synthetic-monitoring/playwright-checks/overview) with your Playwright configuration to your `checkly.config`.
 
 **Usage:**
 
@@ -87,7 +85,38 @@ Create a [Checkly Check Suite](/docs/detect/synthetic-monitoring/playwright-chec
 npx checkly pw-test --create-check
 ```
 
-You can find more detailed example below in the [Creating Scheduled Checks](#creating-scheduled-checks) section.
+**Examples:**
+
+Running this command:
+
+```bash Terminal
+ npx checkly pw-test --create-check -- --project="Mobile Chrome" --grep="@critical"
+```
+
+Adds a new Playwright Check Suite to your `checkly.config.ts`:
+
+```typescript checkly.config.ts highlight={8-15}
+const config = defineConfig({
+  projectName: "Playwright Project",
+  logicalId: "playwright-project",
+
+  checks: {
+    playwrightConfigPath: "./playwright.config.ts",
+    playwrightChecks: [
+      {
+        logicalId: "playwright-check-project-mobile-chrome-grep-critical",
+        name: 'Playwright Test: "--project=Mobile Chrome" --grep=@critical',
+        testCommand:
+          'npx playwright test "--project=Mobile Chrome" --grep=@critical',
+        locations: ["eu-central-1"],
+        frequency: 10,
+      },
+    ],
+  },
+})
+```
+
+<Note>If there's no existing `checkly.config.ts` file, the `--create-check` option will create one.</Note>
 
 </ResponseField>
 
@@ -327,24 +356,6 @@ npx checkly pw-test -- --grep-invert="skip|todo"
 ```bash Terminal
 # Run a specific test file
 npx checkly pw-test -- test.spec.ts
-```
-
-## Creating Scheduled Checks
-
-Using `pw-test` with the `--create-check` flag will create a check with the Playwright `testCommand` you used
-and with a default monitoring configuration, allowing you to tweak the monitoring configuration for your check.
-If there's no `checkly.config.ts` file, it will create one.
-
-### Regression tests in multiple locations
-
-```bash Terminal
-npx checkly pw-test --create-check --location=us-east-1 --location=eu-west-1 --frequency=5m -- --grep="@regression"
-```
-
-### Mobile tests every 10 minutes
-
-```bash Terminal
-npx checkly pw-test --create-check --frequency=10m -- --project="Mobile Chrome" --grep="@critical"
 ```
 
 ## Key Features

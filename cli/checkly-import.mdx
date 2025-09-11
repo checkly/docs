@@ -1,8 +1,10 @@
 ---
 title: checkly import
 description: 'Import existing resources into your CLI-managed project.'
-sidebarTitle: 'checkly import TODO'
+sidebarTitle: 'checkly import'
 ---
+
+<Tip>Learn more about importing existing Checkly resources in [the "Importing Existing Resources" guide](/cli/importing).</Tip>
 
 The `checkly import` command imports existing resources from your Checkly account into your CLI-managed project. This allows you to bring existing checks, alert channels, and other resources under code management using a structured three-phase workflow.
 
@@ -20,48 +22,18 @@ Before using `checkly import`, ensure you have:
 Import all resources from your account into the current project.
 
 ```bash Terminal
-npx checkly import
+npx checkly import [resources] [options]
 ```
 
-## Extended Usage
-
-Import all resources into a specific directory using the root option.
+**Examples:**
 
 ```bash Terminal
-npx checkly import --root ./src/checks
+# Import a specific resource by its ID
+npx checkly import check:2ce8...
 ```
 
-Import specific resources by providing their type and ID as arguments.
+**Available resource types to import**:
 
-```bash Terminal
-npx checkly import check:abc123 alert-channel:456
-```
-
-Import using a specific configuration file for different environments.
-
-```bash Terminal
-npx checkly import --config ./checkly.staging.config.ts
-```
-
-## Unique Options
-
-### `--root`
-Specify the directory where generated code should be placed.
-
-```bash Terminal
-npx checkly import --root ./monitoring
-```
-
-**Default**: Uses the `checkMatch` directory defined in your `checkly.config.ts/js`.
-
-### Resource Type Selection
-Import specific resources by providing `resource-type:id` arguments:
-
-```bash Terminal
-npx checkly import check:abc123 alert-channel:def456
-```
-
-**Available resource types**:
 - `check` - Individual monitoring checks
 - `check-group` - Collections of related checks
 - `alert-channel` - Notification channels
@@ -72,25 +44,75 @@ npx checkly import check:abc123 alert-channel:def456
 - `status-page` - Status page configurations
 - `status-page-service` - Status page service definitions
 
+`npx checkly import` starts an interactive process that generates an import plan, applies it to create Check files, and commits the changes to mark resources as managed by your CLI project.
+
+| Option | Description |
+|--------|-------------|
+| `--config, -c` | The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts|js` file in the current directory. |
+| `--root` | The root folder in which to write generated code files. |
+
+## Command Options
+
+<ResponseField name="--config, -c" type="string">
+
+Specify a particular configuration file to use instead of the default `checkly.config.ts` or `checkly.config.js`.
+
+**Usage:**
+
+```bash Terminal
+npx checkly import --config=<file-path>
+npx checkly import -c=<file-path>
+```
+
+**Examples:**
+
+```bash Terminal
+$ npx checkly import --config="./checkly.staging.config.ts"
+```
+
+</ResponseField>
+
+<ResponseField name="--root" type="string">
+
+Preview generated code without creating an actual import plan.
+
+**Usage:**
+
+```bash Terminal
+npx checkly import --root=<root-folder>
+npx checkly import -r=<root-folder>
+```
+
+**Examples:**
+
+```bash Terminal
+$ npx checkly import --root="./src/checks"
+```
+
+</ResponseField>
+
 ## Import Workflow
 
 The import process follows a three-phase workflow for safe resource migration:
 
 ### 1. Plan Generation
-Analyze your account and generate an import plan showing what will be imported.
+
+Analyze your account, generate an import plan and create code files for your resources.
 
 ```bash Terminal
 npx checkly import
 ```
 
 ### 2. Plan Application
-Apply the generated plan, creating code files for your resources.
+
+ Apply the generated plan and link the imported resources to your CLI project, but keeps the mapping in a pending state.
 
 ```bash Terminal
 npx checkly import apply
 ```
 
 ### 3. Plan Commitment
+
 Commit the applied changes and mark resources as CLI-managed.
 
 ```bash Terminal
@@ -120,108 +142,21 @@ Cancel a generated plan that hasn't been committed to discard any pending import
 npx checkly import cancel
 ```
 
-## Import Process Example
-
-Complete example showing the full three-phase workflow:
-
-```bash Terminal
-# 1. Generate import plan
-npx checkly import
-# Output shows: "Found 15 checks, 3 alert channels, 1 check group"
-
-# 2. Review and apply the plan
-npx checkly import apply
-# Output: "Created 19 files in ./src/checks/"
-
-# 3. Commit the changes
-npx checkly import commit
-# Output: "Import completed. Resources now managed by CLI."
-```
-
-## Generated Code Structure
-
-Imported resources are converted to CLI constructs with organized directory structure:
-
-```
-src/checks/
-├── api-checks/
-│   ├── homepage-api.check.ts
-│   └── user-login-api.check.ts
-├── browser-checks/
-│   ├── checkout-flow.check.ts
-│   └── user-dashboard.check.ts
-├── alert-channels/
-│   ├── slack-alerts.ts
-│   └── email-notifications.ts
-└── check-groups/
-    └── production-monitoring.group.ts
-```
-
-## Environment Variable Targeting
-
-Use environment-specific imports for different deployment stages:
-
-### Staging Environment Import
-```bash Terminal
-npx checkly import \
-  --config ./checkly.staging.config.ts \
-  --env ENVIRONMENT=staging
-```
-
-### Production Environment Import
-```bash Terminal
-npx checkly import \
-  --config ./checkly.production.config.ts \
-  --env ENVIRONMENT=production
-```
-
-## Selective Import Strategy
-
-For large accounts, consider importing incrementally to manage complexity:
-
-Import critical checks first by check group.
-
-```bash Terminal
-npx checkly import check-group:production
-```
-
-Import alert channels to establish notification infrastructure.
-
-```bash Terminal
-npx checkly import alert-channel:slack alert-channel:email
-```
-
-Import remaining resources after establishing core infrastructure.
-
-```bash Terminal
-npx checkly import
-```
-
 ## Best Practices
 
 ### Before Importing
-1. **Backup existing project** structure
+
+1. **Rely on version control and git** to track changes
 2. **Review your account** resources to understand what will be imported
 3. **Plan directory structure** using `--root` if needed
-4. **Test with specific resources** first using `resource-type:id` syntax
+4. **Import specific resources** using `resource-type:id` syntax
 
 ### After Importing
+
 1. **Review generated code** for accuracy and style consistency
 2. **Test imported checks** using `checkly test`
 3. **Commit to version control** to track changes
 4. **Deploy to verify** everything works as expected
-
-## Troubleshooting
-
-### Resource Conflicts
-If resources already exist in your project, the import will show conflicts in the plan. Review carefully before applying.
-
-### Permission Issues
-Ensure your account has sufficient permissions to read all resources you're trying to import.
-
-### Large Account Import
-For accounts with many resources, consider using the selective import approach to manage complexity.
-
 
 ## Related Commands
 

@@ -222,7 +222,7 @@ Response time threshold in milliseconds for marking the check as degraded. This 
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new ApiCheck("performance-check", {
   name: "Performance Monitoring",
   degradedResponseTime: 2000, // Warning at 2 seconds
@@ -242,7 +242,7 @@ Maximum response time in milliseconds before marking the check as failed. This s
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new ApiCheck("timeout-check", {
   name: "API Timeout Check",
   maxResponseTime: 5000, // Fail if response takes longer than 5 seconds
@@ -261,7 +261,7 @@ Whether a failure should count as a pass. When set to `true`, HTTP status codes 
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new ApiCheck("negative-test", {
   name: "Test Error Handling",
   shouldFail: true, // Expect this to fail
@@ -316,7 +316,7 @@ Script to run before the API Check execution. Useful for setting up test data or
 
 <CodeGroup>
 
-```ts File Reference
+```ts File Reference highlight={3-5}
 new ApiCheck("api-with-setup", {
   name: "API with Setup Script",
   setupScript: {
@@ -329,7 +329,7 @@ new ApiCheck("api-with-setup", {
 })
 ```
 
-```ts Inline Script
+```ts Inline Script highlight={3-8}
 new ApiCheck('inline-setup', {
   name: 'API with Inline Setup',
   setupScript: {
@@ -369,7 +369,7 @@ Script to run after the API Check execution. Useful for cleaning up test data or
 
 <CodeGroup>
 
-```ts File Reference
+```ts File Reference highlight={3-5}
 new ApiCheck("api-with-teardown", {
   name: "API with Teardown Script",
   tearDownScript: {
@@ -382,7 +382,7 @@ new ApiCheck("api-with-teardown", {
 })
 ```
 
-```ts Inline Script
+```ts Inline Script highlight={3-9}
 new ApiCheck("inline-teardown", {
   name: "API with Inline Teardown",
   tearDownScript: {

@@ -186,7 +186,7 @@ Friendly name for your Browser Check that will be displayed in the Checkly dashb
 
 **Usage:**
 
-```ts
+```ts highlight={2}
 new BrowserCheck("my-check", {
   name: "User Login Flow Test",
   /* More options... */
@@ -200,7 +200,9 @@ How often the Browser Check should run. Use the `Frequency` enum to set the chec
 
 **Usage:**
 
-```ts
+```ts highlight={5}
+import { Frequency } from 'checkly/constructs'
+
 new BrowserCheck("my-check", {
   name: "My Browser Check",
   frequency: Frequency.EVERY_5M,
@@ -242,7 +244,7 @@ Array of public location codes where the Browser Check should run. Multiple loca
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new BrowserCheck("my-check", {
   name: "My Browser Check",
   locations: ["us-east-1", "eu-west-1", "ap-southeast-1"],
@@ -288,7 +290,7 @@ Whether the browser check is enabled and will run according to its schedule.
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new BrowserCheck("my-check", {
   name: "My Browser Check",
   activated: false, // Disabled check
@@ -304,7 +306,7 @@ Array of tags to organize and categorize your Browser Checks in the Checkly infr
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new BrowserCheck("my-check", {
   name: "My Browser Check",
   tags: ["e2e", "critical-path", "user-journey"],
@@ -352,7 +354,7 @@ Check-level environment variables that will be available during test execution. 
 
 **Usage:**
 
-```ts
+```ts highlight={3-6}
 new BrowserCheck("my-check", {
   name: "My Browser Check",
   environmentVariables: [

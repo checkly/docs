@@ -244,7 +244,7 @@ Time to wait before the first retry attempt. Also used as the base value for cal
 
 **Usage:**
 
-```ts
+```ts highlight={3,8,13}
 // Quick retries for fast services
 RetryStrategyBuilder.fixedStrategy({
   baseBackoffSeconds: 30, // Fixed: 30s, 30s, 30s
@@ -267,7 +267,7 @@ Maximum number of retry attempts after the initial failure. The total number of 
 
 **Usage:**
 
-```ts
+```ts highlight={2}
 RetryStrategyBuilder.linearStrategy({
   maxRetries: 3, // 3 retry attempts after initial failure
 })
@@ -281,7 +281,7 @@ Maximum total time to spend on all retry attempts. If the calculated retry sched
 
 **Usage:**
 
-```ts
+```ts highlight={2}
 RetryStrategyBuilder.exponentialStrategy({
   maxDurationSeconds: 300, // Stop retrying after 5 minutes total
 })
@@ -291,8 +291,9 @@ RetryStrategyBuilder.exponentialStrategy({
 <ResponseField name="sameRegion" type="boolean" default="true">
 Whether retry attempts should run from the same region as the original failed check, or from different regions to help identify regional issues.
 
-### Usage
-```ts
+**Usage:**
+
+```ts highlight={2}
 RetryStrategyBuilder.linearStrategy({
   sameRegion: false, // Try different regions for retries
 })

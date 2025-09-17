@@ -105,7 +105,7 @@ Friendly name for your check group that will be displayed in the Checkly dashboa
 
 **Usage:**
 
-```ts
+```ts highlight={2}
 const group = new CheckGroupV2("api-monitoring-group", {
   name: "API Monitoring Group",
 })
@@ -120,7 +120,7 @@ Whether checks in the group are running. When false, all checks in the group are
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 const group = new CheckGroupV2("api-monitoring-group", {
   name: "API Monitoring Group",
   activated: false,
@@ -136,7 +136,7 @@ Whether to mute alerts for all checks in the group. Checks will still run but wo
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 const group = new CheckGroupV2("api-monitoring-group", {
   name: "API Monitoring Group",
   muted: true, // Silence all alerts
@@ -151,7 +151,9 @@ How often to run checks within the group. This frequency applies to all checks i
 
 **Usage:**
 
-```ts
+```ts highlight={5}
+import { Frequency } from 'checkly/constructs'
+
 const group = new CheckGroupV2('api-monitoring-group', {
   name: "API Monitoring Group",
   frequency: Frequency.EVERY_10M
@@ -168,7 +170,7 @@ Public locations for all checks in the group. Checks inherit these locations unl
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 const group = new CheckGroupV2("api-monitoring-group", {
   name: "API Monitoring Group",
   locations: ["us-east-1", "eu-west-1", "ap-southeast-1"],

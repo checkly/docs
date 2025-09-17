@@ -65,7 +65,7 @@ Phone number to send SMS notifications to. Each SmsAlertChannel supports only on
 
 **Usage:**
 
-```ts
+```ts highlight={2}
 new SmsAlertChannel("team-sms", {
   phoneNumber: "+1234567890",
 })
@@ -79,10 +79,10 @@ Friendly name for the SMS alert channel (e.g. "Tim's phone").
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new SmsAlertChannel("team-sms", {
-  phoneNumber: "+1234567890",
   name: "Tim's phone",
+  phoneNumber: "+1234567890",
 })
 ```
 
@@ -96,7 +96,7 @@ Whether to send notifications when checks recover from failure or degraded state
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new SmsAlertChannel("recovery-sms", {
   phoneNumber: "+1234567890",
   sendRecovery: true, // Send recovery notifications
@@ -133,7 +133,7 @@ Whether to send notifications when checks fail.
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new SmsAlertChannel("failure-sms", {
   phoneNumber: "+1234567890",
   sendFailure: true, // Send failure notifications
@@ -173,7 +173,7 @@ Whether to send notifications when API checks degrade (performance thresholds ex
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new SmsAlertChannel("performance-sms", {
   phoneNumber: "+1234567890",
   sendDegraded: true, // Send degraded performance notifications
@@ -188,7 +188,7 @@ Whether to send notifications for SSL certificate expiry warnings.
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new SmsAlertChannel("security-sms", {
   phoneNumber: "+1234567890",
   sslExpiry: true,
@@ -202,8 +202,9 @@ new SmsAlertChannel("security-sms", {
 <ResponseField name="sslExpiryThreshold" type="number">
 Number of days before SSL certificate expiry to send notifications. Only relevant when `sslExpiry` is enabled.
 
-Usage:
-```ts
+**Usage:**
+
+```ts highlight={4}
 new SmsAlertChannel("ssl-monitoring", {
   phoneNumber: "+1234567890",
   sslExpiry: true,

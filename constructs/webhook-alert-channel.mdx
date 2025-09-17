@@ -99,7 +99,7 @@ Target URL for the webhook request. This is where Checkly will send the HTTP req
 
 **Usage:**
 
-```ts
+```ts highlight={4}
 new WebhookAlertChannel("webhook-channel", {
   name: "API Integration",
   method: "POST",
@@ -153,7 +153,7 @@ HTTP method for the webhook request. Supported methods: `GET`, `POST`, `PUT`, `P
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new WebhookAlertChannel("webhook-channel", {
   name: "API Integration",
   method: "POST", // Most common for webhooks
@@ -212,7 +212,7 @@ Friendly name for the webhook channel to identify it in your Checkly dashboard.
 
 **Usage:**
 
-```ts
+```ts highlight={2}
 new WebhookAlertChannel("webhook-channel", {
   name: "Custom API Integration",
   method: "POST",
@@ -264,7 +264,7 @@ Request body template (commonly JSON) with Handlebars-style variables that are r
 
 **Usage:**
 
-```ts
+```ts highlight={5-8}
 new WebhookAlertChannel("template-webhook", {
   name: "Templated Webhook",
   method: "POST",
@@ -338,7 +338,7 @@ Array of HTTP headers to include in the webhook request. Each header is an objec
 
 **Usage:**
 
-```ts
+```ts highlight={5-8}
 new WebhookAlertChannel("headers-webhook", {
   name: "Headers Webhook",
   method: "POST",
@@ -391,7 +391,7 @@ Array of query parameters to include in the webhook URL. Each parameter is an ob
 
 **Usage:**
 
-```ts
+```ts highlight={5-8}
 new WebhookAlertChannel("query-webhook", {
   name: "Query Webhook",
   method: "GET",
@@ -461,7 +461,7 @@ Whether to send webhook requests when checks recover from failure or degraded st
 
 **Usage:**
 
-```ts
+```ts highlight={5}
 new WebhookAlertChannel("recovery-webhook", {
   name: "Recovery Notifications",
   method: "POST",
@@ -504,7 +504,7 @@ Whether to send webhook requests when checks fail.
 
 **Usage:**
 
-```ts
+```ts highlight={5}
 new WebhookAlertChannel("failure-webhook", {
   name: "Failure Notifications",
   method: "POST",
@@ -547,8 +547,9 @@ const comprehensiveWebhook = new WebhookAlertChannel("all-notifications", {
 <ResponseField name="sendDegraded" type="boolean">
 Whether to send webhook requests when API checks degrade (performance thresholds exceeded but not failed).
 
-Usage:
-```ts
+**Usage:**
+
+```ts highlight={5}
 new WebhookAlertChannel("performance-webhook", {
   name: "Performance Monitoring",
   method: "POST",
@@ -557,7 +558,7 @@ new WebhookAlertChannel("performance-webhook", {
 })
 ```
 
-Examples:
+**Examples:**
 
 <CodeGroup>
 
@@ -606,7 +607,7 @@ Whether to send webhook requests for SSL certificate expiry warnings.
 
 **Usage:**
 
-```ts
+```ts highlight={5}
 new WebhookAlertChannel("security-webhook", {
   name: "Security Team",
   method: "POST",
@@ -663,7 +664,7 @@ Number of days before SSL certificate expiry to send webhook requests. Only rele
 
 **Usage:**
 
-```ts
+```ts highlight={6}
 new WebhookAlertChannel("ssl-monitoring", {
   name: "SSL Monitoring",
   method: "POST",

@@ -63,7 +63,7 @@ Email address to send notifications to. Each EmailAlertChannel supports only one
 
 **Usage:**
 
-```ts
+```ts highlight={2}
 new EmailAlertChannel('team-email', {
   address: 'dev-team@acme.com'
 })
@@ -115,7 +115,7 @@ Whether to send notifications when checks recover from failure or degraded state
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new EmailAlertChannel("recovery-email", {
   address: "ops@acme.com",
   sendRecovery: true, // Send recovery notifications
@@ -152,7 +152,7 @@ Whether to send notifications when checks fail.
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new EmailAlertChannel("failure-email", {
   address: "oncall@acme.com",
   sendFailure: true, // Send failure notifications
@@ -192,7 +192,7 @@ Whether to send notifications when API checks degrade (performance thresholds ex
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new EmailAlertChannel("performance-email", {
   address: "performance-team@acme.com",
   sendDegraded: true, // Send degraded performance notifications
@@ -207,7 +207,7 @@ Whether to send notifications for SSL certificate expiry warnings.
 
 **Usage:**
 
-```ts
+```ts highlight={3}
 new EmailAlertChannel("security-email", {
   address: "security@acme.com",
   sslExpiry: true,
@@ -221,8 +221,9 @@ new EmailAlertChannel("security-email", {
 <ResponseField name="sslExpiryThreshold" type="number">
 Number of days before SSL certificate expiry to send notifications. Only relevant when `sslExpiry` is enabled.
 
-Usage:
-```ts
+**Usage:**
+
+```ts highlight={4}
 new EmailAlertChannel("ssl-monitoring", {
   address: "devops@acme.com",
   sslExpiry: true,

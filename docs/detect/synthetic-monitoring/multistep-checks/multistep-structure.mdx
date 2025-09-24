@@ -1,16 +1,14 @@
 ---
-
-title: 'Multistep Check Test Structure'
+title: 'Multistep Check Structure'
 description: 'Learn how to structure your multistep checks with Playwright.'
-sidebarTitle: Test Structure
+sidebarTitle: MaC Structure
 ---
 
 <Tip>
 **Monitoring as Code**: Learn more about the [Multistep Check Construct](/constructs/multistep-check).
 </Tip>
 
-## Multistep Check Structure
-
+## Multistep Check Construct
 
 ```ts multistep-check.ts
 import { MultiStepCheck, Frequency } from 'checkly/constructs'
@@ -32,89 +30,92 @@ new MultiStepCheck('multistep-check-1', {
 
 Multistep checks use Playwright's `test.step()` function to organize sequential operations:
 
-```typescript onboarding.spec.ts
-import { test, expect } from '@playwright/test'
+```typescript check-group.spec.ts
+import { test, expect } from '@playwright/test' // 1
 
-test('Complete user onboarding workflow', async ({ request }) => {
-  let userId, authToken, profileId
+const headers = { // 2
+  Authorization: `Bearer ${process.env.API_KEY}`,
+  'x-checkly-account': process.env.ACCOUNT_ID,
+}
 
-  await test.step('Register new user', async () => {
-    const response = await request.post('/api/auth/register', {
+const baseUrl = process.env.API_URL ?? 'https://api.checklyhq.com/v1'
+
+test('create and delete a check group', async ({ request }) => { // 3
+  const createdGroup = await test.step('POST /check-groups', async () => { // 4
+    const response = await request.post(`${baseUrl}/check-groups`, {
       data: {
-        email: 'newuser@example.com',
-        password: 'SecurePass123!',
-        firstName: 'John',
-        lastName: 'Doe'
-      }
+        locations: ['eu-west-1'],
+        name: 'exampleCheckGroup',
+      },
+      headers,
     })
-    
-    expect(response.status()).toBe(201)
-    const userData = await response.json()
-    userId = userData.id
-    expect(userId).toBeDefined()
+    expect(response).toBeOK() // 5
+    return response.json() // 6
   })
 
-  await test.step('Verify email and activate account', async () => {
-    const response = await request.post(`/api/auth/verify/${userId}`, {
-      data: { verificationCode: 'TEST_CODE' }
+  await test.step('DELETE /check-group/{id}', async () => { // 7
+    const response = await request.delete(`${baseUrl}/check-groups/${createdGroup.id}`, {
+      headers,
     })
-    
-    expect(response.status()).toBe(200)
-    const result = await response.json()
-    authToken = result.token
-    expect(authToken).toBeDefined()
-  })
-
-  await test.step('Complete user profile', async () => {
-    const response = await request.post('/api/users/profile', {
-      headers: { 'Authorization': `Bearer ${authToken}` },
-      data: {
-        company: 'Example Corp',
-        role: 'Developer',
-        preferences: { newsletter: true }
-      }
-    })
-    
-    expect(response.status()).toBe(201)
-    const profile = await response.json()
-    profileId = profile.id
-    expect(profile.company).toBe('Example Corp')
-  })
-
-  await test.step('Verify complete onboarding', async () => {
-    const response = await request.get(`/api/users/${userId}/status`, {
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    })
-    
-    expect(response.status()).toBe(200)
-    const status = await response.json()
-    expect(status.onboardingComplete).toBe(true)
-    expect(status.profileId).toBe(profileId)
+    expect(response).toBeOK()
   })
 })
 ```
+## Test Structure
+Let's look at the code above step-by-step, as it determines what our Multistep check will do.
+
+**1. Initial declarations:** Import the Playwright test framework.
+
+**2. Define our headers:** In many cases, you will have to authenticate when requesting data by providing authorization headers. Use [environment variables](/docs/browser-checks/variables/) to avoid having any confidential data in your test.
+
+**3. Establish environment:** Create a new test and leverage the Playwright `request` fixture to make API requests in the test steps.
+
+**4. Declare our first `test.step`:** The test step uses the `request` to perform a `post` request, using the headers we defined earlier.
+
+<Warning>
+Always use `await` before `test.step`, otherwise the test will fail.
+</Warning>
+
+**5. Define our assertion:** Use the `expect(response)` method to assert if the response was successful (the response code is in the range of 200 - 299) with `toBeOK()`. Should the request return anything outside of the 'OK' range, the check will fail and in a production scenario, trigger any configured alerts.
+
+**6. Return the response for future usage:** Return the request response in JSON format, so we can use it in the next test step.
+
+**7. Declare our second `test.step`:** In order to remove the test group we just created, and avoid cluttering our system with test data, remove it by sending a `delete` request using the group ID that was returned in our earlier test step. Use the same `toBeOK()` assertion as in the previous test step.
+
+If you want to build on the above example, you can add additional assertions, ensuring that the data returned is correct and contains a specific check, or add a `PUT` and `GET` test step to verify more of the `/check-groups` functionality.
+
 
 ## API Request Capabilities
 
 ### HTTP Methods Support
-```typescript
-// GET requests
-const response = await request.get('/api/users/123')
 
-// POST requests with data
+<Tabs>
+<Tab title="GET">
+```typescript
+const response = await request.get('/api/users/123')
+```
+</Tab>
+<Tab title="POST">
+```typescript
 const response = await request.post('/api/users', {
   data: { name: 'John', email: 'john@example.com' }
 })
-
-// PUT/PATCH requests
+```
+</Tab>
+<Tab title="PUT/PATCH">
+```typescript
 const response = await request.patch('/api/users/123', {
   data: { status: 'active' }
 })
-
-// DELETE requests
+```
+</Tab>
+<Tab title="DELETE">
+```typescript
 const response = await request.delete('/api/users/123')
-
-// Custom headers
+```
+</Tab>
+<Tab title="Custom Headers">
+```typescript
 const response = await request.get('/api/protected', {
   headers: {
     'Authorization': 'Bearer token123',
@@ -123,10 +124,14 @@ const response = await request.get('/api/protected', {
   }
 })
 ```
+</Tab>
+</Tabs>
 
 ### Request Configuration
+
+<Tabs>
+<Tab title="Query Parameters">
 ```typescript
-// Query parameters
 const response = await request.get('/api/search', {
   params: {
     q: 'javascript',
@@ -134,16 +139,20 @@ const response = await request.get('/api/search', {
     offset: 0
   }
 })
-
-// Form data
+```
+</Tab>
+<Tab title="Form Data">
+```typescript
 const response = await request.post('/api/upload', {
   form: {
     file: fs.readFileSync('document.pdf'),
     description: 'Important document'
   }
 })
-
-// JSON data
+```
+</Tab>
+<Tab title="JSON Data">
+```typescript
 const response = await request.post('/api/data', {
   data: {
     items: [
@@ -153,6 +162,8 @@ const response = await request.post('/api/data', {
   }
 })
 ```
+</Tab>
+</Tabs>
 
 ## Data Flow Between Steps
 
@@ -248,56 +259,3 @@ await test.step('Extract and validate response data', async () => {
 ```
 
 
-## Environment Configuration
-
-### Dynamic Configuration
-```typescript
-// Environment-specific configuration
-const config = {
-  baseURL: process.env.API_BASE_URL || 'https://api.example.com',
-  authEndpoint: process.env.AUTH_ENDPOINT || '/api/auth/login',
-  testUser: {
-    email: process.env.TEST_USER_EMAIL,
-    password: process.env.TEST_USER_PASSWORD
-  }
-}
-
-test('Environment-aware workflow', async ({ request }) => {
-  // Configure request defaults
-  request = request.defaults({
-    baseURL: config.baseURL,
-    extraHTTPHeaders: {
-      'User-Agent': 'Checkly-Multistep-Check/1.0'
-    }
-  })
-
-  await test.step('Authenticate with environment credentials', async () => {
-    const response = await request.post(config.authEndpoint, {
-      data: config.testUser
-    })
-    
-    expect(response.status()).toBe(200)
-  })
-})
-```
-
-## Integration and Deployment
-
-### CLI Integration
-```typescript
-// checkly.config.ts
-import { MultistepCheck, Frequency } from 'checkly/constructs'
-
-new MultistepCheck('user-onboarding-flow', {
-  name: 'User Onboarding Workflow',
-  frequency: Frequency.EVERY_10M,
-  locations: ['us-east-1', 'eu-west-1'],
-  code: {
-    entrypoint: './onboarding-workflow.spec.ts'
-  },
-  environmentVariables: [
-    { key: 'API_BASE_URL', value: 'https://api.example.com' },
-    { key: 'TEST_USER_EMAIL', value: '{{TEST_USER_EMAIL}}' }
-  ]
-})
-```

@@ -1,13 +1,24 @@
 ---
-title: Web Vitals in Checkly
+title: Performance & Web Vitals
 description: 'Web Vitals for browser checks'
-sidebarTitle: 'Web Vitals'
+sidebarTitle: 'Performance Metrics'
 ---
 
+Checkly automatically collect Network Waterfalls & Performance signals (**Web Vitals**) for each of the pages you visit in the browser session.
 
-Next to this, we also automatically collect Performance signals (**Web Vitals**) for each of the pages you visit in the browser session.
+<Frame>
+      <img 
+        className="block dark:hidden" 
+        src="/images/next/browser-check-performance-results-light.png" 
+        alt="Light mode interface"
+      />
+      <img 
+        className="hidden dark:block" 
+        src="/images/next/browser-check-performance-results-dark.png" 
+        alt="Dark mode interface"
+      />
+    </Frame>
 
-![tracing and web vitals for Playwright based browser checks](/images/docs/images/browser-checks/tracing_web_vitals.png)
 
 <Callout type="warning" emoji="⚠️">
 Checkly only collects tracing and web vitals data if your browser check meets the following criteria:
@@ -15,8 +26,8 @@ Checkly only collects tracing and web vitals data if your browser check meets th
 - It runs on any **runtime above [2021.06](/cli/runtimes)**
 </Callout>
 
-## Page navigations
 
+## Network Waterfalls
 For each page you visit, we automatically collect the following:
 
 1. Any `error`, `warning` or `info` level console messages.
@@ -27,7 +38,8 @@ You can use this data to quickly find issues with the pages you visit. Use cases
 - Finding critical errors in your JavaScript by scanning the console logs.
 - Pinpoint missing images or other resources: they will show a `404` in the network tab.
 
-## Performance tracing with Web Vitals
+
+## Web Performance Vitals
 
 For each page your script visits, we automatically collect a set of five [Web Vitals](https://web.dev/learn-web-vitals/).
 Web Vitals are user focused quality signals for web pages that indicate a good, ok or poor user experience.
@@ -71,23 +83,23 @@ Indicates how long it took for your server to respond with the first byte of con
 Web Vitals are a part [Google Lighthouse](https://developers.google.com/web/tools/lighthouse), but the two are not the same: Web Vitals are a lighter, higher-level tool built on existing browser APIs. Being less resource-intensive than Lighthouse, Web Vitals can be reliably calculated for you on cloud resources every minute.
 </Callout>
 
-## Why are some Web Vitals not reported?
+### Why are some Web Vitals not reported?
 
 Checkly automatically instruments your Playwright code to collect Web Vitals metrics. However, in some cases we will not
 be able to collect a good measurement. There are multiple reasons for this:
 
-### Single Page Applications (SPAs) - **Route-Based Navigation**
+#### Route-Based Navigation
 
 A Single Page App like a React, Vue or Angular app only has one HTML page load event and then relies on route changes.
 The underlying [library we use for collecting Web Vitals](https://github.com/GoogleChrome/web-vitals) does not yet account for this.
 The folks over at Google are aware of this and [posted an FAQ](https://web.dev/vitals-spa-faq/).
 
-### Fast Script Execution - **Insufficient Measurement Time**
+#### Insufficient Measurement Time
 
 Cumulative Layout Shift (CLS) relies on layout events accumulating over time. If your script exits very fast, or triggers
 a redirect, there might not be enough time to actually "catch" this metric.
 
-### wInteraction Requirements - **User Interaction Needed**
+#### User Interaction Needed
 
 Some metrics require a small amount of interaction to effectively "trigger". Clicking a button or other screen element
 in your Playwright script can help here.
@@ -97,7 +109,7 @@ in your Playwright script can help here.
 We are constantly tweaking and updating our Web Vitals collection code, so expect improvements in the future!
 </Callout>
 
-## Lab metrics vs. Field metrics
+### Lab metrics vs. Field metrics
 
 Checkly collects "lab" metrics for you. These are different from "field" metrics. 
 

@@ -4,9 +4,9 @@ description: 'Learn how to troubleshoot browser checks.'
 sidebarTitle: Troubleshooting
 ---
 
-## Troubleshooting Common Issues
+## Common Issues
 
-### Element Selection Problems
+<Accordion title="Element Selection Problems">
 **Issue: Elements not found or interactions failing**
 
 **Solutions**:
@@ -15,7 +15,9 @@ sidebarTitle: Troubleshooting
 3. Use more specific or stable selectors
 4. Check for iframe or shadow DOM elements
 
-### Timing and Race Conditions
+</Accordion>
+
+<Accordion title="Timing and Race Conditions">
 **Issue: Tests failing due to timing issues**
 
 **Solutions**:
@@ -24,7 +26,9 @@ sidebarTitle: Troubleshooting
 3. Use `waitForLoadState()` for page readiness
 4. Implement proper error handling and retries
 
-### Authentication and Session Issues
+</Accordion>
+
+<Accordion title="Authentication and Session Issues">
 **Issue: Login failures or session timeouts**
 
 **Solutions**:
@@ -33,7 +37,9 @@ sidebarTitle: Troubleshooting
 3. Use session storage for authentication state
 4. Test login flow separately from main workflow
 
-### Performance and Timeout Issues
+</Accordion>
+
+<Accordion title="Performance and Timeout Issues">
 **Issue: Tests timing out or running too slowly**
 
 **Solutions**:
@@ -42,14 +48,12 @@ sidebarTitle: Troubleshooting
 3. Use parallel execution where possible
 4. Monitor and alert on performance degradation
 
+</Accordion>
+
  ## Error Handling and Debugging
 
 
-
-
-
-
-### Wait Strategies
+<Accordion title="Wait Strategies">
 ```typescript
 // Wait for specific conditions
 await page.waitForSelector('[data-testid="loading-complete"]')
@@ -65,7 +69,9 @@ await page.waitForResponse(response =>
 await page.waitForSelector('.slow-element', { timeout: 30000 })
 ```
 
-### Error Recovery
+</Accordion>
+
+<Accordion title="Error Recovery">
 ```typescript
 // Graceful error handling
 try {
@@ -82,3 +88,5 @@ if (!isLoggedIn) {
   // Handle login flow
 }
 ```
+
+</Accordion>

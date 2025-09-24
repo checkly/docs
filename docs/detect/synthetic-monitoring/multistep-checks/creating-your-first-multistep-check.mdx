@@ -11,625 +11,83 @@ Multistep checks allow you to monitor complex API workflows that span multiple e
 You'll need a series of API endpoints that work together to complete a business process. Multistep checks excel at testing workflows that require data to flow from one API call to the next.
 </Note>
 
+<Frame>
+![Multistep check edit page](/images/docs/images/multistep-api-checks/create-multistep-check.png)
+</Frame>
 
-## Step-by-Step Setup
+### Name and tags
 
-<Steps>
-<Step title="Navigate to Multistep Checks">
-1. Log into your Checkly dashboard
-2. Go to **Checks** in the main navigation
-3. Click **Create Check** and select **Multistep Check**
+A meaningful name will not only help you and others identify your checks within Checkly, but it will help provide a better alerting experience if your checks fall into an alert state.
 
-![Navigate to create multistep check](/images/docs/images/multistep-api-checks/create-multistep-check-nav.png)
+Tags can relate your checks together. They also determine which checks are shown on your [dashboards](/docs/dashboards/).
 
-**Check Configuration**:
-- **Name**: Descriptive workflow name (e.g., "User Registration Flow")
-- **Tags**: Organize with labels like "critical", "auth", "workflow"
-- **Group**: Assign to a check group for shared settings and alerting
-</Step>
+### Playwright script
 
-<Step title="Write Your Workflow Script">
-Multistep checks use Playwright's `test.step()` function to organize sequential API requests:
+A valid Multistep check is based on a valid [Playwright API test script](https://playwright.dev/docs/api-testing). You can create these scripts either in the in-app editor, or write them in your IDE and deploy them using the [Checkly CLI](/docs/cli/). For production, we recommend using the CLI so you can leverage best practices such as version control and code reviews before updating your checks.
 
-```typescript
+> Valid Playwright Test API scripts are the foundation of a valid Multistep check. If the script passes, your check passes.
+> If the script fails, your check fails.
+
+#### Structuring a Multistep check
+
+To preserve test isolation and provide a structured report view of Multistep checks, Checkly relies on Playwright's [test.step](https://playwright.dev/docs/api/class-test#test-step) method. Your Multistep check can have several test steps.
+
+API requests and assertions in the same test step will be presented under the same node in the reporting structure.
+
+![Multistep test results](/images/docs/images/multistep-api-checks/test-results.jpg)
+
+To provide actionable and easy-to-read [check run results](/docs/monitoring/check-results/#multistep-check-results), we recommend using the `test.step()` structure when writing the Playwright script for you Multistep check.
+
+```ts  {title="my-test.spec.ts"}
 import { test, expect } from '@playwright/test'
 
-test('User registration and setup workflow', async ({ request }) => {
-  let userId, authToken, profileId
-  const timestamp = Date.now()
-  const testEmail = `test-${timestamp}@example.com`
+const baseUrl = 'https://api.checklyhq.com/v1'
 
-  await test.step('Register new user', async () => {
-    const response = await request.post('https://api.example.com/auth/register', {
-      data: {
-        email: testEmail,
-        password: 'SecurePassword123!',
-        firstName: 'John',
-        lastName: 'Doe'
-      }
-    })
-    
-    expect(response.status()).toBe(201)
-    const userData = await response.json()
-    userId = userData.id
-    expect(userId).toBeDefined()
-    console.log(`Created user with ID: ${userId}`)
-  })
+test('My test', async ({request}) => {
+    await test.step('First step', async () => {
+        const health = await request.get(`${baseUrl}/health`)
+        await expect(health).toBeOK()
+    });
 
-  await test.step('Login and get auth token', async () => {
-    const response = await request.post('https://api.example.com/auth/login', {
-      data: {
-        email: testEmail,
-        password: 'SecurePassword123!'
-      }
+    await test.step('Second step', async () => {
+        const response = await request.post(<your request>)
+        // Assertions for the second step
+        ...
     })
-    
-    expect(response.status()).toBe(200)
-    const loginData = await response.json()
-    authToken = loginData.access_token
-    expect(authToken).toBeDefined()
-    console.log('Successfully authenticated user')
-  })
-
-  await test.step('Create user profile', async () => {
-    const response = await request.post('https://api.example.com/users/profile', {
-      headers: {
-        'Authorization': `Bearer ${authToken}`,
-        'Content-Type': 'application/json'
-      },
-      data: {
-        company: 'Example Corp',
-        jobTitle: 'Software Engineer',
-        phoneNumber: '+1-555-0123'
-      }
-    })
-    
-    expect(response.status()).toBe(201)
-    const profile = await response.json()
-    profileId = profile.id
-    expect(profile.company).toBe('Example Corp')
-    console.log(`Created profile with ID: ${profileId}`)
-  })
-
-  await test.step('Verify complete setup', async () => {
-    const response = await request.get(`https://api.example.com/users/${userId}/status`, {
-      headers: {
-        'Authorization': `Bearer ${authToken}`
-      }
-    })
-    
-    expect(response.status()).toBe(200)
-    const status = await response.json()
-    expect(status.registrationComplete).toBe(true)
-    expect(status.profileComplete).toBe(true)
-    console.log('User setup workflow completed successfully')
-  })
 })
 ```
 
-**Key Concepts**:
-- **test.step()**: Organizes workflow into logical steps
-- **Data flow**: Variables pass data between steps
-- **Sequential execution**: Steps run in defined order
-- **Error propagation**: Failed steps stop the workflow
+#### Building scripts in the web editor
 
-![Multistep check script editor](/images/docs/images/multistep-api-checks/multistep-check-script.png)
-</Step>
+You can edit and debug Playwright scripts straight from the web editor. Use the "Run Script" button to run your script ad-hoc, without recording it as a scheduled run. 
 
-<Step title="Configure Request Authentication">
-Set up authentication for protected API endpoints:
+<Frame>
+![Multistep check editor](/images/docs/images/multistep-api-checks/multistep-check-editor.png)
+</Frame>
 
-**Environment Variables for Credentials**:
-```typescript
-// Use secure environment variables
-const apiConfig = {
-  baseURL: process.env.API_BASE_URL || 'https://api.example.com',
-  adminEmail: process.env.ADMIN_EMAIL,
-  adminPassword: process.env.ADMIN_PASSWORD,
-  apiKey: process.env.API_KEY
-}
+In the sidebar, you can view:
 
-test('Authenticated workflow', async ({ request }) => {
-  let adminToken
+- File dependencies
+- Your Playwright config file (if your check was created with the [Checkly CLI](/docs/cli/))
+- The test report
+- OpenTelemetry traces for this run (if you've enabled [Checkly Traces](/docs/traces-open-telemetry/))
+- [Runtimes](/docs/runtimes/), including the packages in your current runtime
 
-  await test.step('Admin authentication', async () => {
-    const response = await request.post(`${apiConfig.baseURL}/admin/login`, {
-      data: {
-        email: apiConfig.adminEmail,
-        password: apiConfig.adminPassword
-      }
-    })
-    
-    const auth = await response.json()
-    adminToken = auth.token
-  })
+After each test run, you can view the result tree by selecting the test report in the editor sidebar. Selecting an API request shows details about that request. You can also view errors and any failed assertions in this report.
 
-  await test.step('Protected operation', async () => {
-    const response = await request.post(`${apiConfig.baseURL}/admin/users`, {
-      headers: {
-        'Authorization': `Bearer ${adminToken}`,
-        'X-API-Key': apiConfig.apiKey
-      },
-      data: {
-        email: 'newuser@example.com',
-        role: 'user'
-      }
-    })
-    
-    expect(response.status()).toBe(201)
-  })
-})
-```
+### Scheduling & locations
 
-**Multiple Authentication Methods**:
-```typescript
-await test.step('Setup authentication', async () => {
-  // Method 1: Bearer token
-  const tokenResponse = await request.post('/api/auth/token', {
-    headers: {
-      'Authorization': `Basic ${btoa('client:secret')}`
-    },
-    data: { grant_type: 'client_credentials' }
-  })
-  const tokenData = await tokenResponse.json()
-  
-  // Method 2: API key authentication
-  const apiKeyHeaders = {
-    'X-API-Key': process.env.API_KEY,
-    'X-Client-ID': process.env.CLIENT_ID
-  }
-  
-  // Store for use in subsequent steps
-  return { 
-    bearerToken: tokenData.access_token,
-    apiKeyHeaders 
-  }
-})
-```
+You can configure your checks to run from our [public](/docs/monitoring/global-locations/) locations, or use a Checkly Agent to host your own [private](/docs/private-locations/) locations. If you don't select more than one location and you've disabled retrying checks from the same location, we will pick a random location when retrying checks.
 
-<Warning>
-Always use environment variables for sensitive data like passwords, API keys, and tokens. Never hardcode credentials in your workflow scripts.
-</Warning>
-</Step>
+Checkly runs your Multistep checks based on an interval you set. The shortest interval you can run is every minute and the longest is every 24 hours.
 
-<Step title="Implement Data Flow Between Steps">
-Pass data and state between workflow steps effectively:
+### Retries & alerting
 
-**Variable Management**:
-```typescript
-test('E-commerce purchase workflow', async ({ request }) => {
-  // Declare variables for the entire workflow
-  let authToken, customerId, cartId, orderId, paymentId
+Select your preferred [retry strategy](/docs/alerting-and-retries/retries/) for failed checks.
 
-  await test.step('Customer authentication', async () => {
-    const response = await request.post('/api/auth/customer-login', {
-      data: {
-        email: process.env.CUSTOMER_EMAIL,
-        password: process.env.CUSTOMER_PASSWORD
-      }
-    })
-    
-    const auth = await response.json()
-    authToken = auth.token
-    customerId = auth.customer.id
-    console.log(`Authenticated customer: ${customerId}`)
-  })
+Choose which [alert channels](/docs/alerting-and-retries/alert-channels/) to get notified through when your check runs into issues. If we don't have your preferred alert method, use [webhooks](/docs/alerting-and-retries/webhooks/) to configure your alert flow.
 
-  await test.step('Create shopping cart', async () => {
-    const response = await request.post('/api/carts', {
-      headers: { 'Authorization': `Bearer ${authToken}` },
-      data: { customerId: customerId }
-    })
-    
-    const cart = await response.json()
-    cartId = cart.id
-    expect(cart.customerId).toBe(customerId)
-    console.log(`Created cart: ${cartId}`)
-  })
+### Testing
 
-  await test.step('Add items to cart', async () => {
-    const items = [
-      { productId: 'PROD_001', quantity: 2, price: 29.99 },
-      { productId: 'PROD_002', quantity: 1, price: 49.99 }
-    ]
-
-    for (const item of items) {
-      const response = await request.post(`/api/carts/${cartId}/items`, {
-        headers: { 'Authorization': `Bearer ${authToken}` },
-        data: item
-      })
-      
-      expect(response.status()).toBe(201)
-    }
-    
-    // Verify cart total
-    const cartResponse = await request.get(`/api/carts/${cartId}`, {
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    })
-    const cartData = await cartResponse.json()
-    expect(cartData.total).toBe(109.97) // 2*29.99 + 1*49.99
-    console.log(`Cart total: $${cartData.total}`)
-  })
-
-  await test.step('Process checkout', async () => {
-    const response = await request.post(`/api/carts/${cartId}/checkout`, {
-      headers: { 'Authorization': `Bearer ${authToken}` },
-      data: {
-        paymentMethod: {
-          type: 'card',
-          cardNumber: '4242424242424242',
-          expiryMonth: 12,
-          expiryYear: 2025,
-          cvv: '123'
-        },
-        shippingAddress: {
-          street: '123 Main St',
-          city: 'Boston',
-          state: 'MA',
-          zipCode: '02101'
-        }
-      }
-    })
-    
-    expect(response.status()).toBe(201)
-    const order = await response.json()
-    orderId = order.id
-    paymentId = order.payment.id
-    expect(order.status).toBe('confirmed')
-    console.log(`Order created: ${orderId}`)
-  })
-
-  await test.step('Verify order completion', async () => {
-    const response = await request.get(`/api/orders/${orderId}`, {
-      headers: { 'Authorization': `Bearer ${authToken}` }
-    })
-    
-    const order = await response.json()
-    expect(order.paymentStatus).toBe('paid')
-    expect(order.fulfillmentStatus).toBe('pending')
-    expect(order.total).toBe(109.97)
-    console.log('Order processing completed successfully')
-  })
-})
-```
-
-**Complex Data Extraction**:
-```typescript
-await test.step('Extract and transform data', async () => {
-  const response = await request.get('/api/analytics/report')
-  const analytics = await response.json()
-  
-  // Extract complex nested data
-  const totalRevenue = analytics.summary.revenue.total
-  const topProducts = analytics.products
-    .sort((a, b) => b.sales - a.sales)
-    .slice(0, 5)
-    .map(p => ({ id: p.id, name: p.name, sales: p.sales }))
-  
-  // Validate business rules
-  expect(totalRevenue).toBeGreaterThan(0)
-  expect(topProducts).toHaveLength(5)
-  
-  // Pass processed data to next step
-  return { totalRevenue, topProducts }
-})
-```
-</Step>
-
-<Step title="Add Comprehensive Assertions">
-Validate your workflow at each step with detailed assertions:
-
-**Response Status Validation**:
-```typescript
-await test.step('Validate API responses', async () => {
-  const response = await request.post('/api/transactions', {
-    data: { amount: 100.50, currency: 'USD' }
-  })
-  
-  // Status code validation
-  expect(response.status()).toBe(201)
-  
-  // Response headers validation
-  expect(response.headers()['content-type']).toContain('application/json')
-  expect(response.headers()['x-rate-limit-remaining']).toBeDefined()
-  
-  // Response body validation
-  const transaction = await response.json()
-  expect(transaction.id).toMatch(/^txn_\w+/)
-  expect(transaction.amount).toBe(100.50)
-  expect(transaction.currency).toBe('USD')
-  expect(transaction.status).toBe('pending')
-  expect(transaction.createdAt).toBeDefined()
-})
-```
-
-**Business Logic Validation**:
-```typescript
-await test.step('Validate business rules', async () => {
-  const response = await request.get('/api/account/balance')
-  const account = await response.json()
-  
-  // Business rule assertions
-  expect(account.balance).toBeGreaterThanOrEqual(0) // No negative balance
-  expect(account.currency).toBe('USD') // Correct currency
-  expect(account.lastTransaction).toBeDefined() // Transaction recorded
-  
-  // Date validation
-  const lastTransactionDate = new Date(account.lastTransaction.timestamp)
-  const now = new Date()
-  const timeDiff = now.getTime() - lastTransactionDate.getTime()
-  expect(timeDiff).toBeLessThan(60000) // Transaction within last minute
-})
-```
-
-**Array and Collection Validation**:
-```typescript
-await test.step('Validate data collections', async () => {
-  const response = await request.get('/api/users/123/orders')
-  const orders = await response.json()
-  
-  // Collection validation
-  expect(orders.data).toBeInstanceOf(Array)
-  expect(orders.data.length).toBeGreaterThan(0)
-  expect(orders.total).toBeGreaterThanOrEqual(orders.data.length)
-  
-  // Individual item validation
-  orders.data.forEach(order => {
-    expect(order.id).toBeDefined()
-    expect(order.status).toMatch(/^(pending|confirmed|shipped|delivered)$/)
-    expect(order.amount).toBeGreaterThan(0)
-    expect(order.items).toBeInstanceOf(Array)
-    expect(order.items.length).toBeGreaterThan(0)
-  })
-})
-```
-</Step>
-
-<Step title="Configure Error Handling">
-Implement robust error handling for workflow reliability:
-
-**Try-Catch Error Handling**:
-```typescript
-await test.step('Handle potential failures gracefully', async () => {
-  try {
-    // Attempt primary operation
-    const response = await request.post('/api/primary-operation', {
-      data: { action: 'process' }
-    })
-    
-    if (response.status() === 200) {
-      console.log('Primary operation succeeded')
-      return await response.json()
-    }
-  } catch (error) {
-    console.log('Primary operation failed, trying fallback')
-  }
-  
-  // Fallback operation
-  const fallbackResponse = await request.post('/api/fallback-operation', {
-    data: { action: 'process_fallback' }
-  })
-  
-  expect(fallbackResponse.status()).toBe(200)
-  return await fallbackResponse.json()
-})
-```
-
-**Conditional Logic and Retries**:
-```typescript
-await test.step('Process with retry logic', async () => {
-  let attempts = 0
-  const maxAttempts = 3
-  let lastError
-
-  while (attempts < maxAttempts) {
-    try {
-      attempts++
-      
-      const response = await request.post('/api/flaky-operation', {
-        data: { attempt: attempts }
-      })
-      
-      if (response.status() === 200) {
-        console.log(`Operation succeeded on attempt ${attempts}`)
-        return await response.json()
-      }
-      
-      if (response.status() === 429) {
-        // Rate limited - wait and retry
-        await new Promise(resolve => setTimeout(resolve, 2000))
-        continue
-      }
-      
-      throw new Error(`HTTP ${response.status()}`)
-      
-    } catch (error) {
-      lastError = error
-      console.log(`Attempt ${attempts} failed:`, error.message)
-      
-      if (attempts < maxAttempts) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-      }
-    }
-  }
-  
-  throw new Error(`Operation failed after ${maxAttempts} attempts: ${lastError.message}`)
-})
-```
-
-**Cleanup and Rollback Logic**:
-```typescript
-test('Workflow with cleanup', async ({ request }) => {
-  let createdResourceId
-
-  try {
-    await test.step('Create test resource', async () => {
-      const response = await request.post('/api/test-resources', {
-        data: { name: 'test-resource', type: 'temporary' }
-      })
-      
-      const resource = await response.json()
-      createdResourceId = resource.id
-    })
-
-    await test.step('Process with resource', async () => {
-      const response = await request.post(`/api/process/${createdResourceId}`, {
-        data: { action: 'test_workflow' }
-      })
-      
-      expect(response.status()).toBe(200)
-    })
-
-  } finally {
-    // Cleanup - always runs regardless of test outcome
-    if (createdResourceId) {
-      await test.step('Cleanup test resource', async () => {
-        try {
-          await request.delete(`/api/test-resources/${createdResourceId}`)
-          console.log(`Cleaned up resource: ${createdResourceId}`)
-        } catch (error) {
-          console.log('Cleanup failed:', error.message)
-        }
-      })
-    }
-  }
-})
-```
-</Step>
-
-<Step title="Set Monitoring Schedule and Locations">
-Configure when and where your multistep check runs:
-
-**Monitoring Frequency**:
-```yaml
-# Critical business workflows
-Frequency: Every 1-5 minutes
-
-# Important processes
-Frequency: Every 10 minutes
-
-# Standard workflows
-Frequency: Every 30 minutes
-
-# Long-running or expensive workflows
-Frequency: Every 1-2 hours
-```
-
-**Global Monitoring Locations**:
-```yaml
-# Recommended coverage for workflows
-Primary Locations:
-  - us-east-1 (N. Virginia)
-  - eu-west-1 (Ireland)
-  - ap-southeast-1 (Singapore)
-
-# Additional coverage for global services
-Extended Coverage:
-  - us-west-2 (Oregon)
-  - eu-central-1 (Frankfurt)
-  - ap-northeast-1 (Tokyo)
-```
-
-**Performance Considerations**:
-- **Timeout Settings**: Set appropriate timeouts for long workflows
-- **Resource Usage**: Consider API rate limits and costs
-- **Parallel Execution**: Avoid overwhelming backend systems
-
-![Multistep check monitoring configuration](/images/docs/images/multistep-api-checks/multistep-check-monitoring.png)
-</Step>
-
-<Step title="Configure Alerting and Notifications">
-Set up comprehensive alerting for workflow failures:
-
-**Alert Conditions**:
-```yaml
-# Immediate Alerts
-- Any step fails in the workflow
-- Workflow timeout exceeded
-- Business logic assertions fail
-- Authentication or authorization errors
-
-# Warning Alerts
-- Workflow performance degradation
-- Increased error rates
-- API rate limiting encountered
-```
-
-**Notification Strategies**:
-```yaml
-# Critical business workflows
-Alert Strategy: Immediate notification on first failure
-Channels: PagerDuty, Slack, Email
-Escalation: Engineering manager after 5 minutes
-
-# Standard workflows
-Alert Strategy: Alert after 2 consecutive failures
-Channels: Slack, Email
-Escalation: Team lead after 15 minutes
-
-# Development workflows
-Alert Strategy: Alert after 3 consecutive failures
-Channels: Email only
-Escalation: None
-```
-
-**Alert Context and Information**:
-- **Failed Step**: Which step in the workflow failed
-- **Error Details**: Specific error messages and response codes
-- **Workflow Duration**: How long the workflow ran before failure
-- **Previous Results**: Recent success/failure patterns
-
-![Multistep check alerting configuration](/images/docs/images/multistep-api-checks/multistep-check-alerts.png)
-</Step>
-
-<Step title="Test and Validate Your Workflow">
-Run your multistep check to ensure it works correctly:
-
-1. **Click "Test Check"** to run a manual execution
-2. **Review step-by-step execution** and timing
-3. **Validate data flow** between steps
-4. **Check error handling** with invalid data
-5. **Verify cleanup** and resource management
-
-**Test Results Include**:
-- **Step-by-step execution log** with detailed timing
-- **Request/response data** for each API call
-- **Variable values** passed between steps
-- **Performance metrics** for the entire workflow
-- **Error details** if any step fails
-
-**Debugging Workflow Issues**:
-- **Step Failures**: Check API responses and authentication
-- **Data Flow Issues**: Verify variable assignment and usage
-- **Timeout Problems**: Adjust timeouts or optimize API performance
-- **Authentication Errors**: Validate credentials and token expiration
-
-![Multistep check test results](/images/docs/images/multistep-api-checks/multistep-check-test.png)
-</Step>
-
-<Step title="Deploy and Monitor">
-Save your multistep check and start workflow monitoring:
-
-1. **Click "Save Check"** to create your workflow monitoring
-2. **Verify configuration** in the check summary
-3. **Monitor initial executions** for any issues
-4. **Review workflow performance** and optimize as needed
-
-**What Happens Next**:
-- Multistep checks run on your defined schedule
-- Complete workflow results are tracked and stored
-- Alerts are sent when any step fails or performance degrades
-- Historical data shows workflow reliability trends
-
-**Monitoring Dashboard Features**:
-- **Workflow success rate** across all executions
-- **Step-level performance** and failure analysis
-- **Business process health** and availability metrics
-- **Trend analysis** for workflow optimization
-
-![Multistep check dashboard results](/images/docs/images/multistep-api-checks/multistep-check-dashboard.png)
-</Step>
-</Steps>
-
-
+You can run your check as an [E2E test](/docs/testing) locally or from your CI/CD pipeline to validate your freshly deployed application. Use the Checkly CLI, or configure integrations with Vercel and GitHub.
 

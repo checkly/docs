@@ -20,13 +20,6 @@ Multistep checks are API-focused tests that perform multiple sequential HTTP req
 - Complex business transaction testing
 - API dependency chain validation
 
-<Accordion title="Key capabilities" icon="workflow">
-- Sequential API request execution
-- Data passing between requests
-- Complex authentication flows
-- Workflow state validation
-- Performance measurement across steps
-</Accordion>
 
 ## How Multistep Checks Work
 
@@ -42,4 +35,36 @@ Multistep checks execute a series of API requests in sequence, with the ability 
 <Tip>
 Multistep checks are powered by Playwright's API testing mode, providing excellent debugging capabilities and detailed request/response logging.
 </Tip>
+
+
+## Key Capabilities
+
+<Accordion title="Sequential API Request Execution">
+Execute multiple API calls in a predefined order, ensuring each step completes successfully before proceeding to the next.
+</Accordion>
+
+<Accordion title="Data Passing Between Requests">
+Extract data from API responses and use it in subsequent requests, enabling realistic workflow testing with dynamic values.
+</Accordion>
+
+<Accordion title="Complex Authentication Flows">
+Handle multi-step authentication processes like OAuth flows, token refresh sequences, and session-based authentication chains.
+</Accordion>
+
+<Accordion title="Workflow State Validation">
+Verify that each step in your business process maintains proper state and data consistency throughout the entire workflow.
+</Accordion>
+
+<Accordion title="Performance Measurement Across Steps">
+Monitor response times and performance metrics for individual steps and the complete workflow to identify bottlenecks.
+</Accordion>
+
+## Timeouts
+As with Browser checks, Checkly runs Multistep checks for a maximum of 240s. Scripts exceeding this will timeout. For more information on how to work with the timeout limits for Multistep and Browser checks, see [Timeouts](/docs/browser-checks/timeouts).
+
+## Built-in Runtime Variables
+
+The Multistep Check [runtime](/docs/platform/runtimes/overview) exposes a set of environment variables (e.g. `process.env.CHECK_NAME`) that indicate what check, check type etc. you are running.
+
+
 

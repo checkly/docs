@@ -7,8 +7,18 @@ sidebarTitle: Troubleshooting
 
 API checks can be tricky to troubleshoot. Here are some common issues and solutions:
 
+## Getting the `Error: ESOCKETTIMEDOUT` error
 
-### Authentication Problems
+Sometimes API checks return this error, without any other information on what caused it. 
+ 
+- This is a socket timeout error. Essentially there is no successful connection with the API at the TCP and/or DNS level. 
+Then, Checkly is closing the connection after the usual 30 seconds timeout, because the server didn’t respond. 
+- Usually the root cause for this error is intermittent network issues on the application side.
+- There will probably be no errors in the application logs, as it was not even possible to establish a connection.
+- The response headers will be empty. If Checkly doesn't get a connection, there is nothing to send back, e.g. the response headers.
+
+
+## Authentication Problems
 **Issue: 401/403 status codes, authorization errors**
 
 **Solutions**:
@@ -17,7 +27,7 @@ API checks can be tricky to troubleshoot. Here are some common issues and soluti
 3. Validate authentication headers format
 4. Test API manually with same credentials
 
-### Timeout Issues
+## Timeout Issues
 **Issue: Requests timing out, slow responses**
 
 **Solutions**:
@@ -26,7 +36,7 @@ API checks can be tricky to troubleshoot. Here are some common issues and soluti
 3. Increase timeout thresholds if appropriate
 4. Investigate API infrastructure capacity
 
-### Assertion Failures
+## Assertion Failures
 **Issue: Unexpected response content or format**
 
 **Solutions**:

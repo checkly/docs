@@ -6,10 +6,105 @@ sidebarTitle: 'Customization'
 
 Dashboard customization allows you to create professional, branded status displays that align with your organization's visual identity and communication needs.
 
+## URL and Domain Configuration
+
+### Default Dashboard URLs
+Every dashboard starts with a unique, randomly generated URL:
+
+```text
+# Example
+https://a1b2c3d4-e5f6-7890-abcd-ef1234567890.checkly-dashboards.com
+```
+
+You can also use a custom subdomain to make your dashboard more recognizable.
+
+<Frame>
+      <img 
+        className="block dark:hidden" 
+        src="/images/next/dashboard-url-light.png" 
+        alt="Light mode interface"
+      />
+      <img 
+        className="hidden dark:block" 
+        src="/images/next/dashboard-url-dark.png" 
+        alt="Dark mode interface"
+      />
+    </Frame>
+
+<Note>
+Custom subdomains must be unique across all Checkly users. Choose something specific to your organization to avoid conflicts.
+</Note>
+
+### Full Custom Domain Configuration
+Use your own domain for maximum branding control and professional appearance:
+
+<Frame>
+      <img 
+        className="block dark:hidden" 
+        src="/images/next/dashboard-domain-light.png" 
+        alt="Light mode interface"
+      />
+      <img 
+        className="hidden dark:block" 
+        src="/images/next/dashboard-domain-dark.png" 
+        alt="Dark mode interface"
+      />
+    </Frame>
+<Steps>
+<Step title="Domain Configuration">
+Add your custom domain in the dashboard settings
+</Step>
+
+<Step title="DNS Setup">
+Create the required DNS records at your domain provider
+</Step>
+
+<Step title="Domain Verification">
+Complete domain verification if required by Checkly
+</Step>
+
+<Step title="SSL Certificate">
+Automatic SSL certificate provisioning and renewal
+</Step>
+
+<Step title="Go Live">
+Dashboard becomes accessible at your custom domain
+</Step>
+</Steps>
+
+#### Required DNS Records
+
+```text
+# CNAME Record (required)
+Type: CNAME
+Name: status (or your chosen subdomain)
+Value: checkly-dashboards.com
+TTL: 3600 (or your domain provider's default)
+
+# TXT Record (if domain verification required)
+Type: TXT
+Name: _checkly-domain-verification.status
+Value: [Verification code provided by Checkly]
+TTL: 3600 (or your domain provider's default)
+```
+
+<Warning>
+DNS changes can take up to 24-48 hours to propagate globally. Plan custom domain setup accordingly if you have time-sensitive launch requirements.
+</Warning>
 
 ## Look and Feel
-![Dashboard customization](/images/dashboard-look.png)
-
+<Frame>
+      <img 
+        className="block dark:hidden" 
+        src="/images/next/dashboard-look-light.png" 
+        alt="Light mode interface"
+      />
+      <img 
+        className="hidden dark:block" 
+        src="/images/next/dashboard-look-dark.png" 
+        alt="Dark mode interface"
+      />
+    </Frame>
 ### Logo
 Upload your brand logo to personalize the dashboard header. The logo image supports PNG, JPG, and SVG formats with a maximum size of 1024px×1024px.
 
@@ -38,8 +133,18 @@ Display performance metrics on your dashboard:
 
 ## Advanced CSS Customization
 
-![Dashboard customization](/images/dashboard-custom-css.png)
-
+<Frame>
+      <img 
+        className="block dark:hidden" 
+        src="/images/next/dashboard-custom-css-light.png" 
+        alt="Light mode interface"
+      />
+      <img 
+        className="hidden dark:block" 
+        src="/images/next/dashboard-custom-css-dark.png" 
+        alt="Dark mode interface"
+      />
+    </Frame>
 ### CSS Editor and Tools
 For Team and Enterprise plans, unlock complete design control:
 

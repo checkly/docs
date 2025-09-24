@@ -66,8 +66,7 @@ Notice we only replace the **host** part, not the URL path or any query paramete
 For browser checks, the environment URL is exposed as the `ENVIRONMENT_URL` environment variable. This means you can use that
 variable in your code to replace any hardcoded URL you might have, i.e.:
 
-<Tabs>
-<Tab title="TypeScript">
+<CodeGroup dropdown>
 ```typescript test.spec.ts
 import { expect, test } from '@playwright/test'
 
@@ -78,9 +77,8 @@ test('assert response status of page', async ({ page }) => {
   expect(response.status()).toBeLessThan(400)
 })
 ```
-</Tab>
-<Tab title="JavaScript">
-```javascript test.spec.ts
+
+```javascript test.spec.js
 const { expect, test } = require('@playwright/test')
 
 test('assert response status of page', async ({ page }) => {
@@ -90,8 +88,7 @@ test('assert response status of page', async ({ page }) => {
   expect(response.status()).toBeLessThan(400)
 })
 ```
-</Tab>
-</Tabs>
+</CodeGroup>
 
 This way we are setting the `targetUrl` variable to either the `ENVIRONMENT_URL` or just our main production URL.
 

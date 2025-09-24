@@ -69,6 +69,23 @@
 - Use CodeGroups and Dropdowns for code examples that show the same example in different languages
 - Use Note/Tip/Warning callouts appropriately
 
+## CodeGroup Dropdown
+- Use `<CodeGroup dropdown>` for code examples that show the same functionality in different programming languages
+- The dropdown automatically creates a language selector based on the code block language identifiers
+- Example usage:
+```mdx
+<CodeGroup dropdown>
+```typescript example.ts
+// TypeScript code here
+```
+
+```javascript example.js
+// JavaScript code here
+```
+</CodeGroup>
+```
+- This replaces the older `<Tabs>` pattern for language-specific code examples
+
 ## Git workflow
 - NEVER use --no-verify when committing
 - Ask how to handle uncommitted changes before starting

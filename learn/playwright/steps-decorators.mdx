@@ -32,7 +32,7 @@ Let me show you how you can replace repetitive `test.step` calls with a single
 
 By default, all your test actions and assertions will be a long wall of instructions shown in UI mode or your test reports. That's not a big deal for twenty instructions, but if you're testing a complex UI flow, your test instruction count will quickly hit a hundred actions. Looking at a report with that many instructions isn't great.
 
-![way too many lines on a top level playwright report](/samples/images/steps1.webp)
+![way too many lines on a top level playwright report](/images/samples/images/steps1.webp)
 
 To solve this problem, you can group your actions in Playwright test steps.
 
@@ -78,7 +78,7 @@ test('Customer is able to create account', async ({
 
 Look at this beautiful and well-structured HTML test report. I'm a fan!
 
-![much nicer html test report](/samples/images/steps2.webp)
+![much nicer html test report](/images/samples/images/steps2.webp)
 
 You might now ask, "Does this work when you implement POMs ([Page Object Model](https://playwright.dev/docs/pom))?".
 
@@ -216,7 +216,7 @@ export class PlaywrightPage {
 
 To decorate a class method with a Playwright step, put a `@step` line before the class method definition. Now TypeScript will complain…
 
-![a complaint from a typescript linter in an IDE](/samples/images/steps3.jpeg)
+![a complaint from a typescript linter in an IDE](/images/samples/images/steps3.jpeg)
 
 … because the decorator isn't defined yet.
 
@@ -260,7 +260,7 @@ You might have noticed it already; the decorator function will be called not onl
 
 If we rerun our test, the `@step` decorator will do its magic and automatically wrap POM methods in a nice Playwright test step showing us the POM class and method. Beautiful!
 
-![a well documented test](/samples/images/steps4.jpeg)
+![a well documented test](/images/samples/images/steps4.jpeg)
 
 You can now go wild and replace all these `test.step` calls with `@step` decorators!
 

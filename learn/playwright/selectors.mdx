@@ -22,12 +22,12 @@ When testing and monitoring websites end to end with Playwright, choosing the ri
 
 Consider a simple web page with a headline, a button, and a status update box. Clicking the button updates the status and throws confetti. Here's how we can test this.
 
-![a demo page](/samples/images/user-first1.png)
+![a demo page](/images/samples/images/user-first1.png)
 
 ## Why we don't want to find a page element with CSS selectors
 If you're used to some older systems for automation and page manipulation like JQuery, we might be tempted to use CSS selectors. If we inspect this page we'll find, sure enough, that there is a class applied to this button that should select it in the page.
 
-![examining the page with an inspector](/samples/images/user-first2.png)
+![examining the page with an inspector](/images/samples/images/user-first2.png)
 
 We could click this button in a test with a line like `await page.locator("button.button-frontpage-style").click()` and that would work, but it's not recommended.
 
@@ -50,7 +50,7 @@ await page.getByRole('button', { name: 'click me' }).click()
 
 Inspect elements using Chrome DevTools to find their accessibility roles and names.
 
-![showing the element's role](/samples/images/user-first3.png)
+![showing the element's role](/images/samples/images/user-first3.png)
 
 This method ensures that tests remain stable even if class names or HTML structure change.
 

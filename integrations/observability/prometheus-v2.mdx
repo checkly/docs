@@ -4,7 +4,7 @@ description: 'Export Checkly monitoring data to Prometheus for advanced metrics 
 sidebarTitle: 'Prometheus V2'
 ---
 <Info>
-This page describes a new V2 version of the Prometheus exporter. For information about the old Prometheus exporter, see the [Prometheus V1 docs](/docs/integrations/prometheus-v1/).
+This page describes a new V2 version of the Prometheus exporter. For information about the old Prometheus exporter, see the [Prometheus V1 docs](/integrations/prometheus-v1/).
 </Info>
 
 If you are using [Prometheus](https://prometheus.io/) for monitoring and the popular [Grafana](https://grafana.com/) stack
@@ -45,7 +45,7 @@ We recommend using a scrape interval of 60 seconds.
 
 ## Check Metrics
 
-The Prometheus exporter exposes several metrics you can use to monitor the status of your checks, as well as to inspect detailed information such as [Web Vitals](/docs/browser-checks/tracing-web-vitals/).
+The Prometheus exporter exposes several metrics you can use to monitor the status of your checks, as well as to inspect detailed information such as [Web Vitals](/browser-checks/tracing-web-vitals/).
 
 The following metrics are available to monitor checks:
 
@@ -53,14 +53,14 @@ The following metrics are available to monitor checks:
 |--------|------|-------------|
 | `checkly_check_status` | Gauge | Indicates whether a given check is currently passing, degraded, or failing. |
 | `checkly_check_result_total` | Counter | The number of passing, degraded, and failing check results. |
-| `checkly_browser_check_web_vitals_seconds` | Histogram | The [Web Vitals](/docs/browser-checks/tracing-web-vitals/) timings. |
+| `checkly_browser_check_web_vitals_seconds` | Histogram | The [Web Vitals](/browser-checks/tracing-web-vitals/) timings. |
 | `checkly_browser_check_duration_seconds` | Histogram | The total check duration. This includes all pages visited and any waits. |
 | `checkly_browser_check_errors` | Histogram | The errors encountered during a full browser session. |
 | `checkly_api_check_timing_seconds` | Histogram | The response time for the API request, as well as the duration of the different phases. |
 | `checkly_url_monitor_timing_seconds` | Histogram | The response time for the HTTP request, as well as the duration of the different phases. |
 | `checkly_tcp_check_timing_seconds` | Histogram | The response time for the TCP request, as well as the duration of the different phases. |
 | `checkly_multistep_check_duration_seconds` | Histogram | The total check duration. This includes all requests done and any waits. |
-| `checkly_time_to_ssl_expiry_seconds` | Gauge | The amount of time remaining before the SSL certificate of the monitored domain expires. See the [SSL certificate expiration docs](/docs/alerting-and-retries/ssl-expiration/) for more information on monitoring SSL certificates with checks. |
+| `checkly_time_to_ssl_expiry_seconds` | Gauge | The amount of time remaining before the SSL certificate of the monitored domain expires. See the [SSL certificate expiration docs](/alerting-and-retries/ssl-expiration/) for more information on monitoring SSL certificates with checks. |
 
 The `checkly_check_status` and `checkly_check_result_total` metrics contain a `status` label with values `passing`, `failing`, and `degraded`.
 The `checkly_check_status` gauge is `1` when the check has the status indicated by the `status` label and is `0` otherwise.
@@ -127,13 +127,13 @@ sum by(type) (rate(checkly_browser_check_web_vitals_seconds_sum{name="Check Name
 
 ## Private Location Metrics
 
-The Prometheus exporter also contains metrics for monitoring [Private Locations](/docs/detect/private-locations/overview). These metrics can be used to ensure that your Private Locations have enough Checkly Agent instances running to execute all of your checks.
+The Prometheus exporter also contains metrics for monitoring [Private Locations](/detect/private-locations/overview). These metrics can be used to ensure that your Private Locations have enough Checkly Agent instances running to execute all of your checks.
 
 The following metrics are available to monitor Private Locations:
 
 | Metric | Type | Description |
 |--------|------|-------------|
-| `checkly_private_location_queue_size` | Gauge | The number of check runs scheduled to the Private Location and waiting to be executed. A high value indicates that checks are becoming backlogged and that you may need to [scale your Checkly Agents](/docs/detect/private-locations/overviewscaling-and-redundancy/). |
+| `checkly_private_location_queue_size` | Gauge | The number of check runs scheduled to the Private Location and waiting to be executed. A high value indicates that checks are becoming backlogged and that you may need to [scale your Checkly Agents](/detect/private-locations/overviewscaling-and-redundancy/). |
 | `checkly_private_location_oldest_scheduled_check_run` | Gauge | The age in seconds of the oldest check run job scheduled to the Private Location queue. A high value indicates that checks are becoming backlogged. |
 | `checkly_private_location_agent_count` | Gauge | The number of agents connected for the Private Location. |
 

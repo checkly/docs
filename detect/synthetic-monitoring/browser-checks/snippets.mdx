@@ -3,7 +3,7 @@ title: Browser Check Snippets
 sidebarTitle: Snippets
 ---
 
-Snippets are JavaScript files which can be reused across [Browser checks](/docs/browser-checks/), as well as [setup and teardown scripts](/docs/api-checks/setup-teardown-scripts/) for API checks. By reusing code with snippets, checks can be made more maintainable and easier to develop.
+Snippets are JavaScript files which can be reused across [Browser checks](/browser-checks/), as well as [setup and teardown scripts](/api-checks/setup-teardown-scripts/) for API checks. By reusing code with snippets, checks can be made more maintainable and easier to develop.
 
 Snippets can be useful for:
 
@@ -14,7 +14,7 @@ Snippets can be useful for:
 
 > [!CLI]
 > If you are using the CLI, you don't need to use snippets. You can just use `import` or `require` to add any local dependencies from your repo.
-> Check the docs on using local dependencies [right here](/docs/cli/npm-packages/).
+> Check the docs on using local dependencies [right here](/cli/npm-packages/).
 
 ## How to use snippets
 
@@ -67,7 +67,7 @@ const setupLibrary = require('./setup-library.js')
 </Tab>
 </Tabs>
 
-Do you use [reusable code snippets for a setup or teardown script](/docs/api-checks/setup-teardown-scripts/#reusable-code-snippets)?
+Do you use [reusable code snippets for a setup or teardown script](/api-checks/setup-teardown-scripts/#reusable-code-snippets)?
 In this case, the setup / teardown snippet will be executed as `script.js` rather than be placed in the snippets directory. To import other snippets, the setup / teardown snippet should include the `snippets` directory in the path.
 For example, import a snippet named `setup-library` using  `require('./snippets/helper.js')`.
 
@@ -152,4 +152,4 @@ test('Github login', async ({ page }) => {
 </Tabs>
 
 Notice we are referencing the `GITHUB_USER` and `GITHUB_PWD` environment variables and passing them to the `gitHubLogin()` function.
-You should store these in [your environment variables](/docs/browser-checks/variables/).
+You should store these in [your environment variables](/browser-checks/variables/).

@@ -4,7 +4,7 @@ description: 'How Checkly runtimes work.'
 sidebarTitle: 'Overview'
 ---
 
-Checkly allows you to use JavaScript code in your [Browser checks](/docs/detect/synthetic-monitoring/browser-checks/overview), [MultiStep Checks](/docs/detect/synthetic-monitoring/multistep-checks/overview) and in the optional [setup & teardown scripts](/docs/detect/synthetic-monitoring/api-checks/set-up-and-tear-down) you can add to your API checks.
+Checkly allows you to use JavaScript code in your [Browser checks](/detect/synthetic-monitoring/browser-checks/overview), [MultiStep Checks](/detect/synthetic-monitoring/multistep-checks/overview) and in the optional [setup & teardown scripts](/detect/synthetic-monitoring/api-checks/set-up-and-tear-down) you can add to your API checks.
 
 This JavaScript code executes in a runtime environment that is managed by Checkly. This environment has access to specific Node.js versions and NPM packages, like the "latest Playwright version on Node 14". We call these environments **runtimes**.
 
@@ -53,7 +53,7 @@ We introduced the concept of runtimes so customers can upgrade their JavaScript 
 
 Currently, Checkly is not a full-blown CI system, where a user has full control over the Node.js version and the packages installed in the `node_modules` directory. To help you navigate this tradeoff, we want to show you exactly what happens under the hood.
 
-1. We bundle all your user code when using the [Checkly CLI](/docs/cli) or GitHub Sync before storing your Check in our database.
+1. We bundle all your user code when using the [Checkly CLI](/cli) or GitHub Sync before storing your Check in our database.
 2. Your Check is scheduled to our 20+ global locations via a message bus that has a 256kb file size limit. This is in 99%
 of the cases more than enough for any user code and included file dependencies you may include. However, it is not enough for potentially unlimited
 NPM dependencies living in `node_modules`.

@@ -5,7 +5,7 @@ sidebarTitle: NPM & Local Dependencies
 ---
 
 Checkly lets you use JavaScript / TypeScript in your Browser and Multistep checks, and in API check setup & teardown scripts.
-Checks are able to use NPM packages that are defined in [our runtimes](/docs/platform/runtimes/overview), as well as import local JavaScript and TypeScript files.
+Checks are able to use NPM packages that are defined in [our runtimes](/platform/runtimes/overview), as well as import local JavaScript and TypeScript files.
 
 
 ## NPM packages
@@ -26,8 +26,8 @@ A runtime contains among others:
 
 ...and a range of other popular NPM package to help you write and assert checks.
 
-- [Browse the latest runtime specs](/docs/platform/runtimes/runtime-specification)
-- [Learn more about runtimes](/docs/platform/runtimes/overview)
+- [Browse the latest runtime specs](/platform/runtimes/runtime-specification)
+- [Learn more about runtimes](/platform/runtimes/overview)
 
 ## Local Dependencies
 
@@ -36,7 +36,7 @@ This is useful for defining helper functions to be reused across multiple checks
 The Checkly CLI will automatically detect these dependencies and make sure that they're bundled as part of the check.
 No additional configuration is needed.
 
-Here is a [Browser Check](/docs/detect/synthetic-monitoring/browser-checks/overview) example of how this works in practice.
+Here is a [Browser Check](/detect/synthetic-monitoring/browser-checks/overview) example of how this works in practice.
 
 The directory tree looks like the following:
 
@@ -75,7 +75,7 @@ test('Github login', async ({ page }) => {
 })
 ```
 
-`login.check.ts` initializes a new [BrowserCheck construct](/docs/cli/constructs-reference/#browsercheck). Note that it's only necessary to configure the main Playwright file `login.spec.ts`. The `login-helper.ts` dependency is automatically detected by the CLI.
+`login.check.ts` initializes a new [BrowserCheck construct](/cli/constructs-reference/#browsercheck). Note that it's only necessary to configure the main Playwright file `login.spec.ts`. The `login-helper.ts` dependency is automatically detected by the CLI.
 
 ```ts login.check.ts
 import { BrowserCheck } from 'checkly/constructs'
@@ -95,4 +95,4 @@ The maximum total size of a Checkly project when deploying or running a test ses
 
 ## Why can't I import any NPM package or other 3rd party dependencies?
 
-Please see [this paragraph in our runtime docs](/docs/platform/runtimes/overview#why-can’t-i-import-any-npm-package-or-other-3rd-party-dependencies%3F).
+Please see [this paragraph in our runtime docs](/platform/runtimes/overview#why-can’t-i-import-any-npm-package-or-other-3rd-party-dependencies%3F).

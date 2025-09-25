@@ -19,11 +19,11 @@ You'll need a series of API endpoints that work together to complete a business 
 
 A meaningful name will not only help you and others identify your checks within Checkly, but it will help provide a better alerting experience if your checks fall into an alert state.
 
-Tags can relate your checks together. They also determine which checks are shown on your [dashboards](/docs/dashboards/).
+Tags can relate your checks together. They also determine which checks are shown on your [dashboards](/dashboards/).
 
 ### Playwright script
 
-A valid Multistep check is based on a valid [Playwright API test script](https://playwright.dev/docs/api-testing). You can create these scripts either in the in-app editor, or write them in your IDE and deploy them using the [Checkly CLI](/docs/cli/). For production, we recommend using the CLI so you can leverage best practices such as version control and code reviews before updating your checks.
+A valid Multistep check is based on a valid [Playwright API test script](https://playwright.dev/docs/api-testing). You can create these scripts either in the in-app editor, or write them in your IDE and deploy them using the [Checkly CLI](/cli/). For production, we recommend using the CLI so you can leverage best practices such as version control and code reviews before updating your checks.
 
 > Valid Playwright Test API scripts are the foundation of a valid Multistep check. If the script passes, your check passes.
 > If the script fails, your check fails.
@@ -36,7 +36,7 @@ API requests and assertions in the same test step will be presented under the sa
 
 ![Multistep test results](/images/docs/images/multistep-api-checks/test-results.jpg)
 
-To provide actionable and easy-to-read [check run results](/docs/monitoring/check-results/#multistep-check-results), we recommend using the `test.step()` structure when writing the Playwright script for you Multistep check.
+To provide actionable and easy-to-read [check run results](/monitoring/check-results/#multistep-check-results), we recommend using the `test.step()` structure when writing the Playwright script for you Multistep check.
 
 ```ts  {title="my-test.spec.ts"}
 import { test, expect } from '@playwright/test'
@@ -68,26 +68,26 @@ You can edit and debug Playwright scripts straight from the web editor. Use the 
 In the sidebar, you can view:
 
 - File dependencies
-- Your Playwright config file (if your check was created with the [Checkly CLI](/docs/cli/))
+- Your Playwright config file (if your check was created with the [Checkly CLI](/cli/))
 - The test report
-- OpenTelemetry traces for this run (if you've enabled [Checkly Traces](/docs/traces-open-telemetry/))
-- [Runtimes](/docs/runtimes/), including the packages in your current runtime
+- OpenTelemetry traces for this run (if you've enabled [Checkly Traces](/traces-open-telemetry/))
+- [Runtimes](/runtimes/), including the packages in your current runtime
 
 After each test run, you can view the result tree by selecting the test report in the editor sidebar. Selecting an API request shows details about that request. You can also view errors and any failed assertions in this report.
 
 ### Scheduling & locations
 
-You can configure your checks to run from our [public](/docs/monitoring/global-locations/) locations, or use a Checkly Agent to host your own [private](/docs/private-locations/) locations. If you don't select more than one location and you've disabled retrying checks from the same location, we will pick a random location when retrying checks.
+You can configure your checks to run from our [public](/monitoring/global-locations/) locations, or use a Checkly Agent to host your own [private](/private-locations/) locations. If you don't select more than one location and you've disabled retrying checks from the same location, we will pick a random location when retrying checks.
 
 Checkly runs your Multistep checks based on an interval you set. The shortest interval you can run is every minute and the longest is every 24 hours.
 
 ### Retries & alerting
 
-Select your preferred [retry strategy](/docs/alerting-and-retries/retries/) for failed checks.
+Select your preferred [retry strategy](/alerting-and-retries/retries/) for failed checks.
 
-Choose which [alert channels](/docs/alerting-and-retries/alert-channels/) to get notified through when your check runs into issues. If we don't have your preferred alert method, use [webhooks](/docs/alerting-and-retries/webhooks/) to configure your alert flow.
+Choose which [alert channels](/alerting-and-retries/alert-channels/) to get notified through when your check runs into issues. If we don't have your preferred alert method, use [webhooks](/alerting-and-retries/webhooks/) to configure your alert flow.
 
 ### Testing
 
-You can run your check as an [E2E test](/docs/testing) locally or from your CI/CD pipeline to validate your freshly deployed application. Use the Checkly CLI, or configure integrations with Vercel and GitHub.
+You can run your check as an [E2E test](/testing) locally or from your CI/CD pipeline to validate your freshly deployed application. Use the Checkly CLI, or configure integrations with Vercel and GitHub.
 

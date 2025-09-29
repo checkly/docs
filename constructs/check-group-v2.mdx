@@ -216,6 +216,13 @@ const group = new CheckGroupV2("api-multistep-group", {
 **Use cases**: Automated test discovery, E2E test organization, user flow monitoring.
 </ResponseField>
 
+<ResponseField name="alertEscalationPolicy" type="object">
+
+An [AlertEscalationPolicy](#alertescalationpolicy) object defines [alert-settings](/docs/alerting-and-retries/) for Check runs. If **set to** `'global'`, it overrides the alert settings of all checks in the group to use the [global account notification settings](https://app.checklyhq.com/alerts/settings). If **set** to specific values, it overrides the alert settings of all checks in the group. If **not set**, each Check uses its own alert configuration.
+
+
+</ResponseField>
+
 ## Examples
 
 <Tabs>
@@ -328,9 +335,3 @@ const group = new CheckGroupV2("api-multistep-group", {
   </Tab>
 </Tabs>
 
-<ResponseField name="activated" type="boolean" default="true">
-
-An [AlertEscalationPolicy](#alertescalationpolicy) object defines [alert-settings](/docs/alerting-and-retries/) for Check runs. If **set to** `'global'`, it overrides the alert settings of all checks in the group to use the [global account notification settings](https://app.checklyhq.com/alerts/settings). If **set** to specific values, it overrides the alert settings of all checks in the group. If **not set**, each Check uses its own alert configuration.
-
-
-</ResponseField>

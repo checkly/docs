@@ -26,7 +26,8 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /platform/secrets
 - /platform/variables
 - /platform/allowlisting-traffic
-- /platform/troubleshooting
+- /platform/network-diagnostic-tools
+- /platform/managing-false-positives
 
 ### Platform - Private Locations
 - /platform/private-locations/overview

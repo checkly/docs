@@ -98,6 +98,10 @@ new ApiCheck("api-check-1", {
 | `browserChecks` | `object` | ❌ | - | Settings for Browser Checks in the group |
 | `multistepChecks` | `object` | ❌ | - | Settings for Multistep Checks in the group |
 
+<Warning>
+  If you want the group's alert settings to override check-level alert settings, you must set the [`alertEscalationPolicy`](/constructs/check-group-v2#param-alert-escalation-policy). Otherwise, the alert settings of individual checks will be used, even if `alertChannels` is defined in your group.
+</Warning>
+
 ### Group Options
 
 <ResponseField name="name" type="string" required>
@@ -222,7 +226,6 @@ An [AlertEscalationPolicy](/constructs/alert-escalation-policy) object defines [
 
 If **set to** `'global'`, it overrides the alert settings of all checks in the group to use the [global account notification settings](https://app.checklyhq.com/alerts/settings). If **set** to specific values, it overrides the alert settings of all checks in the group. If **not set**, each Check uses its own alert configuration.
 
-
 </ResponseField>
 
 ## Examples
@@ -240,6 +243,7 @@ If **set to** `'global'`, it overrides the alert settings of all checks in the g
         { key: "API_BASE_URL", value: "https://api.example.com" },
         { key: "API_VERSION", value: "v2" },
       ],
+      alertEscalationPolicy: 'global',
       alertChannels: [slackChannel],
     })
 
@@ -271,6 +275,7 @@ If **set to** `'global'`, it overrides the alert settings of all checks in the g
       frequency: Frequency.EVERY_10M,
       locations: ["us-east-1", "eu-west-1"],
       tags: ["services", "infrastructure"],
+      alertEscalationPolicy: 'global',
       alertChannels: [emailChannel, pagerdutyChannel],
       retryStrategy: RetryStrategyBuilder.linearStrategy({
         baseBackoffSeconds: 30,
@@ -323,6 +328,7 @@ If **set to** `'global'`, it overrides the alert settings of all checks in the g
         interval: 5,
         amount: 2,
       }),
+      alertChannels: [slackChannel],
     })
 
     new ApiCheck("us-east-api", {

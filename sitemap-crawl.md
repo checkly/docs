@@ -149,7 +149,8 @@ This file contains all valid URLs extracted from docs.json organized by director
 ### Communicate - Dashboards
 - /communicate/dashboards/overview
 - /communicate/dashboards/configuration
-- /communicate/dashboards/customization
+- /communicate/dashboards/custom-css
+- /communicate/dashboards/incidents
 
 ### Communicate - Maintenance Windows
 - /communicate/maintenance-windows/overview

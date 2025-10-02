@@ -55,49 +55,17 @@ jobs:
           echo "spec_changed=false" >> $GITHUB_ENV
         fi
     
-    - name: Create Pull Request
+    - name: Commit and Push Changes
       if: env.spec_changed == 'true'
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        # Create branch name with timestamp
-        BRANCH_NAME="update-api-spec/$(date +%Y%m%d-%H%M%S)"
-        
-        # Create and checkout new branch
-        git checkout -b "$BRANCH_NAME"
-        
         # Commit changes
         git add api-reference/openapi.json
         git commit -m "Update API specification from live endpoint" \
                    -m "Automatically fetched from https://api.checklyhq.com/swagger.json" \
                    -m "Updated on $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-        
-        # Push branch
-        git push origin "$BRANCH_NAME"
-        
-        # Create pull request
-        gh pr create \
-          --title "🔄 Update API Specification - $(date +%Y-%m-%d)" \
-          --body "## 📋 Summary
 
-        This PR updates the API specification with the latest changes from the live Checkly API endpoint.
-
-        ## 🔄 Changes
-
-        - Updated \`api-reference/openapi.json\` from https://api.checklyhq.com/swagger.json
-        - Converted from Swagger 2.0 to OpenAPI 3.0 format
-        - Validated specification with Mintlify
-
-        ## 🤖 Automation
-
-        This PR was automatically created by the \`update-api-spec.yml\` GitHub Action that runs every 48 hours.
-
-        ## ✅ Validation
-
-        The updated specification has been validated and is compatible with Mintlify documentation." \
-          --head "$BRANCH_NAME" \
-          --base main \
-          --label "documentation"
+        # Push directly to main
+        git push origin main
     
     - name: Report no changes
       if: env.spec_changed == 'false'

@@ -14,13 +14,17 @@ import PlaywrightCheckSuiteBetaNote from '/snippets/playwright-check-suite-beta-
 
 ## What are Playwright Checks?
 
-Playwright Checks enable you to run entire Playwright Suites or Projects as both pre-production tests and global production monitors, without rewriting your tests and configuration.
+Playwright Check Suites enable you to run entire Playwright end-to-end test suites, Playwright projects or tagged tests as pre-production tests and global production monitors, without rewriting your tests and configuration.
 
-Unlike [Browser Checks](detect/synthetic-monitoring/browser-checks/overview), Playwright Checks are not limited to a single test spec running in an async browser session and our preinstalled runtime dependencies. Playwright Checks enable you to run Playwright projects complete with all of your required dependencies, private packages, storage, data, and more. It's a complete native way to run Playwright in production, enabling you to detect issues with your applications or services even in the most complex scenarios.
+Unlike [Browser Checks](detect/synthetic-monitoring/browser-checks/overview), Playwright Check Suites are not limited to a single test spec running in an async browser session and our preinstalled runtime dependencies. Playwright Check Suites enable you to run Playwright projects complete with all of your required dependencies, private packages, storage, data, and more and enable you to detect issues with your applications or services even in the most complex scenarios.
 
-Playwright Checks support for the full Playwright API and ecosystem, meaning you can use your existing tests and `playwright.config.ts` files as is.
+<Frame>
+  ![Playwright Check Suites test result](/images/pwn-test-result.png)
+</Frame>
 
-**Playwright Checks are perfect for:**
+**Playwright Check Suites are the native way to run Playwright in production** and support the full Playwright API and ecosystem, meaning you can use your existing tests and `playwright.config.ts` files as is.
+
+**Playwright Check Suites are perfect for:**
 - Converting existing E2E tests into monitoring
 - Testing complex user workflows across multiple browsers
 - Monitoring critical business processes
@@ -31,7 +35,7 @@ Playwright Checks support for the full Playwright API and ecosystem, meaning you
 
 <Steps>
 <Step title="1. Test Discovery">
-Playwright Checks analyze your Playwright configuration and test files to understand your existing test structure.
+Playwright Check Suites analyze your Playwright configuration and test files to understand your existing test structure.
 </Step>
 
 <Step title="2. Selective Monitoring">
@@ -59,19 +63,30 @@ Receive notifications when tests fail or performance degrades, keeping your team
 
 Control which tests become monitoring checks using:
 
-- **Tags**: Select tests marked with specific tags (e.g., `@critical`, `@smoke`)
 - **Projects**: Choose browser configurations from your Playwright config
+- **Tags**: Select tests marked with specific tags (e.g., `@critical`, `@smoke`)
 - **Combinations**: Mix tags and projects for precise test selection
 
-```typescript
-// Example: Monitor critical tests in Chromium
-{
-  name: 'Critical User Flows',
-  pwTags: '@critical',
-  pwProjects: 'chromium',
-  frequency: Frequency.EVERY_1M,
-  locations: ['us-east-1', 'eu-west-1']
-}
+```typescript checkly.config.ts
+export default defineConfig({
+  checks: {
+    playwrightChecks: [
+      {
+        name: "Marketing Environment",
+        logicalId: "environment-marketing-suite",
+        // Select the tests defined in
+        // the `environment-marketing` Playwright project
+        pwProjects: ["environment-marketing"],
+      },
+      {
+        name: "@critical tests",
+        logicalId: "critical tests",
+        // Select tests tagged as `@critical`
+        pwTags: ["@critical"],
+      },
+    ],
+  },
+})
 ```
 
 ## Monitoring Configuration
@@ -89,11 +104,11 @@ Customize monitoring behavior with:
 Ready to turn your Playwright tests into monitoring? Start with our quickstart guide to get running in 5 minutes.
 
 <CardGroup cols={2}>
-<Card title="Quickstart Guide" href="/detect/synthetic-monitoring/playwright-checks/quickstart">
+<Card title="Quickstart Guide" href="/quickstarts/playwright-check">
 Get from zero to deployed monitoring in 5 minutes
 </Card>
 
-<Card title="CLI Reference" href="/detect/synthetic-monitoring/playwright-checks/reference">
+<Card title="Construct Reference" href="/constructs/playwright-check/">
 Complete configuration options and examples
 </Card>
 

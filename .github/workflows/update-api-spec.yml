@@ -79,25 +79,25 @@ jobs:
         gh pr create \
           --title "🔄 Update API Specification - $(date +%Y-%m-%d)" \
           --body "## 📋 Summary
-        
+
         This PR updates the API specification with the latest changes from the live Checkly API endpoint.
-        
+
         ## 🔄 Changes
-        
+
         - Updated \`api-reference/openapi.json\` from https://api.checklyhq.com/swagger.json
         - Converted from Swagger 2.0 to OpenAPI 3.0 format
         - Validated specification with Mintlify
-        
+
         ## 🤖 Automation
-        
+
         This PR was automatically created by the \`update-api-spec.yml\` GitHub Action that runs every 48 hours.
-        
+
         ## ✅ Validation
-        
+
         The updated specification has been validated and is compatible with Mintlify documentation." \
           --head "$BRANCH_NAME" \
           --base main \
-          --label "documentation,api,automated"
+          --label "documentation"
     
     - name: Report no changes
       if: env.spec_changed == 'false'

@@ -28,17 +28,23 @@ fi
 
 echo "🔧 Cleaning up HTML in descriptions..."
 # Convert common HTML tags to Markdown in the authorization description
-sed -i.tmp 's|<a href="\([^"]*\)" target="_blank">here</a>|[here](\1)|g' "$TEMP_CONVERTED"
-sed -i.tmp 's|</br>|\n|g' "$TEMP_CONVERTED"
-sed -i.tmp 's|<br>|\n|g' "$TEMP_CONVERTED"
-sed -i.tmp 's|<b>\([^<]*\)</b>|**\1**|g' "$TEMP_CONVERTED"
-sed -i.tmp 's|<code>\([^<]*\)</code>|`\1`|g' "$TEMP_CONVERTED"
-
-# Clean up any remaining HTML line breaks and improve formatting for curl examples
-sed -i.tmp '/curl -H/,/\]/c\
-For example, set **Authorization** header while using cURL:\n```bash\ncurl -H "Authorization: Bearer [apiKey]" "X-Checkly-Account: [accountId]"\n```' "$TEMP_CONVERTED"
-
-rm -f "${TEMP_CONVERTED}.tmp"
+# Use cross-platform sed syntax (works on both macOS and Linux)
+if sed --version 2>&1 | grep -q GNU; then
+  # GNU sed (Linux)
+  sed -i 's|<a href="\([^"]*\)" target="_blank">here</a>|[here](\1)|g' "$TEMP_CONVERTED"
+  sed -i 's|</br>|\n|g' "$TEMP_CONVERTED"
+  sed -i 's|<br>|\n|g' "$TEMP_CONVERTED"
+  sed -i 's|<b>\([^<]*\)</b>|**\1**|g' "$TEMP_CONVERTED"
+  sed -i 's|<code>\([^<]*\)</code>|`\1`|g' "$TEMP_CONVERTED"
+else
+  # BSD sed (macOS)
+  sed -i.tmp 's|<a href="\([^"]*\)" target="_blank">here</a>|[here](\1)|g' "$TEMP_CONVERTED"
+  sed -i.tmp 's|</br>|\n|g' "$TEMP_CONVERTED"
+  sed -i.tmp 's|<br>|\n|g' "$TEMP_CONVERTED"
+  sed -i.tmp 's|<b>\([^<]*\)</b>|**\1**|g' "$TEMP_CONVERTED"
+  sed -i.tmp 's|<code>\([^<]*\)</code>|`\1`|g' "$TEMP_CONVERTED"
+  rm -f "${TEMP_CONVERTED}.tmp"
+fi
 
 echo "✅ Validating OpenAPI specification..."
 mintlify openapi-check "$TEMP_CONVERTED"

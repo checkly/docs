@@ -31,14 +31,14 @@ echo "🔧 Cleaning up HTML in descriptions..."
 # Use cross-platform sed syntax (works on both macOS and Linux)
 if sed --version 2>&1 | grep -q GNU; then
   # GNU sed (Linux)
-  sed -i 's|<a href="\([^"]*\)" target="_blank">here</a>|[here](\1)|g' "$TEMP_CONVERTED"
+  sed -i 's|<a[^>]*href=\\"\([^"]*\)\\"[^>]*>\([^<]*\)</a>|[\2](\1)|g' "$TEMP_CONVERTED"
   sed -i 's|</br>|\n|g' "$TEMP_CONVERTED"
   sed -i 's|<br>|\n|g' "$TEMP_CONVERTED"
   sed -i 's|<b>\([^<]*\)</b>|**\1**|g' "$TEMP_CONVERTED"
   sed -i 's|<code>\([^<]*\)</code>|`\1`|g' "$TEMP_CONVERTED"
 else
   # BSD sed (macOS)
-  sed -i.tmp 's|<a href="\([^"]*\)" target="_blank">here</a>|[here](\1)|g' "$TEMP_CONVERTED"
+  sed -i.tmp 's|<a[^>]*href=\\"\([^"]*\)\\"[^>]*>\([^<]*\)</a>|[\2](\1)|g' "$TEMP_CONVERTED"
   sed -i.tmp 's|</br>|\n|g' "$TEMP_CONVERTED"
   sed -i.tmp 's|<br>|\n|g' "$TEMP_CONVERTED"
   sed -i.tmp 's|<b>\([^<]*\)</b>|**\1**|g' "$TEMP_CONVERTED"

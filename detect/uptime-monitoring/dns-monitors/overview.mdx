@@ -1,0 +1,92 @@
+---
+title: 'DNS Monitors Overview'
+description: 'Monitor the resolution and lookup times of DNS records'
+sidebarTitle: Overview
+---
+
+{/* <Tip>
+**Monitoring as Code**: Learn more about the [TCP Monitor Construct](/constructs/tcp-monitor).
+</Tip> */}
+
+## What are DNS Monitors?
+
+DNS monitors check that your DNS records resolve as expected. They help you catch misconfigurations, expired records, or propagation issues before they impact your users.  
+
+**Typical use cases include:**  
+- Detecting if your domain stops resolving to its IP address to prevent downtime
+- Verifying that records resolve correctly when queried against a specific nameserver (e.g. 8.8.8.8 or dns.google) to catch resolver-specific issues
+- Monitoring DNS lookup and response times to detect performance degradation or resolver latency
+- Spotting slow or inconsistent DNS resolution across different regions
+
+## How do DNS monitors work?
+
+To verify your DNS configuration, DNS monitors run lookups for the requested record type:
+
+* When you specify a domain, Checkly runs a DNS lookup from the configured location(s)
+
+* The query is sent to a DNS resolver (by default a public DNS server, or a custom one you define)
+
+* The resolver continues through the DNS chain and retrieves the requested record type from the authoritative server
+
+For example, querying the A record for checklyhq.com returns:
+
+```
+NOERROR 0ms
+;; opcode: QUERY, status: NOERROR, id: 16122
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 4, AUTHORITY: 0, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;checklyhq.com.	IN	 A
+
+;; ANSWER SECTION:
+checklyhq.com.	6	IN	A	18.66.102.127
+checklyhq.com.	6	IN	A	18.66.102.76
+checklyhq.com.	6	IN	A	18.66.102.10
+checklyhq.com.	6	IN	A	18.66.102.85
+```
+
+The query response is shown on the results page in the UI as both raw output and parsed JSON, based on which you can define [assertions](/detect/uptime-monitoring/dns-monitors/configuration#assertions) for expected responses.
+
+## Troubleshooting Common Issues [Placeholder]
+
+This is a placeholder from chatGPT, we should talk to someone like Daniel, Simo or the platform team to nail down a few useful tips
+
+<Accordion title="NXDOMAIN (Non-Existent Domain)">
+**Symptom**: The monitor shows `NXDOMAIN`.  
+**Causes**:  
+- The domain does not exist or has been removed.  
+- Typo in the domain name.  
+- Record not yet propagated.  
+
+**Solutions**:  
+1. Verify the domain spelling.  
+2. Check record existence with: `dig example.com`.  
+3. Allow time for DNS changes to propagate.  
+</Accordion>
+
+<Accordion title="SERVFAIL">
+**Symptom**: The monitor shows `SERVFAIL`.  
+**Causes**:  
+- Authoritative nameserver unavailable.  
+- Misconfigured DNSSEC.  
+- Issues with the upstream resolver.  
+
+**Solutions**:  
+1. Query a specific resolver: `dig @8.8.8.8 example.com`.  
+2. Verify DNSSEC configuration.  
+3. Check availability of authoritative nameservers.  
+</Accordion>
+
+<Accordion title="Slow Resolution">
+**Symptom**: Lookup times exceed thresholds.  
+**Causes**:  
+- High latency to resolver.  
+- Overloaded DNS server.  
+- Network issues on intermediate hops.  
+
+**Solutions**:  
+1. Compare response times from different locations.  
+2. Identify slow or failing resolvers.  
+3. Contact your DNS provider if latency persists.  
+</Accordion>
+

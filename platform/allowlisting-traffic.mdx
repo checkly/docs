@@ -102,6 +102,42 @@ test('my user agent test', async ({ page }) => {
 </Tab>
 </Tabs>
 
+### Allowlisting Playwright checks with user agents
+
+You can configure the user agent globally in your `playwright.config.ts` file to ensure all your Playwright tests use the Checkly user agent.
+
+**For all projects:**
+
+```ts playwright.config.ts
+import { defineConfig } from '@playwright/test'
+
+export default defineConfig({
+  use: {
+    userAgent: "(Checkly, https://www.checklyhq.com)",
+  },
+})
+```
+
+**For individual projects:**
+
+To preserve the browser's user agent while adding the Checkly identifier, append it to the device's user agent:
+
+```ts playwright.config.ts
+import { defineConfig, devices } from '@playwright/test'
+
+export default defineConfig({
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        userAgent: `${devices['Desktop Chrome'].userAgent} (Checkly, https://www.checklyhq.com)`
+      },
+    },
+  ],
+})
+```
+
 ## Filtering Google Analytics
 
 You might want to filter Checkly traffic in Google Analytics to prevent Checkly browser checks from skewing your results.

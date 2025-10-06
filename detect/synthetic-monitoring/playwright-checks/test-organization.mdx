@@ -106,6 +106,8 @@ export default defineConfig({
 <Tip>
 Playwright projects are most commonly used to configure different browser settings, but they can be used to configure different environments, authentication states, or any other Playwright configuration.
 
+Using `pwProjects` creates a custom `testCommand` that includes the exact same `npx playwright test --project` configuration.
+
 [Find more Playwright project examples below](#recommendations-and-examples).
 </Tip>
 
@@ -151,11 +153,13 @@ test(
 Playwright Check Suites let you filter existing tests using `pwTags`. However, we recommend to always start with a separated Playwright project and reuse it via `pwProjects` in your `checkly.config.ts`.
 
 This approach improves the maintainability and separates the Playwright test configuration (`playwright.config.ts`) from the Checkly monitoring configuration (`checkly.config.ts`).
+
+Using `pwTags` creates a custom `testCommand` that includes the exact same `npx playwright test --grep @tag` configuration for your check suite to run.
 </Tip>
 
 ## Recommendations and Examples
 
-Synthetic monitoring with Playwright Check Suites is most effective when you group and organize your Playwright tests to reflect your monitoring needs. The ideal configuration varies and depends on your application.
+Synthetic monitoring with Playwright Check Suites is most effective when you organize your Playwright tests to match your monitoring needs. The best setup depends on your application and how quickly you want to receive alerts.
 
 <Note>
 [The following examples are also available on GitHub](https://github.com/checkly/playwright-check-suite-examples/) if you want to see them in action.
@@ -291,7 +295,7 @@ export default defineConfig({
 
 ### Group tests depending on urgency or execution time
 
-If you want to use your Playwright tests to monitor highly critical user flows (e.g. login) on a high interval with critical alert settings and still monitor uncritical flows (e.g. profile updates) on a lower interval, create [Playwright projects](https://playwright.dev/docs/test-projects) and select files via [Playwright annotations and tags](https://playwright.dev/docs/test-annotations#tag-tests).
+If you want to use your Playwright tests to monitor both essential user flows, like login at a high frequency with critical alerts, and less critical ones, like profile updates at a lower frequency, create [Playwright projects](https://playwright.dev/docs/test-projects) and select tests via [Playwright annotations and tags](https://playwright.dev/docs/test-annotations#tag-tests).
 
 <Frame>
   ![Two Playwright Check Suites grouped by urgency](/images/pwn-urgency-grouping.png)
@@ -328,7 +332,7 @@ export default defineConfig({
         logicalId: "critical",
         // Pick the `critical` project
         pwProjects: ["critical"],
-        // Run this Playwright Check Suite in three location every 5 minutes
+        // Run this Playwright Check Suite in three locations every 5 minutes
         frequency: Frequency.EVERY_5M,
         locations: ["us-west-1", "eu-west-2", "af-south-1"],
         // Assign critical alert channels

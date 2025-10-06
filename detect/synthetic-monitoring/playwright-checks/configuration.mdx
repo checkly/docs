@@ -137,8 +137,8 @@ export default defineConfig({
         pwTags: '@e2e',
         // Override default dependencies install command
         installCommand: 'npm install --dev',
-        // Override the default test command
-        testCommand: 'npx playwright test --grep@checkly --config=playwright.foo.config.ts',
+        // Append to the resulting test command, respects your pwTags and pwProjects filters.
+        testCommand: 'npx playwright test --trace=on',
         // Activate the check so that it runs on a schedule, true by default
         activated: true,
         // Mute the check so that it doesn't send alerts

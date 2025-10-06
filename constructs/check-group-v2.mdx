@@ -228,6 +228,37 @@ If **set to** `'global'`, it overrides the alert settings of all checks in the g
 
 </ResponseField>
 
+## Reference an existing group by ID
+
+To add checks to an existing group in your account, find the group ID in the Checkly web UI or via the API and reference it using `CheckGroupV2.fromId()`.
+
+<Tabs>
+  <Tab title="Web UI">
+    Navigate to the group in the Checkly UI and copy the group ID from the URL or the group details.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -H "Authorization: Bearer YOUR_API_KEY" \
+         -H "X-Checkly-Account: YOUR_ACCOUNT_ID" \
+         https://api.checklyhq.com/v1/check-groups/
+    ```
+  </Tab>
+</Tabs>
+
+```ts Using Existing Group
+// Reference an existing group by ID
+const existingGroup = CheckGroupV2.fromId(123)
+
+new ApiCheck("existing-group-check", {
+  name: "Check with Existing Group",
+  group: existingGroup,
+  request: {
+    method: "GET",
+    url: "https://api.example.com/endpoint",
+  },
+})
+```
+
 ## Examples
 
 <Tabs>

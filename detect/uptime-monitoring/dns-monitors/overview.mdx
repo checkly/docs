@@ -47,46 +47,47 @@ checklyhq.com.	6	IN	A	18.66.102.85
 
 The query response is shown on the results page in the UI as both raw output and parsed JSON, based on which you can define [assertions](/detect/uptime-monitoring/dns-monitors/configuration#assertions) for expected responses.
 
-## Troubleshooting Common Issues [Placeholder]
+## Troubleshooting Common Issues
 
-This is a placeholder from chatGPT, we should talk to someone like Daniel, Simo or the platform team to nail down a few useful tips
+<Accordion title="Users Still Hitting Old IPs After DNS Changes">
+**Symptom**: DNS updated but users still reach old infrastructure
 
-<Accordion title="NXDOMAIN (Non-Existent Domain)">
-**Symptom**: The monitor shows `NXDOMAIN`.  
-**Causes**:  
-- The domain does not exist or has been removed.  
-- Typo in the domain name.  
-- Record not yet propagated.  
+**Causes**:
+- TTL caching keeps old records alive
+- Regional resolver differences
+- Propagation delays
 
-**Solutions**:  
-1. Verify the domain spelling.  
-2. Check record existence with: `dig example.com`.  
-3. Allow time for DNS changes to propagate.  
+**Solutions**:
+- Use assertion `$.Answer[0].Address` to verify correct IP
+- Monitor from multiple Checkly locations
+- Check TTL with `dig +noall +answer yourdomain.com`
 </Accordion>
 
-<Accordion title="SERVFAIL">
-**Symptom**: The monitor shows `SERVFAIL`.  
-**Causes**:  
-- Authoritative nameserver unavailable.  
-- Misconfigured DNSSEC.  
-- Issues with the upstream resolver.  
+<Accordion title="Wrong Number of A Records Returned">
+**Symptom**: Expected multiple A records but getting fewer than expected
 
-**Solutions**:  
-1. Query a specific resolver: `dig @8.8.8.8 example.com`.  
-2. Verify DNSSEC configuration.  
-3. Check availability of authoritative nameservers.  
+**Causes**:
+- Auto-scaling events changed record count
+- Health checks removed unhealthy instances
+- Load balancer configuration drift
+
+**Solutions**:
+- Use JSON path assertion `$.Answer.length` for expected count
+- Set range assertions for auto-scaling (e.g., 2-8 records)
+- Monitor record count changes over time
 </Accordion>
 
-<Accordion title="Slow Resolution">
-**Symptom**: Lookup times exceed thresholds.  
-**Causes**:  
-- High latency to resolver.  
-- Overloaded DNS server.  
-- Network issues on intermediate hops.  
+<Accordion title="DNS Works Locally But Fails for Some Users">
+**Symptom**: DNS resolves from your network but fails for certain users
 
-**Solutions**:  
-1. Compare response times from different locations.  
-2. Identify slow or failing resolvers.  
-3. Contact your DNS provider if latency persists.  
+**Causes**:
+- Different public resolvers have different behaviors
+- Corporate/ISP DNS filtering
+- Resolver-specific caching issues
+
+**Solutions**:
+- Configure monitors with different DNS servers (8.8.8.8, 1.1.1.1)
+- Monitor from multiple geographic locations
+- Test against specific resolvers users report issues with
 </Accordion>
 

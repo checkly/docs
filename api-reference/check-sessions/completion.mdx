@@ -1,0 +1,13 @@
+---
+title: 'Await completion of a check session'
+openapi: 'GET /v1/check-sessions/{checkSessionId}/completion'
+description: 'Wait for a check session to finish and get final results'
+---
+
+## Overview
+
+Call this endpoint to await the completion of a check session. A successful response will be returned once the check session reaches its final state (i.e. when it passes or fails).
+
+If the check session takes a long time to complete, the endpoint will return a timeout error code. You should keep calling the endpoint until you receive a successful response, or a non-timeout related error code. If using *curl*, its `--retry` option is suitable.
+
+The successful response of this endpoint is equivalent to the `GET /v1/check-sessions/{checkSessionId}` endpoint's response for a completed check session.

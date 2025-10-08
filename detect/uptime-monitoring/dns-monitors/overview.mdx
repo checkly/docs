@@ -8,6 +8,10 @@ sidebarTitle: Overview
 **Monitoring as Code**: Learn more about the [TCP Monitor Construct](/constructs/tcp-monitor).
 </Tip> */}
 
+<Warning>
+DNS monitors are currently available in the UI only. MaC support (CLI, Terraform, Pulumi) will be released shortly. Keep an eye on our [changelog](https://feedback.checklyhq.com/changelog) for updates.
+</Warning>
+
 ## What are DNS Monitors?
 
 DNS monitors check that your DNS records resolve as expected. They help you catch misconfigurations, expired records, or propagation issues before they impact your users.  
@@ -58,7 +62,7 @@ The query response appears on the results page as both raw output and parsed JSO
 - Propagation delays
 
 **Solutions**:
-- Use assertion `$.response.answers[0].resolvedValue.value` to verify correct IP
+- Use [assertions](/detect/uptime-monitoring/dns-monitors/configuration#assertions) `$.response.answers[0].resolvedValue.value` to verify correct IP
 - Monitor TTL with `$.response.answers[0].ttl` to track propagation timing
 - Monitor from multiple Checkly locations
 </Accordion>
@@ -71,7 +75,7 @@ The query response appears on the results page as both raw output and parsed JSO
 - Health checks removed unhealthy instances
 
 **Solutions**:
-- Use JSON path assertion `$.response.answers.length` for expected count
+- Use JSON path [assertions](/detect/uptime-monitoring/dns-monitors/configuration#assertions) `$.response.answers.length` for expected count
 - Set range assertions for auto-scaling (e.g., 2-8 records)
 </Accordion>
 

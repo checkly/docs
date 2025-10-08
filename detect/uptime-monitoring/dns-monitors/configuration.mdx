@@ -18,8 +18,8 @@ Specify the domain and record type you want to check:
 
 * **Domain:** The domain you want to monitor (e.g. checklyhq.com)
 * **Record type:** The DNS record to query (A, AAAA, CNAME, MX, TXT, etc.). Defaults to A, which resolves to an IPv4 address
-* **DNS server & Port:** Optionally override the default resolver with a specific nameserver (e.g. dns.google). Can be a domain name or an IP address
-* **Protocol:** DNS uses UDP by default and upgrades to TCP automatically if required. You can pin the protocol to UDP-only or TCP-only if required
+* **DNS server:** Optionally override the default resolver with a specific nameserver (e.g. dns.google). Accepts domain + port or IP address
+* **Protocol:** DNS uses UDP by default and upgrades to TCP automatically if needed. You can also pin it to UDP-only or TCP-only
 
 ### Assertions
 
@@ -39,26 +39,39 @@ The raw and JSON responses are shown on the results page of a DNS monitor run an
 
 * **JSON response:** The DNS response parsed as JSON. This allows you to target specific fields without relying on regex. Taking the example of an A record lookup for checklyhq.com:
 
-```
-NOERROR 0ms
-;; opcode: QUERY, status: NOERROR, id: 59493
-;; flags: qr aa rd ra; QUERY: 1, ANSWER: 4, AUTHORITY: 0, ADDITIONAL: 0
-
-;; QUESTION SECTION:
-;checklyhq.com.	IN	 A
-
-;; ANSWER SECTION:
-checklyhq.com.	27	IN	A	18.66.102.85
-checklyhq.com.	27	IN	A	18.66.102.10
-checklyhq.com.	27	IN	A	18.66.102.76
-checklyhq.com.	27	IN	A	18.66.102.127
+```json
+{
+  "response": {
+    "status": "NOERROR",
+    "responseTime": 25,
+    "answers": [
+      {
+        "domainName": "checklyhq.com.",
+        "recordType": "A",
+        "ttl": 27,
+        "resolvedValue": {
+          "value": "18.66.102.85"
+        }
+      },
+      {
+        "domainName": "checklyhq.com.",
+        "recordType": "A",
+        "ttl": 27,
+        "resolvedValue": {
+          "value": "18.66.102.10"
+        }
+      }
+      // ...
+    ]
+  }
+}
 ```
 
 With JSON path assertions, you could:
 
-* `$.Answer.length` → assert that checklyhq.com always returns exactly 4 A records.
+* `$.response.answers.length` → assert that checklyhq.com always returns exactly x amount of A records
 
-* `$.Answer[0].TTL` → assert that the TTL for a record is above or below a given threshold.
+* `$.response.answers[0].ttl` → assert that the TTL for a record is above or below a given threshold
 
 Learn more about JSON path assertions here: [JSON responses with JSON path](/detect/synthetic-monitoring/api-checks/assertions/#json-responses-with-json-path).
 

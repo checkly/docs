@@ -15,7 +15,7 @@ DNS monitors check that your DNS records resolve as expected. They help you catc
 **Typical use cases include:**  
 - Detecting if your domain stops resolving to its IP address to prevent downtime
 - Verifying that records resolve correctly when queried against a specific nameserver (e.g. 8.8.8.8 or dns.google) to catch resolver-specific issues
-- Monitoring DNS lookup and response times to detect performance degradation or resolver latency
+- Monitoring DNS response times to detect performance degradation or resolver latency
 - Spotting slow or inconsistent DNS resolution across different regions
 
 ## How do DNS monitors work?
@@ -28,7 +28,7 @@ To verify your DNS configuration, DNS monitors run lookups for the requested rec
 
 * The resolver continues through the DNS chain and retrieves the requested record type from the authoritative server
 
-For example, querying the A record for checklyhq.com returns:
+For example, querying the A record for `checklyhq.com` returns:
 
 ```
 NOERROR 0ms
@@ -45,7 +45,7 @@ checklyhq.com.	6	IN	A	18.66.102.10
 checklyhq.com.	6	IN	A	18.66.102.85
 ```
 
-The query response is shown on the results page in the UI as both raw output and parsed JSON, based on which you can define [assertions](/detect/uptime-monitoring/dns-monitors/configuration#assertions) for expected responses.
+The query response appears on the results page as both raw output and parsed JSON. Use it as a reference to define [assertions](/detect/uptime-monitoring/dns-monitors/configuration#assertions) for expected values.
 
 ## Troubleshooting Common Issues
 
@@ -58,9 +58,9 @@ The query response is shown on the results page in the UI as both raw output and
 - Propagation delays
 
 **Solutions**:
-- Use assertion `$.Answer[0].Address` to verify correct IP
+- Use assertion `$.response.answers[0].resolvedValue.value` to verify correct IP
+- Monitor TTL with `$.response.answers[0].ttl` to track propagation timing
 - Monitor from multiple Checkly locations
-- Check TTL with `dig +noall +answer yourdomain.com`
 </Accordion>
 
 <Accordion title="Wrong Number of A Records Returned">
@@ -69,12 +69,10 @@ The query response is shown on the results page in the UI as both raw output and
 **Causes**:
 - Auto-scaling events changed record count
 - Health checks removed unhealthy instances
-- Load balancer configuration drift
 
 **Solutions**:
-- Use JSON path assertion `$.Answer.length` for expected count
+- Use JSON path assertion `$.response.answers.length` for expected count
 - Set range assertions for auto-scaling (e.g., 2-8 records)
-- Monitor record count changes over time
 </Accordion>
 
 <Accordion title="DNS Works Locally But Fails for Some Users">

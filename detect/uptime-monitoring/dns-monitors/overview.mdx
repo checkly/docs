@@ -18,7 +18,7 @@ DNS monitors check that your DNS records resolve as expected. They help you catc
 
 **Typical use cases include:**  
 - Detecting if your domain stops resolving to its IP address to prevent downtime
-- Verifying that records resolve correctly when queried against a specific nameserver (e.g. 8.8.8.8 or dns.google) to catch resolver-specific issues
+- Verifying that records resolve correctly when queried against a specific nameserver (e.g. 208.67.222.222 for OpenDNS) to catch resolver-specific issues
 - Monitoring DNS response times to detect performance degradation or resolver latency
 - Spotting slow or inconsistent DNS resolution across different regions
 
@@ -28,7 +28,7 @@ To verify your DNS configuration, DNS monitors run lookups for the requested rec
 
 * When you specify a domain, Checkly runs a DNS lookup from the configured location(s)
 
-* The query is sent to a DNS resolver (by default a public DNS server, or a custom one you define)
+* The query is sent to a DNS resolver. By default, it uses 8.8.8.8 (Google DNS). If that fails, it falls back to 1.1.1.1 (Cloudflare DNS) and then an internal AWS resolver. You can also specify a custom resolver
 
 * The resolver continues through the DNS chain and retrieves the requested record type from the authoritative server
 

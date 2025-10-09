@@ -4127,7 +4127,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                 ],
                 "responses": {
                     "201": {
-                        "description": "Returns the check sessions that were created for the checks.",
+                        "description": "Returns a check session for each check matching target conditions.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4193,7 +4193,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
             "get": {
                 "summary": "Retrieve a check session",
                 "operationId": "getV1ChecksessionsChecksessionid",
-                "description": "Retrieves a check session. Note that the returned data may be incomplete if the check session is still in progress.\n\nResults for all finished check runs are included. A check session should have one result for each of its run locations. Each result contains just enough information to quickly determine whether the check run was successful or not. To dive even deeper into individual results, use the `GET /v1/check-results/{checkId}/{checkResultId}` endpoint to retrieve detailed data about a specific result.",
+                "description": "Retrieves a check session. Results may be incomplete if the check session is still in progress.\n\nOnce a check session has finished, results will include at least one check result for each run location: one result with `resultType` equal to `\"FINAL\"`, and zero or more results with `resultType` equal to `\"ATTEMPT\"` (one for each failed attempt, if any).\n\nEach result contains just enough information to quickly determine whether the check run was successful or not. To dive even deeper into individual results, use the `GET /v1/check-results/{checkId}/{checkResultId}` endpoint to retrieve detailed data about a specific result.",
                 "parameters": [
                     {
                         "description": "The unique identifier of the check session.",
@@ -5335,7 +5335,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "default": "2025-10-06T02:30:37.264Z"
+                            "default": "2025-10-08T02:32:04.593Z"
                         }
                     },
                     {
@@ -5345,7 +5345,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "default": "2025-10-07T02:30:37.265Z"
+                            "default": "2025-10-09T02:32:04.594Z"
                         }
                     }
                 ],
@@ -5441,7 +5441,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "default": "2025-10-06T02:30:37.266Z"
+                            "default": "2025-10-08T02:32:04.596Z"
                         }
                     },
                     {
@@ -5451,7 +5451,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "default": "2025-10-07T02:30:37.266Z"
+                            "default": "2025-10-09T02:32:04.597Z"
                         }
                     },
                     {
@@ -19435,7 +19435,6 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 "enum": [
                     "API",
                     "BROWSER",
-                    "HEARTBEAT",
                     "MULTI_STEP",
                     "TCP",
                     "PLAYWRIGHT",
@@ -19540,14 +19539,14 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             },
             "sessions": {
                 "type": "array",
-                "description": "The list of checks in the check session.",
+                "description": "A list of check sessions, with one check session for each check.",
                 "items": {
                     "$ref": "#/components/schemas/CheckSession"
                 }
             },
             "TriggerCheckSessionResponse": {
                 "type": "object",
-                "description": "Returns the check sessions that were created for the checks.",
+                "description": "Returns a check session for each check matching target conditions.",
                 "properties": {
                     "sessions": {
                         "$ref": "#/components/schemas/sessions"
@@ -19586,7 +19585,6 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 "enum": [
                     "API",
                     "BROWSER",
-                    "HEARTBEAT",
                     "MULTI_STEP",
                     "TCP",
                     "PLAYWRIGHT",
@@ -19615,7 +19613,6 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 "enum": [
                     "API",
                     "BROWSER",
-                    "HEARTBEAT",
                     "MULTI_STEP",
                     "TCP",
                     "PLAYWRIGHT",
@@ -19711,7 +19708,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             },
             "results": {
                 "type": "array",
-                "description": "THe results of the check session. Only partial results are available until the check session has completed.",
+                "description": "The results of the check session. Only partial results are available until the check session has completed.",
                 "items": {
                     "$ref": "#/components/schemas/CheckSessionConciseCheckResult"
                 }
@@ -19818,7 +19815,6 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 "enum": [
                     "API",
                     "BROWSER",
-                    "HEARTBEAT",
                     "MULTI_STEP",
                     "TCP",
                     "PLAYWRIGHT",
@@ -27410,7 +27406,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "publicIncidentUpdateDate": {
                         "type": "string",
                         "format": "date-time",
-                        "default": "2025-10-07T02:30:37.858Z"
+                        "default": "2025-10-09T02:32:05.521Z"
                     },
                     "notifySubscribers": {
                         "type": "boolean",
@@ -27900,7 +27896,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "publicIncidentUpdateDate": {
                         "type": "string",
                         "format": "date-time",
-                        "default": "2025-10-07T02:30:37.899Z"
+                        "default": "2025-10-09T02:32:05.582Z"
                     },
                     "created_at": {
                         "type": "string",

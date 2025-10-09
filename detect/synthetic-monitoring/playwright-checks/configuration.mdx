@@ -8,17 +8,17 @@ import PlaywrightCheckSuiteBetaNote from '/snippets/playwright-check-suite-beta-
 
 <PlaywrightCheckSuiteBetaNote />
 
-Use the `checkly.config.ts/js` file to define your Playwright Check Suite.
+Use the `checkly.config.ts/js` file to define your Playwright Check Suite. Each Playwright Check Suite can be connected to references in your `playwright.config.ts/js` file.
 
-Each Playwright Check Suite can be connected to references in your `playwright.config.ts/js` file.
-
-During the Beta, **a Playwright Check Suite can run up to 20 minutes**. This limit can be adjusted based on feedback.
+<Info>
+**A Playwright Check Suite can run up to 15 minutes**. [Please contact us in the Checkly Web App](https://app.checklyhq.com/?support=true) or get in touch with your account executive if you're interested in longer runs.
+</Info>
 
 ## Playwright Check Suite definition
 
 To add Playwright Check Suites to your Checkly monitoring setup, specify the path to your `playwright.config.ts/js` and add a new `playwrightChecks` property to the existing `checks` configuration in your `checkly.config.ts/js`.
 
-```typescript
+```typescript checkly.config.ts highlight={8-14}
 import { defineConfig } from 'checkly'
 import { Frequency } from 'checkly/constructs'
 
@@ -29,11 +29,8 @@ export default defineConfig({
     playwrightConfigPath: './playwright.config.ts',
     playwrightChecks: [
       {
-        name: 'critical-tagged',
-        pwTags: 'critical',
-        pwProjects: 'chromium',
-        frequency: Frequency.EVERY_1M,
-        locations: ['us-east-1', 'eu-west-1','eu-central-1', 'ap-south-1'],
+        name: 'all-pwt-tests',
+        logicalId: 'all-tests',
       }
     ],
   },
@@ -49,41 +46,48 @@ Other available properties like `frequency`, `alertChannels` or `locations` are 
 
 ## Playwright references
 
-The Checkly infrastructure will run and deploy all your existing Playwright tests (similar to what `npx playwright test` runs) as monitors if you don't reference Playwright projects or tags.
+Without limiting and selecting specific tests or Playwright projects, the Checkly infrastructure will run and deploy **all your existing Playwright tests** (similar to what `npx playwright test` runs) as monitors.
 
 Specify which tests should become part of global end-to-end monitoring by defining these properties:
 
-* `pwProjects` --- select existing project names from your Playwright configuration to create a Playwright Check Suite.
+* `pwProjects`: select an existing project by name from your Playwright configuration to create a Playwright Check Suite.
 
-* `pwTags` --- select test tags that will be grouped into a Playwright Check Suite.
+* `pwTags`: select tagged tests that will be grouped into a Playwright Check Suite.
 
 You can combine `pwTags` and `pwProjects` to generate your check suite, too.
 
 For example:
 
-```typescript
+```typescript checkly.config.ts highlight={11, 20}
 export default defineConfig({
   // ...
   checks: {
     playwrightConfigPath: './playwright.config.ts',
     playwrightChecks: [
       {
-        /**
-         * Run critical tagged tests in Chromium
-         * every minute from 4 locations.
-         */
-        name: 'critical-tagged',
-        pwTags: '@critical',
-        pwProjects: 'chromium',
-        frequency: Frequency.EVERY_1M,
-        locations: ['us-east-1', 'eu-west-1','eu-central-1', 'ap-south-1'],
+        name: "Marketing Environment",
+        logicalId: "environment-marketing-suite",
+        // Run the `environment-marketing` Playwright project
+        // in two locations every hour
+        pwProjects: ["environment-marketing"],
+        frequency: Frequency.EVERY_1H,
+        locations: ["us-west-1", "eu-west-2"],
+      },
+      {
+        name: "Critical production tests",
+        logicalId: "critical-tests",
+        // Run `@critical` tagged Playwright tests
+        // in three locations every ten minutes
+        pwTags: ["@critical"],
+        frequency: Frequency.EVERY_10M,
+        locations: ["us-west-1", "eu-west-2", "af-south-1"],
       },
     ],
   },
 });
 ```
 
-> We recommend using `pwTags` and `pwProjects` to group your Playwright tests into different monitoring levels with different monitoring settings. For example, critical application functionality may be monitored best with short monitoring frequencies to lower the mean time to detect (MTTD).
+Learn more about [best practices to organize and structure your Playwright tests](/detect/synthetic-monitoring/playwright-checks/test-organization/) for synthetic monitoring.
 
 ## Monitoring customizations
 
@@ -97,10 +101,13 @@ A Playwright Check Suite inherits multiple properties from [the abstract `Check`
 - `frequency`
 - `alertChannels`
 - `privateLocations`
-- `retryStrategy`
 - `alertEscalationPolicy`
 
-Check [the reference documentation](/cli/constructs-reference/#check) for more information on these settings.
+Check [the reference documentation](/constructs/project#param-checks-playwright-checks) for more information on these settings.
+
+<Note>
+**Checks' Retry strategy is not applicable for Playwright checks.** Playwright includes its own retry features that can be set up directly in your `playwright.config.ts/js` file with the [`retries`](https://playwright.dev/docs/test-retries) option. This allows for more detailed management of test retries within Playwright, when your check runs.
+</Note>
 
 Additionally, Playwright Check Suites provide specific configuration for your Playwright monitoring.
 
@@ -110,36 +117,43 @@ Additionally, Playwright Check Suites provide specific configuration for your Pl
 
 * `groupName:` The group this check belongs to.
 
-```typescript
-checks: {
-  playwrightConfigPath: './playwright.config.ts', // specify your config file
-  playwrightChecks: [
-    {
-      /**
-       * Run `@e2e` tagged tests across browsers
-       * every 5 minute from 4 locations.
-       */
-      // Human readable name
-      name: 'E2E test suite',
-      // Reference id
-      logicalId: 'e2e-test-suite',
-      // Playwright project references defined in `playwright.config`
-      pwProjects: ['chromium', 'firefox', 'webkit'],
-      // Playwright tags defined in `spec` files
-      pwTags: '@e2e',
-      // Override default dependencies install command
-      installCommand: 'npm install --dev',
-      // Override the default test command
-      testCommand: 'npx playwright test --grep@checkly --config=playwright.foo.config.ts',
-      // Activate the check so that it runs on a schedule, true by default
-      activated: true,
-      // Mute the check so that it doesn't send alerts
-      muted: false,
-      // Add a check to a group
-      groupName: 'production-group',
-      frequency: Frequency.EVERY_5M,
-      locations: ['us-east-1', 'eu-west-1','eu-central-1', 'ap-south-1'],
-    }
-  ]
- },
+```typescript checkly.config.ts
+export default defineConfig({
+  // Shared Checkly configuration (scheduling, locations, etc.)
+  // ...
+  checks: {
+    // Specify the relative path to your config file
+    playwrightConfigPath: './playwright.config.ts',
+    playwrightChecks: [
+      {
+        /**
+         * Run `@e2e` tagged tests across browsers
+         * every 5 minute from 4 locations.
+         */
+        // Human readable name
+        name: 'E2E test suite',
+        // Reference id
+        logicalId: 'e2e-test-suite',
+        // Playwright project references defined in `playwright.config`
+        pwProjects: ['chromium', 'firefox', 'webkit'],
+        // Playwright tags defined in `spec` files
+        pwTags: '@e2e',
+        // Override default dependencies install command
+        installCommand: 'npm install --dev',
+        // Append to the resulting test command, respects your pwTags and pwProjects filters.
+        testCommand: 'npx playwright test --trace=on',
+        // Activate the check so that it runs on a schedule, true by default
+        activated: true,
+        // Mute the check so that it doesn't send alerts
+        muted: false,
+        // Add a check to a group
+        groupName: 'production-group',
+        // Specify a monitoring frequency
+        frequency: Frequency.EVERY_5M,
+        // Define locations to monitor from
+        locations: ['us-east-1', 'eu-west-1','eu-central-1', 'ap-south-1'],
+      }
+    ]
+  },
+}
 ```

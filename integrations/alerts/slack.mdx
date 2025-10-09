@@ -1,6 +1,6 @@
 ---
 title: 'Sending Alerts to Slack'
-description: 'Configure Slack integration to receive real-time alerts from Checkly monitors'
+description: 'Configure Slack integration to receive real-time alerts from Checkly'
 sidebarTitle: 'Slack'
 ---
 
@@ -19,9 +19,9 @@ You have the option to customize the default channel you've set in Slack by sett
 
 By customizing the channel name, alerting options & checks for that alert channel, you can use a single Incoming WebHook URL for multiple scenarios.
 
-<Callout type="warning">
+<Warning>
 If you're using a free Slack workspace, be aware of [message limits](https://slack.com/help/articles/115002422943-Usage-limits-for-free-workspaces). Exceeding these limits may prevent new alerts from being delivered.
-</Callout>
+</Warning>
 
 ## Example Failed Slack Alert
 
@@ -37,7 +37,7 @@ From the recovered Slack message, you can see the timestamp as well as a link to
 
 ## Custom Slack Webhook Integration
 
-For users who need more control over the Slack alert format and content, you can use a **Webhook Alert Channel** in Checkly to send fully customized messages to Slack.
+For users who need more control over the Slack alert format and content, you can use a [Webhook Alert Channel](/integrations/alerts/webhooks) in Checkly to send fully customized messages to Slack.
 
 This approach is ideal when the native Slack integration does not meet your formatting or dynamic content needs. You will be using a Webhook alert channel with a Slack Incoming WebHook URL and a custom payload template. This setup allows you to control Slack message formatting using Slack's [Block Kit](https://api.slack.com/block-kit).
 
@@ -100,36 +100,75 @@ The following template uses conditional logic (`{{#if}}`) to change the message 
             {{/if}}
             {
               "type": "mrkdwn",
-              "text": "*Status:*\n{{ALERT_TYPE}}"
+              "text": "*Type:*\n{{CHECK_TYPE}}"
             },
             {
               "type": "mrkdwn",
-              "text": "*Location:*\n{{LOCATION}}"
-            }
-          ]
-        },
-        {
-          "type": "section",
-          "fields": [
+              "text": "*Started at:*\n{{STARTED_AT}}"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Run Location:*\n`{{RUN_LOCATION}}`"
+            },
             {
               "type": "mrkdwn",
               "text": "*Response Time:*\n{{RESPONSE_TIME}}ms"
-            },
+            }
+            {{#if API_CHECK_RESPONSE_STATUS_CODE}},
             {
               "type": "mrkdwn",
-              "text": "*Timestamp:*\n{{TIMESTAMP}}"
+              "text": "*Status Code:*\n{{API_CHECK_RESPONSE_STATUS_CODE}} {{API_CHECK_RESPONSE_STATUS_TEXT}}"
             }
+            {{/if}}
           ]
         },
-        {{#if (eq ALERT_TYPE "ALERT_FAILURE")}}
+        {{#if CHECK_ERROR_MESSAGE}}
         {
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "*Error Details:*\n{{ERROR_MESSAGE}}"
+            "text": "*❌ Error Message:*\n```{{CHECK_ERROR_MESSAGE}}```"
           }
         },
         {{/if}}
+
+        {{#if (eq ALERT_TYPE "ALERT_RECOVERY")}}
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "✅ *This check has recovered and is now passing successfully.*"
+          }
+        },
+        {{/if}}
+
+        {{#if (eq ALERT_TYPE "ALERT_DEGRADED_RECOVERY")}}
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "🟡 *This check has recovered from a degraded state.*"
+          }
+        },
+        {{/if}}
+
+        {{#if (eq ALERT_TYPE "ALERT_DEGRADED")}}
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "⚠️ *This check is running but performance is degraded.*"
+          }
+        },
+        {{/if}}
+
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "🔎 *View full result:*\n<{{RESULT_LINK}}|Click here to view details in Checkly>"
+          }
+        },
         {
           "type": "actions",
           "elements": [
@@ -137,19 +176,37 @@ The following template uses conditional logic (`{{#if}}`) to change the message 
               "type": "button",
               "text": {
                 "type": "plain_text",
-                "text": "View Check",
+                "text": "Runbook",
                 "emoji": true
               },
-              "url": "https://app.checklyhq.com/checks/{{CHECK_ID}}"
+              {{#if (eq CHECK_NAME "Check A")}}
+              "url": "https://example.com/check-a",
+              {{else if (eq CHECK_NAME "Check B")}}
+              "url": "https://example.com/check-b",
+              {{else}}
+              "url": "https://example.com/default",
+              {{/if}}
+              "action_id": "open_link_button"
             },
             {
               "type": "button",
               "text": {
                 "type": "plain_text",
-                "text": "View Result",
+                "text": "OTel Provider",
                 "emoji": true
               },
-              "url": "https://app.checklyhq.com/checks/{{CHECK_ID}}/results/{{RESULT_ID}}"
+              "url": "https://example.com",
+              "action_id": "open_link_button_needs_to_be_unique"
+            }
+          ]
+        },
+        {
+          "type": "context",
+          "elements": [
+            {
+              "type": "plain_text",
+              "text": "Tags: {{TAGS}} | UUID: {{CHECK_RESULT_ID}}",
+              "emoji": false
             }
           ]
         }
@@ -159,90 +216,24 @@ The following template uses conditional logic (`{{#if}}`) to change the message 
 }
 ```
 
-### Template Variables
+<Note> 
+Be sure to update or remove the placeholder button links to Runbooks, OTel provider and anything else that is not needed for your use case.
+</Note>
 
-The template uses these Checkly variables:
+<Note> 
+Be sure each check mapped in the runbook logic has a corresponding URL. If a match isn’t found, fallback to a default documentation page.
+</Note>
 
-- `{{CHECK_ID}}` - Unique identifier for the check
-- `{{CHECK_NAME}}` - Name of the check
-- `{{GROUP_NAME}}` - Name of the check group (if applicable)
-- `{{ALERT_TYPE}}` - Type of alert (ALERT_FAILURE, ALERT_RECOVERY, etc.)
-- `{{LOCATION}}` - Monitoring location where the check ran
-- `{{RESPONSE_TIME}}` - Response time in milliseconds
-- `{{TIMESTAMP}}` - When the check was executed
-- `{{ERROR_MESSAGE}}` - Error details (for failures)
-- `{{RESULT_ID}}` - Unique identifier for the check result
+### Testing the Webhook Limitations
+* You cannot use the **Test Webhook** button in Checkly for this template, as Slack requires valid payload structure and the test payload lacks real check data.
+* To test, trigger a real alert by adjusting a check so it fails, degrades, and recovers.
 
-### Customization Options
+### Examples of Alert Transitions
 
-You can further customize the template by:
+![A customized slack message showing a failed alert](/images/docs/images/alerting/slack-custom-failed.png)
 
-- Adding more fields to display additional information
-- Changing colors based on alert severity
-- Including custom emojis or formatting
-- Adding conditional blocks for different alert types
-- Including links to your internal systems or dashboards
+![A customized slack message showing a degraded alert](/images/docs/images/alerting/slack-custom-degraded.png)
 
-This custom webhook approach gives you complete control over the Slack message format while maintaining all the functionality of Checkly's native Slack integration.
+![A customized slack message showing a recovered alert](/images/docs/images/alerting/slack-custom-recovered.png)
 
-## Advanced Slack Configuration
-
-### Slack Channel Strategy
-
-Organize alerts across different Slack channels based on your team structure and operational needs:
-
-```yaml
-# Example Slack channel organization
-#alerts-critical:
-  Checks: Core production services
-  Alert Types: Failure, Recovery
-  Escalation: @here for immediate attention
-
-#alerts-performance:
-  Checks: All API and browser checks
-  Alert Types: Degradation, Recovery
-  Escalation: No @here, passive monitoring
-
-#alerts-security:
-  Checks: SSL certificate monitoring
-  Alert Types: SSL Expiration
-  Escalation: @security-team
-
-#alerts-staging:
-  Checks: Development and staging environment
-  Alert Types: All
-  Escalation: @dev-team during business hours
-```
-
-### Slack Message Formatting
-
-Slack alerts include rich formatting and interactive elements. Here's what a typical alert looks like:
-
-```text
-🔴 **ALERT: Payment API has failed**
-
-**Check**: Payment API Health Check
-**Location**: N. Virginia
-**Response Time**: 5,234ms
-**Started**: <!date^1642248622^{date_short_pretty} at {time}|2024-01-15 14:30:22 UTC>
-
-**Error**: Connection timeout after 5000ms
-
-[View Results](https://app.checklyhq.com/checks/abc123/results/def456) | [Check Config](https://app.checklyhq.com/checks/abc123)
-```
-
-### Slack Threading and Updates
-
-Configure how Checkly handles related alerts:
-
-- **Thread updates**: Group related alerts (failure → recovery) in threads
-- **Channel posting**: Each alert as separate message for visibility
-- **Mention strategies**: Use @here/@channel appropriately based on severity
-
-### Slack Best Practices
-
-- Use separate channels for different severity levels (critical, standard, development)
-- Configure @here mentions only for critical production failures
-- Set up channel-specific notification schedules (e.g., mute development alerts after hours)
-- Use threaded conversations to reduce channel noise while maintaining visibility
-- Consider using channel prefixes like #alerts- for easy organization
+![A customized slack message showing a recovered alert from degraded state](/images/docs/images/alerting/slack-custom-recovered-degraded.png)

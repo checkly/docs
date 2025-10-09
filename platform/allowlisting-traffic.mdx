@@ -102,6 +102,68 @@ test('my user agent test', async ({ page }) => {
 </Tab>
 </Tabs>
 
+### Allowlisting Playwright check suites with user agents
+
+You can configure the user agent globally in your `playwright.config.ts` file to ensure all your Playwright tests use the Checkly user agent.
+
+**For all projects:**
+
+```ts playwright.config.ts
+import { defineConfig } from '@playwright/test'
+
+export default defineConfig({
+  use: {
+    userAgent: "(Checkly, https://www.checklyhq.com)",
+  },
+})
+```
+
+**For individual projects:**
+
+To preserve the browser's user agent while adding the Checkly identifier, append it to the device's user agent:
+
+```ts playwright.config.ts
+import { defineConfig, devices } from '@playwright/test'
+
+export default defineConfig({
+  projects: [
+    {
+      name: 'chromium-checkly-agent',
+      use: {
+        ...devices['Desktop Chrome'],
+        userAgent: `${devices['Desktop Chrome'].userAgent} (Checkly, https://www.checklyhq.com)`
+      },
+    },
+  ],
+})
+```
+
+Afterwards, you can reference this new project with the Checkly user-agent so that it's the one run in your checks:
+
+```ts checkly.config.ts highlight={15}
+import { defineConfig } from 'checkly'
+import { Frequency } from 'checkly/constructs'
+
+export default defineConfig({
+  projectName: 'WebApp E2E check suite',
+  logicalId: 'webapp-e2e-check-suite',
+  repoUrl: 'https://your.url.here',
+  checks: {
+    playwrightConfigPath: './playwright.config.ts',
+    playwrightChecks: [
+      {
+        name: 'My new check',
+        logicalId: 'my-new-check',
+        frequency: Frequency.EVERY_10M,
+        pwProjects: ['chromium-checkly-agent'], // reference the new project
+        locations: ['us-east-1', 'eu-central-1'],
+      },
+    ],
+  },
+  //test configuration
+})
+```
+
 ## Filtering Google Analytics
 
 You might want to filter Checkly traffic in Google Analytics to prevent Checkly browser checks from skewing your results.

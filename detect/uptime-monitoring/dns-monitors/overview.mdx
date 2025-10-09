@@ -1,0 +1,95 @@
+---
+title: 'DNS Monitors Overview'
+description: 'Monitor the resolution and lookup times of DNS records'
+sidebarTitle: Overview
+---
+
+{/* <Tip>
+**Monitoring as Code**: Learn more about the [TCP Monitor Construct](/constructs/tcp-monitor).
+</Tip> */}
+
+<Warning>
+DNS monitors are currently available in the UI only. MaC support (CLI, Terraform, Pulumi) will be released shortly. Keep an eye on our [changelog](https://feedback.checklyhq.com/changelog) for updates.
+</Warning>
+
+## What are DNS Monitors?
+
+DNS monitors check that your DNS records resolve as expected. They help you catch misconfigurations, expired records, or propagation issues before they impact your users.  
+
+**Typical use cases include:**  
+- Detecting if your domain stops resolving to its IP address to prevent downtime
+- Verifying that records resolve correctly when queried against a specific nameserver (e.g. 208.67.222.222 for OpenDNS) to catch resolver-specific issues
+- Monitoring DNS response times to detect performance degradation or resolver latency
+- Spotting slow or inconsistent DNS resolution across different regions
+
+## How do DNS monitors work?
+
+To verify your DNS configuration, DNS monitors run lookups for the requested record type:
+
+* When you specify a domain, Checkly runs a DNS lookup from the configured location(s)
+
+* The query is sent to a DNS resolver. By default, it uses 8.8.8.8 (Google DNS). If that fails, it falls back to 1.1.1.1 (Cloudflare DNS) and then an internal AWS resolver. You can also specify a custom resolver
+
+* The resolver continues through the DNS chain and retrieves the requested record type from the authoritative server
+
+For example, querying the A record for `checklyhq.com` returns:
+
+```
+NOERROR 0ms
+;; opcode: QUERY, status: NOERROR, id: 16122
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 4, AUTHORITY: 0, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;checklyhq.com.	IN	 A
+
+;; ANSWER SECTION:
+checklyhq.com.	6	IN	A	18.66.102.127
+checklyhq.com.	6	IN	A	18.66.102.76
+checklyhq.com.	6	IN	A	18.66.102.10
+checklyhq.com.	6	IN	A	18.66.102.85
+```
+
+The query response appears on the results page as both raw output and parsed JSON. Use it as a reference to define [assertions](/detect/uptime-monitoring/dns-monitors/configuration#assertions) for expected values.
+
+## Troubleshooting Common Issues
+
+<Accordion title="Users Still Hitting Old IPs After DNS Changes">
+**Symptom**: DNS updated but users still reach old infrastructure
+
+**Causes**:
+- TTL caching keeps old records alive
+- Regional resolver differences
+- Propagation delays
+
+**Solutions**:
+- Use [assertions](/detect/uptime-monitoring/dns-monitors/configuration#assertions) `$.response.answers[0].resolvedValue.value` to verify correct IP
+- Monitor TTL with `$.response.answers[0].ttl` to track propagation timing
+- Monitor from multiple Checkly locations
+</Accordion>
+
+<Accordion title="Wrong Number of A Records Returned">
+**Symptom**: Expected multiple A records but getting fewer than expected
+
+**Causes**:
+- Auto-scaling events changed record count
+- Health checks removed unhealthy instances
+
+**Solutions**:
+- Use JSON path [assertions](/detect/uptime-monitoring/dns-monitors/configuration#assertions) `$.response.answers.length` for expected count
+- Set range assertions for auto-scaling (e.g., 2-8 records)
+</Accordion>
+
+<Accordion title="DNS Works Locally But Fails for Some Users">
+**Symptom**: DNS resolves from your network but fails for certain users
+
+**Causes**:
+- Different public resolvers have different behaviors
+- Corporate/ISP DNS filtering
+- Resolver-specific caching issues
+
+**Solutions**:
+- Configure monitors with different DNS servers (8.8.8.8, 1.1.1.1)
+- Monitor from multiple geographic locations
+- Test against specific resolvers users report issues with
+</Accordion>
+

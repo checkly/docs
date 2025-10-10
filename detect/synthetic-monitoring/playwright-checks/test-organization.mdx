@@ -1,6 +1,7 @@
 ---
 title: Organize your tests and monitors
 sidebarTitle: Test organization
+description: Learn how to structure and organize your Playwright Check Suites.
 tags: ['synthetic-monitoring', 'playwright-checks']
 ---
 
@@ -20,11 +21,36 @@ Playwright Check Suites enable you to reuse your existing Playwright end-to-end 
 
 Run your entire Playwright end-to-end test suite, pick specific tests or group multiple tests together to run them as global synthetic monitoring and get alerted when your Playwright-based monitors fail.
 
+## How does an ideal Playwright Check Suite look like?
+
+While a Playwright Check Suite can reflect and run your entire existing end-to-end test suite, **we recommend splitting your Playwright test suite into multiple Playwright Check Suites to fulfill your monitoring requirements**.
+
+Playwright tests are run to validate a pre-production environment and prepare a production release. Full end-to-end test executions going way beyond fifteen minutes are common for this use case. And while running all the tests in preparation makes sense for testing, it is not ideal for monitoring.
+
+**The longer your Playwright Check Suite runs, the longer you have to wait until you will receive an alert in case of a failure.** Your Playwright Check Suites should execute and fail quickly to guarantee a short Mean Time to Detect (MTTD).
+
+<Frame>
+  <img
+    className="block"
+    src="/images/playwright-test-groups.jpg"
+    alt="Playwright Check Suites should be a subset of the entire Playwright end-to-end test suite."
+  />
+</Frame>
+
+Split your Playwright tests into focus areas or groups of urgency to ensure the best monitoring frequency and alerting mechanisms.
+
+<Tip>
+What test duration is acceptable depends on your application and how quickly you want to be alerted in case of an issue. If you're service level agreements (SLAs) require a fast reaction time, we recommend to keep your Playwright Check Suites as short as possible.
+
+Remember: 99.9% uptime allows for 1m 26s downtime a day. To guarantee a high-level of uptime, your Playwright Check Suites should run significantly faster than that.
+</Tip>
+
+
 ## How to include Playwright tests in your Playwright Check Suite
 
 The quickest way to reuse your existing Playwright end-to-end tests as Playwright Check Suites is to specify your Playwright config path and a single Playwright Check Suite in your `checkly.config.ts`.
 
-```typescript highlight={3-10}
+```typescript highlight={3-11}
 export default defineConfig({
   checks: {
     playwrightConfigPath: "./playwright.config.ts",

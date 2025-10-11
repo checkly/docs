@@ -4,6 +4,7 @@ description: 'Learn how to structure your Browser Checks with Monitoring as Code
 sidebarTitle: MaC Structure
 ---
 
+import GenericRuntimeVariablesTable from '/snippets/generic-runtime-variables-table.mdx';
 
 Monitoring as Code works by connecting Playwrighttest files with Checkly constructs to handle the end-to-endconfiguration of your Browser Check. 
 
@@ -42,3 +43,39 @@ test('Environment-aware test', async ({ page }) => {
 })
 ```
 
+## Environment variables
+
+[Check, group and global variables](/platform/variables) are accessible in your code using the standard Node.js `process.env.MY_VAR` notation. For example, the code snippet below show how you can log into GitHub.
+
+<CodeGroup dropdown>
+
+```ts variables.spec.ts
+import { test } from '@playwright/test'
+
+test('GitHub login', async ({ page }) => {
+  await page.goto('https://github.com/login')
+  await page.getByLabel('Username or email address').type(process.env.GITHUB_USER)
+  await page.getByLabel('Password').type(process.env.GITHUB_PWD)
+  await page.getByRole('button', { name: 'Sign in' }).click()
+})
+```
+
+```js variables.spec.js
+const { test } = require('@playwright/test')
+
+test('GitHub login', async ({ page }) => {
+  await page.goto('https://github.com/login')
+  await page.getByLabel('Username or email address').type(process.env.GITHUB_USER)
+  await page.getByLabel('Password').type(process.env.GITHUB_PWD)
+  await page.getByRole('button', { name: 'Sign in' }).click()
+})
+```
+
+</CodeGroup>
+
+### Built-in runtime variables
+
+Our [check runtimes](/platform/runtimes/overview/) also expose a set of environment variables (e.g. `process.env.CHECK_NAME`)
+to figure out what check, check type etc. you are running.
+
+<GenericRuntimeVariablesTable/>

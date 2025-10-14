@@ -831,7 +831,7 @@ Use the `to` and `from` parameters to specify a date range (UNIX timestamp in se
                         }
                     },
                     {
-                        "description": "Select documents up from this UNIX timestamp (>= date). Defaults to now - 6 hours.",
+                        "description": "Select records up from this UNIX timestamp (>= date). Defaults to now - 6 hours.",
                         "name": "from",
                         "in": "query",
                         "required": false,
@@ -841,7 +841,7 @@ Use the `to` and `from` parameters to specify a date range (UNIX timestamp in se
                         }
                     },
                     {
-                        "description": "Optional. Select alerts up to this UNIX timestamp (< date). Defaults to 6 hours after \"from\".",
+                        "description": "Optional. Select records up to this UNIX timestamp (< date). Defaults to 6 hours after \"from\".",
                         "name": "to",
                         "in": "query",
                         "required": false,
@@ -2908,7 +2908,7 @@ Use the `to` and `from` parameters to specify a date range (UNIX timestamp in se
                         }
                     },
                     {
-                        "description": "Select documents up from this UNIX timestamp (>= date). Defaults to now - 6 hours.",
+                        "description": "Select records up from this UNIX timestamp (>= date). Defaults to now - 6 hours.",
                         "name": "from",
                         "in": "query",
                         "required": false,
@@ -2918,7 +2918,7 @@ Use the `to` and `from` parameters to specify a date range (UNIX timestamp in se
                         }
                     },
                     {
-                        "description": "Optional. Select alerts up to this UNIX timestamp (< date). Defaults to 6 hours after \"from\".",
+                        "description": "Optional. Select records up to this UNIX timestamp (< date). Defaults to 6 hours after \"from\".",
                         "name": "to",
                         "in": "query",
                         "required": false,
@@ -3039,7 +3039,7 @@ Use the `to` and `from` parameters to specify a date range (UNIX timestamp in se
                         }
                     },
                     {
-                        "description": "Select documents up from this UNIX timestamp (>= date). Defaults to now - 6 hours.",
+                        "description": "Select records up from this UNIX timestamp (>= date). Defaults to now - 6 hours.",
                         "name": "from",
                         "in": "query",
                         "required": false,
@@ -3049,7 +3049,7 @@ Use the `to` and `from` parameters to specify a date range (UNIX timestamp in se
                         }
                     },
                     {
-                        "description": "Optional. Select alerts up to this UNIX timestamp (< date). Defaults to 6 hours after \"from\".",
+                        "description": "Optional. Select records up to this UNIX timestamp (< date). Defaults to 6 hours after \"from\".",
                         "name": "to",
                         "in": "query",
                         "required": false,
@@ -3859,7 +3859,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         }
                     },
                     {
-                        "description": "Select documents up from this UNIX timestamp (>= date). Defaults to now - 6 hours.",
+                        "description": "Select records up from this UNIX timestamp (>= date). Defaults to now - 6 hours.",
                         "name": "from",
                         "in": "query",
                         "required": false,
@@ -3869,7 +3869,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         }
                     },
                     {
-                        "description": "Optional. Select alerts up to this UNIX timestamp (< date). Defaults to 6 hours after \"from\".",
+                        "description": "Optional. Select records up to this UNIX timestamp (< date). Defaults to 6 hours after \"from\".",
                         "name": "to",
                         "in": "query",
                         "required": false,
@@ -5335,7 +5335,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "default": "2025-10-08T02:32:04.593Z"
+                            "default": "2025-10-13T10:55:35.647Z"
                         }
                     },
                     {
@@ -5345,7 +5345,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "default": "2025-10-09T02:32:04.594Z"
+                            "default": "2025-10-14T10:55:35.647Z"
                         }
                     }
                 ],
@@ -5441,7 +5441,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "default": "2025-10-08T02:32:04.596Z"
+                            "default": "2025-10-13T10:55:35.650Z"
                         }
                     },
                     {
@@ -5451,7 +5451,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "default": "2025-10-09T02:32:04.597Z"
+                            "default": "2025-10-14T10:55:35.650Z"
                         }
                     },
                     {
@@ -7141,6 +7141,228 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                 }
             }
         },
+        "/v1/error-groups/checks/{checkId}": {
+            "get": {
+                "summary": "List all error groups for a specific check.",
+                "operationId": "getV1ErrorgroupsChecksCheckid",
+                "description": "List all error groups for a specific check.",
+                "parameters": [
+                    {
+                        "description": "Your Checkly account ID, you can find it at https://app.checklyhq.com/settings/account/general",
+                        "x-format": {
+                            "guid": true
+                        },
+                        "name": "x-checkly-account",
+                        "in": "header",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Error Groups"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorGroupsList"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ForbiddenError"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TooManyRequestsError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/error-groups/{id}": {
+            "get": {
+                "summary": "Retrieve one error group.",
+                "operationId": "getV1ErrorgroupsId",
+                "description": "Retrieve one error group.",
+                "parameters": [
+                    {
+                        "description": "Your Checkly account ID, you can find it at https://app.checklyhq.com/settings/account/general",
+                        "x-format": {
+                            "guid": true
+                        },
+                        "name": "x-checkly-account",
+                        "in": "header",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Error Groups"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorGroup"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ForbiddenError"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundError"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TooManyRequestsError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Update an error group. Mainly used for archiving error groups.",
+                "operationId": "patchV1ErrorgroupsId",
+                "description": "Update an error group. Mainly used for archiving error groups.",
+                "parameters": [
+                    {
+                        "description": "Your Checkly account ID, you can find it at https://app.checklyhq.com/settings/account/general",
+                        "x-format": {
+                            "guid": true
+                        },
+                        "name": "x-checkly-account",
+                        "in": "header",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ErrorGroupPatch"
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Error Groups"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorGroup"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ForbiddenError"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotFoundError"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TooManyRequestsError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/v1/incidents": {
             "post": {
                 "summary": "Create an incident",
@@ -7163,7 +7385,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Model210"
+                                "$ref": "#/components/schemas/Model211"
                             }
                         }
                     }
@@ -7177,7 +7399,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model214"
+                                    "$ref": "#/components/schemas/Model215"
                                 }
                             }
                         }
@@ -7340,7 +7562,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model214"
+                                    "$ref": "#/components/schemas/Model215"
                                 }
                             }
                         }
@@ -7427,7 +7649,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Model215"
+                                "$ref": "#/components/schemas/Model216"
                             }
                         }
                     }
@@ -7441,7 +7663,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model216"
+                                    "$ref": "#/components/schemas/Model217"
                                 }
                             }
                         }
@@ -7522,7 +7744,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Model209"
+                                "$ref": "#/components/schemas/Model210"
                             }
                         }
                     }
@@ -7706,7 +7928,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Model217"
+                                "$ref": "#/components/schemas/Model218"
                             }
                         }
                     }
@@ -7720,7 +7942,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model212"
+                                    "$ref": "#/components/schemas/Model213"
                                 }
                             }
                         }
@@ -9880,7 +10102,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model229"
+                                    "$ref": "#/components/schemas/Model230"
                                 }
                             }
                         }
@@ -9945,7 +10167,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     }
                 ],
                 "requestBody": {
-                    "$ref": "#/components/requestBodies/Model234"
+                    "$ref": "#/components/requestBodies/Model235"
                 },
                 "tags": [
                     "Status Pages"
@@ -9956,7 +10178,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model235"
+                                    "$ref": "#/components/schemas/Model236"
                                 }
                             }
                         }
@@ -10049,7 +10271,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model240"
+                                    "$ref": "#/components/schemas/Model241"
                                 }
                             }
                         }
@@ -10117,7 +10339,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Model247"
+                                "$ref": "#/components/schemas/Model248"
                             }
                         }
                     }
@@ -10131,7 +10353,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model238"
+                                    "$ref": "#/components/schemas/Model239"
                                 }
                             }
                         }
@@ -10301,7 +10523,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model238"
+                                    "$ref": "#/components/schemas/Model239"
                                 }
                             }
                         }
@@ -10380,7 +10602,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Model250"
+                                "$ref": "#/components/schemas/Model251"
                             }
                         }
                     }
@@ -10394,7 +10616,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model238"
+                                    "$ref": "#/components/schemas/Model239"
                                 }
                             }
                         }
@@ -10480,7 +10702,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model251"
+                                    "$ref": "#/components/schemas/Model252"
                                 }
                             }
                         }
@@ -10556,7 +10778,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     }
                 ],
                 "requestBody": {
-                    "$ref": "#/components/requestBodies/Model245"
+                    "$ref": "#/components/requestBodies/Model246"
                 },
                 "tags": [
                     "Status Page Incidents"
@@ -10567,7 +10789,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model245"
+                                    "$ref": "#/components/schemas/Model246"
                                 }
                             }
                         }
@@ -10759,7 +10981,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model245"
+                                    "$ref": "#/components/schemas/Model246"
                                 }
                             }
                         }
@@ -10846,7 +11068,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     }
                 ],
                 "requestBody": {
-                    "$ref": "#/components/requestBodies/Model245"
+                    "$ref": "#/components/requestBodies/Model246"
                 },
                 "tags": [
                     "Status Page Incidents"
@@ -10857,7 +11079,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model245"
+                                    "$ref": "#/components/schemas/Model246"
                                 }
                             }
                         }
@@ -10957,7 +11179,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model253"
+                                    "$ref": "#/components/schemas/Model254"
                                 }
                             }
                         }
@@ -11021,7 +11243,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     }
                 ],
                 "requestBody": {
-                    "$ref": "#/components/requestBodies/Model254"
+                    "$ref": "#/components/requestBodies/Model255"
                 },
                 "tags": [
                     "Status Page Services"
@@ -11032,7 +11254,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model221"
+                                    "$ref": "#/components/schemas/Model222"
                                 }
                             }
                         }
@@ -11193,7 +11415,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model221"
+                                    "$ref": "#/components/schemas/Model222"
                                 }
                             }
                         }
@@ -11268,7 +11490,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     }
                 ],
                 "requestBody": {
-                    "$ref": "#/components/requestBodies/Model254"
+                    "$ref": "#/components/requestBodies/Model255"
                 },
                 "tags": [
                     "Status Page Services"
@@ -11279,7 +11501,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model221"
+                                    "$ref": "#/components/schemas/Model222"
                                 }
                             }
                         }
@@ -11449,7 +11671,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model235"
+                                    "$ref": "#/components/schemas/Model236"
                                 }
                             }
                         }
@@ -11525,7 +11747,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     }
                 ],
                 "requestBody": {
-                    "$ref": "#/components/requestBodies/Model234"
+                    "$ref": "#/components/requestBodies/Model235"
                 },
                 "tags": [
                     "Status Pages"
@@ -11536,7 +11758,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model235"
+                                    "$ref": "#/components/schemas/Model236"
                                 }
                             }
                         }
@@ -12252,7 +12474,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model257"
+                                    "$ref": "#/components/schemas/Model258"
                                 }
                             }
                         }
@@ -12837,7 +13059,7 @@ You can filter by check type and result type to narrow down the list. Use the `t
                         }
                     },
                     {
-                        "description": "Select documents up from this UNIX timestamp (>= date).",
+                        "description": "Select records up from this UNIX timestamp (>= date).",
                         "name": "from",
                         "in": "query",
                         "required": false,
@@ -12847,7 +13069,7 @@ You can filter by check type and result type to narrow down the list. Use the `t
                         }
                     },
                     {
-                        "description": "Optional. Select documents up to this UNIX timestamp (< date).",
+                        "description": "Optional. Select records up to this UNIX timestamp (< date).",
                         "name": "to",
                         "in": "query",
                         "required": false,
@@ -13104,29 +13326,29 @@ You can filter by check type and result type to narrow down the list. Use the `t
                     }
                 }
             },
-            "Model234": {
+            "Model235": {
                 "content": {
                     "application/json": {
                         "schema": {
-                            "$ref": "#/components/schemas/Model234"
+                            "$ref": "#/components/schemas/Model235"
                         }
                     }
                 }
             },
-            "Model245": {
+            "Model246": {
                 "content": {
                     "application/json": {
                         "schema": {
-                            "$ref": "#/components/schemas/Model245"
+                            "$ref": "#/components/schemas/Model246"
                         }
                     }
                 }
             },
-            "Model254": {
+            "Model255": {
                 "content": {
                     "application/json": {
                         "schema": {
-                            "$ref": "#/components/schemas/Model254"
+                            "$ref": "#/components/schemas/Model255"
                         }
                     }
                 }
@@ -26017,6 +26239,111 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     }
                 }
             },
+            "Model208": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "checkId": {
+                        "type": "string"
+                    },
+                    "errorHash": {
+                        "type": "string",
+                        "description": "The hash of the cleaned error message for quicker deduplication."
+                    },
+                    "rawErrorMessage": {
+                        "type": "string",
+                        "description": "The raw error message as recorded in a check result."
+                    },
+                    "cleanedErrorMessage": {
+                        "type": "string",
+                        "description": "The cleaned and sanitized error message used for hashing and grouping."
+                    },
+                    "firstSeen": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "lastSeen": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "archivedUntilNextEvent": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "checkId",
+                    "errorHash",
+                    "rawErrorMessage",
+                    "cleanedErrorMessage",
+                    "firstSeen",
+                    "lastSeen",
+                    "archivedUntilNextEvent"
+                ]
+            },
+            "ErrorGroupsList": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/Model208"
+                }
+            },
+            "ErrorGroup": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "checkId": {
+                        "type": "string"
+                    },
+                    "errorHash": {
+                        "type": "string",
+                        "description": "The hash of the cleaned error message for quicker deduplication."
+                    },
+                    "rawErrorMessage": {
+                        "type": "string",
+                        "description": "The raw error message as recorded in a check result."
+                    },
+                    "cleanedErrorMessage": {
+                        "type": "string",
+                        "description": "The cleaned and sanitized error message used for hashing and grouping."
+                    },
+                    "firstSeen": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "lastSeen": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "archivedUntilNextEvent": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "checkId",
+                    "errorHash",
+                    "rawErrorMessage",
+                    "cleanedErrorMessage",
+                    "firstSeen",
+                    "lastSeen",
+                    "archivedUntilNextEvent"
+                ]
+            },
+            "ErrorGroupPatch": {
+                "type": "object",
+                "properties": {
+                    "archiveForEver": {
+                        "type": "boolean"
+                    },
+                    "archivedUntilNextEvent": {
+                        "type": "boolean"
+                    }
+                }
+            },
             "impact": {
                 "type": "string",
                 "description": "Used to indicate the impact or severity.",
@@ -26028,7 +26355,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "MINOR"
                 ]
             },
-            "Model208": {
+            "Model209": {
                 "type": "string",
                 "description": "The incident update status. Must be one of INVESTIGATING,IDENTIFIED,MONITORING,RESOLVED,MAINTENANCE",
                 "example": "INVESTIGATING",
@@ -26040,11 +26367,11 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "MAINTENANCE"
                 ]
             },
-            "Model209": {
+            "Model210": {
                 "type": "object",
                 "properties": {
                     "status": {
-                        "$ref": "#/components/schemas/Model208"
+                        "$ref": "#/components/schemas/Model209"
                     },
                     "description": {
                         "type": "string",
@@ -26070,10 +26397,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "length": 1
                 },
                 "items": {
-                    "$ref": "#/components/schemas/Model209"
+                    "$ref": "#/components/schemas/Model210"
                 }
             },
-            "Model210": {
+            "Model211": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -26112,7 +26439,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "incidentUpdates"
                 ]
             },
-            "Model211": {
+            "Model212": {
                 "type": "string",
                 "description": "The incident update status. Must be one of INVESTIGATING,IDENTIFIED,MONITORING,RESOLVED,MAINTENANCE",
                 "example": "INVESTIGATING",
@@ -26124,11 +26451,11 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "MAINTENANCE"
                 ]
             },
-            "Model212": {
+            "Model213": {
                 "type": "object",
                 "properties": {
                     "status": {
-                        "$ref": "#/components/schemas/Model211"
+                        "$ref": "#/components/schemas/Model212"
                     },
                     "description": {
                         "type": "string",
@@ -26164,7 +26491,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "updated_at"
                 ]
             },
-            "Model213": {
+            "Model214": {
                 "type": "array",
                 "description": "The first incident update with the status and description. It must be only one element.",
                 "example": [
@@ -26187,10 +26514,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 ],
                 "minItems": 1,
                 "items": {
-                    "$ref": "#/components/schemas/Model212"
+                    "$ref": "#/components/schemas/Model213"
                 }
             },
-            "Model214": {
+            "Model215": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -26239,7 +26566,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "example": "2022-09-08T20:41:28.658Z"
                     },
                     "incidentUpdates": {
-                        "$ref": "#/components/schemas/Model213"
+                        "$ref": "#/components/schemas/Model214"
                     }
                 },
                 "required": [
@@ -26252,7 +26579,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "incidentUpdates"
                 ]
             },
-            "Model215": {
+            "Model216": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -26281,7 +26608,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "impact"
                 ]
             },
-            "Model216": {
+            "Model217": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -26345,10 +26672,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             "IncidentResults": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model212"
+                    "$ref": "#/components/schemas/Model213"
                 }
             },
-            "Model217": {
+            "Model218": {
                 "type": "object",
                 "properties": {
                     "description": {
@@ -26630,7 +26957,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "created_at"
                 ]
             },
-            "Model218": {
+            "Model219": {
                 "type": "array",
                 "items": {
                     "$ref": "#/components/schemas/privateLocationKeys"
@@ -26676,7 +27003,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/groupAssignments"
                     },
                     "keys": {
-                        "$ref": "#/components/schemas/Model218"
+                        "$ref": "#/components/schemas/Model219"
                     },
                     "proxyUrl": {
                         "type": "string",
@@ -26734,7 +27061,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "slugName"
                 ]
             },
-            "Model219": {
+            "Model220": {
                 "type": "array",
                 "items": {
                     "$ref": "#/components/schemas/privateLocationKeys"
@@ -26780,7 +27107,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/groupAssignments"
                     },
                     "keys": {
-                        "$ref": "#/components/schemas/Model219"
+                        "$ref": "#/components/schemas/Model220"
                     },
                     "proxyUrl": {
                         "type": "string",
@@ -27279,7 +27606,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "AUTO"
                 ]
             },
-            "Model220": {
+            "Model221": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -27293,10 +27620,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             "checks": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model220"
+                    "$ref": "#/components/schemas/Model221"
                 }
             },
-            "Model221": {
+            "Model222": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -27336,10 +27663,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             "services": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model221"
+                    "$ref": "#/components/schemas/Model222"
                 }
             },
-            "Model222": {
+            "Model223": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -27372,10 +27699,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             "cards": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model222"
+                    "$ref": "#/components/schemas/Model223"
                 }
             },
-            "Model223": {
+            "Model224": {
                 "type": "string",
                 "enum": [
                     "CRITICAL",
@@ -27385,7 +27712,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 ],
                 "maxLength": 1
             },
-            "Model224": {
+            "Model225": {
                 "type": "string",
                 "enum": [
                     "INVESTIGATING",
@@ -27394,19 +27721,19 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "RESOLVED"
                 ]
             },
-            "Model225": {
+            "Model226": {
                 "type": "object",
                 "properties": {
                     "description": {
                         "type": "string"
                     },
                     "status": {
-                        "$ref": "#/components/schemas/Model224"
+                        "$ref": "#/components/schemas/Model225"
                     },
                     "publicIncidentUpdateDate": {
                         "type": "string",
                         "format": "date-time",
-                        "default": "2025-10-09T02:32:05.521Z"
+                        "default": "2025-10-14T10:55:36.513Z"
                     },
                     "notifySubscribers": {
                         "type": "boolean",
@@ -27429,10 +27756,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "created_at"
                 ]
             },
-            "Model226": {
+            "Model227": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model225"
+                    "$ref": "#/components/schemas/Model226"
                 }
             },
             "lastUpdateStatus": {
@@ -27444,7 +27771,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "RESOLVED"
                 ]
             },
-            "Model227": {
+            "Model228": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -27452,7 +27779,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "maxLength": 255
                     },
                     "severity": {
-                        "$ref": "#/components/schemas/Model223"
+                        "$ref": "#/components/schemas/Model224"
                     },
                     "id": {
                         "type": "string",
@@ -27464,7 +27791,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/services"
                     },
                     "incidentUpdates": {
-                        "$ref": "#/components/schemas/Model226"
+                        "$ref": "#/components/schemas/Model227"
                     },
                     "lastUpdateStatus": {
                         "$ref": "#/components/schemas/lastUpdateStatus"
@@ -27490,10 +27817,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             "incidents": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model227"
+                    "$ref": "#/components/schemas/Model228"
                 }
             },
-            "Model228": {
+            "Model229": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -27568,10 +27895,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             "entries": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model228"
+                    "$ref": "#/components/schemas/Model229"
                 }
             },
-            "Model229": {
+            "Model230": {
                 "type": "object",
                 "properties": {
                     "length": {
@@ -27589,7 +27916,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "entries"
                 ]
             },
-            "Model230": {
+            "Model231": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -27600,13 +27927,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     }
                 }
             },
-            "Model231": {
+            "Model232": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model230"
+                    "$ref": "#/components/schemas/Model231"
                 }
             },
-            "Model232": {
+            "Model233": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -27625,20 +27952,20 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "type": "string"
                     },
                     "services": {
-                        "$ref": "#/components/schemas/Model231"
+                        "$ref": "#/components/schemas/Model232"
                     }
                 },
                 "required": [
                     "name"
                 ]
             },
-            "Model233": {
+            "Model234": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model232"
+                    "$ref": "#/components/schemas/Model233"
                 }
             },
-            "Model234": {
+            "Model235": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -27673,7 +28000,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/defaultTheme"
                     },
                     "cards": {
-                        "$ref": "#/components/schemas/Model233"
+                        "$ref": "#/components/schemas/Model234"
                     }
                 },
                 "required": [
@@ -27682,7 +28009,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "cards"
                 ]
             },
-            "Model235": {
+            "Model236": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -27732,7 +28059,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "id"
                 ]
             },
-            "Model236": {
+            "Model237": {
                 "type": "string",
                 "enum": [
                     "CRITICAL",
@@ -27742,13 +28069,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 ],
                 "maxLength": 1
             },
-            "Model237": {
+            "Model238": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model225"
+                    "$ref": "#/components/schemas/Model226"
                 }
             },
-            "Model238": {
+            "Model239": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -27756,7 +28083,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "maxLength": 255
                     },
                     "severity": {
-                        "$ref": "#/components/schemas/Model236"
+                        "$ref": "#/components/schemas/Model237"
                     },
                     "id": {
                         "type": "string",
@@ -27768,7 +28095,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/services"
                     },
                     "incidentUpdates": {
-                        "$ref": "#/components/schemas/Model237"
+                        "$ref": "#/components/schemas/Model238"
                     },
                     "lastUpdateStatus": {
                         "$ref": "#/components/schemas/lastUpdateStatus"
@@ -27792,20 +28119,20 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "created_at"
                 ]
             },
-            "Model239": {
+            "Model240": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model238"
+                    "$ref": "#/components/schemas/Model239"
                 }
             },
-            "Model240": {
+            "Model241": {
                 "type": "object",
                 "properties": {
                     "length": {
                         "type": "integer"
                     },
                     "entries": {
-                        "$ref": "#/components/schemas/Model239"
+                        "$ref": "#/components/schemas/Model240"
                     },
                     "nextId": {
                         "type": "string"
@@ -27816,7 +28143,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "entries"
                 ]
             },
-            "Model241": {
+            "Model242": {
                 "type": "string",
                 "enum": [
                     "CRITICAL",
@@ -27826,7 +28153,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 ],
                 "maxLength": 1
             },
-            "Model242": {
+            "Model243": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -27862,14 +28189,14 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "accountId"
                 ]
             },
-            "Model243": {
+            "Model244": {
                 "type": "array",
                 "minItems": 1,
                 "items": {
-                    "$ref": "#/components/schemas/Model242"
+                    "$ref": "#/components/schemas/Model243"
                 }
             },
-            "Model244": {
+            "Model245": {
                 "type": "string",
                 "enum": [
                     "INVESTIGATING",
@@ -27878,7 +28205,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "RESOLVED"
                 ]
             },
-            "Model245": {
+            "Model246": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -27891,12 +28218,12 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "type": "string"
                     },
                     "status": {
-                        "$ref": "#/components/schemas/Model244"
+                        "$ref": "#/components/schemas/Model245"
                     },
                     "publicIncidentUpdateDate": {
                         "type": "string",
                         "format": "date-time",
-                        "default": "2025-10-09T02:32:05.582Z"
+                        "default": "2025-10-14T10:55:36.573Z"
                     },
                     "created_at": {
                         "type": "string",
@@ -27911,16 +28238,16 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "description"
                 ]
             },
-            "Model246": {
+            "Model247": {
                 "type": "array",
                 "x-constraint": {
                     "length": 1
                 },
                 "items": {
-                    "$ref": "#/components/schemas/Model245"
+                    "$ref": "#/components/schemas/Model246"
                 }
             },
-            "Model247": {
+            "Model248": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -27945,13 +28272,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "maxLength": 255
                     },
                     "severity": {
-                        "$ref": "#/components/schemas/Model241"
+                        "$ref": "#/components/schemas/Model242"
                     },
                     "services": {
-                        "$ref": "#/components/schemas/Model243"
+                        "$ref": "#/components/schemas/Model244"
                     },
                     "incidentUpdates": {
-                        "$ref": "#/components/schemas/Model246"
+                        "$ref": "#/components/schemas/Model247"
                     }
                 },
                 "required": [
@@ -27961,7 +28288,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "incidentUpdates"
                 ]
             },
-            "Model248": {
+            "Model249": {
                 "type": "string",
                 "enum": [
                     "CRITICAL",
@@ -27971,14 +28298,14 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 ],
                 "maxLength": 1
             },
-            "Model249": {
+            "Model250": {
                 "type": "array",
                 "minItems": 1,
                 "items": {
-                    "$ref": "#/components/schemas/Model242"
+                    "$ref": "#/components/schemas/Model243"
                 }
             },
-            "Model250": {
+            "Model251": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -28003,10 +28330,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "maxLength": 255
                     },
                     "severity": {
-                        "$ref": "#/components/schemas/Model248"
+                        "$ref": "#/components/schemas/Model249"
                     },
                     "services": {
-                        "$ref": "#/components/schemas/Model249"
+                        "$ref": "#/components/schemas/Model250"
                     }
                 },
                 "required": [
@@ -28015,26 +28342,26 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "services"
                 ]
             },
-            "Model251": {
-                "type": "array",
-                "items": {
-                    "$ref": "#/components/schemas/Model245"
-                }
-            },
             "Model252": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model221"
+                    "$ref": "#/components/schemas/Model246"
                 }
             },
             "Model253": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/Model222"
+                }
+            },
+            "Model254": {
                 "type": "object",
                 "properties": {
                     "length": {
                         "type": "integer"
                     },
                     "entries": {
-                        "$ref": "#/components/schemas/Model252"
+                        "$ref": "#/components/schemas/Model253"
                     },
                     "nextId": {
                         "type": "string"
@@ -28045,7 +28372,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "entries"
                 ]
             },
-            "Model254": {
+            "Model255": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -28056,14 +28383,14 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "name"
                 ]
             },
-            "Model255": {
+            "Model256": {
                 "type": "string",
                 "description": "The type of subscription.",
                 "enum": [
                     "EMAIL"
                 ]
             },
-            "Model256": {
+            "Model257": {
                 "type": "string",
                 "description": "The status of the subscription.",
                 "enum": [
@@ -28079,7 +28406,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "description": "The ID of the subscription."
                     },
                     "type": {
-                        "$ref": "#/components/schemas/Model255"
+                        "$ref": "#/components/schemas/Model256"
                     },
                     "address": {
                         "type": "string",
@@ -28089,7 +28416,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         }
                     },
                     "status": {
-                        "$ref": "#/components/schemas/Model256"
+                        "$ref": "#/components/schemas/Model257"
                     },
                     "created_at": {
                         "type": "string",
@@ -28188,13 +28515,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "checkId"
                 ]
             },
-            "Model257": {
+            "Model258": {
                 "type": "array",
                 "items": {
                     "$ref": "#/components/schemas/EnvironmentVariableGet"
                 }
             },
-            "Model258": {
+            "Model259": {
                 "type": "string",
                 "enum": [
                     "us-east-1",
@@ -28221,7 +28548,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "af-south-1"
                 ]
             },
-            "Model259": {
+            "Model260": {
                 "type": "array",
                 "description": "An array of one or more data center locations where to run the checks.",
                 "example": [
@@ -28229,10 +28556,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "eu-central-1"
                 ],
                 "items": {
-                    "$ref": "#/components/schemas/Model258"
+                    "$ref": "#/components/schemas/Model259"
                 }
             },
-            "Model260": {
+            "Model261": {
                 "type": "string",
                 "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute checks in this group.",
                 "default": null,
@@ -28245,7 +28572,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "2022.10"
                 ]
             },
-            "Model261": {
+            "Model262": {
                 "type": "array",
                 "description": "List of alert channel subscriptions.",
                 "example": [],
@@ -28253,7 +28580,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/Model29"
                 }
             },
-            "Model262": {
+            "Model263": {
                 "type": "array",
                 "description": "An array of one or more private locations where to run the checks.",
                 "example": [
@@ -28263,7 +28590,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "type": "string"
                 }
             },
-            "Model263": {
+            "Model264": {
                 "type": "object",
                 "description": "Alert settings.",
                 "default": null,
@@ -28310,7 +28637,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/CheckGroupTagList"
                     },
                     "locations": {
-                        "$ref": "#/components/schemas/Model259"
+                        "$ref": "#/components/schemas/Model260"
                     },
                     "concurrency": {
                         "type": "number",
@@ -28328,13 +28655,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "type": "string"
                     },
                     "runtimeId": {
-                        "$ref": "#/components/schemas/Model260"
+                        "$ref": "#/components/schemas/Model261"
                     },
                     "environmentVariables": {
                         "$ref": "#/components/schemas/environmentVariables"
                     },
                     "alertChannelSubscriptions": {
-                        "$ref": "#/components/schemas/Model261"
+                        "$ref": "#/components/schemas/Model262"
                     },
                     "setupSnippetId": {
                         "type": "number",
@@ -28361,7 +28688,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": null
                     },
                     "privateLocations": {
-                        "$ref": "#/components/schemas/Model262"
+                        "$ref": "#/components/schemas/Model263"
                     },
                     "runParallel": {
                         "type": "boolean",
@@ -28369,7 +28696,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": null
                     },
                     "alertSettings": {
-                        "$ref": "#/components/schemas/Model263"
+                        "$ref": "#/components/schemas/Model264"
                     },
                     "retryStrategy": {
                         "$ref": "#/components/schemas/RetryStrategy"
@@ -28388,7 +28715,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "name"
                 ]
             },
-            "Model264": {
+            "Model265": {
                 "type": "array",
                 "items": {
                     "$ref": "#/components/schemas/CheckResult"
@@ -28401,7 +28728,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "type": "number"
                     },
                     "entries": {
-                        "$ref": "#/components/schemas/Model264"
+                        "$ref": "#/components/schemas/Model265"
                     },
                     "nextId": {
                         "type": "string"

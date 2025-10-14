@@ -98,6 +98,46 @@ request, use the username and password fields in the relevant section.
 
 ![api monitoring basic auth](/images/docs/images/api-checks/http-request-auth.png)
 
+## Accessing environment variables
+
+[Environment variables](/platform/variables) are exposed to your API checks using the common Handlebars/Moustache templating delimiters, i.e. `{{USER_API_KEY}}`. Note that Handlebars (double brackets) variables will be URI encoded. To avoid encoding, you can access your environment variables with triple brackets, i.e. `{{{USER_API_KEY}}}`.
+
+Variables can be used in the following API checks fields:
+
+- URL
+- Body
+- Header values
+- Query parameters values
+- Basic authentication username and password
+
+### Using helpers and built-in variables
+
+Next to your own variables, we've added some built-in ones.
+
+These variables are specific to API checks:
+
+| Helper               | Description |
+|----------------------|------------ |
+| `{{GROUP_BASE_URL}}` | If your check belongs to a group, this resolves to the group's configured base URL. |
+| `{{REQUEST_URL}}`    | The request URL. |
+| `{{$UUID}}`          | Generates a random UUID/v4, i.e.  9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d. |
+| `{{$RANDOM_NUMBER}}` | Generates a random decimal number between 0 and 10000, i.e. 345. |
+| `{{moment}}`         | Generates a date or time using **moment.js** and allows for formatting: <ul> <li>`{{moment "YYYY-MM-DD"}}` generates a date, i.e. 2020-08-26</li> <li>`{{moment "2 days ago" "YYYY-MM-DD"}}` generates the date two days ago: 2020-08-24</li> <li>`{{moment "last week" "X"}}` generates a UNIX timestamp from last week: 1597924480</li> </ul> |
+
+A practical example of using the `{{moment}}` helper would be setting the pagination options on a typical API endpoint:
+
+```
+ GET https://api.acme.com/events?from={{moment "last week" "X"}}&to={{moment "X"}}
+```
+
+<Info>
+For a full overview of date formatting option, check the [moment.js docs](https://momentjs.com/docs/#/displaying/format/).
+</Info>
+
+In addition, you have access to these generic variables available to all checks:
+
+<GenericRuntimeVariablesTable/>
+
 ## Import a cURL request
 
 You can import the request method, url, headers and body from a [cURL](https://curl.haxx.se/) command.
@@ -161,43 +201,3 @@ This list shows all content types that we scrub from the response data.
 |`video/x-msvideo`|
 |`video/x-flv`|
 |`video/webm`|
-
-## Accessing environment variables
-
-[Environment variables](/platform/variables) are exposed to your API checks using the common Handlebars/Moustache templating delimiters, i.e. `{{USER_API_KEY}}`. Note that Handlebars (double brackets) variables will be URI encoded. To avoid encoding, you can access your environment variables with triple brackets, i.e. `{{{USER_API_KEY}}}`.
-
-Variables can be used in the following API checks fields:
-
-- URL
-- Body
-- Header values
-- Query parameters values
-- Basic authentication username and password
-
-### Using helpers and built-in variables
-
-Next to your own variables, we've added some built-in ones.
-
-These variables are specific to API checks:
-
-| Helper               | Description |
-|----------------------|------------ |
-| `{{GROUP_BASE_URL}}` | If your check belongs to a group, this resolves to the group's configured base URL. |
-| `{{REQUEST_URL}}`    | The request URL. |
-| `{{$UUID}}`          | Generates a random UUID/v4, i.e.  9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d. |
-| `{{$RANDOM_NUMBER}}` | Generates a random decimal number between 0 and 10000, i.e. 345. |
-| `{{moment}}`         | Generates a date or time using **moment.js** and allows for formatting: <ul> <li>`{{moment "YYYY-MM-DD"}}` generates a date, i.e. 2020-08-26</li> <li>`{{moment "2 days ago" "YYYY-MM-DD"}}` generates the date two days ago: 2020-08-24</li> <li>`{{moment "last week" "X"}}` generates a UNIX timestamp from last week: 1597924480</li> </ul> |
-
-A practical example of using the `{{moment}}` helper would be setting the pagination options on a typical API endpoint:
-
-```
- GET https://api.acme.com/events?from={{moment "last week" "X"}}&to={{moment "X"}}
-```
-
-<Info>
-For a full overview of date formatting option, check the [moment.js docs](https://momentjs.com/docs/#/displaying/format/).
-</Info>
-
-In addition, you have access to these generic variables available to all checks:
-
-<GenericRuntimeVariablesTable/>

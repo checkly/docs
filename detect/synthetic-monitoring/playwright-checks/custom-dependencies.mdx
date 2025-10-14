@@ -22,7 +22,9 @@ Whether you use [npm](https://www.npmjs.com/), [yarn](https://yarnpkg.com/), or 
 }
 ```
 
-**By default, the Checkly infrastructure installs dependencies via npm.**
+<Note>
+By default, the Checkly infrastructure installs dependencies via npm.
+</Note>
 
 However, if an alternative lock file (`pnpm-lock.json` or `yarn.lock`) is discovered, Checkly uses the matching package manager to install the project dependencies.
 
@@ -32,7 +34,9 @@ However, if an alternative lock file (`pnpm-lock.json` or `yarn.lock`) is discov
 | `pnpm-lock.json`    | pnpm            |
 | `yarn.lock`         | yarn            |
 
-> **For `pnpm` users:** if you define the same dependency in `dependencies` and `devDependencies`, please use a custom `installCommand` in your `checkly.config.ts|js` to register your package as a development dependency: `pnpm install --dev additional-package`
+<Warning>
+**For `pnpm` users:** if you define the same dependency in `dependencies` and `devDependencies`, please use a custom `installCommand` in your `checkly.config.ts|js` to ensure all required dependenies are installed: `pnpm install`
+</Warning>
 
 ## Using private dependencies
 
@@ -87,11 +91,11 @@ registry=https://yourcompany.jfrog.io/artifactory/api/npm/yourcompany.jfrog.io/a
 
 ### Include custom configuration files
 
-To make the Checkly CLI and infrastructure aware of a custom package manager configuration for private packages, specify the additional files in the `checks.include` property in your `checkly.config.ts|js`.
+To make the Checkly CLI and infrastructure aware of your configuration for private packages, specify the additional files in the `checks.include` property in your `checkly.config.ts`.
 
-Checkly CLI commands like `test` or `deploy` will then bundle and upload these files so they are available in the Checkly infrastructure when running essential commands like `install`.
+Checkly CLI commands like `test` or `deploy` will bundle and upload these files so they are available in the Checkly infrastructure when running essential commands like `install`; making sure your private dependencies are installed.
 
-```typescript
+```typescript checkly.config.ts
 export default defineConfig({
   checks: {
     playwrightConfigPath: './playwright.config.ts',

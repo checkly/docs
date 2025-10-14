@@ -228,6 +228,43 @@ If **set to** `'global'`, it overrides the alert settings of all checks in the g
 
 </ResponseField>
 
+## Reference an existing group by ID
+
+To add checks to an existing group in your account, find the group ID in the Checkly web UI or via the API and reference it using `CheckGroupV2.fromId()`.
+
+<Tabs>
+  <Tab title="Web UI">
+    Navigate to the group in the Checkly UI and copy the group ID from the URL or the group details.
+  </Tab>
+  <Tab title="API">
+    ```bash
+    curl -H "Authorization: Bearer YOUR_API_KEY" \
+         -H "X-Checkly-Account: YOUR_ACCOUNT_ID" \
+         https://api.checklyhq.com/v1/check-groups
+    ```
+  </Tab>
+</Tabs>
+
+```ts Using Existing Group highlight={2,6}
+// Reference an existing group by ID
+const existingGroup = CheckGroupV2.fromId(123)
+
+new ApiCheck("existing-group-check", {
+  name: "Check with Existing Group",
+  group: existingGroup,
+  request: {
+    method: "GET",
+    url: "https://api.example.com/endpoint",
+  },
+})
+```
+
+When referencing existing groups with `fromId()`, note:
+- You cannot filter tests by group tags since group properties aren't available locally
+- Checks won't inherit the group's frequency. This only works for groups defined in the CLI project
+
+If you need these features, you can either import the group using the [Checkly import feature](/cli/checkly-import) (e.g. `npx checkly import check-group:123`) or define a new group directly in your project.
+
 ## Examples
 
 <Tabs>

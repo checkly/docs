@@ -69,6 +69,7 @@ Use the `RetryStrategyBuilder` methods to apply different retry strategies to yo
 | Method | Description | Use Case |
 |--------|-------------|----------|
 | `noRetries()` | No retries are performed | Checks that should fail fast |
+| `singleRetry(options)` | Single retry attempt with configurable delay | Simple retry for transient failures |
 | `fixedStrategy(options)` | Fixed time between retries (e.g., 5s, 5s, 5s) | Predictable retry intervals |
 | `linearStrategy(options)` | Linearly increasing intervals (e.g., 5s, 10s, 15s) | Gradual backoff |
 | `exponentialStrategy(options)` | Exponentially increasing intervals (e.g., 5s, 25s, 125s) | Aggressive backoff for overloaded services |
@@ -92,6 +93,24 @@ new ApiCheck("critical-endpoint", {
 ```
 
 **Use cases**: Critical services requiring immediate alerting, security endpoints, fail-fast scenarios.
+</ResponseField>
+
+<ResponseField name="singleRetry(options)" type="method">
+Performs exactly one retry after a failure.
+
+**Usage:**
+
+```ts highlight={4-6}
+new ApiCheck("single-retry-check", {
+  name: "Single Retry Check",
+  retryStrategy: RetryStrategyBuilder.singleRetry({
+    baseBackoffSeconds: 60,
+  }),
+  /* More options... */
+})
+```
+
+**Use cases**: Simple retry for transient failures.
 </ResponseField>
 
 <ResponseField name="fixedStrategy(options)" type="method">
@@ -304,6 +323,22 @@ When `sameRegion: false`, retries are attempted from different regions to help d
 </Info>
 
 **Use cases**: Regional issue detection, network diversity, consistency testing.
+</ResponseField>
+
+<ResponseField name="onlyOn" type="RetryStrategyCondition" default="undefined">
+Apply the retry strategy only when the failure cause matches the specified condition. 
+
+**Usage:**
+
+```ts highlight={3}
+RetryStrategyBuilder.fixedStrategy({
+  maxRetries: 3,
+  onlyOn: 'NETWORK_ERROR', // Only retry network failures
+})
+```
+
+Currently supports `'NETWORK_ERROR'` for `ApiCheck` and `UrlMonitor` constructs only. Learn more in [network retries](https://www.checklyhq.com/docs/communicate/alerts/retries/#network-retries).
+
 </ResponseField>
 
 ## Examples

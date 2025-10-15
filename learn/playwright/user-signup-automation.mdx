@@ -13,10 +13,13 @@ learn_playwright:
   parent: "E2E examples"
 ---
 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 Signups are key transactions in most web platforms, and therefore prime targets for automation.
 
 Oftentimes, registering an account is where we will find longer forms asking the user to answer a variety of questions. Luckily, Playwright is quick enough to blaze through these in seconds.
-
 
 
 ## Steps
@@ -49,11 +52,11 @@ npx playwright signup.spec.ts
 
 
 
-The normal signup flow might include asking the user to confirm their email address right away by navigating to a URL 
-included in an automated email. Reliably replicating the steps needed to achieve that is not trivial. 
+The normal signup flow might include asking the user to confirm their email address right away by navigating to a URL
+included in an automated email. Reliably replicating the steps needed to achieve that is not trivial.
 
-A possible solution to the issue is having the system under test distinguish between test sessions and normal user sessions, 
-and skip the verification step for test sessions. A way to achieve this would be to check for a specific user agent ID 
+A possible solution to the issue is having the system under test distinguish between test sessions and normal user sessions,
+and skip the verification step for test sessions. A way to achieve this would be to check for a specific user agent ID
 which could be set as part of our test:
 
 ```js

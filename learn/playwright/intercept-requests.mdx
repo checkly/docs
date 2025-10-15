@@ -16,8 +16,11 @@ learn_playwright:
   parent: "Basics"
 ---
 
-When we browse the web, a series of HTTP requests and responses are exchanged between our browser and the pages we are visiting. There are scenarios in which it is useful to monitor or manipulate this traffic.
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
 
+<PlaywrightCheckSuiteTryOut />
+
+When we browse the web, a series of HTTP requests and responses are exchanged between our browser and the pages we are visiting. There are scenarios in which it is useful to monitor or manipulate this traffic.
 
 
 ## Request interception
@@ -33,12 +36,12 @@ test('intercept requests', async ({ page }) => {
   page.on('request', request => {
     console.log('Request:', request.url());
   });
-  
+
   // Listen for all responses
   page.on('response', response => {
     console.log('Response:', response.url(), response.status());
   });
-  
+
   await page.goto('https://danube-web.shop/');
 });
 ```
@@ -59,7 +62,7 @@ test('block image requests', async ({ page }) => {
       route.continue();
     }
   });
-  
+
   await page.goto('https://danube-web.shop/');
 });
 ```
@@ -98,14 +101,14 @@ test('intercept and modify response', async ({ page }) => {
         }
       ]
     };
-    
+
     route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify(customResponse)
     });
   });
-  
+
   await page.goto('https://danube-web.shop/');
 });
 ```

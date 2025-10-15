@@ -5,6 +5,10 @@ tags: Playwright
 sidebarTitle: A Guide to Playwright Traces
 ---
 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 Checkly warns you of failures before they’re reported by users. With well-timed alerts you can find out minutes or hours before you get your first support ticket that something is broken. But once we’ve gotten a notification of a failure, how do we do the first step of root cause analysis: diagnosing the cause of the failure?
 
 Browser checks, especially, involve multiple systems that have to ‘work’ to pass a check, how do we find out if network issues, script errors, or a garbled database row, were possible causes? This article shows you how to go from an alert to the first part of repair: finding the error.
@@ -46,7 +50,7 @@ What would cause some, but not all, checks to fail with some regularity? Checkin
 
 In this case geo-fencing, localization or some other geographic specific setting is causing only one check location to fail. A few settings to detect this issue more reliably:
 
-If you’re often getting failures in one region that’s critical to your business, consider increasing check frequency or setting your checks to ‘parallel runs’ meaning that ever selected geographic region every time 
+If you’re often getting failures in one region that’s critical to your business, consider increasing check frequency or setting your checks to ‘parallel runs’ meaning that ever selected geographic region every time
 
 
 ![a Checkly dashboard](/images/guides/images/reading-traces-04.png)
@@ -75,7 +79,7 @@ But now, my check on this page is failing, and I’d like to figure out why. The
 
 ### We all start by checking the video
 
-Reader, I’ll level with you: the purpose of this article is to get you to do more than checking the video on a failed check. But before I offer more routes to check I wish to acknowledge *we all start by checking the video.* A video has the great benefit of showing both the failure and the ‘normal’ behavior of the check up until that point, it reminds us what page we were loading and there’s a good chance that the failure is visual enough to show up right away. 
+Reader, I’ll level with you: the purpose of this article is to get you to do more than checking the video on a failed check. But before I offer more routes to check I wish to acknowledge *we all start by checking the video.* A video has the great benefit of showing both the failure and the ‘normal’ behavior of the check up until that point, it reminds us what page we were loading and there’s a good chance that the failure is visual enough to show up right away.
 
 
 ![a Checkly dashboard](/images/guides/images/reading-traces-07.png)
@@ -143,6 +147,6 @@ If you notice that the page took a second or two to fully load, and you’re wor
 
 ### **Conclusions**
 
-Effective incident diagnosis begins with understanding the patterns in your check failures before diving into detailed traces. Starting with the video replay is natural, as it provides immediate visual context, but the real answers often lie in the network logs, console errors, and full traces. 
+Effective incident diagnosis begins with understanding the patterns in your check failures before diving into detailed traces. Starting with the video replay is natural, as it provides immediate visual context, but the real answers often lie in the network logs, console errors, and full traces.
 
 Ultimately, Checkly equips you with the data needed to move from alert to resolution efficiently. By combining pattern recognition with detailed trace analysis, you can diagnose issues faster, reduce downtime, and maintain a seamless user experience. For further optimization, explore [fine-tuning check frequencies](https://www.checklyhq.com/blog/check-frequency/) and retry strategies to minimize detection time—because the sooner you find the problem, the sooner you can fix it.

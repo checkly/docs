@@ -11,9 +11,13 @@ tags:
 sidebarTitle: Assertions
 ---
 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 ### What are Playwright Assertions?
 
-Playwright is more than a testing framework. With its generalized tool at simulating user behavior in a browser (or via an API), playwright is better defined as a web automation framework. You can use Playwright to scrape websites, automate form submissions, or any other time it would be helpful to replace a human web user with a robot. For most users, Playwright is intimately associated with end-to-end tests, and for these we must stop our automated actions and check to see if everything is working right. 
+Playwright is more than a testing framework. With its generalized tool at simulating user behavior in a browser (or via an API), playwright is better defined as a web automation framework. You can use Playwright to scrape websites, automate form submissions, or any other time it would be helpful to replace a human web user with a robot. For most users, Playwright is intimately associated with end-to-end tests, and for these we must stop our automated actions and check to see if everything is working right.
 
 To make an automation into a test, we have assertions. When a hard assertion fails, the execution of a Playwright test stops, and following steps are not run.
 
@@ -60,7 +64,7 @@ Auto-retrying assertions automatically recheck conditions until they pass or a t
 
 ### Non-retrying Assertions
 
-Non-retrying assertions evaluate conditions only once. They are used when you expect a condition to be deterministic and want to avoid any retry logic. 
+Non-retrying assertions evaluate conditions only once. They are used when you expect a condition to be deterministic and want to avoid any retry logic.
 
 | **Assertion** | **Description** |
 | --- | --- |
@@ -96,7 +100,7 @@ Soft assertions collect all failures within a block before failing the test, rat
 
 ### Checkly, soft assertions, and degraded check states
 
-Checkly can use soft assertions as part of a ‘degraded’ state for checks. If a check fails soft assertions and there is a call to `markCheckAsDegraded`, the check will be placed in a ‘yellow light’ category of degraded rather than failing. Instead of categorizing the check as a total failure the 'degraded' state signals that the check encountered issues but still completed execution. Degraded checks have different notification policies. For example: you might have degraded checks report to Slack rather than sending a notification that wakes people up. 
+Checkly can use soft assertions as part of a ‘degraded’ state for checks. If a check fails soft assertions and there is a call to `markCheckAsDegraded`, the check will be placed in a ‘yellow light’ category of degraded rather than failing. Instead of categorizing the check as a total failure the 'degraded' state signals that the check encountered issues but still completed execution. Degraded checks have different notification policies. For example: you might have degraded checks report to Slack rather than sending a notification that wakes people up.
 
 This is useful for distinguishing between partial service disruptions and complete outages, offering teams a more precise understanding of performance and reliability. If your Playwright test is running on Checkly, the check will enter a ‘degraded’ state when some soft assertions fail, or if you call `markCheckAsDegraded` in its execution.
 
@@ -113,7 +117,7 @@ test("SpaceX-API Dragon Capsules & Next Launch", async ({ request }) => {
 
     // Hard assertion for a 200 status code, this passes!
     expect(response).toBeOK()
-    
+
     // Soft assertion of a very fast response time
     expect.soft(getAPIResponseTime(response), 'GET /dragons too slow')
       .toBeLessThanOrEqual(200)
@@ -121,7 +125,7 @@ test("SpaceX-API Dragon Capsules & Next Launch", async ({ request }) => {
     return response.json()
   })
 
-  // Mark as degraded if we got any errors. 
+  // Mark as degraded if we got any errors.
   if (test.info().errors.length) {
     markCheckAsDegraded('Check degraded due to soft assertion failure.')
   }
@@ -132,7 +136,7 @@ In this case if the response has a 200 status code but the API response time is 
 
 ### Custom Assertions
 
-While Playwright has almost every scenario for testing supported in its core methods, it remains quite customizable, even [allowing custom assertions](https://www.youtube.com/watch?v=Fs-nM747TY4). 
+While Playwright has almost every scenario for testing supported in its core methods, it remains quite customizable, even [allowing custom assertions](https://www.youtube.com/watch?v=Fs-nM747TY4).
 
 - `expect.configure`: Configures custom options for assertions.
 - `expect.poll`: Polls a condition until it passes or a timeout is reached, useful for dynamic content.
@@ -206,9 +210,9 @@ Understanding how to diagnose assertion failures can save significant debugging 
 await page.waitForTimeout(3000);
 ```
 
-When you have page components you want to ensure are loading quickly, or you have page components that you know take some time to load, it’s tempting to reach for a hard wait, however, there are better ways to accomplish this functionality, like the soft assertions and auto-retry assertions listed above. 
+When you have page components you want to ensure are loading quickly, or you have page components that you know take some time to load, it’s tempting to reach for a hard wait, however, there are better ways to accomplish this functionality, like the soft assertions and auto-retry assertions listed above.
 
-After that fixed period, if the next step doesn’t work, the test will fail. Hard waits are the most common cause of unreliable or ‘flaky’ tests with Playwright. They’re also inefficient, if the element we’re checking for becomes available *before* the hard wait time has elapsed, the test runner still has to wait to the end of the wait time. Read more about this in our page on [waiting in Playwright](https://www.checklyhq.com/learn/playwright/waits-and-timeouts/). 
+After that fixed period, if the next step doesn’t work, the test will fail. Hard waits are the most common cause of unreliable or ‘flaky’ tests with Playwright. They’re also inefficient, if the element we’re checking for becomes available *before* the hard wait time has elapsed, the test runner still has to wait to the end of the wait time. Read more about this in our page on [waiting in Playwright](https://www.checklyhq.com/learn/playwright/waits-and-timeouts/).
 
 ### Manual Assertions
 
@@ -252,7 +256,7 @@ Checkly offers tools for continuous monitoring using Playwright scripts. With Ch
 
 ### Conclusion
 
-By using the right types of assertions, debugging tools, and best practices, you can ensure your tests are robust and efficient. In general, my direct experience has served to emphasize the wisdom of the Playwright project’s recommendations: web first assertions, dependent on web-first selectors. 
+By using the right types of assertions, debugging tools, and best practices, you can ensure your tests are robust and efficient. In general, my direct experience has served to emphasize the wisdom of the Playwright project’s recommendations: web first assertions, dependent on web-first selectors.
 
 For assertions, web-first, auto-retrying assertions are the preferred choice for most scenarios, as they leverage Playwright’s built-in waiting mechanisms, making tests more resilient and less prone to flakiness. These assertions continuously check conditions until they pass or reach a timeout, which can help streamline test execution. Examples like `toBeVisible` or `toContainText` illustrate how these assertions can improve test stability. On the other hand, non-retrying assertions evaluate conditions just once and should be reserved for scenarios where retries are unnecessary or could introduce ambiguity. Anything other than web-first assertions will lead to brittle tests with more false positives.
 

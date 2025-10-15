@@ -13,9 +13,11 @@ learn_playwright:
   parent: "E2E examples"
 ---
 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 Websites might expose files for users to download and then access from their local machine. Common cases are downloading tickets, receipts and itineraries.
-
-
 
 ## Steps
 
@@ -27,7 +29,7 @@ This example runs against our [test webshop](https://danube-web.shop/) and proce
 
 We will check that the downloaded file is as expected by comparing it to a [fixture file](/learn/playwright/handling-test-data/) in our final assertion.
 
-We can approach this scenario in different ways. One possibility is to perform the first two steps, then [extract](/learn/playwright/web-scraping/) 
+We can approach this scenario in different ways. One possibility is to perform the first two steps, then [extract](/learn/playwright/web-scraping/)
 the `href` value and use it to retrieve the file with a `GET` request (performed with [axios](https://github.com/axios/axios), for example).
 
 ```ts title="file-download.spec.ts"
@@ -42,24 +44,24 @@ test('download file with HTTP request', async ({ page }) => {
   await page.fill('#email', process.env.USER_EMAIL!);
   await page.fill('#password', process.env.USER_PASSWORD!);
   await page.click('#login-button');
-  
+
   // Navigate to account page
   await page.goto('https://danube-web.shop/account');
-  
+
   // Extract download link
   const downloadLink = await page.getAttribute('a[href*="receipt"]', 'href');
-  
+
   // Download file using HTTP request
   const response = await axios.get(downloadLink, { responseType: 'stream' });
   const downloadPath = './downloaded-receipt.pdf';
   const writer = fs.createWriteStream(downloadPath);
   response.data.pipe(writer);
-  
+
   await new Promise((resolve, reject) => {
     writer.on('finish', resolve);
     writer.on('error', reject);
   });
-  
+
   // Compare with fixture file
   const downloadedFile = fs.readFileSync(downloadPath);
   const fixtureFile = fs.readFileSync('./fixtures/expected-receipt.pdf');
@@ -81,19 +83,19 @@ test('download file with download event', async ({ page }) => {
   await page.fill('#email', process.env.USER_EMAIL!);
   await page.fill('#password', process.env.USER_PASSWORD!);
   await page.click('#login-button');
-  
+
   // Navigate to account page
   await page.goto('https://danube-web.shop/account');
-  
+
   // Wait for download event when clicking the link
   const downloadPromise = page.waitForEvent('download');
   await page.click('a[href*="receipt"]');
   const download = await downloadPromise;
-  
+
   // Save the downloaded file
   const downloadPath = './downloaded-receipt.pdf';
   await download.saveAs(downloadPath);
-  
+
   // Compare with fixture file
   const downloadedFile = fs.readFileSync(downloadPath);
   const fixtureFile = fs.readFileSync('./fixtures/expected-receipt.pdf');

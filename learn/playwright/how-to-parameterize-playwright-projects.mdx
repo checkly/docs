@@ -13,6 +13,10 @@ learn_playwright:
   parent: "Best practices"
 ---
 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 In a previously [released YouTube video](https://www.youtube.com/watch?v=k488kAtT-Pw), I explained how and why Playwright fixtures perfectly match with page object models. Combining the two allows you to hide setup instructions and keep your tests clean. Page object models no longer have to be initialized in every test case.
 
 
@@ -57,8 +61,8 @@ Let's look at a fixture example that hides the initialization of a page object m
 import { DashboardPage } from './poms/dashboard-page.ts'
 
 test('create check', async ({ page }) => {
-  const dashboardPage = new DashboardPage(page, { 
-    email: 'stefan@checklyhq.com', 
+  const dashboardPage = new DashboardPage(page, {
+    email: 'stefan@checklyhq.com',
     password: '...'
   });
   await dashboardPage.login()
@@ -89,7 +93,7 @@ import { test as base } from '@playwright/test'
 import { DashboardPage, User } from './poms/dashboard'
 
 // 2. extend `base` with your custom functionality
-// 3. export and use the returned value as `test` 
+// 3. export and use the returned value as `test`
 export const test = base.extend({
   dashboardPage: async ({ page }, use) => {
     const dashboardPage = new DashboardPage(page, {
@@ -108,7 +112,7 @@ export { expect } from '@playwright/test'
 
 Playwright's `test` method allows you to enrich Playwright's core functionality with your own custom fixtures and options. The trick is to import and rename `test`, extend it with your custom additions, and then export the returned value as `test` to be used in your test cases.
 
-In the example above, the `dashboard` fixture initializes the new `DashboardPage` and then passes the result to the provided `use` method. Whatever `use` will be called with will be passed to your test cases. This has the advantage of having all your setup instructions in one place. 
+In the example above, the `dashboard` fixture initializes the new `DashboardPage` and then passes the result to the provided `use` method. Whatever `use` will be called with will be passed to your test cases. This has the advantage of having all your setup instructions in one place.
 
 But if you now have test cases that should use the `dashboardPage` object with different users, you can't change how the page object model will be initialized because the setup is hidden away from the test cases.
 
@@ -224,7 +228,7 @@ Either way, tests or fixtures can access your user config option. And if you wan
 ## Conclusion
 If your Playwright project grows, I highly recommend looking into ways to establish conventions and keep your tests clean. Fixtures and options are the perfect tool for this. Setting these up might feel like overkill, but trust me, you won't look back once you define your dependencies in this Playwright-native way.
 
-If you have any questions or comments, say "Hi" in the Checkly community Slack! 
+If you have any questions or comments, say "Hi" in the Checkly community Slack!
 
 But what's Checkly? Checkly enables you to take your existing Playwright tests running in CI/CD and transform them into synthetic [end-to-end monitoring](https://www.checklyhq.com/guides/end-to-end-monitoring/). Your Playwright tests will run around the clock and from anywhere on this planet so that you know that your production sites are up and running. And if they're not, you'll be the first to know because Checkly will alert you. It's pretty cool, trust me. 😉
 

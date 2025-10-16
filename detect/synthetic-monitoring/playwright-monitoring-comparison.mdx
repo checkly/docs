@@ -1,0 +1,50 @@
+---
+title: 'Playwright Monitoring Comparison'
+description: 'Compare the features of the different Playwright-based checks'
+sidebarTitle: 'Playwright Feature Comparison'
+
+---
+
+import { checkDurations } from '/snippets/check-comparison.mdx'
+
+[MultiStep Checks](/detect/synthetic-monitoring/multistep-checks/overview), [Browser Checks](/detect/synthetic-monitoring/browser-checks/overview), and [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview) use Playwright for synthetic monitoring. The different check types differ in terms of capabilities, flexibility, and use cases.
+
+Checkly's strengths is that you can login into the Checkly web application, write Playwright code in the built-in editor and start monitoring your APIs and sites. **MultiStep and Browser checks are the perfect tools to get you off the ground quickly.** Don't worry about where to store the monitoring code, how to configure advanced configuration, or when to update dependencies. Checkly takes care of all of this.
+
+However, when your monitoring setup needs to match scaling and growing project requirements, you'll quickly find yourself looking for ways to version-control your checks with [the Monitoring as Code approach \(MaC\)](/concepts/monitoring-as-code).
+
+All Playwright-based checks can be created, updated and configured as code. But, when should you use which?
+
+## When to use MultiStep Checks
+
+[MultiStep Checks](/detect/synthetic-monitoring/multistep-checks/overview) enable you to monitor complex API workflows with sequential requests using the familiar Playwright API. The check run is based on a single `spec.ts` file, limited to making HTTP requests (there's no browser available) and **the max check run duration is capped at { checkDurations.multiStep }**.
+
+## When to use Browser Checks
+
+[Browser Checks](/detect/synthetic-monitoring/browser-checks/overview) let you monitor end-to-end user flows and realistic interactions with automated browser testing using Playwright. The check run is based on a single `spec.ts` file, supports the headless Chromium/Chrome browser and **the max check run duration is capped at { checkDurations.browser }**.
+
+## When to use Playwright Check Suites
+
+MultiStep and Browser Checks are single units based on a single `spec.ts` file.
+
+[Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview), on the other hand, let you take your entire existing Playwright test suite, and turn it into globally distributed monitoring. Check Suites support multiple spec files, advanced global configuration, multiple Playwright projects, tags for selective monitoring, storage state, custom dependencies, and more.
+
+<Tip>
+Playwright Check Suites are the native way to run your Playwright project in production.
+</Tip>
+
+## Feature comparison
+
+| Feature                                       | Playwright Check Suite        | Browser Check                   | MultiStep Check                 |
+|-----------------------------------------------|-------------------------------|---------------------------------|---------------------------------|
+| Supports *Monitoring as Code*                 | Yes                           | Yes                             | Yes                             |
+| Supported test formats                        | API and Browser               | API and Browser                 | API only                        |
+| Multiple spec files                           | Yes                           | No                              | No                              |
+| Flexible test selection via tags and projects | Yes                           | No                              | No                              |
+| Browser compatibility                         | Chromium, Webkit, Firefox     | Chromium, Chrome                | Chromium, Chrome                |
+| Storage state support                         | Yes                           | No                              | No                              |
+| Multiple Playwright Project support           | Yes                           | No                              | No                              |
+| Custom dependencies (public and private)      | Yes                           | No, fixed runtime dependencies. | No, fixed runtime dependencies. |
+| Max Check Duration                            | { checkDurations.checkSuite } | { checkDurations.browser }      | { checkDurations.multiStep }    |
+| Complete Playwright feature parity            | Yes                           | No                              | No                              |
+| Fake media devices                            | Yes                           | No                              | No                              |

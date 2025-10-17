@@ -31,7 +31,18 @@ At the end of our test, we need to check if our login procedure has been success
 On our [test site](https://danube-web.shop/) this could look like the following:
 
 ```ts login.spec.ts
-// Example code - see original file for details
+import { test, expect } from '@playwright/test'
+
+test('Login', async ({ page }) => {
+  await page.goto('https://danube-web.shop/')
+
+  await page.getByRole('button', { name: 'Log in' }).click()
+  await page.getByPlaceholder('Email').fill(process.env.USER_EMAIL)
+  await page.getByPlaceholder('Password').fill(process.env.USER_PASSWORD)
+  await page.getByRole('button', { name: 'Sign In' }).click()
+
+  await expect(page.getByText('Welcome back, user@email.com')).toBeVisible()
+})
 ```
 
 Run this example as follows. Replace the username and password placeholder with your own credentials.

@@ -1,116 +1,94 @@
 ---
-title: 'Environment variables'
+title: 'Environment variables and secrets'
 sidebarTitle: 'Environment Variables'
-description: 'Securely store and manage sensitive data like credentials and configuration values across your monitoring checks'
+description: 'Store and manage common configuration values across your checks'
 ---
 
-Environment variables allow you to store sensitive data like credentials and configuration values that can be reused across your monitoring setup. This keeps secrets out of your code and enables flexible configuration management.
+import GenericRuntimeVariablesTable from '/snippets/generic-runtime-variables-table.mdx';
+
+Your checks might share the same configuration data, like an authentication token, a user name, or even a specific part of the URL. You can use variables and secrets to 'DRY' up your checks, store these variables in one place, and keep sensitive data secure. 
+
+## Overview
+
+There are two ways to store configuration information in Checkly: Variables and secrets. Both variables and secrets are encrypted at rest and in flight.
+* **Variables** are used to store non-sensitive information. Variables are shown in plaintext when being edited, on the check result page and in logs. Variables can be accessed via the CLI and API.
+* **Secrets** allow you to store sensitive data for use in checks. Once saved, secrets are never shown in the UI or in logs and cannot be accessed via the CLI or API. 
+
+<Note>
+Secrets are fully supported starting with runtime version 2024.09 and later. For [Private Locations](/docs/private-locations/), secrets are available in agent version `3.3.4` and later, and for the [CLI](/docs/cli/), in version `4.9.0` and later.
+</Note>
+
+<Warning>
+To ensure the integrity of Playwright artifacts (traces, videos and screenshots), the following are not scrubbed, even when saved as secrets: The characters `/` and `*` and the full or partial match of `/artifact/`, `https://`, `http://`, `*********`, and `123`.
+Values of the keys `sha1`, `_sha1`, `pageref`, `downloadsPath`, `tracesDir`, `pageId` and any string that ends with `sha1` will not be scrubbed from the Playwright trace, but will be scrubbed from the general check result.
+Numbers are not scrubbed from the Playwright trace, but from the general check result.
+</Warning>
+
+<Tip>
+  This page provides a general overview of environment variables. For information specific to the CLI, refer to our [Checkly CLI documentation](/cli/environment-variables).
+</Tip> 
+
+From here on, in this document, we refer to both variables and secrets as 'variables' for ease of reading, unless explicitly mentioned.
 
 ## Managing variables
 
-You can create environment variables at three hierarchical levels, with check-level variables taking precedence over group and global variables.
+You can create environment variables and secrets at three hierarchical levels:
 
-<Accordion title="Check-level variables">
+<Accordion title="Check-level">
 Variables defined at the check level are only available to that specific check. Use these for check-specific configuration or to override group/global variables.
 
-**Supported by:** API, Browser, Multistep & Playwright checks
+**Supported by:** API (only via the CLI), Browser, Multistep & Playwright checks
 
-Add variables on the **Variables** tab when editing a check.
+Check-level variables are shown in the **Variables** tab on the check edit page.
 
 ![check environment variables](/images/docs/images/browser-checks/check-environment-variables.png)
-
-**Example use cases:**
-- Test-specific credentials
-- Different API endpoints per check
-- Override default timeout values
 </Accordion>
 
-<Accordion title="Group-level variables">
-Variables defined at the group level are inherited by all checks within that group. This is ideal for sharing common configuration across related checks.
+<Accordion title="Group-level">
+Group variables are only accessible in the context of a group, which includes the checks within the group and their configuration.
 
-**Benefits:**
-- Reduces duplication across checks in the same group
-- Consistent configuration for related monitoring scenarios
-- Easy maintenance when credentials or endpoints change
+Group-level variables are shown the **Variables** tab in a check group.
 
-**Example use cases:**
-- Shared service credentials for all checks in a group
-- Common API base URLs
-- Environment-specific configuration (staging vs production)
+![set group environment variable](/images/docs/images/browser-checks/group-environment-variables.png)
 </Accordion>
 
-<Accordion title="Global variables">
-Variables defined at the global level are available to all checks across your entire account. Use these for organization-wide configuration.
+<Accordion title="Global">
+Variables defined at the global level are available throughout Checkly, including in checks, alert channels, and global configuration options.
 
-**Best practice:** Store variables at the global level whenever possible to follow the DRY (Don't Repeat Yourself) principle.
+Global variables are shown in the [Environment variables](https://app.checklyhq.com/environment-variables) section on the left-side menu.
 
-**Example use cases:**
-- Organization-wide credentials
-- Global configuration values
-- Default timeout and retry settings
+![set global environment variable](/images/docs/images/browser-checks/global-environment-variables.png)
+
+<Note>
+Store variables at the global level whenever possible to follow the DRY (Don't Repeat Yourself) principle.
+</Note>
+
 </Accordion>
+
+By default, all variables are stored as string values. 
+
+When using variables, you can click the lock icon to hide the value. Any data you “lock” is encrypted at rest and in flight on our back end and is only decrypted when needed. Locked environment variables can only be accessed by team members with [Read & Write access](/admin/team-management/overview/) or above.
+
+Secrets are never visible for any user and are always encrypted.
 
 ## Variable hierarchy
 
-When checks run, Checkly merges variables from all three levels into a single dataset. Variables at more specific levels override those at broader levels:
+As checks are scheduled, Checkly merges the check, group, and global environment variables into one data set and exposes them
+to the runtime environment. During merging, variables at more specific levels override those at broader levels.
 
-**Check variables** > **Group variables** > **Global variables**
+Or, in other words: **check** variables override **group** variables override **global** variables.
 
-This hierarchy allows you to:
-- Set default values at the global or group level
-- Override specific values at the check level when needed
-- Maintain flexible configuration with minimal duplication
+You can make use of this by providing a default value for a specific variable at the global or group level, but allow that variable to
+be overridden at the check level.
 
 ## Accessing variables
 
-Environment variables are accessible in your code using the standard Node.js `process.env.VARIABLE_NAME` notation.
+How variables are accessed depends on where you're accessing them from:
 
-<Accordion title="Example: GitHub login">
-<CodeGroup dropdown>
-
-```ts variables.spec.ts
-import { test } from '@playwright/test'
-
-test('GitHub login', async ({ page }) => {
-  await page.goto('https://github.com/login')
-  await page.getByLabel('Username or email address').type(process.env.GITHUB_USER)
-  await page.getByLabel('Password').type(process.env.GITHUB_PWD)
-  await page.getByRole('button', { name: 'Sign in' }).click()
-})
-```
-
-```js variables.spec.js
-const { test } = require('@playwright/test')
-
-test('GitHub login', async ({ page }) => {
-  await page.goto('https://github.com/login')
-  await page.getByLabel('Username or email address').type(process.env.GITHUB_USER)
-  await page.getByLabel('Password').type(process.env.GITHUB_PWD)
-  await page.getByRole('button', { name: 'Sign in' }).click()
-})
-```
-
-</CodeGroup>
-</Accordion>
-
-## Built-in variables
-
-Checkly provides several built-in environment variables that are automatically available in your checks:
-
-<Accordion title="Runtime variables">
-- `CHECK_NAME` - The name of the current check
-- `CHECK_TYPE` - The type of check (API, BROWSER, etc.)
-- `CHECK_ID` - The unique identifier of the check
-- `REGION` - The current data center location (e.g., `us-east-1`)
-- `RUN_ID` - Unique identifier for the current check run
-</Accordion>
-
-## Security
-
-- **Encryption:** All variable data is encrypted at rest and in transit
-- **Access control:** Locked variables can only be accessed by team members with Read & Write access or above
-- **Best practices:** Avoid logging sensitive variables in your check results to prevent exposure to Read Only team members
+* In [Browser](/detect/synthetic-monitoring/browser-checks/mac-structure#environment-variables), [Multistep](/detect/synthetic-monitoring/multistep-checks/overview#built-in-runtime-variables), and [API Check setup/teardown scripts](/detect/synthetic-monitoring/api-checks/set-up-and-tear-down#built-in-variables), use the standard Node.js `process.env.VARIABLE_NAME` notation.
+* In [API Check requests](/detect/synthetic-monitoring/api-checks/requests#accessing-environment-variables), use Handlebars/Moustache templating delimiters, i.e. `{{VARIABLE_NAME}}`
+* In [webhook alert channels](/integrations/alerts/webhooks#template-variables), also use the Handlebar/Moustache format, i.e. `{{VARIABLE_NAME}}`
 
 <Note>
-For more login scenarios and examples, see our [login scenarios documentation](/browser-checks/login-scenarios/).
+  Handlebar (double brackets) variables will be URI encoded. To avoid encoding, you can access your environment variables with triple brackets, i.e. `{{{VARIABLE_NAME}}}`.
 </Note>

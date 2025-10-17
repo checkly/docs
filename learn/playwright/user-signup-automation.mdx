@@ -13,10 +13,13 @@ learn_playwright:
   parent: "E2E examples"
 ---
 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 Signups are key transactions in most web platforms, and therefore prime targets for automation.
 
 Oftentimes, registering an account is where we will find longer forms asking the user to answer a variety of questions. Luckily, Playwright is quick enough to blaze through these in seconds.
-
 
 
 ## Steps
@@ -30,7 +33,25 @@ The flow will often match the following:
 We will likely want to also check that some change occurred in the UI to confirm that the registration worked.
 
 ```ts signup.spec.ts
-// Example code - see original file for details
+import { test, expect } from '@playwright/test'
+
+test('Sign up', async ({ page }) => {
+  await page.goto('https://danube-web.shop/')
+
+  await page.getByRole('button', { name: 'Sign up' }).click()
+  await page.getByPlaceholder('Name', { exact: true }).fill('John')
+  await page.getByPlaceholder('Surname').fill('Doe')
+  await page.getByPlaceholder('Email').fill('user@email.com')
+  await page.getByPlaceholder('Password').fill('supersecure1')
+
+  await page.getByPlaceholder('Company (optional)').fill('Test Inc.')
+  await page.getByLabel('Myself').check()
+  await page.getByLabel('I would like to receive').check()
+  await page.getByLabel('I have read and accept the').check()
+
+  await page.getByRole('button', { name: 'Register' }).click()
+  await expect(page.getByText('Welcome back, user@email.com')).toBeVisible()
+})
 ```
 
 Run this example as follows:
@@ -49,11 +70,11 @@ npx playwright signup.spec.ts
 
 
 
-The normal signup flow might include asking the user to confirm their email address right away by navigating to a URL 
-included in an automated email. Reliably replicating the steps needed to achieve that is not trivial. 
+The normal signup flow might include asking the user to confirm their email address right away by navigating to a URL
+included in an automated email. Reliably replicating the steps needed to achieve that is not trivial.
 
-A possible solution to the issue is having the system under test distinguish between test sessions and normal user sessions, 
-and skip the verification step for test sessions. A way to achieve this would be to check for a specific user agent ID 
+A possible solution to the issue is having the system under test distinguish between test sessions and normal user sessions,
+and skip the verification step for test sessions. A way to achieve this would be to check for a specific user agent ID
 which could be set as part of our test:
 
 ```js

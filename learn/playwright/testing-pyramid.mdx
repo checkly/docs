@@ -1,6 +1,6 @@
 ---
 title: The Layers of the Testing Pyramid
-description: 
+description:
   This article gives a tour of the testing pyramid’s layers with examples, and shows you how each part is required for a complete picture of system performance.
 date: 2025-04-01
 author: Nočnica Mellifera
@@ -14,6 +14,10 @@ learn_playwright:
   parent: "Getting started"
 ---
 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 When you begin your journey in QA, SRE, Development, or Operations, you’ll ask about testing and hear ‘we test that on a different layer of the pyramid’ or ‘we test that during unit testing.’ As you grow, you’ll suggest an end-to-end test and hear “that’s not end-to-end testing, that’s integration testing.” It seems as if everyone else understands the layers of the testing pyramid, and which tests belong where. Really though, the separate are fairly abstract, without clean divisions either technically or conceptually. This article gives a tour of the testing pyramid’s layers with examples, and shows you how each part is required for a complete picture of system performance.
 
 ## How do we know our app is working?
@@ -22,7 +26,7 @@ We know our app is working by testing, but this begs the question: who should te
 
 ## The Testing Pyramid in Full
 
-Originally conceived by Mike Cohn, and then popularized by Martin Fowler, the testing pyramid shows categories of tests, with the slowest on top and the fastest on the bottom. 
+Originally conceived by Mike Cohn, and then popularized by Martin Fowler, the testing pyramid shows categories of tests, with the slowest on top and the fastest on the bottom.
 
 ![The Testing Pyramid](/images/learn/images/testing-pyramid-01.png)
 
@@ -35,7 +39,7 @@ Next let’s briefly describe the layers, along with how they work in a modern c
 
 ## Unit Tests - with examples
 
-A unit test is a highly isolated test that only works with a tiny chunk of code, possibly the code in a single file, or even a single function. A unit test is by its nature extremely high performance, and can run as frequently as the developer saves her work (or even with every entered newline). 
+A unit test is a highly isolated test that only works with a tiny chunk of code, possibly the code in a single file, or even a single function. A unit test is by its nature extremely high performance, and can run as frequently as the developer saves her work (or even with every entered newline).
 
 In the following example, we have the unit test for a single function called `noWhiteSpace`
 
@@ -148,7 +152,7 @@ export function mockUpdateUserName(request: UpdateUserRequest): UpdateUserRespon
 
 In this example, the mock almost looks like application code, it even validates the input slightly! But think about it: no request is made to any data store, and therefore there’s no check to see if this is even a valid userID, much less whether we’ve successfully updated their info.
 
-When we drew a dotted line between integration tests and unit tests, it was to indicate that it’s never 100% clear the distinction between a (simple, fast) unit test and a (slower, more comprehensive) integration test. It’s likely that integration tests will be run somewhere in between the moment-to-moment development process and the deployment of code to production. 
+When we drew a dotted line between integration tests and unit tests, it was to indicate that it’s never 100% clear the distinction between a (simple, fast) unit test and a (slower, more comprehensive) integration test. It’s likely that integration tests will be run somewhere in between the moment-to-moment development process and the deployment of code to production.
 
 ### Integration testing’s more rigid cousin: contract testing
 
@@ -158,7 +162,7 @@ In microservice architecture, ideally microservices would interact in tightly co
 - Contracts often expect consistent, readable information in data stores that doesn’t perfectly reflect reality.
 - The nature of failures during service interaction is rarely due to ‘services not upholding their contracts’ and as such contract testing fails to find failures before users do.
 
-Integration testing of some sort is a necessary part of the deployment process. 
+Integration testing of some sort is a necessary part of the deployment process.
 
 ## End-to-end testing: testing like the users do
 
@@ -168,7 +172,7 @@ The testing period requires, an addition to reflect testing in the real world. A
 
 *Many’s the night on an on-call team I’ve used my phone to check our production site when a user-reported error wasn’t showing up on any dashboard*
 
-When your default action is to go and click around on the site to really know that things are working, you’re showing that your end-to-end testing doesn’t have your full confidence. End-to-end tests are supposed to simulate the users interacting with your service. Passing an end-to-end test suite shows that all business critical paths through your application are working as expected. With testing tools like Playwright, there should be no user behavior that you can’t simulate. 
+When your default action is to go and click around on the site to really know that things are working, you’re showing that your end-to-end testing doesn’t have your full confidence. End-to-end tests are supposed to simulate the users interacting with your service. Passing an end-to-end test suite shows that all business critical paths through your application are working as expected. With testing tools like Playwright, there should be no user behavior that you can’t simulate.
 
 ```tsx
 await page.locator('#item-to-be-dragged').dragTo(page.locator('#item-to-drop-at'));
@@ -184,7 +188,7 @@ If we agree on the importance of end-to-end testing, it begs the question if tes
 
 ## What problem is the testing pyramid trying to solve?
 
-While it sadly causes many arguments about which tests belong where or which layer is most important, the testing pyramid is meant to acknowledge that each test type has a role to play, and the differences in performance is natural. 
+While it sadly causes many arguments about which tests belong where or which layer is most important, the testing pyramid is meant to acknowledge that each test type has a role to play, and the differences in performance is natural.
 
 ## Conclusions: Every Layer of Testing Matters
 

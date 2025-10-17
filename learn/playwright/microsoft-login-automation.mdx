@@ -13,9 +13,11 @@ learn_playwright:
   parent: "E2E examples"
 ---
 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 Playwright allows us to automate logging in to a Microsoft Online account.
-
-
 
 ## Steps
 
@@ -24,7 +26,20 @@ Playwright allows us to automate logging in to a Microsoft Online account.
 3. We are redirected to the main account page
 
 ```ts ms-account-login.spec.ts
-// Example code - see original file for details
+import { test } from '@playwright/test'
+
+test('test', async ({ page }) => {
+  await page.goto('https://login.microsoftonline.com/')
+
+  await page.getByRole('heading', { name: 'Sign in' }).click()
+  await page.getByPlaceholder('Email address, phone number').fill(process.env.MS_USERNAME)
+  await page.getByRole('button', { name: 'Next' }).click()
+
+  await page.getByTestId('i0118').fill(process.env.MS_PASSWORD)
+  await page.getByTestId('textButtonContainer').getByRole('button', { name: 'Sign in' }).click()
+  await page.getByTestId('checkboxField').check()
+  await page.getByLabel('Stay signed in?').click()
+})
 ```
 Run this example as follows. Replace the username and password placeholder with your own credentials.
 

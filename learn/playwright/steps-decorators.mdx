@@ -12,6 +12,11 @@ sidebarTitle: Automatic Steps
 learn_playwright:
   parent: "Best practices"
 ---
+
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 You can write Playwright end-to-end testing code using JavaScript or TypeScript. Which one should you choose?
 
 When I started writing my first automated browser tests, I went with JavaScript because I couldn't be bothered with the type wrangling. I just wanted to get something off the ground quickly. YOLO, right?
@@ -165,12 +170,12 @@ However, this doesn't hinder the TypeScript team from shipping JavaScript decora
 But what are they? If you look at the proposal, you'll find that:
 
 > Decorators are functions called on classes, class elements, or other JavaScript syntax forms during definition.
-> 
+>
 
 This definition is somewhat cryptic. Let me explain the feature in my own words.
 
 > With decorators, you can access, replace, or wrap class methods (like a method in your POM class) with other functions with a very condensed and developer-friendly syntax.
-> 
+>
 
 Wrapping class methods is what we need to avoid all these `test.step` instructions. Let's find out how to define a decorator!
 
@@ -271,7 +276,7 @@ export class YourPageObject {
 
   @step
   async methodTwo() { /* ... */ }
-  
+
   @step
   async methodThree() { /* ... */ }
 }

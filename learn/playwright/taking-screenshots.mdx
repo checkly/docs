@@ -13,16 +13,25 @@ learn_playwright:
   parent: "Basics"
 ---
 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 Headless browsers are fully capable of taking screenshots, which is very useful in troubleshooting failures or faulty scripts. Using additional libraries and tools, it is also possible to automate visual comparisons.
-
-
 
 ## Generating and saving screenshots
 
 The `page.screenshot` command allows us to save one or more screenshots of the current page to a specified path. Without any additional options, the size of the screenshot depends on the viewport size:
 
 ```ts basic-screenshot.spec.ts
-// Example code - see original file for details
+import { test } from '@playwright/test'
+
+test('take a screenshot', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await page.goto('https://danube-web.shop/')
+  await page.screenshot({ path: 'my_screenshot.png' })
+})
+
 ```
 
 
@@ -39,7 +48,25 @@ await page.screenshot({ path: 'my_screenshot.png', fullPage: true })
 Having our screenshot limited to a smaller portion of the viewport is also possible. All we need to do is specify the coordinates of the top left corner of the screenshot, plus `width` and `height`. We then pass these options to:
 
 ```ts basic-screenshot-clipped.spec.ts
-// Example code - see original file for details
+import { test } from '@playwright/test'
+
+test('take a clipped screenshot', async ({ page }) => {
+  const options = {
+    path: 'clipped_screenshot.png',
+    fullPage: false,
+    clip: {
+      x: 5,
+      y: 60,
+      width: 240,
+      height: 40
+    }
+  }
+
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await page.goto('https://danube-web.shop/')
+  await page.screenshot(options)
+})
+
 ```
 
 
@@ -50,13 +77,19 @@ npx playwright test basic-screenshots.spec.ts
 
 ## Visual regression testing
 
-Playwright can be used to take screenshots of a page and compare them with a reference image. This is useful for visual 
+Playwright can be used to take screenshots of a page and compare them with a reference image. This is useful for visual
 regression testing, where we can detect changes in the UI that may have been introduced by code changes.
 
 The `expect(page).toMatchSnapshot()` command is used to take a screenshot and compare it with a reference image. If the images are different, the test will fail.
 
 ```ts visual-regression.spec.ts
-// Example code - see original file for details
+import { test, expect } from '@playwright/test'
+
+test('visual regression', async ({ page }) => {
+  await page.goto('https://danube-web.shop/')
+  const screenshot = await page.screenshot()
+  expect(screenshot).toMatchSnapshot('danube-web-shop.png')
+})
 ```
 
 

@@ -18,6 +18,10 @@ learn_playwright:
   parent: "Interaction"
 ---
 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 Every script that we will write will almost certainly do three key things:
 1. Navigating to some web page
 2. Waiting for something
@@ -39,7 +43,13 @@ In the example below we trigger two navigations:
 2. A navigation to the shopping cart by clicking a link
 
 ```ts basic-browser-navigation.spec.ts
-// Example code - see original file for details
+import { test } from '@playwright/test'
+
+test('basic navigation', async ({ page }) => {
+  await page.goto('https://danube-web.shop/')
+  await page.click('#cart')
+})
+
 ```
 
 
@@ -53,11 +63,19 @@ npx playwright test basic-browser-navigation.spec.ts
 waiting for something to happen is a crucial part of any automation script. In most cases, this is handled automatically
 by Playwright. For example, when you click a button, Playwright will wait for that button to be clickable before it actually clicks it.
 
-In the example below, we type an email address into an input field on a login modal. Playwright's `fill` method comes with 
+In the example below, we type an email address into an input field on a login modal. Playwright's `fill` method comes with
 built-in waiting functionality.
 
 ```ts basic-browser-waiting.spec.ts
-// Example code - see original file for details
+import { test } from '@playwright/test'
+
+test('basic built-in waiting', async ({ page }) => {
+  await page.goto('https://danube-web.shop/')
+  await page.getByRole('button', { name: 'Log in' }).click()
+  await page.getByPlaceholder('Email').click()
+  await page.getByPlaceholder('Email').fill('test@test.com')
+})
+
 ```
 Run this example as follows:
 

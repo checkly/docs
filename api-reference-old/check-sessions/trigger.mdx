@@ -1,0 +1,17 @@
+---
+title: 'Trigger a check session'
+openapi: 'POST /v1/check-sessions/trigger'
+description: 'Run checks on demand'
+---
+
+## Overview
+
+This endpoint triggers an ad-hoc check session for all **activated** checks matching the provided filters (equivalent to clicking *Schedule now* in the UI). If no filters are specified, all eligible checks are run.
+
+The request returns immediately and does not wait for the session to finish. To track progress, use the 
+* `GET /v1/check-sessions/{checkSessionId}/completion`
+* `GET /v1/check-sessions/{checkSessionId}`
+
+endpoints.
+
+Standard alerting rules apply to finished check runs.

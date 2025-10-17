@@ -17,6 +17,10 @@ learn_playwright:
   parent: "Basics"
 ---
 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 Playwright controls headless desktop browsers that can also emulate mobile devices. And while device emulation can't replace testing on mobile devices entirely, it's a practical and quick-to-setup approach to testing mobile scenarios.
 
 Device emulation is well suited to test if your site behaves correctly across multiple viewport sizes and correctly handles `user-agent` strings. But if your site relies on device-specific browser features, an iPhone emulation running in a Chromium browser might lead to false positives.
@@ -49,12 +53,12 @@ If your site follows responsive web design practices and renders elements depend
 ```ts emulate-mobile-viewport.spec.ts
 const { test } = require('@playwright/test')
 
-test.use({ 
-  viewport: { 
-    width: 320, 
-    height: 568 
-  }, 
-  deviceScaleFactor: 2 
+test.use({
+  viewport: {
+    width: 320,
+    height: 568
+  },
+  deviceScaleFactor: 2
 })
 
 test('emulate iPhone SE', async ({ page }) => {
@@ -76,7 +80,7 @@ Leverage the pre-defined devices to emulate mobile devices.
 import { test, devices } from '@playwright/test'
 const iPhone = devices['iPhone SE']
 
-test.use({ 
+test.use({
   ...iPhone,
 })
 

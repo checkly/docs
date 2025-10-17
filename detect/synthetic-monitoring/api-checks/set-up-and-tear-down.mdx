@@ -5,6 +5,8 @@ description: 'Learn how to set up and tear down an API check with Checkly.'
 sidebarTitle: Set Up and Tear Down
 ---
 
+import GenericRuntimeVariablesTable from '/snippets/generic-runtime-variables-table.mdx';
+
 Setup and teardown scripts can be used to execute arbitrary JavaScript/TypeScript code before and/or after an API check. 
 Both script types have access to all environment variables, runtime objects like `request` and `response` and popular npm packages
 like `moment`, `axios` and `lodash`.
@@ -166,7 +168,7 @@ delete process.env.SOME_OTHER_KEY
 In setup scripts, the modified environment object is used for the subsequent HTTP request. In teardown
 script, the modified environment object is just there for informational purposes.
 
-[More about using environment variables](/api-checks/variables/)
+[More about using environment variables](/platform/variables)
 
 ### Request
 
@@ -196,16 +198,18 @@ Response properties are exposed a standard Javascript object. These are only ava
 ### Built-in runtime variables
 
 [The setup and teardown runtime](/platform/runtimes/overview) also exposes a set of specific environment variables to the setup and teardown scripts,
-next to the "generic" runtime variables like `process.env.CHECK_NAME` you find in all check runtimes
+next to the "generic" runtime variables like `process.env.CHECK_NAME` you find in all check runtimes.
 
 #### Setup & teardown specific variables
 
-| variable         | description                                                |
+| Variable         | Description                                                |
 |------------------|------------------------------------------------------------|
 | `GROUP_BASE_URL` | The `{{GROUP_BASE_URL}}` value of the grouped `API` check. |
 | `REQUEST_URL`    | The request URL of the `API` check executed.               |
 
+#### Generic runtime variables
 
+<GenericRuntimeVariablesTable/>
 
 ## Included libraries
 

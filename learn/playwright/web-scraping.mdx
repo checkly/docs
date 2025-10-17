@@ -15,6 +15,10 @@ learn_playwright:
   parent: "Best practices"
 ---
 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 We call the action of extracting data from web pages _web scraping_. Scraping is useful for a variety of use cases:
 
 1. In testing and monitoring, asserting against the state of one or more elements on a page.
@@ -25,7 +29,7 @@ You can use Playwright as a library to scrape data from web pages, without also 
 
 ## Scraping element attributes & properties
 
-Below is an example running against our [test site](https://danube-web.shop/), getting and printing out the `href` attribute of the first `a` element on the homepage. 
+Below is an example running against our [test site](https://danube-web.shop/), getting and printing out the `href` attribute of the first `a` element on the homepage.
 That just happens to be our logo, which links right back to our homepage, and therefore will have an `href` value equal to the URL we navigate to using `page.goto()`:
 
 ```js title="basic-get-href-value.js"
@@ -36,10 +40,10 @@ const { chromium } = require('playwright');
   const browser = await chromium.launch();
   const page = await browser.newPage();
   await page.goto('https://danube-web.shop/');
-  
+
   const href = await page.getAttribute('a', 'href');
   console.log('First link href:', href);
-  
+
   await browser.close();
 })();
 ```
@@ -54,11 +58,11 @@ const { chromium } = require('playwright');
   const browser = await chromium.launch();
   const page = await browser.newPage();
   await page.goto('https://danube-web.shop/');
-  
+
   const element = await page.$('a');
   const href = await element.getAttribute('href');
   console.log('First link href:', href);
-  
+
   await browser.close();
 })();
 ```
@@ -77,12 +81,12 @@ const { chromium } = require('playwright');
   const browser = await chromium.launch();
   const page = await browser.newPage();
   await page.goto('https://danube-web.shop/');
-  
-  const categories = await page.$$eval('.category-link', elements => 
+
+  const categories = await page.$$eval('.category-link', elements =>
     elements.map(element => element.innerText)
   );
   console.log('Categories:', categories);
-  
+
   await browser.close();
 })();
 ```
@@ -101,14 +105,14 @@ const fs = require('fs');
   const browser = await chromium.launch();
   const page = await browser.newPage();
   await page.goto('https://danube-web.shop/');
-  
+
   const imageSrc = await page.getAttribute('img[alt="logo"]', 'src');
   console.log('Image source:', imageSrc);
-  
+
   const response = await axios.get(imageSrc, { responseType: 'stream' });
   const writer = fs.createWriteStream('logo.png');
   response.data.pipe(writer);
-  
+
   await browser.close();
 })();
 ```
@@ -133,18 +137,18 @@ const fs = require('fs');
   const browser = await chromium.launch();
   const page = await browser.newPage();
   await page.goto('https://danube-web.shop/');
-  
-  const books = await page.$$eval('.book-item', elements => 
+
+  const books = await page.$$eval('.book-item', elements =>
     elements.map(element => ({
       title: element.querySelector('.book-title').innerText,
       author: element.querySelector('.book-author').innerText,
       price: element.querySelector('.book-price').innerText
     }))
   );
-  
+
   fs.writeFileSync('books.json', JSON.stringify(books, null, 2));
   console.log('Books data saved to books.json');
-  
+
   await browser.close();
 })();
 ```

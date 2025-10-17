@@ -9,6 +9,10 @@ tags:
 sidebarTitle: Moving from Puppeteer to Playwright
 ---
 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 <Note>
 You can use our [puppeteer-to-playwright](https://github.com/checkly/puppeteer-to-playwright) conversion script to quickly migrate your Puppeteer codebase to Playwright.
 </Note>
@@ -26,7 +30,7 @@ While a comprehensive comparison of each tool's strengths and weaknesses could f
 1. As of the writing of this guide, Playwright has been frequently and consistently adding game changing features (see [below](#new-possibilities-to-be-aware-of) for a partial list) for many months, with Puppeteer releasing in turn mostly smaller changes and bug fixes. This led to a reversal of the feature gap that had once separated the two tools.
 2. Playwright maintains an edge in performance in real-world E2E scenarios (see benchmark linked above), resulting in lower execution times for test suites and faster monitoring checks.
 3. Playwright scripts seem to run even more stable than their already reliable Puppeteer counterparts.
-4. The Playwright community on [GitHub](https://github.com/microsoft/playwright/issues), [Twitter](https://twitter.com/playwrightweb), [Slack](https://aka.ms/playwright-slack) and beyond has gotten very vibrant, while Puppeteer's has gone more and more quiet. 
+4. The Playwright community on [GitHub](https://github.com/microsoft/playwright/issues), [Twitter](https://twitter.com/playwrightweb), [Slack](https://aka.ms/playwright-slack) and beyond has gotten very vibrant, while Puppeteer's has gone more and more quiet.
 
 ## What to change in your scripts - short version
 
@@ -56,7 +60,7 @@ Remember to add `await` as necessary.
 
 
 
-<Note> Did we forget anything? Please let us know by getting in touch, or [submit your own PR](https://github.com/checkly/checklyhq.com).</Note>
+<Note> Did we forget anything? Please let us know by getting in touch, or [submit your own PR](https://github.com/checkly/docs).</Note>
 
 ## What to change in your scripts - in depth
 
@@ -124,21 +128,21 @@ const page = await browser.newPage();
 
 The auto-waiting mechanism in Playwright means you will likely not need to care about explicitly waiting as often. Still, waiting being one of the trickiest bits of UI automation, you will still want to know different ways of having your script explicitly wait for one or more conditions to be met.
 
-In this area, Playwright brings about several changes you want to be mindful of: 
+In this area, Playwright brings about several changes you want to be mindful of:
 
-1. `[page.waitForNavigation](https://playwright.dev/docs/api/class-page#page-wait-for-navigation)` and `[page.waitForSelector](https://playwright.dev/docs/api/class-page#page-wait-for-selector)` remain, but in many cases will not be necessary due to auto-waiting.
+1. [page.waitForNavigation](https://playwright.dev/docs/api/class-page#page-wait-for-navigation) and `[page.waitForSelector](https://playwright.dev/docs/api/class-page#page-wait-for-selector) remain, but in many cases will not be necessary due to auto-waiting.
 
-2. `[page.waitForEvent](https://playwright.dev/docs/api/class-page#page-wait-for-event)` has been added.
+2. [page.waitForEvent](https://playwright.dev/docs/api/class-page#page-wait-for-event) has been added.
 
-3. Puppeteer's `[page.waitForXPath](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-pagewaitforxpathxpath-options)` has been incorporated into `[page.waitForSelector](https://playwright.dev/docs/api/class-page#page-wait-for-selector)`, which recognises XPath expressions automatically.
+3. Puppeteer's [page.waitForXPath](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-pagewaitforxpathxpath-options) has been incorporated into `[page.waitForSelector](https://playwright.dev/docs/api/class-page#page-wait-for-selector), which recognises XPath expressions automatically.
 
-4. `[page.waitForFileChooser](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-pagewaitforfilechooseroptions)` been removed (see the [official dedicated page](https://playwright.dev/docs/input#upload-files) and our [file upload example](https://www.checklyhq.com/learn/playwright/testing-file-uploads/) for new usage)
+4. [page.waitForFileChooser](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-pagewaitforfilechooseroptions) been removed (see the [official dedicated page](https://playwright.dev/docs/input#upload-files) and our [file upload example](https://www.checklyhq.com/learn/playwright/testing-file-uploads/) for new usage)
 
-5. `[page.waitForNetworkIdle](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-pagewaitfornetworkidleoptions)` has been generalised into `[page.waitForLoadState](https://playwright.dev/docs/api/class-page#page-wait-for-load-state)` (see the `networkidle` state to recreate previous behaviour)
+5. [page.waitForNetworkIdle](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-pagewaitfornetworkidleoptions) has been generalised into [page.waitForLoadState](https://playwright.dev/docs/api/class-page#page-wait-for-load-state) (see the `networkidle` state to recreate previous behaviour)
 
-6. `[page.waitForUrl](https://playwright.dev/docs/api/class-page#page-wait-for-url)` has been added allowing you to wait until a URL has been loaded by the page's main frame.
+6. [page.waitForUrl](https://playwright.dev/docs/api/class-page#page-wait-for-url) has been added allowing you to wait until a URL has been loaded by the page's main frame.
 
-7. `[page.waitFor(timeout)](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-pagewaitforselectororfunctionortimeout-options-args)` becomes `[page.waitForTimeout(timeout)](https://playwright.dev/docs/api/class-frame#frame-wait-for-timeout)`.
+7. [page.waitFor(timeout)](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-pagewaitforselectororfunctionortimeout-options-args) becomes `[page.waitForTimeout(timeout)](https://playwright.dev/docs/api/class-frame#frame-wait-for-timeout).
 
 > This is as good a place as any to remind that `page.waitForTimeout` should never be used in production scripts! Hard waits/sleeps should be used only for debugging purposes.
 
@@ -148,23 +152,23 @@ Puppeteer's `page.setViewport` becomes `page.setViewportSize` in Playwright.
 
 ### Typing
 
-While puppeteer's `[page.type](https://playwright.dev/docs/api/class-page#page-type)` is available in Playwright and still handles fine-grained keyboard events, Playwright adds `[page.fill](https://playwright.dev/docs/api/class-page#page-fill)` specifically for filling and clearing forms.
+While puppeteer's [page.type](https://playwright.dev/docs/api/class-page#page-type) is available in Playwright and still handles fine-grained keyboard events, Playwright adds [page.fill](https://playwright.dev/docs/api/class-page#page-fill) specifically for filling and clearing forms.
 
 ### Cookies
 
-With Puppeteer cookies are handled at the page level; with Playwright you manipulate them at the BrowserContext level. 
+With Puppeteer cookies are handled at the page level; with Playwright you manipulate them at the BrowserContext level.
 
 The old...
 
-1. `[page.cookies([...urls])](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-pagecookiesurls)`
-2. `[page.deleteCookie(...cookies)](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-pagedeletecookiecookies)`
-3. `[page.setCookie(...cookies)](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-pagesetcookiecookies)`
+1. [page.cookies([...urls])](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-pagecookiesurls)
+2. [page.deleteCookie(...cookies)](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-pagedeletecookiecookies)
+3. [page.setCookie(...cookies)](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-pagesetcookiecookies)
 
 ...become:
 
-1. `[browserContext.cookies([urls])](https://playwright.dev/docs/api/class-browsercontext#browser-context-cookies)`
-2. `[browserContext.clearCookies()](https://playwright.dev/docs/api/class-browsercontext#browser-context-clear-cookies)`
-3. `[browserContext.addCookies(cookies)](https://playwright.dev/docs/api/class-browsercontext#browser-context-add-cookies)`
+1. [browserContext.cookies([urls])](https://playwright.dev/docs/api/class-browsercontext#browser-context-cookies)
+2. [browserContext.clearCookies()](https://playwright.dev/docs/api/class-browsercontext#browser-context-clear-cookies)
+3. [browserContext.addCookies(cookies)](https://playwright.dev/docs/api/class-browsercontext#browser-context-add-cookies)
 
 Note the slight differences in the methods and how the cookies are passed to them.
 
@@ -202,13 +206,13 @@ See our [example on file download](/learn/headless/e2e-file-download/).
 
 ### File upload
 
-Puppeteer's `[elementHandle.uploadFile](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-elementhandleuploadfilefilepaths)` becomes `[elementHandle.setInputFiles](https://playwright.dev/docs/api/class-elementhandle#element-handle-set-input-files)`.
+Puppeteer's [elementHandle.uploadFile](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-elementhandleuploadfilefilepaths) becomes [elementHandle.setInputFiles](https://playwright.dev/docs/api/class-elementhandle#element-handle-set-input-files).
 
 See our [example on file upload](/learn/headless/e2e-account-settings/).
 
 ### Request interception
 
-Request interception in Puppeteer is handled via `[page.on('request', ...)](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-event-request)`:
+Request interception in Puppeteer is handled via [page.on('request', ...)](https://pptr.dev/#?product=Puppeteer&version=v11.0.0&show=api-event-request):
 
 ```js Playwright.js
 await page.setRequestInterception(true)
@@ -219,7 +223,7 @@ page.on('request', (request) => {
 })
 ```
 
-In Playwright, `[page.route](https://playwright.dev/docs/api/class-page#page-route)` can be used to intercept requests with a URL matching a specific pattern:
+In Playwright, [page.route](https://playwright.dev/docs/api/class-page#page-route) can be used to intercept requests with a URL matching a specific pattern:
 
 ```js Playwright.js
 await page.route('**/*', (route) => {
@@ -231,7 +235,7 @@ await page.route('**/*', (route) => {
 
 See our [full guide](/learn/headless/request-interception/) on request interception for more examples.
 
-> For many of the points in the list above, variations of the same function exist at `[Page](https://playwright.dev/docs/api/class-page/)`, `[Frame](https://playwright.dev/docs/api/class-frame/)` and `[ElementHandle](https://playwright.dev/docs/api/class-elementhandle/)` level. For simplicity, we reported only one. 
+> For many of the points in the list above, variations of the same function exist at [Page](https://playwright.dev/docs/api/class-page/), [Frame](https://playwright.dev/docs/api/class-frame/) and [ElementHandle](https://playwright.dev/docs/api/class-elementhandle/) level. For simplicity, we reported only one.
 
 ## New possibilities to be aware of
 
@@ -251,7 +255,7 @@ For more information on selectors and how to use them, see [our dedicated guide]
 
 ### Saving and reusing state
 
-Playwright makes it easy for you to save the authenticated state (cookies and localStorage) of a given session and reuse it for subsequent script runs. 
+Playwright makes it easy for you to save the authenticated state (cookies and localStorage) of a given session and reuse it for subsequent script runs.
 
 Reusing state can [save significant amounts of time](/learn/headless/valuable-tests/#keep-tests-independent) on larger suites by skipping the pre-authentication phase in scripts where it is not supposed to be directly tested / monitored.
 
@@ -271,7 +275,7 @@ The Inspector also comes in handy due its ability to suggest selectors for page 
 
 ### Playwright Test
 
-Playwright comes with its own runner, [Playwright Test](https://playwright.dev/docs/intro), which adds useful features around end-to-end testing, like out-of-the-box parallelisation, test fixtures, hooks and more. 
+Playwright comes with its own runner, [Playwright Test](https://playwright.dev/docs/intro), which adds useful features around end-to-end testing, like out-of-the-box parallelisation, test fixtures, hooks and more.
 
 ### Trace Viewer
 

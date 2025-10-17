@@ -14,9 +14,11 @@ learn_playwright:
   parent: "E2E examples"
 ---
 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 Searching a website is an everyday action for most internet users. For most services, the speed at which their customers are able to get to the products they are looking for is directly tied to revenue. To enable that, a performant and reliable search function is needed.
-
-
 
 ## Steps
 
@@ -31,14 +33,14 @@ import { test, expect } from '@playwright/test';
 
 test('search functionality', async ({ page }) => {
   await page.goto('https://danube-web.shop/');
-  
+
   // Enter search term
   await page.fill('#search-input', 'book');
   await page.click('#search-button');
-  
+
   // Assert expected number of results
   await expect(page.locator('.search-result')).toHaveCount(4);
-  
+
   // Assert all expected search results are shown
   await expect(page.locator('.search-result')).toContainText([
     'Haben oder haben',
@@ -55,7 +57,7 @@ Run this example as follows:
 npx playwright test search.spec.ts
 ```
 
-> When testing search on large sets of data, you might additionally need to handle result pagination, together with the possibility of duplicate results.
+<Note> When testing search on large sets of data, you might additionally need to handle result pagination, together with the possibility of duplicate results.</Note>
 
 Listing search terms and their corresponding expected results in a file could be helpful for additional, more thorough testing. The contents of the file would be then used to drive the searches and comparisons. An example could look like the following JSON:
 

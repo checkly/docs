@@ -1,18 +1,15 @@
 ---
 title: Overview
 sidebarTitle: Overview
+description: 'Run your Playwright end-to-end test suite as synthetic production monitoring.'
 tags: ['synthetic-monitoring', 'playwright-checks']
 ---
-
-import PlaywrightCheckSuiteBetaNote from '/snippets/playwright-check-suite-beta-note.mdx'
 
 <Tip>
 **Monitoring as Code**: Learn more about the [Playwright Check Suite Construct](/constructs/playwright-check).
 </Tip>
 
-<PlaywrightCheckSuiteBetaNote />
-
-## What are Playwright Checks?
+## What are Playwright Check Suites?
 
 Playwright Check Suites enable you to run entire Playwright end-to-end test suites, Playwright projects or tagged tests as pre-production tests and global production monitors, without rewriting your tests and configuration.
 
@@ -31,7 +28,7 @@ Unlike [Browser Checks](detect/synthetic-monitoring/browser-checks/overview), Pl
 - Validating application functionality after deployments
 
 
-## How Playwright Checks Work
+## How Playwright Check Suites Work
 
 <Steps>
 <Step title="1. Test Discovery">
@@ -61,9 +58,15 @@ Receive notifications when tests fail or performance degrades, keeping your team
 
 ## Test Selection
 
-Control which tests become monitoring checks using:
+Your Playwright end-to-end test suite consists of projects, `spec.ts` files and individual tests. Use Playwright Check Suites to select and regroup the tests you want to run as synthetic monitors.
 
-- **Projects**: Choose browser configurations from your Playwright config
+<Frame>
+  ![Playwright Check Suites test selection](/images/playwright-test-selection.jpg)
+</Frame>
+
+**A Playwright **Check** Suite is a collection of tests that are defined in one or more `spec.ts` files.** To control which tests become part of your Playwright Check Suite, use:
+
+- **Projects**: Choose browser and project configurations from your Playwright config
 - **Tags**: Select tests marked with specific tags (e.g., `@critical`, `@smoke`)
 - **Combinations**: Mix tags and projects for precise test selection
 
@@ -92,6 +95,10 @@ export default defineConfig({
 <Info>
 The Playwright Check Suite runner will use the `pwProjects` and `pwTags` values to configure [the native Playwright Test CLI run](https://playwright.dev/docs/test-cli). `pwProjects` reflects the `--project` and `pwTags` the `--grep` CLI options.
 </Info>
+
+<Tip>
+[Read the guide on test organization](/detect/synthetic-monitoring/playwright-checks/test-organization) to learn more about all the options for selecting and grouping tests in a Playwright Check Suite.
+</Tip>
 
 ## Monitoring Configuration
 

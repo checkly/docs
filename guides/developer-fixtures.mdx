@@ -1,11 +1,16 @@
 ---
 title: Automating Check Steps for Developers
-description: 
+description:
   When we enable developers to create page or API monitors, we want to automate as much of the code writing process as possible, so that developers can test the functionality they care about without getting bogged down in setup steps.
 tags:
   - FAQ
 sidebarTitle: Testing Fixtures
 ---
+
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 ## To involve developers in monitoring, you need to make it easy
 
 Most engineering organizations are shifting their monitoring and observability left, making developers part of the team that makes sure their service is always running and available. But we don't expect our developers to become QA and Operations experts, so we need to enable their contributions with as much automation and default configuration as possible. The goal of this guide is to help create an easy process for all your engineers to contribute to monitoring. Just like any Checkly user, developers can still control every aspect of how a monitor runs, when it detects failure, and who gets notified of that failure. This isn't about taking away control, just setting defaults and automation so that you don't need to become a monitoring expert to contribute to your team's monitoring.
@@ -75,7 +80,7 @@ Some important things to remember when working with a group of checks:
   2. group settings
   3. global settings
 
-So group settings will override global settings, and individual settings will override everything else. 
+So group settings will override global settings, and individual settings will override everything else.
 
 * While groups are a useful feature of Checkly, and will make sense for some applications, you may also be served by using Javascript and Typescript's native features for [inheritance](https://www.typescriptlang.org/docs/handbook/2/classes.html). Since files can inherit modules from others, it's possible to share configuration very cleanly, is as complex a heirarchy as you'd like, using these native features. This especially may make sense if you're going deep into [Monitoring as Code](https://docs.checklyhq.com/guides/getting-started-with-monitoring-as-code/) and want to set up a complex repository for all monitoring. Native features also help support the next section on using fixtures to share code blocks.
 
@@ -159,7 +164,7 @@ To see fixtures demonstrated, and a step-by-step explanation of the code, check 
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowfullscreen
   />
-</Frame> 
+</Frame>
 
 ## Running standardized code across every check
 While it's useful to package up tasks like logging in across multiple tests, we may want some code to run before and after every single check. Some possible examples:
@@ -217,7 +222,7 @@ To see this demonstrated, and a step-by-step explanation of the fixture code, ch
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowfullscreen
   />
-</Frame> 
+</Frame>
 
 Here's our [complete YouTube playlist on fixtures](https://www.youtube.com/playlist?list=PLMZDRUOi3a8N067UNvkxXEThKlTII_OJ-).
 

@@ -14,6 +14,10 @@ learn_playwright:
   parent: "Basics"
 ---
 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
 Playwright is built to interact with web pages the way your users would. Playwright’s flexible [selectors](https://www.checklyhq.com/learn/playwright/selectors/) and assertions mean that any automated test will dynamically find elements on the page even if they’ve slightly shifted visually. But how do you test dynamic content on your page? If the page content shifts constantly, we’d still like to be able to check that a certain version of the page is rendering correctly. In this article we’ll learn how to ‘fix’ dynamic content with API mocking, which lets you edit API responses while leaving the rest of the response dynamic.
 
 ## The problem, dynamic content on a critical page
@@ -34,7 +38,7 @@ test('Book has correct details', async ({ page }) => {
 });
 ```
 
-There are some ways to ‘fake’ the other dynamic components like price or rating: perhaps I could test only records that have a very stable price and rating. But you can imagine the trouble with trying to check a stock number: it shifts constantly! 
+There are some ways to ‘fake’ the other dynamic components like price or rating: perhaps I could test only records that have a very stable price and rating. But you can imagine the trouble with trying to check a stock number: it shifts constantly!
 
 It’s no surprise that this stock number is set on the page by a call to our books API. Let’s look at a few options to move forward with testing this page.
 
@@ -45,15 +49,15 @@ Here are some of the paths we could take with dynamic information like a book’
 1. Don’t test the dynamic content - only test things that should remain constant like the book title. This is often our default approach, but obviously means that we miss testing big chunks of the page.
 2. Populate our test assertions with an API call - if details like price are constantly shifting, it may make sense to have our test start with a request to our API, loading in details from that API, and using that response to create our assertion dynamically. One problem with this approach: if we make assertions based on the same API as the page, we’re no longer ‘testing’ that this API response looks right to us, since the response sets the requirements. For example if the API responded  `stock:"potato"`, both the page and the test would just check for “Left in stock: potato” and the test would pass.
 3. Make our assertion dynamic with a regular expression - right now our final assertion is
-    
+
     `await expect(page.locator('#app-content')).toContainText('Left in stock: 1');`
-    
+
     but the `toContainText` assertion will accept a regex, so we could write a passing test with:
-    
+
     `await expect(page.locator('#app-content')).toContainText(/Left in stock: \d/);`
-    
+
     Numbers other than 1 would now pass, but if the page rendered “Left in stock: potato” the test would fail. Solving this (and most other) dynamic content problems with a regex has two major drawbacks:
-    
+
     - When writing easy-to-maintain testing, a regex should not be the tool we use first. Not every developer finds regex patterns easy to read or edit.
     - Not everything is particularly easy to test with regex, for example the `rating` api response here comes back as Unicode stars like “★★★★☆,” which isn’t as straightforward to test with regex as a digit.
 4. Modify the API response - Finally the option that gives us high consistency in what we’re testing and what we expect in response. By modifying the API response we can set only the key value pairs that concern us to fixed values, letting the others remain dynamic. We test how the page renders with fixed data, *and* we’re still testing that the API is available.
@@ -96,7 +100,7 @@ test('Book has correct details', async ({ page }) => {
 });
 ```
 
-Now we can run this check as often as we like and be sure that the current stock will always be 12. 
+Now we can run this check as often as we like and be sure that the current stock will always be 12.
 
 Note that, if you’re using the Playwright UI, this mocking behavior will show up in the UI, as the API request will have two lines in the ‘Network’ tab
 
@@ -130,7 +134,7 @@ test('Book has correct details', async ({ page }) => {
 });
 ```
 
-Now we no longer wait for this API response to come back and supply the whole response. As mentioned in the section above this has the benefit of delivering consistent results and removing the dependency on the API. In the Checkly UI, we can actually see that removing this API request and supplying a response significantly [speeds up](https://www.checklyhq.com/blog/speed-up-playwright-scripts-request-interception/) the overall test execution. 
+Now we no longer wait for this API response to come back and supply the whole response. As mentioned in the section above this has the benefit of delivering consistent results and removing the dependency on the API. In the Checkly UI, we can actually see that removing this API request and supplying a response significantly [speeds up](https://www.checklyhq.com/blog/speed-up-playwright-scripts-request-interception/) the overall test execution.
 
 ![Our e-commerce storefront](/images/learn/images/mock-api-03.png)
 
@@ -171,7 +175,7 @@ Sure enough, the behavior of our web store isn’t correct, with an out-of-stock
 
 *Whatever happens when you click ‘Add To Cart’ here it won’t be satisfying for the user*
 
-We can also stress test the UI in other ways: returning very large numbers for the data fields, or very long text blobs to make sure the UI still renders correctly. 
+We can also stress test the UI in other ways: returning very large numbers for the data fields, or very long text blobs to make sure the UI still renders correctly.
 
 ### Editing API responses and visual regression tests
 

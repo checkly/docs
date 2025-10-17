@@ -13,7 +13,11 @@ learn_playwright:
   parent: "Basics"
 ---
 
-Playwright enables us to control multiple browser tabs, albeit in different ways. 
+import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+
+<PlaywrightCheckSuiteTryOut />
+
+Playwright enables us to control multiple browser tabs, albeit in different ways.
 
 ## Opening tabs directly
 
@@ -42,12 +46,12 @@ test('open multiple tabs', async ({ browser }) => {
 
 ## Handling links that open a new tab
 
-Controlling tabs that are opened after a click on an element on the page can be trickier. Let's explore this through an example: 
+Controlling tabs that are opened after a click on an element on the page can be trickier. Let's explore this through an example:
 
 - Navigating to `https://checklyhq.com/docs`.
 - Opening a new tab by clicking the link to the Checkly YouTube channel which opens in a new tab.
 
-By allowing us to wait for the creation of a child tab with `page.waitForEvent`, Playwright enables us to "catch" it following a click on an element with `target="_blank"`, and then seamlessly interact with any of the currently open tabs. 
+By allowing us to wait for the creation of a child tab with `page.waitForEvent`, Playwright enables us to "catch" it following a click on an element with `target="_blank"`, and then seamlessly interact with any of the currently open tabs.
 
 ```ts multitab-flows.spec.ts
 import { test } from '@playwright/test'

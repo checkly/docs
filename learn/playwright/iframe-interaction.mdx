@@ -19,7 +19,14 @@ Playwright enables us to access and interact with iframes.
 To access iframe elements, locate the iframe and query the DOM elements as if you're in the page context.
 
 ```ts iframe-access.spec.ts
-// Example code - see original file for details
+import { test } from '@playwright/test'
+
+test('access iframe content', async ({ page }) => {
+  await page.goto('https://your-page-with-an-iframe.com')
+  const header = await page.frameLocator('iframe').locator('h1')
+  console.log(await header.innerText())
+})
+
 ```
 
 ## Further reading

@@ -39,7 +39,13 @@ In the example below we trigger two navigations:
 2. A navigation to the shopping cart by clicking a link
 
 ```ts basic-browser-navigation.spec.ts
-// Example code - see original file for details
+import { test } from '@playwright/test'
+
+test('basic navigation', async ({ page }) => {
+  await page.goto('https://danube-web.shop/')
+  await page.click('#cart')
+})
+
 ```
 
 
@@ -57,7 +63,15 @@ In the example below, we type an email address into an input field on a login mo
 built-in waiting functionality.
 
 ```ts basic-browser-waiting.spec.ts
-// Example code - see original file for details
+import { test } from '@playwright/test'
+
+test('basic built-in waiting', async ({ page }) => {
+  await page.goto('https://danube-web.shop/')
+  await page.getByRole('button', { name: 'Log in' }).click()
+  await page.getByPlaceholder('Email').click()
+  await page.getByPlaceholder('Email').fill('test@test.com')
+})
+
 ```
 Run this example as follows:
 

@@ -158,10 +158,8 @@ To see one way this can look like, see our [example repository](https://github.c
 
 ## Global configuration
 
-We are gradually rolling out support for global configuration options for the Playwright Test Runner. This allows you to 
+We are gradually rolling out support for global configuration options for the Playwright Test Runner. This allows you to
 configure your Playwright tests in a single place, instead of having to repeat the same configuration for each test file.
-
-<Warning> This feature is in **beta** and is only available when using the Checkly CLI to manage your checks and associated `.spec.ts|js` files.</Warning>
 
 There are three things you should be aware of:
 1. You can only use a subset of the Playwright config options. See the [supported configuration options](#supported-configuration-options) section for more information.
@@ -169,7 +167,7 @@ There are three things you should be aware of:
 3. We explicitly do not read from the existing `playwright.config.ts` or `playwright.config.js` file in your project. This is to avoid any confusion about which config file is used to run your tests and to prevent any unexpected behaviour.
 
 
-If you have an existing `playwright.config.ts` or `playwright.config.js` file in your project that you want to import, 
+If you have an existing `playwright.config.ts` or `playwright.config.js` file in your project that you want to import,
 you can simply run the [sync-playwright](/cli/checkly-sync-playwright)
 
 ```bash
@@ -389,7 +387,7 @@ await expect(page).toHaveScreenshot('homepage.png')
 test('Mobile checkout workflow', async ({ page }) => {
   // Simulate iPhone 12
   await page.setViewportSize({ width: 390, height: 844 })
-  
+
   // Test mobile-specific interactions
   await page.goto('https://shop.example.com')
   await page.click('[data-testid="mobile-menu-toggle"]')
@@ -417,7 +415,7 @@ test('Setup authentication', async ({ page }) => {
   await page.fill('[name="email"]', process.env.TEST_EMAIL)
   await page.fill('[name="password"]', process.env.TEST_PASSWORD)
   await page.click('[type="submit"]')
-  
+
   // Save authentication state
   await page.context().storageState({ path: 'auth-state.json' })
 })

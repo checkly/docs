@@ -163,7 +163,7 @@ While Playwright and Selenium are both used for similar roles as test automation
 
 ## 
 
-## Selenium Examples
+## Selenium Example
 
 Here’s a test that simulates a user logging in and loading recent transactions. The automation then takes a screenshot.
 
@@ -186,25 +186,23 @@ async function loginAndCaptureScreenshot() {
     // Step 3: Click the login button
     await driver.findElement(By.id('login-button')).click();
 
-    // Step 4: Wait until the transactions page is loaded
+    // Step 4: Wait until the recent transactions button is loaded
+    await driver.wait(until.elementLocated(By.id('recent-transactions-button')), 10000);
+    
+    // Step 5: Click recent transactions
+    await driver.findElement(By.id('recent-transactions-button')).click();
+
+    // Step 6: Wait until the recent transactions are loaded
     await driver.wait(until.elementLocated(By.id('recent-transactions')), 10000);
 
-    // Step 5: Load recent transactions
-    const transactionsElement = await driver.findElement(By.id('recent-transactions'));
-
-    // Verify transactions are visible (optional)
-    const isDisplayed = await transactionsElement.isDisplayed();
-    console.log('Transactions loaded:', isDisplayed);
-
-    // Step 6: Take a screenshot
+    // Step 7: Take a screenshot
     const screenshot = await driver.takeScreenshot();
     fs.writeFileSync('screenshot.png', screenshot, 'base64');
-    console.log('Screenshot taken and saved as screenshot.png');
 
   } catch (error) {
     console.error('An error occurred:', error);
   } finally {
-    // Step 7: Close the browser
+    // Step 8: Close the browser
     await driver.quit();
   }
 }
@@ -213,33 +211,30 @@ async function loginAndCaptureScreenshot() {
 loginAndCaptureScreenshot()
 ```
 
-## Playwright Examples
+## Playwright Example
 
 Here’s the same test in Playwright:
 
 ```js
-const { chromium } = require('playwright');
+import { test, expect } from '@playwright/test'
 
-async function loginAndCaptureScreenshot() {
+test('login and capture screenshot', async ({ page }) => {
     // Step 1: Navigate to the login page
     await page.goto('https://www.example-service.com/login');
     
     // Step 2: Enter login credentials
-	  await page.getByLabel('Username or email address').fill('username');
-	  await page.getByLabel('Password').fill('password');
-	  
+    await page.getByLabel('Username or email address').fill('username');
+    await page.getByLabel('Password').fill('password');
+    
     // Step 3: Click the login button
-	  await page.getByRole('button', { name: 'Sign in' }).click();
-	  
-	  // Step 4: Click recent transactions
-	  await page.getByLabel('Transactions').click()
-	  
-	  // Step 5: Take a screenshot
-	  await page.screenshot({ path: 'screenshot.png', fullPage: true });
-}
-
-// Run the test
-loginAndCaptureScreenshot()
+    await page.getByRole('button', { name: 'Sign in' }).click();
+    
+    // Step 4: Click recent transactions
+    await page.getByLabel('Transactions').click()
+    
+    // Step 5: Take a screenshot
+    await page.screenshot({ path: 'screenshot.png', fullPage: true });
+})
 ```
 
 Some key differences in the two examples:

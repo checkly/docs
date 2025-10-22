@@ -1,7 +1,6 @@
 ---
-title: Using npm packages and local dependencies
+title: Using NPM packages and local dependencies
 sidebarTitle: NPM & Local Dependencies
-
 ---
 
 Checkly lets you use JavaScript / TypeScript in your Browser and Multistep checks, and in API check setup & teardown scripts.
@@ -60,7 +59,7 @@ export async function gitHubLogin (page, username, password) {
 
 In `login.spec.ts` we define the actual Playwright test. This file can import the `gitHubLogin` function from `login-helper.ts`.
 
-It also reads the username and password from [remote environment variables](/cli/environment-variables).
+It also reads the username and password from [remote environment variables](/cli/environment-variables#remote-environment-variables).
 
 ```ts login.spec.ts
 // @ts-ignore
@@ -75,7 +74,7 @@ test('Github login', async ({ page }) => {
 })
 ```
 
-`login.check.ts` initializes a new [BrowserCheck construct](/cli/constructs-reference/#browsercheck). Note that it's only necessary to configure the main Playwright file `login.spec.ts`. The `login-helper.ts` dependency is automatically detected by the CLI.
+`login.check.ts` initializes a new [BrowserCheck construct](/constructs/browser-check). Note that it's only necessary to configure the main Playwright file `login.spec.ts`. The `login-helper.ts` dependency is automatically detected by the CLI.
 
 ```ts login.check.ts
 import { BrowserCheck } from 'checkly/constructs'

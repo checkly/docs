@@ -5113,6 +5113,193 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                 }
             }
         },
+        "/v1/checks/dns": {
+            "post": {
+                "summary": "Create an DNS monitor",
+                "operationId": "postV1ChecksDns",
+                "description": "Creates a new DNS monitor. Will return a `402` when you are over the limit of your plan.\n    When using the `globalAlertSetting`, the `alertSetting` can be `null`",
+                "parameters": [
+                    {
+                        "description": "Your Checkly account ID, you can find it at https://app.checklyhq.com/settings/account/general",
+                        "x-format": {
+                            "guid": true
+                        },
+                        "name": "x-checkly-account",
+                        "in": "header",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Determines whether a new check will automatically be added as a subscriber to all existing alert channels when it gets created.",
+                        "name": "autoAssignAlerts",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CheckURLCreate"
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Checks"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MonitorDNS"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    },
+                    "402": {
+                        "description": "Payment Required",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentRequiredError"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ForbiddenError"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TooManyRequestsError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/checks/dns/{id}": {
+            "put": {
+                "summary": "Update an DNS Monitor",
+                "operationId": "putV1ChecksDnsId",
+                "description": "Updates an DNS monitor.",
+                "parameters": [
+                    {
+                        "description": "Your Checkly account ID, you can find it at https://app.checklyhq.com/settings/account/general",
+                        "x-format": {
+                            "guid": true
+                        },
+                        "name": "x-checkly-account",
+                        "in": "header",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "x-format": {
+                            "guid": true
+                        },
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Determines whether a new check will automatically be added as a subscriber to all existing alert channels when it gets created.",
+                        "name": "autoAssignAlerts",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CheckURLUpdate"
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Monitors"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MonitorDNS"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UnauthorizedError"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ForbiddenError"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TooManyRequestsError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/v1/checks/heartbeat": {
             "post": {
                 "summary": "Create a heartbeat check",
@@ -5335,7 +5522,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "default": "2025-10-22T02:33:28.031Z"
+                            "default": "2025-10-24T02:32:15.462Z"
                         }
                     },
                     {
@@ -5345,7 +5532,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "default": "2025-10-23T02:33:28.031Z"
+                            "default": "2025-10-25T02:32:15.462Z"
                         }
                     }
                 ],
@@ -5358,7 +5545,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model122"
+                                    "$ref": "#/components/schemas/Model142"
                                 }
                             }
                         }
@@ -5441,7 +5628,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "default": "2025-10-22T02:33:28.033Z"
+                            "default": "2025-10-24T02:32:15.465Z"
                         }
                     },
                     {
@@ -5451,7 +5638,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "schema": {
                             "type": "string",
                             "format": "date",
-                            "default": "2025-10-23T02:33:28.033Z"
+                            "default": "2025-10-25T02:32:15.465Z"
                         }
                     },
                     {
@@ -5473,7 +5660,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model125"
+                                    "$ref": "#/components/schemas/Model145"
                                 }
                             }
                         }
@@ -5570,7 +5757,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model126"
+                                    "$ref": "#/components/schemas/Model146"
                                 }
                             }
                         }
@@ -6023,7 +6210,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CheckURLCreate"
+                                "$ref": "#/components/schemas/Model201"
                             }
                         }
                     }
@@ -6127,7 +6314,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CheckURLUpdate"
+                                "$ref": "#/components/schemas/Model219"
                             }
                         }
                     }
@@ -7069,7 +7256,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Model207"
+                                "$ref": "#/components/schemas/Model229"
                             }
                         }
                     }
@@ -7385,7 +7572,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Model211"
+                                "$ref": "#/components/schemas/Model233"
                             }
                         }
                     }
@@ -7399,7 +7586,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model215"
+                                    "$ref": "#/components/schemas/Model237"
                                 }
                             }
                         }
@@ -7562,7 +7749,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model215"
+                                    "$ref": "#/components/schemas/Model237"
                                 }
                             }
                         }
@@ -7649,7 +7836,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Model216"
+                                "$ref": "#/components/schemas/Model238"
                             }
                         }
                     }
@@ -7663,7 +7850,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model217"
+                                    "$ref": "#/components/schemas/Model239"
                                 }
                             }
                         }
@@ -7744,7 +7931,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Model210"
+                                "$ref": "#/components/schemas/Model232"
                             }
                         }
                     }
@@ -7928,7 +8115,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Model218"
+                                "$ref": "#/components/schemas/Model240"
                             }
                         }
                     }
@@ -7942,7 +8129,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model213"
+                                    "$ref": "#/components/schemas/Model235"
                                 }
                             }
                         }
@@ -10102,7 +10289,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model230"
+                                    "$ref": "#/components/schemas/Model252"
                                 }
                             }
                         }
@@ -10167,7 +10354,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     }
                 ],
                 "requestBody": {
-                    "$ref": "#/components/requestBodies/Model235"
+                    "$ref": "#/components/requestBodies/Model257"
                 },
                 "tags": [
                     "Status Pages"
@@ -10178,7 +10365,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model236"
+                                    "$ref": "#/components/schemas/Model258"
                                 }
                             }
                         }
@@ -10271,7 +10458,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model241"
+                                    "$ref": "#/components/schemas/Model263"
                                 }
                             }
                         }
@@ -10339,7 +10526,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Model248"
+                                "$ref": "#/components/schemas/Model270"
                             }
                         }
                     }
@@ -10353,7 +10540,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model239"
+                                    "$ref": "#/components/schemas/Model261"
                                 }
                             }
                         }
@@ -10523,7 +10710,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model239"
+                                    "$ref": "#/components/schemas/Model261"
                                 }
                             }
                         }
@@ -10602,7 +10789,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Model251"
+                                "$ref": "#/components/schemas/Model273"
                             }
                         }
                     }
@@ -10616,7 +10803,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model239"
+                                    "$ref": "#/components/schemas/Model261"
                                 }
                             }
                         }
@@ -10702,7 +10889,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model252"
+                                    "$ref": "#/components/schemas/Model274"
                                 }
                             }
                         }
@@ -10778,7 +10965,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     }
                 ],
                 "requestBody": {
-                    "$ref": "#/components/requestBodies/Model246"
+                    "$ref": "#/components/requestBodies/Model268"
                 },
                 "tags": [
                     "Status Page Incidents"
@@ -10789,7 +10976,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model246"
+                                    "$ref": "#/components/schemas/Model268"
                                 }
                             }
                         }
@@ -10981,7 +11168,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model246"
+                                    "$ref": "#/components/schemas/Model268"
                                 }
                             }
                         }
@@ -11068,7 +11255,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     }
                 ],
                 "requestBody": {
-                    "$ref": "#/components/requestBodies/Model246"
+                    "$ref": "#/components/requestBodies/Model268"
                 },
                 "tags": [
                     "Status Page Incidents"
@@ -11079,7 +11266,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model246"
+                                    "$ref": "#/components/schemas/Model268"
                                 }
                             }
                         }
@@ -11179,7 +11366,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model254"
+                                    "$ref": "#/components/schemas/Model276"
                                 }
                             }
                         }
@@ -11243,7 +11430,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     }
                 ],
                 "requestBody": {
-                    "$ref": "#/components/requestBodies/Model255"
+                    "$ref": "#/components/requestBodies/Model277"
                 },
                 "tags": [
                     "Status Page Services"
@@ -11254,7 +11441,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model222"
+                                    "$ref": "#/components/schemas/Model244"
                                 }
                             }
                         }
@@ -11415,7 +11602,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model222"
+                                    "$ref": "#/components/schemas/Model244"
                                 }
                             }
                         }
@@ -11490,7 +11677,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     }
                 ],
                 "requestBody": {
-                    "$ref": "#/components/requestBodies/Model255"
+                    "$ref": "#/components/requestBodies/Model277"
                 },
                 "tags": [
                     "Status Page Services"
@@ -11501,7 +11688,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model222"
+                                    "$ref": "#/components/schemas/Model244"
                                 }
                             }
                         }
@@ -11671,7 +11858,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model236"
+                                    "$ref": "#/components/schemas/Model258"
                                 }
                             }
                         }
@@ -11747,7 +11934,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                     }
                 ],
                 "requestBody": {
-                    "$ref": "#/components/requestBodies/Model235"
+                    "$ref": "#/components/requestBodies/Model257"
                 },
                 "tags": [
                     "Status Pages"
@@ -11758,7 +11945,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model236"
+                                    "$ref": "#/components/schemas/Model258"
                                 }
                             }
                         }
@@ -12474,7 +12661,7 @@ This endpoint will return data within a 6-hour timeframe. If the `from` and `to`
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Model258"
+                                    "$ref": "#/components/schemas/Model280"
                                 }
                             }
                         }
@@ -13308,11 +13495,29 @@ You can filter by check type and result type to narrow down the list. Use the `t
                     }
                 }
             },
+            "Model268": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Model268"
+                        }
+                    }
+                }
+            },
             "CheckGroupCreateOrUpdateV2": {
                 "content": {
                     "application/json": {
                         "schema": {
                             "$ref": "#/components/schemas/CheckGroupCreateOrUpdateV2"
+                        }
+                    }
+                }
+            },
+            "Model277": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/Model277"
                         }
                     }
                 }
@@ -13326,29 +13531,11 @@ You can filter by check type and result type to narrow down the list. Use the `t
                     }
                 }
             },
-            "Model235": {
+            "Model257": {
                 "content": {
                     "application/json": {
                         "schema": {
-                            "$ref": "#/components/schemas/Model235"
-                        }
-                    }
-                }
-            },
-            "Model246": {
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "$ref": "#/components/schemas/Model246"
-                        }
-                    }
-                }
-            },
-            "Model255": {
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "$ref": "#/components/schemas/Model255"
+                            "$ref": "#/components/schemas/Model257"
                         }
                     }
                 }
@@ -22418,57 +22605,124 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/Model29"
                 }
             },
-            "periodUnit": {
+            "recordType": {
                 "type": "string",
                 "enum": [
-                    "seconds",
-                    "minutes",
-                    "hours",
-                    "days"
+                    "A",
+                    "AAAA",
+                    "CNAME",
+                    "MX",
+                    "TXT",
+                    "SOA",
+                    "NS"
                 ]
             },
-            "graceUnit": {
+            "DnsMonitorAssertionSource": {
                 "type": "string",
                 "enum": [
-                    "seconds",
-                    "minutes",
-                    "hours",
-                    "days"
+                    "RESPONSE_TIME",
+                    "RESPONSE_CODE",
+                    "TEXT_ANSWER",
+                    "JSON_ANSWER"
+                ]
+            },
+            "DnsMonitorAssertionComparison": {
+                "type": "string",
+                "enum": [
+                    "EQUALS",
+                    "NOT_EQUALS",
+                    "HAS_KEY",
+                    "NOT_HAS_KEY",
+                    "HAS_VALUE",
+                    "NOT_HAS_VALUE",
+                    "IS_EMPTY",
+                    "NOT_EMPTY",
+                    "GREATER_THAN",
+                    "LESS_THAN",
+                    "CONTAINS",
+                    "NOT_CONTAINS",
+                    "IS_NULL",
+                    "NOT_NULL"
                 ]
             },
             "Model113": {
                 "type": "object",
                 "properties": {
-                    "period": {
-                        "type": "number",
-                        "description": "Interval expected between pings."
-                    },
-                    "periodUnit": {
-                        "$ref": "#/components/schemas/periodUnit"
-                    },
-                    "grace": {
-                        "type": "number",
-                        "description": "Grace added to the period."
-                    },
-                    "graceUnit": {
-                        "$ref": "#/components/schemas/graceUnit"
-                    },
-                    "pingToken": {
+                    "property": {
                         "type": "string",
-                        "description": "UUID token used to build a unique ping URL.",
-                        "x-format": {
-                            "guid": true
-                        }
+                        "default": ""
+                    },
+                    "target": {
+                        "type": "string",
+                        "default": ""
+                    },
+                    "regex": {
+                        "type": "string",
+                        "default": ""
+                    },
+                    "source": {
+                        "$ref": "#/components/schemas/DnsMonitorAssertionSource"
+                    },
+                    "comparison": {
+                        "$ref": "#/components/schemas/DnsMonitorAssertionComparison"
+                    }
+                }
+            },
+            "DnsMonitorAssertionList": {
+                "type": "array",
+                "description": "Check the main Checkly documentation on assertions.",
+                "example": [
+                    {
+                        "source": "RESPONSE_CODE",
+                        "comparison": "EQUALS",
+                        "target": "NOERROR"
+                    }
+                ],
+                "items": {
+                    "$ref": "#/components/schemas/Model113"
+                }
+            },
+            "protocol": {
+                "type": "string",
+                "default": "UDP",
+                "enum": [
+                    "TCP",
+                    "UDP"
+                ]
+            },
+            "DnsMonitorRequest": {
+                "type": "object",
+                "description": "Determines the request that the DNS monitor is going to run.",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "example": "api.checklyhq.com",
+                        "maxLength": 100
+                    },
+                    "nameServer": {
+                        "type": "string",
+                        "default": "",
+                        "maxLength": 100
+                    },
+                    "port": {
+                        "type": "number"
+                    },
+                    "recordType": {
+                        "$ref": "#/components/schemas/recordType"
+                    },
+                    "assertions": {
+                        "$ref": "#/components/schemas/DnsMonitorAssertionList"
+                    },
+                    "protocol": {
+                        "$ref": "#/components/schemas/protocol"
                     }
                 },
                 "required": [
-                    "period",
-                    "periodUnit",
-                    "grace",
-                    "graceUnit"
+                    "query",
+                    "recordType"
                 ]
             },
-            "CheckHeartbeatCreate": {
+            "CheckURLCreate": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -22529,6 +22783,841 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "alertChannelSubscriptions": {
                         "$ref": "#/components/schemas/Model112"
                     },
+                    "retryStrategy": {
+                        "$ref": "#/components/schemas/RetryStrategy"
+                    },
+                    "triggerIncident": {
+                        "$ref": "#/components/schemas/TriggerIncident"
+                    },
+                    "runParallel": {
+                        "type": "boolean",
+                        "description": "When true, the check will run in parallel in all selected locations.",
+                        "default": false
+                    },
+                    "frequency": {
+                        "type": "integer",
+                        "description": "How often the check should run in minutes.",
+                        "default": 10,
+                        "enum": [
+                            0,
+                            1,
+                            2,
+                            5,
+                            10,
+                            15,
+                            30,
+                            60,
+                            120,
+                            180,
+                            360,
+                            720,
+                            1440
+                        ]
+                    },
+                    "frequencyOffset": {
+                        "type": "integer",
+                        "description": "Used for setting seconds for check frequencies under 1 minutes (only for API & TCP checks) and spreading checks over a time range for frequencies over 1 minute. This works as follows: Checks with a frequency of 0 can have a frequencyOffset of 10, 20 or 30 meaning they will run every 10, 20 or 30 seconds. Checks with a frequency lower than and equal to 60 can have a frequencyOffset between 1 and a max value based on the formula \"Math.floor(frequency * 10)\", i.e. for a check that runs every 5 minutes the max frequencyOffset is 50. Checks with a frequency higher than 60 can have a frequencyOffset between 1 and a max value based on the formula \"Math.ceil(frequency / 60)\", i.e. for a check that runs every 720 minutes, the max frequencyOffset is 12. ",
+                        "minimum": 1
+                    },
+                    "request": {
+                        "$ref": "#/components/schemas/DnsMonitorRequest"
+                    },
+                    "heartbeat": {
+                        "$ref": "#/components/schemas/heartbeat"
+                    },
+                    "script": {
+                        "type": "string"
+                    },
+                    "scriptPath": {
+                        "type": "string",
+                        "description": "Path of the script in the runtime."
+                    },
+                    "sslCheckDomain": {
+                        "type": "string"
+                    },
+                    "environmentVariables": {
+                        "$ref": "#/components/schemas/CheckEnvironmentVariableList"
+                    },
+                    "setupSnippetId": {
+                        "type": "number",
+                        "description": "An ID reference to a snippet to use in the setup phase of an API check.",
+                        "default": null
+                    },
+                    "tearDownSnippetId": {
+                        "type": "number",
+                        "description": "An ID reference to a snippet to use in the teardown phase of an API check.",
+                        "default": null
+                    },
+                    "localSetupScript": {
+                        "type": "string",
+                        "description": "A valid piece of Node.js code to run in the setup phase.",
+                        "default": null
+                    },
+                    "localTearDownScript": {
+                        "type": "string",
+                        "description": "A valid piece of Node.js code to run in the teardown phase.",
+                        "default": null
+                    },
+                    "degradedResponseTime": {
+                        "type": "number",
+                        "description": "The response time in milliseconds where a check should be considered degraded.",
+                        "default": 500,
+                        "minimum": 0,
+                        "maximum": 500
+                    },
+                    "maxResponseTime": {
+                        "type": "number",
+                        "description": "The response time in milliseconds where a check should be considered failing.",
+                        "default": 1000,
+                        "minimum": 0,
+                        "maximum": 1000
+                    }
+                },
+                "required": [
+                    "name",
+                    "request",
+                    "heartbeat",
+                    "script"
+                ]
+            },
+            "Model114": {
+                "type": "string",
+                "enum": [
+                    "us-east-1",
+                    "us-east-2",
+                    "us-west-1",
+                    "us-west-2",
+                    "ca-central-1",
+                    "sa-east-1",
+                    "eu-west-1",
+                    "eu-central-1",
+                    "eu-west-2",
+                    "eu-west-3",
+                    "eu-north-1",
+                    "eu-south-1",
+                    "me-south-1",
+                    "ap-southeast-1",
+                    "ap-northeast-1",
+                    "ap-east-1",
+                    "ap-southeast-2",
+                    "ap-southeast-3",
+                    "ap-northeast-2",
+                    "ap-northeast-3",
+                    "ap-south-1",
+                    "af-south-1"
+                ]
+            },
+            "Model115": {
+                "type": "array",
+                "description": "An array of one or more data center locations where to run this check.",
+                "example": [
+                    "us-east-1",
+                    "eu-central-1"
+                ],
+                "items": {
+                    "$ref": "#/components/schemas/Model114"
+                }
+            },
+            "Model116": {
+                "type": "string",
+                "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute this check.",
+                "default": null,
+                "enum": [
+                    "2025.04",
+                    "2024.09",
+                    "2024.02",
+                    "2023.09",
+                    "2023.02",
+                    "2022.10"
+                ]
+            },
+            "Model117": {
+                "type": "object",
+                "description": "Determines the request that the DNS monitor is going to run.",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "example": "api.checklyhq.com",
+                        "maxLength": 100
+                    },
+                    "nameServer": {
+                        "type": "string",
+                        "default": "",
+                        "maxLength": 100
+                    },
+                    "port": {
+                        "type": "number"
+                    },
+                    "recordType": {
+                        "$ref": "#/components/schemas/recordType"
+                    },
+                    "assertions": {
+                        "$ref": "#/components/schemas/DnsMonitorAssertionList"
+                    },
+                    "protocol": {
+                        "$ref": "#/components/schemas/protocol"
+                    }
+                },
+                "required": [
+                    "query",
+                    "recordType"
+                ]
+            },
+            "Model118": {
+                "type": "string",
+                "enum": [
+                    "DNS"
+                ]
+            },
+            "MonitorDNS": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "9d6df684-0bc3-4a38-a094-4e97627dd93e"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the check.",
+                        "example": "Check"
+                    },
+                    "activated": {
+                        "type": "boolean",
+                        "description": "Determines if the check is running or not.",
+                        "default": true
+                    },
+                    "muted": {
+                        "type": "boolean",
+                        "description": "Determines if any notifications will be send out when a check fails and/or recovers.",
+                        "default": false
+                    },
+                    "doubleCheck": {
+                        "type": "boolean",
+                        "description": "[Deprecated] Retry failed check runs. This property is deprecated, and `retryStrategy` can be used instead.",
+                        "default": true
+                    },
+                    "shouldFail": {
+                        "type": "boolean",
+                        "description": "Allows to invert the behaviour of when a check is considered to fail. Allows for validating error status like 404.",
+                        "default": false
+                    },
+                    "locations": {
+                        "$ref": "#/components/schemas/Model115"
+                    },
+                    "tags": {
+                        "$ref": "#/components/schemas/CheckTagList"
+                    },
+                    "alertSettings": {
+                        "$ref": "#/components/schemas/CheckAlertSettings"
+                    },
+                    "useGlobalAlertSettings": {
+                        "type": "boolean",
+                        "description": "When true, the account level alert setting will be used, not the alert setting defined on this check.",
+                        "default": true
+                    },
+                    "groupId": {
+                        "type": "number",
+                        "description": "The id of the check group this check is part of.",
+                        "example": "null",
+                        "default": null
+                    },
+                    "groupOrder": {
+                        "type": "number",
+                        "description": "The position of this check in a check group. It determines in what order checks are run when a group is triggered from the API or from CI/CD.",
+                        "example": "null",
+                        "default": null,
+                        "minimum": 0
+                    },
+                    "runtimeId": {
+                        "$ref": "#/components/schemas/Model116"
+                    },
+                    "alertChannelSubscriptions": {
+                        "$ref": "#/components/schemas/CheckAlertChannelSubscriptionList"
+                    },
+                    "retryStrategy": {
+                        "$ref": "#/components/schemas/RetryStrategy"
+                    },
+                    "triggerIncident": {
+                        "$ref": "#/components/schemas/TriggerIncident"
+                    },
+                    "runParallel": {
+                        "type": "boolean",
+                        "description": "When true, the check will run in parallel in all selected locations.",
+                        "default": false
+                    },
+                    "frequency": {
+                        "type": "integer",
+                        "description": "How often the check should run in minutes.",
+                        "default": 10,
+                        "enum": [
+                            0,
+                            1,
+                            2,
+                            5,
+                            10,
+                            15,
+                            30,
+                            60,
+                            120,
+                            180,
+                            360,
+                            720,
+                            1440
+                        ]
+                    },
+                    "frequencyOffset": {
+                        "type": "integer",
+                        "description": "Used for setting seconds for check frequencies under 1 minutes (only for API & TCP checks) and spreading checks over a time range for frequencies over 1 minute. This works as follows: Checks with a frequency of 0 can have a frequencyOffset of 10, 20 or 30 meaning they will run every 10, 20 or 30 seconds. Checks with a frequency lower than and equal to 60 can have a frequencyOffset between 1 and a max value based on the formula \"Math.floor(frequency * 10)\", i.e. for a check that runs every 5 minutes the max frequencyOffset is 50. Checks with a frequency higher than 60 can have a frequencyOffset between 1 and a max value based on the formula \"Math.ceil(frequency / 60)\", i.e. for a check that runs every 720 minutes, the max frequencyOffset is 12. ",
+                        "minimum": 1
+                    },
+                    "degradedResponseTime": {
+                        "type": "number"
+                    },
+                    "maxResponseTime": {
+                        "type": "number"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "alertChannels": {
+                        "$ref": "#/components/schemas/CheckAlertChannels"
+                    },
+                    "request": {
+                        "$ref": "#/components/schemas/Model117"
+                    },
+                    "checkType": {
+                        "$ref": "#/components/schemas/Model118"
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            },
+            "Model119": {
+                "type": "string",
+                "enum": [
+                    "us-east-1",
+                    "us-east-2",
+                    "us-west-1",
+                    "us-west-2",
+                    "ca-central-1",
+                    "sa-east-1",
+                    "eu-west-1",
+                    "eu-central-1",
+                    "eu-west-2",
+                    "eu-west-3",
+                    "eu-north-1",
+                    "eu-south-1",
+                    "me-south-1",
+                    "ap-southeast-1",
+                    "ap-northeast-1",
+                    "ap-east-1",
+                    "ap-southeast-2",
+                    "ap-southeast-3",
+                    "ap-northeast-2",
+                    "ap-northeast-3",
+                    "ap-south-1",
+                    "af-south-1"
+                ]
+            },
+            "Model120": {
+                "type": "array",
+                "description": "An array of one or more data center locations where to run this check.",
+                "example": [
+                    "us-east-1",
+                    "eu-central-1"
+                ],
+                "items": {
+                    "$ref": "#/components/schemas/Model119"
+                }
+            },
+            "Model121": {
+                "type": "object",
+                "description": "Alert settings.",
+                "default": {
+                    "escalationType": "RUN_BASED",
+                    "runBasedEscalation": {
+                        "failedRunThreshold": 1
+                    },
+                    "reminders": {
+                        "amount": 0,
+                        "interval": 5
+                    },
+                    "parallelRunFailureThreshold": {
+                        "enabled": false,
+                        "percentage": 10
+                    }
+                },
+                "properties": {
+                    "escalationType": {
+                        "$ref": "#/components/schemas/escalationType"
+                    },
+                    "reminders": {
+                        "$ref": "#/components/schemas/AlertSettingsReminders"
+                    },
+                    "sslCertificates": {
+                        "$ref": "#/components/schemas/AlertSettingsSSLCertificates"
+                    },
+                    "runBasedEscalation": {
+                        "$ref": "#/components/schemas/AlertSettingsRunBasedEscalation"
+                    },
+                    "timeBasedEscalation": {
+                        "$ref": "#/components/schemas/AlertSettingsTimeBasedEscalation"
+                    },
+                    "parallelRunFailureThreshold": {
+                        "$ref": "#/components/schemas/parallelRunFailureThreshold"
+                    }
+                }
+            },
+            "Model122": {
+                "type": "string",
+                "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute this check.",
+                "default": null,
+                "enum": [
+                    "2025.04",
+                    "2024.09",
+                    "2024.02",
+                    "2023.09",
+                    "2023.02",
+                    "2022.10"
+                ]
+            },
+            "Model123": {
+                "type": "array",
+                "description": "List of alert channel subscriptions.",
+                "example": [],
+                "items": {
+                    "$ref": "#/components/schemas/Model29"
+                }
+            },
+            "Model124": {
+                "type": "string",
+                "description": "Determines which type of retry strategy to use.",
+                "enum": [
+                    "FIXED",
+                    "LINEAR",
+                    "EXPONENTIAL",
+                    "SINGLE_RETRY"
+                ]
+            },
+            "Model125": {
+                "type": "string",
+                "description": "The HTTP request could not be completed due to a network error: no response status code was received",
+                "enum": [
+                    "NETWORK_ERROR"
+                ]
+            },
+            "Model126": {
+                "type": "array",
+                "x-constraint": {
+                    "length": 1,
+                    "unique": true,
+                    "single": true
+                },
+                "items": {
+                    "$ref": "#/components/schemas/Model125"
+                }
+            },
+            "Model127": {
+                "type": "object",
+                "description": "The strategy to determine how failed checks are retried.",
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Model124"
+                    },
+                    "baseBackoffSeconds": {
+                        "type": "number",
+                        "description": "The number of seconds to wait before the first retry attempt.",
+                        "default": 60
+                    },
+                    "sameRegion": {
+                        "type": "boolean",
+                        "description": "Whether retries should be run in the same region as the initial check run.",
+                        "default": true
+                    },
+                    "maxRetries": {
+                        "type": "number",
+                        "description": "The maximum number of attempts to retry the check. Not supported for SINGLE_RETRY",
+                        "minimum": 1,
+                        "maximum": 10
+                    },
+                    "maxDurationSeconds": {
+                        "type": "number",
+                        "description": "The total amount of time to continue retrying the check. Not supported for SINGLE_RETRY",
+                        "minimum": 0,
+                        "maximum": 600
+                    },
+                    "onlyOn": {
+                        "$ref": "#/components/schemas/Model126"
+                    }
+                },
+                "required": [
+                    "type"
+                ]
+            },
+            "Model128": {
+                "type": "object",
+                "description": "Determines the request that the DNS monitor is going to run.",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "example": "api.checklyhq.com",
+                        "maxLength": 100
+                    },
+                    "nameServer": {
+                        "type": "string",
+                        "default": "",
+                        "maxLength": 100
+                    },
+                    "port": {
+                        "type": "number"
+                    },
+                    "recordType": {
+                        "$ref": "#/components/schemas/recordType"
+                    },
+                    "assertions": {
+                        "$ref": "#/components/schemas/DnsMonitorAssertionList"
+                    },
+                    "protocol": {
+                        "$ref": "#/components/schemas/protocol"
+                    }
+                },
+                "required": [
+                    "query",
+                    "recordType"
+                ]
+            },
+            "CheckURLUpdate": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the check.",
+                        "example": "Check"
+                    },
+                    "activated": {
+                        "type": "boolean",
+                        "description": "Determines if the check is running or not.",
+                        "default": true
+                    },
+                    "muted": {
+                        "type": "boolean",
+                        "description": "Determines if any notifications will be send out when a check fails and/or recovers.",
+                        "default": false
+                    },
+                    "doubleCheck": {
+                        "type": "boolean",
+                        "description": "[Deprecated] Retry failed check runs. This property is deprecated, and `retryStrategy` can be used instead.",
+                        "default": true
+                    },
+                    "shouldFail": {
+                        "type": "boolean",
+                        "description": "Allows to invert the behaviour of when a check is considered to fail. Allows for validating error status like 404.",
+                        "default": false
+                    },
+                    "locations": {
+                        "$ref": "#/components/schemas/Model120"
+                    },
+                    "tags": {
+                        "$ref": "#/components/schemas/CheckTagList"
+                    },
+                    "alertSettings": {
+                        "$ref": "#/components/schemas/Model121"
+                    },
+                    "useGlobalAlertSettings": {
+                        "type": "boolean",
+                        "description": "When true, the account level alert setting will be used, not the alert setting defined on this check.",
+                        "default": true
+                    },
+                    "groupId": {
+                        "type": "number",
+                        "description": "The id of the check group this check is part of.",
+                        "example": "null",
+                        "default": null
+                    },
+                    "groupOrder": {
+                        "type": "number",
+                        "description": "The position of this check in a check group. It determines in what order checks are run when a group is triggered from the API or from CI/CD.",
+                        "example": "null",
+                        "default": null,
+                        "minimum": 0
+                    },
+                    "runtimeId": {
+                        "$ref": "#/components/schemas/Model122"
+                    },
+                    "alertChannelSubscriptions": {
+                        "$ref": "#/components/schemas/Model123"
+                    },
+                    "retryStrategy": {
+                        "$ref": "#/components/schemas/Model127"
+                    },
+                    "triggerIncident": {
+                        "$ref": "#/components/schemas/TriggerIncident"
+                    },
+                    "runParallel": {
+                        "type": "boolean",
+                        "description": "When true, the check will run in parallel in all selected locations.",
+                        "default": false
+                    },
+                    "frequency": {
+                        "type": "integer",
+                        "description": "How often the check should run in minutes.",
+                        "default": 10,
+                        "enum": [
+                            0,
+                            1,
+                            2,
+                            5,
+                            10,
+                            15,
+                            30,
+                            60,
+                            120,
+                            180,
+                            360,
+                            720,
+                            1440
+                        ]
+                    },
+                    "frequencyOffset": {
+                        "type": "integer",
+                        "description": "Used for setting seconds for check frequencies under 1 minutes (only for API & TCP checks) and spreading checks over a time range for frequencies over 1 minute. This works as follows: Checks with a frequency of 0 can have a frequencyOffset of 10, 20 or 30 meaning they will run every 10, 20 or 30 seconds. Checks with a frequency lower than and equal to 60 can have a frequencyOffset between 1 and a max value based on the formula \"Math.floor(frequency * 10)\", i.e. for a check that runs every 5 minutes the max frequencyOffset is 50. Checks with a frequency higher than 60 can have a frequencyOffset between 1 and a max value based on the formula \"Math.ceil(frequency / 60)\", i.e. for a check that runs every 720 minutes, the max frequencyOffset is 12. ",
+                        "minimum": 1
+                    },
+                    "request": {
+                        "$ref": "#/components/schemas/Model128"
+                    },
+                    "heartbeat": {
+                        "$ref": "#/components/schemas/heartbeat"
+                    },
+                    "script": {
+                        "type": "string"
+                    },
+                    "scriptPath": {
+                        "type": "string",
+                        "description": "Path of the script in the runtime."
+                    },
+                    "sslCheckDomain": {
+                        "type": "string"
+                    },
+                    "environmentVariables": {
+                        "$ref": "#/components/schemas/CheckEnvironmentVariableList"
+                    },
+                    "setupSnippetId": {
+                        "type": "number",
+                        "description": "An ID reference to a snippet to use in the setup phase of an API check.",
+                        "default": null
+                    },
+                    "tearDownSnippetId": {
+                        "type": "number",
+                        "description": "An ID reference to a snippet to use in the teardown phase of an API check.",
+                        "default": null
+                    },
+                    "localSetupScript": {
+                        "type": "string",
+                        "description": "A valid piece of Node.js code to run in the setup phase.",
+                        "default": null
+                    },
+                    "localTearDownScript": {
+                        "type": "string",
+                        "description": "A valid piece of Node.js code to run in the teardown phase.",
+                        "default": null
+                    },
+                    "degradedResponseTime": {
+                        "type": "number",
+                        "description": "The response time in milliseconds where a check should be considered degraded.",
+                        "default": 500,
+                        "minimum": 0,
+                        "maximum": 500
+                    },
+                    "maxResponseTime": {
+                        "type": "number",
+                        "description": "The response time in milliseconds where a check should be considered failing.",
+                        "default": 1000,
+                        "minimum": 0,
+                        "maximum": 1000
+                    }
+                },
+                "required": [
+                    "heartbeat",
+                    "script"
+                ]
+            },
+            "Model129": {
+                "type": "string",
+                "enum": [
+                    "us-east-1",
+                    "us-east-2",
+                    "us-west-1",
+                    "us-west-2",
+                    "ca-central-1",
+                    "sa-east-1",
+                    "eu-west-1",
+                    "eu-central-1",
+                    "eu-west-2",
+                    "eu-west-3",
+                    "eu-north-1",
+                    "eu-south-1",
+                    "me-south-1",
+                    "ap-southeast-1",
+                    "ap-northeast-1",
+                    "ap-east-1",
+                    "ap-southeast-2",
+                    "ap-southeast-3",
+                    "ap-northeast-2",
+                    "ap-northeast-3",
+                    "ap-south-1",
+                    "af-south-1"
+                ]
+            },
+            "Model130": {
+                "type": "array",
+                "description": "An array of one or more data center locations where to run this check.",
+                "example": [
+                    "us-east-1",
+                    "eu-central-1"
+                ],
+                "items": {
+                    "$ref": "#/components/schemas/Model129"
+                }
+            },
+            "Model131": {
+                "type": "string",
+                "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute this check.",
+                "default": null,
+                "enum": [
+                    "2025.04",
+                    "2024.09",
+                    "2024.02",
+                    "2023.09",
+                    "2023.02",
+                    "2022.10"
+                ]
+            },
+            "Model132": {
+                "type": "array",
+                "description": "List of alert channel subscriptions.",
+                "example": [],
+                "items": {
+                    "$ref": "#/components/schemas/Model29"
+                }
+            },
+            "periodUnit": {
+                "type": "string",
+                "enum": [
+                    "seconds",
+                    "minutes",
+                    "hours",
+                    "days"
+                ]
+            },
+            "graceUnit": {
+                "type": "string",
+                "enum": [
+                    "seconds",
+                    "minutes",
+                    "hours",
+                    "days"
+                ]
+            },
+            "Model133": {
+                "type": "object",
+                "properties": {
+                    "period": {
+                        "type": "number",
+                        "description": "Interval expected between pings."
+                    },
+                    "periodUnit": {
+                        "$ref": "#/components/schemas/periodUnit"
+                    },
+                    "grace": {
+                        "type": "number",
+                        "description": "Grace added to the period."
+                    },
+                    "graceUnit": {
+                        "$ref": "#/components/schemas/graceUnit"
+                    },
+                    "pingToken": {
+                        "type": "string",
+                        "description": "UUID token used to build a unique ping URL.",
+                        "x-format": {
+                            "guid": true
+                        }
+                    }
+                },
+                "required": [
+                    "period",
+                    "periodUnit",
+                    "grace",
+                    "graceUnit"
+                ]
+            },
+            "CheckHeartbeatCreate": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the check.",
+                        "example": "Check"
+                    },
+                    "activated": {
+                        "type": "boolean",
+                        "description": "Determines if the check is running or not.",
+                        "default": true
+                    },
+                    "muted": {
+                        "type": "boolean",
+                        "description": "Determines if any notifications will be send out when a check fails and/or recovers.",
+                        "default": false
+                    },
+                    "doubleCheck": {
+                        "type": "boolean",
+                        "description": "[Deprecated] Retry failed check runs. This property is deprecated, and `retryStrategy` can be used instead.",
+                        "default": true
+                    },
+                    "shouldFail": {
+                        "type": "boolean",
+                        "description": "Allows to invert the behaviour of when a check is considered to fail. Allows for validating error status like 404.",
+                        "default": false
+                    },
+                    "locations": {
+                        "$ref": "#/components/schemas/Model130"
+                    },
+                    "tags": {
+                        "$ref": "#/components/schemas/CheckTagList"
+                    },
+                    "alertSettings": {
+                        "$ref": "#/components/schemas/AlertSettings"
+                    },
+                    "useGlobalAlertSettings": {
+                        "type": "boolean",
+                        "description": "When true, the account level alert setting will be used, not the alert setting defined on this check.",
+                        "default": true
+                    },
+                    "groupId": {
+                        "type": "number",
+                        "description": "The id of the check group this check is part of.",
+                        "example": "null",
+                        "default": null
+                    },
+                    "groupOrder": {
+                        "type": "number",
+                        "description": "The position of this check in a check group. It determines in what order checks are run when a group is triggered from the API or from CI/CD.",
+                        "example": "null",
+                        "default": null,
+                        "minimum": 0
+                    },
+                    "runtimeId": {
+                        "$ref": "#/components/schemas/Model131"
+                    },
+                    "alertChannelSubscriptions": {
+                        "$ref": "#/components/schemas/Model132"
+                    },
                     "triggerIncident": {
                         "$ref": "#/components/schemas/TriggerIncident"
                     },
@@ -22550,7 +23639,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/CheckRequest"
                     },
                     "heartbeat": {
-                        "$ref": "#/components/schemas/Model113"
+                        "$ref": "#/components/schemas/Model133"
                     },
                     "script": {
                         "type": "string"
@@ -22606,13 +23695,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "script"
                 ]
             },
-            "Model114": {
+            "Model134": {
                 "type": "string",
                 "enum": [
                     "HEARTBEAT"
                 ]
             },
-            "Model115": {
+            "Model135": {
                 "type": "object",
                 "properties": {
                     "period": {
@@ -22693,10 +23782,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "checkType": {
-                        "$ref": "#/components/schemas/Model114"
+                        "$ref": "#/components/schemas/Model134"
                     },
                     "heartbeat": {
-                        "$ref": "#/components/schemas/Model115"
+                        "$ref": "#/components/schemas/Model135"
                     },
                     "alertChannels": {
                         "$ref": "#/components/schemas/CheckAlertChannels"
@@ -22714,7 +23803,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "name"
                 ]
             },
-            "Model116": {
+            "Model136": {
                 "type": "string",
                 "enum": [
                     "us-east-1",
@@ -22741,7 +23830,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "af-south-1"
                 ]
             },
-            "Model117": {
+            "Model137": {
                 "type": "array",
                 "description": "An array of one or more data center locations where to run this check.",
                 "example": [
@@ -22749,10 +23838,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "eu-central-1"
                 ],
                 "items": {
-                    "$ref": "#/components/schemas/Model116"
+                    "$ref": "#/components/schemas/Model136"
                 }
             },
-            "Model118": {
+            "Model138": {
                 "type": "object",
                 "description": "Alert settings.",
                 "default": {
@@ -22790,7 +23879,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     }
                 }
             },
-            "Model119": {
+            "Model139": {
                 "type": "string",
                 "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute this check.",
                 "default": null,
@@ -22803,7 +23892,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "2022.10"
                 ]
             },
-            "Model120": {
+            "Model140": {
                 "type": "array",
                 "description": "List of alert channel subscriptions.",
                 "example": [],
@@ -22811,7 +23900,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/Model29"
                 }
             },
-            "Model121": {
+            "Model141": {
                 "type": "object",
                 "properties": {
                     "period": {
@@ -22872,13 +23961,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "locations": {
-                        "$ref": "#/components/schemas/Model117"
+                        "$ref": "#/components/schemas/Model137"
                     },
                     "tags": {
                         "$ref": "#/components/schemas/CheckTagList"
                     },
                     "alertSettings": {
-                        "$ref": "#/components/schemas/Model118"
+                        "$ref": "#/components/schemas/Model138"
                     },
                     "useGlobalAlertSettings": {
                         "type": "boolean",
@@ -22899,10 +23988,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "minimum": 0
                     },
                     "runtimeId": {
-                        "$ref": "#/components/schemas/Model119"
+                        "$ref": "#/components/schemas/Model139"
                     },
                     "alertChannelSubscriptions": {
-                        "$ref": "#/components/schemas/Model120"
+                        "$ref": "#/components/schemas/Model140"
                     },
                     "triggerIncident": {
                         "$ref": "#/components/schemas/TriggerIncident"
@@ -22925,7 +24014,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/CheckRequest"
                     },
                     "heartbeat": {
-                        "$ref": "#/components/schemas/Model121"
+                        "$ref": "#/components/schemas/Model141"
                     },
                     "script": {
                         "type": "string"
@@ -22990,7 +24079,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     }
                 }
             },
-            "Model122": {
+            "Model142": {
                 "type": "object",
                 "properties": {
                     "successRatio": {
@@ -23013,7 +24102,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "LATE"
                 ]
             },
-            "Model123": {
+            "Model143": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -23049,21 +24138,21 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             "events": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model123"
+                    "$ref": "#/components/schemas/Model143"
                 }
             },
             "stats": {
                 "type": "object",
                 "properties": {
                     "last24Hours": {
-                        "$ref": "#/components/schemas/Model122"
+                        "$ref": "#/components/schemas/Model142"
                     },
                     "last7Days": {
-                        "$ref": "#/components/schemas/Model122"
+                        "$ref": "#/components/schemas/Model142"
                     }
                 }
             },
-            "Model124": {
+            "Model144": {
                 "type": "object",
                 "properties": {
                     "events": {
@@ -23074,24 +24163,24 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     }
                 }
             },
-            "Model125": {
+            "Model145": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model124"
+                    "$ref": "#/components/schemas/Model144"
                 }
             },
-            "Model126": {
+            "Model146": {
                 "type": "object",
                 "properties": {
                     "event": {
-                        "$ref": "#/components/schemas/Model123"
+                        "$ref": "#/components/schemas/Model143"
                     },
                     "stats": {
                         "$ref": "#/components/schemas/stats"
                     }
                 }
             },
-            "Model127": {
+            "Model147": {
                 "type": "string",
                 "enum": [
                     "us-east-1",
@@ -23118,7 +24207,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "af-south-1"
                 ]
             },
-            "Model128": {
+            "Model148": {
                 "type": "array",
                 "description": "An array of one or more data center locations where to run this check.",
                 "example": [
@@ -23126,10 +24215,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "eu-central-1"
                 ],
                 "items": {
-                    "$ref": "#/components/schemas/Model127"
+                    "$ref": "#/components/schemas/Model147"
                 }
             },
-            "Model129": {
+            "Model149": {
                 "type": "string",
                 "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute this check.",
                 "default": null,
@@ -23142,7 +24231,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "2022.10"
                 ]
             },
-            "Model130": {
+            "Model150": {
                 "type": "array",
                 "description": "List of alert channel subscriptions.",
                 "example": [],
@@ -23150,14 +24239,14 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/Model29"
                 }
             },
-            "Model131": {
+            "Model151": {
                 "type": "string",
                 "default": "MULTI_STEP",
                 "enum": [
                     "MULTI_STEP"
                 ]
             },
-            "Model132": {
+            "Model152": {
                 "type": "array",
                 "description": "Key/value pairs for setting environment variables during check execution. Use global environment variables whenever possible.",
                 "example": [],
@@ -23166,7 +24255,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/EnvironmentVariable"
                 }
             },
-            "Model133": {
+            "Model153": {
                 "type": "array",
                 "description": "An array of one or more private locations where to run the check.",
                 "example": [],
@@ -23203,7 +24292,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "locations": {
-                        "$ref": "#/components/schemas/Model128"
+                        "$ref": "#/components/schemas/Model148"
                     },
                     "tags": {
                         "$ref": "#/components/schemas/CheckTagList"
@@ -23230,10 +24319,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "minimum": 0
                     },
                     "runtimeId": {
-                        "$ref": "#/components/schemas/Model129"
+                        "$ref": "#/components/schemas/Model149"
                     },
                     "alertChannelSubscriptions": {
-                        "$ref": "#/components/schemas/Model130"
+                        "$ref": "#/components/schemas/Model150"
                     },
                     "retryStrategy": {
                         "$ref": "#/components/schemas/RetryStrategy"
@@ -23247,10 +24336,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "checkType": {
-                        "$ref": "#/components/schemas/Model131"
+                        "$ref": "#/components/schemas/Model151"
                     },
                     "environmentVariables": {
-                        "$ref": "#/components/schemas/Model132"
+                        "$ref": "#/components/schemas/Model152"
                     },
                     "frequency": {
                         "type": "integer",
@@ -23281,7 +24370,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "description": "Path of the script in the runtime."
                     },
                     "privateLocations": {
-                        "$ref": "#/components/schemas/Model133"
+                        "$ref": "#/components/schemas/Model153"
                     },
                     "dependencies": {
                         "$ref": "#/components/schemas/dependencies"
@@ -23292,7 +24381,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "script"
                 ]
             },
-            "Model134": {
+            "Model154": {
                 "type": "string",
                 "enum": [
                     "us-east-1",
@@ -23319,7 +24408,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "af-south-1"
                 ]
             },
-            "Model135": {
+            "Model155": {
                 "type": "array",
                 "description": "An array of one or more data center locations where to run this check.",
                 "example": [
@@ -23327,10 +24416,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "eu-central-1"
                 ],
                 "items": {
-                    "$ref": "#/components/schemas/Model134"
+                    "$ref": "#/components/schemas/Model154"
                 }
             },
-            "Model136": {
+            "Model156": {
                 "type": "string",
                 "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute this check.",
                 "default": null,
@@ -23343,13 +24432,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "2022.10"
                 ]
             },
-            "Model137": {
+            "Model157": {
                 "type": "string",
                 "enum": [
                     "MULTI_STEP"
                 ]
             },
-            "Model138": {
+            "Model158": {
                 "type": "array",
                 "description": "Key/value pairs for setting environment variables during check execution. Use global environment variables whenever possible.",
                 "maxItems": 50,
@@ -23390,7 +24479,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "locations": {
-                        "$ref": "#/components/schemas/Model135"
+                        "$ref": "#/components/schemas/Model155"
                     },
                     "tags": {
                         "$ref": "#/components/schemas/CheckTagList"
@@ -23417,7 +24506,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "minimum": 0
                     },
                     "runtimeId": {
-                        "$ref": "#/components/schemas/Model136"
+                        "$ref": "#/components/schemas/Model156"
                     },
                     "alertChannelSubscriptions": {
                         "$ref": "#/components/schemas/CheckAlertChannelSubscriptionList"
@@ -23434,7 +24523,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "checkType": {
-                        "$ref": "#/components/schemas/Model137"
+                        "$ref": "#/components/schemas/Model157"
                     },
                     "frequency": {
                         "type": "integer",
@@ -23474,7 +24563,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "format": "date-time"
                     },
                     "environmentVariables": {
-                        "$ref": "#/components/schemas/Model138"
+                        "$ref": "#/components/schemas/Model158"
                     }
                 },
                 "required": [
@@ -23482,7 +24571,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "script"
                 ]
             },
-            "Model139": {
+            "Model159": {
                 "type": "string",
                 "enum": [
                     "us-east-1",
@@ -23509,7 +24598,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "af-south-1"
                 ]
             },
-            "Model140": {
+            "Model160": {
                 "type": "array",
                 "description": "An array of one or more data center locations where to run this check.",
                 "example": [
@@ -23517,10 +24606,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "eu-central-1"
                 ],
                 "items": {
-                    "$ref": "#/components/schemas/Model139"
+                    "$ref": "#/components/schemas/Model159"
                 }
             },
-            "Model141": {
+            "Model161": {
                 "type": "object",
                 "description": "Alert settings.",
                 "default": {
@@ -23558,7 +24647,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     }
                 }
             },
-            "Model142": {
+            "Model162": {
                 "type": "string",
                 "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute this check.",
                 "default": null,
@@ -23571,7 +24660,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "2022.10"
                 ]
             },
-            "Model143": {
+            "Model163": {
                 "type": "array",
                 "description": "List of alert channel subscriptions.",
                 "example": [],
@@ -23579,7 +24668,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/Model29"
                 }
             },
-            "Model144": {
+            "Model164": {
                 "type": "string",
                 "description": "Determines which type of retry strategy to use.",
                 "enum": [
@@ -23589,14 +24678,14 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "SINGLE_RETRY"
                 ]
             },
-            "Model145": {
+            "Model165": {
                 "type": "string",
                 "description": "The HTTP request could not be completed due to a network error: no response status code was received",
                 "enum": [
                     "NETWORK_ERROR"
                 ]
             },
-            "Model146": {
+            "Model166": {
                 "type": "array",
                 "x-constraint": {
                     "length": 1,
@@ -23604,15 +24693,15 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "single": true
                 },
                 "items": {
-                    "$ref": "#/components/schemas/Model145"
+                    "$ref": "#/components/schemas/Model165"
                 }
             },
-            "Model147": {
+            "Model167": {
                 "type": "object",
                 "description": "The strategy to determine how failed checks are retried.",
                 "properties": {
                     "type": {
-                        "$ref": "#/components/schemas/Model144"
+                        "$ref": "#/components/schemas/Model164"
                     },
                     "baseBackoffSeconds": {
                         "type": "number",
@@ -23637,21 +24726,21 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "maximum": 600
                     },
                     "onlyOn": {
-                        "$ref": "#/components/schemas/Model146"
+                        "$ref": "#/components/schemas/Model166"
                     }
                 },
                 "required": [
                     "type"
                 ]
             },
-            "Model148": {
+            "Model168": {
                 "type": "string",
                 "default": "MULTI_STEP",
                 "enum": [
                     "MULTI_STEP"
                 ]
             },
-            "Model149": {
+            "Model169": {
                 "type": "array",
                 "description": "Key/value pairs for setting environment variables during check execution. Use global environment variables whenever possible.",
                 "example": [],
@@ -23660,7 +24749,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/EnvironmentVariable"
                 }
             },
-            "Model150": {
+            "Model170": {
                 "type": "array",
                 "description": "An array of one or more private locations where to run the check.",
                 "example": [],
@@ -23697,13 +24786,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "locations": {
-                        "$ref": "#/components/schemas/Model140"
+                        "$ref": "#/components/schemas/Model160"
                     },
                     "tags": {
                         "$ref": "#/components/schemas/CheckTagList"
                     },
                     "alertSettings": {
-                        "$ref": "#/components/schemas/Model141"
+                        "$ref": "#/components/schemas/Model161"
                     },
                     "useGlobalAlertSettings": {
                         "type": "boolean",
@@ -23724,13 +24813,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "minimum": 0
                     },
                     "runtimeId": {
-                        "$ref": "#/components/schemas/Model142"
+                        "$ref": "#/components/schemas/Model162"
                     },
                     "alertChannelSubscriptions": {
-                        "$ref": "#/components/schemas/Model143"
+                        "$ref": "#/components/schemas/Model163"
                     },
                     "retryStrategy": {
-                        "$ref": "#/components/schemas/Model147"
+                        "$ref": "#/components/schemas/Model167"
                     },
                     "triggerIncident": {
                         "$ref": "#/components/schemas/TriggerIncident"
@@ -23741,10 +24830,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "checkType": {
-                        "$ref": "#/components/schemas/Model148"
+                        "$ref": "#/components/schemas/Model168"
                     },
                     "environmentVariables": {
-                        "$ref": "#/components/schemas/Model149"
+                        "$ref": "#/components/schemas/Model169"
                     },
                     "frequency": {
                         "type": "integer",
@@ -23775,14 +24864,14 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "description": "Path of the script in the runtime."
                     },
                     "privateLocations": {
-                        "$ref": "#/components/schemas/Model150"
+                        "$ref": "#/components/schemas/Model170"
                     },
                     "dependencies": {
                         "$ref": "#/components/schemas/dependencies"
                     }
                 }
             },
-            "Model151": {
+            "Model171": {
                 "type": "string",
                 "enum": [
                     "us-east-1",
@@ -23809,7 +24898,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "af-south-1"
                 ]
             },
-            "Model152": {
+            "Model172": {
                 "type": "array",
                 "description": "An array of one or more data center locations where to run this check.",
                 "example": [
@@ -23817,10 +24906,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "eu-central-1"
                 ],
                 "items": {
-                    "$ref": "#/components/schemas/Model151"
+                    "$ref": "#/components/schemas/Model171"
                 }
             },
-            "Model153": {
+            "Model173": {
                 "type": "string",
                 "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute this check.",
                 "default": null,
@@ -23833,7 +24922,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "2022.10"
                 ]
             },
-            "Model154": {
+            "Model174": {
                 "type": "array",
                 "description": "List of alert channel subscriptions.",
                 "example": [],
@@ -23841,7 +24930,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/Model29"
                 }
             },
-            "Model155": {
+            "Model175": {
                 "type": "string",
                 "enum": [
                     "RESPONSE_DATA",
@@ -23852,7 +24941,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 "type": "object",
                 "properties": {
                     "source": {
-                        "$ref": "#/components/schemas/Model155"
+                        "$ref": "#/components/schemas/Model175"
                     },
                     "comparison": {
                         "type": "string"
@@ -23871,7 +24960,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     }
                 }
             },
-            "Model156": {
+            "Model176": {
                 "type": "array",
                 "description": "Check the main Checkly documentation on assertions for specific values like regular expressions and JSON path descriptors you can use in the \"property\" field.",
                 "example": [
@@ -23885,7 +24974,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/TcpCheckAssertion"
                 }
             },
-            "Model157": {
+            "Model177": {
                 "type": "object",
                 "properties": {
                     "hostname": {
@@ -23900,7 +24989,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": null
                     },
                     "assertions": {
-                        "$ref": "#/components/schemas/Model156"
+                        "$ref": "#/components/schemas/Model176"
                     },
                     "ipFamily": {
                         "$ref": "#/components/schemas/ipFamily"
@@ -23939,7 +25028,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "locations": {
-                        "$ref": "#/components/schemas/Model152"
+                        "$ref": "#/components/schemas/Model172"
                     },
                     "tags": {
                         "$ref": "#/components/schemas/CheckTagList"
@@ -23966,10 +25055,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "minimum": 0
                     },
                     "runtimeId": {
-                        "$ref": "#/components/schemas/Model153"
+                        "$ref": "#/components/schemas/Model173"
                     },
                     "alertChannelSubscriptions": {
-                        "$ref": "#/components/schemas/Model154"
+                        "$ref": "#/components/schemas/Model174"
                     },
                     "retryStrategy": {
                         "$ref": "#/components/schemas/RetryStrategy"
@@ -23983,7 +25072,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "request": {
-                        "$ref": "#/components/schemas/Model157"
+                        "$ref": "#/components/schemas/Model177"
                     },
                     "frequency": {
                         "type": "integer",
@@ -24033,7 +25122,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "request"
                 ]
             },
-            "Model158": {
+            "Model178": {
                 "type": "string",
                 "enum": [
                     "us-east-1",
@@ -24060,7 +25149,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "af-south-1"
                 ]
             },
-            "Model159": {
+            "Model179": {
                 "type": "array",
                 "description": "An array of one or more data center locations where to run this check.",
                 "example": [
@@ -24068,10 +25157,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "eu-central-1"
                 ],
                 "items": {
-                    "$ref": "#/components/schemas/Model158"
+                    "$ref": "#/components/schemas/Model178"
                 }
             },
-            "Model160": {
+            "Model180": {
                 "type": "string",
                 "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute this check.",
                 "default": null,
@@ -24084,7 +25173,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "2022.10"
                 ]
             },
-            "Model161": {
+            "Model181": {
                 "type": "array",
                 "description": "Check the main Checkly documentation on assertions for specific values like regular expressions and JSON path descriptors you can use in the \"property\" field.",
                 "example": [
@@ -24098,7 +25187,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/TcpCheckAssertion"
                 }
             },
-            "Model162": {
+            "Model182": {
                 "type": "object",
                 "properties": {
                     "hostname": {
@@ -24113,7 +25202,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": null
                     },
                     "assertions": {
-                        "$ref": "#/components/schemas/Model161"
+                        "$ref": "#/components/schemas/Model181"
                     },
                     "ipFamily": {
                         "$ref": "#/components/schemas/ipFamily"
@@ -24123,7 +25212,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "port"
                 ]
             },
-            "Model163": {
+            "Model183": {
                 "type": "string",
                 "enum": [
                     "TCP"
@@ -24162,7 +25251,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "locations": {
-                        "$ref": "#/components/schemas/Model159"
+                        "$ref": "#/components/schemas/Model179"
                     },
                     "tags": {
                         "$ref": "#/components/schemas/CheckTagList"
@@ -24189,7 +25278,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "minimum": 0
                     },
                     "runtimeId": {
-                        "$ref": "#/components/schemas/Model160"
+                        "$ref": "#/components/schemas/Model180"
                     },
                     "alertChannelSubscriptions": {
                         "$ref": "#/components/schemas/CheckAlertChannelSubscriptionList"
@@ -24251,17 +25340,17 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/privateLocations"
                     },
                     "request": {
-                        "$ref": "#/components/schemas/Model162"
+                        "$ref": "#/components/schemas/Model182"
                     },
                     "checkType": {
-                        "$ref": "#/components/schemas/Model163"
+                        "$ref": "#/components/schemas/Model183"
                     }
                 },
                 "required": [
                     "name"
                 ]
             },
-            "Model164": {
+            "Model184": {
                 "type": "string",
                 "enum": [
                     "us-east-1",
@@ -24288,7 +25377,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "af-south-1"
                 ]
             },
-            "Model165": {
+            "Model185": {
                 "type": "array",
                 "description": "An array of one or more data center locations where to run this check.",
                 "example": [
@@ -24296,10 +25385,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "eu-central-1"
                 ],
                 "items": {
-                    "$ref": "#/components/schemas/Model164"
+                    "$ref": "#/components/schemas/Model184"
                 }
             },
-            "Model166": {
+            "Model186": {
                 "type": "object",
                 "description": "Alert settings.",
                 "default": {
@@ -24337,7 +25426,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     }
                 }
             },
-            "Model167": {
+            "Model187": {
                 "type": "string",
                 "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute this check.",
                 "default": null,
@@ -24350,7 +25439,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "2022.10"
                 ]
             },
-            "Model168": {
+            "Model188": {
                 "type": "array",
                 "description": "List of alert channel subscriptions.",
                 "example": [],
@@ -24358,7 +25447,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/Model29"
                 }
             },
-            "Model169": {
+            "Model189": {
                 "type": "string",
                 "description": "Determines which type of retry strategy to use.",
                 "enum": [
@@ -24368,14 +25457,14 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "SINGLE_RETRY"
                 ]
             },
-            "Model170": {
+            "Model190": {
                 "type": "string",
                 "description": "The HTTP request could not be completed due to a network error: no response status code was received",
                 "enum": [
                     "NETWORK_ERROR"
                 ]
             },
-            "Model171": {
+            "Model191": {
                 "type": "array",
                 "x-constraint": {
                     "length": 1,
@@ -24383,15 +25472,15 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "single": true
                 },
                 "items": {
-                    "$ref": "#/components/schemas/Model170"
+                    "$ref": "#/components/schemas/Model190"
                 }
             },
-            "Model172": {
+            "Model192": {
                 "type": "object",
                 "description": "The strategy to determine how failed checks are retried.",
                 "properties": {
                     "type": {
-                        "$ref": "#/components/schemas/Model169"
+                        "$ref": "#/components/schemas/Model189"
                     },
                     "baseBackoffSeconds": {
                         "type": "number",
@@ -24416,14 +25505,14 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "maximum": 600
                     },
                     "onlyOn": {
-                        "$ref": "#/components/schemas/Model171"
+                        "$ref": "#/components/schemas/Model191"
                     }
                 },
                 "required": [
                     "type"
                 ]
             },
-            "Model173": {
+            "Model193": {
                 "type": "array",
                 "description": "Check the main Checkly documentation on assertions for specific values like regular expressions and JSON path descriptors you can use in the \"property\" field.",
                 "example": [
@@ -24437,7 +25526,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/TcpCheckAssertion"
                 }
             },
-            "Model174": {
+            "Model194": {
                 "type": "object",
                 "properties": {
                     "hostname": {
@@ -24452,7 +25541,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": null
                     },
                     "assertions": {
-                        "$ref": "#/components/schemas/Model173"
+                        "$ref": "#/components/schemas/Model193"
                     },
                     "ipFamily": {
                         "$ref": "#/components/schemas/ipFamily"
@@ -24491,13 +25580,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "locations": {
-                        "$ref": "#/components/schemas/Model165"
+                        "$ref": "#/components/schemas/Model185"
                     },
                     "tags": {
                         "$ref": "#/components/schemas/CheckTagList"
                     },
                     "alertSettings": {
-                        "$ref": "#/components/schemas/Model166"
+                        "$ref": "#/components/schemas/Model186"
                     },
                     "useGlobalAlertSettings": {
                         "type": "boolean",
@@ -24518,13 +25607,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "minimum": 0
                     },
                     "runtimeId": {
-                        "$ref": "#/components/schemas/Model167"
+                        "$ref": "#/components/schemas/Model187"
                     },
                     "alertChannelSubscriptions": {
-                        "$ref": "#/components/schemas/Model168"
+                        "$ref": "#/components/schemas/Model188"
                     },
                     "retryStrategy": {
-                        "$ref": "#/components/schemas/Model172"
+                        "$ref": "#/components/schemas/Model192"
                     },
                     "triggerIncident": {
                         "$ref": "#/components/schemas/TriggerIncident"
@@ -24535,7 +25624,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "request": {
-                        "$ref": "#/components/schemas/Model174"
+                        "$ref": "#/components/schemas/Model194"
                     },
                     "frequency": {
                         "type": "integer",
@@ -24581,7 +25670,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     }
                 }
             },
-            "Model175": {
+            "Model195": {
                 "type": "string",
                 "enum": [
                     "us-east-1",
@@ -24608,7 +25697,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "af-south-1"
                 ]
             },
-            "Model176": {
+            "Model196": {
                 "type": "array",
                 "description": "An array of one or more data center locations where to run this check.",
                 "example": [
@@ -24616,10 +25705,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "eu-central-1"
                 ],
                 "items": {
-                    "$ref": "#/components/schemas/Model175"
+                    "$ref": "#/components/schemas/Model195"
                 }
             },
-            "Model177": {
+            "Model197": {
                 "type": "string",
                 "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute this check.",
                 "default": null,
@@ -24632,7 +25721,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "2022.10"
                 ]
             },
-            "Model178": {
+            "Model198": {
                 "type": "array",
                 "description": "List of alert channel subscriptions.",
                 "example": [],
@@ -24640,7 +25729,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/Model29"
                 }
             },
-            "Model179": {
+            "Model199": {
                 "type": "string",
                 "default": "GET",
                 "enum": [
@@ -24662,7 +25751,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "GREATER_THAN"
                 ]
             },
-            "Model180": {
+            "Model200": {
                 "type": "object",
                 "properties": {
                     "property": {
@@ -24696,7 +25785,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     }
                 ],
                 "items": {
-                    "$ref": "#/components/schemas/Model180"
+                    "$ref": "#/components/schemas/Model200"
                 }
             },
             "UrlMonitorRequest": {
@@ -24704,7 +25793,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 "description": "Determines the request that the check is going to run.",
                 "properties": {
                     "method": {
-                        "$ref": "#/components/schemas/Model179"
+                        "$ref": "#/components/schemas/Model199"
                     },
                     "url": {
                         "type": "string",
@@ -24729,7 +25818,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "url"
                 ]
             },
-            "CheckURLCreate": {
+            "Model201": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -24758,7 +25847,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "locations": {
-                        "$ref": "#/components/schemas/Model176"
+                        "$ref": "#/components/schemas/Model196"
                     },
                     "tags": {
                         "$ref": "#/components/schemas/CheckTagList"
@@ -24785,10 +25874,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "minimum": 0
                     },
                     "runtimeId": {
-                        "$ref": "#/components/schemas/Model177"
+                        "$ref": "#/components/schemas/Model197"
                     },
                     "alertChannelSubscriptions": {
-                        "$ref": "#/components/schemas/Model178"
+                        "$ref": "#/components/schemas/Model198"
                     },
                     "retryStrategy": {
                         "$ref": "#/components/schemas/RetryStrategy"
@@ -24852,7 +25941,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "request"
                 ]
             },
-            "Model181": {
+            "Model202": {
                 "type": "string",
                 "enum": [
                     "us-east-1",
@@ -24879,7 +25968,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "af-south-1"
                 ]
             },
-            "Model182": {
+            "Model203": {
                 "type": "array",
                 "description": "An array of one or more data center locations where to run this check.",
                 "example": [
@@ -24887,10 +25976,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "eu-central-1"
                 ],
                 "items": {
-                    "$ref": "#/components/schemas/Model181"
+                    "$ref": "#/components/schemas/Model202"
                 }
             },
-            "Model183": {
+            "Model204": {
                 "type": "string",
                 "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute this check.",
                 "default": null,
@@ -24903,19 +25992,19 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "2022.10"
                 ]
             },
-            "Model184": {
+            "Model205": {
                 "type": "string",
                 "default": "GET",
                 "enum": [
                     "GET"
                 ]
             },
-            "Model185": {
+            "Model206": {
                 "type": "object",
                 "description": "Determines the request that the check is going to run.",
                 "properties": {
                     "method": {
-                        "$ref": "#/components/schemas/Model184"
+                        "$ref": "#/components/schemas/Model205"
                     },
                     "url": {
                         "type": "string",
@@ -24940,7 +26029,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "url"
                 ]
             },
-            "Model186": {
+            "Model207": {
                 "type": "string",
                 "enum": [
                     "URL"
@@ -24979,7 +26068,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "locations": {
-                        "$ref": "#/components/schemas/Model182"
+                        "$ref": "#/components/schemas/Model203"
                     },
                     "tags": {
                         "$ref": "#/components/schemas/CheckTagList"
@@ -25006,7 +26095,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "minimum": 0
                     },
                     "runtimeId": {
-                        "$ref": "#/components/schemas/Model183"
+                        "$ref": "#/components/schemas/Model204"
                     },
                     "alertChannelSubscriptions": {
                         "$ref": "#/components/schemas/CheckAlertChannelSubscriptionList"
@@ -25068,17 +26157,17 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/privateLocations"
                     },
                     "request": {
-                        "$ref": "#/components/schemas/Model185"
+                        "$ref": "#/components/schemas/Model206"
                     },
                     "checkType": {
-                        "$ref": "#/components/schemas/Model186"
+                        "$ref": "#/components/schemas/Model207"
                     }
                 },
                 "required": [
                     "name"
                 ]
             },
-            "Model187": {
+            "Model208": {
                 "type": "string",
                 "enum": [
                     "us-east-1",
@@ -25105,7 +26194,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "af-south-1"
                 ]
             },
-            "Model188": {
+            "Model209": {
                 "type": "array",
                 "description": "An array of one or more data center locations where to run this check.",
                 "example": [
@@ -25113,10 +26202,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "eu-central-1"
                 ],
                 "items": {
-                    "$ref": "#/components/schemas/Model187"
+                    "$ref": "#/components/schemas/Model208"
                 }
             },
-            "Model189": {
+            "Model210": {
                 "type": "object",
                 "description": "Alert settings.",
                 "default": {
@@ -25154,7 +26243,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     }
                 }
             },
-            "Model190": {
+            "Model211": {
                 "type": "string",
                 "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute this check.",
                 "default": null,
@@ -25167,7 +26256,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "2022.10"
                 ]
             },
-            "Model191": {
+            "Model212": {
                 "type": "array",
                 "description": "List of alert channel subscriptions.",
                 "example": [],
@@ -25175,7 +26264,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/Model29"
                 }
             },
-            "Model192": {
+            "Model213": {
                 "type": "string",
                 "description": "Determines which type of retry strategy to use.",
                 "enum": [
@@ -25185,14 +26274,14 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "SINGLE_RETRY"
                 ]
             },
-            "Model193": {
+            "Model214": {
                 "type": "string",
                 "description": "The HTTP request could not be completed due to a network error: no response status code was received",
                 "enum": [
                     "NETWORK_ERROR"
                 ]
             },
-            "Model194": {
+            "Model215": {
                 "type": "array",
                 "x-constraint": {
                     "length": 1,
@@ -25200,15 +26289,15 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "single": true
                 },
                 "items": {
-                    "$ref": "#/components/schemas/Model193"
+                    "$ref": "#/components/schemas/Model214"
                 }
             },
-            "Model195": {
+            "Model216": {
                 "type": "object",
                 "description": "The strategy to determine how failed checks are retried.",
                 "properties": {
                     "type": {
-                        "$ref": "#/components/schemas/Model192"
+                        "$ref": "#/components/schemas/Model213"
                     },
                     "baseBackoffSeconds": {
                         "type": "number",
@@ -25233,26 +26322,26 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "maximum": 600
                     },
                     "onlyOn": {
-                        "$ref": "#/components/schemas/Model194"
+                        "$ref": "#/components/schemas/Model215"
                     }
                 },
                 "required": [
                     "type"
                 ]
             },
-            "Model196": {
+            "Model217": {
                 "type": "string",
                 "default": "GET",
                 "enum": [
                     "GET"
                 ]
             },
-            "Model197": {
+            "Model218": {
                 "type": "object",
                 "description": "Determines the request that the check is going to run.",
                 "properties": {
                     "method": {
-                        "$ref": "#/components/schemas/Model196"
+                        "$ref": "#/components/schemas/Model217"
                     },
                     "url": {
                         "type": "string",
@@ -25277,7 +26366,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "url"
                 ]
             },
-            "CheckURLUpdate": {
+            "Model219": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -25306,13 +26395,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "locations": {
-                        "$ref": "#/components/schemas/Model188"
+                        "$ref": "#/components/schemas/Model209"
                     },
                     "tags": {
                         "$ref": "#/components/schemas/CheckTagList"
                     },
                     "alertSettings": {
-                        "$ref": "#/components/schemas/Model189"
+                        "$ref": "#/components/schemas/Model210"
                     },
                     "useGlobalAlertSettings": {
                         "type": "boolean",
@@ -25333,13 +26422,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "minimum": 0
                     },
                     "runtimeId": {
-                        "$ref": "#/components/schemas/Model190"
+                        "$ref": "#/components/schemas/Model211"
                     },
                     "alertChannelSubscriptions": {
-                        "$ref": "#/components/schemas/Model191"
+                        "$ref": "#/components/schemas/Model212"
                     },
                     "retryStrategy": {
-                        "$ref": "#/components/schemas/Model195"
+                        "$ref": "#/components/schemas/Model216"
                     },
                     "triggerIncident": {
                         "$ref": "#/components/schemas/TriggerIncident"
@@ -25350,7 +26439,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "request": {
-                        "$ref": "#/components/schemas/Model197"
+                        "$ref": "#/components/schemas/Model218"
                     },
                     "frequency": {
                         "type": "integer",
@@ -25396,7 +26485,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     }
                 }
             },
-            "Model198": {
+            "Model220": {
                 "type": "string",
                 "enum": [
                     "us-east-1",
@@ -25423,7 +26512,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "af-south-1"
                 ]
             },
-            "Model199": {
+            "Model221": {
                 "type": "array",
                 "description": "An array of one or more data center locations where to run this check.",
                 "example": [
@@ -25431,10 +26520,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "eu-central-1"
                 ],
                 "items": {
-                    "$ref": "#/components/schemas/Model198"
+                    "$ref": "#/components/schemas/Model220"
                 }
             },
-            "Model200": {
+            "Model222": {
                 "type": "object",
                 "description": "Alert settings.",
                 "default": {
@@ -25472,7 +26561,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     }
                 }
             },
-            "Model201": {
+            "Model223": {
                 "type": "string",
                 "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute this check.",
                 "default": null,
@@ -25485,7 +26574,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "2022.10"
                 ]
             },
-            "Model202": {
+            "Model224": {
                 "type": "array",
                 "description": "List of alert channel subscriptions.",
                 "example": [],
@@ -25493,7 +26582,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/Model29"
                 }
             },
-            "Model203": {
+            "Model225": {
                 "type": "string",
                 "description": "Determines which type of retry strategy to use.",
                 "enum": [
@@ -25503,14 +26592,14 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "SINGLE_RETRY"
                 ]
             },
-            "Model204": {
+            "Model226": {
                 "type": "string",
                 "description": "The HTTP request could not be completed due to a network error: no response status code was received",
                 "enum": [
                     "NETWORK_ERROR"
                 ]
             },
-            "Model205": {
+            "Model227": {
                 "type": "array",
                 "x-constraint": {
                     "length": 1,
@@ -25518,15 +26607,15 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "single": true
                 },
                 "items": {
-                    "$ref": "#/components/schemas/Model204"
+                    "$ref": "#/components/schemas/Model226"
                 }
             },
-            "Model206": {
+            "Model228": {
                 "type": "object",
                 "description": "The strategy to determine how failed checks are retried.",
                 "properties": {
                     "type": {
-                        "$ref": "#/components/schemas/Model203"
+                        "$ref": "#/components/schemas/Model225"
                     },
                     "baseBackoffSeconds": {
                         "type": "number",
@@ -25551,7 +26640,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "maximum": 600
                     },
                     "onlyOn": {
-                        "$ref": "#/components/schemas/Model205"
+                        "$ref": "#/components/schemas/Model227"
                     }
                 },
                 "required": [
@@ -25587,13 +26676,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": false
                     },
                     "locations": {
-                        "$ref": "#/components/schemas/Model199"
+                        "$ref": "#/components/schemas/Model221"
                     },
                     "tags": {
                         "$ref": "#/components/schemas/CheckTagList"
                     },
                     "alertSettings": {
-                        "$ref": "#/components/schemas/Model200"
+                        "$ref": "#/components/schemas/Model222"
                     },
                     "useGlobalAlertSettings": {
                         "type": "boolean",
@@ -25614,13 +26703,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "minimum": 0
                     },
                     "runtimeId": {
-                        "$ref": "#/components/schemas/Model201"
+                        "$ref": "#/components/schemas/Model223"
                     },
                     "alertChannelSubscriptions": {
-                        "$ref": "#/components/schemas/Model202"
+                        "$ref": "#/components/schemas/Model224"
                     },
                     "retryStrategy": {
-                        "$ref": "#/components/schemas/Model206"
+                        "$ref": "#/components/schemas/Model228"
                     },
                     "triggerIncident": {
                         "$ref": "#/components/schemas/TriggerIncident"
@@ -26108,7 +27197,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "header"
                 ]
             },
-            "Model207": {
+            "Model229": {
                 "type": "object",
                 "properties": {
                     "customDomain": {
@@ -26239,7 +27328,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     }
                 }
             },
-            "Model208": {
+            "Model230": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -26286,7 +27375,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             "ErrorGroupsList": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model208"
+                    "$ref": "#/components/schemas/Model230"
                 }
             },
             "ErrorGroup": {
@@ -26355,7 +27444,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "MINOR"
                 ]
             },
-            "Model209": {
+            "Model231": {
                 "type": "string",
                 "description": "The incident update status. Must be one of INVESTIGATING,IDENTIFIED,MONITORING,RESOLVED,MAINTENANCE",
                 "example": "INVESTIGATING",
@@ -26367,11 +27456,11 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "MAINTENANCE"
                 ]
             },
-            "Model210": {
+            "Model232": {
                 "type": "object",
                 "properties": {
                     "status": {
-                        "$ref": "#/components/schemas/Model209"
+                        "$ref": "#/components/schemas/Model231"
                     },
                     "description": {
                         "type": "string",
@@ -26397,10 +27486,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "length": 1
                 },
                 "items": {
-                    "$ref": "#/components/schemas/Model210"
+                    "$ref": "#/components/schemas/Model232"
                 }
             },
-            "Model211": {
+            "Model233": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -26439,7 +27528,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "incidentUpdates"
                 ]
             },
-            "Model212": {
+            "Model234": {
                 "type": "string",
                 "description": "The incident update status. Must be one of INVESTIGATING,IDENTIFIED,MONITORING,RESOLVED,MAINTENANCE",
                 "example": "INVESTIGATING",
@@ -26451,11 +27540,11 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "MAINTENANCE"
                 ]
             },
-            "Model213": {
+            "Model235": {
                 "type": "object",
                 "properties": {
                     "status": {
-                        "$ref": "#/components/schemas/Model212"
+                        "$ref": "#/components/schemas/Model234"
                     },
                     "description": {
                         "type": "string",
@@ -26491,7 +27580,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "updated_at"
                 ]
             },
-            "Model214": {
+            "Model236": {
                 "type": "array",
                 "description": "The first incident update with the status and description. It must be only one element.",
                 "example": [
@@ -26514,10 +27603,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 ],
                 "minItems": 1,
                 "items": {
-                    "$ref": "#/components/schemas/Model213"
+                    "$ref": "#/components/schemas/Model235"
                 }
             },
-            "Model215": {
+            "Model237": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -26566,7 +27655,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "example": "2022-09-08T20:41:28.658Z"
                     },
                     "incidentUpdates": {
-                        "$ref": "#/components/schemas/Model214"
+                        "$ref": "#/components/schemas/Model236"
                     }
                 },
                 "required": [
@@ -26579,7 +27668,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "incidentUpdates"
                 ]
             },
-            "Model216": {
+            "Model238": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -26608,7 +27697,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "impact"
                 ]
             },
-            "Model217": {
+            "Model239": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -26672,10 +27761,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             "IncidentResults": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model213"
+                    "$ref": "#/components/schemas/Model235"
                 }
             },
-            "Model218": {
+            "Model240": {
                 "type": "object",
                 "properties": {
                     "description": {
@@ -26957,7 +28046,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "created_at"
                 ]
             },
-            "Model219": {
+            "Model241": {
                 "type": "array",
                 "items": {
                     "$ref": "#/components/schemas/privateLocationKeys"
@@ -27003,7 +28092,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/groupAssignments"
                     },
                     "keys": {
-                        "$ref": "#/components/schemas/Model219"
+                        "$ref": "#/components/schemas/Model241"
                     },
                     "proxyUrl": {
                         "type": "string",
@@ -27061,7 +28150,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "slugName"
                 ]
             },
-            "Model220": {
+            "Model242": {
                 "type": "array",
                 "items": {
                     "$ref": "#/components/schemas/privateLocationKeys"
@@ -27107,7 +28196,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/groupAssignments"
                     },
                     "keys": {
-                        "$ref": "#/components/schemas/Model220"
+                        "$ref": "#/components/schemas/Model242"
                     },
                     "proxyUrl": {
                         "type": "string",
@@ -27606,7 +28695,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "AUTO"
                 ]
             },
-            "Model221": {
+            "Model243": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -27620,10 +28709,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             "checks": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model221"
+                    "$ref": "#/components/schemas/Model243"
                 }
             },
-            "Model222": {
+            "Model244": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -27663,10 +28752,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             "services": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model222"
+                    "$ref": "#/components/schemas/Model244"
                 }
             },
-            "Model223": {
+            "Model245": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -27699,10 +28788,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             "cards": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model223"
+                    "$ref": "#/components/schemas/Model245"
                 }
             },
-            "Model224": {
+            "Model246": {
                 "type": "string",
                 "enum": [
                     "CRITICAL",
@@ -27712,7 +28801,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 ],
                 "maxLength": 1
             },
-            "Model225": {
+            "Model247": {
                 "type": "string",
                 "enum": [
                     "INVESTIGATING",
@@ -27721,19 +28810,19 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "RESOLVED"
                 ]
             },
-            "Model226": {
+            "Model248": {
                 "type": "object",
                 "properties": {
                     "description": {
                         "type": "string"
                     },
                     "status": {
-                        "$ref": "#/components/schemas/Model225"
+                        "$ref": "#/components/schemas/Model247"
                     },
                     "publicIncidentUpdateDate": {
                         "type": "string",
                         "format": "date-time",
-                        "default": "2025-10-23T02:33:28.626Z"
+                        "default": "2025-10-25T02:32:16.658Z"
                     },
                     "notifySubscribers": {
                         "type": "boolean",
@@ -27756,10 +28845,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "created_at"
                 ]
             },
-            "Model227": {
+            "Model249": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model226"
+                    "$ref": "#/components/schemas/Model248"
                 }
             },
             "lastUpdateStatus": {
@@ -27771,7 +28860,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "RESOLVED"
                 ]
             },
-            "Model228": {
+            "Model250": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -27779,7 +28868,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "maxLength": 255
                     },
                     "severity": {
-                        "$ref": "#/components/schemas/Model224"
+                        "$ref": "#/components/schemas/Model246"
                     },
                     "id": {
                         "type": "string",
@@ -27791,7 +28880,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/services"
                     },
                     "incidentUpdates": {
-                        "$ref": "#/components/schemas/Model227"
+                        "$ref": "#/components/schemas/Model249"
                     },
                     "lastUpdateStatus": {
                         "$ref": "#/components/schemas/lastUpdateStatus"
@@ -27817,10 +28906,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             "incidents": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model228"
+                    "$ref": "#/components/schemas/Model250"
                 }
             },
-            "Model229": {
+            "Model251": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -27895,10 +28984,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
             "entries": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model229"
+                    "$ref": "#/components/schemas/Model251"
                 }
             },
-            "Model230": {
+            "Model252": {
                 "type": "object",
                 "properties": {
                     "length": {
@@ -27916,7 +29005,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "entries"
                 ]
             },
-            "Model231": {
+            "Model253": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -27927,13 +29016,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     }
                 }
             },
-            "Model232": {
+            "Model254": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model231"
+                    "$ref": "#/components/schemas/Model253"
                 }
             },
-            "Model233": {
+            "Model255": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -27952,20 +29041,20 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "type": "string"
                     },
                     "services": {
-                        "$ref": "#/components/schemas/Model232"
+                        "$ref": "#/components/schemas/Model254"
                     }
                 },
                 "required": [
                     "name"
                 ]
             },
-            "Model234": {
+            "Model256": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model233"
+                    "$ref": "#/components/schemas/Model255"
                 }
             },
-            "Model235": {
+            "Model257": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -28000,7 +29089,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/defaultTheme"
                     },
                     "cards": {
-                        "$ref": "#/components/schemas/Model234"
+                        "$ref": "#/components/schemas/Model256"
                     }
                 },
                 "required": [
@@ -28009,7 +29098,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "cards"
                 ]
             },
-            "Model236": {
+            "Model258": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -28059,7 +29148,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "id"
                 ]
             },
-            "Model237": {
+            "Model259": {
                 "type": "string",
                 "enum": [
                     "CRITICAL",
@@ -28069,13 +29158,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 ],
                 "maxLength": 1
             },
-            "Model238": {
+            "Model260": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model226"
+                    "$ref": "#/components/schemas/Model248"
                 }
             },
-            "Model239": {
+            "Model261": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -28083,7 +29172,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "maxLength": 255
                     },
                     "severity": {
-                        "$ref": "#/components/schemas/Model237"
+                        "$ref": "#/components/schemas/Model259"
                     },
                     "id": {
                         "type": "string",
@@ -28095,7 +29184,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/services"
                     },
                     "incidentUpdates": {
-                        "$ref": "#/components/schemas/Model238"
+                        "$ref": "#/components/schemas/Model260"
                     },
                     "lastUpdateStatus": {
                         "$ref": "#/components/schemas/lastUpdateStatus"
@@ -28119,20 +29208,20 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "created_at"
                 ]
             },
-            "Model240": {
+            "Model262": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model239"
+                    "$ref": "#/components/schemas/Model261"
                 }
             },
-            "Model241": {
+            "Model263": {
                 "type": "object",
                 "properties": {
                     "length": {
                         "type": "integer"
                     },
                     "entries": {
-                        "$ref": "#/components/schemas/Model240"
+                        "$ref": "#/components/schemas/Model262"
                     },
                     "nextId": {
                         "type": "string"
@@ -28143,7 +29232,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "entries"
                 ]
             },
-            "Model242": {
+            "Model264": {
                 "type": "string",
                 "enum": [
                     "CRITICAL",
@@ -28153,7 +29242,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 ],
                 "maxLength": 1
             },
-            "Model243": {
+            "Model265": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -28189,14 +29278,14 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "accountId"
                 ]
             },
-            "Model244": {
+            "Model266": {
                 "type": "array",
                 "minItems": 1,
                 "items": {
-                    "$ref": "#/components/schemas/Model243"
+                    "$ref": "#/components/schemas/Model265"
                 }
             },
-            "Model245": {
+            "Model267": {
                 "type": "string",
                 "enum": [
                     "INVESTIGATING",
@@ -28205,7 +29294,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "RESOLVED"
                 ]
             },
-            "Model246": {
+            "Model268": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -28218,12 +29307,12 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "type": "string"
                     },
                     "status": {
-                        "$ref": "#/components/schemas/Model245"
+                        "$ref": "#/components/schemas/Model267"
                     },
                     "publicIncidentUpdateDate": {
                         "type": "string",
                         "format": "date-time",
-                        "default": "2025-10-23T02:33:28.664Z"
+                        "default": "2025-10-25T02:32:16.720Z"
                     },
                     "created_at": {
                         "type": "string",
@@ -28238,16 +29327,16 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "description"
                 ]
             },
-            "Model247": {
+            "Model269": {
                 "type": "array",
                 "x-constraint": {
                     "length": 1
                 },
                 "items": {
-                    "$ref": "#/components/schemas/Model246"
+                    "$ref": "#/components/schemas/Model268"
                 }
             },
-            "Model248": {
+            "Model270": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -28272,13 +29361,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "maxLength": 255
                     },
                     "severity": {
-                        "$ref": "#/components/schemas/Model242"
+                        "$ref": "#/components/schemas/Model264"
                     },
                     "services": {
-                        "$ref": "#/components/schemas/Model244"
+                        "$ref": "#/components/schemas/Model266"
                     },
                     "incidentUpdates": {
-                        "$ref": "#/components/schemas/Model247"
+                        "$ref": "#/components/schemas/Model269"
                     }
                 },
                 "required": [
@@ -28288,7 +29377,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "incidentUpdates"
                 ]
             },
-            "Model249": {
+            "Model271": {
                 "type": "string",
                 "enum": [
                     "CRITICAL",
@@ -28298,14 +29387,14 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                 ],
                 "maxLength": 1
             },
-            "Model250": {
+            "Model272": {
                 "type": "array",
                 "minItems": 1,
                 "items": {
-                    "$ref": "#/components/schemas/Model243"
+                    "$ref": "#/components/schemas/Model265"
                 }
             },
-            "Model251": {
+            "Model273": {
                 "type": "object",
                 "properties": {
                     "id": {
@@ -28330,10 +29419,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "maxLength": 255
                     },
                     "severity": {
-                        "$ref": "#/components/schemas/Model249"
+                        "$ref": "#/components/schemas/Model271"
                     },
                     "services": {
-                        "$ref": "#/components/schemas/Model250"
+                        "$ref": "#/components/schemas/Model272"
                     }
                 },
                 "required": [
@@ -28342,26 +29431,26 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "services"
                 ]
             },
-            "Model252": {
+            "Model274": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model246"
+                    "$ref": "#/components/schemas/Model268"
                 }
             },
-            "Model253": {
+            "Model275": {
                 "type": "array",
                 "items": {
-                    "$ref": "#/components/schemas/Model222"
+                    "$ref": "#/components/schemas/Model244"
                 }
             },
-            "Model254": {
+            "Model276": {
                 "type": "object",
                 "properties": {
                     "length": {
                         "type": "integer"
                     },
                     "entries": {
-                        "$ref": "#/components/schemas/Model253"
+                        "$ref": "#/components/schemas/Model275"
                     },
                     "nextId": {
                         "type": "string"
@@ -28372,7 +29461,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "entries"
                 ]
             },
-            "Model255": {
+            "Model277": {
                 "type": "object",
                 "properties": {
                     "name": {
@@ -28383,14 +29472,14 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "name"
                 ]
             },
-            "Model256": {
+            "Model278": {
                 "type": "string",
                 "description": "The type of subscription.",
                 "enum": [
                     "EMAIL"
                 ]
             },
-            "Model257": {
+            "Model279": {
                 "type": "string",
                 "description": "The status of the subscription.",
                 "enum": [
@@ -28406,7 +29495,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "description": "The ID of the subscription."
                     },
                     "type": {
-                        "$ref": "#/components/schemas/Model256"
+                        "$ref": "#/components/schemas/Model278"
                     },
                     "address": {
                         "type": "string",
@@ -28416,7 +29505,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         }
                     },
                     "status": {
-                        "$ref": "#/components/schemas/Model257"
+                        "$ref": "#/components/schemas/Model279"
                     },
                     "created_at": {
                         "type": "string",
@@ -28515,13 +29604,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "checkId"
                 ]
             },
-            "Model258": {
+            "Model280": {
                 "type": "array",
                 "items": {
                     "$ref": "#/components/schemas/EnvironmentVariableGet"
                 }
             },
-            "Model259": {
+            "Model281": {
                 "type": "string",
                 "enum": [
                     "us-east-1",
@@ -28548,7 +29637,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "af-south-1"
                 ]
             },
-            "Model260": {
+            "Model282": {
                 "type": "array",
                 "description": "An array of one or more data center locations where to run the checks.",
                 "example": [
@@ -28556,10 +29645,10 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "eu-central-1"
                 ],
                 "items": {
-                    "$ref": "#/components/schemas/Model259"
+                    "$ref": "#/components/schemas/Model281"
                 }
             },
-            "Model261": {
+            "Model283": {
                 "type": "string",
                 "description": "The runtime version, i.e. fixed set of runtime dependencies, used to execute checks in this group.",
                 "default": null,
@@ -28572,7 +29661,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "2022.10"
                 ]
             },
-            "Model262": {
+            "Model284": {
                 "type": "array",
                 "description": "List of alert channel subscriptions.",
                 "example": [],
@@ -28580,7 +29669,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "$ref": "#/components/schemas/Model29"
                 }
             },
-            "Model263": {
+            "Model285": {
                 "type": "array",
                 "description": "An array of one or more private locations where to run the checks.",
                 "example": [
@@ -28590,7 +29679,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "type": "string"
                 }
             },
-            "Model264": {
+            "Model286": {
                 "type": "object",
                 "description": "Alert settings.",
                 "default": null,
@@ -28637,7 +29726,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "$ref": "#/components/schemas/CheckGroupTagList"
                     },
                     "locations": {
-                        "$ref": "#/components/schemas/Model260"
+                        "$ref": "#/components/schemas/Model282"
                     },
                     "concurrency": {
                         "type": "number",
@@ -28655,13 +29744,13 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "type": "string"
                     },
                     "runtimeId": {
-                        "$ref": "#/components/schemas/Model261"
+                        "$ref": "#/components/schemas/Model283"
                     },
                     "environmentVariables": {
                         "$ref": "#/components/schemas/environmentVariables"
                     },
                     "alertChannelSubscriptions": {
-                        "$ref": "#/components/schemas/Model262"
+                        "$ref": "#/components/schemas/Model284"
                     },
                     "setupSnippetId": {
                         "type": "number",
@@ -28688,7 +29777,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": null
                     },
                     "privateLocations": {
-                        "$ref": "#/components/schemas/Model263"
+                        "$ref": "#/components/schemas/Model285"
                     },
                     "runParallel": {
                         "type": "boolean",
@@ -28696,7 +29785,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "default": null
                     },
                     "alertSettings": {
-                        "$ref": "#/components/schemas/Model264"
+                        "$ref": "#/components/schemas/Model286"
                     },
                     "retryStrategy": {
                         "$ref": "#/components/schemas/RetryStrategy"
@@ -28715,7 +29804,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                     "name"
                 ]
             },
-            "Model265": {
+            "Model287": {
                 "type": "array",
                 "items": {
                     "$ref": "#/components/schemas/CheckResult"
@@ -28728,7 +29817,7 @@ For example, set **Authorization** header while using cURL: `curl -H \"Authoriza
                         "type": "number"
                     },
                     "entries": {
-                        "$ref": "#/components/schemas/Model265"
+                        "$ref": "#/components/schemas/Model287"
                     },
                     "nextId": {
                         "type": "string"

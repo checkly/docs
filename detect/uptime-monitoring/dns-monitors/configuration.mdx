@@ -18,9 +18,9 @@ Specify the domain and record type you want to check:
 </Frame>
 
 * **Domain:** The domain you want to monitor (e.g. `checklyhq.com`)
-* **Record type:** The DNS record to query. See [supported record types](/detect/uptime-monitoring/dns-monitors/overview#supported-dns-record-types) for the full list.
+* **Record type:** The DNS record to query. See [supported record types](/detect/uptime-monitoring/dns-monitors/overview#supported-dns-record-types) for the full list
 * **DNS server:** Queries use 8.8.8.8 (Google DNS) by default with automatic failover to 1.1.1.1 (Cloudflare) and an internal AWS resolver on errors. You can specify a custom nameserver and port (e.g., `1.1.1.1:53` or `dns.google:53`) to test resolver-specific behavior
-* **Protocol:** You can pin DNS queries to UDP-only or TCP-only.
+* **Protocol:** You can pin DNS queries to UDP-only or TCP-only
 
 ### Assertions
 
@@ -35,11 +35,11 @@ The raw and JSON responses are shown on the results page of a DNS monitor run an
 
 * **Response time:** The lookup time in milliseconds. Use this to set thresholds for failed lookups
 
-* **Return code:** By default, DNS monitors pass when the return code is NOERROR and fail on error codes (FORMERR, SERVFAIL, NXDOMAIN, etc.). You can override this behavior by defining a custom return code assertion
+* **Response code:** By default, DNS monitors pass when the return code is NOERROR and fail on error codes (FORMERR, SERVFAIL, NXDOMAIN, etc.). You can override this behavior by defining a custom return code assertion
 
-* **Text response:** The raw DNS response as plain text. Use this to check for specific strings in the response
+* **Answer:** The raw DNS response as plain text. Use this to check for specific strings in the response
 
-* **JSON response:** The DNS response parsed as JSON. This allows you to target specific fields using JSON path assertions. The response structure varies by record type. See [JSON response schemas](#json-response-schemas) below for all supported record types.
+* **Structured answer:** The DNS response parsed as JSON. This allows you to target specific fields using JSON path assertions. The response structure varies by record type. See [JSON response schemas](#json-response-schemas) below for all supported record types
 
 With JSON path assertions, you can:
 
@@ -321,8 +321,8 @@ Set how often the monitor runs (every 10 seconds to 24 hours):
 </Frame>
 
 * **Strategy:** Choose between round-robin or parallel execution. Learn more about [scheduling strategies](/monitoring/global-locations#scheduling-strategies)
-* **Locations:** Select one or more [public](/monitoring/global-locations/) locations to run the monitor from.
-* **Private locations**: DNS monitors do not currently support private locations.
+* **Locations:** Select one or more [public](/monitoring/global-locations/) locations to run the monitor from
+* **Private locations**: DNS monitors do not currently support private locations
 ### Additional Settings
 
 * **Name:** Give your monitor a clear name to identify it in dashboards and alerts

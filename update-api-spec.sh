@@ -4,7 +4,7 @@
 
 set -e
 
-LIVE_API_URL="https://api.checklyhq.com/swagger.json"
+LIVE_API_URL="https://api.checklyhq.com/openapi.json"
 API_SPEC_PATH="./api-reference/openapi.json"
 TEMP_FILE="/tmp/checkly_openapi.json"
 
@@ -38,11 +38,6 @@ fi
 
 echo "✅ Validating OpenAPI specification..."
 npm exec mintlify openapi-check "$TEMP_FILE"
-
-echo "📝 Creating backup of current specification..."
-if [ -f "$API_SPEC_PATH" ]; then
-    cp "$API_SPEC_PATH" "${API_SPEC_PATH}.backup.$(date +%Y%m%d_%H%M%S)"
-fi
 
 echo "🔄 Updating API specification..."
 cp "$TEMP_FILE" "$API_SPEC_PATH"

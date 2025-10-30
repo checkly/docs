@@ -10,65 +10,28 @@ sidebarTitle: 'Email'
 
 Email notifications provide a reliable and widely-supported way to receive alerts from your Checkly monitors. Set up email alerts for individuals or distribution lists with customizable content.
 
+<Frame>
+  <img 
+    className="block dark:hidden" 
+    src="/images/email-light.png" 
+    alt="Light mode interface"
+  />
+  <img 
+    className="hidden dark:block" 
+    src="/images/email-dark.png" 
+    alt="Dark mode interface"
+  />
+</Frame>
+
 ## Basic Email Configuration
 
-Set up email alerts for individuals or distribution lists:
+To recieve alerts, you'll need to add a valid email address, choose what states you want to receive alerts for, and then also add subscriptions to checks. 
 
-```yaml
-Email Configuration:
-  Recipients:
-    - engineering@company.com
-    - ops-team@company.com
-    - john.doe@company.com
-  Alert Types: [Failure, Recovery]
-  Subject Format: "[CHECKLY] {{ALERT_TITLE}}"
-  Include Details: Response time, location, direct link
-```
-
-## Email Content
-
-Email alerts include comprehensive check information:
-
-```text
-Subject: [CHECKLY] Check "Payment API" has failed
-
-Alert Details:
-- Check Name: Payment API Health Check
-- Alert Type: ALERT_FAILURE
-- Location: N. Virginia (us-east-1)
-- Response Time: 5,234ms
-- Started At: 2024-01-15 14:30:22 UTC
-- Error: Connection timeout after 5000ms
-
-View detailed results: https://app.checklyhq.com/checks/abc123/results/def456
-
-Check configuration: https://app.checklyhq.com/checks/abc123
-```
-
-## Email Best Practices
-
-### Distribution Lists vs Individual Addresses
-
-- **Use distribution lists**: Instead of individual email addresses for better management
-- **Role-based emails**: Use role-based addresses like ops-team@company.com rather than personal emails
-- **Environment separation**: Set up different email lists for production, staging, and development
-
-### Email Organization
-
-- **Separate emails for severity levels**: Configure different email addresses for critical vs standard alerts
-- **Email filters**: Set up email filters for automated processing and organization
-- **Team-based routing**: Include relevant team members based on check ownership and service responsibility
-
-### Subject Line Formatting
-
-Customize subject lines for better email organization:
-
-- Include environment indicators: `[CHECKLY-PROD]` vs `[CHECKLY-STAGING]`
-- Add severity levels: `[CRITICAL]`, `[WARNING]`, `[INFO]`
-- Use consistent formatting for automated filtering
-
-### Managing Email Volume
-
-- **Consolidate recovery notifications**: Consider whether recovery emails are needed for all alerts
-- **Time-based filtering**: Reduce email volume during non-business hours for non-critical alerts
-- **Escalation policies**: Only send email alerts after initial notification channels have been tried
+When an alert is triggered, you'll receive an email like below:
+<Frame>
+  <img 
+    className="" 
+    src="/images/email-content.png" 
+    alt=" mode interface"
+  />
+</Frame>

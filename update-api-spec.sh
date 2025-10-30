@@ -33,7 +33,6 @@ else
   sed -i.tmp 's|<br>|\n|g' "$TEMP_FILE"
   sed -i.tmp 's|<b>\([^<]*\)</b>|**\1**|g' "$TEMP_FILE"
   sed -i.tmp 's|<code>\([^<]*\)</code>|`\1`|g' "$TEMP_FILE"
-  rm -f "${TEMP_FILE}.tmp"
 fi
 
 echo "✅ Validating OpenAPI specification..."

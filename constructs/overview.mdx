@@ -13,13 +13,13 @@ Constructs are JavaScript/TypeScript classes that represent your all monitoring 
 <CodeGroup dropdown>
 
 ```ts api.check.ts
-import { ApiCheck, AssertionBuilder } from "checkly/constructs"
+import { ApiCheck, AssertionBuilder } from 'checkly/constructs'
 
-new ApiCheck("api-health-check", {
-  name: "API Health Check",
+new ApiCheck('api-health-check', {
+  name: 'API Health Check',
   request: {
-    url: "https://danube-web.shop/api/books",
-    method: "GET",
+    url: 'https://danube-web.shop/api/books',
+    method: 'GET',
     assertions: [
       AssertionBuilder.statusCode().equals(200),
     ],
@@ -28,13 +28,13 @@ new ApiCheck("api-health-check", {
 ```
 
 ```js api.check.js
-const { ApiCheck, AssertionBuilder } = require("checkly/constructs")
+const { ApiCheck, AssertionBuilder } = require('checkly/constructs')
 
-new ApiCheck("api-health-check", {
-  name: "API Health Check",
+new ApiCheck('api-health-check', {
+  name: 'API Health Check',
   request: {
-    url: "https://danube-web.shop/api/books",
-    method: "GET",
+    url: 'https://danube-web.shop/api/books',
+    method: 'GET',
     assertions: [
       AssertionBuilder.statusCode().equals(200),
     ],
@@ -49,7 +49,9 @@ Test this API check with `npx checkly test` and transform it to production monit
 
 ## Project Structure
 
-Configure your Checkly project by creating and editing the `checkly.config.ts`. The configuration file enables you to set default settings like monitoring locations, configure alert settings and organize your Checkly files to match your project requirements.
+- `checkly.config.ts` - Mandatory global project and CLI configuration. We recommend using TypeScript.
+- `src/__checks__/*` - TS/JS files defining your checks and other resources.
+- `package.json` - Standard NPM project manifest.
 
 Here is an example directory tree of what that would look like:
 
@@ -65,61 +67,57 @@ Here is an example directory tree of what that would look like:
 
 ```
 
-We recommend separating your monitoring resources from your application code using the `__checks__` path convention. However, it's up to you to define where your monitoring setup will be configured.
+The `checkly.config.ts` at the root of your project defines a range of defaults for all your checks.
 
 ## Project Configuration
 
 As your project grows, you will want to override these defaults for specific checks or check groups. The recommended way to tackle this is using a mix of **global** and **local** configuration.
 
-<Tabs>
-  <Tab title="Global Configuration">
-    Your global `checkly.config` holds a set of defaults for your project.
+### Global Configuration
+As mentioned, your global `checkly.config.ts` holds a set of defaults for your project, checks, and some CLI commands. Use `defineConfig` to configure your Checkly project.
 
-    <ChecklyConfigCodeBlock />
+<ChecklyConfigCodeBlock />
 
-    Find a full reference of all project properties in [the `Project` configuration section](/constructs/project).
-  </Tab>
+Find a full reference of all project properties in [the `Project` construct section](/constructs/project).
 
-  <Tab title="Local Configuration">
-    Override any of the `checkly.config` settings at the individual check level.
+### Local Configuration
+Override any of the `checks` global configuration settings at the individual check level.
 
-    <CodeGroup dropdown>
+<CodeGroup dropdown>
 
 ```ts __checks__/api.check.ts
-import { ApiCheck, AssertionBuilder, Frequency } from "checkly/constructs"
+import { ApiCheck, AssertionBuilder, Frequency } from 'checkly/constructs'
 
-new ApiCheck("books-api", {
-  name: "Books API",
-  locations: ["ap-south-1"], // overrides the locations property
+new ApiCheck('books-api', {
+  name: 'Books API',
+  locations: ['ap-south-1'], // overrides the locations property
   frequency: Frequency.EVERY_30M, // overrides the frequency property
   request: {
-    method: "GET",
-    url: "https://danube-web.shop/api/books",
+    method: 'GET',
+    url: 'https://danube-web.shop/api/books',
     assertions: [AssertionBuilder.statusCode().equals(200)],
   },
 })
 ```
 
 ```js __checks__/api.check.js
-const { ApiCheck, AssertionBuilder, Frequency } = require("checkly/constructs")
+const { ApiCheck, AssertionBuilder, Frequency } = require('checkly/constructs')
 
-new ApiCheck("books-api", {
-  name: "Books API",
-  locations: ["ap-south-1"], // overrides the locations property
+new ApiCheck('books-api', {
+  name: 'Books API',
+  locations: ['ap-south-1'], // overrides the locations property
   frequency: Frequency.EVERY_30M, // overrides the frequency property
   request: {
-    method: "GET",
-    url: "https://danube-web.shop/api/books",
+    method: 'GET',
+    url: 'https://danube-web.shop/api/books',
     assertions: [AssertionBuilder.statusCode().equals(200)],
   },
 })
 ```
 
-    </CodeGroup>
+</CodeGroup>
 
-    Find a full reference of all check properties in [the `ApiCheck` construct](/cli/constructs-reference/#apicheck) or [`BrowserCheck` construct section](/cli/constructs-reference/#browsercheck).
-  </Tab>
-</Tabs>
+Find a full reference of all check properties in [the `ApiCheck` construct](/constructs/api-check) or [`BrowserCheck` construct section](/constructs/browser-check).
 
 ## Logical IDs
 
@@ -145,20 +143,20 @@ Constructs are JavaScript/TypeScript classes that you can initialize programmati
 
 ```ts api-check.ts
 // Share alert channels across checks
-const alertChannel = new EmailAlertChannel("team-alerts", {
-  address: "team@example.com",
+const alertChannel = new EmailAlertChannel('team-alerts', {
+  address: 'team@example.com',
 })
 
 // Define your endpoints
-const endpoints = ["/api/books", "/api/books/22"]
+const endpoints = ['/api/books', '/api/books/22']
 
 // Create a new check for each endpoint
 endpoints.forEach(
   (endpoint) =>
-    new ApiCheck(`${endpoint.replace("/", "-")}-check`, {
+    new ApiCheck(`${endpoint.replace('/', '-')}-check`, {
       name: `${endpoint} Check`,
       request: {
-        method: "GET",
+        method: 'GET',
         url: `https://danube-web.shop/${endpoint}`,
       },
       alertChannels: [alertChannel],

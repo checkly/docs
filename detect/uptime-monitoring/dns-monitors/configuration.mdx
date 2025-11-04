@@ -43,7 +43,6 @@ The raw and JSON responses are shown on the results page of a DNS monitor run an
 
 With JSON path assertions, you can:
 
-* `$.Answer.length` → verify the number of records returned
 * `$.Answer[0].TTL` → validate TTL values are within expected ranges
 * `$.Answer[0].data` → check specific IP addresses or record values
 * `$.Status` → verify the DNS response status code
@@ -118,7 +117,6 @@ The DNS response is parsed into a structured JSON format. All responses share a 
 
 Common assertions:
 - `$.Answer[0].data` - Check specific IP address
-- `$.Answer.length` - Verify number of A records
 - `$.Answer[0].TTL` - Validate TTL value
 </Accordion>
 
@@ -202,7 +200,6 @@ Common assertions:
 
 Common assertions:
 - `$.Answer[0].data` - Check MX priority and mail server (format: "priority hostname")
-- `$.Answer.length` - Verify number of mail servers
 </Accordion>
 
 <Accordion title="TXT Record">
@@ -259,7 +256,6 @@ Common assertions:
 ```
 
 Common assertions:
-- `$.Answer.length` - Verify number of nameservers
 - `$.Answer[0].data` - Check specific nameserver
 </Accordion>
 
@@ -339,9 +335,9 @@ Set how often the monitor runs (every 10 seconds to 24 hours):
 - **Domain**: `cdn.example.com`
 - **Record type**: A
 - **Assertions**:
-  - `$.Answer.length` equals `4` (verify all IPs present)
   - `$.Answer[0].TTL` is less than `300` (ensure low TTL for quick failover)
   - `$.Answer[0].data` equals expected IP address
+  - Text response contains expected IP range (check multiple IPs in raw response)
 </Accordion>
 
 <Accordion title="Verify email security records (SPF, DKIM, DMARC)">
@@ -369,7 +365,6 @@ For DMARC:
 - **Domain**: `example.com`
 - **Record type**: MX
 - **Assertions**:
-  - `$.Answer.length` is greater than `1` (at least 2 MX records)
   - `$.Answer[0].data` contains `10 mail.example.com.` (priority 10 + hostname)
   - Text response contains `mail.example.com`
 </Accordion>
@@ -384,6 +379,5 @@ For DMARC:
   - Monitor 1: DNS server `ns1.example.com:53`
   - Monitor 2: DNS server `ns2.example.com:53`
 - **Assertions**:
-  - `$.Answer.length` equals expected count
   - `$.Answer[0].data` equals `ns1.example.com.` or `ns2.example.com.`
 </Accordion>

@@ -22,8 +22,8 @@ DNS monitors perform lookups to verify your DNS configuration:
 1. **Query initiation**: Checkly runs a DNS lookup from your configured location(s)
 
 2. **Resolver selection**: The query is sent to a DNS resolver:
-   - **Default**: 8.8.8.8 (Google DNS) with automatic failover. If the default resolver returns an error code (SERVFAIL, NXDOMAIN, etc.), Checkly automatically retries with 1.1.1.1 (Cloudflare DNS), then an internal AWS resolver
-   - **Custom resolver**: You can specify a custom nameserver and port for testing resolver-specific behavior (no automatic failover, queries only use your specified nameserver)
+   - **Default**: The query is sent to 8.8.8.8 (Google DNS). If that resolver returns an error (SERVFAIL, NXDOMAIN, etc.), Checkly automatically retries with 1.1.1.1 (Cloudflare DNS), then with an internal AWS resolver.
+   - **Custom resolver**: You can specify your own nameserver (and port) to test resolver-specific behavior. In this mode, the query is sent only to your resolver, no failover is applied.
 
 3. **DNS chain resolution**: The resolver queries the authoritative nameserver and retrieves the requested record type
 

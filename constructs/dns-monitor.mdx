@@ -62,7 +62,7 @@ new DnsMonitor("advanced-dns-monitor", {
     port: 53,
     protocol: "UDP",
     assertions: [
-      DnsAssertionBuilder.jsonAnswer("$.Answer[0].TTL").between(300, 86400),
+      DnsAssertionBuilder.jsonAnswer("$.Answer[0].TTL").greaterThan(300),
       DnsAssertionBuilder.responseTime().lessThan(500),
       DnsAssertionBuilder.jsonAnswer("$.Answer[0].data").equals("93.184.216.34")
     ],
@@ -137,7 +137,7 @@ Learn more in [Assertions](/detect/uptime-monitoring/dns-monitors/configuration#
 </ResponseField>
 
 <ResponseField name="degradedResponseTime" type="number" default="500">
-Response time threshold in milliseconds for marking the DNS monitor as degraded (warning state).
+Response time threshold in milliseconds for marking the DNS Monitor as degraded (warning state).
 
 **Usage:**
 
@@ -157,7 +157,7 @@ new DnsMonitor("dns-performance-tiers", {
 </ResponseField>
 
 <ResponseField name="maxResponseTime" type="number" default="1000">
-Maximum response time in milliseconds before the DNS monitor is marked as failed.
+Maximum response time in milliseconds before the DNS Monitor is marked as failed.
 
 **Usage:**
 
@@ -176,7 +176,7 @@ new DnsMonitor("fast-dns", {
 ### General Monitor Options
 
 <ResponseField name="name" type="string" required>
-Friendly name for your DNS monitor that will be displayed in the Checkly dashboard and used in notifications.
+Friendly name for your DNS Monitor that will be displayed in the Checkly dashboard and used in notifications.
 
 **Usage:**
 
@@ -190,7 +190,7 @@ new DnsMonitor("my-monitor", {
 </ResponseField>
 
 <ResponseField name="frequency" type="Frequency">
-How often the DNS monitor should run. Use the `Frequency` enum to set the check interval.
+How often the DNS Monitor should run. Use the `Frequency` enum to set the check interval.
 
 **Usage:**
 
@@ -205,7 +205,7 @@ new DnsMonitor("my-monitor", {
 </ResponseField>
 
 <ResponseField name="locations" type="string[]" default="[]">
-Array of [public location codes](/concepts/locations/#public-locations) where the DNS monitor should run from. Multiple locations provide geographic coverage and help detect regional DNS issues.
+Array of [public location codes](/concepts/locations/#public-locations) where the DNS Monitor should run from. Multiple locations provide geographic coverage and help detect regional DNS issues.
 
 **Usage:**
 
@@ -217,7 +217,7 @@ new DnsMonitor("global-dns-monitor", {
 </ResponseField>
 
 <ResponseField name="activated" type="boolean" default="true">
-Whether the DNS monitor is enabled and will run according to its schedule.
+Whether the DNS Monitor is enabled and will run according to its schedule.
 
 **Usage:**
 

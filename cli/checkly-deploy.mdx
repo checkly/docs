@@ -5,6 +5,7 @@ sidebarTitle: 'checkly deploy'
 ---
 
 import CliCommandPrerequisites from '/snippets/cli-command-prerequisites.mdx';
+import CliEnvVars from "/snippets/cli-env-vars.mdx"
 
 The `checkly deploy` command deploys all your checks and associated resources like alert channels to your Checkly account. This command synchronizes your local monitoring-as-code configuration with your Checkly account.
 
@@ -174,14 +175,7 @@ When you deploy a project, you can attach Git-specific information so changes to
 
 The Checkly CLI evaluates Git information from your local or CI environment on a best effort basis. Override any automatically detected values by setting the corresponding environment variables.
 
-| item               | auto  | variable                                               | description                                 |
-|--------------------|-------|--------------------------------------------------------|---------------------------------------------|
-| **Repository**     | false | `repoUrl` in `checkly.config.ts` or `CHECKLY_REPO_URL` | The URL of your repo on GitHub, GitLab etc. |
-| **Commit hash**    | true  | `CHECKLY_REPO_SHA`                                     | The SHA of the commit.                      |
-| **Branch**         | true  | `CHECKLY_REPO_BRANCH`                                  | The branch name.                            |
-| **Commit owner**   | true  | `CHECKLY_REPO_COMMIT_OWNER`                            | The committer's name or email.              |
-| **Commit message** | true  | `CHECKLY_REPO_COMMIT_MESSAGE`                          | The commit message.                         |
-| **Environment**    | false | `CHECKLY_TEST_ENVIRONMENT`                             | The environment name, e.g. "staging".       |
+<CliEnvVars />
 
 ## Related Commands
 

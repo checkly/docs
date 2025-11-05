@@ -2,19 +2,26 @@
 title: 'Creating A Playwright Check Suite'
 description: 'Get started with Checkly by creating your first Playwright Check Suite'
 sidebarTitle: 'Playwright Check Suite'
-mode: "wide"
 ---
+
+import { YoutubeEmbed } from "/snippets/youtube-embed.jsx"
+
+<Tip>
+Learn more about all the [Playwright Check Suites capabilities](/detect/synthetic-monitoring/playwright-checks/overview) in the general overview.
+</Tip>
 
 ## QuickStart Guide
 
-Here's how to get from zero to deployed checks in 5 minutes.
+Here's how to get started with Playwright Check Suites.
+
+<YoutubeEmbed id="eP9rSxVWt9Y" />
 
 ### Before you begin
 
 What you need:
 
 * A checkly account
-* A repository using Playwright for E2E tests and a Playwright configuration file.
+* A repository using Playwright for end-to-end testing and a Playwright configuration file.
 
 ## Steps
 
@@ -27,26 +34,26 @@ What you need:
 
 ### 2. [Optional] If you're using TypeScript
 
-  If you're using TypeScript, install the dev dependencies [`jiti`](https://www.npmjs.com/package/jiti) and [`typescript`](https://www.npmjs.com/package/typescript). These help the CLI bundle your typescript config and test files correctly.
+  If you're using TypeScript, install the dev dependency [`jiti`](https://www.npmjs.com/package/jiti). Jiti will enable the CLI to bundle your TypeScript config and test files correctly.
 
   ```bash terminal
-  npm install --save-dev jiti typescript
+  npm install --save-dev jiti
   ```
 
 
 
 ### 3. Use `pw-test` to test in Checkly
 
-Run your Playwright test suite using `pw-test`.
+Run your existing Playwright test suite using `pw-test`.
 
 `pw-test` accepts both Checkly and Playwright command line arguments using the following syntax:
 
-`npx checkly pw-test --checkly-flag -- --playwright-flag`. Use `--` to separate Checkly and Playwright flags.
+`npx checkly pw-test [--checkly-flag] -- [--playwright-flag]`. Use `--` to separate Checkly and Playwright flags.
 
-The CLI command will then return a link to results, traces and more details:
+The CLI command will then return a link to the test session results, traces and more details:
 
 ```bash
-> npx checkly pw-test -- --project=chromium
+$ npx checkly pw-test -- --project=chromium
 
 Parsing your Playwright project... ✅
 
@@ -63,14 +70,16 @@ Detailed session summary at: https://chkly.link/l/linkhere
 ```
 
 
-### 4. Convert tests to checks with `pw-test`:
+### 4. Convert tests to monitoring checks with `pw-test --create-check`:
 
-Using `pw-test` with the `--create-check` flag will create a `checkly.config.ts` file if it doesn't exist, and will add the new check. Afterwards, you can tweak the monitoring configuration for your check.
+The `pw-test` command enables you to run your existing tests in the Checkly infrastructure. 
+Use the `--create-check` flag to define the new check in your `checkly.config.ts` file. 
+`--create-check` will create a `checkly.config.ts` file if it doesn't exist and will include the necessary definitions to run your Playwright tests as a synthetic check.
 
 For example:
 
 ```bash
-> npx checkly pw-test --create-check -- --project=chromium
+$ npx checkly pw-test --create-check -- --project=chromium
 ⚠ No Checkly config file found
 
 ℹ Creating a default checkly config file.
@@ -78,34 +87,35 @@ For example:
 Creating Checkly check from Playwright test... ✅
 ```
 
-Review the resulting check configuration in your `checkly.config.ts` file and make sure to tweak locations and schedule as needed.
+Review the resulting check configuration in your `checkly.config.ts` file and make sure to adjust locations and schedule as needed.
 
-```typescript {title="checkly.config.ts"}
+```typescript {title="checkly.config.ts"} highlight={8-18}
 import { defineConfig } from 'checkly'
 
 const config = defineConfig({
-  logicalId: 'my-repo-name',
-  projectName: 'my-repo-name',
+  logicalId: 'playwright-check-suites',
+  projectName: 'my-repo-playwright-check-suites',
   checks: {
     playwrightConfigPath: './playwright.config.ts',
     playwrightChecks: [
       {
-        logicalId: 'playwright-check-project-chromium', // tweak ID
-        name: 'Playwright Test: --project=chromium', // tweak name
-        testCommand: 'npx playwright test --project=chromium', // what we'll run as part of your check suite
+        logicalId: 'playwright-check-project-chromium', // Playwright Check Suite id
+        name: 'Playwright Test: --project=chromium', // Playwright Check Suite name
+        installCommand: 'npm install --dev' // Command to install your  code dependencies
+        testCommand: 'npx playwright test --project=chromium', // Command to run your tests
         locations: [
-          'eu-central-1', // add or change locations
+          'eu-central-1', // monitoring locations
         ],
-        frequency: 10, // a custom per-check frequency
+        frequency: 10, // monitoring frequency (every 10 minutes)
       },
     ],
-    frequency: 10, // a global default frequency
+    frequency: 10, // global default frequency
     locations: [
-      'us-east-1', // a global default location
+      'us-east-1', // global default location
     ],
   },
   cli: {
-    runLocation: 'us-east-1', // where test and pw-test will run
+    runLocation: 'us-east-1', // CLI test location used in `test` and `pw-test`
   },
 })
 
@@ -113,30 +123,45 @@ export default config
 
 ```
 
-### 5. Deploy your Playwright Check Suites
+### 5. Test your monitoring configuration
 
-Once you are ready to start monitoring your applications with these checks, deploy your Playwright Check Suite into global monitoring with `npx checkly deploy`.
+After creating your `checkly.config.ts` file, run the `checkly test` command to validate and test your Checkly monitoring infrastructure that now includes your new Playwright Check Suite.
 
-    ```bash terminal
-npx checkly deploy
+```bash
+$ npx checkly test
+
+Parsing your project... ✅
+Validating project resources... ✅
+Bundling project resources... ✅
+
+Running 1 checks in us-east-1.
+
+playwright.config.ts
+  ✔ Playwright Test: --project=chromium (22s)
+
+1 passed, 1 total
+```
+
+<Info>
+The difference between `checkly test` and `checkly pw-test` is that `test` uses `checkly.config.*` and takes all your defined monitors and runs them in the Checkly infrastructure. `pw-test` uses your `playwright.config.*` instead, which parses and runs your existing Playwright tests with the provided CLI configuration.
+</Info>
+
+### 6. Deploy your Playwright Check Suites
+
+Once you are happy with the test results and ready to start monitoring your applications with your defined checks, deploy your Playwright Check Suite into global monitoring with `npx checkly deploy`.
+
+```bash terminal
+$ npx checkly deploy
 
 > You are about to deploy your project "playwright-check-suites" to account "Checkly E2E Prod". Do you want to continue? … yes
 
-Successfully deployed project "playwright-check-suite" to account "Checkly E2E Prod".
+Successfully deployed project "playwright-check-suites" to account "Checkly E2E Prod".
 ```
 
 Once deployed, your checks will run on a schedule and results will appear in your [home dashboard](https://app.checklyhq.com/).
 
-### 6. Set up Alerts
+## Next steps
 
-Configure alert channels and alert groups to get notified when checks fail. You can receive alerts via email, Slack, webhooks, and more.
+Running your Playwright tests on a schedule is only the first step. To get alerted about production issues you need set up notifications and alerting.
 
-To set up alerts:
-
-1. Go to the Checkly dashboard.
-2. Navigate to [**Alert Channels** ](https://app.checklyhq.com/accounts/alerts/settings) to create a new channel.
-3. Assign channels to your project or individual checks.
-
-Learn more in the [alerting guide](https://www.checklyhq.com/docs/alerts/).
-
-And all done!
+Learn more about [alerting with Checkly](/communicate/alerts/overview) and [all available alert channels](/communicate/alerts/channels).

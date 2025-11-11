@@ -64,6 +64,8 @@ Docker host](https://docs.docker.com/desktop/networking/) `http://host.docker.in
 
 New versions of the Checkly Agent are released regularly. To have access to the latest improvements, you can update the Checkly Agent containers.
 
+View our [changelog](https://feedback.checklyhq.com/changelog?c=Checkly+Agent) to learn more about each version.
+
 ### Manual updates
 
 To manually upgrade your Checkly Agent containers, first pull the image:
@@ -97,7 +99,7 @@ Use caution when enabling automatic updates in production. This could automatica
 Since the agent is stateless, it can also be updated by replacing or updating the image in place.
 If you don't have an existing process for upgrading containers, an in-place upgrade is easiest as it keeps the previously defined environment variables.
 
-Breaking changes are communicated by increasing the major version of the image (e.g. from v1.3.8 to v2.0.0). Each version of the agent only supports a single runtime. You can find a list of agent versions and corresponding runtimes [below](/platform/private-locations/agent-configuration/#agent-version-and-runtimes).
+Breaking changes are communicated by increasing the major version of the image (e.g. from v1.3.8 to v2.0.0). Each version of the agent only supports specific runtimes. You can find a list of agent versions and corresponding runtimes [below](/platform/private-locations/agent-configuration/#agent-version-and-runtimes).
 
 You can use the [Watchtower tool](https://containrrr.dev/watchtower/) to do an in-place upgrade of an agent container. Ensure you have sufficient agent capacity as the agent container will have a short outage as it is upgraded. As agent shutdowns are graceful, no running checks will be lost:
 
@@ -150,18 +152,18 @@ docker run -v ~/certificate.pem:/checkly/certificate.pem -e NODE_EXTRA_CA_CERTS=
 
 ## Agent Version and Runtimes
 
-Each Checkly Agent only supports a single [runtime](/platform/runtimes/overview/). This is to keep the container image at an acceptable size. When you change the runtime a check uses, you also need to change to the corresponding agent version. Similarly, if you update the agent version to one using a different runtime you also need to update your checks to use the same runtime.
+Each Checkly Agent only supports specific [runtimes](/platform/runtimes/overview/). This is to keep the container image at an acceptable size. When you change the runtime a check uses, you may also need to change to the corresponding agent version. Similarly, if you update the agent version to one using a different runtime you also need to update your checks to use the same runtime.
 
-| Runtime | Agent version |
+| Runtime | Agent versions |
 |---------|---------------|
-| 2025.04 | 5.0.0         |
-| 2024.09 | 3.5.0         |
-| 2024.02 | 3.4.0         |
-| 2023.09 | 3.2.0         |
-| 2023.02 | 2.0.0         |
-| 2022.10 | 1.3.9         |
+| 2025.04 | 5.0.0, 6.0.0 |
+| 2024.09 | 3.5.0, 4.0.0, 6.0.0 |
+| 2024.02 | 3.4.0 |
+| 2023.09 | 3.4.0 |
+| 2023.02 | 2.0.0 |
+| 2022.10 | 1.2.0 |
 
-As each agent version only supports a single runtime we recommend pinning agent versions used in production.
+As each agent version only supports specific runtimes, we recommend pinning agent versions used in production.
 
 ## Troubleshooting
 

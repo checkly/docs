@@ -92,3 +92,31 @@ How variables are accessed depends on where you're accessing them from:
 <Note>
   Handlebar (double brackets) variables will be URI encoded. To avoid encoding, you can access your environment variables with triple brackets, i.e. `{{{VARIABLE_NAME}}}`.
 </Note>
+
+## System Variables
+
+Checkly provides a set of built-in system variables that you can use in your checks. These variables provide information about the check execution environment, and can be especially useful in playwright checks to distinguish between Checkly executions and local runs.
+
+* **CHECKLY**: We set this to "1" for all check runs executed by Checkly.
+* **CHECKLY_RUN_SOURCE**: This variable indicates the source or reason why the check was run. You can use this to skip parts of your test suite in certain scenarios. Possible values include:
+  * `CLI_DEPLOY`: When checks are deployed using `npx checkly deploy` their first run is scheduled with this type.
+  * `DEPLOYMENT`: The check was triggered as part of a [CI/CD deployment](/integrations/ci-cd/github/deployments).
+  * `EDITOR`: Browser, multi step and API check editor page.
+  * `GROUP_RUN_ALL`: Group edit "Run all checks" button.
+  * `SCHEDULE_NOW`: The check was triggered manually by a user clicking "Schedule now" in the webapp.
+  * `SCHEDULER`: The check was executed as part of its regular schedule.
+  * `TEST_NO_RECORD`: CLI `npx checkly test`.
+  * `TEST_RECORD`: CLI `npx checkly test --record`.
+  * `TRIGGER_API`: The check was triggered via the API.
+  * `TRIGGER_NO_RECORD`: CLI Trigger `npx checkly trigger`.
+  * `TRIGGER_RECORD`: CLI Trigger `npx checkly trigger --record`.
+* **CI**: We set this to "1" for the following check runs:
+  * CLI runs via `npx checkly test` or `npx checkly trigger`.
+  * Check runs that are triggered by [deployments](/integrations/ci-cd/github/deployments).
+
+The following variables are mostly for informational and debugging purposes and shouldn't be used to influence test behaviour.
+
+* `ACCOUNT_ID`: The UUID of the Checkly account as found in the URL.
+* `CHECK_NAME`: The name of the check.
+* `CHECKLY_CHECK_ID`: The UUID of the check as found in the URL.
+* `CHECKLY_REGION`: The region in which the check was executed.

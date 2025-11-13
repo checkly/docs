@@ -44,11 +44,19 @@ To start pushing your Playwright test reports to Checkly you need to authenticat
 Define your account id and API key as environment variables.
 
 ```bash
-export CHECKLY_API_KEY=cu_123....
+export CHECKLY_API_KEY=cu_123...
 export CHECKLY_ACCOUNT_ID=b2f...
 ```
 
-<Tip>The Playwright reporter will automatically pick up the environment variables `CHECKLY_API_KEY` and `CHECKLY_ACCOUNT_ID`.</Tip>
+The Playwright reporter will automatically pick up the environment variables `CHECKLY_API_KEY` and `CHECKLY_ACCOUNT_ID`.
+
+<Tip>
+	If you can't set environment variables use inline environment variables when running Playwright:
+
+```
+$ CHECKLY_API_KEY=.. CHECKLY_ACCOUNT_ID=.. npx playwright test
+```
+</Tip>
 
 ### Add the Playwright reporter to your Playwright configuration
 
@@ -229,3 +237,38 @@ This `dryRun` mode allows you to:
 - Test locally with API credentials when available
 - Run validation in CI without requiring secrets
 - Keep ZIP files in CI for artifact upload
+
+## Run the Playwright Reporter in CI/CD
+
+Execute your Playwright tests in CI/CD and use the Playwright reporter to store all your test artifacts in Checkly.
+
+<Tabs>
+	<Tab title="GitHub Actions">
+	```yaml
+name: Playwright Tests
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        env:
+          CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
+          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+        run: npx playwright test
+	```
+	</Tab>
+</Tabs>

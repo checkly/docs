@@ -1,0 +1,33 @@
+---
+title: Playwright Check Suite Environment Variables
+sidebarTitle: Environment Variables
+description: "Customize your Playwright Check Suite runs based on the execution environment."
+tags: ["synthetic-monitoring", "playwright-checks", "environment-variables"]
+---
+
+Checkly sets the following built-in environment variables on every Playwright Check Suite run. They provide information about the check execution environment, and allow you to distinguish between Checkly executions and local runs.
+
+- **CHECKLY**: Set to `1` for all check runs executed by Checkly.
+- **CHECKLY_RUN_SOURCE**: Indicates the manual or scheduled check run trigger. Use this variable to skip parts of your test suite in certain scenarios or adjust the check run configuration. Possible values include:
+  - `CLI_DEPLOY`: Checks deployed using `npx checkly deploy` get their first run scheduled with this type.
+  - `DEPLOYMENT`: The check was triggered as part of a [CI/CD deployment](/integrations/ci-cd/github/deployments).
+  - `EDITOR`: The check was triggered from the editor page of a browser, multi step or API check.
+  - `GROUP_RUN_ALL`: The check was triggered as part of a group edit by a user clicking the "Run all checks" button.
+  - `SCHEDULE_NOW`: The check was triggered manually by a user clicking "Schedule now" in the webapp.
+  - `SCHEDULER`: The check was run as part of its regular schedule.
+  - `TEST_NO_RECORD`: The check triggered from the CLI with `npx checkly test`.
+  - `TEST_RECORD`: The check triggered from the CLI with `npx checkly test --record`.
+  - `TRIGGER_API`: The check was triggered via the API.
+  - `TRIGGER_NO_RECORD`: The check triggered from the CLI with `npx checkly trigger`.
+  - `TRIGGER_RECORD`: The check triggered from the CLI with `npx checkly trigger --record`.
+- **CI**: Set to `1` for the following check runs:
+  - CLI runs via `npx checkly test` or `npx checkly trigger`.
+  - Check runs that are triggered by [deployments](/integrations/ci-cd/github/deployments).
+
+The following variables are mostly for informational and debugging purposes and shouldn't be used to influence test behaviour.
+
+- `ACCOUNT_ID`: The UUID of the Checkly account as found in the URL.
+- `CHECK_NAME`: The name of the check.
+- `CHECKLY_CHECK_ID`: The UUID of the check as found in the URL.
+- `CHECKLY_REGION`: The region in which the check was executed.
+

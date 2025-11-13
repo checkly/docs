@@ -67,7 +67,7 @@ export default defineConfig({
 ```
 
 <Warning>
-  Ensure that you also enabled the native `json` reporter with the described `outputFile` before registering the Checkly Playwright Reporter. The Checkly Playwright Reporter relies on the JSON reporter output to analyze and upload the test results. The best terminal output uses all 3: `list`, `json` and `checkly/playwright-reporter`. 
+  Ensure that you also enabled the native `json` reporter with the described `outputFile` before registering the Checkly Playwright Reporter. The Checkly Playwright Reporter relies on the JSON reporter output to analyze and upload the test results. The best terminal output uses all 3: `list`, `json` and `checkly/playwright-reporter`.
 </Warning>
 
 ### Run your tests and automatically upload results to Checkly
@@ -135,11 +135,11 @@ export default defineConfig({
       // Skip API calls, only create local ZIP
       dryRun: false,
       // Custom ZIP output path
-      outputPath: 'checkly-report.zip',
+      outputPath: "checkly-report.zip",
       // Custom JSON report path
-      jsonReportPath: 'test-results/report.json',
+      jsonReportPath: "test-results/report.json",
       // Custom test results directory
-      testResultsDir: 'test-results'
+      testResultsDir: "test-results"
     }],
   ],
 });
@@ -194,8 +194,8 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   reporter: [
-    ['json', { outputFile: 'test-results/playwright-test-report.json' }],
-    ['@checkly/playwright-reporter', {
+    ["json", { outputFile: "test-results/playwright-test-report.json" }],
+    ["@checkly/playwright-reporter", {
       dryRun: true // Skip the upload and only create a local ZIP file
     }]
   ],
@@ -215,8 +215,8 @@ Automatically use dry run in CI, but enable API calls and uploads locally:
 ```typescript playwright.config.ts
 export default defineConfig({
   reporter: [
-    ['json', { outputFile: 'test-results/playwright-test-report.json' }],
-    ['@checkly/playwright-reporter', {
+    ["json", { outputFile: "test-results/playwright-test-report.json" }],
+    ["@checkly/playwright-reporter", {
       // Dry run in CI, normal mode locally
       dryRun: !!process.env.CI
     }]

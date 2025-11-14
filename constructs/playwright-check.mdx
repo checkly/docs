@@ -39,12 +39,13 @@ import { PlaywrightCheck } from "checkly/constructs"
 
 new PlaywrightCheck("critical-e2e-monitor", {
   name: "Critical E2E Monitor",
+  include: ['.npmrc','test-files/**'],
   playwrightConfigPath: "./playwright.config.ts",
   installCommand: "npm ci",
   testCommand: "npx playwright test --retries=2",
   pwProjects: ["chromium"],
   pwTags: ["e2e"],
-  include: [".npmrc"],
+
 })
 ```
 
@@ -191,7 +192,7 @@ new PlaywrightCheck("critical-e2e-monitor", {
 
 <ResponseField name="include" type="string">
 
-The file patterns to include when bundling the Playwright Check Suite. Use this option to include test files, utilities, and other assets that aren't automatically discovered.
+Defines the glob patterns for files and directories that should be included when bundling the Playwright Check Suite. Use this option to manually include additional test files, helper utilities, or other resources that might be outside of the tests directory that your playwright config file points to.
 
 **Usage:**
 
@@ -199,7 +200,7 @@ The file patterns to include when bundling the Playwright Check Suite. Use this 
 new PlaywrightCheck("critical-e2e-monitor", {
   name: "Critical E2E Monitor",
   playwrightConfigPath: "../playwright.config.ts",
-  include: ['.npmrc']
+  include: ['.npmrc','test-files/**'],
 })
 ```
 

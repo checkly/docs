@@ -6,11 +6,18 @@ sidebarTitle: 'Configuration'
 
 ### Basic Setup
 
-Monitor any URL by specifying the endpoint you want to track. You can configure the HTTP method, add request headers, and set SSL/redirect options:
+Monitor public URLs by specifying the endpoint you want to track.
 
 <Frame>
-  <img src="/images/url-monitor-entry.png" alt="URL monitor setup interface showing HTTP method selection, URL input field, and options for Skip SSL and Follow redirects" />
+  <img src="/images/url-monitor-entry.png" alt="URL monitor setup interface showing IP family selection, URL input field, Skip SSL, Follow redirects and Should fail option" />
 </Frame>
+
+* **Request method:** Always GET.
+* **URL:** The HTTP(S) URL to monitor (e.g. https://api.example.com).
+* **IP family:** Defaults to IPv4.
+* **Follow redirects:** Automatically follow 30x redirects.
+* **Skip SSL:** Skip SSL certificate validation.
+* **This request should fail:** Treat HTTP error codes (4xx and 5xx) as passed. Please note that successful responses still pass. Only failed assertions will cause the check to fail.
 
 ### Assertions
 
@@ -19,8 +26,6 @@ Use assertions to validate the status code of your URL request. When one or more
 <Frame>
   <img src="/images/url-monitor-assertions.png" alt="URL monitor assertions interface showing status code configuration" />
 </Frame>
-
-**Status Code:** Verify your endpoint returns the expected HTTP status code using the comparison dropdown. Choose from equals, not equals, greater than, or less than.
 
 ### Response Time Limits
 
@@ -36,7 +41,7 @@ Set performance thresholds to ensure your application meets speed requirements:
 
 ### Frequency
 
-Determine how often your monitors run. Unlike Synthetic Monitors, URL Monitors do not consume "Checks" and can run at any frequency available to your plan:
+Determine how often your monitors run.
 
 <Frame>
   <img src="/images/url-monitor-frequency.png" alt="URL monitor frequency selection interface showing available check intervals" />
@@ -52,9 +57,9 @@ Choose when and how your checks run across multiple locations:
   <img src="/images/url-monitor-scheduling.png" alt="URL monitor scheduling strategy interface showing round robin vs fixed schedule options" />
 </Frame>
 
-**Round Robin** (Default): Checks run from one random location each interval. Most cost-effective option for general availability monitoring.
+**Round Robin** (Default): Checks run on one of the selected locations each time it is scheduled.
 
-**Fixed Schedule**: Checks run from all selected locations simultaneously. Higher consumption but provides immediate global visibility for critical services.
+**Parallel**: Checks run from all selected locations simultaneously. Higher consumption but provides immediate global visibility for critical services.
 
 ### Locations
 
@@ -64,7 +69,7 @@ Select from Checkly's global monitoring locations to test your URLs from differe
   <img src="/images/url-monitor-locations.png" alt="URL monitor locations selection interface showing global monitoring locations" />
 </Frame>
 
-Choose 2-3 locations that best represent your user base for optimal monitoring coverage. 
+We recommend to chose at least 2-3 locations that best represent your user base for optimal monitoring coverage.
 
 See [Locations](/concepts/locations) for the complete list of available regions and guidance on location selection.
 
@@ -131,9 +136,8 @@ Define where notifications are sent when checks fail or recover. Additional chan
 
 **Alert Types** (per channel):
 - ✅ **Success/Recovery**: Check has recovered from failure
-- ⚠ **Warning**: Check is degraded but not failed  
+- ⚠ **Degraded**: Check is degraded but not failed
 - ❌ **Failure**: Check has failed
-- 🔒 **Locked/Restricted**: Channel access limited
 
 <Note>
 **Global Alert Settings**: By default, monitors inherit your account's notification preferences. Select "Use specific notification settings" to customize alerts for individual monitors.

@@ -5,6 +5,7 @@ sidebarTitle: 'Visual Monitoring'
 ---
 
 import { YoutubeEmbed } from "/snippets/youtube-embed.jsx"
+import { CLITip } from "/snippets/cli-tip.jsx"
 
 Playwright Test gives you the ability to do visual regression testing and snapshot testing. With Checkly, you can run these tests 
 against production, 24x7. 
@@ -68,16 +69,16 @@ Starting with visual regression testing takes just three easy steps:
   src="/images/docs/images/browser-checks/visual_comparison_1st_run.mp4"
 ></video>
 
-   This will generate the golden image, which you can inspect in the "golden files" tab in the editor. You can now save 
+   This will generate the golden image, which you can inspect in the "golden files" tab in the editor. You can now save
    your check and on each check run the golden image will be compared to the actual screenshot.
 
-
-   > [!CLI]
-   > If you are using the Checkly CLI, you can also generate a golden image / reference snapshot by running the following 
-   > command in your terminal:
-   > ```
-   > npx checkly test --update-snapshots
-   > ```
+   <CLITip>
+   If you are using the Checkly CLI, you can also generate a golden image / reference snapshot by running the following
+   command in your terminal:
+   ```
+   npx checkly test --update-snapshots
+   ```
+   </CLITip>
 
 Now, when your check fails due to a visual difference, you will see a diff of the golden image and the actual screenshot
 in your check result.

@@ -1,0 +1,36 @@
+---
+title: 'Dev Agent for Native Modules'
+description: 'Use the dev agent for npm packages that require compilation.'
+sidebarTitle: 'Dev Agent for Native Modules'
+---
+
+Private Locations run inside your own environment using the Checkly Agent. In some cases, teams extend the agent with additional npm packages that their checks depend on. These packages may include native code that needs to be compiled during installation.
+
+The standard Checkly Agent is intentionally lightweight and does not include necessary build tools. For checks that rely on native packages, use the `dev` variant instead.
+
+## Included build tools
+
+A native module (in Node.js) contains code written in C or C++ and must be compiled before it can be used.  This is common for database clients (e.g. `bcrypt`) and low-level networking libraries (e.g.`zookeeper`).
+
+To support this, the dev agent includes the following tools:
+
+- `build-essential` (includes `gcc`, `g++`, `make`, etc.)
+- `python3`, which `node-gyp` uses during compilation
+
+## How to use it
+
+The dev agent works exactly like the standard agent, but includes the build tools required to compile native modules.
+
+- Use `checkly/agent:dev` for the dev variant
+- Use `checkly/agent:latest` for the standard version
+
+To use the dev variant, simply change the image tag:
+
+```bash Dev agent (with build tools)
+docker run \
+  -e API_KEY="your_api_key_here" \
+  --name checkly-agent-dev \
+  -d checkly/agent:dev
+```
+
+All other setup and configuration remains the same. For more information, see the [Private Locations documentation](/docs/platform/private-locations/overview/).

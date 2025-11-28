@@ -10,11 +10,15 @@ Status pages provide transparent communication about your service health and inc
 ![Status page example](/images/docs/images/status-pages/status-pages-overview-1.png)
 
 
-## Core status page components
+## Core Status Page components
 
 ### Services
 
 A service represents a functional piece of your application or website, such as landing page, API, support portal etc. You manage your services from the service overview page, accessible in the sidebar.
+
+<Note>
+The number of services and subscribers you can have varies by plan. [View pricing](https://checklyhq.com/pricing)
+</Note>
 
 When naming a service, use a name that is identifiable for your users, as this is used when sending out incident notifications.
 
@@ -28,9 +32,9 @@ A service can be used by multiple status pages. When an incident is opened for a
 
 ### Connecting services and status pages
 
-To display a service on a status page, go to the status page editor and open the `Services` dropdown on the card you want to display your service on. 
+To display a service on a Status Page, go to the Status Page editor and open the `Services` dropdown on the card you want to display your service on. 
 
-Select your service from the list and save your status page. The page will now display the selected service. 
+Select your service from the list and save your Status Page. The page will now display the selected service. 
 
 You can also create new services directly from the dropdown by entering a new service name and pressing `Create`.
 
@@ -44,7 +48,29 @@ Use [incident automation](/communicate/status-pages/incidents#incident-automatio
 
 ### Service organization
 
-Services on your status page should reflect how your users think about your product. Name them using terminology your users understand—for example, "API", "Dashboard", or "Payment Processing" rather than internal system names. Group related functionality under a single service when it makes sense to users, but keep services separate when they represent distinct features that might fail independently.
+Create services that align with how your users think about your application:
+
+```yaml
+# Good service examples
+Frontend Application:
+  - Website loading and navigation
+  - User interface responsiveness
+  - Client-side functionality
+
+API Services:
+  - Core API endpoints
+  - Authentication services
+  - Data processing capabilities
+
+Third-party Integrations:
+  - Payment processors
+  - Email delivery services
+  - External data sources
+```
+
+<Tip>
+Create services to match how your users perceive your system, not according to your internal architecture. Users care about "Login" working, not whether your "Auth microservice cluster" is healthy.
+</Tip>
 
 ### Incident communication
 

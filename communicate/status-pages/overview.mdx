@@ -10,11 +10,15 @@ Status pages provide transparent communication about your service health and inc
 ![Status page example](/images/docs/images/status-pages/status-pages-overview-1.png)
 
 
-## Core Status Page Components
+## Core Status Page components
 
 ### Services
 
 A service represents a functional piece of your application or website, such as landing page, API, support portal etc. You manage your services from the service overview page, accessible in the sidebar.
+
+<Note>
+The number of services and subscribers you can have varies by plan. [View pricing](https://checklyhq.com/pricing)
+</Note>
 
 When naming a service, use a name that is identifiable for your users, as this is used when sending out incident notifications.
 
@@ -28,9 +32,9 @@ A service can be used by multiple status pages. When an incident is opened for a
 
 ### Connecting services and status pages
 
-To display a service on a status page, go to the status page editor and open the `Services` dropdown on the card you want to display your service on. 
+To display a service on a Status Page, go to the Status Page editor and open the `Services` dropdown on the card you want to display your service on. 
 
-Select your service from the list and save your status page. The page will now display the selected service. 
+Select your service from the list and save your Status Page. The page will now display the selected service. 
 
 You can also create new services directly from the dropdown by entering a new service name and pressing `Create`.
 
@@ -40,22 +44,34 @@ You can display the same service on multiple pages. An incident declared on that
 
 Use incident automation to connect a service and a check to automatically open incidents for services based on check alerts. [See Incident automation for details](/communicate/status-pages/incidents#incident-automation).
 
-## Status Page Best Practices
+## Best practices for status pages
 
-### Service Organization
-- **User-centric services**: Create services based on user-facing functionality
-- **Logical grouping**: Group related services together for clarity
-- **Clear descriptions**: Use terminology your users understand
-- **Appropriate granularity**: Balance detail with simplicity
+### Service organization
 
-### Incident Communication
-- **Timely updates**: Provide regular updates during ongoing incidents
-- **Clear messaging**: Use plain language to describe issues and impacts
-- **Proactive communication**: Notify users before they notice problems
-- **Transparent resolution**: Explain what was fixed and preventive measures
+Create services that align with how your users think about your application:
 
-### Maintenance Planning
-- **Advance notice**: Schedule maintenance announcements with sufficient lead time
-- **Impact assessment**: Clearly communicate which services will be affected
-- **Duration estimates**: Provide realistic timeframes for maintenance windows
-- **Progress updates**: Keep users informed during maintenance activities
+```yaml
+# Good service examples
+Frontend Application:
+  - Website loading and navigation
+  - User interface responsiveness
+  - Client-side functionality
+
+API Services:
+  - Core API endpoints
+  - Authentication services
+  - Data processing capabilities
+
+Third-party Integrations:
+  - Payment processors
+  - Email delivery services
+  - External data sources
+```
+
+<Tip>
+Create services to match how your users perceive your system, not according to your internal architecture. Users care about "Login" working, not whether your "Auth microservice cluster" is healthy.
+</Tip>
+
+### Incident communication
+
+When an incident occurs, provide clear updates that explain what's happening and how it affects users. Write in plain language, avoiding technical jargon unless your audience is technical. Update the incident as you learn more about the issue, and close it with an explanation of what was fixed. Where possible, communicate proactively to maximize chances to warn users before they encounter problems themselves.

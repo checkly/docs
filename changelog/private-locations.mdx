@@ -16,15 +16,15 @@ Release history for the Checkly Private Locations Agent. For setup instructions,
 
 - First image also including a developer version `6.1.7-dev`, learn all about the [dev image](https://www.checklyhq.com/docs/platform/private-locations/dev-agent/) here.
   - From now on, you can get the most recent dev image available using `checkly/agent:dev`.
-- Playwright Check Suites: improve internal logging and metrics.
-- Browser and MultiStep checks using Runtime 2025-04 automatically scrub the authorization header in requests.
+- Playwright Check Suites: improved internal logging and metrics.
+- Browser and MultiStep checks using Runtime **2025-04** automatically scrubs the authorization header in requests.
 
 ### Version 6.1.6 (November 24, 2025)
 
 **Features**
 
 - Added Checkly environment variables and configuration to [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview). See the docs on [Playwright Check Suites environment variables](/detect/synthetic-monitoring/playwright-checks/environment-variables)
-  - Add support for `CHECKLY` to all checkly triggered runs: scheduled checks and test sessions triggered through either `npx checkly test`, `npx checkly trigger` or `npx checkly pw-test`
+  - Adds support for `CHECKLY` to all checkly triggered runs: scheduled checks and test sessions triggered through either `npx checkly test`, `npx checkly trigger` or `npx checkly pw-test`
   - Include the environment variable `CI` as true only for test session triggered runs
 
 ### Version 6.1.5 (November 14, 2025)
@@ -43,7 +43,7 @@ Release history for the Checkly Private Locations Agent. For setup instructions,
 
 **Security updates**
 
-- Improved secret scrubbing with new PW fork version
+- Improved secret scrubbing with new Playwright fork version
 - Additional commits from runners
 - Full changelog [here](https://github.com/checkly/checkly-runners/releases/tag/v6.1.3)
 
@@ -52,10 +52,10 @@ Release history for the Checkly Private Locations Agent. For setup instructions,
 **Features**
 
 - Add support for CHECKLY_SECRET environment variables
-  - When a CHECKLY_SECRET_ environment variable contains special characters (anything other than A-Za-z0-9-_.~), the system now:
-    1. Detects special characters using regex pattern `/[^A-Za-z0-9\-_.~]/`
-    2. Creates encoded version using encodeURIComponent() with additional ! character encoding (%21)
-    3. Adds to scrubbing cache to ensure both original and encoded values are properly scrubbed from traces
+  - When an environment variable prefixed with `CHECKLY_SECRET_` contains special characters (anything other than A-Za-z0-9-_.~), the system now:
+    1. Detects special characters using the regex pattern `/[^A-Za-z0-9\-_.~]/`
+    2. Creates an encoded version using `encodeURIComponent()` with additional `!` character encoding (%21)
+    3. Adds it to the scrubbing cache to ensure both original and encoded values are properly scrubbed from traces
   - This ensures that secrets containing special characters like `@, %, !, +`, etc. are properly scrubbed even when they appear in encoded form within request payloads or URLs
 
 ### Version 6.1.1 (July 30, 2025)
@@ -68,13 +68,13 @@ Release history for the Checkly Private Locations Agent. For setup instructions,
 
 **Features**
 
-- Add support for secret detection on runtime for browser and MS checks (behind the FF `RUNTIME_SECRET_DETECTION`)
+- Add support for secret detection on runtime for browser and MS checks (behind the Feature Flag `RUNTIME_SECRET_DETECTION`)
 
 ### Version 6.0.7 (June 30, 2025)
 
 **Bug fixes**
 
-- Use lower case envars for cURL
+- Use lower case environment variables for cURL
 - Pass both headers
 - Allow proxy to forward requests to minio
 - Use xit

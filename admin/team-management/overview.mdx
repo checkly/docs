@@ -8,30 +8,33 @@ This section covers all aspects of administering your Checkly account, from mana
 
 ## Team Member Roles
 
-When inviting a team member to join your account you can assign one of five roles that all have different access patterns.
+When inviting a team member to join your account you can assign one of five roles: **Owner**, **Admin**, **Read & Write**, **Read & Run**, or **Read Only**. Each role inherits all permissions from the roles below it.
 
-1. **Owner**
-    - Can change the team name.
-2. **Admin**
-    - Can invite, edit and remove other team members.
-    - Can change the account settings.
-3. **Read & Write**
-    - Can create, update and delete checks.
-    - Can create, update and delete alert settings of individual checks.
-    - Can create, update and delete maintenance windows.
-4. **Read & Run**
-    - Can view all resources.
-    - Can manually trigger checks and tests via the UI, CLI, and API.
-    - Cannot create, edit, or delete resources.
-5. **Read Only**
-    - Look, no touch.
+Only the initial account creator has the Owner role. You can change assigned roles at any time after a teammate joins.
 
-Only the initial account creator has the **Owner** role. You can always change any assigned roles after a teammate has
-joined your team.
+| Capability | Owner | Admin | Read & Write | Read & Run | Read Only |
+|------------|:-----:|:-----:|:------------:|:----------:|:---------:|
+| View all resources | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Trigger checks (UI/CLI/API) | ✓ | ✓ | ✓ | ✓ | ✗ |
+| Create/edit/delete checks | ✓ | ✓ | ✓ | ✗ | ✗ |
+| Manage alert settings | ✓ | ✓ | ✓ | ✗ | ✗ |
+| Manage maintenance windows | ✓ | ✓ | ✓ | ✗ | ✗ |
+| Access locked variables | ✓ | ✓ | ✓ | ✗ | ✗ |
+| Manage team members | ✓ | ✓ | ✗ | ✗ | ✗ |
+| Manage account settings | ✓ | ✓ | ✗ | ✗ | ✗ |
+| Manage Private Locations | ✓ | ✓ | ✗ | ✗ | ✗ |
+| Create service API keys | ✓ | ✓ | ✗ | ✗ | ✗ |
+| Transfer ownership | ✓ | ✗ | ✗ | ✗ | ✗ |
 
-<Info>
-Roles are staggered, so any role higher up the totem pole has all the rights of the roles below him/her.
-</Info>
+### Choosing the Right Role
+
+| Role | Best for |
+|------|----------|
+| **Owner** | Account creator with full control over billing and ownership |
+| **Admin** | Team leads who manage members, settings, and infrastructure |
+| **Read & Write** | Developers who create and maintain checks |
+| **Read & Run** | QA engineers or CI/CD pipelines that run tests but shouldn't modify configuration |
+| **Read Only** | Stakeholders who need visibility into monitoring status |
 
 ### Adding Team Members
 

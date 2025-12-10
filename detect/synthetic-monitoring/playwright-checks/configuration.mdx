@@ -99,7 +99,7 @@ A Playwright Check Suite inherits multiple properties from [the abstract `Check`
 - `privateLocations`
 - `alertEscalationPolicy`
 
-Check [the reference documentation](/constructs/project#param-checks-playwright-checks) for more information on these settings.
+Check out [the reference documentation](/constructs/project#param-checks-playwright-checks) for more information on these settings.
 
 <Note>
 **Checks' Retry strategy is not applicable for Playwright checks.** Playwright includes its own retry features that can be set up directly in your `playwright.config.ts/js` file with the [`retries`](https://playwright.dev/docs/test-retries) option. This allows for more detailed management of test retries within Playwright, when your check runs.
@@ -107,11 +107,48 @@ Check [the reference documentation](/constructs/project#param-checks-playwright-
 
 Additionally, Playwright Check Suites provide specific configuration for your Playwright monitoring.
 
-* `installCommand:` Override the command to install dependencies, by default it'll use `npm install --dev`.
+* `installCommand:` Override the command to install dependencies. `npm install --dev` is used by default.
 
-* `testCommand:` Override the command to test, by default it uses npx playwright test with the tags, projects, and config file options your check specifies.
+* `testCommand:` Override the command to test. `npx playwright test` is used by default with the tags, projects, and config file options your check specifies.
 
 * `groupName:` The group this check belongs to.
+
+### Example command customizations
+
+**When to override `installCommand`:**
+
+```typescript
+// Install from a specific directory
+installCommand: 'npm install --prefix ./e2e'
+
+// Use a different package manager
+installCommand: 'yarn install --frozen-lockfile'
+
+// Skip installing dependencies (if bundled with your code)
+installCommand: 'echo "Dependencies already installed"'
+```
+
+**When to override `testCommand`:**
+
+```typescript
+// Enable Playwright tracing for debugging failures
+testCommand: 'npx playwright test --trace=on'
+
+// Run with specific test timeout
+testCommand: 'npx playwright test --timeout=60000'
+
+// Run tests with headed browser for debugging
+testCommand: 'npx playwright test --headed'
+
+// Combine multiple flags
+testCommand: 'npx playwright test --trace=retain-on-failure --max-failures=5'
+```
+
+<Note>
+The `testCommand` automatically includes your `pwProjects`, `pwTags`, and Playwright config file path so you don't add these flags manually.
+</Note>
+
+### Example Checkly config
 
 ```typescript checkly.config.ts
 export default defineConfig({
@@ -153,3 +190,64 @@ export default defineConfig({
   },
 }
 ```
+
+## Testing configuration locally
+
+Before deploying your Playwright Check Suites, validate your configuration locally:
+
+```bash
+# Test your configuration without deploying
+npx checkly test
+
+# Test a specific check by logical ID
+npx checkly test --grep=e2e-test-suite
+```
+
+The `npx checkly test` command runs your Playwright tests locally using the same configuration that Checkly will use in production. This helps catch configuration errors before deployment.
+
+## Common issues & troubleshooting
+
+### Configuration errors
+
+**Invalid `logicalId`**
+
+```
+Error: logicalId must be unique across all checks
+```
+
+Ensure each Playwright Check Suite has a unique `logicalId`. The `logicalId` is used as a stable reference across deployments.
+
+**Missing Playwright configuration**
+
+```
+Error: Cannot find playwright.config.ts at path: ./playwright.config.ts
+```
+
+Verify that `playwrightConfigPath` points to the correct relative path from your `checkly.config.ts` file.
+
+### Test execution issues
+
+**Tests exceed 15-minute limit**
+
+If your Playwright Check Suite times out after 15 minutes:
+
+- Split large test suites into multiple Playwright Check Suites using `pwTags` or `pwProjects`
+- Use `.only` or `.skip` in your tests during development, then create separate check suites for different test priorities
+- Optimize slow tests by reducing wait times and parallelizing where possible
+- [Contact Checkly support](https://app.checklyhq.com/?support=true) if you need further help
+
+**Dependency installation failures**
+
+If dependencies fail to install:
+
+- Check that your `package.json` and lock file (e.g., `package-lock.json`) are both included in your deployment
+- Verify that the private registry authentication is configured correctly. See the [custom dependencies guide](/detect/synthetic-monitoring/playwright-checks/custom-dependencies/) for more details.
+- Adjust the `installCommand` to match your project's expectation.
+
+**Authentication failures in tests**
+
+If tests fail due to authentication issues:
+
+- Verify environment variables are set correctly in Checkly. You can verify your environment variables using `npx checkly env ls`, or looking at your Check's configuration in the Checkly Webapp to ensure any `process.env.VARIABLE_NAME` call from your test is defined.
+- For persistent authentication, use Playwright's [`storageState`](https://playwright.dev/docs/auth#reuse-authentication-state) feature
+- Check that authentication cookies/tokens haven't expired between local testing and Checkly execution

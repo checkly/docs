@@ -4,7 +4,25 @@ description: 'Organize your Playwright Check Suites with groups for better manag
 sidebarTitle: 'Add to Group'
 ---
 
-You can define a new group, or associate a Playwright Check Suite to an existing group.
+<Accordion title="Prerequisites">
+Before adding Playwright Check Suites to Groups, ensure you have:
+
+- An initialized Checkly CLI project with Playwright Check Suites configured
+- Basic understanding of [Check Groups](/constructs/check-group-v2) in Checkly
+
+For additional setup information, see [Playwright Check Suites overview](/detect/synthetic-monitoring/playwright-checks/overview).
+</Accordion>
+
+You can define a new Group, or associate a Playwright Check Suite to an existing Group.
+
+## Why use Groups?
+
+Grouping your Playwright Check Suites provides several benefits:
+
+- **Shared configuration**: Set locations, frequency, retry strategies, and other settings once for all checks in the group
+- **Better organization**: Group related checks together (e.g., by feature, environment, or service)
+- **Unified alerting**: Configure alert channels and escalation policies at the group level
+- **Easier management**: Activate, mute, or configure multiple checks simultaneously
 
 ## Steps
 
@@ -13,32 +31,31 @@ You can define a new group, or associate a Playwright Check Suite to an existing
 Create a new file to create and configure your new group.
 
 ```typescript website-group.check.ts
-import { CheckGroup } from 'checkly/constructs'
+import { CheckGroupV2, RetryStrategyBuilder } from 'checkly/constructs'
 
-export const myGroup = new CheckGroup('production-group', {
+export const myGroup = new CheckGroupV2('production-group', {
   name: 'Production group',
-  logicalID: 'production-group',
   activated: true,
   muted: false,
   locations: ['us-east-1', 'eu-west-1'],
   tags: ['mac', 'group'],
   environmentVariables: [],
   apiCheckDefaults: {},
-  concurrency: 100,
-  runParallel: true,
+  concurrency: 100, // Max checks running concurrently when group is triggered
+  runParallel: true, // Run checks simultaneously across all locations
   retryStrategy: RetryStrategyBuilder.linearStrategy({
-    baseBackoffSeconds: 30,
+    baseBackoffSeconds: 30, // Wait 30s, 60s, etc. between retries
     maxRetries: 2,
-    sameRegion: false
+    sameRegion: false // Retry from different regions to detect regional issues
   }),
 })
 ```
 
 <Tip>
-Learn more about [using groups](/constructs/check-group-v2) to unify checks in Checkly.
+Learn more about [using Groups](/constructs/check-group-v2) to unify checks in Checkly.
 </Tip>
 
-### 2. Associate the group to the check
+### 2. Associate the Group to the check
 
 When specifying your Playwright Check Suite, you can reference the new or existing group, using its name:
 
@@ -71,4 +88,41 @@ npx checkly deploy --preview # confirm what will be deployed
 npx checkly deploy           # deploy
 ```
 
-You can now see your Playwright Check Suite assigned to your group.
+You can now see your Playwright Check Suite assigned to your Group.
+
+## Multiple Check Suites in one Group
+
+To ensure that multiple Playwright Check Suites inherit the same Group's configuration (locations, retry strategy, alert channels, etc.) while maintaining their individual test selection and frequency settings, you can reference the Group name in each suite's configuration. Example:
+
+```typescript checkly.config.ts highlight={12,19,26}
+export default defineConfig({
+  logicalId: 'checkly-website',
+  projectName: 'checkly-website',
+  checks: {
+    playwrightConfigPath: './playwright.config.ts',
+    playwrightChecks: [
+      {
+        name: 'Critical User Flows',
+        logicalId: 'critical-flows',
+        pwTags: 'critical',
+        frequency: 5,
+        groupName: 'Production group', // Same group
+      },
+      {
+        name: 'Authentication Tests',
+        logicalId: 'auth-tests',
+        pwTags: 'auth',
+        frequency: 10,
+        groupName: 'Production group', // Same group
+      },
+      {
+        name: 'Checkout Flow',
+        logicalId: 'checkout-flow',
+        pwTags: 'checkout',
+        frequency: 5,
+        groupName: 'Production group', // Same group
+      },
+    ],
+  },
+})
+```

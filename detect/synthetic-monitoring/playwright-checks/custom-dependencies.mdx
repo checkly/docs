@@ -54,16 +54,13 @@ For example, if you use npm to manage your private dependencies, you need to:
 - **add custom npm configuration** to your project.
 - **include custom configuration files** in your Checkly project to make the infrastructure aware.
 
-### Custom npm configuration for private packages
+### Configuration files for private packages
 
-Let's look at popular options for private packages:
+Package managers use configuration files to authenticate with private registries. All supported package managers (npm, yarn, pnpm) can use `.npmrc` for authentication:
 
-- using private npm packages on the public npm registry.
-- using npm with JFrog Artifactory.
-
-To access the private source code, npm relies on custom configuration in a project-specific `.npmrc` file.
-
-> To avoid putting sensitive information into your `.npmrc` we recommend setting your authentication token via Checkly environment variables [available in the UI](https://app.checklyhq.com/environment-variables) or [the CLI](https://www.checklyhq.com/docs/cli/using-environment-variables/#managing-remote-environment-variables-using-the-cli).
+<Note>
+To avoid putting sensitive information into configuration files, set authentication tokens via Checkly [environment secrets](/platform/variables). Reference them using `${VARIABLE_NAME}` syntax in your configuration files.
+</Note>
 
 #### Using private npm packages
 
@@ -79,11 +76,25 @@ To access the private source code, npm relies on custom configuration in a proje
 
 ```txt
 # Custom registry URL with hard-coded authentication token
-registry=https://yourcompany.jfrog.io/artifactory/api/npm/yourcompany.jfrog.io/artifactory/api/npm/npm-local/:_authToken=abc...
+registry=https://yourcompany.jfrog.io/artifactory/api/npm/npm-local/
+//yourcompany.jfrog.io/artifactory/api/npm/npm-local/:_authToken=abc...
 
 # Custom registry URL with authentication token defined in environment variables
-registry=https://yourcompany.jfrog.io/artifactory/api/npm/yourcompany.jfrog.io/artifactory/api/npm/npm-local/:_authToken=${ARTIFACTORY_TOKEN}
+registry=https://yourcompany.jfrog.io/artifactory/api/npm/npm-local/
+//yourcompany.jfrog.io/artifactory/api/npm/npm-local/:_authToken=${ARTIFACTORY_TOKEN}
 ```
+
+#### Using GitHub Packages
+
+```txt
+# Authentication token defined in environment variables
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+@your-org:registry=https://npm.pkg.github.com
+```
+
+### Using yarn or pnpm with private packages
+
+Both **yarn** and **pnpm** support `.npmrc` for authentication (same format as npm examples above). Checkly automatically detects your package manager based on the lock file present and uses the `.npmrc` configuration for authentication.
 
 ### Include custom configuration files
 
@@ -95,7 +106,8 @@ Checkly CLI commands like `test` or `deploy` will bundle and upload these files 
 export default defineConfig({
   checks: {
     playwrightConfigPath: './playwright.config.ts',
-    // Include .npmrc to be used in the Checkly infrastructure
+    // Include .npmrc for authentication with private registries
+    // Works with npm, yarn, and pnpm
     include: ['.npmrc'],
     playwrightChecks: [
       // Configure your Playwright Check Suites
@@ -104,3 +116,36 @@ export default defineConfig({
   }
 })
 ```
+
+## Troubleshooting
+
+### Package not found
+
+If you see errors like `404 Not Found` or `Package '@your-org/package' not found`:
+
+- Verify your `.npmrc` file is included in `checks.include`
+- Check that the registry URL is correct
+- Ensure your package name matches exactly (including scope)
+
+### Authentication failed
+
+If you see `401 Unauthorized` or `403 Forbidden` errors:
+
+- Verify the environment secret is set in Checkly (check [environment variables](/platform/variables) for details)
+- Ensure the variable name in your config file matches exactly (e.g., `${NPM_TOKEN}`)
+- Check that your token has the necessary permissions to access the package
+
+### Wrong package manager detected
+
+If Checkly uses the wrong package manager:
+
+- Verify the correct lock file is present (`package-lock.json`, `yarn.lock`, or `pnpm-lock.json`)
+- Remove any conflicting lock files
+- If needed, override with a custom `installCommand` in your [Playwright Check Suite configuration](/detect/synthetic-monitoring/playwright-checks/configuration)
+
+### Installation timeout
+
+If package installation exceeds time limits:
+
+- Check for large dependencies that can be optimized
+- Consider using a custom `installCommand` to install only required packages

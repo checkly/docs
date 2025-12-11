@@ -7,7 +7,7 @@ sidebarTitle: Playwright in Production
 
 import { YoutubeEmbed } from "/snippets/youtube-embed.jsx"
 
-We all do testing. We all test code as we write it, and before we release it. But somehow regressions, bugs and even downtime still happens. Code that worked perfectly on our laptop somehow fails when it meets production, and in ways so obscure that simple integration tests, even canary deploys, don't catch every failure.
+We all do testing. We all test code as we write it, and before we release it. But somehow regressions, bugs, and even downtime still happen. Code that worked perfectly on our laptop somehow fails when it meets production, and in ways so obscure that simple integration tests, even canary deploys, don't catch every failure.
 
 When we want to ensure reliable software, traditional testing methods often fall short at monitoring real-world scenarios. Enter **Playwright** and **Checkly**, two powerful tools that enable **end-to-end (E2E) testing in production**.
 
@@ -24,7 +24,7 @@ Questions like "if this microservice goes down, will users still be able to add 
 
 The result? A flood of monitoring data—logs, metrics, and traces—that can be overwhelming. While observability tools have emerged to help manage this data, they often come with a hefty price tag and can be noisy, making it difficult to extract clear signals about whether your application is truly working.
 
-The core question developers and operations teams need to answer is: "Does my app still work?" This means ensuring that the application provides the expected business function correctly and timely, not just in pre-production environments but in **production**, where real users interact with it.
+The core question developers and operations teams need to answer is: "Does my app still work?" This means ensuring that the application provides the expected business function correctly and in a timely manner, not just in pre-production environments but in **production**, where real users interact with it.
 
 ![a diagram showing the SDLC with real world feedback](/images/guides/images/testing-to-monitoring-02.png)
 
@@ -34,14 +34,14 @@ The core question developers and operations teams need to answer is: "Does my ap
 Traditional QA processes, including unit tests and end-to-end tests, are essential but often stop at the pre-production stage. Once the application goes live, monitoring takes over, typically handled by a different team using different tools. **This disconnect between QA and monitoring creates gaps in visibility and reliability.**
 
 ![a diagram showing the ideal SDLC](/images/guides/images/testing-to-monitoring-03.png)
-*In the ideal SDLC, Playwright helps you test code pre deployment, and make sure everything's working*
+*In the ideal SDLC, Playwright helps you test code pre-deployment, and make sure everything's working*
 
 A simple thought experiment is to ask:
 
 - Can we agree that no level of pre-deployment QA will catch every failure?
 - And if so, is it acceptable that everything not caught by QA will have to be found and reported by a user?
 
-If your answers to these questions is 'yes' and 'no' respectively, it's time to think about going beyond traditional QA.
+If your answers to these questions are 'yes' and 'no' respectively, it's time to think about going beyond traditional QA.
 
 Testing in production is often treated as a meme, but it shouldn't be. The reality is that production environments are fundamentally different from pre-production environments. Differences in data, security configurations, third-party services, and geographic distribution mean that testing in staging or UAT environments doesn't guarantee success in production.
 
@@ -58,7 +58,7 @@ Here's why Playwright stands out:
 2. [**Automatic Retries and Waits**](https://www.checklyhq.com/learn/playwright/waits-and-timeouts/): Playwright automatically retries actions and waits for elements to be visible, reducing flaky tests.
 3. [**Powerful Debugging Tools**](https://www.checklyhq.com/learn/playwright/debugging/): Playwright provides traces, videos, and screenshots to help diagnose issues quickly.
 4. [**API Testing**](https://www.checklyhq.com/learn/playwright/testing-apis/): Beyond browser automation, Playwright can also handle API testing, making it a versatile tool for end-to-end workflows.
-5. [**Detailed Assertions**](https://www.checklyhq.com/learn/playwright/assertions/): No more do we call every `200 OK` response a passing test, Playwright can make complex, programmatic assertions about the responses it receives, checking things like 'every loaded record has a connected ID' or 'all buttons are set to be a brand-approved color'
+5. [**Detailed Assertions**](https://www.checklyhq.com/learn/playwright/assertions/): No more do we call every `200 OK` response a passing test. Playwright can make complex, programmatic assertions about the responses it receives, checking things like 'every loaded record has a connected ID' or 'all buttons are set to be a brand-approved color.'
 
 
 ## Testing in Production with Playwright and Checkly
@@ -74,7 +74,7 @@ Run a Playwright test every hour or every minute from locations all across the g
 ### Key Features of Checkly:
 
 1. **Global Test Execution**: Run your Playwright scripts from multiple geographic locations to ensure your application performs well for users worldwide.
-2. **Monitoring Cadence**: Run tests every minute or every hour, and set a monitoring cadence that defends your SLA
+2. **Monitoring Cadence**: Run tests every minute or every hour, and set a monitoring cadence that defends your SLA.
 3. **Alerting and Notifications**: Set up alerts via email, Slack, PagerDuty, or other channels to notify your team of failures.
 4. **Connect Backend Traces**: With Checkly Traces, harness the power of OpenTelemetry to [see backend traces connected to each testing session.](https://www.checklyhq.com/docs/traces-open-telemetry/)
 5. **Code Workflow Integration**: Manage your monitoring scripts as code, enabling version control, collaboration, and CI/CD integration.
@@ -89,13 +89,13 @@ Let's say you're running an e-commerce platform. Any regression, missing feature
 3. Adding the product to the cart.
 4. Checking out.
 
-A typical web development process would have QA or developers run tests before deployment, and then 'monitor' deployments to make sure the site is still available after releases. Playwright enhances this pre-deployment testing by letting you simulate user behavior in detail. However, when features don't work as expected on production, in a way that wasn't detectable in a QA environment, you might end up relying on your users to tell you. **By the time problems are identified, revenue (and trust) has already been lost.**
+A typical web development process would have QA or developers run tests before deployment, and then 'monitor' deployments to make sure the site is still available after releases. Playwright enhances this pre-deployment testing by letting you simulate user behavior in detail. However, when features don't work as expected in production, in a way that wasn't detectable in a QA environment, you might end up relying on your users to tell you. **By the time problems are identified, revenue (and trust) has already been lost.**
 
-With Playwright, you can automate the process of testing your site, removing the need for a human to click through your pages. And with Checkly's [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview), you can take your existing Playwright test suite run it globally and on a cadence, meaning your monitoring will be the first place you'll hear about problems with the critical user paths.
+With Playwright, you can automate the process of testing your site, removing the need for a human to click through your pages. And with Checkly's [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview), you can take your existing Playwright test suite, run it globally and on a cadence, meaning your monitoring will be the first place you'll hear about problems with the critical user paths.
 
 Here's how Checkly enhances the process of releasing new code:
 
-1. **Write the Playwright Script**: Automate the login, product search, and checkout steps. Run initial tests through the Checkly network to make sure it's working from all your users' geo locations.
+1. **Write the Playwright Script**: Automate the login, product search, and checkout steps. Run initial tests through the Checkly network to make sure it's working from all your users' geo-locations.
 2. **Configure Monitoring Settings**: Define how often the script should run (e.g., every 15 minutes) and from which locations (e.g., Ireland, Frankfurt).
 3. **Set Up Alerts**: Notify your team if a Playwright test fails, ensuring quick resolution of issues.
 4. **Deploy to Production**: Use [Checkly's CLI to deploy](/cli/checkly-deploy) your Playwright tests and start monitoring your production environment.
@@ -104,7 +104,7 @@ With Checkly running your Playwright monitors, you can find and resolve issues b
 
 ### What to Consider When Getting Started with Monitoring in Production
 
-But what do you need to consider when you start globally monitoring in production? How do you make your Playwright tests geo location aware? How can you avoid that your tests are counted as real users? And should every test become a Playwright monitor?
+But what do you need to consider when you start globally monitoring in production? How do you make your Playwright tests geo-location aware? How can you avoid having your tests counted as real users? And should every test become a Playwright monitor?
 
 We covered all these questions in a recent webinar.
 
@@ -112,11 +112,11 @@ We covered all these questions in a recent webinar.
 
 If you want to learn how to apply different Playwright settings depending on the execution environment, watch the recording. This guide will include essential snippets below.
 
-### Environment-aware Playwright tests
+### Environment-Aware Playwright Tests
 
-Once, your Playwright tests run locally, in CI/CD and as scheduled monitors, they need to be aware of their execution environment.
+Once your Playwright tests run locally, in CI/CD, and as scheduled monitors, they need to be aware of their execution environment.
 
-A local Playwright test executed with `npx playwright test` needs to target `localhost`, a CI/CD test run via [`npx checkly pw-test`](/cli/checkly-pw-test) or [`npx checkly test`](/cli/checkly-test) needs to target environment specific preview URLs, and global production monitoring might need to be aware of its execution region.
+A local Playwright test executed with `npx playwright test` needs to target `localhost`, a CI/CD test run via [`npx checkly pw-test`](/cli/checkly-pw-test) or [`npx checkly test`](/cli/checkly-test) needs to target environment-specific preview URLs, and global production monitoring might need to be aware of its execution region.
 
 To differentiate your Playwright test runs in Checkly, use the [provided environment variables](/detect/synthetic-monitoring/playwright-checks/environment-variables).
 
@@ -143,7 +143,7 @@ export function getEnvironment(): Environment {
 }
 ```
 
-After knowing about your Playwright environment, adjust `baseURL`, `retries` and any other additional configuration.
+After knowing about your Playwright environment, adjust `baseURL`, `retries`, and any other additional configuration.
 
 <Tabs>
 <Tab title="Base URL">
@@ -175,7 +175,7 @@ export function getRetries(env: Environment) {
   const isCI = env === "CI";
   if (isCi) return 1;
 
-  // increase retries to avoid unnessecary monitoring alerts
+  // increase retries to avoid unnecessary monitoring alerts
   const isProd = env === "PROD";
   if (isProd) return 2;
 
@@ -219,7 +219,7 @@ export function getLocationCountry() {
 
 ### Request Blocking to Avoid Incorrect Analytics
 
-If you start running Playwright against production sites, you must ensure to not mess with possible client-side analytics. Luckily, [request interceptions is quickly done in Playwright](/learn/playwright/intercept-requests).
+If you start running Playwright against production sites, you must ensure not to mess with possible client-side analytics. Luckily, [request interception is quickly done in Playwright](/learn/playwright/intercept-requests).
 
 ```ts
 page.route("**/*", (route) => {

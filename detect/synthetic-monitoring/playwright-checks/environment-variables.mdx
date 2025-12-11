@@ -38,9 +38,9 @@ Checkly sets the following environment variables on every Playwright Check Suite
 | `TRIGGER_NO_RECORD` | Used for Check runs triggered by the `npx checkly trigger` CLI command. |
 | `TRIGGER_RECORD` | Used for Check runs triggered by the `npx checkly trigger --record` CLI command. |
 
-## Using built-in variables
+## Use built-in variables
 
-Here are common ways to use Checkly's built-in environment variables in your tests:
+Common ways to use Checkly's built-in environment variables:
 
 ### Skip tests in production monitoring
 
@@ -63,7 +63,7 @@ test('slow integration test', async ({ page }) => {
 
 ### Adjust behavior based on trigger type
 
-Different behavior for scheduled runs versus manual triggers:
+Set different behavior for scheduled runs versus manual triggers:
 
 ```typescript highlight={4}
 import { test } from '@playwright/test';
@@ -82,6 +82,27 @@ test('API health check', async ({ request }) => {
 });
 ```
 
+### Configure Playwright based on environment
+
+Adjust your Playwright configuration for different environments in `playwright.config.ts`:
+
+```typescript playwright.config.ts
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  // Use 2 workers on Checkly, 1 on CI and undefined elsewhere
+  workers: process.env.CHECKLY === '1' ? 2 : process.env.CI ? 1 : undefined,
+
+  use: {
+    // Always trace in Checkly to compare successful and failed runs, only on retry elsewhere
+    trace: process.env.CHECKLY === '1' ? 'on' : 'on-first-retry',
+  },
+
+  // Retry failed tests in Checkly and CI, but not locally
+  retries: (process.env.CHECKLY === '1' || process.env.CI) ? 2 : 0,
+});
+```
+
 ### Access region information
 
 Use region information for debugging or region-specific behavior:
@@ -97,7 +118,7 @@ test('geo-specific content test', async ({ page }) => {
 
   // Region-specific assertions
   if (process.env.CHECKLY_REGION?.startsWith('eu-')) {
-    // Expect EU-specific content. Cookie banner anyone?
+    // Expect EU-specific content, like a cookie banner
   }
 });
 ```

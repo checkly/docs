@@ -156,7 +156,7 @@ export function getBaseUrl(env: Environment) {
   if (isDev) return "http://localhost:3000";
 
   const isCI = env === "CI";
-  if (isCi) return process.env.PREVIEW_URL;
+  if (isCI) return process.env.PREVIEW_URL;
 
   const isProd = env === "PROD";
   if (isProd) return "your-production-site.com";
@@ -173,7 +173,7 @@ export function getRetries(env: Environment) {
   if (isDev) return 0;
 
   const isCI = env === "CI";
-  if (isCi) return 1;
+  if (isCI) return 1;
 
   // increase retries to avoid unnecessary monitoring alerts
   const isProd = env === "PROD";

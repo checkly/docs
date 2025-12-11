@@ -4,11 +4,11 @@ description: 'Use private packages, custom registries, and additional dependenci
 sidebarTitle: 'Custom Dependencies'
 ---
 
-Playwright Check Suites let you take your existing Playwright tests and turn them into globally distributed monitoring using the [Checkly CLI](/cli/). It will read your Playwright configuration and parse your existing settings and dependencies to prepare the Checkly monitoring infrastructure.
+Use the [Checkly CLI](/cli/) to turn your Playwright tests into globally distributed monitors. Checkly uses your existing `package.json` dependencies and Playwright configuration.
 
 ## Using JavaScript/Node.js dependencies
 
-Whether you use [npm](https://www.npmjs.com/), [yarn](https://yarnpkg.com/), or [pnpm](https://pnpm.io/); Checkly uses your existing `package.json` and lock files to install the correct `devDependencies` and prepare your testing and monitoring environment.
+Checkly installs dependencies from your `package.json` and lock files. It works with [npm](https://www.npmjs.com/), [yarn](https://yarnpkg.com/), and [pnpm](https://pnpm.io/).
 
 ```json
 {
@@ -19,10 +19,10 @@ Whether you use [npm](https://www.npmjs.com/), [yarn](https://yarnpkg.com/), or 
 ```
 
 <Note>
-By default, the Checkly infrastructure installs dependencies via npm.
+Checkly uses npm by default.
 </Note>
 
-However, if an alternative lock file (`pnpm-lock.json` or `yarn.lock`) is discovered, Checkly uses the matching package manager to install the project dependencies.
+Checkly detects your package manager from your lock file:
 
 | Available lock file | Package manager |
 |---------------------|-----------------|
@@ -31,12 +31,12 @@ However, if an alternative lock file (`pnpm-lock.json` or `yarn.lock`) is discov
 | `yarn.lock`         | yarn            |
 
 <Warning>
-**For `pnpm` users:** if you define the same dependency in `dependencies` and `devDependencies`, please use a custom `installCommand` in your `checkly.config.ts|js` to ensure all required dependenies are installed: `pnpm install`
+**For pnpm users:** If you define the same dependency in both `dependencies` and `devDependencies`, use a custom `installCommand` in your `checkly.config.ts` to install all dependencies: `pnpm install`
 </Warning>
 
 ## Using private dependencies
 
-There are no dependency changes required if you rely on private packages or a custom package registry. The Checkly CLI detects your existing private `package.json` dependencies and installs those using the credentials provided.
+Your private packages work without changes. Checkly installs them using the credentials you provide.
 
 ```json
 {
@@ -47,60 +47,58 @@ There are no dependency changes required if you rely on private packages or a cu
 ```
 
 
-Regardless of whether you use private packages or a custom registry, the Checkly infrastructure needs to authenticate with your provider to `install` your private source code.
+To install private packages, Checkly authenticates with your package registry. You need to:
 
-For example, if you use npm to manage your private dependencies, you need to:
-
-- **add custom npm configuration** to your project.
-- **include custom configuration files** in your Checkly project to make the infrastructure aware.
+1. Add authentication configuration to your `.npmrc` file
+2. Include the `.npmrc` file in your Checkly configuration file
+3. Store authentication tokens as [environment variables](/platform/variables) in Checkly
 
 ### Configuration files for private packages
 
-Package managers use configuration files to authenticate with private registries. All supported package managers (npm, yarn, pnpm) can use `.npmrc` for authentication:
+All package managers (npm, yarn, pnpm) use `.npmrc` files to authenticate with private registries.
 
 <Note>
-To avoid putting sensitive information into configuration files, set authentication tokens via Checkly [environment secrets](/platform/variables). Reference them using `${VARIABLE_NAME}` syntax in your configuration files.
+Store authentication tokens as Checkly [environment variables](/platform/variables). Reference them in your `.npmrc` file using `${VARIABLE_NAME}` syntax.
 </Note>
 
 #### Using private npm packages
 
 ```txt
-# Hard-coded authentication token
-//registry.npmjs.org/:_authToken=npm_abc...
-
-# Authentication token defined in environment variables
+# Using an environment variable (recommended)
 //registry.npmjs.org/:_authToken=${NPM_TOKEN}
+
+# Hard-coded token (not recommended)
+//registry.npmjs.org/:_authToken=npm_abc...
 ```
 
 #### Using JFrog Artifactory
 
 ```txt
-# Custom registry URL with hard-coded authentication token
-registry=https://yourcompany.jfrog.io/artifactory/api/npm/yourcompany.jfrog.io/artifactory/api/npm/npm-local/:_authToken=abc...
+# Using an environment variable (recommended)
+registry=https://yourcompany.jfrog.io/artifactory/api/npm/npm-local/:_authToken=${ARTIFACTORY_TOKEN}
 
-# Custom registry URL with authentication token defined in environment variables
-registry=https://yourcompany.jfrog.io/artifactory/api/npm/yourcompany.jfrog.io/artifactory/api/npm/npm-local/:_authToken=${ARTIFACTORY_TOKEN}
+# Hard-coded token (not recommended)
+registry=https://yourcompany.jfrog.io/artifactory/api/npm/npm-local/:_authToken=abc...
 ```
 
 #### Using GitHub Packages
 
 ```txt
-# Authentication token defined in environment variables
 //npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
 @your-org:registry=https://npm.pkg.github.com
 ```
 
 ### Using yarn or pnpm with private packages
 
-Both **yarn** and **pnpm** support `.npmrc` for authentication (same format as npm examples above). Checkly automatically detects your package manager based on the lock file present and uses the `.npmrc` configuration for authentication.
+**yarn** and **pnpm** also use `.npmrc` for authentication (same format as npm examples above).
 
-### Include custom configuration files
+### Include authentication files
 
-To make the Checkly CLI and infrastructure aware of your configuration for private packages, specify the additional files in the `checks.include` property in your `checkly.config.ts`.
+Add your `.npmrc` file to the `checks.include` property in your `checkly.config.ts`.
 
-Checkly CLI commands like `test` or `deploy` will bundle and upload these files so they are available in the Checkly infrastructure when running essential commands like `install`; making sure your private dependencies are installed.
+When you run `npx checkly test` or `npx checkly deploy`, the CLI bundles and uploads these files. This makes them available when Checkly runs `installCommand` to install your dependencies.
 
-```typescript checkly.config.ts
+```typescript checkly.config.ts highlight={5}
 export default defineConfig({
   checks: {
     playwrightConfigPath: './playwright.config.ts',
@@ -108,7 +106,6 @@ export default defineConfig({
     // Works with npm, yarn, and pnpm
     include: ['.npmrc'],
     playwrightChecks: [
-      // Configure your Playwright Check Suites
       // ...
     ]
   }

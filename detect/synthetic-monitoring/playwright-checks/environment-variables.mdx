@@ -42,24 +42,6 @@ Checkly sets the following environment variables on every Playwright Check Suite
 
 Common ways to use Checkly's built-in environment variables:
 
-### Skip tests in production monitoring
-
-Skip certain tests when running in Checkly that you only want to run locally during development:
-
-```typescript highlight={5}
-import { test } from '@playwright/test';
-
-test('slow integration test', async ({ page }) => {
-  // Skip this test in Checkly - too slow for monitoring
-  if (process.env.CHECKLY === '1') {
-    test.skip();
-  }
-
-  // Test that takes several minutes or hits rate limits
-  await page.goto('http://localhost:3000');
-  // ... rest of your test
-});
-```
 
 ### Adjust behavior based on trigger type
 
@@ -84,22 +66,19 @@ test('API health check', async ({ request }) => {
 
 ### Configure Playwright based on environment
 
-Adjust your Playwright configuration for different environments in `playwright.config.ts`:
+Adjust your Playwright configuration to always record traces on Checkly. 
+
+In your  `playwright.config.ts`, use the CHECKLY variable to identify it's from Checkly.
 
 ```typescript playwright.config.ts
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  // Use 2 workers on Checkly, 1 on CI and undefined elsewhere
-  workers: process.env.CHECKLY === '1' ? 2 : process.env.CI ? 1 : undefined,
 
   use: {
     // Always trace in Checkly to compare successful and failed runs, only on retry elsewhere
     trace: process.env.CHECKLY === '1' ? 'on' : 'on-first-retry',
   },
-
-  // Retry failed tests in Checkly and CI, but not locally
-  retries: (process.env.CHECKLY === '1' || process.env.CI) ? 2 : 0,
 });
 ```
 

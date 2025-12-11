@@ -126,7 +126,7 @@ export function getEnvironment(): Environment {
   // $ npx checkly pw-test
   // $ npx checkly test
   const isTest = process.env.CHECKLY_RUN_SOURCE?.startsWith("TEST");
-  if (isTestRun) return "CI";
+  if (isTest) return "CI";
 
   const isMonitoring = process.env?.CHECKLY_RUN_SOURCE?.startsWith("TRIGGER") ||
     process.env?.CHECKLY_RUN_SOURCE?.startsWith("SCHEDULE") ||

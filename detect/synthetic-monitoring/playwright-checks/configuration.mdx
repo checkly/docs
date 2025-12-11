@@ -111,84 +111,73 @@ Additionally, Playwright Check Suites provide specific configuration for your Pl
 
 * `testCommand:` Override the command to test. `npx playwright test` is used by default with the tags, projects, and config file options your check specifies.
 
-* `groupName:` The group this check belongs to.
+* `group:` The group construct this check belongs to.
 
-### Example command customizations
+### Customize install and test commands
 
-**When to override `installCommand`:**
+By default, Checkly runs `npm install --dev` to install dependencies and `npx playwright test` to run tests. The `testCommand` automatically includes your `pwProjects`, `pwTags`, and Playwright config file path.
+
+You can override these commands to:
+
+**Use a different package manager:**
 
 ```typescript
-// Install from a specific directory
-installCommand: 'npm install --prefix ./e2e'
-
-// Use a different package manager
 installCommand: 'yarn install --frozen-lockfile'
-
-// Skip installing dependencies (if bundled with your code)
-installCommand: 'echo "Dependencies already installed"'
 ```
 
-**When to override `testCommand`:**
+**Install dependencies from a specific directory:**
 
 ```typescript
-// Enable Playwright tracing for debugging failures
+installCommand: 'npm install --prefix ./e2e'
+```
+
+**Enable Playwright tracing to debug failures**
+
+```typescript
 testCommand: 'npx playwright test --trace=on'
+```
 
-// Run with specific test timeout
+**Set a specific test timeout:**
+
+```typescript
 testCommand: 'npx playwright test --timeout=60000'
+```
 
-// Run tests with headed browser for debugging
-testCommand: 'npx playwright test --headed'
+**Combine multiple test flags:**
 
-// Combine multiple flags
+```typescript
 testCommand: 'npx playwright test --trace=retain-on-failure --max-failures=5'
 ```
-
-<Note>
-The `testCommand` automatically includes your `pwProjects`, `pwTags`, and Playwright config file path so you don't add these flags manually.
-</Note>
 
 ### Example Checkly config
 
 ```typescript checkly.config.ts
+import { defineConfig } from 'checkly'
+import { Frequency } from 'checkly/constructs'
+import { productionGroup } from './production-group.check'
+
 export default defineConfig({
   // Shared Checkly configuration (scheduling, locations, etc.)
   // ...
   checks: {
-    // Specify the relative path to your config file
     playwrightConfigPath: './playwright.config.ts',
     playwrightChecks: [
       {
-        /**
-         * Run `@e2e` tagged tests across browsers
-         * every 5 minute from 4 locations.
-         */
-        // Human readable name
         name: 'E2E test suite',
-        // Reference id
         logicalId: 'e2e-test-suite',
-        // Playwright project references defined in `playwright.config`
         pwProjects: ['chromium', 'firefox', 'webkit'],
-        // Playwright tags defined in `spec` files
         pwTags: '@e2e',
-        // Override default dependencies install command
         installCommand: 'npm install --dev',
-        // Append to the resulting test command, respects your pwTags and pwProjects filters.
         testCommand: 'npx playwright test --trace=on',
-        // Activate the check so that it runs on a schedule, true by default
         activated: true,
-        // Mute the check so that it doesn't send alerts
         muted: false,
-        // Add a check to a group
-        groupName: 'production-group',
-        // Specify a monitoring frequency
+        group: productionGroup,
         frequency: Frequency.EVERY_5M,
-        // Define locations to monitor from
         locations: ['us-east-1', 'eu-west-1','eu-central-1', 'ap-south-1'],
       }
     ]
   },
-}
+})
 ```
 
 ## Testing configuration locally

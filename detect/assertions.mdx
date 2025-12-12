@@ -4,11 +4,11 @@ description: 'Add assertions to validate your check results'
 sidebarTitle: 'Assertions'
 ---
 
-Uptime monitors allow you to define assertions to validate a response and check its data for correctness.
+Uptime monitors and API checks allow you to define assertions to validate a response and check its data for correctness.
 
 ## How assertions work
 
-Assertions let you validate specific parts of a response. You can add multiple assertions to a single check, each targeting a different aspect of the result. For example:
+Assertions let you validate specific parts of a check's response. For example:
 
 - **URL monitor**: HTTP response status equals 200.
 - **TCP monitor**: Response contains expected string (e.g. OK).
@@ -224,7 +224,7 @@ The first item `quick brown fox` is the full match, which we do not return.
 
 ### Text body assertions with regular expressions
 
-When a check returns a text-based response (such as HTML), you can use regular expressions to extract and assert on specific parts of the response body.
+When a check returns a text-based response, you can use regular expressions to extract and assert on specific parts of the response body.
 
 For example, an HTML document might include a `lang="en"` attribute on the `<html>` element. You can capture the two-character language code using the following regular expression:
 
@@ -235,7 +235,7 @@ sure there are only non-capital characters, we could tighten it up a bit with `l
 
 ### API Header assertions with regular expressions
 
-We can use regular expressions with API headers too. In this example, we check if the `max-age` property of a `Strict-Transport-Security`
-response header is above a `100000`
+We can use regular expressions with [API headers](/detect/synthetic-monitoring/api-checks/configuration#headers) too. In this example, we check if the `max-age` property of a `Strict-Transport-Security`
+response header is above a `100000`.
 
 ![api monitoring use regular expression on http header](/images/docs/images/api-checks/assertions-11.png)

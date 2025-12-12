@@ -59,25 +59,14 @@ API checks perform comprehensive endpoint validation:
 API checks are ideal for testing both internal services and external API dependencies your application relies on.
 </Tip>
 
-## Timeouts 
+## Response Metrics
 
-All API checks are capped at a timeout of **30 seconds**. With each request, we record the most relevant timing phases. This can help you troubleshoot slow responses, e.g. your DNS might be slow.
+With each request, we record the most relevant timing phases:
 
-The timing phases correspond to the Node.js request library timing phases:
-
-- `wait`: Duration of socket initialization
 - `dns`: Duration of DNS lookup
 - `tcp`: Duration of TCP connection
 - `firstByte`: Duration of HTTP server response
 - `download`: Duration of HTTP download
 
-![api monitoring timing phases](/images/docs/images/api-checks/timing-phases.png)
-
-<Note>
-## Interpreting the `wait` metric  
-
-The "wait" time is the time it takes for the underlying Node HTTP module to get a socket from the network layer. 
-This time can vary quite a bit, usually it goes from 900 microseconds to some milliseconds. Most clients for API / webpage will have this lag too.
-
-</Note>
+This can help you troubleshoot slow responses, e.g. your DNS might be slow.
 

@@ -1,57 +1,46 @@
 ---
-title: 'Writing assertions for API checks'
-description: 'Writing assertions for API checks'
+title: 'Defining Assertions'
+description: 'Add assertions to validate your check results'
 sidebarTitle: 'Assertions'
 ---
 
-
-
-The response of an API request can be checked for correctness and timeliness by using assertions on the response data. Assertions are flexible statements that combine preset modifiers with custom values to meet the needs of a broad set of use cases.
+Uptime monitors allow you to define assertions to validate a response and check its data for correctness.
 
 ## How assertions work
 
-Assertions are statements you create that check one aspect of the HTTP response. You can create multiple assertions for one check that assert various aspects of a response, for example:
+Assertions let you validate specific parts of a response. You can add multiple assertions to a single check, each targeting a different aspect of the result. For example:
 
-- HTTP response status equals 200.
-- HTTP response body equals the text "success".
-- HTTP response time is lower than 2000 milliseconds.
-- HTTP response header "X-Custom-Header" equals "SomeValue".
-- HTTP response JSON object has a key called "accountBalance" with a value greater than 9999
+- **URL monitor**: HTTP response status equals 200.
+- **TCP monitor**: Response contains expected string (e.g. OK).
+- **DNS monitor**: Resolved IP equals 93.184.216.34.
+- **API check**: HTTP response header "X-Custom-Header" equals "SomeValue".
+
+### Sources
 
 In each assertion, a **source** is connected to a **comparison** and a **target**.
 
 ![api monitoring assertions example 1](/images/docs/images/api-checks/assertions-1.png)
 
-In some cases a **property** is added, for example when asserting headers or JSON response bodies.
+In some cases a [property](#property) is added, for example when asserting API headers or JSON response bodies.
 
 ![api monitoring assertions example 2](/images/docs/images/api-checks/assertions-2.png)
 
 Assertions are executed from top to bottom. If one assertion fails, the full check is considered as failed.
 
-## Source
+Supported assertion sources vary by monitor type. Refer to the documentation of the specific monitor (API, DNS, TCP, etc.) to see which sources are available.
 
-On each API check assertion, the following sources are available:
+### Property
 
-- **Status code:** The HTTP response status, parsed as an integer.
-- **JSON body:** The response body parsed as a JSON object.
-- **Text body:** The response body as plain text.
-- **Headers:** The response headers as an array of key/value pairs.
-- **Response time:** The response time of the full API request in milliseconds, parsed as an integer value.
+The property field is a free-form text input that lets you point to a specific part of the data you want to validate. It’s available for the following types of assertion [sources](#sources):
 
-## Property
+- **JSON response bodies**: Use a JSON path expressions in the form of dot-separated strings to 
+target nested properties in an object, i.e. `$.product.size` or an item in an array, i.e. `$.[1].key`. [Learn more](#json-responses-with-json-path).
 
-The property field is a free form text field used to identify the name of a header, the part of a JSON object using JSON path or part of a text body.
+- **Text response bodies**: Provide a regular expression with a capture group to pick out parts, 
+i.e. `<!doctype (.{4})` would grab the word `html` from a body return `<doctype html>`. [Learn more](#text-body-assertions-with-regular-expressions).
 
-- With **JSON response bodies**, the property field accepts **JSON path** expressions in the form of dot-separated strings to 
-target nested properties in an object, i.e. `$.product.size` or an item in an array, i.e. `$.[1].key`
-
-- With **text response bodies**, the property field accepts a **regular expression** with a capture group to pick out parts, 
-i.e. `<!doctype (.{4})` would grab the word `html` from a body return `<doctype html>`
-
-- With **headers**, you provide the header you want to assert in the property field, i.e. `Content-Type`. You can even add a
-regular expression after that to tease out a specific part of the header.
-
-Read more about asserting JSON response bodies below.
+- **API Headers**: Enter the header name you want to assert on i.e. `Content-Type`. You can even add a
+regular expression after that to tease out a specific part of the header. [Learn more](#using-regular-expressions).
 
 ## Comparison
 
@@ -75,19 +64,14 @@ Response time is empty? JSON Object is less than? We block out the comparisons w
 
 The target field is a free form text field that determines the desired outcome of your assertion.
 
-
 ## JSON responses with JSON path
 
-You can use **JSON path** to specify which field of a JSON response body should be asserted. JSON path is a query language 
+For monitors that support JSON body assertions, you can use **JSON path** to specify which field of a JSON response body should be asserted. JSON path is a query language 
 similar to Xpath for XML, but in general a lot more intuitive and simpler to use.
-
-> For Checkly to be able to parse the JSON body, the `Content-Type` header of the response should be set to `application/json`.
 
 ### JSON path primer
 
-JSON path only uses a handful of operators in its queries. Not all of them are useful in the context of assertions.
-Here is an adapted set of examples based on  [Stefan Goessner's 2007 introduction post](http://goessner.net/articles/JsonPath/).
-
+The following JSONPath operators are available:
 
 JSONPath         | Description
 -----------------|------------
@@ -163,8 +147,7 @@ JSONPath                      | Description
 `$..book[?(@.price<30 && @.category=="fiction")]` | Filter all fiction books cheaper than 30
 `$..*`                         | All members of JSON structure
 
-Use this [online editor to play around](https://jsonpath.com/), or look at the examples below. We use this [jsonpath NPM 
-module](https://github.com/dchester/jsonpath) under the hood.
+Use this [online editor](https://jsonpath.com/) to try out your own JSONPath expressions.
 
 ### Asserting basic types
 
@@ -218,12 +201,9 @@ Regular expressions give you the power to extract specific parts of text from a 
 You can use regular expressions with two assertions sources:
 
 1. **Text body:** Use the property field to add your regex.
-2. **Headers:** First select the header you are interested in the property field, then click "add regex".
+2. **API Headers:** First select the header you are interested in the property field, then click "add regex".
 
-Under the hood, we use the stock Javascript regular expressions implementation. Specifically, we use the [.match()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match)
-method. We *do not use the `/g` modifier* and return the first matched group the expression finds.
-
-Sounds more complicated than it is. Here is an example:
+Here is an example:
 
 ```javascript
 const paragraph = 'The quick brown fox jumps over the lazy dog. It barked.'
@@ -244,25 +224,18 @@ The first item `quick brown fox` is the full match, which we do not return.
 
 ### Text body assertions with regular expressions
 
-If our API returns HTML, there might be a `lang="en"` attribute in the `<html>` element. We can capture the two character 
-country/language code value of that attribute with the following expression.
+When a check returns a text-based response (such as HTML), you can use regular expressions to extract and assert on specific parts of the response body.
+
+For example, an HTML document might include a `lang="en"` attribute on the `<html>` element. You can capture the two-character language code using the following regular expression:
 
 ![api monitoring use regular expression on text body](/images/docs/images/api-checks/assertions-10.png)
 
 The expression `lang="(.{2})"` means 'grab any of the first two characters between `lang="` and the next `"`'. If we were
 sure there are only non-capital characters, we could tighten it up a bit with `lang="([a-z]*)"`.
 
-### Header assertions with regular expressions
+### API Header assertions with regular expressions
 
-We can use regular expressions with headers too. In this example, we check if the `max-age` property of a `Strict-Transport-Security`
+We can use regular expressions with API headers too. In this example, we check if the `max-age` property of a `Strict-Transport-Security`
 response header is above a `100000`
 
 ![api monitoring use regular expression on http header](/images/docs/images/api-checks/assertions-11.png)
-
-
-
-
-
-
-
-

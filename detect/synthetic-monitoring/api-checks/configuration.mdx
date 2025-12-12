@@ -1,32 +1,26 @@
 ---
-title: 'Requests'
-description: 'Requests'
-sidebarTitle: 'Requests'
+title: 'Configuration'
+description: 'Configure your API checks to validate responses and ensure your endpoints behave as expected.'
+sidebarTitle: 'Configuration'
+aliases:
+  - /detect/synthetic-monitoring/api-checks/assertions/
+  - /detect/synthetic-monitoring/api-checks/requests/
 ---
 
-import GenericRuntimeVariablesTable from '/snippets/generic-runtime-variables-table.mdx';
+While configuring up your API check, you can run the request and its assertions using the **Run request** button. This will run the API check on production infrastructure and help you debug any issues.
 
-A full HTTP request is created by filling out the various parts of the HTTP request settings screen. Not all sections and fields
-are mandatory, only a name and URL are required to get going.
+## Basic Setup
 
-While building up your API check, you can run the request and its assertions using the **Run request** button. This will run the
-API checks on the production infrastructure and help you debug any issues.
+Start by specifying the endpoint you want to track.
 
-## Method & URL
+![api monitoring request configuration](/images/docs/images/api-checks/api-request-configuration.png)
 
-An API check starts with creating an HTTP request including a HTTP verb (GET, POST, PUT, etc.) and a URL at the minimum.
-
-![api monitoring http request](/images/docs/images/api-checks/http-request-method.png)
-
-- Available methods are `GET, POST, PUT, HEAD, DELETE, PATCH`
-- URL's are checked for correctness and must start with either `http://` or `https://`
-
-Checking the **"This request should fail"** checkbox allows you to treat HTTP error codes (4xx and 5xx) as correct responses. This comes in handy when testing 404 pages or 500 error handling.
-
-When enabled:
-  * ✅ Failed responses (4xx, 5xx) → check passes
-  * ✅ Successful responses → check passes
-  * ❌ Failed assertions → check fails
+- **URL**: The HTTP(S) URL to monitor (e.g. https://checklyhq.com). URL's are checked for correctness and must start with either `http://` or `https://`.
+- **Request methods**: Available methods are `GET, POST, PUT, HEAD, DELETE, PATCH`.
+- **IP family**: Defaults to IPv4.
+- **Skip SSL**: Skip SSL certificate validation.
+- **Follow redirects**: Automatically follow 30x redirects.
+- **This request should fail**: Treat HTTP error codes (4xx and 5xx) as passed. Please note that successful responses still pass. Only failed assertions will cause the check to fail.
 
 ## Body
 
@@ -47,7 +41,6 @@ This option sets the `Content-Type` request header to `application/json`. Format
 JSON bodies are commonly used with REST APIs.
 
 ### GraphQL
-
 
 This option also sets the `Content-Type` request header to `application/json`, but allows you to type GraphQL queries and
 format them as such, i.e.
@@ -93,10 +86,8 @@ This section allows you to add query parameters to the request URL in a structur
 
 ## Basic authentication
 
-To add [HTTP basic authentication parameters](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) to your API
-request, use the username and password fields in the relevant section.
-
-![api monitoring basic auth](/images/docs/images/api-checks/http-request-auth.png)
+Add [HTTP basic authentication parameters](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) to your API
+request by entering a username and password in the Authentication tab.
 
 ## Accessing environment variables
 
@@ -166,6 +157,30 @@ parses your spec and prompts you to make some decisions about which requests are
 - **Query parameters:** import query parameters from your spec.
 - **Add a "group" tag:** Copy the name of you spec to a tag and add it to each imported request. This helps
 filtering and grouping related checks in the Checkly dashboard.
+
+## Assertions
+
+The response of an API request can be checked for correctness and timeliness by using assertions on the response data. This allows you to verify things such as:
+
+- HTTP response status equals 200.
+- HTTP response body equals the text "success".
+- HTTP response time is lower than 2000 milliseconds.
+- HTTP response header "X-Custom-Header" equals "SomeValue".
+- HTTP response JSON object has a key called "accountBalance" with a value greater than 9999.
+
+![api check assertions](/images/docs/images/api-checks/api-check-assertions.png)
+
+## API assertion sources
+
+On each API check assertion, the following sources are available:
+
+- **Status code:** The HTTP response status, parsed as an integer.
+- **JSON body:** The response body parsed as a JSON object. To enable parsing, the Content-Type header of the response should be set to application/json..
+- **Text body:** The response body as plain text.
+- **Headers:** The response headers as an array of key/value pairs.
+- **Response time:** The response time of the full API request in milliseconds, parsed as an integer value.
+
+For more details, see our documentation on [Assertions](/detect/assertions).
 
 ## Responses
 

@@ -21,7 +21,7 @@ In each assertion, a **source** is connected to a **comparison** and a **target*
 
 ![api monitoring assertions example 1](/images/docs/images/api-checks/assertions-1.png)
 
-In some cases a [property](#property) is added, for example when asserting API headers or JSON response bodies.
+In some cases a [property](#property) is added, for example when asserting API check headers or JSON response bodies.
 
 ![api monitoring assertions example 2](/images/docs/images/api-checks/assertions-2.png)
 
@@ -33,13 +33,13 @@ Supported assertion sources vary by monitor type. Refer to the documentation of 
 
 The property field is a free-form text input that lets you point to a specific part of the data you want to validate. It’s available for the following types of assertion [sources](#sources):
 
-- **JSON response bodies**: Use a JSON path expressions in the form of dot-separated strings to 
+- **JSON response bodies**: Use a JSON path expression in the form of dot-separated strings to
 target nested properties in an object, i.e. `$.product.size` or an item in an array, i.e. `$.[1].key`. [Learn more](#json-responses-with-json-path).
 
 - **Text response bodies**: Provide a regular expression with a capture group to pick out parts, 
 i.e. `<!doctype (.{4})` would grab the word `html` from a body return `<doctype html>`. [Learn more](#text-body-assertions-with-regular-expressions).
 
-- **API Headers**: Enter the header name you want to assert on i.e. `Content-Type`. You can even add a
+- **API check headers**: Enter the header name you want to assert on i.e. `Content-Type`. You can even add a
 regular expression after that to tease out a specific part of the header. [Learn more](#using-regular-expressions).
 
 ## Comparison
@@ -201,7 +201,7 @@ Regular expressions give you the power to extract specific parts of text from a 
 You can use regular expressions with two assertions sources:
 
 1. **Text body:** Use the property field to add your regex.
-2. **API Headers:** First select the header you are interested in the property field, then click "add regex".
+2. **API check headers:** First select the header you are interested in the property field, then click "add regex".
 
 Here is an example:
 
@@ -233,9 +233,9 @@ For example, an HTML document might include a `lang="en"` attribute on the `<htm
 The expression `lang="(.{2})"` means 'grab any of the first two characters between `lang="` and the next `"`'. If we were
 sure there are only non-capital characters, we could tighten it up a bit with `lang="([a-z]*)"`.
 
-### API Header assertions with regular expressions
+### API check header assertions with regular expressions
 
-We can use regular expressions with [API headers](/detect/synthetic-monitoring/api-checks/configuration#headers) too. In this example, we check if the `max-age` property of a `Strict-Transport-Security`
+We can use regular expressions with [API check headers](/detect/synthetic-monitoring/api-checks/configuration#headers) too. In this example, we check if the `max-age` property of a `Strict-Transport-Security`
 response header is above a `100000`.
 
 ![api monitoring use regular expression on http header](/images/docs/images/api-checks/assertions-11.png)

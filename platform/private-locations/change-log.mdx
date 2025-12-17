@@ -14,18 +14,17 @@ Learn more about:
 
 ## Full release history
 
+### Version 6.2.0 (December 16, 2025)
+
+- Coming soon
+
 ### Version 6.1.7 (December 3, 2025)
 
-**Features**
-
-- First image also including a developer version `6.1.7-dev`, learn all about the [dev image](https://www.checklyhq.com/docs/platform/private-locations/dev-agent/) here.
-  - From now on, you can get the most recent dev image available using `checkly/agent:dev`.
-- Playwright Check Suites: improved internal logging and metrics.
-- Browser and MultiStep checks using Runtime **2025-04** automatically scrubs the authorization header in requests.
+- Added support for a [dev image](https://www.checklyhq.com/docs/platform/private-locations/dev-agent/) starting with `checkly/agent:6.1.7-dev`. Going forward, the dev variant is published both as a floating tag (`checkly/agent:dev`) and as versioned images (`checkly/agent:X.Y.Z-dev`).
+- Improved internal logging and metrics for [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview)
+- Browser and MultiStep checks using Runtime **2025-04** now automatically scrub the `Authorization` header from requests
 
 ### Version 6.1.6 (November 24, 2025)
-
-**Features**
 
 - Added Checkly environment variables and configuration to [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview). See the docs on [Playwright Check Suites environment variables](/detect/synthetic-monitoring/playwright-checks/environment-variables)
   - Adds support for `CHECKLY` to all checkly triggered runs: scheduled checks and test sessions triggered through either `npx checkly test`, `npx checkly trigger` or `npx checkly pw-test`
@@ -33,98 +32,28 @@ Learn more about:
 
 ### Version 6.1.5 (November 14, 2025)
 
-**Features**
-
-- Added playwright test metrics support for Test performance and Test statuses graphs in Check Overview
+- Added Playwright test metrics to the check overview page, including **Test performance** and **Test statuses** graphs
 
 ### Version 6.1.4 (October 29, 2025)
-
-**Improvements**
 
 - Minor patches on reporting
 
 ### Version 6.1.3 (August 14, 2025)
 
-**Security updates**
-
-- Improved secret scrubbing with new Playwright fork version
-- Additional commits from runners
-- Full changelog [here](https://github.com/checkly/checkly-runners/releases/tag/v6.1.3)
+- Improved and centralized secret scrubbing for more reliable removal of sensitive data
 
 ### Version 6.1.2 (August 6, 2025)
 
-**Features**
-
-- Add support for CHECKLY_SECRET environment variables
-  - When an environment variable prefixed with `CHECKLY_SECRET_` contains special characters (anything other than A-Za-z0-9-_.~), the system now:
-    1. Detects special characters using the regex pattern `/[^A-Za-z0-9\-_.~]/`
-    2. Creates an encoded version using `encodeURIComponent()` with additional `!` character encoding (%21)
-    3. Adds it to the scrubbing cache to ensure both original and encoded values are properly scrubbed from traces
-  - This ensures that secrets containing special characters like `@, %, !, +`, etc. are properly scrubbed even when they appear in encoded form within request payloads or URLs
+- Added support for `CHECKLY_SECRET_*` environment variables. Secrets containing special characters (e.g. `@`, `%`, `!`, `+`) are now reliably scrubbed from traces, including when they appear in encoded form in URLs or request payloads
 
 ### Version 6.1.1 (July 30, 2025)
 
-**Bug fixes**
-
-- Make proxied env accessible to dependency callers
+- Fixed an issue where checks could fail behind proxies during dependency installation because proxy-related environment variables were not consistently available
 
 ### Version 6.1.0 (July 25, 2025)
 
-**Features**
-
-- Add support for secret detection on runtime for browser and MS checks (behind the Feature Flag `RUNTIME_SECRET_DETECTION`)
+- Added runtime secret detection for Browser and MultiStep checks (enabled for selected accounts)
 
 ### Version 6.0.7 (June 30, 2025)
 
-**Bug fixes**
-
-- Use lower case environment variables for cURL
-- Pass both headers
-- Allow proxy to forward requests to minio
-- Use xit
-
-**Features**
-
-- Create new hash
-
-### Version 6.0.6 (June 26, 2025)
-
-**Security improvements**
-
-- Updated container to use GID 10001 for enhanced Kubernetes compatibility
-- Configure with `runAsGroup: 10001` in your security context
-
-**Stability fixes**
-
-- Improved error handling for missing `await` statements in Playwright tests
-- Fixed JSON report generation issues with oversized or unparsable values
-
-### Version 6.0.5 (June 23, 2025)
-
-**Features**
-
-- Added support for [Playwright check suites](/detect/synthetic-monitoring/playwright-checks/overview).
-- Added debug logging with `DEBUG=checkly:*` environment variable
-- Bundled Node.js for offline installations
-
-**Security updates**
-
-- Enhanced secret scrubbing in logs
-- Patched all reported npm vulnerabilities
-
-**Improvements**
-
-- Added retry logic for artifact uploads
-- Improved fault tolerance
-
-### Version 6.0.0 (May 9, 2025)
-
-**Breaking changes**
-
-- Minimum Docker version 20.10 required
-- Updated configuration schema
-
-**New features**
-
-- Support for runtimes [2024.09](/platform/runtimes/runtime-specification#202409) and [2025.04](/platform/runtimes/runtime-specification#202504)
-- Disabled `PLAYWRIGHT_NO_COPY_PROMPT` for better reporter compatibility
+- Internal improvements and fixes related to networking and request handling

@@ -117,18 +117,6 @@ new TcpMonitor("tcp-monitor", {
 | `data` | `string` | ❌ | - | Data to send to the target host |
 | `assertions` | `TcpAssertion[]` | ❌ | `[]` | Response assertions using `TcpAssertionBuilder` |
 
-<Info>
-Use the `hostname` parameter without including a scheme (like `http://`) or port number. Specify the port separately using the `port` parameter.
-</Info>
-
-Define assertions using the `TcpAssertionBuilder` to validate both response time and response data:
-
-```ts
-TcpAssertionBuilder.responseData().contains("ping")
-TcpAssertionBuilder.responseTime().lessThan(1000)
-TcpAssertionBuilder.responseTime().greaterThan(5000)
-```
-
 **Examples:**
 
 <Tabs>
@@ -260,6 +248,33 @@ new TcpMonitor("batch-service", {
 
 **Use cases**: Performance monitoring, SLA compliance, connection timeout management.
 </ResponseField>
+
+### `TcpMonitor` Assertions
+
+To define `assertions` for the `request` of an `TcpMonitor` you should use the `TcpAssertionBuilder`. The following sources are available for TCP monitor assertions:
+
+- `responseTime()`: Assert the total response time of the TCP request
+- `responseData()`: Assert the value in the response data
+
+Here are some examples:
+
+- Assert the total response time of the TCP request
+
+```ts
+TcpAssertionBuilder.responseTime().lessThan(1000),
+// Equivalent to:
+{ source: 'RESPONSE_TIME', comparison: 'LESS_THAN', target: '1000' }
+```
+
+- Asserting the value in the response
+
+```ts
+TcpAssertionBuilder.responseData().contains('ping')
+// Equivalent to:
+{ source: 'RESPONSE_DATA', comparison: 'CONTAINS', target: 'ping' }
+```
+
+Learn more in our docs on [Assertions](/docs/api-checks/assertions/).
 
 ### General Monitor Options
 

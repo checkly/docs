@@ -4,68 +4,80 @@ description: 'Complete guide to the Checkly CLI for monitoring as code'
 sidebarTitle: 'Overview'
 ---
 
-import CliInstallation from '/snippets/cli-installation.mdx';
-import CliProjectInit from '/snippets/cli-project-init.mdx';
+import MainCicdCards from "/snippets/main-cicd-cards.mdx"
 
-<Note>
-See [the general quickstart guide](quickstarts/browser-check/) if you want to start creating your monitoring in the Checkly app first.
-</Note>
+The Checkly CLI gives you a JavaScript/TypeScript-native workflow for coding, testing and deploying synthetic
+monitoring at scale, from your code base. The Checkly CLI comes with **native `@playwright/test` support.** No lock-in, 
+just write standard `*.spec.ts` files.
 
-The Checkly CLI enables monitoring as code, allowing you to create, test, and deploy synthetic monitoring checks directly from your codebase. Write checks in JavaScript/TypeScript, test them locally, and deploy them to Checkly's global monitoring infrastructure.
+## Starting your first project
 
-## Installing
-
-**Recommended approach:** Create a new project with the CLI:
-
-<CliProjectInit/>
-
-**Alternative:** Install as a dev dependency in existing projects:
-
-<CliInstallation/>
-
-Recommended: Install [jiti](https://www.npmjs.com/package/jiti) to use TypeScript for your Checkly monitoring setup.
+Get started by installing the CLI using the following command which will guide you through the required steps to
+set up a fully working example.
 
 ```bash Terminal
-npm i --save-dev jiti
+npm create checkly@latest
 ```
 
-Then, discover all available commands using:
+Now, login to your Checkly account or sign up for a new account right from the terminal.
 
 ```bash Terminal
-npx checkly --help
+npx checkly login
 ```
 
-## Checking the Version
+After this, let's dry run the Checks in your new project against the global Checkly infrastructure.
+
 ```bash Terminal
-npx checkly --version
+npx checkly test
 ```
 
-## Command Reference
+This should report the following output to your terminal 
 
-### Authentication & Account Management
-- [`checkly login`](/cli/checkly-login) - Authenticate with your account
-- [`checkly logout`](/cli/checkly-logout) - Sign out and remove tokens
-- [`checkly whoami`](/cli/checkly-whoami) - Display current account info
-- [`checkly switch`](/cli/checkly-switch) - Switch between accounts
+```
+Running 4 checks in eu-west-1.
 
-### Development & Testing
-- [`checkly test`](/cli/checkly-test) - Run checks locally for testing
-- [`checkly pw-test`](/cli/checkly-pw-test) - Run Playwright checks locally for testing
-- [`checkly runtimes`](/cli/checkly-runtimes) - List available runtime environments
-- [`checkly sync-playwright`](/cli/checkly-sync-playwright) - Sync Playwright configuration
+src/__checks__/api.check.ts
+  ✔ Books API (222ms)
+src/__checks__/home.check.ts
+  ✔ Home page (24s)
+  ✔ Login Check (5s)
+src/__checks__/multi-step-spacex.check.ts
+  ✔ SpaceX MS (4s)
 
-### Deployment & Management
-- [`checkly deploy`](/cli/checkly-deploy) - Deploy checks to your account
-- [`checkly destroy`](/cli/checkly-destroy) - Remove all project resources
-- [`checkly trigger`](/cli/checkly-trigger) - Run deployed checks on-demand
+4 passed, 4 total
+```
 
-### Environment & Import
-- [`checkly env`](/cli/checkly-env) - Manage global environment variables
-- [`checkly import`](/cli/checkly-import) - Import existing resources into CLI
+Lastly, you deploy your Checks and related alert channels to Checkly, so we run your checks around the clock.
 
+```bash Terminal
+npx checkly deploy
+```
 
-## Next Steps
+You just created your entire synthetic monitoring setup with API and Playwright-based Browser Checks from your code base! 
+Open up [your Checkly dashboard](https://app.checklyhq.com) and you should see your check, ready to start monitoring around the clock.
 
-1. **[Authenticate](/cli/authentication)** - Get started with the CLI
-2. **[Create your first test](/cli/checkly-test)** - Write and test a check locally
-3. **[Deploy your monitoring](/cli/checkly-deploy)** - Push checks to Checkly
+For a custom installation check out [our installation docs](/cli/installation/).
+
+## Using AI IDEs and Copilots
+
+Checkly is designed to work with AI IDEs and Copilots. You can use your preferred provider to generate code for API 
+Checks, Browser Checks and all other constructs.
+
+<Columns cols={3}>
+  <Card title="GitHub Copilot" icon="/images/github-copilot-icon.svg" href="/integrations/ai/copilot">
+    Download the Checkly instructions file and let copilot generate Checkly CLI code for you.
+  </Card>
+  <Card title="Cursor" icon="/images/cursor-icon.svg" href="/integrations/ai/cursor">
+    Download the Checkly `.mdc` rules file and let Cursor generate Checkly CLI code for you.
+  </Card>
+  <Card title="Windsurf" icon="/images/windsurf-icon.svg" href="/integrations/ai/windsurf">
+    Download the Checkly rules file and let Windsurf generate Checkly CLI code for you.
+  </Card>
+</Columns>
+
+## Integrating with CI/CD
+
+After kicking the tires, you should delegate the testing and deploying of your checks to your CI/CD pipeline. Check our
+docs on [setting up the Checkly CLI with your favourite CI/CD platform](/integrations/ci-cd/overview).
+
+<MainCicdCards />

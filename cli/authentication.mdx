@@ -3,23 +3,28 @@ title: Authentication
 description: 'How to authenticate with the Checkly CLI'
 sidebarTitle: 'Authentication'
 ---
-Before you can use the Checkly CLI, you need to authenticate with your Checkly account.
+Before you can use the Checkly CLI, you need to authenticate with your Checkly account. There are different ways to authenticate depending on the environment where you are running the CLI from.
 
-## Login
+## Interactive
 
-The primary way to authenticate is using the interactive login command:
+When **running the CLI interactively** from your dev environment, just use the built-in `login` command. If you have multiple
+Checkly accounts, it will prompt which account you want to target.
 
 ```bash Terminal
 npx checkly login
 ```
 
-This command will:
-- Open your default browser to the Checkly authentication page
-- Prompt you to log in to your Checkly account
-- Generate an API key that the CLI will use for authentication
-- Store the credentials securely on your local machine
+Once authenticated, you can switch between accounts using:
 
-## Log Out
+```bash Terminal
+npx checkly switch
+```
+
+... or quickly find out which account you are currently targeting with:
+
+```bash Terminal
+npx checkly whoami
+```
 
 To log out and clear your stored credentials:
 
@@ -27,28 +32,23 @@ To log out and clear your stored credentials:
 npx checkly logout
 ```
 
-This will remove the stored API key from your local machine.
+## From CI
 
-## Other Authentication Options
+You can also authenticate using environment variables, which is useful for CI/CD pipelines and automated environments.
 
-### Environment Variables
+You will need to export two environment variables in the shell:
+- `CHECKLY_API_KEY`
+- `CHECKLY_ACCOUNT_ID`
 
-You can also authenticate using environment variables, which is useful for CI/CD pipelines and automated environments:
+To get your API key, go to your Settings page in Checkly and grab a API key from [the API keys tab](https://app.checklyhq.com/settings/user/api-keys) and your Account ID from the [Account settings tab](https://app.checklyhq.com/settings/account/general).
 
-To get your API key:
-
-1. Log in to your Checkly dashboard
-2. Navigate to **Account Settings** → **API Keys**
-3. Create a new API key
-4. Use the key in your environment variables or CLI configuration
-
-Set the account id and API key as follows:
+Set the account ID and API key as follows:
 
 ```bash Terminal
 # Set your Checkly API key
 export CHECKLY_API_KEY=your_api_key_here
 
-# Set your Checkly account ID (optional, CLI will detect automatically)
+# Set your Checkly account ID
 export CHECKLY_ACCOUNT_ID=your_account_id_here
 ```
 
@@ -60,36 +60,16 @@ npx checkly whoami
 
 This will display your account information and confirm your authentication status.
 
-## Multiple Accounts
-
-If you work with multiple Checkly accounts, you can switch between them:
-
-```bash Terminal
-# Switch to a different account using interactive prompt
-npx checkly switch
-
-# Switch to a different account using the account id
-npx checkly switch --account-id your_account_id
-
-# View current account
-npx checkly whoami
-```
-
-## Security Best Practices
-
-- **Never commit API keys** to version control
-- **Use environment variables** in production environments
-- **Rotate API keys** regularly for security
-
 ## Troubleshooting
 
-### Common Issues
+<AccordionGroup>
+<Accordion title="`npx checkly login` doesn't open a browser window">
+If `npx checkly login` doesn't automatically open a browser window to authenticate, you can generate a direct link instead.
 
-**"Authentication failed" error:**
-- Verify your API key is correct
-- Check that your account ID is correct (if specified)
-- Ensure your API key hasn't expired
+When prompted with:
 
-**"Browser didn't open" error:**
-- Decline to open the browser automatically and navigate to the authentication URL shown in the terminal
-- Copy and paste the URL into your browser
+> Do you want to open a browser window to continue with login? (Y/n)
+
+Enter "n". The CLI will provide a link that you can copy and paste into your browser to authenticate.
+</Accordion>
+</AccordionGroup>

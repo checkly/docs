@@ -88,7 +88,7 @@ Create a minimal `checkly.config.ts` (or `checkly.config.js`) at the root of you
   </Tab>
 </Tabs>
 
-Use the CLI to authenticate and pick a Checkly account. Make sure you have [signed up for a free account on checklyhq.com](https://www.checklyhq.com/)
+Use the CLI to [authenticate](/cli/authentication) and pick a Checkly account. Make sure you have [signed up for a free account on checklyhq.com](https://www.checklyhq.com/)
 before hand or just sign up for a new account straight from the terminal.
 
 ```bash Terminal
@@ -114,40 +114,6 @@ You will find the following files and folders:
 If you want to move the CLI and its constructs to a different, already existing Node.js project, just copy the full contents
 of the `node_modules` folder to your project and manually add a `checkly.config.ts` file.
 </Note>
-
-## Authentication
-
-There are different ways to authenticate when using the CLI depending on the environment where you are running the CLI from.
-
-### Interactive
-
-When **running the CLI interactively** from your dev environment, just use the built-in `login` command. If you have multiple
-Checkly accounts, it will prompt which account you want to target.
-
-```bash Terminal
-npx checkly login
-```
-
-Once authenticated, you can switch between accounts using:
-
-```bash Terminal
-npx checkly switch
-```
-
-... or quickly find out which account you are currently targeting with:
-
-```bash Terminal
-npx checkly whoami
-```
-
-### From CI
-
-When **running the CLI from your CI pipeline** you will need to export two variables in the shell:
-- `CHECKLY_API_KEY`
-- `CHECKLY_ACCOUNT_ID`
-
-Go to your Settings page in Checkly and grab a fresh API key from [the API keys tab](https://app.checklyhq.com/settings/user/api-keys) and your
-Account ID from the [Account settings tab](https://app.checklyhq.com/settings/account/general).
 
 ## Using a Proxy Server
 

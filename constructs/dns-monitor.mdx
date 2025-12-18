@@ -188,24 +188,24 @@ Here are some examples:
 
 ```ts
 DnsAssertionBuilder.responseTime().lessThan(1000)
-// renders to a JSON string
-"{ source: 'RESPONSE_TIME', regex: '', property: '', comparison: 'LESS_THAN', target: '1000' }"
+// Equivalent to:
+{ source: 'RESPONSE_TIME', comparison: 'LESS_THAN', target: '1000' }
 ```
 
 - Assert the DNS response code
 
 ```ts
 DnsAssertionBuilder.responseCode().equals('NOERROR')
-// renders to a JSON string
-"{ source: 'RESPONSE_CODE', regex: '', property: '', comparison: 'EQUALS', target: 'NOERROR' }"
+// Equivalent to:
+{ source: 'RESPONSE_CODE', comparison: 'EQUALS', target: 'NOERROR' }
 ````
 
 - Assert against specific JSON fields in the response.
 
 ```ts
 DnsAssertionBuilder.jsonAnswer('$.Answer.legth').equals(4)
-// renders to a JSON string
-"{ source: 'JSON_ANSWER', regex: '', property: '$.Answer.length', comparison: 'EQUALS', target: '4' }"
+// Equivalent to:
+{ source: 'JSON_ANSWER', property: '$.Answer.length', comparison: 'EQUALS', target: '4' }
 ```
 
 Learn more in our docs on [Assertions](/docs/api-checks/assertions/).

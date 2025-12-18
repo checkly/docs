@@ -10,7 +10,7 @@ The standard agent is optimized for size and doesn’t ship with build tools. In
 
 ## When to Use the Dev Image
 
-Use the **dev image** (`checkly/agent:X.Y.Z-dev`) when your checks require npm packages with **native dependencies** that need compilation. Common examples include:
+Use the **dev image** (`checkly/agent-dev:X.Y.Z`) when your checks require npm packages with **native dependencies** that need compilation. Common examples include:
 
 - `sqlite3` - SQLite database
 - `zookeeper` - Apache ZooKeeper client
@@ -26,7 +26,7 @@ If your checks only use pure JavaScript packages, the standard runtime image is 
 docker pull checkly/agent:1.2.3
 
 # Dev (with build tools)
-docker pull checkly/agent:1.2.3-dev
+docker pull checkly/agent-dev:1.2.3
 ```
 
 ### Floating Tags
@@ -36,10 +36,10 @@ docker pull checkly/agent:1.2.3-dev
 docker pull checkly/agent:latest
 
 # Latest dev release
-docker pull checkly/agent:dev
+docker pull checkly/agent-dev:latest
 ```
 
-<Note>  Use versioned tags for reproducible deployments. Floating tags (like `:dev`) may change between pulls.</Note>
+<Note>  Use versioned tags for reproducible deployments. Floating tags (like `:latest`) may change between pulls.</Note>
 
 ## What's Included in the Dev Image
 
@@ -62,7 +62,7 @@ To use the dev variant, simply change the image tag:
 docker run \
   -e API_KEY="your_api_key_here" \
   --name checkly-agent-dev \
-  -d checkly/agent:dev
+  -d checkly/agent-dev:latest
 ```
 
 All other setup and configuration remains the same. For more information, see the [Private Locations documentation](/platform/private-locations/overview/).

@@ -8,6 +8,7 @@ rss: true
 For major release announcements and summaries, see Checkly's [product changelog](https://feedback.checklyhq.com/changelog?c=Checkly+Agent), filtered by `Checkly Agent`.
 
 Learn more about:
+
 - updating to the latest version in
   [updating the agent container](/platform/private-locations/agent-configuration#updating-the-agent-container)
 - supported runtimes for each agent version in
@@ -15,12 +16,18 @@ Learn more about:
 
 ## Full release history
 
+<Update label="v6.3.0" tags={["December 2025"]}>
+  - Added [agent-dev image](https://www.checklyhq.com/docs/platform/private-locations/dev-agent/) including build tools to support building native npm packages. Going forward, the dev variant is published as a separate image rather than a tag on the main agent image
+  - Improved secret scrubbing speed
+  - Improved error logging for hanging or long running Playwright Check Suite jobs
+</Update>
+
 <Update label="v6.2.0" tags={["December 2025"]}>
   Ensured `devDependencies` are not installed in the agent image
 </Update>
 
 <Update label="v6.1.7" tags={["December 2025"]}>
-  - Added support for a [dev image](https://www.checklyhq.com/docs/platform/private-locations/dev-agent/), which is published both as a floating tag `checkly/agent:dev` and as a versioned image `checkly/agent:X.Y.Z-dev`
+  - Added support for a [dev image](https://www.checklyhq.com/docs/platform/private-locations/dev-agent/) including build tools to support building native npm packages
   - Improved internal logging and metrics for [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview)
   - Browser and Multistep checks using runtime 2025.04 now automatically scrub the `Authorization` header from requests
 </Update>

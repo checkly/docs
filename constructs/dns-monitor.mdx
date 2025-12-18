@@ -175,12 +175,12 @@ new DnsMonitor("fast-dns", {
 
 ### `DnsMonitor` Assertions
 
-To define `assertions` for the `request` of an `DnsMonitor` you should use the `DnsAssertionBuilder`. The `DnsAssertionBuilder` supports the following sources:
+To define `assertions` for the `request` of an `DnsMonitor` you should use the `DnsAssertionBuilder`. The following sources are available for DNS monitor assertions:
 
 - `responseTime()`: Assert the total response time of the DNS request in milliseconds. Use this to set thresholds for failed lookups
 - `responseCode()`: By default, DNS monitors pass when the return code is NOERROR and fail on error codes (FORMERR, SERVFAIL, NXDOMAIN, etc.). You can override this behavior by defining a custom return code assertion
 - `textAnswer()`: The raw DNS response as plain text. Use this to check for specific strings in the response
-- `jsonAnswer()`: The DNS response parsed as JSON. This allows you to target specific fields using JSON path assertions. The response structure varies by record type. See JSON response schemas below for all supported record types
+- `jsonAnswer()`: The DNS response parsed as JSON. This allows you to target specific fields using JSON path assertions. The response structure varies by record type. [Learn more about using JSON path](/docs/api-checks/assertions/#json-responses-with-json-path).
 
 Here are some examples:
 
@@ -200,7 +200,7 @@ DnsAssertionBuilder.responseCode().equals('NOERROR')
 "{ source: 'RESPONSE_CODE', regex: '', property: '', comparison: 'EQUALS', target: 'NOERROR' }"
 ````
 
-- Assert against specific JSON fields in the response
+- Assert against specific JSON fields in the response.
 
 ```ts
 DnsAssertionBuilder.jsonAnswer('$.Answer.legth').equals(4)

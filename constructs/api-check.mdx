@@ -108,7 +108,7 @@ The API Check configuration consists of specific API Check options and inherited
 </Tab>
 </Tabs>
 
-### API Check Options
+### `ApiCheck` Options
 
 <ResponseField name="request" type="object" required>
 The HTTP request configuration that defines the API endpoint to monitor. This is the core component of any API Check.
@@ -417,6 +417,45 @@ You must provide either `entrypoint` or `content`, but not both.
 
 **Use cases**: Test data cleanup, resource cleanup, logging and reporting.
 </ResponseField>
+
+### `ApiCheck` Assertions
+
+To define `assertions` for the `request` of an `ApiCheck` you should use the `AssertionBuilder`. The following sources are available an assertion for API checks:
+
+- `statusCode()`: Assert the HTTP status code for the HTTP request, e.g. 200 or 404
+- `jsonBody(property?)`: Assert the JSON response body. The property argument accepts a [JSON path expression](/docs/api-checks/assertions/#json-responses-with-json-path)
+- `textBody()`: Assert the body as raw text
+- `headers(propery?, regex?)`: Assert a set of response headers, takes the header name as the property argument and a regex to tease out a string from the header value
+- `responseTime()`: Assert the total response time of the HTTP request
+
+Learn more in our docs on [Assertions](/docs/api-checks/assertions/).
+
+**Assertion Examples**
+
+- Asserting an HTTP status code.
+
+```ts
+AssertionBuilder.statusCode().equals(200)
+// renders to a JSON string
+"{ source: 'STATUS_CODE', regex: '', property: '', comparison: 'EQUALS', target: '200' }"
+```
+
+- Asserting a part of a JSON response body using a JSON path expression. [Learn more about using JSON path](/docs/api-checks/assertions/#json-responses-with-json-path).
+
+```ts
+AssertionBuilder.jsonBody('$.data').greaterThan(2000),
+// renders to a JSON string
+"{ source: 'JSON_BODY', regex: '', property: '$.data', comparison: 'GREATER_THAN', target: '2000' }"
+```
+
+- Asserting the value of a part of an HTTP response header. Note that you can pass in a regex as the second argument.
+
+```ts
+AssertionBuilder.headers('strict-transport-security', 'max-age=(\\d+)').greaterThan(10000),
+// renders to a JSON string
+"{ source: 'HEADERS', regex: 'max-age=(\d+)', property: 'strict-transport-security', comparison: 'GREATER_THAN', target: '100000' }"
+```
+
 
 ## Examples
 

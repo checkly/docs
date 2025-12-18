@@ -115,15 +115,6 @@ new UrlMonitor("url-monitor", {
 | `skipSSL` | `boolean` | ❌ | `false` | Whether to skip validation of SSL certificates |
 | `assertions` | `UrlAssertion[]` | ❌ | `[]` | Response assertions using `UrlAssertionBuilder` |
 
-Define assertions using the `UrlAssertionBuilder` to validate HTTP status codes:
-
-```ts
-UrlAssertionBuilder.statusCode().equals(200)
-UrlAssertionBuilder.statusCode().notEquals(404)
-UrlAssertionBuilder.statusCode().greaterThan(200)
-UrlAssertionBuilder.statusCode().lessThan(300)
-```
-
 **Examples:**
 
 <Tabs>
@@ -239,6 +230,30 @@ new UrlMonitor("api-timeout", {
 
 **Use cases**: Performance monitoring, SLA compliance, user experience optimization.
 </ResponseField>
+
+### `UrlMonitor` Assertions
+
+To define `assertions` for the `request` of an `UrlMonitor` you should use the `UrlAssertionBuilder`. The following source is available for URL monitor assertions:
+
+- `statusCode()`: Assert the HTTP status code for the HTTP response, e.g. 200 or 201
+
+Here is an example:
+
+- Assert the status code of a HTTP request
+
+```ts
+UrlAssertionBuilder.statusCode().equals(200)
+// Equivalent to:
+{ source: 'STATUS_CODE', comparison: 'EQUALS', target: '200' }
+```
+
+```ts
+UrlAssertionBuilder.statusCode().lessThan(300)
+// Equivalent to:
+{ source: 'STATUS_CODE', comparison: 'lessThan', target: '300' }
+```
+
+Learn more in our docs on [Assertions](/docs/api-checks/assertions/).
 
 ### General Monitor Options
 

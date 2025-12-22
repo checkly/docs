@@ -90,8 +90,8 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /detect/synthetic-monitoring/api-checks/overview
 - /detect/synthetic-monitoring/api-checks/creating-your-first-api-check
 - /detect/synthetic-monitoring/api-checks/api-structure
-- /detect/synthetic-monitoring/api-checks/requests
-- /detect/synthetic-monitoring/api-checks/assertions
+- /detect/synthetic-monitoring/api-checks/configuration
+- /detect/assertions
 - /detect/synthetic-monitoring/api-checks/set-up-and-tear-down
 - /detect/synthetic-monitoring/api-checks/snippets
 - /detect/synthetic-monitoring/api-checks/troubleshooting

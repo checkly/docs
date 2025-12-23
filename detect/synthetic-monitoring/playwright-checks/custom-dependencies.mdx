@@ -138,16 +138,16 @@ export default defineConfig({
 
 ## Dependency Caching
 
-Checkly caches installed dependencies between check runs to speed up execution and reduce installation time. This means your dependencies are installed once and reused for subsequent runs until your `package.json` and lock files change.
+Checkly caches installed packages between check runs to speed up execution and reduce installation time. Dependencies are installed once and reused for subsequent runs until your lock files (`package-lock.json`, `pnpm-lock.yaml`, or `yarn.lock`) change.
 
 ### How caching works
 
 When dependency caching is enabled:
 
-1. On the first run, Checkly installs all dependencies from your `package.json` and stores them in cache
-2. On subsequent runs, Checkly checks if your `package.json` and lock files have changed
-3. If unchanged, Checkly uses the cached dependencies, skipping the installation step
-4. If changed, Checkly installs dependencies again and updates the cache
+1. On the first run, Checkly installs all packages from your lock file and stores them in cache
+2. On subsequent runs, Checkly checks if your lock file has changed
+3. If unchanged, Checkly uses the cached packages, skipping the installation step
+4. If changed, Checkly installs packages again and updates the cache
 
 This significantly reduces check execution time, especially for projects with many or large dependencies.
 

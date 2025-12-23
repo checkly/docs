@@ -96,11 +96,11 @@ environments.forEach((environment) => {
 You can handle potential differences between target environments via group-level [environment variables](/platform/variables/), which are made available to all checks within a group.
 
 ```ts  __checks__/group.check.ts
-import { CheckGroup } from 'checkly/constructs'
+import { CheckGroupV2 } from 'checkly/constructs'
 import { smsChannel, emailChannel } from '../alert-channels'
 const alertChannels = [smsChannel, emailChannel]
 
-export const groupPreview = new CheckGroup('group-browser-preview', {
+export const groupPreview = new CheckGroupV2('group-browser-preview', {
   name: 'WebShop - Preview',
   activated: true,
   muted: false,
@@ -111,10 +111,11 @@ export const groupPreview = new CheckGroup('group-browser-preview', {
   environmentVariables: [ { key: 'TARGET_URL', value: 'https://preview.mywebsite.com' }],
   apiCheckDefaults: {},
   concurrency: 100,
+  alertEscalationPolicy: 'global',
   alertChannels
 })
 
-export const groupProd = new CheckGroup('group-browser-prod', {
+export const groupProd = new CheckGroupV2('group-browser-prod', {
   name: 'WebShop - Production',
   activated: true,
   muted: false,
@@ -125,6 +126,7 @@ export const groupProd = new CheckGroup('group-browser-prod', {
   environmentVariables: [ { key: 'TARGET_URL', value: 'https://www.mywebsite.com' }],
   apiCheckDefaults: {},
   concurrency: 100,
+  alertEscalationPolicy: 'global',
   alertChannels
 })
 ```

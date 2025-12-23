@@ -43,7 +43,7 @@ Create a minimal `checkly.config.ts` (or `checkly.config.js`) at the root of you
       muted: false,
       runtimeId: '2025.04',
       frequency: Frequency.EVERY_5M,
-      locations: ['us-east-1', 'eu-west-1'],
+      locations: ['us-east-1', 'eu-central-1'],
       tags: ['website', 'api'],
       checkMatch: '**/__checks__/**/*.check.ts',
       ignoreDirectoriesMatch: [],
@@ -53,14 +53,17 @@ Create a minimal `checkly.config.ts` (or `checkly.config.js`) at the root of you
       },
     },
     cli: {
-      runLocation: 'eu-west-1',
+      runLocation: 'eu-central-1',
     }
   })
    ```
   </Tab>
   <Tab title="JavaScript">
    ```js {title="checkly.config.js"}
-  const config = {
+   const defineConfig = require('checkly')
+   const { Frequency } = require('checkly/constructs')
+
+   const config = {
     projectName: 'Website Monitoring',
     logicalId: 'website-monitoring-1',
     repoUrl: 'https://github.com/acme/website',
@@ -69,7 +72,7 @@ Create a minimal `checkly.config.ts` (or `checkly.config.js`) at the root of you
       muted: false,
       runtimeId: '2025.04',
       frequency: Frequency.EVERY_5M,
-      locations: ['us-east-1', 'eu-west-1'],
+      locations: ['us-east-1', 'eu-central-1'],
       tags: ['website', 'api'],
       checkMatch: '**/__checks__/**/*.check.js',
       ignoreDirectoriesMatch: [],
@@ -79,11 +82,11 @@ Create a minimal `checkly.config.ts` (or `checkly.config.js`) at the root of you
       },
     },
     cli: {
-      runLocation: 'eu-west-1',
+      runLocation: 'eu-central-1',
     }
-  }
+   }
 
-  module.exports = config;
+   module.exports = config;
    ```
   </Tab>
 </Tabs>

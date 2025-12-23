@@ -5,13 +5,33 @@ sidebarTitle: 'Runtime Specification'
 ---
 
 
-By default, all our runners have their timezone set to UTC, regardless of their location.
+By default, all Checkly runners (the isolated environments where checks execute) run with their time zone set to UTC, regardless of the locations used in your checks.
 
 ## Resource limitations
-Each Playwright-powered check (Browser and Multistep) can use up to `2.7 GiB` of memory and `1678m` [milli-CPU units](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-cpu). This limit applies to all processes spawned by the check, including the browser, the test framework, and the test code itself. The limit is enforced by the runner and is not configurable.
+
+### Browser and Multistep Checks
+
+Browser and Multistep checks can use up to `2.7 GiB` of memory and `1678m` [milli-CPU units](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-cpu). This limit applies to all processes spawned by the check, including the browser, the test framework, and the test code itself. The limit is enforced by the runner and is not configurable.
 
 > When the memory limit is exceeded, the check will automatically fail with a relevant error message, for example:
 > `Your check has reached the maximum memory usage of 2.7 GiB`.
+
+### Playwright Check Suites
+
+Playwright Check Suites run in a custom dependencies environment. Playwright Check Suites can use up to `6.8 GiB` of memory and `33000m` milli-CPU units.
+
+- **Node.js version**: v22
+- **Execution limit**: 30 minutes per check run
+
+Playwright Check Suites install dependencies from your `package.json` to create the runtime environment. Learn more about [using custom dependencies](/detect/synthetic-monitoring/playwright-checks/custom-dependencies).
+
+<Tip>
+To take advantage of the available CPU cores, configure workers in your `playwright.config.ts`:
+
+```typescript
+workers: process.env.CHECKLY ? 4 : undefined,
+```
+</Tip>
 
 ## Built-in Node.js modules
 The following standard Node modules are included and can be used as normal, e.g.

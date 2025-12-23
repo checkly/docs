@@ -28,10 +28,10 @@ Checkly prepares your execution environment:
 
 1. **Playwright and browsers**: Load the right playwright version with its corresponding browsers
 2. **Dependencies cache download**: Downloads the dependencies cache if it exists
-3. **Dependency installation**: If the dependencies cache doesn't exist, Checkly runs the install command (default: `npm install`, `pnpm install` or `yarn install`).
+3. **Dependency installation**: If the dependencies cache doesn't exist, Checkly runs the install command (default: `npm install`, `pnpm install` or `yarn install`)
    - This stage has a **5-minute timeout**
-   - Customize the install command using `installCommand` in your [check suite configuration](/detect/synthetic-monitoring/playwright-checks/configuration#customize-install-and-test-commands)
-4. **Creates and uploads new dependencies cache**: This cache will be used in consecutive runs in your account with the same dependencies.
+   - Use `installCommand` in your [check suite configuration](/detect/synthetic-monitoring/playwright-checks/configuration#customize-install-and-test-commands) to run a custom dependency installation command. This can help prevent timeouts during installation. For example `installCommand: 'npm install --ignore-scripts'` to skip running postinstall and other lifecycle scripts
+4. **Creates and uploads new dependencies cache**: This cache will be used in consecutive runs in your account with the same dependencies
 
 ### 2. Test execution
 
@@ -39,7 +39,7 @@ Checkly runs your tests using `npx playwright test`:
 
 - The timeouts of this stage are set through the timeouts in your Playwright tests and configuration.
 - To set a global playwright test timeout in Checkly, use a custom test command, `testCommand` , in your [check suite configuration](/detect/synthetic-monitoring/playwright-checks/configuration#customize-install-and-test-commands)
-  - Use `testCommand: npx playwright test --global-timeout=<timeout_in_ms>` to customize the timeout of this step.
+  - Use `testCommand: npx playwright test --global-timeout=<timeout_in_ms>` to customize the timeout of this step
 
 ### 3. Post-processing
 

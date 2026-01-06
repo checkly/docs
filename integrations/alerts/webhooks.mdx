@@ -36,25 +36,29 @@ Use dynamic variables to create contextual alerts:
 
 | Variable | Description | Example Value |
 |----------|-------------|---------------|
-| `CHECK_NAME` | Full check name | "Payment API Health Check" |
-| `CHECK_ID` | UUID of the check | "abc123-def456-ghi789" |
-| `CHECK_TYPE` | Type of check | "API", "BROWSER", "HEARTBEAT" |
 | `ALERT_TITLE` | Human-readable alert title | "Check 'Payment API' has failed" |
 | `ALERT_TYPE` | Alert event type | "ALERT_FAILURE", "ALERT_RECOVERY" |
-| `CHECK_RESULT_ID` | UUID of the result | "result-123-456" |
+| `API_CHECK_RESPONSE_STATUS_CODE` | HTTP status code (API checks only) | 404 |
+| `API_CHECK_RESPONSE_STATUS_TEXT` | HTTP status text (API checks only) | "Not Found" |
 | `CHECK_ERROR_MESSAGE` | Error details | "Connection timeout after 5000ms" |
+| `CHECK_ID` | UUID of the check | "abc123-def456-ghi789" |
+| `CHECK_NAME` | Full check name | "Payment API Health Check" |
+| `CHECK_RESULT_ID` | UUID of the result | "result-123-456" |
+| `CHECK_TYPE` | Type of check | "API", "BROWSER", "HEARTBEAT" |
+| `GROUP_NAME` | Group name if applicable | "Payment Services" |
+| `REGION` | AWS region code where check ran | "us-east-1" |
 | `RESPONSE_TIME` | Response time in milliseconds | 1234 |
-| `RUN_LOCATION` | Location where check ran | "N. Virginia" |
 | `RESULT_LINK` | Direct link to results | "https://app.checklyhq.com/..." |
+| `RUN_LOCATION` | Location where check ran | "N. Virginia" |
+| `SSL_CHECK_DOMAIN` | Domain for SSL certificate check | "api.example.com" |
+| `SSL_DAYS_REMAINING` | Days until SSL certificate expires | 14 |
 | `STARTED_AT` | ISO timestamp | "2024-01-15T14:30:22.000Z" |
 | `TAGS` | Array of check tags | ["critical", "payment", "api"] |
-| `GROUP_NAME` | Group name if applicable | "Payment Services" |
 
 ### Handlebars Helpers
 
 | Helper | Description |
 |--------|-------------|
-| `{{REGION}}` | Resolves to the AWS region name (e.g., `us-east-1`) |
 | `{{$UUID}}` | Generates a random UUID/v4 (e.g., `9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d`) |
 | `{{$RANDOM_NUMBER}}` | Generates a random decimal number between 0 and 1000 (e.g., `345`) |
 | `{{moment}}` | Generates dates/times using **moment.js** with formatting:

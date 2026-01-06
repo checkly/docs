@@ -5,65 +5,54 @@ description: 'Run your Playwright end-to-end test suite as synthetic production 
 tags: ['synthetic-monitoring', 'playwright-checks']
 ---
 
-<Tip>
-**Monitoring as Code**: Learn more about the [Playwright Check Suite Construct](/constructs/playwright-check).
-</Tip>
-
 ## What are Playwright Check Suites?
 
-Playwright Check Suites enable you to run entire Playwright end-to-end test suites, Playwright projects or tagged tests as pre-production tests and global production monitors, without rewriting your tests and configuration.
+Playwright Check Suites turn your Playwright end-to-end tests into production monitors. Run entire test suites, specific projects, or tagged tests globally without modifying your existing code or configuration.
 
-Unlike [Browser Checks](detect/synthetic-monitoring/browser-checks/overview), Playwright Check Suites are not limited to a single test spec and our preinstalled runtime dependencies. Playwright Check Suites enable you to run Playwright projects complete with all of your required dependencies, private packages, storage, data, and more, and enable you to detect issues with your applications or services even in the most complex scenarios.
+<Warning>
+**Known limitations**: Playwright Check Suites do not currently support monorepo workspaces for dependency installation.
+Each check run has a maximum execution time of 30 minutes.
+</Warning>
 
 <Frame>
   ![Playwright Check Suites test result](/images/pwn-test-result.png)
 </Frame>
 
-**Playwright Check Suites are the native way to run Playwright in production** and support the full Playwright API and ecosystem, meaning you can use your existing tests and `playwright.config.ts` files as is.
-
-**Playwright Check Suites are perfect for:**
-- Converting existing E2E tests into monitoring
-- Testing complex user workflows across multiple browsers
-- Monitoring critical business processes
-- Validating application functionality after deployments
+**Use Playwright Check Suites to:**
+- Turn E2E tests into global synthetic monitors
+- Monitor complex user workflows across browsers and regions
+- Detect issues in critical business processes
+- Verify functionality after deployments
 
 ## How Playwright Check Suites Work
 
 <Steps>
-<Step title="1. Test Discovery">
-Playwright Check Suites analyze your Playwright configuration and test files to understand your existing test structure.
+<Step title="1. Select tests">
+Choose which tests to turn into monitors using Playwright projects or tags from your existing configuration.
+</Step>
+<Step title="Choose frequency and locations">
+Specify the locations to run the check from, and set its frequency
+
+</Step>
+<Step title="Deploy globally">
+Run selected tests on schedules from global locations with performance tracking and detailed reporting.
 </Step>
 
-<Step title="2. Selective Monitoring">
-Use tags and projects to define monitoring scope, choosing which tests become production monitors.
-</Step>
-
-<Step title="3. Global Deployment">
-Deploy your selected tests to run from multiple worldwide locations for comprehensive coverage.
-</Step>
-
-<Step title="4. Continuous Monitoring">
-Execute tests on schedules with performance tracking and detailed reporting.
-</Step>
-
-<Step title="5. Alert Integration">
-Receive notifications when tests fail or performance degrades, keeping your team informed.
+<Step title="Get alerted">
+Receive notifications when tests fail or performance degrades.
 </Step>
 </Steps>
 
 ## Test Selection
 
-Your Playwright end-to-end test suite consists of projects, `spec.ts` files and individual tests. Use Playwright Check Suites to select and regroup the tests you want to run as synthetic monitors.
+Control which tests run as monitors using:
 
-<Frame>
-  ![Playwright Check Suites test selection](/images/playwright-test-selection.jpg)
-</Frame>
+- **Projects**: Select browser and project configurations from your Playwright config with `pwProjects`
+- **Tags**: Choose tests marked with specific tags (e.g., `@critical`, `@smoke`) with `pwTags`
+- **Combinations**: Mix tags and projects for precise control
+- **testCommand**: Use `npx playwright test ...` to select the tests you want to create a monitor for, using playwright flags like `--grep-invert` or `--projects`
 
-**A Playwright **Check** Suite is a collection of tests that are defined in one or more `spec.ts` files.** To control which tests become part of your Playwright Check Suite, use:
-
-- **Projects**: Choose browser and project configurations from your Playwright config
-- **Tags**: Select tests marked with specific tags (e.g., `@critical`, `@smoke`)
-- **Combinations**: Mix tags and projects for precise test selection
+Configure test selection in your `checkly.config.ts` file:
 
 ```typescript checkly.config.ts
 export default defineConfig({
@@ -82,51 +71,43 @@ export default defineConfig({
         // Select tests tagged as `@critical`
         pwTags: ["@critical"],
       },
+            {
+        name: "customTestCommand",
+        logicalId: "custom-testCommand-critical-no-smoke",
+        // Select tests not tagged as `@smoke` and tagged as @critical
+        testCommand: "npx playwright test --grep-invert @smoke --grep @critical"
+      },
     ],
   },
 })
 ```
 
-<Info>
-The Playwright Check Suite runner will use the `pwProjects` and `pwTags` values to configure [the native Playwright Test CLI run](https://playwright.dev/docs/test-cli). `pwProjects` reflects the `--project` and `pwTags` the `--grep` CLI options.
-</Info>
-
 <Tip>
-[Read the guide on test organization](/detect/synthetic-monitoring/playwright-checks/test-organization) to learn more about all the options for selecting and grouping tests in a Playwright Check Suite.
+Learn more about [test organization strategies](/detect/synthetic-monitoring/playwright-checks/test-organization) for selecting and grouping tests.
 </Tip>
 
 ## Monitoring Configuration
 
-Customize monitoring behavior with:
+Customize how your checks run:
 
-- **Frequency**: From every minute to custom schedules
-- **Locations**: Choose from global monitoring regions
-- **Alerting**: Configure team notifications and escalation
-- **Groups**: Organize related checks for management
-- **Dependencies**: Support for private packages and custom registries
-
-## Known limitations
-
-Playwright Check Suites are under active development. The following features are not currently supported:
-
-- **Monorepo workspaces** - Installing dependencies from specific workspaces is not supported.
-- **Execution time limit** - Check Suites have a maximum runtime of 15 minutes per execution.
+- **Frequency**: Schedule runs at regular intervals
+- **Locations**: Deploy to multiple global regions
+- **Alerting**: Set up notifications and escalation
+- **Dependencies**: Use private packages and custom registries (see [custom dependencies](/detect/synthetic-monitoring/playwright-checks/custom-dependencies))
 
 ## Getting Started
 
-Ready to turn your Playwright tests into monitoring? Start with our quickstart guide to get running in 5 minutes.
-
 <CardGroup cols={2}>
 <Card title="Quickstart Guide" href="/quickstarts/playwright-check">
-Get from zero to deployed monitoring in 5 minutes
+Deploy your first Playwright Check Suite
 </Card>
 
 <Card title="Construct Reference" href="/constructs/playwright-check/">
-Complete configuration options and examples
+Construct configuration options and examples
 </Card>
 
 <Card title="Add to Group" href="/detect/synthetic-monitoring/playwright-checks/add-to-group">
-Organize checks with groups for better management
+Organize checks with groups
 </Card>
 
 <Card title="Custom Dependencies" href="/detect/synthetic-monitoring/playwright-checks/custom-dependencies">

@@ -93,7 +93,7 @@ The private location is temporarily disabled for maintenance:
 
 ## Use Cases
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="Internal Network Monitoring" icon="network-wired">
 Monitor internal services behind firewalls or in private networks
@@ -111,7 +111,7 @@ Meet regulatory requirements for monitoring from specific jurisdictions
 Test performance from your actual user locations or network paths
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Code Examples
 
@@ -137,7 +137,7 @@ console.log(`Found ${data.meta.totalItems} private locations`);
 data.data.forEach(location => {
   const lastSeen = new Date(location.lastHeartbeat);
   const isRecent = (Date.now() - lastSeen.getTime()) < 5 * 60 * 1000; // 5 minutes
-  
+
   console.log(`${location.name}:`);
   console.log(`  Status: ${location.status}`);
   console.log(`  Agent Version: ${location.agentVersion}`);
@@ -169,7 +169,7 @@ for location in data['data']:
         location['lastHeartbeat'].replace('Z', '+00:00')
     )
     time_since_heartbeat = now - last_heartbeat.replace(tzinfo=None)
-    
+
     print(f"Name: {location['name']}")
     print(f"Status: {location['status']}")
     print(f"Region: {location['region']}")
@@ -203,7 +203,7 @@ Monitor private location health:
 function isLocationHealthy(location) {
   const lastHeartbeat = new Date(location.lastHeartbeat);
   const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-  
+
   return location.status === 'ACTIVE' && lastHeartbeat > fiveMinutesAgo;
 }
 
@@ -225,7 +225,7 @@ def check_agent_versions(locations):
         if version not in versions:
             versions[version] = []
         versions[version].append(location['name'])
-    
+
     return versions
 
 # Example usage

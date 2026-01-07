@@ -96,7 +96,7 @@ This endpoint returns all alerts that have been triggered by checks in your acco
 
 ## Common Use Cases
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="Incident Response" icon="exclamation-triangle">
 Monitor and respond to active incidents in real-time
@@ -126,7 +126,7 @@ GET /v1/check-alerts?acknowledgedBy=null&severity=critical
 ```
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Query Parameters
 
@@ -170,7 +170,7 @@ GET /v1/check-alerts?acknowledgedBy=null&severity=critical
 
 ## Alert Types
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="Check Failure" icon="exclamation-triangle">
 **Triggered when:**
@@ -221,7 +221,7 @@ GET /v1/check-alerts?acknowledgedBy=null&severity=critical
 - Network connectivity issues
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Alert Severity Levels
 
@@ -412,45 +412,45 @@ response = requests.get(
 if response.status_code == 200:
     alerts_data = response.json()
     alerts = alerts_data['data']
-    
+
     print(f"Found {len(alerts)} triggered alerts in the last 24 hours")
-    
+
     # Analyze alerts by severity
     severity_counts = {}
     for alert in alerts:
         severity = alert['severity']
         severity_counts[severity] = severity_counts.get(severity, 0) + 1
-    
+
     print(f"Alert breakdown by severity:")
     for severity, count in sorted(severity_counts.items()):
         print(f"  {severity.capitalize()}: {count}")
-    
+
     # Find unacknowledged critical alerts
     critical_unack = [
-        alert for alert in alerts 
+        alert for alert in alerts
         if alert['severity'] == 'critical' and alert['acknowledgedAt'] is None
     ]
-    
+
     if critical_unack:
         print(f"\n🚨 {len(critical_unack)} CRITICAL unacknowledged alerts:")
         for alert in critical_unack:
             print(f"  - {alert['checkName']}: {alert['message']}")
             print(f"    Triggered: {alert['triggeredAt']}")
             print(f"    Location: {alert['location']['name']}")
-    
+
     # Calculate average resolution time for resolved alerts
     resolved_alerts = [alert for alert in alerts if alert['status'] == 'resolved']
     if resolved_alerts:
         total_resolution_time = sum(alert['duration'] for alert in resolved_alerts if alert['duration'])
         avg_resolution_time = total_resolution_time / len(resolved_alerts) / 1000 / 60  # Convert to minutes
         print(f"\nAverage resolution time: {avg_resolution_time:.1f} minutes")
-    
+
     # Identify checks with multiple alerts (potential issues)
     check_alert_counts = {}
     for alert in alerts:
         check_id = alert['checkId']
         check_alert_counts[check_id] = check_alert_counts.get(check_id, 0) + 1
-    
+
     problematic_checks = {k: v for k, v in check_alert_counts.items() if v > 3}
     if problematic_checks:
         print(f"\nChecks with >3 alerts (may need attention):")

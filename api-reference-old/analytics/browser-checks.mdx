@@ -110,7 +110,7 @@ This endpoint provides comprehensive analytics for browser checks, including pag
 
 ## Metrics Explained
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="Page Performance" icon="browser">
 - **Page Load Time**: Time to fully load the page
@@ -137,7 +137,7 @@ This endpoint provides comprehensive analytics for browser checks, including pag
 - **Device Simulation**: Mobile vs desktop performance
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Use Cases
 
@@ -258,12 +258,12 @@ if response.status_code == 200:
     analytics = response.json()
     data = analytics['data']
     metrics = data['metrics']
-    
+
     print(f"Check: {data['checkName']}")
     print(f"Success Rate: {metrics['successRate']}%")
     print(f"Average Page Load Time: {metrics['averagePageLoadTime']}s")
     print(f"Performance Score: {metrics['performanceScore']}/100")
-    
+
     # Core Web Vitals analysis
     cwv = metrics['coreWebVitals']
     print(f"\nCore Web Vitals:")
@@ -271,12 +271,12 @@ if response.status_code == 200:
     print(f"Largest Contentful Paint: {cwv['largestContentfulPaint']}s")
     print(f"Cumulative Layout Shift: {cwv['cumulativeLayoutShift']}")
     print(f"First Input Delay: {cwv['firstInputDelay']}ms")
-    
+
     # Performance by location
     print(f"\nPerformance by Location:")
     for location in data['locationBreakdown']:
         print(f"{location['locationName']}: {location['averagePageLoadTime']}s")
-    
+
     # Step breakdown analysis
     if 'stepBreakdown' in data:
         print(f"\nStep Performance:")

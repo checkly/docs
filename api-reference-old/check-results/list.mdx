@@ -59,7 +59,7 @@ This endpoint returns detailed execution results for a specific check. Check res
           "passed": true
         },
         {
-          "source": "JSON_BODY", 
+          "source": "JSON_BODY",
           "property": "$.status",
           "comparison": "EQUALS",
           "target": "healthy",
@@ -79,7 +79,7 @@ This endpoint returns detailed execution results for a specific check. Check res
     },
     {
       "id": "result_987654321",
-      "checkId": "check_api_health", 
+      "checkId": "check_api_health",
       "checkName": "Production API Health Check",
       "checkType": "api",
       "runId": "run_321654987",
@@ -121,7 +121,7 @@ This endpoint returns detailed execution results for a specific check. Check res
         {
           "source": "STATUS_CODE",
           "property": "",
-          "comparison": "EQUALS", 
+          "comparison": "EQUALS",
           "target": "200",
           "passed": false,
           "actual": "500"
@@ -271,7 +271,7 @@ console.log(`Data transfer: ${breakdown.dataTransfer}ms (${(breakdown.dataTransf
 
 ## Common Use Cases
 
-<CardGroup cols={1}>
+<Columns cols={1}>
 
 <Card title="Performance Monitoring" icon="chart-line">
 Track API performance trends and identify regressions
@@ -301,7 +301,7 @@ GET /v1/check-results/{checkId}?location=us-east-1&period=24h
 ```
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Additional Use Cases
 
@@ -434,7 +434,7 @@ if (responseTimes.length > 0) {
   const median = sorted[Math.floor(sorted.length / 2)];
   const min = Math.min(...responseTimes);
   const max = Math.max(...responseTimes);
-  
+
   console.log(`\nResponse time distribution:`);
   console.log(`Min: ${min}ms`);
   console.log(`Median: ${median}ms`);
@@ -444,7 +444,7 @@ if (responseTimes.length > 0) {
 }
 
 // Find slow requests (>1 second)
-const slowRequests = results.filter(r => 
+const slowRequests = results.filter(r =>
   r.status === 'success' && r.response.responseTime > 1000
 );
 
@@ -459,14 +459,14 @@ if (slowRequests.length > 0) {
 const failedResults = results.filter(r => r.status === 'failed');
 if (failedResults.length > 0) {
   console.log(`\n❌ ${failedResults.length} failed requests:`);
-  
+
   // Group failures by status code
   const failuresByStatus = failedResults.reduce((acc, r) => {
     const status = r.response?.statusCode || 'No response';
     acc[status] = (acc[status] || 0) + 1;
     return acc;
   }, {});
-  
+
   Object.entries(failuresByStatus).forEach(([status, count]) => {
     console.log(`  ${status}: ${count} failures`);
   });
@@ -501,18 +501,18 @@ if response.status_code == 200:
     results = check_results['data']
     meta = check_results['meta']
     summary = meta['summary']
-    
+
     print(f"Check: {meta['checkName']}")
     print(f"Time period: {meta['timeframe']['from']} to {meta['timeframe']['to']}")
     print(f"Total results: {meta['totalItems']}")
     print(f"Success rate: {summary['successRate']}%")
     print(f"Average response time: {summary['averageResponseTime']}ms")
-    
+
     # Response time analysis
     successful_results = [r for r in results if r['status'] == 'success']
     if successful_results:
         response_times = [r['response']['responseTime'] for r in successful_results]
-        
+
         print(f"\nResponse Time Analysis:")
         print(f"  Minimum: {min(response_times)}ms")
         print(f"  Maximum: {max(response_times)}ms")
@@ -520,54 +520,54 @@ if response.status_code == 200:
         print(f"  Standard deviation: {statistics.stdev(response_times):.1f}ms")
         print(f"  95th percentile: {summary['p95ResponseTime']}ms")
         print(f"  99th percentile: {summary['p99ResponseTime']}ms")
-    
+
     # Error analysis
     failed_results = [r for r in results if r['status'] == 'failed']
     if failed_results:
         print(f"\nError Analysis ({len(failed_results)} failures):")
-        
+
         # Group by error type
         error_types = {}
         status_codes = {}
-        
+
         for result in failed_results:
             # Error message analysis
             error_msg = result.get('error', {}).get('message', 'Unknown error')
             error_types[error_msg] = error_types.get(error_msg, 0) + 1
-            
+
             # Status code analysis
             status_code = result['response'].get('statusCode', 'No response')
             status_codes[status_code] = status_codes.get(status_code, 0) + 1
-        
+
         print("  Most common errors:")
         for error, count in sorted(error_types.items(), key=lambda x: x[1], reverse=True)[:3]:
             print(f"    {error}: {count}")
-        
+
         print("  Status code breakdown:")
         for status, count in sorted(status_codes.items(), key=lambda x: x[1], reverse=True):
             print(f"    {status}: {count}")
-    
+
     # Performance by location
     location_performance = {}
     for result in successful_results:
         location = result['location']['name']
         response_time = result['response']['responseTime']
-        
+
         if location not in location_performance:
             location_performance[location] = []
         location_performance[location].append(response_time)
-    
+
     if location_performance:
         print(f"\nPerformance by Location:")
         for location, times in location_performance.items():
             avg_time = sum(times) / len(times)
             print(f"  {location}: {avg_time:.1f}ms average ({len(times)} samples)")
-    
+
     # Timing breakdown analysis (for latest result)
     if results and results[0]['status'] == 'success':
         timing = results[0]['timing']
         total = timing['total']
-        
+
         print(f"\nLatest Request Timing Breakdown:")
         print(f"  DNS resolution: {timing['dns']}ms ({timing['dns']/total*100:.1f}%)")
         print(f"  TCP connection: {timing['tcp']}ms ({timing['tcp']/total*100:.1f}%)")

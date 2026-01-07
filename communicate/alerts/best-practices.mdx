@@ -18,14 +18,14 @@ graph TD
     A[Critical Alerts - Immediate Action] --> B[Warning Alerts - Investigate Soon]
     B --> C[Info Alerts - Monitor Trends]
     C --> D[Debug Logs - Historical Analysis]
-    
+
     style A fill:#ff6b6b
     style B fill:#ffa500
     style C fill:#4ecdc4
     style D fill:#95a5a6
 ```
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 <Card title="Critical alerts (P1)" icon="siren">
 **Immediate Action Required**
 - Customer-impacting outages
@@ -61,7 +61,7 @@ graph TD
 - System health indicators
 - Available for investigation
 </Card>
-</CardGroup>
+</Columns>
 
 ### Alert Criticality Matrix
 Use a systematic approach to determine alert priority:
@@ -78,7 +78,7 @@ Use a systematic approach to determine alert priority:
 ### Run-Based vs Time-Based Escalation
 Choose the right strategy for different scenarios:
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 <Card title="Run-based escalation" icon="repeat">
 **Best for stable systems:**
 ```yaml
@@ -104,7 +104,7 @@ Configuration:
     - Rate-limited services
 ```
 </Card>
-</CardGroup>
+</Columns>
 
 ### Frequency-Specific Configurations
 Tailor escalation to check frequency:
@@ -117,7 +117,7 @@ High_Frequency_Config:
   Location_Threshold: 67% (avoid regional noise)
   Retries: Minimal (2 attempts, 30s apart)
 
-# Standard frequency (5-15 minutes)  
+# Standard frequency (5-15 minutes)
 Standard_Config:
   Strategy: Run-based (2 failures)
   Reasoning: Each run is significant
@@ -137,7 +137,7 @@ Low_Frequency_Config:
 ### Intelligent Retry Configuration
 Match retry strategies to failure patterns:
 
-<CardGroup cols={3}>
+<Columns cols={3}>
 <Card title="Network issues" icon="wifi">
 **Fixed interval retries**
 ```yaml
@@ -167,7 +167,7 @@ Max_Retries: 3
 Use_Case: API rate limits, overload
 ```
 </Card>
-</CardGroup>
+</Columns>
 
 ### Location-Based Retry Logic
 Optimize retry behavior based on deployment architecture:
@@ -206,15 +206,15 @@ Network_Retry_Configuration:
     - ENOTFOUND (DNS failure)
     - ETIMEDOUT (timeout)
     - ECONNREFUSED (connection refused)
-  
+
   Skip_On_HTTP_Status: true
   Reasoning: "4xx/5xx are application errors, not network issues"
-  
+
 Application_Error_Handling:
   HTTP_4xx: No retry (client error)
   HTTP_5xx: No retry (server error, likely persistent)
   Assert_Failures: No retry (application logic issue)
-  
+
 Benefits:
   - Reduces noise from transient network issues
   - Focuses alerts on real application problems
@@ -236,11 +236,11 @@ Critical_Production:
     - SMS: Primary and backup engineers
     - Slack: #production-alerts channel
     - Phone: For P1 incidents only
-  
+
   Business_Hours: 24/7 coverage
   Response_SLA: 5 minutes acknowledgment
 
-# Tier 2: Standard Production Alerts  
+# Tier 2: Standard Production Alerts
 Standard_Production:
   Checks: All production services
   Escalation: After 2 consecutive failures
@@ -248,7 +248,7 @@ Standard_Production:
     - Slack: #production-alerts channel
     - Email: Engineering team distribution list
     - PagerDuty: During business hours only
-  
+
   Business_Hours: Extended hours (6 AM - 11 PM)
   Response_SLA: 30 minutes acknowledgment
 
@@ -259,7 +259,7 @@ Non_Production:
   Channels:
     - Slack: #dev-alerts channel
     - Email: Development team
-  
+
   Business_Hours: Business hours only
   Response_SLA: Best effort
 
@@ -271,7 +271,7 @@ Security_Alerts:
     - Email: Security team
     - Slack: #security-alerts channel
     - SIEM: Security information system
-  
+
   Business_Hours: 24/7 for critical, business hours for warnings
   Response_SLA: Varies by severity
 ```
@@ -287,15 +287,15 @@ Backend_Team:
     - Slack: #backend-alerts
     - Email: backend-team@company.com
     - PagerDuty: Backend on-call rotation
-  
-# Frontend Team  
+
+# Frontend Team
 Frontend_Team:
   Services: ["web-app", "*-ui", "cdn-*"]
   Channels:
     - Slack: #frontend-alerts
     - Email: frontend-team@company.com
     - Browser: User journey monitoring alerts
-  
+
 # Infrastructure Team
 Infrastructure_Team:
   Services: ["monitoring-*", "logging-*", "metrics-*"]
@@ -351,8 +351,8 @@ Alert_Quality_KPIs:
   Mean_Time_to_Acknowledge: <5 minutes (critical), <30 minutes (standard)
   Mean_Time_to_Resolution: Varies by severity
   Alert_Volume_Trend: Decreasing over time (improving stability)
-  
-# Team Response Metrics  
+
+# Team Response Metrics
 Team_Response_KPIs:
   Acknowledgment_Rate: >95% (alerts acknowledged)
   Response_Time_Compliance: >90% within SLA
@@ -377,7 +377,7 @@ Adaptive_Sensitivity:
   After_Hours: Increased thresholds for non-critical alerts
   Weekends: Reduced sensitivity for development systems
   Holidays: Critical alerts only
-  
+
 # Load-Based Alerting
 Load_Adaptive_Thresholds:
   High_Traffic_Periods: Increased response time tolerance
@@ -385,7 +385,7 @@ Load_Adaptive_Thresholds:
   Deployment_Windows: Temporary threshold adjustments
   Maintenance_Periods: Automatic muting with exceptions
 
-# Historical Pattern Recognition  
+# Historical Pattern Recognition
 Pattern_Based_Alerting:
   Known_Flaky_Services: Higher retry counts and thresholds
   Seasonal_Patterns: Adjust for known traffic variations
@@ -398,7 +398,7 @@ Pattern_Based_Alerting:
 ### Production vs Non-Production Alerting
 Tailor alerting approaches for different environments:
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 <Card title="Production alerting" icon="shield">
 **Maximum Reliability**
 ```yaml
@@ -422,7 +422,7 @@ Coverage: Core functionality only
 Response: Business hours support
 ```
 </Card>
-</CardGroup>
+</Columns>
 
 ### Service Criticality Classification
 Implement tiered service classification:
@@ -435,15 +435,15 @@ Critical_Services:
   Alert_Strategy: Immediate escalation
   Response_Time: <5 minutes
   Coverage: Comprehensive (API + Browser + Performance)
-  
-# Important Services (P2)  
+
+# Important Services (P2)
 Important_Services:
   Examples: ["search-api", "recommendation-engine", "analytics"]
   Customer_Impact: Degraded experience
   Alert_Strategy: 2 failure escalation
   Response_Time: <30 minutes
   Coverage: Core functionality monitoring
-  
+
 # Standard Services (P3)
 Standard_Services:
   Examples: ["admin-tools", "reporting", "batch-jobs"]
@@ -451,7 +451,7 @@ Standard_Services:
   Alert_Strategy: 3-5 failure escalation
   Response_Time: <2 hours
   Coverage: Basic health monitoring
-  
+
 # Development Services (P4)
 Development_Services:
   Examples: ["test-environments", "staging-apis"]
@@ -476,7 +476,7 @@ SSL_Alert_Strategy:
   7_Days_Before: Critical escalation to management
   3_Days_Before: Emergency procedures activation
   1_Day_Before: All-hands alert + communication plan
-  
+
 # SSL Monitoring Coverage
 SSL_Coverage:
   Primary_Domains: All customer-facing endpoints
@@ -484,7 +484,7 @@ SSL_Coverage:
   API_Endpoints: All authenticated API services
   CDN_Certificates: Content delivery network certificates
   Internal_Services: Critical internal HTTPS services
-  
+
 # SSL Alert Channels
 SSL_Alert_Routing:
   Security_Team: All SSL-related alerts
@@ -560,7 +560,7 @@ Incident_Severity_Mapping:
       - Payment system failures
     Response: Immediate page + incident commander
     Communication: Customer notification within 15 minutes
-    
+
   SEV2_High:
     Triggers:
       - Significant performance degradation
@@ -569,7 +569,7 @@ Incident_Severity_Mapping:
       - High error rates
     Response: Page during business hours, 30min after hours
     Communication: Internal teams + status page update
-    
+
   SEV3_Medium:
     Triggers:
       - Minor performance issues
@@ -578,7 +578,7 @@ Incident_Severity_Mapping:
       - Approaching capacity limits
     Response: Standard team notification
     Communication: Internal teams only
-    
+
   SEV4_Low:
     Triggers:
       - Successful recoveries
@@ -624,7 +624,7 @@ Service_Onboarding_Checklist:
   - [ ] Define escalation channels
   - [ ] Test alert delivery
   - [ ] Document alert procedures
-  
+
 # Service Updates
 Service_Update_Process:
   - [ ] Review alert configuration relevance
@@ -632,8 +632,8 @@ Service_Update_Process:
   - [ ] Modify channels for team changes
   - [ ] Test configuration updates
   - [ ] Update documentation
-  
-# Service Decommissioning  
+
+# Service Decommissioning
 Service_Decommission_Process:
   - [ ] Disable alert escalation
   - [ ] Maintain monitoring for cleanup period
@@ -652,7 +652,7 @@ Optimization_Strategies:
   Location_Coverage: Strategic global placement, not every location
   Retry_Logic: Intelligent retries reduce check volume
   Alert_Aggregation: Group related alerts to reduce channel usage
-  
+
 # Performance Optimization
 Performance_Strategies:
   Alert_Channel_Efficiency: Use webhooks for complex routing
@@ -676,7 +676,7 @@ Alert_Runbook_Structure:
   Escalation_Path: When and how to escalate
   Resolution_Steps: Common fixes and procedures
   Prevention: How to prevent recurrence
-  
+
 # Example: Payment API Failure Runbook
 Payment_API_Failure_Runbook:
   Description: "Payment processing API is failing or unavailable"

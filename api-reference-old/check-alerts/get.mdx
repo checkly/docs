@@ -119,7 +119,7 @@ This endpoint returns all alerts that have been triggered by a specific check. T
 
 ## Common Use Cases
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="Check Reliability Assessment" icon="chart-bar">
 Evaluate reliability and uptime of individual checks
@@ -149,7 +149,7 @@ GET /v1/check-alerts/{checkId}?period=90d&limit=100
 ```
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Query Parameters
 
@@ -194,7 +194,7 @@ GET /v1/check-alerts/{checkId}?period=90d&limit=100
 
 ## Alert Summary Metrics
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="Reliability Metrics" icon="chart-line">
 - **Uptime Percentage**: Overall availability during the time period
@@ -225,7 +225,7 @@ GET /v1/check-alerts/{checkId}?period=90d&limit=100
 - **Escalation Paths**: How alerts were escalated
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Alert Analysis Use Cases
 
@@ -265,7 +265,7 @@ Analyze performance degradation patterns:
 ```python
 # Example: Analyze performance degradation trends
 performance_alerts = [
-    alert for alert in alerts 
+    alert for alert in alerts
     if alert['alertType'] == 'performance_degradation'
 ]
 
@@ -322,7 +322,7 @@ Object.keys(alertsByType).forEach(key => {
   const data = alertsByType[key];
   data.avgDuration = data.avgDuration / data.count;
   data.escalationRate = (data.escalations / data.count) * 100;
-  
+
   if (data.escalationRate < 5 && data.avgDuration < 300000) {
     console.log(`Consider raising threshold for ${key}: low escalation rate and quick resolution`);
   }
@@ -389,7 +389,7 @@ if (unresolvedAlerts.length > 0) {
 // Performance degradation analysis
 const perfAlerts = alerts.filter(alert => alert.alertType === 'performance_degradation');
 if (perfAlerts.length > 0) {
-  const avgResponseTime = perfAlerts.reduce((sum, alert) => 
+  const avgResponseTime = perfAlerts.reduce((sum, alert) =>
     sum + (alert.checkResult?.responseTime || 0), 0) / perfAlerts.length;
   console.log(`\nPerformance alerts: ${perfAlerts.length}`);
   console.log(`Average response time during performance alerts: ${Math.round(avgResponseTime)}ms`);
@@ -424,32 +424,32 @@ if response.status_code == 200:
     alerts = check_alerts['data']
     meta = check_alerts['meta']
     summary = meta['summary']
-    
+
     print(f"Check: {meta['checkName']}")
     print(f"Analysis period: {meta['timeframe']['from']} to {meta['timeframe']['to']}")
     print(f"Total alerts: {meta['totalAlerts']}")
     print(f"Uptime: {summary['uptimePercentage']}%")
     print(f"MTTR: {summary['mttr']/60:.1f} minutes")
     print(f"MTTD: {summary['mttd']/60:.1f} minutes")
-    
+
     # Alert type breakdown
     alert_types = Counter(alert['alertType'] for alert in alerts)
     print(f"\nAlert breakdown:")
     for alert_type, count in alert_types.items():
         print(f"  {alert_type.replace('_', ' ').title()}: {count}")
-    
+
     # Severity distribution
     severities = Counter(alert['severity'] for alert in alerts)
     print(f"\nSeverity distribution:")
     for severity, count in severities.items():
         print(f"  {severity.capitalize()}: {count}")
-    
+
     # Location analysis
     locations = Counter(alert['location']['name'] for alert in alerts)
     print(f"\nAlerts by location:")
     for location, count in locations.most_common():
         print(f"  {location}: {count}")
-    
+
     # Response time analysis for acknowledged alerts
     acknowledged_alerts = [alert for alert in alerts if alert['acknowledgedAt']]
     if acknowledged_alerts:
@@ -459,28 +459,28 @@ if response.status_code == 200:
             acknowledged = datetime.fromisoformat(alert['acknowledgedAt'].replace('Z', '+00:00'))
             response_time = (acknowledged - triggered).total_seconds() / 60  # minutes
             response_times.append(response_time)
-        
+
         avg_response_time = sum(response_times) / len(response_times)
         print(f"\nTeam response analysis:")
         print(f"  Acknowledgment rate: {len(acknowledged_alerts)/len(alerts)*100:.1f}%")
         print(f"  Average response time: {avg_response_time:.1f} minutes")
         print(f"  Fastest response: {min(response_times):.1f} minutes")
         print(f"  Slowest response: {max(response_times):.1f} minutes")
-    
+
     # Recent trends (last 7 days vs previous 7 days)
     now = datetime.utcnow()
     week_ago = now - timedelta(days=7)
     two_weeks_ago = now - timedelta(days=14)
-    
+
     recent_alerts = [
-        alert for alert in alerts 
+        alert for alert in alerts
         if datetime.fromisoformat(alert['triggeredAt'].replace('Z', '+00:00')) >= week_ago
     ]
     previous_alerts = [
-        alert for alert in alerts 
+        alert for alert in alerts
         if two_weeks_ago <= datetime.fromisoformat(alert['triggeredAt'].replace('Z', '+00:00')) < week_ago
     ]
-    
+
     print(f"\nTrend analysis:")
     print(f"  Last 7 days: {len(recent_alerts)} alerts")
     print(f"  Previous 7 days: {len(previous_alerts)} alerts")

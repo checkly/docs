@@ -28,7 +28,7 @@ new ApiCheck('internal-api-check', {
   maxResponseTime: 5000
 })
 
-// Browser check using private location  
+// Browser check using private location
 new BrowserCheck('internal-app-check', {
   name: 'Internal App Login Flow',
   code: {
@@ -136,15 +136,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          
+
       - name: Install dependencies
         run: npm install
-        
+
       - name: Deploy to Checkly
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
@@ -221,8 +221,8 @@ import { defineConfig } from 'checkly/constructs'
 import { productionConfig } from './environments/production'
 import { stagingConfig } from './environments/staging'
 
-const config = process.env.ENVIRONMENT === 'production' 
-  ? productionConfig 
+const config = process.env.ENVIRONMENT === 'production'
+  ? productionConfig
   : stagingConfig
 
 export default defineConfig(config)
@@ -322,7 +322,7 @@ npx checkly deploy --verbose
 
 ## Next Steps
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 <Card title="Agent Configuration" href="/detect/private-locations/agent-configuration">
 Learn advanced agent configuration options
 </Card>
@@ -338,8 +338,8 @@ Deploy at scale with Kubernetes
 <Card title="Scaling Guide" href="/detect/private-locations/scaling-redundancy">
 Plan for growth and redundancy
 </Card>
-</CardGroup>
+</Columns>
 
 <Tip>
 Start with a simple configuration and gradually add complexity as you become familiar with Private Location integration patterns.
-</Tip> 
+</Tip>

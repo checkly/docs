@@ -325,7 +325,7 @@ new UrlMonitor('users-api', {
 })
 
 new UrlMonitor('orders-api', {
-  name: 'Orders API', 
+  name: 'Orders API',
   group: apiGroup,
   request: {
     url: 'https://api.myapp.com/orders',
@@ -384,7 +384,7 @@ const environment = process.env.ENVIRONMENT || 'production'
 new UrlMonitor(`${environment}-api-check`, {
   name: `${environment.toUpperCase()} API Health`,
   activated: environment === 'production',
-  locations: environment === 'production' 
+  locations: environment === 'production'
     ? ['us-east-1', 'eu-west-1', 'ap-southeast-1']
     : ['us-east-1'],
   frequency: environment === 'production' ? 2 : 10,
@@ -414,7 +414,7 @@ const environment = process.env.ENVIRONMENT || 'production'
 new UrlMonitor(`${environment}-api-check`, {
   name: `${environment.toUpperCase()} API Health`,
   activated: environment === 'production',
-  locations: environment === 'production' 
+  locations: environment === 'production'
     ? ['us-east-1', 'eu-west-1', 'ap-southeast-1']
     : ['us-east-1'],
   frequency: environment === 'production' ? 2 : 10,
@@ -473,22 +473,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Test monitors
         run: npx checkly test
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
           CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
-      
+
       - name: Deploy monitors
         run: npx checkly deploy
         env:
@@ -589,7 +589,7 @@ interface MonitoringConfig {
 
 export const config: MonitoringConfig = {
   baseUrl: process.env.BASE_URL || 'https://api.myapp.com',
-  locations: process.env.ENVIRONMENT === 'production' 
+  locations: process.env.ENVIRONMENT === 'production'
     ? ['us-east-1', 'eu-west-1', 'ap-southeast-1']
     : ['us-east-1'],
   alertChannels: process.env.ENVIRONMENT === 'production'
@@ -603,7 +603,7 @@ export const config: MonitoringConfig = {
 ```js config/monitoring.js
 const config = {
   baseUrl: process.env.BASE_URL || 'https://api.myapp.com',
-  locations: process.env.ENVIRONMENT === 'production' 
+  locations: process.env.ENVIRONMENT === 'production'
     ? ['us-east-1', 'eu-west-1', 'ap-southeast-1']
     : ['us-east-1'],
   alertChannels: process.env.ENVIRONMENT === 'production'
@@ -655,7 +655,7 @@ monitoring/
 
 ## Next Steps
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 <Card title="Alerting Configuration" href="/detect/uptime-monitoring/alerting">
 Configure alert channels and notification rules for your CLI-managed monitors
 </Card>
@@ -671,4 +671,4 @@ Complete API reference for all monitor types and configuration options
 <Card title="CI/CD Integration" href="/cli/ci-cd">
 Advanced CI/CD patterns and deployment strategies
 </Card>
-</CardGroup>
+</Columns>

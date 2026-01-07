@@ -77,7 +77,7 @@ Environment variables allow you to store configuration values, API keys, and oth
 
 ## Common Use Cases
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="API Configuration" icon="key">
 Store API endpoints, tokens, and authentication credentials
@@ -107,7 +107,7 @@ GET /v1/variables?locked=true
 ```
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Additional Examples
 
@@ -157,7 +157,7 @@ for var in data['data']:
     print(f"\nVariable: {var['key']}")
     print(f"  Locked: {var['locked']}")
     print(f"  Usage: {var['usage']['checksCount']} checks, {var['usage']['checkGroupsCount']} groups")
-    
+
     # Security audit - flag unused sensitive variables
     if var['locked'] and var['usage']['checksCount'] == 0:
         print(f"  ⚠️  WARNING: Locked variable '{var['key']}' is not being used")

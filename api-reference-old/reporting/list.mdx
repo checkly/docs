@@ -288,7 +288,7 @@ This endpoint provides access to your monitoring reports including scheduled sum
 
 ## Report Types
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="Executive Summary" icon="chart-line">
 **Purpose:** High-level overview for leadership
@@ -342,7 +342,7 @@ This endpoint provides access to your monitoring reports including scheduled sum
 - Goal tracking
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Report Status
 
@@ -622,7 +622,7 @@ def create_sla_report():
             "webhookUrl": "https://sla-dashboard.company.com/api/reports"
         }
     }
-    
+
     return requests.post('/api/v1/reports', json=report_config)
 ```
 </Accordion>
@@ -678,7 +678,7 @@ def setup_performance_benchmarks():
             "internal_tools": 99.5
         }
     }
-    
+
     report = {
         "name": "Performance Benchmark Report",
         "metrics": {
@@ -687,7 +687,7 @@ def setup_performance_benchmarks():
             "trendAnalysis": True
         }
     }
-    
+
     return create_report(report)
 ```
 </Accordion>
@@ -715,7 +715,7 @@ def setup_performance_benchmarks():
 
 // Weekly on Mondays at 9 AM Eastern
 {
-  "frequency": "weekly", 
+  "frequency": "weekly",
   "dayOfWeek": "monday",
   "time": "09:00",
   "timezone": "America/New_York"
@@ -784,7 +784,7 @@ def setup_performance_benchmarks():
     },
     {
       "audience": "operations",
-      "frequency": "daily", 
+      "frequency": "daily",
       "format": "json"
     }
   ]
@@ -827,7 +827,7 @@ console.log(`Active reports: ${meta.summary.active}`);
 console.log(`Scheduled this week: ${meta.summary.scheduledThisWeek}`);
 
 // Process executive reports
-const executiveReports = reports.filter(report => 
+const executiveReports = reports.filter(report =>
   report.type === 'executive_summary'
 );
 
@@ -837,7 +837,7 @@ if (executiveReports.length > 0) {
     console.log(`\n- ${report.name}`);
     console.log(`  Next run: ${report.schedule.nextRun}`);
     console.log(`  Recipients: ${report.delivery.recipients?.length || 'N/A'}`);
-    
+
     if (report.lastRun) {
       console.log(`  Last run: ${report.lastRun.status} (${report.lastRun.timestamp})`);
       if (report.lastRun.status === 'success') {
@@ -849,7 +849,7 @@ if (executiveReports.length > 0) {
 }
 
 // Check for failed deliveries
-const failedReports = reports.filter(report => 
+const failedReports = reports.filter(report =>
   report.lastRun?.status === 'failed'
 );
 
@@ -888,11 +888,11 @@ class ReportManager:
             'Authorization': f'Bearer {api_key}',
             'X-Checkly-Account': account_id
         }
-    
+
     def get_reports(self, **filters):
         """Get reports with optional filters"""
         params = {k: v for k, v in filters.items() if v is not None}
-        
+
         response = requests.get(
             f'{self.base_url}/reports',
             headers=self.headers,
@@ -900,21 +900,21 @@ class ReportManager:
         )
         response.raise_for_status()
         return response.json()
-    
+
     def get_executive_reports(self):
         """Get all executive summary reports"""
         return self.get_reports(type='executive_summary', status='active')
-    
+
     def get_sla_reports(self):
         """Get SLA compliance reports"""
         return self.get_reports(type='sla_compliance', status='active')
-    
+
     def monitor_report_health(self):
         """Monitor overall report system health"""
         data = self.get_reports(limit=100)
         reports = data['data']
         summary = data['meta']['summary']
-        
+
         print(f"📊 REPORT SYSTEM HEALTH")
         print(f"{'='*50}")
         print(f"Total reports: {summary['totalReports']}")
@@ -922,41 +922,41 @@ class ReportManager:
         print(f"Paused: {summary['paused']}")
         print(f"Scheduled this week: {summary['scheduledThisWeek']}")
         print(f"Deliveries last week: {summary['lastWeekDeliveries']}")
-        
+
         # Check for failed reports
         failed_reports = [r for r in reports if r.get('lastRun', {}).get('status') == 'failed']
         if failed_reports:
             print(f"\n❌ {len(failed_reports)} REPORTS WITH RECENT FAILURES:")
             for report in failed_reports:
                 print(f"  - {report['name']}: {report['lastRun'].get('error', 'Unknown error')}")
-        
+
         # Check upcoming reports
         now = datetime.now()
         next_24h = now + timedelta(hours=24)
-        
+
         upcoming = []
         for report in reports:
             if report['status'] == 'active' and report['schedule'].get('nextRun'):
                 next_run = datetime.fromisoformat(report['schedule']['nextRun'].replace('Z', '+00:00'))
                 if now <= next_run <= next_24h:
                     upcoming.append(report)
-        
+
         if upcoming:
             print(f"\n⏰ REPORTS SCHEDULED IN NEXT 24 HOURS:")
             for report in sorted(upcoming, key=lambda x: x['schedule']['nextRun']):
                 next_run = report['schedule']['nextRun']
                 print(f"  - {report['name']}: {next_run}")
-        
+
         # Delivery method distribution
         delivery_methods = {}
         for report in reports:
             method = report['delivery']['method']
             delivery_methods[method] = delivery_methods.get(method, 0) + 1
-        
+
         print(f"\n📬 DELIVERY METHOD DISTRIBUTION:")
         for method, count in delivery_methods.items():
             print(f"  {method}: {count} reports")
-    
+
     def create_executive_report(self, name, recipients, check_groups=None):
         """Create a new executive summary report"""
         report_config = {
@@ -978,7 +978,7 @@ class ReportManager:
             "metrics": {
                 "included": [
                     "overall_availability",
-                    "incident_summary", 
+                    "incident_summary",
                     "mttr_trends",
                     "sla_compliance",
                     "top_failures"
@@ -1001,7 +1001,7 @@ class ReportManager:
                 "includeRawData": False
             }
         }
-        
+
         response = requests.post(
             f'{self.base_url}/reports',
             headers=self.headers,
@@ -1009,7 +1009,7 @@ class ReportManager:
         )
         response.raise_for_status()
         return response.json()
-    
+
     def create_sla_report(self, name, webhook_url, check_groups):
         """Create an SLA compliance report with webhook delivery"""
         report_config = {
@@ -1058,7 +1058,7 @@ class ReportManager:
                 }
             }
         }
-        
+
         response = requests.post(
             f'{self.base_url}/reports',
             headers=self.headers,
@@ -1066,15 +1066,15 @@ class ReportManager:
         )
         response.raise_for_status()
         return response.json()
-    
+
     def analyze_report_performance(self, days=30):
         """Analyze report delivery performance over time"""
         end_date = datetime.now()
         start_date = end_date - timedelta(days=days)
-        
+
         # Get all reports
         all_reports = self.get_reports(limit=100)['data']
-        
+
         # Filter reports with recent runs
         recent_runs = []
         for report in all_reports:
@@ -1091,15 +1091,15 @@ class ReportManager:
                         'timestamp': last_run_time,
                         'delivery_method': report['delivery']['method']
                     })
-        
+
         if not recent_runs:
             return "No recent report runs found"
-        
+
         # Calculate statistics
         total_runs = len(recent_runs)
         successful_runs = len([r for r in recent_runs if r['status'] == 'success'])
         success_rate = (successful_runs / total_runs) * 100
-        
+
         # Group by type
         type_stats = {}
         for run in recent_runs:
@@ -1109,7 +1109,7 @@ class ReportManager:
             type_stats[report_type]['total'] += 1
             if run['status'] == 'success':
                 type_stats[report_type]['successful'] += 1
-        
+
         return {
             'period_days': days,
             'total_runs': total_runs,

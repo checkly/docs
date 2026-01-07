@@ -11,7 +11,7 @@ This guide covers best practices for effectively managing your Checkly monitorin
 
 ### Naming Conventions
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 <Card title="Resource Names" icon="tag">
 **Consistent Naming**
 - Use descriptive, lowercase names with hyphens
@@ -27,7 +27,7 @@ This guide covers best practices for effectively managing your Checkly monitorin
 - Enable easy filtering and reporting
 - Document your tagging strategy
 </Card>
-</CardGroup>
+</Columns>
 
 **Good Examples:**
 ```javascript
@@ -113,7 +113,7 @@ const accountId = config.require('checkly:accountId')
 
 ### Access Control
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 <Card title="API Key Security" icon="key">
 **Secure API Keys**
 - Use dedicated API keys for Pulumi
@@ -129,7 +129,7 @@ const accountId = config.require('checkly:accountId')
 - Review access permissions regularly
 - Use separate stacks for different environments
 </Card>
-</CardGroup>
+</Columns>
 
 ## Environment Management
 
@@ -194,7 +194,7 @@ pulumi config set apiUrl https://api.example.com --stack prod
 
 ### Check Frequency Optimization
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 <Card title="Critical Services" icon="alert-triangle">
 **High Frequency**
 - 1-5 minute intervals for critical APIs
@@ -210,7 +210,7 @@ pulumi config set apiUrl https://api.example.com --stack prod
 - Delayed alerting
 - Basic health checks
 </Card>
-</CardGroup>
+</Columns>
 
 ### Location Strategy
 
@@ -352,7 +352,7 @@ module.exports = { createStandardApiCheck }
 
 ### Automated Deployments
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 <Card title="GitHub Actions" icon="github">
 **GitHub Workflow**
 - Deploy on push to main branch
@@ -368,7 +368,7 @@ module.exports = { createStandardApiCheck }
 - Azure DevOps integration
 - CircleCI configuration
 </Card>
-</CardGroup>
+</Columns>
 
 **GitHub Actions Example:**
 ```yaml
@@ -383,18 +383,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          
+
       - name: Install Pulumi
         uses: pulumi/setup-pulumi@v2
-        
+
       - name: Install Dependencies
         run: npm install
-        
+
       - name: Deploy to Production
         run: pulumi up --yes --stack prod
         env:
@@ -535,4 +535,4 @@ Maintain comprehensive documentation of your monitoring infrastructure, includin
 
 <Warning>
 Remember that monitoring infrastructure is critical to your application's reliability. Always test changes in development environments before deploying to production.
-</Warning> 
+</Warning>

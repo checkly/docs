@@ -10,7 +10,7 @@ This endpoint returns all available monitoring locations where checks can be exe
 
 ## Common Use Cases
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="Global Coverage Analysis" icon="globe">
 Analyze available locations for optimal global monitoring
@@ -40,7 +40,7 @@ GET /v1/locations?provider=AWS
 ```
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Response Example
 
@@ -239,12 +239,12 @@ print("Regional Analysis:")
 for region, locations in regions.items():
     avg_latency = sum(loc['performance']['averageLatency'] for loc in locations) / len(locations)
     avg_reliability = sum(loc['performance']['reliability'] for loc in locations) / len(locations)
-    
+
     print(f"\n{region}:")
     print(f"  Locations: {len(locations)}")
     print(f"  Avg Latency: {avg_latency:.1f}ms")
     print(f"  Avg Reliability: {avg_reliability:.2f}%")
-    
+
     for loc in locations:
         print(f"    - {loc['name']}: {loc['performance']['averageLatency']}ms")
 

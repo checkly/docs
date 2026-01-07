@@ -52,7 +52,7 @@ This endpoint provides real-time status information for all checks in your accou
           "lastSuccess": "2024-01-25T14:30:00.000Z"
         },
         {
-          "id": "eu-west-1", 
+          "id": "eu-west-1",
           "name": "Ireland, Europe",
           "status": "passing",
           "lastSuccess": "2024-01-25T14:29:45.000Z"
@@ -104,7 +104,7 @@ This endpoint provides real-time status information for all checks in your accou
       "locations": [
         {
           "id": "us-east-1",
-          "name": "N. Virginia, USA", 
+          "name": "N. Virginia, USA",
           "status": "failing",
           "lastSuccess": "2024-01-25T12:10:00.000Z"
         },
@@ -142,7 +142,7 @@ This endpoint provides real-time status information for all checks in your accou
 
 ## Common Use Cases
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="System Health Dashboard" icon="tachometer-alt">
 Build real-time system health overviews and status pages
@@ -172,7 +172,7 @@ GET /v1/check-statuses?availabilityMin=99&period=30d
 ```
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Query Parameters
 
@@ -219,7 +219,7 @@ GET /v1/check-statuses?availabilityMin=99&period=30d
 
 ## Status Types
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="Passing" icon="check-circle">
 **Indicates:**
@@ -273,7 +273,7 @@ GET /v1/check-statuses?availabilityMin=99&period=30d
 - Location unavailable
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Performance Trends
 
@@ -408,7 +408,7 @@ const checks = await getCheckStatuses();
 const report = checks.map(check => {
   const compliant = check.availability.percentage >= slaTarget;
   const deficit = compliant ? 0 : slaTarget - check.availability.percentage;
-  
+
   return {
     service: check.checkName,
     availability: check.availability.percentage,
@@ -435,7 +435,7 @@ Each check execution location has its own status:
 
 **Per-Location Status**:
 - `passing`: Recent executions successful from this location
-- `failing`: Recent executions failed from this location  
+- `failing`: Recent executions failed from this location
 - `degraded`: Mixed results or performance issues
 - `unknown`: No recent data or location unavailable
 
@@ -451,7 +451,7 @@ Each check execution location has its own status:
 # Analyze performance by region
 def analyze_regional_performance(checks):
     regional_stats = {}
-    
+
     for check in checks:
         for location in check['locations']:
             region = location['name']
@@ -462,10 +462,10 @@ def analyze_regional_performance(checks):
                     'failing': 0,
                     'degraded': 0
                 }
-            
+
             regional_stats[region]['total_checks'] += 1
             regional_stats[region][location['status']] += 1
-    
+
     # Calculate regional health scores
     for region, stats in regional_stats.items():
         health_score = stats['passing'] / stats['total_checks'] * 100
@@ -498,12 +498,12 @@ async function pollCheckStatuses() {
       'X-Checkly-Account': 'account-id'
     }
   });
-  
+
   if (response.status === 304) {
     // No changes since last poll
     return null;
   }
-  
+
   lastUpdateHash = response.headers.get('ETag');
   return response.json();
 }
@@ -519,11 +519,11 @@ previous_statuses = {}
 
 def detect_status_changes(current_checks):
     changes = []
-    
+
     for check in current_checks:
         check_id = check['checkId']
         current_status = check['status']
-        
+
         if check_id in previous_statuses:
             previous_status = previous_statuses[check_id]
             if current_status != previous_status:
@@ -534,9 +534,9 @@ def detect_status_changes(current_checks):
                     'currentStatus': current_status,
                     'timestamp': check['lastExecution']['timestamp']
                 })
-        
+
         previous_statuses[check_id] = current_status
-    
+
     return changes
 ```
 </Accordion>
@@ -576,8 +576,8 @@ console.log(`System Health: ${meta.summary.averageAvailability}% availability`);
 console.log(`Active Issues: ${meta.summary.failing} failing, ${meta.summary.activeIncidents} incidents`);
 
 // Identify services needing attention
-const needsAttention = checks.filter(check => 
-  check.status !== 'passing' || 
+const needsAttention = checks.filter(check =>
+  check.status !== 'passing' ||
   check.performance.trend === 'degrading' ||
   check.availability.percentage < 99
 );
@@ -618,11 +618,11 @@ class CheckStatusMonitor:
             'Authorization': f'Bearer {api_key}',
             'X-Checkly-Account': account_id
         }
-    
+
     def get_check_statuses(self, **filters):
         """Get check statuses with optional filters"""
         params = {k: v for k, v in filters.items() if v is not None}
-        
+
         response = requests.get(
             f'{self.base_url}/check-statuses',
             headers=self.headers,
@@ -630,44 +630,44 @@ class CheckStatusMonitor:
         )
         response.raise_for_status()
         return response.json()
-    
+
     def get_health_summary(self):
         """Get overall system health summary"""
         data = self.get_check_statuses(includeSummary=True)
         return data['meta']['summary']
-    
+
     def find_failing_checks(self):
         """Get all currently failing checks"""
         data = self.get_check_statuses(status='failing', limit=100)
         return data['data']
-    
+
     def monitor_system_health(self, interval=300):
         """Continuously monitor system health"""
         print("Starting system health monitoring...")
-        
+
         while True:
             try:
                 summary = self.get_health_summary()
                 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                
+
                 print(f"\n[{timestamp}] System Health Report:")
                 print(f"  Overall Availability: {summary['averageAvailability']}%")
                 print(f"  Checks: {summary['passing']} passing, {summary['failing']} failing, {summary['degraded']} degraded")
                 print(f"  Active Incidents: {summary['activeIncidents']}")
                 print(f"  Active Alerts: {summary['activeAlerts']}")
-                
+
                 # Alert on critical issues
                 if summary['failing'] > 0:
                     failing_checks = self.find_failing_checks()
                     print(f"\n  🚨 FAILING CHECKS:")
                     for check in failing_checks[:5]:  # Show first 5
                         print(f"    - {check['checkName']}: {check['lastExecution'].get('error', 'Unknown error')}")
-                
+
                 if summary['averageAvailability'] < 95:
                     print(f"  ⚠️  LOW AVAILABILITY WARNING: {summary['averageAvailability']}%")
-                
+
                 time.sleep(interval)
-                
+
             except KeyboardInterrupt:
                 print("\nMonitoring stopped.")
                 break

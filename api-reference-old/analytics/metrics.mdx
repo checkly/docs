@@ -143,7 +143,7 @@ This endpoint returns all available metrics for a specific check type (API, URL,
     ],
     "checkTypes": [
       "api",
-      "browser", 
+      "browser",
       "heartbeat",
       "tcp",
       "multistep",
@@ -204,12 +204,12 @@ These metrics align with Google's Core Web Vitals standards.
 
 ## Metric Thresholds
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="Core Web Vitals Thresholds" icon="gauge">
 **Good Performance:**
 - FCP: ≤ 1.8 seconds
-- LCP: ≤ 2.5 seconds  
+- LCP: ≤ 2.5 seconds
 - CLS: ≤ 0.1
 - FID: ≤ 100 milliseconds
 
@@ -247,7 +247,7 @@ Success rate targets should align with your SLA commitments.
 Missed heartbeats should be minimal for critical services.
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Query Parameters
 
@@ -375,13 +375,13 @@ response = requests.get(
 
 if response.status_code == 200:
     metrics_data = response.json()
-    
+
     # Create a lookup table for metrics
     metrics_lookup = {}
     for category, metrics in metrics_data['data'].items():
         for metric in metrics:
             metrics_lookup[metric['name']] = metric
-    
+
     # Function to get metric info
     def get_metric_info(metric_name):
         if metric_name in metrics_lookup:
@@ -394,19 +394,19 @@ if response.status_code == 200:
                 'precision': metric.get('precision', 0)
             }
         return None
-    
+
     # Example: Get Core Web Vitals metrics for browser checks
     browser_metrics = [
         metric for metric in metrics_lookup.values()
         if 'browser' in metric['availableFor']
     ]
-    
+
     print("Browser Check Metrics:")
     for metric in browser_metrics:
         print(f"- {metric['displayName']} ({metric['unit']})")
         if 'goodThreshold' in metric:
             print(f"  Good: ≤ {metric['goodThreshold']} {metric['unit']}")
-    
+
     # Check what metrics are available for specific check types
     check_types = metrics_data['meta']['checkTypes']
     for check_type in check_types:
@@ -415,7 +415,7 @@ if response.status_code == 200:
             if check_type in metric['availableFor']
         ]
         print(f"\n{check_type.upper()} checks support {len(available_metrics)} metrics")
-        
+
 else:
     print(f"Error: {response.status_code} - {response.text}")
 ```

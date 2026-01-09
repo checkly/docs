@@ -88,7 +88,7 @@ This endpoint provides detailed analytics for API checks, including response tim
 
 ## Metrics Explained
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="Response Time Metrics" icon="clock">
 - **Average Response Time**: Mean response time across all requests
@@ -114,7 +114,7 @@ This endpoint provides detailed analytics for API checks, including response tim
 - **Anomaly Detection**: Spot unusual response time spikes
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Use Cases
 
@@ -217,12 +217,12 @@ response = requests.get(
 if response.status_code == 200:
     analytics = response.json()
     metrics = analytics['data']['metrics']
-    
+
     print(f"Check: {analytics['data']['checkName']}")
     print(f"Average Response Time: {metrics['averageResponseTime']}ms")
     print(f"Success Rate: {metrics['successRate']}%")
     print(f"Total Requests: {metrics['totalRequests']}")
-    
+
     # Analyze location performance
     locations = analytics['data']['locationBreakdown']
     for location in locations:

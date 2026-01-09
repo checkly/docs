@@ -13,7 +13,7 @@ This guide shows you how to integrate the Checkly Pulumi provider with various C
 CI/CD integration enables you to automatically deploy monitoring changes when code is pushed, ensuring your monitoring infrastructure stays in sync with your application deployments.
 </Callout>
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 <Card title="Automated Deployments" icon="rocket">
 **Continuous Deployment**
 - Deploy monitoring changes automatically
@@ -45,7 +45,7 @@ CI/CD integration enables you to automatically deploy monitoring changes when co
 - Collaborative infrastructure management
 - Standardized deployment processes
 </Card>
-</CardGroup>
+</Columns>
 
 ## GitHub Actions
 
@@ -66,19 +66,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
+
       - name: Install Pulumi
         uses: pulumi/setup-pulumi@v2
-        
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Deploy to production
         run: pulumi up --yes --stack prod
         env:
@@ -101,19 +101,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
+
       - name: Install Pulumi
         uses: pulumi/setup-pulumi@v2
-        
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Preview changes
         run: pulumi preview --stack prod
         env:
@@ -146,25 +146,25 @@ jobs:
           - environment: prod
             branch: main
             stack: prod
-    
+
     if: github.ref == "refs/heads/${{ matrix.branch }}"
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
+
       - name: Install Pulumi
         uses: pulumi/setup-pulumi@v2
-        
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Deploy to ${{ matrix.environment }}
         run: pulumi up --yes --stack ${{ matrix.stack }}
         env:
@@ -190,19 +190,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Run tests
         run: npm test
-        
+
       - name: Lint code
         run: npm run lint
 
@@ -213,19 +213,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
+
       - name: Install Pulumi
         uses: pulumi/setup-pulumi@v2
-        
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Preview changes
         run: pulumi preview --stack staging
         env:
@@ -241,19 +241,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
+
       - name: Install Pulumi
         uses: pulumi/setup-pulumi@v2
-        
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Deploy to staging
         run: pulumi up --yes --stack staging
         env:
@@ -269,19 +269,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          
+
       - name: Install Pulumi
         uses: pulumi/setup-pulumi@v2
-        
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Deploy to production
         run: pulumi up --yes --stack prod
         env:
@@ -376,36 +376,36 @@ deploy-production:
 ```groovy Jenkinsfile
 pipeline {
     agent any
-    
+
     environment {
         NODE_VERSION = '18'
         PULUMI_VERSION = '3.100.0'
     }
-    
+
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-        
+
         stage('Setup') {
             steps {
                 sh '''
                     # Install Node.js
                     curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | sudo -E bash -
                     sudo apt-get install -y nodejs
-                    
+
                     # Install Pulumi
                     curl -fsSL https://get.pulumi.com | sh
                     export PATH=$PATH:$HOME/.pulumi/bin
-                    
+
                     # Install dependencies
                     npm ci
                 '''
             }
         }
-        
+
         stage('Test') {
             steps {
                 sh '''
@@ -414,7 +414,7 @@ pipeline {
                 '''
             }
         }
-        
+
         stage('Preview') {
             when {
                 changeRequest()
@@ -426,7 +426,7 @@ pipeline {
                 '''
             }
         }
-        
+
         stage('Deploy Staging') {
             when {
                 branch 'staging'
@@ -438,7 +438,7 @@ pipeline {
                 '''
             }
         }
-        
+
         stage('Deploy Production') {
             when {
                 branch 'main'
@@ -451,7 +451,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         always {
             cleanWs()
@@ -494,15 +494,15 @@ stages:
       inputs:
         versionSpec: $(nodeVersion)
       displayName: 'Install Node.js'
-    
+
     - script: |
         npm ci
       displayName: 'Install dependencies'
-    
+
     - script: |
         npm test
       displayName: 'Run tests'
-    
+
     - script: |
         npm run lint
       displayName: 'Run linting'
@@ -519,13 +519,13 @@ stages:
       inputs:
         versionSpec: $(nodeVersion)
       displayName: 'Install Node.js'
-    
+
     - script: |
         curl -fsSL https://get.pulumi.com | sh
         export PATH=$PATH:$HOME/.pulumi/bin
         npm ci
       displayName: 'Setup Pulumi and install dependencies'
-    
+
     - script: |
         export PATH=$PATH:$HOME/.pulumi/bin
         pulumi preview --stack staging
@@ -551,13 +551,13 @@ stages:
             inputs:
               versionSpec: $(nodeVersion)
             displayName: 'Install Node.js'
-          
+
           - script: |
               curl -fsSL https://get.pulumi.com | sh
               export PATH=$PATH:$HOME/.pulumi/bin
               npm ci
             displayName: 'Setup Pulumi and install dependencies'
-          
+
           - script: |
               export PATH=$PATH:$HOME/.pulumi/bin
               pulumi up --yes --stack staging
@@ -583,13 +583,13 @@ stages:
             inputs:
               versionSpec: $(nodeVersion)
             displayName: 'Install Node.js'
-          
+
           - script: |
               curl -fsSL https://get.pulumi.com | sh
               export PATH=$PATH:$HOME/.pulumi/bin
               npm ci
             displayName: 'Setup Pulumi and install dependencies'
-          
+
           - script: |
               export PATH=$PATH:$HOME/.pulumi/bin
               pulumi up --yes --stack prod
@@ -722,7 +722,7 @@ workflows:
 
 ### Secret Management
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 <Card title="Environment Variables" icon="key">
 **Secure Storage**
 - Use CI/CD platform secret management
@@ -738,7 +738,7 @@ workflows:
 - Implement approval gates for production
 - Audit access regularly
 </Card>
-</CardGroup>
+</Columns>
 
 ### Security Checklist
 
@@ -807,4 +807,4 @@ Always test your CI/CD pipeline in a development environment before deploying to
 
 <Warning>
 Never commit secrets or sensitive information to your repository. Always use your CI/CD platform's secret management features.
-</Warning> 
+</Warning>

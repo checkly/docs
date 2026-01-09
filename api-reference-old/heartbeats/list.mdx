@@ -177,7 +177,7 @@ while True:
     )
     data = response.json()
     all_heartbeats.extend(data['data'])
-    
+
     if page >= data['meta']['totalPages']:
         break
     page += 1
@@ -194,7 +194,7 @@ for heartbeat in all_heartbeats:
     methods[heartbeat['method']] += 1
     frequencies[heartbeat['frequency']] += 1
     response_limits.append(heartbeat['responseTimeLimit'])
-    
+
     for location in heartbeat['locations']:
         locations_usage[location] += 1
 
@@ -222,7 +222,7 @@ if inactive_heartbeats:
 
 ## Use Cases
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="API Health Monitoring" icon="heartbeat">
 Monitor API endpoints for availability and response time
@@ -240,7 +240,7 @@ Monitor service discovery endpoints and load balancers
 Monitor external services your application depends on
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Filtering and Pagination
 

@@ -160,7 +160,7 @@ data = response.json()
 for window in data['data']:
     starts_at = datetime.fromisoformat(window['startsAt'].replace('Z', '+00:00'))
     ends_at = datetime.fromisoformat(window['endsAt'].replace('Z', '+00:00'))
-    
+
     print(f"Name: {window['name']}")
     print(f"Schedule: {starts_at} to {ends_at}")
     print(f"Repeat: {window['repeatInterval']}")
@@ -172,7 +172,7 @@ for window in data['data']:
 
 ## Use Cases
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="Scheduled Deployments" icon="rocket">
 Suppress alerts during planned software deployments and updates
@@ -190,7 +190,7 @@ Avoid alerts during nightly backups and database maintenance
 Handle known downtime from external service providers
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Filtering Options
 
@@ -239,7 +239,7 @@ function isMaintenanceActive(window) {
   const now = new Date();
   const starts = new Date(window.startsAt);
   const ends = new Date(window.endsAt);
-  
+
   return now >= starts && now <= ends;
 }
 ```
@@ -252,7 +252,7 @@ Check if a maintenance window is scheduled in the future:
 function isMaintenanceUpcoming(window) {
   const now = new Date();
   const starts = new Date(window.startsAt);
-  
+
   return starts > now;
 }
 ```

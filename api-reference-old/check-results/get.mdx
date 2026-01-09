@@ -155,7 +155,7 @@ This endpoint returns comprehensive details about a single check execution resul
 
 ## Common Use Cases
 
-<CardGroup cols={2}>
+<Columns cols={2}>
 
 <Card title="Debugging Failed Checks" icon="bug">
 Investigate specific check failures with detailed error analysis
@@ -185,7 +185,7 @@ GET /v1/check-results/{checkId}/{resultId}
 ```
 </Card>
 
-</CardGroup>
+</Columns>
 
 ## Detailed Information Sections
 
@@ -287,14 +287,14 @@ Investigate specific check failures in detail:
 if (result.status === 'failed') {
   console.log(`Failed check: ${result.checkName}`);
   console.log(`Error: ${result.error.message}`);
-  
+
   // Analyze failed assertions
   const failedAssertions = result.assertions.filter(a => !a.passed);
   failedAssertions.forEach(assertion => {
     console.log(`Failed assertion: ${assertion.message}`);
     console.log(`Expected: ${assertion.target}, Got: ${assertion.actual}`);
   });
-  
+
   // Check for timing issues
   if (result.timing.total > 5000) {
     console.log(`Slow response detected: ${result.timing.total}ms`);
@@ -335,7 +335,7 @@ print(f"Download: {timing['download']}ms ({download_pct:.1f}%)")
 # Identify the slowest component
 phases = {
     'DNS': timing['dns'],
-    'TCP': timing['tcp'], 
+    'TCP': timing['tcp'],
     'TLS': timing['tls'],
     'Server': timing['firstByte'],
     'Download': timing['download']
@@ -443,12 +443,12 @@ if (result.certificate) {
   console.log(`  Subject: ${result.certificate.subject}`);
   console.log(`  Issuer: ${result.certificate.issuer}`);
   console.log(`  Valid until: ${result.certificate.validTo}`);
-  
+
   // Check if certificate is expiring soon (30 days)
   const expiryDate = new Date(result.certificate.validTo);
   const thirtyDaysFromNow = new Date();
   thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
-  
+
   if (expiryDate < thirtyDaysFromNow) {
     console.log(`  ⚠️ Certificate expires in less than 30 days!`);
   }
@@ -498,7 +498,7 @@ if (result.status === 'failed' && result.error) {
   if (result.error.code) {
     console.log(`  Code: ${result.error.code}`);
   }
-  
+
   // Stack trace (first few lines)
   if (result.error.stack) {
     const stackLines = result.error.stack.split('\n').slice(0, 3);
@@ -527,7 +527,7 @@ response = requests.get(
 
 if response.status_code == 200:
     result = response.json()
-    
+
     print(f"Check Result Analysis")
     print(f"=" * 50)
     print(f"Check: {result['checkName']}")
@@ -535,11 +535,11 @@ if response.status_code == 200:
     print(f"Executed: {result['startedAt']}")
     print(f"Location: {result['location']['name']}")
     print(f"Duration: {result['duration']}ms")
-    
+
     # Performance analysis
     timing = result['timing']
     response_time = result['response']['responseTime']
-    
+
     print(f"\nPerformance Breakdown:")
     print(f"  Network Setup: {timing['dns'] + timing['tcp'] + timing['tls']}ms")
     print(f"    - DNS Resolution: {timing['dns']}ms")
@@ -548,29 +548,29 @@ if response.status_code == 200:
     print(f"  Server Processing: {timing['firstByte'] - timing['dns'] - timing['tcp'] - timing['tls']}ms")
     print(f"  Content Download: {timing['download']}ms")
     print(f"  Total Response Time: {response_time}ms")
-    
+
     # Response analysis
     response_data = result['response']
     print(f"\nResponse Analysis:")
     print(f"  Status Code: {response_data['statusCode']} {response_data['statusText']}")
     print(f"  Body Size: {response_data['bodySize']} bytes")
     print(f"  Redirects: {response_data.get('redirectCount', 0)}")
-    
+
     # Security analysis
     if 'certificate' in result:
         cert = result['certificate']
         valid_to = datetime.fromisoformat(cert['validTo'].replace('Z', '+00:00'))
         days_until_expiry = (valid_to - datetime.now()).days
-        
+
         print(f"\nSSL Certificate:")
         print(f"  Subject: {cert['subject']}")
         print(f"  Issuer: {cert['issuer']}")
         print(f"  Valid until: {cert['validTo']}")
         print(f"  Days until expiry: {days_until_expiry}")
-        
+
         if days_until_expiry < 30:
             print(f"  ⚠️ Certificate expires in {days_until_expiry} days!")
-    
+
     # Security headers check
     headers_received = result['response']['headers']
     security_headers = {
@@ -579,20 +579,20 @@ if response.status_code == 200:
         'x-frame-options': 'X-Frame-Options',
         'x-content-type-options': 'X-Content-Type-Options'
     }
-    
+
     print(f"\nSecurity Headers:")
     for header, description in security_headers.items():
         present = any(h.lower() == header for h in headers_received.keys())
         status = "✅" if present else "❌"
         print(f"  {status} {description}")
-    
+
     # Assertion analysis
     if 'assertions' in result and result['assertions']:
         passed_assertions = sum(1 for a in result['assertions'] if a['passed'])
         total_assertions = len(result['assertions'])
-        
+
         print(f"\nAssertions: {passed_assertions}/{total_assertions} passed")
-        
+
         failed_assertions = [a for a in result['assertions'] if not a['passed']]
         if failed_assertions:
             print(f"Failed assertions:")
@@ -600,17 +600,17 @@ if response.status_code == 200:
                 print(f"  ❌ {assertion['message']}")
                 print(f"     Expected: {assertion['target']}")
                 print(f"     Actual: {assertion['actual']}")
-    
+
     # Error analysis
     if result['status'] == 'failed' and 'error' in result:
         error = result['error']
         print(f"\nError Analysis:")
         print(f"  Type: {error.get('type', error.get('name', 'Unknown'))}")
         print(f"  Message: {error['message']}")
-        
+
         if 'code' in error:
             print(f"  Error Code: {error['code']}")
-        
+
         # Categorize error type
         error_msg = error['message'].lower()
         if 'timeout' in error_msg:
@@ -621,7 +621,7 @@ if response.status_code == 200:
             print(f"  Category: Assertion Failure")
         elif any(code in str(response_data.get('statusCode', '')) for code in ['4', '5']):
             print(f"  Category: HTTP Error Response")
-    
+
     # Generate summary
     print(f"\nSummary:")
     if result['status'] == 'success':
@@ -630,7 +630,7 @@ if response.status_code == 200:
             print(f"⚠️ Response time is slower than 2 seconds")
     else:
         print(f"❌ Check failed - requires investigation")
-        
+
     print(f"Response time: {response_time}ms")
     print(f"Location: {result['location']['name']}")
     print(f"Triggered by: {result['triggeredBy']}")

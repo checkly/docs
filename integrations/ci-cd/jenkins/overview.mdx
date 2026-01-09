@@ -2,6 +2,9 @@
 title: Integrating Checkly in Jenkins
 sidebarTitle: Jenkins
 ---
+
+import CliEnvVars from "/snippets/cli-env-vars.mdx"
+
 We've optimized the [Checkly CLI](/cli/overview/) to work in any CI/CD workflow. Here are the basics you need to know that will come in handy when adapting the examples we give you to your own, specific setup.
 
 1. For **authentication**, make sure to set the `CHECKLY_API_KEY` and `CHECKLY_ACCOUNT_ID` parameters as environment variables
@@ -13,15 +16,7 @@ in your CI/CD platform.
 When using the `--record` flag, the CLI will attempt to parse `git` specific information from
 the environment to display in the recorded test session as metadata. However, you can also set these data items specifically by using environment variables.
 
-| item               | auto | variable                                               | description                                |
-|--------------------|--------------|--------------------------------------------------------|--------------------------------------------|
-| **Repository**     | false        | `repoUrl` in `checkly.config.ts` or `CHECKLY_REPO_URL` | The URL of your repo on GitHub, GitLab etc. |
-| **Commit hash**    | true         | `CHECKLY_REPO_SHA`                                     | The SHA of the commit.               |
-| **Branch**         | true         | `CHECKLY_REPO_BRANCH`                                  | The branch name.                     |
-| **Commit owner**   | true         | `CHECKLY_REPO_COMMIT_OWNER`                            | The committer's name or email.       |
-| **Commit message** | true         | `CHECKLY_REPO_COMMIT_MESSAGE`                          | The commit message.                  |
-| **Environment**    | false        | `CHECKLY_TEST_ENVIRONMENT`                             | The environment name, e.g. "staging" |
-
+<CliEnvVars />
 
 ## A Basic pipeline example
 

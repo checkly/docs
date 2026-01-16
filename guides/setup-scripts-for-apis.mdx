@@ -9,7 +9,7 @@ sidebarTitle: Setup and Teardown Scripts
 
 Checkly's [API Monitoring](/blog/what-is-api-monitoring/) checks run independently and on different schedules, possibly even following different retry logic when failures occur. It is therefore important not to create dependencies between them, which could introduce false failures and flakiness. Checkly prevents this antipattern by having each check run fully isolated in its own sandbox.
 
-But how do you run complex API checks that have prerequisites (e.g., auth tokens, test data) that themselves require an API call or other preparation steps? That's what [setup and teardown scripts](/detect/synthetic-monitoring/api-checks/set-up-and-tear-down) are made for:
+But how do you run complex API checks that have prerequisites (e.g., auth tokens, test data) that themselves require an API call or other preparation steps? That's what [setup and teardown scripts](/detect/synthetic-monitoring/api-checks/setup-and-teardown) are made for:
 
 - **Setup scripts** run before the API check's main request. Use them to prepare test data, fetch tokens, or configure the request.
 - **Teardown scripts** run after the HTTP request completes. Use them to clean up test data, scrub sensitive information, or normalize responses.
@@ -238,7 +238,7 @@ if (response.statusCode >= 200 && response.statusCode < 300) {
 ## Read more
 
 <div class="cards-list">
-<Card title="Setup and Teardown Reference" href="/detect/synthetic-monitoring/api-checks/set-up-and-tear-down">
+<Card title="Setup and Teardown Reference" href="/detect/synthetic-monitoring/api-checks/setup-and-teardown">
   Full reference for setup and teardown scripts, including built-in variables and technical details.
 </Card>
 

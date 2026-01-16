@@ -1,6 +1,6 @@
 ---
 title: 'Webhook Integrations'
-description: 'Create custom webhook integrations to send Checkly alerts to any API endpoint with advanced templating and security features'
+description: 'Create custom webhook integrations to send Checkly alerts to any API endpoint'
 sidebarTitle: 'Webhooks'
 ---
 
@@ -8,52 +8,50 @@ sidebarTitle: 'Webhooks'
 **Monitoring as Code**: Learn more about the [Webhook Alert Channel Construct](/constructs/webhook-alert-channel).
 </Tip>
 
-Webhooks provide the most flexible way to integrate Checkly with any system that accepts HTTP requests. Create sophisticated integrations with custom endpoints using templating, conditional logic, and security features.
+Webhooks allow you to POST custom payloads to any endpoint in your own infrastructure or a third party provider. In a
+nutshell, you can:
 
-## Basic Webhook Setup
+- Create a **custom URL** by adding in authentication tokens or other secrets.
+- Create a **custom payload body** using any environment variables and specific instance variables per event. Note: that means that if you are attaching the webhook to a Group, you will be able to access Group-level variables, too.
+- **Debug and test the webhook** in the editor by sending test messages.
 
-<Steps>
-<Step title="Create Webhook Channel">
-Navigate to Alert Settings and choose Webhook as your channel type
-</Step>
+## Using Variables
 
-<Step title="Configure Endpoint">
-Set your webhook URL, HTTP method, and authentication headers
-</Step>
+![webhook jira example](/images/docs/images/alerting/webhook-jira.png)
 
-<Step title="Customize Payload">
-Design your request body using Checkly's templating system
-</Step>
+The example above shows a webhook configured to create a Jira ticket on each event. Notice the following:
 
-<Step title="Test Integration">
-Send test alerts to verify your webhook integration works correctly
-</Step>
-</Steps>
+- We use the variable `JIRA_INSTANCE_URL` in the URL. We previously stored this variable in the [environment variables section](https://app.checklyhq.com/environment-variables). Alerting configurations only support the use of environment variables, secrets are not supported.
+- We use the variable `CHECK_ID` in the payload. This is one of many event-based variables that will change with each call. See below for the complete list.
 
-## Template Variables
+In both cases we use the familiar Handlebars templating braces, i.e. `{{ }}` to insert the variable.
 
-Use dynamic variables to create contextual alerts:
+<Note>
+To avoid encoding, you can access your environment variables with triple brackets, i.e. `{{{USER_API_KEY}}}`
+</Note>
 
-| Variable | Description | Example Value |
-|----------|-------------|---------------|
-| `ALERT_TITLE` | Human-readable alert title | "Check 'Payment API' has failed" |
-| `ALERT_TYPE` | Alert event type | "ALERT_FAILURE", "ALERT_RECOVERY" |
-| `API_CHECK_RESPONSE_STATUS_CODE` | HTTP status code (API checks only) | 404 |
-| `API_CHECK_RESPONSE_STATUS_TEXT` | HTTP status text (API checks only) | "Not Found" |
-| `CHECK_ERROR_MESSAGE` | Error details | "Connection timeout after 5000ms" |
-| `CHECK_ID` | UUID of the check | "abc123-def456-ghi789" |
-| `CHECK_NAME` | Full check name | "Payment API Health Check" |
-| `CHECK_RESULT_ID` | UUID of the result | "result-123-456" |
-| `CHECK_TYPE` | Type of check | "API", "BROWSER", "HEARTBEAT" |
-| `GROUP_NAME` | Group name if applicable | "Payment Services" |
-| `REGION` | AWS region code where check ran | "us-east-1" |
-| `RESPONSE_TIME` | Response time in milliseconds | 1234 |
-| `RESULT_LINK` | Direct link to results | "https://app.checklyhq.com/..." |
-| `RUN_LOCATION` | Location where check ran | "N. Virginia" |
-| `SSL_CHECK_DOMAIN` | Domain for SSL certificate check | "api.example.com" |
-| `SSL_DAYS_REMAINING` | Days until SSL certificate expires | 14 |
-| `STARTED_AT` | ISO timestamp | "2024-01-15T14:30:22.000Z" |
-| `TAGS` | Array of check tags | ["critical", "payment", "api"] |
+You can use the following event-related variables in both URL and payload.
+
+| Variable            | Description                                                  |
+|---------------------|--------------------------------------------------------------|
+| `ALERT_TITLE`       | Human readable title, e.g. 'Check "My API check" has failed' |
+| `ALERT_TYPE`        | Type of alert, e.g. "ALERT_FAILURE", "ALERT_RECOVERY", "ALERT_DEGRADED", "ALERT_DEGRADED_RECOVERY". See [alert states](/communicate/alerts/overview#alert-states) for all options. |
+| `API_CHECK_RESPONSE_STATUS_CODE`     | The response status code, e.g. 200. Only populated for API checks.                  |
+| `API_CHECK_RESPONSE_STATUS_TEXT`     | The response status text, e.g. "OK". Only populated for API checks.                  |
+| `CHECK_ERROR_MESSAGE` | The check error message                                    |
+| `CHECK_ID`          | The UUID of the check                                        |
+| `CHECK_NAME`        | Full name of the check                                       |
+| `CHECK_RESULT_ID`   | The UUID of the result that triggered this message           |
+| `CHECK_TYPE`        | The check type, e.g. API, BROWSER  .                         |
+| `GROUP_NAME`        | The name of the group, if the check belongs to one.          |
+| `REGION`            | AWS region code where check ran, e.g. "us-east-1"                       |
+| `RESPONSE_TIME`     | The reported response time for this result                   |
+| `RESULT_LINK`       | The full link to the check result                            |
+| `RUN_LOCATION`      | The location where the check ran, i.e. "N. California"       |
+| `SSL_CHECK_DOMAIN`  | The domain of the SSL certificate. For ALERT_SSL only.       |
+| `SSL_DAYS_REMAINING`| How many days remain on the SSL certificate. For ALERT_SSL only.|
+| `STARTED_AT`        | The ISO timestamp from when this check run started           |
+| `TAGS`              | An array of tags assigned to the check. Have a look at our Opsgenie example below on how to render this to a JSON array. |
 
 ### Handlebars Helpers
 
@@ -67,28 +65,36 @@ Use dynamic variables to create contextual alerts:
 - `{{moment "2 days ago" "YYYY-MM-DD"}}` → `2020-08-24`
 - `{{moment "last week" "X"}}` → `1597924480`
 
-A practical example of using the `{{moment}}` helper would be setting the pagination options on a typical API endpoint:
-
-```bash api-request
- GET https://api.acme.com/events?from={{moment "last week" "X"}}&to={{moment "X"}}
-```
-
-> You can find the [full list of helpers in the README.md file](https://github.com/checkly/handlebars) of the underlying library we are using.
+<Note>
+You can find the [full list of helpers in the README.md file](https://github.com/checkly/handlebars) of the underlying library we are using.
 For a full overview of date formatting option, check the [moment.js docs](https://momentjs.com/docs/#/displaying/format/).
+</Note>
 
+You can also use conditional helpers like `{{#eq}}` statements. Here is an example:
 
-Create dynamic webhook content with conditional formatting:
-
-```json webhook-payload.json
+```json
 {
-  "priority": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}P1{{else}}{{#eq ALERT_TYPE 'ALERT_DEGRADED'}}P2{{else}}P3{{/eq}}{{/eq}}",
-  "environment": "{{#contains CHECK_NAME 'prod'}}production{{else}}{{#contains CHECK_NAME 'staging'}}staging{{else}}development{{/contains}}{{/contains}}",
-  "escalation_needed": {{#and (eq ALERT_TYPE 'ALERT_FAILURE') (contains TAGS 'critical')}}true{{else}}false{{/and}},
-  "formatted_tags": [{{#each TAGS}}"{{uppercase this}}"{{#unless @last}},{{/unless}}{{/each}}],
-  "response_time_category": "{{#gt RESPONSE_TIME 5000}}slow{{else}}{{#gt RESPONSE_TIME 2000}}medium{{else}}fast{{/gt}}{{/gt}}",
-  "alert_color": "{{#eq ALERT_TYPE 'ALERT_FAILURE'}}#ff0000{{else}}{{#eq ALERT_TYPE 'ALERT_DEGRADED'}}#ffa500{{else}}#00ff00{{/eq}}{{/eq}}"
+  "message": "Check is {{#eq ALERT_TYPE 'ALERT_FAILURE'}}DOWN{{/eq}} {{#eq ALERT_TYPE 'ALERT_RECOVERY'}}UP{{/eq}}"
 }
 ```
+
+The above webhook body uses the `{{#eq}}` helper to execute the logic
+
+*If the ALERT_TYPE variable equals 'ALERT_FAILURE', print 'DOWN', if it equals 'ALERT_RECOVERY' print 'UP'*
+
+So in the case of a failure event, the body would render to:
+
+```json
+{
+  "message": "Check is DOWN"
+}
+```
+
+Two clear benefits here:
+- You only need to create one webhook to inform a 3rd party system.
+- You can translate Checkly terms to your 3rd party tool's term for the same concept, i.e. the "up status" of a check.
+
+You can find the [full list of helpers in the README.md file](https://github.com/checkly/handlebars) of the underlying library we are using.
 
 ## Webhook Secrets
 
@@ -105,10 +111,9 @@ of the webhook and its payload.
 
 Have a look at the code examples below on how to use the header and your favourite web framework.
 
-<Tabs>
-<Tab title="Node.js">
+<CodeGroup>
 
-```javascript webhook-server.js
+```javascript Node.js
 // We store the webhook secret in an environment variable called CHECKLY_WEBHOOK_SECRET
 const app = require('express')();
 const bodyParser = require('body-parser');
@@ -138,11 +143,7 @@ app.post('/webhook', bodyParser.json({ type: 'application/json' }), (request, re
 app.listen(4242, () => console.log('Running on port 4242'))
 ```
 
-</Tab>
-
-<Tab title="Ruby">
-
-```ruby webhook-server.rb
+```ruby Ruby
 # We store the webhook secret in an environment variable called CHECKLY_WEBHOOK_SECRET
 require 'sinatra'
 
@@ -153,7 +154,7 @@ post '/webhook' do
   payload = request.body.read
   digest = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), ENV['CHECKLY_WEBHOOK_SECRET'], payload)
 
-  if Rack::Utils.secure_compare(digest, signature)
+  if Rack::Utils.secure_compare(digest, signature)    
     status 200
     return
   else
@@ -162,11 +163,8 @@ post '/webhook' do
   end
 end
 ```
-</Tab>
 
-<Tab title="Python">
-
-```python webhook-handler.py
+```python Python
 # This example assumes you use Django
 import hmac
 from hashlib import sha256
@@ -187,9 +185,8 @@ def webhook(request):
 
     return HttpResponse()
 ```
-</Tab>
 
-</Tabs>
+</CodeGroup>
 
 ## Webhook Retries
 
@@ -208,7 +205,7 @@ The following examples give an idea how to integrate Checkly with 3rd party aler
 
 You can create an <a href="https://docs.opsgenie.com/docs/alert-api" target="_blank">OpsGenie</a> alert by POST-ing the following body
 
-```json opsgenie-webhook.json
+```json
 {
   "message": "{{ALERT_TITLE}}",
   "description": "{{ALERT_TYPE}} <br>{{STARTED_AT}} ({{RESPONSE_TIME}}ms) <br>{{RESULT_LINK}}",
@@ -218,7 +215,7 @@ You can create an <a href="https://docs.opsgenie.com/docs/alert-api" target="_bl
 
 to the OpsGenie `alerts` API endpoint
 
-```bash endpoint-url
+```
 https://{{OPSGENIE_API_KEY}}@api.opsgenie.com/v2/alerts
 ```
 
@@ -230,7 +227,7 @@ Authorization: GenieKey {{OPSGENIE_API_KEY}}
 
 This is an example of a full alert body:
 
-```json opsgenie-full-webhook.json
+```json
 {
   "message": "{{ALERT_TITLE}}",
   "description": "{{ALERT_TYPE}}: {{CHECK_NAME}} <br>{{STARTED_AT}} ({{RESPONSE_TIME}}ms) <br>{{RESULT_LINK}}",
@@ -248,7 +245,7 @@ This is an example of a full alert body:
 
 In case you would like different teams to be responsible for different Check Groups, you could add a `CHECK_GROUP_TEAM` variable with a different value for each Group, then modify the above snippet with the following:
 
-```json team-responders.json
+```json
 "responders": [
       {
           "id":"{{CHECK_GROUP_TEAM}}",
@@ -261,7 +258,7 @@ In case you would like different teams to be responsible for different Check Gro
 
 Given an existing service on your PagerDuty account, create an incident for it by posting the following body
 
-```json pagerduty-webhook.json
+```json
 {
   "incident": {
     "type": "incident",
@@ -286,7 +283,7 @@ to `https://api.pagerduty.com/incidents`. You will need to set the following hea
 
 Send a message using [Pushover](https://pushover.net/) by posting this body:
 
-```json pushover-webhook.json
+```json
 {
   "token":"YOUR_SECRET_TOKEN_FROM_PUSHOVER",
   "user":"YOUR_USER_FROM_PUSHOVER",
@@ -312,7 +309,7 @@ https://api.trello.com/1/cards?idList=5b28c04aed47522097be8bc4&key={{TRELLO_KEY}
 
 You can send your SSL alerts using webhooks. Using the following body:
 
-```json ssl-alert-webhook.json
+```json
 {
   "message": "{{ALERT_TITLE}}",
   "link":"{{RESULT_LINK}}"
@@ -322,7 +319,7 @@ You can send your SSL alerts using webhooks. Using the following body:
 Will yield the following output, where we customize the `ALERT_TITLE` to include the domain and the days remaining till your
 certificate expires.
 
-```json ssl-alert-response.json
+```json
 {
   "message": "The SSL certificate for api.checklyhq.com will expire in 14 days",
   "link": "http://app-test.checklyhq.com/checks/08437f9c-df8c-45ed-975a-a3f9e24d626d"
@@ -332,7 +329,7 @@ certificate expires.
 
 You can configure a webhook to POST to a JavaScript snippet running in a [Twilio Function](https://www.twilio.com/docs/runtime/functions). This code receives the Checkly webhook JSON, then triggers a Twilio "Flow execution":
 
-```javascript twilio-function.js
+```javascript
 //"From" is the sender phone number
 //"To" is the receiver phone number
 exports.handler = async function (context, event, callback) {
@@ -358,7 +355,7 @@ We will be creating a POST request to `{{JIRA_INSTANCE_URL}}/rest/api/3/issue`, 
 
 The required headers will be:
 
-```bash jira-headers
+```bash
 Authorization: Basic <base64 encoded user_email:api_token_string>
 Accept: application/json
 Content-Type: application/json
@@ -368,7 +365,7 @@ For more details on authenticating with the Jira API, refer to [Atlassian's guid
 
 An example body could look as follows:
 
-```json jira-webhook.json
+```json
 {
   "fields": {
     "description": { // your Jira issue description, using Atlassian Document Format (ADF)
@@ -420,12 +417,3 @@ An example body could look as follows:
 For full details on creating issues via the Jira API, see [Atlassian's documentation for this endpoint](https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-post).
 
 You can also use version 2 of the Jira API (i.e. `{{JIRA_INSTANCE_URL}}/rest/api/2/issue`). The only difference is that version 2 does not support [Atlassian Document Format (ADF)](https://developer.atlassian.com/cloud/jira/platform/apis/document/structure/).
-
-## Webhook Best Practices
-
-- **Authentication**: Always use proper authentication (API keys, signatures, OAuth)
-- **Idempotency**: Design endpoints to handle duplicate webhook deliveries gracefully
-- **Error Handling**: Return appropriate HTTP status codes (200-299 for success, 4xx/5xx for errors)
-- **Timeout**: Respond to webhooks quickly (within 30 seconds) to avoid retries
-- **Logging**: Log webhook events for debugging and monitoring
-- **Security**: Validate webhook signatures and implement replay attack protection

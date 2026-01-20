@@ -97,9 +97,9 @@ Run entire Playwright test suites and projects as production monitors without co
 ![monitoring and alerting pipeline](/images/docs/images/monitoring/monitoring-alerting-pipeline.svg)
 
 1. A cron process picks up a check based on its schedule, say every 5 minutes. It validates that the check is not in progress at the moment to avoid race conditions. The check is put into a queue to be run from the next configured data center location.
-2. If the check is an API check and has a [setup script](/detect/synthetic-monitoring/api-checks/set-up-and-tear-down), the setup script is executed. 
+2. If the check is an API check and has a [setup script](/detect/synthetic-monitoring/api-checks/setup-and-teardown), the setup script is executed. 
 3. The check is executed.
-4. If the check is an API check and has a [teardown script](/detect/synthetic-monitoring/api-checks/set-up-and-tear-down), the teardown script is executed.
+4. If the check is an API check and has a [teardown script](/detect/synthetic-monitoring/api-checks/setup-and-teardown), the teardown script is executed.
 Teardown scripts are run *before* any assertions are validated.
 5. The result is stored in our central database.
 6. If the check fails, its retry strategy is executed. Based on the retry strategy, a check is retried one or multiple times. Any setup & teardown scripts are run again as part of the process.

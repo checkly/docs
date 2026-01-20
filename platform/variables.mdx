@@ -6,16 +6,16 @@ description: 'Store and manage common configuration values across your checks'
 
 import GenericRuntimeVariablesTable from '/snippets/generic-runtime-variables-table.mdx';
 
-Your checks might share the same configuration data, like an authentication token, a user name, or even a specific part of the URL. You can use variables and secrets to 'DRY' up your checks, store these variables in one place, and keep sensitive data secure. 
+Your checks might share the same configuration data, like an authentication token, a user name, or even a specific part of the URL. You can use variables and secrets to 'DRY' up your checks, store these variables in one place, and keep sensitive data secure.
 
 ## Overview
 
 There are two ways to store configuration information in Checkly: Variables and secrets. Both variables and secrets are encrypted at rest and in flight.
 * **Variables** are used to store non-sensitive information. Variables are shown in plaintext when being edited, on the check result page and in logs. Variables can be accessed via the CLI and API.
-* **Secrets** allow you to store sensitive data for use in checks. Once saved, secrets are never shown in the UI or in logs and cannot be accessed via the CLI or API. 
+* **Secrets** allow you to store sensitive data for use in checks. Once saved, secrets are never shown in the UI or in logs and cannot be accessed via the CLI or API.
 
 <Note>
-Secrets are fully supported starting with runtime version 2024.09 and later. For [Private Locations](/docs/private-locations/), secrets are available in agent version `3.3.4` and later, and for the [CLI](/docs/cli/), in version `4.9.0` and later.
+Secrets are fully supported starting with runtime version 2024.09 and later. For [Private Locations](/platform/private-locations/overview/), secrets are available in agent version `3.3.4` and later, and for the [CLI](/cli/overview/), in version `4.9.0` and later.
 </Note>
 
 <Warning>
@@ -26,7 +26,7 @@ Numbers are not scrubbed from the Playwright trace, but from the general check r
 
 <Tip>
   This page provides a general overview of environment variables. For information specific to the CLI, refer to our [Checkly CLI documentation](/cli/environment-variables).
-</Tip> 
+</Tip>
 
 From here on, in this document, we refer to both variables and secrets as 'variables' for ease of reading, unless explicitly mentioned.
 
@@ -65,7 +65,7 @@ Store variables at the global level whenever possible to follow the DRY (Don't R
 
 </Accordion>
 
-By default, all variables are stored as string values. 
+By default, all variables are stored as string values.
 
 When using variables, you can click the lock icon to hide the value. Any data you "lock" is encrypted at rest and in flight on our back end and is only decrypted when needed. Locked environment variables can only be accessed by team members with [Read & Write, Admin, or Owner roles](/admin/team-management/overview/).
 

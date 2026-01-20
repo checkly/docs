@@ -17,6 +17,7 @@ learn_playwright:
   parent: "Interaction"
 ---
 
+import SignUpCta from "/snippets/sign-up-cta.mdx"
 import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
 
 <PlaywrightCheckSuiteTryOut />
@@ -37,12 +38,6 @@ test('can click log in', async ({ page }) => {
   await page.getByRole('button', { name: 'Log in' }).click()
 })
  ```
-
-
-For the times when even the humble click fails, you can try the following alternatives:
-1. `await page.click('#login', { force: true })` to force the click even if the selected element appears not to be accessible
-2. `await page.$eval('#login', elem => elem.click())` to run the click inside the webpage
-3. `await page.dispatchEvent('#login', 'click')` to directly dispatch the click event on the element
 
 ## Hovering
 
@@ -107,6 +102,8 @@ You can run (from the terminal) the above examples as follows:
 ```sh
 npx playwright test basic-click-type.ts
 ```
+
+<SignUpCta />
 
 ## Further reading
 1. The related official documentation of [Playwright](https://playwright.dev/docs/input#mouse-click)

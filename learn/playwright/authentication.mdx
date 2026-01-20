@@ -20,6 +20,7 @@ aliases:
   - managing-cookies
 ---
 
+import SignUpCta from "/snippets/sign-up-cta.mdx"
 import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
 
 <PlaywrightCheckSuiteTryOut />
@@ -197,14 +198,14 @@ test('API token auth', async ({ request }) => {
       'Authorization': `Bearer ${process.env.API_TOKEN}`
     }
   })
-	expect(response).toBeOK()
+  expect(response).toBeOK()
 })
 ```
 
 Just like with username and password authentication, make sure to store your API tokens securely using environment
 variables.
 
-# Reusing authentication state with storageState
+# Reusing authentication state with `storageState`
 
 All of the above examples work fine if you are running just one test that requires authentication. However, the
 moment you will run more tests — either in parallel or in sequence — you will exercise your authentication
@@ -215,7 +216,7 @@ Ideally, you can authenticate once and reuse the authenticated state across mult
 [Playwright has this feature baked in](https://playwright.dev/docs/auth) and leverages something called `storageState`.
 It requires a little setup 👇
 
-## Setting up the playwright.config.ts file
+## Setting up the `playwright.config.ts` file
 
 The recommended way to reuse auth state is by setting up **projects** in your `playwright.config.ts` file and defining a `setup` step that references file — `auth.setup.ts` for example — that takes care of the necessary authentication flow.
 
@@ -303,3 +304,5 @@ When writing automation scripts that deal with authentication, there are some ge
 
 - [How to automate Google login with Playwright.](https://www.checklyhq.com/learn/playwright/google-login-automation/)
 - [How to bypass Time-Based 2FA login flows with Playwright.](https://www.checklyhq.com/learn/playwright/bypass-totp/)
+
+<SignUpCta />

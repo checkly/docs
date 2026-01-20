@@ -12,6 +12,7 @@ learn_playwright:
   parent: "Interaction"
 ---
 
+import SignUpCta from "/snippets/sign-up-cta.mdx"
 import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
 
 <PlaywrightCheckSuiteTryOut />
@@ -35,7 +36,7 @@ await page.waitFor(1000) // hard wait for 1000ms
 await page.click('#button-login')
 ```
 
-In such a situation, the following can happen:
+In such a situation, the following two scenarios can happen:
 
 1. You end up waiting a shorter time than the element takes to load!
 
@@ -97,21 +98,21 @@ Generally, **it's recommended to rely on Playwright's auto-waiting and built-in 
 
 When you can't wait for an element to appear on a page and want to explicitly wait for the network use the following.
 
-`` waits until the required load state has been reached. It defaults to the page `load` event but can also be configured to wait for `domcontentloaded` or `networkidle` (discouraged).
+`waitForLoadState` waits until the required load state has been reached. It defaults to the page `load` event but can also be configured to wait for `domcontentloaded` or `networkidle` (discouraged).
 
 ```ts
 // wait for a page `load` event
 await page.waitForLoadState()
 ```
 
-`` waits until a navigation to the target URL. It also defaults to the page `load` event but can be configured to wait for `commit`, `domcontentloaded` or `networkidle` (discouraged).
+`waitForURL` waits until a navigation to the target URL. It also defaults to the page `load` event but can be configured to wait for `commit`, `domcontentloaded` or `networkidle` (discouraged).
 
 ```ts
 // wait for the page `load` event of the `/login` URL
 await page.waitForURL('**/login')
 ```
 
-You can also wait until a request is sent or a response is received with ``. These two methods are key for implementing [request and response interception](/learn/playwright/intercept-requests/).
+You can also wait until a request is sent or a response is received with `waitForRequest` and `waitForResponse`. These two methods are key for implementing [request and response interception](/learn/playwright/intercept-requests/).
 
 ```ts
 // wait for a request being made after clicking a button
@@ -127,7 +128,7 @@ const loginResponse = await loginResponsePromise
 
 ### Waiting for an element in Playwright
 
-There are multiple ways to wait for a specific element to appear on the page. To wait for an element to be visible or reach a particular state it's recommended to use Playwright's web-first assertions. `toBeVisible`, `toBeEnabled`, `toBeChecked` and many more included assertions are asynchronous and wait for the elements to change, appear or disappear.
+There are multiple ways to validate that a specific element appears on the page. To wait for an element to be visible or reach a particular state it's recommended to use Playwright's web-first assertions. `toBeVisible`, `toBeEnabled`, `toBeChecked` and many more included assertions are asynchronous and wait for the elements to change, appear or disappear.
 
 ```ts
 // wait for this button to be visible, stable, ... and click it
@@ -140,10 +141,10 @@ await expect(page.getByRole('button', {name: 'Login'})).toBeHidden()
 
 If you pair web-first assertions with Playwright's auto-waiting actions, your scripts will be expressive, human-readable, and, most importantly, not include any hard timeouts.
 
-If you're not using Playwright Test (web-first assertions are only available in `@playwright/test`) and you want to wait for an element to be visible, use ``.
+If you're not using Playwright Test (web-first assertions are only available in `@playwright/test`) and you want to wait for an element to be visible, use `waitFor`.
 
 ```ts
-const button =  page.getByRole('button', { name: 'Login' }).click()
+const button =  page.getByRole('button', { name: 'Login' })
 // wait for this button to be visible
 await button.waitFor()
 ```
@@ -152,7 +153,7 @@ In any case, a good knowledge of [locators](/learn/playwright/selectors/) is key
 
 ### Waiting for page events
 
-With Playwright, you can also directly wait for `.
+With Playwright, you can also directly wait for `waitForEvent`.
 
 ```ts
 // wait for a new window or popup to open after clicking a button
@@ -163,7 +164,7 @@ const popup = await popupPromise
 
 ### Waiting for page functions
 
-And for more advanced cases, you can pass a function to be evaluated within the browser context via ``.
+And for more advanced cases, you can pass a function to be evaluated within the browser context via `waitForFunction`.
 
 ```ts
 // wait for a specific state in the browser window after clicking a button
@@ -179,3 +180,5 @@ await secretInternalState
 1. Never use hard waits or timeouts.
 2. Use auto-waiting instead.
 3. Combine auto-waiting actions with web-first assertions to test UI state instead of implementation details.
+
+<SignUpCta />

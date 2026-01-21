@@ -12,9 +12,7 @@ GitHub created the [deployments API](https://docs.github.com/en/rest/deployments
 integrators like Vercel and Heroku use this to relay deployment status to GitHub. However, you can also call this API
 yourself and trigger a `deployment_status` event.
 
-> Make sure to set your `CHECKLY_API_KEY` and `CHECKLY_ACCOUNT_ID` as
-[secrets in your GitHub Actions settings](https://docs.github.com/en/actions/security-guides/encrypted-secrets) before you
-get started.
+> Make sure to set your `CHECKLY_API_KEY` as a [secret](https://docs.github.com/en/actions/security-guides/encrypted-secrets) and `CHECKLY_ACCOUNT_ID` as a [variable](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables) in your GitHub Actions settings before you get started.
 
 ## Running on `deployment_status` events
 
@@ -34,7 +32,7 @@ on: [deployment_status]
 # to run your checks against staging, preview or production.
 env:
   CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
-  CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+  CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
   ENVIRONMENT_URL: ${{ github.event.deployment_status.environment_url }}
   CHECKLY_TEST_ENVIRONMENT: ${{ github.event.deployment_status.environment }}
 jobs:
@@ -108,7 +106,7 @@ on: [deployment_status]
 env:
   ENVIRONMENT_URL: ${{ github.event.deployment_status.environment_url }}
   CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
-  CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+  CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
 run-name: Run MaC checks against ${{ github.event.deployment_status.environment_url }}
 jobs:
   test-e2e:

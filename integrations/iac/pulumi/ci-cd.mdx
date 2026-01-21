@@ -82,7 +82,7 @@ jobs:
       - name: Deploy to production
         run: pulumi up --yes --stack prod
         env:
-          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 ```
@@ -117,7 +117,7 @@ jobs:
       - name: Preview changes
         run: pulumi preview --stack prod
         env:
-          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 ```
@@ -168,7 +168,7 @@ jobs:
       - name: Deploy to ${{ matrix.environment }}
         run: pulumi up --yes --stack ${{ matrix.stack }}
         env:
-          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 ```
@@ -229,7 +229,7 @@ jobs:
       - name: Preview changes
         run: pulumi preview --stack staging
         env:
-          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
@@ -257,7 +257,7 @@ jobs:
       - name: Deploy to staging
         run: pulumi up --yes --stack staging
         env:
-          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
@@ -285,7 +285,7 @@ jobs:
       - name: Deploy to production
         run: pulumi up --yes --stack prod
         env:
-          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 ```

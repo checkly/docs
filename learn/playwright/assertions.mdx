@@ -107,7 +107,7 @@ await expect.soft(page.getByTestId('cookieBanner')).toBeVisible();
 
 ### Checkly, soft assertions, and degraded check states
 
-Checkly can use soft assertions as part of [a `degraded` state for MultiStep checks](/detect/synthetic-monitoring/multistep-checks/degraded-states). If a check fails soft assertions and there is a call to `markCheckAsDegraded`, the check will be placed in a 'yellow light' category of degraded rather than failing. Instead of categorizing the check as a total failure the 'degraded' state signals that the check encountered issues but still completed execution. Degraded checks have different notification policies. For example: you might have degraded checks report to Slack rather than sending a notification that wakes people up.
+Checkly can use soft assertions as part of [a `degraded` state for Multistep checks](/detect/synthetic-monitoring/multistep-checks/degraded-states). If a check fails soft assertions and there is a call to `markCheckAsDegraded`, the check will be placed in a 'yellow light' category of degraded rather than failing. Instead of categorizing the check as a total failure the 'degraded' state signals that the check encountered issues but still completed execution. Degraded checks have different notification policies. For example: you might have degraded checks report to Slack rather than sending a notification that wakes people up.
 
 This is useful for distinguishing between partial service disruptions and complete outages, offering teams a more precise understanding of performance and reliability. If your Playwright test is running on Checkly, the check will enter a 'degraded' state when some soft assertions fail, or if you call `markCheckAsDegraded` in its execution.
 

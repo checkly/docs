@@ -12,8 +12,8 @@ learn_playwright:
   parent: "Interaction"
 ---
 
-import SignUpCta from "/snippets/sign-up-cta.mdx"
 import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+import SignUpCta from "/snippets/sign-up-cta.mdx"
 
 <PlaywrightCheckSuiteTryOut />
 
@@ -56,7 +56,7 @@ Flakiness, a higher-than-acceptable and unpredictable failure rate, is a major p
 
 **Your tests and automation scripts must be stable and hard waits should never appear in your end-to-end testing and monitoring scripts**.
 
-## Avoiding hard waits by relying on Playwright's auto-waiting
+## Avoiding hard waits by relying on Playwright's auto-waiting actions and web-first assertions
 
 To avoid these issues, you should forget that hard waits exist and adopt tools like [Playwright, which provide auto-waiting mechanisms](https://playwright.dev/docs/actionability). Let's revisit the previous example and use Playwright's core functionality.
 
@@ -90,13 +90,56 @@ This auto-waiting approach has two main advantages:
 1. Your Playwright scripts will be as quick as possible because Playwright will interact with elements whenever they're ready.
 2. You can focus on defining UI actions and the expected results instead of worrying about network calls and timings.
 
+### Playwright's web-first assertions
+
+Auto-waiting Playwright actions help to avoid using hard waits when interacting with elements. But what if you want to wait for an element to appear on the page or reach a specific state before proceeding with your script?
+
+Playwright's web-first assertions (`toBe*`) also provide auto-waiting capabilities. For example, to wait for an element to become visible, it's recommended to use Playwright's `toBeVisible` assertions. `toBeVisible`, `toBeEnabled`, `toBeChecked` and many more included assertions are asynchronous and wait for the elements to reach a certain state.
+
+```ts
+// wait for this button to be visible, stable, ... and click it
+await page.getByRole('button', { name: 'Login' }).click()
+// wait for this button to be disabled
+await expect(page.getByRole('button', {name: 'Login'})).toBeDisabled()
+// wait for this button to be gone
+await expect(page.getByRole('button', {name: 'Login'})).toBeHidden()
+```
+
+If you pair web-first assertions with Playwright's auto-waiting actions, your scripts will be expressive, human-readable, and, most importantly, not include any hard timeouts.
+
+<Tip>
+It's important to understand that auto-waiting web-first assertions also have synchronous counterparts.
+
+```
+// check if this element is visible at this moment (true/false)
+await page.getByRole('button').isVisible()
+
+// wait for this element to become visible
+await expect(page.getByRole('button')).toBeVisible()
+```
+
+It's recommended to reach for web-first assertions whenever possible to avoid flakiness.
+</Tip>
+
+If you're not using Playwright Test (web-first assertions are only available in `@playwright/test`) and you want to wait for an element to be visible, use `waitFor`.
+
+```ts
+const button =  page.getByRole('button', { name: 'Login' })
+// wait for this button to be visible
+await button.waitFor()
+```
+
+In any case, a good knowledge of [locators](/learn/playwright/selectors/) is key to enable you to select precisely the element we need to wait for.
+
 ## Other waiting mechanisms
 
 Generally, **it's recommended to rely on Playwright's auto-waiting and built-in web-first assertions**, but if you must, here are some other waiting mechanisms.
 
 ### Waiting on navigations and network conditions in Playwright
 
-When you can't wait for an element to appear on a page and want to explicitly wait for the network use the following.
+When you can't wait for an element to appear on a page and want to explicitly wait for the network, one of the other `waitFor` methods.
+
+#### `page.waitForLoadState`
 
 `waitForLoadState` waits until the required load state has been reached. It defaults to the page `load` event but can also be configured to wait for `domcontentloaded` or `networkidle` (discouraged).
 
@@ -105,12 +148,16 @@ When you can't wait for an element to appear on a page and want to explicitly wa
 await page.waitForLoadState()
 ```
 
+#### `page.waitForURL`
+
 `waitForURL` waits until a navigation to the target URL. It also defaults to the page `load` event but can be configured to wait for `commit`, `domcontentloaded` or `networkidle` (discouraged).
 
 ```ts
 // wait for the page `load` event of the `/login` URL
 await page.waitForURL('**/login')
 ```
+
+#### `page.waitForRequest` / `page.waitForResponse`
 
 You can also wait until a request is sent or a response is received with `waitForRequest` and `waitForResponse`. These two methods are key for implementing [request and response interception](/learn/playwright/intercept-requests/).
 
@@ -125,31 +172,6 @@ const loginResponsePromise = page.waitForResponse('/login')
 await page.getByRole('button', { name: 'Login' }).click()
 const loginResponse = await loginResponsePromise
 ```
-
-### Waiting for an element in Playwright
-
-There are multiple ways to validate that a specific element appears on the page. To wait for an element to be visible or reach a particular state it's recommended to use Playwright's web-first assertions. `toBeVisible`, `toBeEnabled`, `toBeChecked` and many more included assertions are asynchronous and wait for the elements to change, appear or disappear.
-
-```ts
-// wait for this button to be visible, stable, ... and click it
-await page.getByRole('button', { name: 'Login' }).click()
-// wait for this button to be disabled
-await expect(page.getByRole('button', {name: 'Login'})).toBeDisabled()
-// wait for this button to be gone
-await expect(page.getByRole('button', {name: 'Login'})).toBeHidden()
-```
-
-If you pair web-first assertions with Playwright's auto-waiting actions, your scripts will be expressive, human-readable, and, most importantly, not include any hard timeouts.
-
-If you're not using Playwright Test (web-first assertions are only available in `@playwright/test`) and you want to wait for an element to be visible, use `waitFor`.
-
-```ts
-const button =  page.getByRole('button', { name: 'Login' })
-// wait for this button to be visible
-await button.waitFor()
-```
-
-In any case, a good knowledge of [locators](/learn/playwright/selectors/) is key to enable you to select precisely the element we need to wait for.
 
 ### Waiting for page events
 

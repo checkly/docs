@@ -1,0 +1,77 @@
+---
+title: 'ICMP Monitors Overview'
+description: 'Monitor host reachability and network latency using ICMP ping.'
+sidebarTitle: Overview
+---
+<Tip>
+**Monitoring as Code**: Learn more about the [ICMP Monitor Construct](/constructs/icmp-monitor).
+</Tip>
+
+## What are ICMP Monitors?
+
+ICMP monitors verify that a host is reachable and responding. Typical use cases include:
+
+* Detecting network-level outages before they're visible via HTTP endpoints
+* Monitoring latency across regions to identify geographic performance issues
+* Verifying reachability for servers, load balancers, or network appliances that don't expose HTTP endpoints or open TCP ports
+* Tracking packet loss to catch network quality degradation early
+
+## How do ICMP monitors work?
+
+ICMP monitors perform ping tests:
+
+* Hostname resolution: If a hostname is provided, Checkly resolves it to an IP address.
+* Ping execution: Multiple ICMP Echo Request packets (configurable from 1–50, default: 10) are sent from your configured location(s).
+* Response valildation: ICMP Echo Reply packets are received. Round-trip latency and packet loss are measured and evaluated against your configured assertions.
+
+For example, pinging checklyhq.com with 10 pings returns:
+
+```json
+{
+  "latency": {
+    "min": 12.3,
+    "max": 18.7,
+    "avg": 14.2,
+    "stddev": 2.1
+  },
+  "packetLoss": 0,
+  "timingPhases": { "dns": 5.2 },
+  "pingsSucceeded": 10,
+  "pingsFailed": 0
+}
+```
+
+The response appears on the results page as both raw output and parsed JSON. You can use it as a reference to define [assertions](/detect/uptime-monitoring/icmp-monitors/configuration#assertions) for expected values.
+
+## Troubleshooting Common Issues
+
+<Accordion title="100% packet loss but the host is reachable via HTTP">
+**Symptom**: ICMP monitor shows complete packet loss, but the website/API works fine
+
+**Root cause**:
+- **Firewall rules blocking ICMP**: Many organizations block ICMP echo request packets at the firewall, load balancer, or host level as a security measure
+
+**How to detect and fix**:
+1. **Verify HTTP connectivity**: Create an API or URL monitor for the same hostname to confirm it's reachable
+2. **Check both protocols**: Test both IPv4 and IPv6, some hosts allow ICMP on one protocol but not the other
+3. **Confirm with infrastructure team**: Ask if ICMP is intentionally blocked in security policies
+
+**When to use a different monitor type**: If ICMP is deliberately blocked, use TCP, URL, or API checks instead to verify availability at the application layer.
+</Accordion>
+
+<Accordion title="High latency or packet loss from specific regions">
+**Symptom**: ICMP monitor shows high latency or packet loss from certain locations but not others
+
+**Root causes**:
+- **Geographic routing**: Network paths vary by region, some routes may be congested
+- **Transit provider issues**: Problems with specific ISPs or peering connections
+- **Rate limiting**: Some hosts rate-limit ICMP responses, affecting distant locations more
+
+**How to detect and fix**:
+1. **Compare across locations**: Run monitors from multiple regions to identify which paths are affected
+2. **Monitor trends over time**: Check if issues are persistent or intermittent
+3. **Cross-reference with other monitor types**: Compare ICMP latency with TCP/HTTP latency from the same locations
+4. **Use latency assertions**: Set region-specific assertions, e.g., `latency.avg` less than `50ms` for nearby regions, `200ms` for distant ones
+
+**Investigation tip**: Persistent high latency from a specific region often indicates routing issues with your hosting provider or CDN configuration.
+</Accordion>

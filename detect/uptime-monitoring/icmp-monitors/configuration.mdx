@@ -1,0 +1,64 @@
+---
+title: 'ICMP Monitor Configuration'
+description: 'Configure your ICMP monitor to verify host reachability and measure network latency.'
+sidebarTitle: 'Configuration'
+---
+
+### Basic Setup
+
+Configure your ICMP monitor by specifying the target host:
+
+[IMG]
+
+* **Hostname or IP address:** The server you want to monitor (e.g. `db.example.com` or `203.0.113.1`)
+* **IP family:** Choose between IPv4 (default) or IPv6
+* **Pings per run:** Number of ICMP Echo Request packets to send per check run (1-50, default: 10)
+
+### Assertions
+
+Validate latency metrics to ensure your infrastructure meets performance requirements:
+
+[IMG]
+
+You can create assertions based on:
+
+* **Latency metrics:** Validate `min`, `max`, `avg`, or `stddev` latency values
+* **JSON response:** Assert against the full JSON response structure
+
+### Packet Loss Limits
+
+Define packet loss thresholds to determine when an ICMP monitor should be considered degraded or failed:
+
+<Frame>
+  <img className="block dark:hidden" src="/images/icmp-packet-loss-threshold.png" alt="ICMP monitor packet loss limits interface" />
+  <img className="hidden dark:block" src="/images/icmp-packet-loss-threshold-dark.png" alt="ICMP monitor packet loss limits interface" />
+</Frame>
+
+### Frequency
+
+Set how often the monitor runs (every 10 seconds to 24 hours):
+
+<Frame>
+  <img className="block dark:hidden" src="/images/dns-monitors/frequency.png" alt="ICMP monitor frequency selection interface" />
+  <img className="hidden dark:block" src="/images/dns-monitors/frequency-dark.png" alt="ICMP monitor frequency selection interface" />
+</Frame>
+
+### Scheduling & Locations
+
+<Frame>
+  <img className="block dark:hidden" src="/images/dns-monitors/scheduling.png" alt="ICMP monitor scheduling strategy and location selection interface" />
+  <img className="hidden dark:block" src="/images/dns-monitors/scheduling-dark.png" alt="ICMP monitor scheduling strategy and location selection interface" />
+</Frame>
+
+* **Strategy:** Choose between round-robin or parallel execution. Learn more about [scheduling strategies](/concepts/scheduling)
+* **Locations:** Select one or more [public](/concepts/locations/#public-locations) locations to run the monitor from
+* **Private locations**: ICMP monitors do not currently support private locations
+
+### Additional Settings
+
+* **Name:** Give your monitor a clear name to identify it in dashboards and alerts
+* **Tags:** Use tags to organize monitors across dashboards and [maintenance windows](/communicate/maintenance-windows/overview)
+* **Retries:** Define how failed runs should be retried. See [retry strategies](/communicate/alerts/retries)
+* **Alerting:** Configure your [alert settings](/communicate/alerts/configuration), [alert channels](/communicate/alerts/channels), or set up [webhooks](/integrations/alerts/webhooks) for custom integrations
+
+

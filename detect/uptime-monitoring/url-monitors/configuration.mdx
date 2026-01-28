@@ -12,12 +12,12 @@ Monitor public URLs by specifying the endpoint you want to track.
   <img src="/images/url-monitor-entry.png" alt="URL monitor setup interface showing IP family selection, URL input field, Skip SSL, Follow redirects and Should fail option" />
 </Frame>
 
-* **Request method:** Always GET.
-* **URL:** The HTTP(S) URL to monitor (e.g. https://api.example.com).
-* **IP family:** Defaults to IPv4.
-* **Follow redirects:** Automatically follow 30x redirects.
-* **Skip SSL:** Skip SSL certificate validation.
-* **This request should fail:** Treat HTTP error codes (4xx and 5xx) as passed. Please note that successful responses still pass. Only failed assertions will cause the check to fail.
+* **Request method:** Always GET
+* **URL:** The HTTP(S) URL to monitor (e.g. https://api.example.com)
+* **IP family:** Choose between IPv4 (default) or IPv6
+* **Follow redirects:** Automatically follow 30x redirects
+* **Skip SSL:** Skip SSL certificate validation
+* **This request should fail:** Treat HTTP error codes (4xx and 5xx) as passed. Please note that successful responses still pass. Only failed assertions will cause the check to fail
 
 ### Assertions
 
@@ -37,19 +37,17 @@ Set performance thresholds to ensure your application meets speed requirements:
   <img src="/images/url-monitor-response-times.png" alt="URL monitor response time limits interface showing degraded and failed thresholds" />
 </Frame>
 
-**Degraded After**: Time threshold (in milliseconds) after which the check is marked as degraded but not failed. Use for performance warnings without triggering failure alerts.
+* **Degraded After**: Time threshold (in milliseconds) after which the check is marked as degraded but not failed. Use for performance warnings without triggering failure alerts
 
-**Failed After**: Time threshold after which the check fails completely. Use for hard performance limits where slow responses should trigger alerts.
+* **Failed After**: Time threshold after which the check fails completely. Use for hard performance limits where slow responses should trigger alerts
 
 ### Frequency
 
-Determine how often your monitors run.
+Set how often the monitor runs (every 10 seconds to 24 hours):
 
 <Frame>
   <img src="/images/url-monitor-frequency.png" alt="URL monitor frequency selection interface showing available check intervals" />
 </Frame>
-
-Choose a frequency that balances monitoring coverage with resource usage. Higher frequencies provide faster detection but may not be necessary for all services.
 
 ### Scheduling Strategy
 
@@ -59,25 +57,21 @@ Choose when and how your checks run across multiple locations:
   <img src="/images/url-monitor-scheduling.png" alt="URL monitor scheduling strategy interface showing round robin vs fixed schedule options" />
 </Frame>
 
-**Round Robin** (Default): Checks run on one of the selected locations each time it is scheduled.
+* **Round Robin** (Default): Checks run on one of the selected locations each time it is scheduled
 
-**Parallel**: Checks run from all selected locations simultaneously. Higher consumption but provides immediate global visibility for critical services.
+* **Parallel**: Checks run from all selected locations simultaneously. Higher consumption but provides immediate global visibility for critical services
+
+Learn more in our documentation on [Scheduling strategies](/concepts/scheduling/#scheduling-strategies).
 
 ### Locations
 
-Select from Checkly's global monitoring locations to test your URLs from different regions:
+Select one or more [public](/monitoring/global-locations/) or [private](/platform/private-locations/overview) locations to run the monitor from.
 
 <Frame>
   <img src="/images/url-monitor-locations.png" alt="URL monitor locations selection interface showing global monitoring locations" />
 </Frame>
 
 We recommend to chose at least 2-3 locations that best represent your user base for optimal monitoring coverage.
-
-See [Locations](/concepts/locations) for the complete list of available regions and guidance on location selection.
-
-<Info>
-**Private Locations**: Run checks from your own infrastructure to monitor internal applications, check services behind firewalls, or maintain data residency compliance. [Set up Private Locations →](/detect/private-locations/overview)
-</Info>
 
 ### Retries
 

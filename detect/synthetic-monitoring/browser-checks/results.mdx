@@ -4,7 +4,33 @@ description: 'Working with monitoring results and degraded states'
 sidebarTitle: 'Results'
 ---
 
+Individual browser check results contain:
+
+1. A short check summary, including errors broken down by category.
+![check results browser summary](/images/docs/images/monitoring/check-results-browser-summary.png)
+
+2. When using Playwright Test Runner you will have an additional section displaying the test steps, error message, and assets (traces, videos, screenshots). [Read more](/browser-checks/playwright-test/) about the additonal functionalities of Playwright Test.
+![check results browser playwright test report](/images/docs/images/monitoring/check-results-browser-pwt-report.png)
+
+3. An error log, only if your script failed.
+![check results browser error log](/images/docs/images/monitoring/check-results-browser-error-log.png)
+
+4. Expandable tabs on page your script navigated to.
+![check results browser page navigation](/images/docs/images/monitoring/check-results-browser-page-navigations.png)
+
+When expanded, each tab shows its own navigation/loading time ribbon and web vitals...
+![check results browser page navigation top](/images/docs/images/monitoring/check-results-browser-navigation-top.png)
+
+...together with browser console logs, network logs and any screenshots that had been taken (including one screenshot taken automatically on failure).
+![check results browser page navigation bottom](/images/docs/images/monitoring/check-results-browser-navigation-bottom.png)
+
+5. A job log for the check.
+![check results browser job log](/images/docs/images/monitoring/check-results-browser-job-log.png)
+
+Learn more in our documentation on [Results](/concepts/results).
+
 ## Degraded State
+
 If you want to monitor your service for non-critical errors or performance degradations you can use the degraded check state. This allows you to signal that parts of a Browser check performed slower than expected, or that it triggered assertions that are of lower criticality. 
 
 The degraded state does not affect your check's success ratio like a failed state does. You can [configure alert channels](/communicate/alerts/channels#managing-alert-channels) to notify you when a check has degraded. 

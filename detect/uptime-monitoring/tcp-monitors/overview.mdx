@@ -1,24 +1,24 @@
 ---
 title: 'TCP Monitors Overview'
-description: 'Monitor the availability and performance of your TCP services by establishing connections and verifying responses.'
+description: 'Monitor the availability and performance of your TCP services.'
 sidebarTitle: Overview
 ---
+
 <Tip>
 **Monitoring as Code**: Learn more about the [TCP Monitor Construct](/constructs/tcp-monitor).
 </Tip>
+
 ## What are TCP Monitors?
 
-TCP monitors perform low-level connectivity checks by establishing TCP connections to your services. They verify that your services are listening on the expected ports and can accept connections, making them essential for monitoring infrastructure components and backend services.
+Use TCP monitors to verify that your non-HTTP services are working as expected. TCP monitors work by establishing a connection to a host and port, then checking the speed and validity of the response.
+
+For example, use these checks to verify that:
+
+* Your mail server is online and responds to IMAPS requests quickly
+* Your FTP server responds correctly to commands
+* Your custom TCP-based service returns the expected response when sent a health check message
 
 ![TCP monitor interface showing connection status](/images/docs/images/tcp-monitors/tcp-check-overview.png)
-
-**TCP Monitors are perfect for detecting downtime and performance issues in:**
-- Database servers (MySQL, PostgreSQL, MongoDB)
-- Mail servers (SMTP, IMAP, POP3)
-- Custom TCP services and APIs
-- Load balancers and proxies
-- SSH and FTP servers
-- Redis and Memcached instances
 
 ## How TCP Monitoring Works
 
@@ -26,72 +26,25 @@ TCP monitors perform connection-level checks:
 
 1. **Connection Attempt** - Establishes a TCP connection to your service
 2. **Port Verification** - Confirms the service is listening on the specified port
-3. **Response Validation** - Optionally validates service responses
-4. **SSL/TLS Check** - Verifies certificate validity for secure connections
-5. **Timing Measurement** - Records connection and response times
+3. **Response Validation** - Optionally validates service responses based on your configured assertions
 
-<Tip>
-TCP monitors are ideal for monitoring services that don't expose HTTP endpoints but need connectivity verification.
-</Tip>
+## TCP Monitor Results
 
-## SSL/TLS Certificate Monitoring
+Select a specific check run to review its results:
 
-For services using SSL/TLS, TCP monitors automatically check:
+<Frame>
+  <img src="/images/tcp-monitor-results-page.png" alt="TCP monitor results page" />
+</Frame>
 
-- **Certificate Validity**: Ensures certificates are not expired
-- **Chain Validation**: Verifies the complete certificate chain
-- **Expiration Warnings**: Alerts before certificates expire
-- **Protocol Compliance**: Checks for secure protocol versions
+* **Summary:** Displays the monitor target (hostname and port), the monitor state (`success` for passed and degraded runs, or `error` for failed runs), the request status code and the total check run duration
 
-<Warning>
-Certificate monitoring is only available when using SSL/TLS protocol options.
-</Warning>
+* **Error details:** If the check failed, the error status code and message log will be shown
 
+* **Request data:** If a payload was sent, it is shown alongside the response received from the server
 
-## Troubleshooting Common Issues
+* **Timing phases:** For each request, we capture the following timing metrics:
+  * DNS: Time taken to resolve the hostname to an IP address (if a hostname was provided)
+  * Connect: Time taken to establish the TCP connection (SYN, SYN-ACK, ACK)
+  * Data: Time taken to send the payload and receive the response data
 
-<Accordion title="Connection Refused">
-**Symptom**: Monitor shows "Connection refused" errors
-**Causes**:
-- Service is not running
-- Port is blocked by firewall
-- Incorrect host/port configuration
-
-
-**Solutions**:
-1. Verify service is running: `netstat -tlnp | grep :3306`
-2. Check firewall rules
-3. Test connectivity: `telnet hostname port`
-</Accordion>
-
-<Accordion title="Timeout Errors">
-**Symptom**: Monitor times out without connecting
-**Causes**:
-- Network latency or packet loss
-- Service overloaded
-- Timeout set too low
-
-**Solutions**:
-1. Increase connection timeout
-2. Check network connectivity
-3. Monitor service performance
-
-</Accordion>
-
-<Accordion title="SSL Certificate Issues">
-**Symptom**: SSL validation failures
-**Causes**:
-- Certificate expired
-- Hostname mismatch
-- Invalid certificate chain
-
-**Solutions**:
-1. Check certificate validity: `openssl s_client -connect hostname:port`
-2. Verify certificate expiration dates
-3. Update certificates before expiration
-
-</Accordion>
-
-
-
-
+Learn more in our documentation on [Results](/concepts/results).

@@ -22,9 +22,6 @@ Browser checks are automated tests that use real browsers to interact with your 
 - Form submissions and user journey validation
 - Frontend performance monitoring
 
-
-
-
 <Info>
 Supported Browsers:
 - **Chromium**: Default browser, fast and reliable
@@ -32,9 +29,7 @@ Supported Browsers:
 - **Mobile Simulation**: Test responsive designs and mobile workflows
 </Info>
 
-
 ## How Browser Checks Work
-
 
 Checkly uses Playwright to power your Browser checks. [Playwright](https://playwright.dev/docs/intro) is a robust, open-source framework for browser automation and end-to-end web application testing. It enables you to write idiomatic, reliable tests and easily control interactions within a web page. Browser checks execute automated test scripts in real browsers:
 
@@ -45,7 +40,6 @@ Checkly uses Playwright to power your Browser checks. [Playwright](https://playw
 5. **Performance Monitoring** - Captures Core Web Vitals and timing metrics
 6. **Results Collection** - Records screenshots, videos, and detailed logs
 7. **Alerts** - Triggers alerts if any of the assertions fail
-
 
 ## Check Structure
 
@@ -101,6 +95,32 @@ test('User login workflow', async ({ page }) => {
 <Info>
 To learn more about Playwright, see the our [Playwright documentation](/learn/playwright).
 </Info>
+
+## Browser Check Results
+
+Individual browser check results contain:
+
+* A short check summary, including errors broken down by category
+![check results browser summary](/images/docs/images/monitoring/check-results-browser-summary.png)
+
+* When using Playwright Test Runner you will have an additional section displaying the test steps, error message, and assets (traces, videos, screenshots)
+
+* An error log, only if your script failed
+![check results browser error log](/images/docs/images/monitoring/check-results-browser-error-log.png)
+
+* Expandable tabs on page your script navigated to
+![check results browser page navigation](/images/docs/images/monitoring/check-results-browser-page-navigations.png)
+
+  When expanded, each tab shows its own navigation/loading time ribbon and web vitals...
+  ![check results browser page navigation top](/images/docs/images/monitoring/check-results-browser-navigation-top.png)
+
+  ...together with browser console logs, network logs and any screenshots that had been taken (including one screenshot taken automatically on failure)
+  ![check results browser page navigation bottom](/images/docs/images/monitoring/check-results-browser-navigation-bottom.png)
+
+* A job log for the check
+![check results browser job log](/images/docs/images/monitoring/check-results-browser-job-log.png)
+
+Learn more in our documentation on [Results](/concepts/results).
 
 ## Key Capabilities
 <Accordion title="Real Browser Automation">

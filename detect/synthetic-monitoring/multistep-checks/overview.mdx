@@ -22,7 +22,6 @@ Multistep checks are API-focused tests that perform multiple sequential HTTP req
 - Complex business transaction testing
 - API dependency chain validation
 
-
 ## How Multistep Checks Work
 
 Multistep checks execute a series of API requests in sequence, with the ability to pass data between steps:
@@ -37,7 +36,6 @@ Multistep checks execute a series of API requests in sequence, with the ability 
 <Tip>
 Multistep checks are powered by Playwright's API testing mode, providing excellent debugging capabilities and detailed request/response logging.
 </Tip>
-
 
 ## Key Capabilities
 
@@ -62,6 +60,7 @@ Monitor response times and performance metrics for individual steps and the comp
 </Accordion>
 
 ## Timeouts
+
 As with Browser checks, Checkly runs Multistep checks for a maximum of 240s. Scripts exceeding this will timeout. For more information on how to work with the timeout limits for Multistep and Browser checks, see [Timeouts](/detect/synthetic-monitoring/browser-checks/timeouts).
 
 ## Built-in Runtime Variables
@@ -71,3 +70,25 @@ The Multistep Check [runtime](/platform/runtimes/overview) exposes a set of envi
 <GenericRuntimeVariablesTable/>
 
 [Learn more about environment variables.](/platform/variables)
+
+## Multistep Check Results
+
+Multistep check results are navigated using the tree on the left side of the screen. If you are running checks in parallel, first select the location you are interested in.
+
+<Frame>
+  <img src="/images/docs/images/multistep-api-checks/multistep-check-results.png" alt="Multistep check results page" />
+</Frame>
+
+In the result tree, the top node shows the check run log and the check run configuration.
+
+Each Playwright request is shown as a separate node under the test step in which it was performed. Selecting a request node opens the request details. Here you can view:
+* The request and response body
+* Headers and any request parameters
+* A breakdown of the request timings 
+* If you've made assertions in the same test step as this request, then those assertions will be shown here
+
+The default request user-agent is `Checkly/1.0 (https://www.checklyhq.com)`. If you would like to use a different user-agent, you can add `test.use({userAgent: 'customUserAgent'})` to your script.
+
+Currently, only requests done using the Playwright `request` are shown as nodes in the tree, requests done via e.g Axios or HTTPS are not.
+
+Learn more in our documentation on [Results](/concepts/results).

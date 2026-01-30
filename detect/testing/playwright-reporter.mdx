@@ -8,16 +8,16 @@ sidebarTitle: 'Using the Playwright Reporter'
   ![CLI interface in front of the Playwright test session report](/images/docs/images/integrations/playwright-reporter.jpg)
 </Frame>
 
-Use the Playwright Reporter to seamlessly integrate Playwright test results with Checkly monitoring. Automatically upload test results, screenshots, videos, and traces to gain visibility into your application's health across test runs.
+Integrate Playwright test results with Checkly monitoring. Upload test results, screenshots, videos, and traces to gain visibility into your application's health across test runs.
 
 **Fully compatible with Playwright's native JSON reporter** - use it as a drop-in replacement that adds Checkly integration.
 
 <Accordion title="Prerequisites">
-Before using the Playwright reporter, ensure you:
+Before using the Playwright reporter, ensure you have:
 
-- use Node.js >= 18.0.0
-- use Playwright >= 1.40.0
-- have a Checkly account ([sign up](https://www.checklyhq.com/signup))
+- Node.js >= 18.0.0
+- Playwright >= 1.40.0
+- A Checkly account ([sign up](https://www.checklyhq.com/signup))
 </Accordion>
 
 ## Install the Playwright Reporter
@@ -32,23 +32,23 @@ npm install --save-dev @checkly/playwright-reporter
 
 ### 1. Create an API key and get your Account ID
 
-To start pushing your Playwright test reports to Checkly you need to authenticate the reporter with your Checkly Account ID and an API Key.
+Authenticate the reporter with your Checkly Account ID and an API Key:
 
 1. [Log in to Checkly](https://app.checklyhq.com)
-2. Navigate to [your account Settings](https://app.checklyhq.com/settings/account/general) to get your account id (Account Settings > General)
-3. Create a new API key in [your user settings](https://app.checklyhq.com/settings/user/api-keys) (User Settings > API Keys)
+2. Get your Account ID from [Account Settings > General](https://app.checklyhq.com/settings/account/general)
+3. Create an API key in [User Settings > API Keys](https://app.checklyhq.com/settings/user/api-keys)
 
-Define your account id and API key as environment variables.
+Set your credentials as environment variables:
 
 ```bash
 export CHECKLY_API_KEY=cu_123...
 export CHECKLY_ACCOUNT_ID=b2f...
 ```
 
-The Playwright reporter will automatically pick up the environment variables `CHECKLY_API_KEY` and `CHECKLY_ACCOUNT_ID`.
+The reporter automatically detects `CHECKLY_API_KEY` and `CHECKLY_ACCOUNT_ID` environment variables.
 
 <Tip>
-If you can't set environment variables use inline environment variables when running Playwright:
+Use inline environment variables if needed:
 
 ```bash
 CHECKLY_API_KEY=... CHECKLY_ACCOUNT_ID=... npx playwright test
@@ -70,7 +70,7 @@ export default defineConfig({
 ```
 
 <Tip>
-Using `createChecklyReporter()` provides full intellisense for configuration options. Alternatively, use the array syntax: `['@checkly/playwright-reporter', {}]`
+`createChecklyReporter()` provides full IntelliSense for configuration options. Alternatively, use array syntax: `['@checkly/playwright-reporter', {}]`
 </Tip>
 
 ### 3. Run your tests
@@ -81,7 +81,7 @@ npx playwright test
 
 You'll see real-time test progress and a session URL in the output:
 
-```
+```console
 Running 5 tests using 5 workers
 
 View test results: https://app.checklyhq.com/test-sessions/abc123
@@ -90,11 +90,8 @@ View test results: https://app.checklyhq.com/test-sessions/abc123
   ✓  2 [chromium] › tests/products.spec.ts:14:7 › products › catalog loads (1.9s)
   ✓  3 [chromium] › tests/cart.spec.ts:4:7 › cart › add to cart (6.8s)
 
-┌─────────────────┬───────┬───────┬───────┬───────┬───────┬─────────┐
-│ Project         │ Total │  Pass │  Fail │ Flaky │  Skip │    Rate │
-├─────────────────┼───────┼───────┼───────┼───────┼───────┼─────────┤
-│ chromium        │     3 │     3 │     0 │     0 │     0 │ 100.00% │
-└─────────────────────────────────────────────────────────────────────┘
+Project   Total  Pass  Fail  Flaky  Skip  Rate
+chromium      3     3     0      0     0  100.00%
 
 🦝 Checkly Reporter v1.3.0  •  🎭 Playwright v1.57.0
 📁 3 files  •  10.6s
@@ -117,20 +114,21 @@ export default defineConfig({
 
       // Custom session name (string or function)
       sessionName: 'My Test Suite',
+      // or: sessionName: () => `Build ${process.env.BUILD_NUMBER}`,
 
-      // Skip API calls, only create local ZIP
+      // Skip upload, create local files only
       dryRun: false,
 
       // Enable debug logging
       verbose: false,
 
-      // Show real-time test progress (default: true)
+      // Show real-time test progress
       showProgress: true,
 
-      // Show individual test steps in progress output
+      // Show individual test steps
       printSteps: false,
 
-      // Show per-project summary table (default: true, set false to disable)
+      // Show per-project summary table
       showSummaryTable: true,
     }),
   ],
@@ -139,13 +137,13 @@ export default defineConfig({
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `outputDir` | `string` | Playwright's `outputDir` | Directory for assets, JSON, and ZIP |
-| `sessionName` | `string \| function` | Auto-generated | Custom session name |
-| `dryRun` | `boolean` | `false` | Create ZIP without uploading |
+| `outputDir` | `string` | Playwright's `outputDir` | Directory for output files |
+| `sessionName` | `string \| function` | Auto-generated | Custom session name or function returning name |
+| `dryRun` | `boolean` | `false` | Skip upload, create local files only |
 | `verbose` | `boolean` | `false` | Enable debug logging |
-| `showProgress` | `boolean` | `true` | Show real-time test progress |
-| `printSteps` | `boolean` | `false` | Show individual test steps |
-| `showSummaryTable` | `boolean` | `true` | Show per-project breakdown table |
+| `showProgress` | `boolean` | `true` | Display real-time test progress |
+| `printSteps` | `boolean` | `false` | Display individual test steps |
+| `showSummaryTable` | `boolean` | `true` | Display per-project results table |
 
 **Output files** (written to `outputDir`):
 - `checkly-report.json` - JSON test report
@@ -177,86 +175,76 @@ export default defineConfig({
 If your Checkly reports don't include traces or videos, ensure that your `playwright.config.ts` enables these Playwright features. The reporter only uploads what your Playwright test run creates.
 </Tip>
 
+## Understanding Test Sessions
+
+The reporter creates **suite-level test sessions**, not individual test file results.
+
+When you run `npx playwright test`:
+
+1. **One test session** is created for the entire run
+2. **All test results** are grouped together
+3. **All assets uploaded** in a single ZIP file
+
+This provides a consolidated view of your test suite, efficient storage, and the ability to track overall pass/fail rates over time.
+
+View your results at [app.checklyhq.com/test-sessions](https://app.checklyhq.com/test-sessions).
+
 ## Features
 
 ### Real-time Test Progress
 
-See test results as they run with status icons, error details, and a summary table. Similar to Playwright's built-in `line` reporter but with Checkly integration.
+Shows test results as they run with status icons and error details. Similar to Playwright's `list` reporter with Checkly integration.
 
-Disable with `showProgress: false` if using another reporter for terminal output.
+Set `showProgress: false` when using another reporter for terminal output.
 
 ### Summary Table
 
-A per-project breakdown of test results is shown by default. Disable with `showSummaryTable: false`.
+Displays a summary table with per-project breakdown of test results. Set `showSummaryTable: false` to disable.
 
-```
-┌─────────────────┬───────┬───────┬───────┬───────┬───────┬─────────┐
-│ Project         │ Total │  Pass │  Fail │ Flaky │  Skip │    Rate │
-├─────────────────┼───────┼───────┼───────┼───────┼───────┼─────────┤
-│ chromium        │    10 │     9 │     0 │     1 │     0 │  90.00% │
-│ firefox         │    10 │    10 │     0 │     0 │     0 │ 100.00% │
-│ webkit          │    10 │     8 │     2 │     0 │     0 │  80.00% │
-└─────────────────────────────────────────────────────────────────────┘
+```console
+Project   Total  Pass  Fail  Flaky  Skip  Rate
+chromium     10     9     0      1     0  90.00%
+firefox      10    10     0      0     0  100.00%
+webkit       10     8     2      0     0  80.00%
 ```
 
 ### Multi-Provider Git Detection
 
-Git information (branch, commit, author) is automatically detected from any CI provider:
+Automatically detects git information (branch, commit, author) from:
 
-- GitHub Actions
-- GitLab CI
-- Jenkins
-- CircleCI
-- Travis CI
-- Azure DevOps
-- Bitbucket Pipelines
-
-When running locally, git info is extracted directly from your repository.
-
-### Flaky Test Detection
-
-The reporter automatically detects flaky tests:
-
-- **Flaky test**: A test that failed initially but passed after retry
-- **Degraded status**: Set when there are flaky tests but no complete failures
-- **Overall status**: `passed` if all tests eventually pass, `failed` otherwise
+- GitHub Actions, GitLab CI, CircleCI, Travis CI
+- Jenkins, Azure DevOps, Bitbucket Pipelines
+- Local git repository (when running locally)
 
 ### Test Step Code Snippets
 
-Test steps include source code context in the report. When viewing step details, you'll see the exact line of code that executed along with surrounding context, making debugging easier.
+Includes source code context in test step reports. View the exact line of code that executed with surrounding context for easier debugging.
 
-## Running Locally (No Upload)
+## Dry Run Mode
 
-For local development without uploading to Checkly:
+Skip uploading to Checkly while still generating local files:
 
+**Without credentials** (automatic skip):
 ```bash
 # Don't set CHECKLY_API_KEY or CHECKLY_ACCOUNT_ID
 npx playwright test
 ```
 
-What happens:
-- Reporter creates `checkly-report.zip` locally
-- Upload is automatically skipped
-- Tests run normally
-- You can inspect the ZIP file for debugging
-
-## Dry Run Mode
-
-Create local JSON and ZIP files without uploading:
-
+**With `dryRun` option** (explicit skip):
 ```ts playwright.config.ts
 createChecklyReporter({
   dryRun: true,
 })
 ```
 
-Conditional dry run (upload only in CI):
-
+**Upload only in CI**:
 ```ts playwright.config.ts
 createChecklyReporter({
   dryRun: !process.env.CI,
 })
 ```
+
+Both approaches create `checkly-report.json` and `checkly-report.zip` in your output directory for local inspection.
 
 ## CI/CD Integration
 
@@ -288,6 +276,12 @@ jobs:
           CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
         run: npx playwright test
 ```
+
+**Set up secrets:**
+1. Go to your GitHub repository settings
+2. Navigate to Settings > Secrets and variables > Actions
+3. Add `CHECKLY_API_KEY` as a repository secret
+4. Add `CHECKLY_ACCOUNT_ID` as a repository secret
   </Tab>
   <Tab title="GitLab CI">
 ```yaml
@@ -302,11 +296,11 @@ test:
     CHECKLY_ACCOUNT_ID: $CHECKLY_ACCOUNT_ID
 ```
 
-**Setting up variables:**
-1. Go to your GitLab project
+**Set up variables:**
+1. Go to your GitLab project settings
 2. Navigate to Settings > CI/CD > Variables
-3. Add `CHECKLY_API_KEY` (check "Mask variable")
-4. Add `CHECKLY_ACCOUNT_ID` (check "Mask variable")
+3. Add `CHECKLY_API_KEY` (enable "Mask variable")
+4. Add `CHECKLY_ACCOUNT_ID` (enable "Mask variable")
   </Tab>
   <Tab title="CircleCI">
 ```yaml
@@ -315,14 +309,20 @@ jobs:
   test:
     docker:
       - image: mcr.microsoft.com/playwright:v1.57.0-jammy
+    environment:
+      CHECKLY_API_KEY: $CHECKLY_API_KEY
+      CHECKLY_ACCOUNT_ID: $CHECKLY_ACCOUNT_ID
     steps:
       - checkout
       - run: npm ci
       - run: npx playwright test
-    environment:
-      CHECKLY_API_KEY: $CHECKLY_API_KEY
-      CHECKLY_ACCOUNT_ID: $CHECKLY_ACCOUNT_ID
 ```
+
+**Set up variables:**
+1. Go to your CircleCI project settings
+2. Navigate to Project Settings > Environment Variables
+3. Add `CHECKLY_API_KEY` (automatically masked)
+4. Add `CHECKLY_ACCOUNT_ID`
   </Tab>
 </Tabs>
 
@@ -343,20 +343,44 @@ export default defineConfig({
 });
 ```
 
-## Understanding Test Sessions
+## Troubleshooting
 
-The reporter creates **suite-level test sessions**, not individual test file results.
+### Missing traces or videos
 
-When you run `npx playwright test`:
+Ensure your `playwright.config.ts` enables these features:
 
-1. **One test session** is created, named after your directory
-2. **One test result** for the entire run
-3. **All assets uploaded together** in a single ZIP file
+```ts playwright.config.ts
+export default defineConfig({
+  use: {
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    trace: 'retain-on-failure',
+  },
+});
+```
 
-Benefits:
-- Consolidated view of your entire test suite
-- Efficient storage
-- Track overall pass/fail rates over time
+See [Playwright's trace options](https://playwright.dev/docs/trace-viewer#recording-a-trace) and [video options](https://playwright.dev/docs/videos) for all configuration options.
+
+### Authentication errors
+
+Verify your environment variables are set correctly:
+
+```bash
+echo $CHECKLY_API_KEY
+echo $CHECKLY_ACCOUNT_ID
+```
+
+If empty, set them before running tests:
+
+```bash
+export CHECKLY_API_KEY=cu_123...
+export CHECKLY_ACCOUNT_ID=b2f...
+```
+
+### Upload failures
+
+- Enable verbose logging with `verbose: true` or `CHECKLY_REPORTER_VERBOSE=true` for detailed error messages
+- Verify your API key exists in [Checkly API Keys settings](https://app.checklyhq.com/accounts/settings/user/api-keys)
 
 ## Changelog
 

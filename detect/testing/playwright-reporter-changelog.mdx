@@ -5,8 +5,6 @@ description: Release history for the Checkly Playwright Reporter
 rss: true
 ---
 
-For the latest updates, see the [npm package](https://www.npmjs.com/package/@checkly/playwright-reporter).
-
 View your test sessions at [app.checklyhq.com/test-sessions](https://app.checklyhq.com/test-sessions).
 
 Learn more about:
@@ -14,6 +12,32 @@ Learn more about:
 - [Configuration options](/detect/testing/playwright-reporter#configuration)
 
 ## Full release history
+
+<Update label="v1.4.0" tags={["February 2026"]}>
+  **Added**
+
+  - **Secret scrubbing** - Automatically scrub sensitive values from reports and trace files. Configure via the new `scrubbing` option:
+    - `envVars`: Array of environment variable names whose values should be scrubbed
+    - `autoDetect`: Auto-detect secrets from env vars matching common patterns (SECRET, KEY, TOKEN, PASSWORD, CREDENTIAL, AUTH, PRIVATE, API)
+    - `replacement`: Custom replacement string (default: `*********`)
+    - Set `scrubbing: false` to disable scrubbing entirely
+
+  ```typescript
+  createChecklyReporter({
+    scrubbing: {
+      envVars: ['API_KEY', 'DB_PASSWORD'],
+      autoDetect: true,
+      replacement: '[REDACTED]'
+    }
+  })
+  ```
+
+  - **Improved network and console data** - Network requests now include detailed fields (domain, resource type, headers, timing, transfer/resource bytes). Console logs include location information. Resource types are automatically derived from Content-Type headers when not available.
+
+  **Changed**
+
+  - **Playwright 1.58 support** - Now tested against Playwright 1.58.0.
+</Update>
 
 <Update label="v1.3.0" tags={["January 2026"]}>
   **Real-time test progress** - Shows test results as they run with status icons, error details, and summary. Similar to Playwright's `list` reporter. Disable with `showProgress: false` if using another reporter.

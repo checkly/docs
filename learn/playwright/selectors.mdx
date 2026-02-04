@@ -16,7 +16,9 @@ learn_playwright:
   parent: "Interaction"
 ---
 
+import SignUpCta from "/snippets/sign-up-cta.mdx"
 import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
+import { YoutubeEmbed } from "/snippets/youtube-embed.jsx"
 
 <PlaywrightCheckSuiteTryOut />
 
@@ -29,7 +31,7 @@ Consider a simple web page with a headline, a button, and a status update box. C
 ![a demo page](/images/samples/images/user-first1.png)
 
 ## Why we don't want to find a page element with CSS selectors
-If you're used to some older systems for automation and page manipulation like JQuery, we might be tempted to use CSS selectors. If we inspect this page we'll find, sure enough, that there is a class applied to this button that should select it in the page.
+If you're used to some older systems for automation and page manipulation like jQuery, we might be tempted to use CSS selectors. If we inspect this page we'll find, sure enough, that there is a class applied to this button that should select it in the page.
 
 ![examining the page with an inspector](/images/samples/images/user-first2.png)
 
@@ -43,7 +45,7 @@ If our button text is coming from a CMS, and it breaks, the button text could ch
 Due to the reasons above, the Playwright project encourages you to not use CSS locators, and it's a good idea to follow the standards set down in the project!
 
 ### Instead of CSS selectors, try User-First Locators
-Playwright offers a number of locators that are based on page role, a more functional view of the page than finding by CSS or HTML. Use built-in locators like `getByRole`, `getByText`, and `getByLabel`, which will all work the same in the test that they will for the user, even if the user is using an unusual browser build, mobile device, or even a screen reader!
+Playwright offers a number of locators that are based on page role, a more functional view of the page than finding by CSS or HTML. Use [the recommended built-in locators](https://playwright.dev/docs/locators#quick-guide) like `getByRole`, `getByText`, and `getByLabel`, which will all work the same in the test that they will for the user, even if the user is using an unusual browser build, mobile device, or even a screen reader!
 
 ## User-First Locators in Action
 Let's replace `page.locator` with `getByRole` to locate the button by its role and accessible name:
@@ -64,19 +66,25 @@ This change means that if the button label changes to something like "HEROBUTTON
 
 ### What to do when `getByRole` and `getByLabel` won't work on your page
 
-One of the reasons I support using user-first locators is what happens when you realize that these selectors don't work on your page. If role and label aren't set for many of your page items, or you find that all your page items have the same labels and roles, it indicates that your page has some serious accessibility issues. After all, if nothing has unique labels it means that screen readers and keyboard navigation tools won't work correctly on the page, meaning many users won't be able to navigate your pages. That should start a conversation among developers and QA people about improving the structure of your pages, which will fix testing and the experience for all users.
+One of the reasons I support using user-first locators is what happens when you realize that these selectors don't work on your page. If role and label aren't set for many of your page items, or you find that all your page items have the same labels and roles, it indicates that your page has some serious accessibility issues.
+
+After all, if nothing has unique labels it means that screen readers and keyboard navigation tools won't work correctly on the page, meaning many users won't be able to navigate your pages. That should start a conversation among developers and QA people about improving the structure of your pages, which will fix testing and the experience for all users.
 
 In the short term, take a look at all of Playwright's locators, as there are definitely techniques that will find any element on your page, but I encourage you to use this as a jumping off point for tech debt conversations in the future.
 
 ### Handling Multiple Matching Elements
 If a locator matches multiple elements, Playwright's strict mode will fail. For example, using `getByRole('button')` might match several buttons. You'll get an error that reads something like:
 
-`Error: locator.click: Error: strict mode violation: getByRole('button', { name: 'click' }) resolved to 2 elements:`
+```
+Error: locator.click: Error: strict mode violation:
+  getByRole('button', { name: 'click' }) resolved to 2 elements:
+  ...
+```
 
 
 Note that in strict mode this test will fail even if the first result, or all the results, passes the rest of the test. Resolve this by specifying the position or filtering elements.
 
-### Position-Based Selection
+#### Position-Based Selection
 When we first run into this error, the easiest solution is just to specify a position in a list. The simplest being to take the first result:
 
 ```ts
@@ -93,7 +101,7 @@ await page.getByRole('button').nth(3).click()
 
 The .nth() function is zero-indexed, so .nth(3) will select the fourth item in the results. Positional selectors work, but they can be brittle, if we have dynamic page content, selecting anything but the first result may present a false positive. To be really sure that we're pointing to the correct element in a dynamic list, do a bit of element filtering.
 
-## Element Filtering in Playwright
+#### Element Filtering in Playwright
 If we imagine an e-store interface, with a number of results only some of which are available, we can see that a position selector isn't going to test reliably.
 
 ![too many matches](/images/samples/images/user-first4.png)
@@ -120,8 +128,14 @@ There is no one-size-fits-all solution for locators. Here are some tips:
 
 ## See user-first locators in action
 
-Putting all these pieces together, [check out Stefan’s video for a demonstration of user-first locators.](https://www.youtube.com/watch?v=9RJMNU4eNEc)
+Putting all these pieces together, [check out this video for a demonstration of user-first locators.](https://www.youtube.com/watch?v=9RJMNU4eNEc)
+
+<YoutubeEmbed id="9RJMNU4eNEc" title="Playwright User-First Locators" />
 
 ### Conclusion
 
-Choosing the right locators is key to creating stable and maintainable Playwright tests. User-first locators reduce flakiness and encourage good development practices. If you're interested in joining a community of Playwright developers, join us on the [Checkly Slack](https://www.checklyhq.com/slack/).  And if you use Playwright for [end-to-end testing](https://www.checklyhq.com/guides/playwright-testing-to-monitoring/), consider using Checkly for monitoring your production site, we’ve got a great story for empowering your developers with [Monitoring as Code](https://www.checklyhq.com/guides/monitoring-as-code/).
+Choosing the right locators is key to creating stable and maintainable Playwright tests. User-first locators reduce flakiness and encourage good development practices.
+
+And if you use Playwright for [end-to-end testing](https://www.checklyhq.com/guides/playwright-testing-to-monitoring/), consider using Checkly for monitoring your production site, we’ve got a great story for empowering your developers with [Monitoring as Code](/guides/getting-started-with-monitoring-as-code).
+
+<SignUpCta />

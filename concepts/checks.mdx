@@ -1,13 +1,11 @@
 ---
 title: 'What are Checks?'
-description: 'Checks are the foundational unit of Checkly, representing a single result of a test run.'
+description: 'Checks are automated tests that monitor your application on a schedule.'
 sidebarTitle: 'Checks'
 ---
+Checks are automated monitors that run against your application to verify availability, performance, and reliability. Each Check represents a specific test that runs on a schedule you define, whether that's a simple health check on an API endpoint or a complex, multi-step workflow through your entire application.
 
-
-Checks are automated tests that monitor your application in staging or production. Each Check represents a specific test that runs on a schedule you define, whether that's a simple health check on an API endpoint or a complex, multi-step workflow through your entire application.
-
-Checks proactively experience your application the same way real users would—clicking buttons, making API calls, filling forms, or connecting to services. You can run them as frequently as needed—every minute, hourly, or daily. When something breaks, you get notified immediately, often before users are affected.
+Checks experience your application the same way real users would—clicking buttons, making API calls, filling forms, or connecting to services. You can run them as frequently as needed—every minute, hourly, or daily. When something breaks, you get notified immediately, often before users are affected.
 
 This lets you catch issues early, maintain confidence in your deployments, and ensure your critical systems are working as expected.
 
@@ -17,7 +15,7 @@ Checkly's flexible offering includes several types of Checks, each designed for 
 
 <AccordionGroup>
 <Accordion title="URL Monitors">
-Monitor HTTP/HTTPS endpoints for availability and basic performance. URL Monitors check if your websites and APIs are responding correctly by making HTTP requests and validating the response.
+Monitor HTTP/HTTPS endpoints for availability and performance. URL Monitors check if your websites and APIs are responding correctly by making HTTP requests and validating the response.
 
 **Perfect for:**
 - Website uptime monitoring
@@ -43,10 +41,18 @@ Monitor scheduled processes, cron jobs, and batch operations that should "check 
 - Batch process oversight
 - Data pipeline health
 </Accordion>
+<Accordion title="DNS Monitor">
+Verify DNS resolution by querying domain records and validating responses. DNS Monitors help ensure your domains resolve correctly and detect issues such as misconfigurations, propagation delays, or resolver failures.
 
+**Perfect for:**
+- Domain resolution monitoring
+- DNS record validation
+- Detecting propagation issues
+- Troubleshooting resolver performance
+</Accordion>
 
 <Accordion title="API Checks">
-Advanced API testing that goes beyond basic uptime monitoring. Use setup and teardown scripts, complex assertions, and custom request handling. Validate that your backend services respond correctly, perform within acceptable timeframes, and return the right data structures.
+Advanced API testing that goes beyond uptime monitoring. Use setup and teardown scripts, complex assertions, and custom request handling. Validate that your backend services respond correctly, perform within acceptable timeframes, and return the right data structures.
 
 **Perfect for:**
 - Complex API endpoint validation
@@ -58,7 +64,7 @@ Advanced API testing that goes beyond basic uptime monitoring. Use setup and tea
 </Accordion>
 
 <Accordion title="Multistep Checks">
-Write sophisticated Node.js scripts that run multiple API requests in sequence with arbitrary code between requests. Perfect for testing complex workflows involving authentication, data manipulation, and multi-step processes that span multiple endpoints.
+Write Node.js scripts that run multiple API requests in sequence with arbitrary code between requests. Perfect for testing complex workflows involving authentication, data manipulation, and multi-step processes that span multiple endpoints.
 
 **Perfect for:**
 - Multi-step authentication flows
@@ -80,7 +86,7 @@ Simulate real user interactions in a headless browser using TypeScript/JavaScrip
 - Mobile device emulation
 </Accordion>
 
-<Accordion title="Playwright Checks">
+<Accordion title="Playwright Check Suites">
 Run entire Playwright test suites and projects as production monitors without code rewrites. Playwright Check Suites support the full Playwright API and ecosystem, enabling you to use existing tests and configuration files as-is.
 
 **Perfect for:**
@@ -96,13 +102,13 @@ Run entire Playwright test suites and projects as production monitors without co
 
 ![monitoring and alerting pipeline](/images/docs/images/monitoring/monitoring-alerting-pipeline.svg)
 
-1. A cron process picks up a check based on its schedule, say every 5 minutes. It validates that the check is not in progress at the moment to avoid race conditions. The check is put into a queue to be run from the next configured data center location.
-2. If the check is an API check and has a [setup script](/detect/synthetic-monitoring/api-checks/set-up-and-tear-down), the setup script is executed. 
-3. The check is executed.
-4. If the check is an API check and has a [teardown script](/detect/synthetic-monitoring/api-checks/set-up-and-tear-down), the teardown script is executed.
-Teardown scripts are run *before* any assertions are validated.
-5. The result is stored in our central database.
-6. If the check fails, its retry strategy is executed. Based on the retry strategy, a check is retried one or multiple times. Any setup & teardown scripts are run again as part of the process.
+1. A cron process picks up a check based on its schedule, say every 5 minutes. It validates that the check is not in progress at the moment to avoid race conditions. The check is put into a queue to be run from the next configured data center location
+2. If the check is an API check and has a [setup script](/detect/synthetic-monitoring/api-checks/setup-and-teardown), the setup script is executed
+3. The check is executed
+4. If the check is an API check and has a [teardown script](/detect/synthetic-monitoring/api-checks/setup-and-teardown), the teardown script is executed
+Teardown scripts are run *before* any assertions are validated
+5. The result is stored in our central database
+6. If the check fails, its retry strategy is executed. Based on the retry strategy, a check is retried one or multiple times. Any setup & teardown scripts are run again as part of the process
 7. Alerts are sent out in requested channels when the sequence is complete. It's considered complete when the check run was successful or the final attempt was executed. We will send alerts only if the final attempt has failed (no alerts sent for the initial attempts)
 
 

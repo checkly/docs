@@ -12,6 +12,7 @@ learn_playwright:
   parent: "Basics"
 ---
 
+import SignUpCta from "/snippets/sign-up-cta.mdx"
 import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
 
 <PlaywrightCheckSuiteTryOut />
@@ -61,7 +62,7 @@ We can also have custom headers and footers added to our pages, displaying value
 import { test, expect } from '@playwright/test';
 
 test('generate PDF with header and footer', async ({ page }) => {
-  await page.goto('https://www.checklyhq.com/');
+  await page.goto('https://www.checklyhq.com/docs/');
   await page.pdf({
     path: 'checkly-with-header-footer.pdf',
     format: 'A4',
@@ -78,7 +79,7 @@ test('generate PDF with header and footer', async ({ page }) => {
 });
 ```
 
-We are including the following template files for our header and footer.
+Change `headerTemplate` and `footerTemplate` to include more complex templates like these ones below.
 
 **template-header.html**
 ```html
@@ -147,7 +148,7 @@ We are including the following template files for our header and footer.
 </html>
 ```
 
-The first page of the generated PDF looks as follows:
+Then, the first page of the generated PDF looks as follows:
 
 ![generated pdf example](/images/samples/images/pdf-generation-hd.png)
 
@@ -161,3 +162,4 @@ npx playwright test generate-pdf.ts
 
 We can easily transform existing web pages into PDF format, just as we have shown in our example. An even more interesting use case is about generating a brand new document: now we can use our existing HTML and CSS skills to produce high-quality PDFs, often eliminating the need for LaTeX or similar tools.
 
+<SignUpCta />

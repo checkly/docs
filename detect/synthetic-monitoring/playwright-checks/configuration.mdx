@@ -239,3 +239,19 @@ If tests fail due to authentication issues:
 
 - Verify environment variables are set correctly in Checkly. You can verify your environment variables using `npx checkly env ls`, or looking at your Global or Check's environment variables in the Checkly Webapp to ensure any `process.env.VARIABLE_NAME` call from your test is defined.
 - For persistent authentication, use Playwright's [`storageState`](https://playwright.dev/docs/auth#reuse-authentication-state) feature.
+
+**webServer configuration requires additional files**
+
+When using `webServer` in your Playwright config, you need to include the server files in your check configuration:
+
+- Add server files to the `include` parameter in your [Playwright check configuration](/constructs/playwright-check/#param-include)
+- Include all files needed to start the server (e.g., server scripts, config files)
+- Alternatively, skip `webServer` on Checkly and use your deployed URL: `...(process.env.CHECKLY ? {} : { webServer: { ... } })`
+
+**No tests found**
+
+If Playwright couldn't find any tests to run, this usually means a mismatch between your config and your test files:
+
+- Verify your `--grep` pattern matches actual test tags or projects
+- Verify the `testDir` path in `playwright.config.ts` matches the actual directory containing your test files
+- Ensure path aliases (`~/`, `@/`) in imports are configured in your `tsconfig.json`, or replace them with relative paths

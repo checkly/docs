@@ -27,8 +27,8 @@ Here is an example
 # prometheus.yml
 - job_name: 'checkly'
   scrape_interval: 60s
-  metrics_path: '/accounts/993adb-8ac6-3432-9e80-cb43437bf263/v2/prometheus/metrics'
-  bearer_token: 'lSAYpOoLtdAa7ajasoNNS234'
+  metrics_path: '/accounts/<your account ID>/v2/prometheus/metrics'
+  bearer_token: '<your bearer token>'
   scheme: https
   static_configs:
   - targets: ['api.checklyhq.com']
@@ -95,6 +95,27 @@ In addition, the check metrics all contain the following labels:
 > You can set `key:value` tags in your checks and groups and they will be exported as custom labels in Prometheus. For instance the tag `env:production` will be exposed as a custom label `env="production"`. You can disable this by adding the query param `disableTagParsing=true`. Please note that Prometheus label names may only contain ASCII letters, numbers, as well as underscores (see the official [docs](https://prometheus.io/docs/concepts/data_model/)). Tags containing other characters in the label name will be sanitized.
 
 > The counter and histogram metrics are reset every hour. These resets can be handled in Prometheus by using the [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) or [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions.
+
+### Check Run Location Label
+
+To avoid creating a high volume of metrics, by default the metrics don't include a label for the check run location. It is possible to enable this by adding the query param `locationLabelEnabled=true` to your API request. This will add a `location` label giving the location where the checks ran.
+
+Since check status and SSL days remaining is only tracked on a per-check basis rather than by location, `checkly_check_status` and `checkly_time_to_ssl_expiry_seconds` do not have the `location` label included. All other [check metrics](#check-metrics) will have the `location` label added.
+
+Here is an example for how to set this in your `prometheus.yml` config:
+
+```yaml
+# prometheus.yml
+- job_name: 'checkly'
+  scrape_interval: 60s
+  metrics_path: '/accounts/<your account ID>/v2/prometheus/metrics'
+  bearer_token: '<your bearer token>'
+  scheme: https
+  static_configs:
+  - targets: ['api.checklyhq.com']
+  params:
+    locationLabelEnabled: ['true']
+```
 
 ### PromQL Examples
 

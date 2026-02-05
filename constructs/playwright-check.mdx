@@ -70,7 +70,22 @@ The Playwright Check Suite configuration consists of specific Playwright Check S
 </Tab>
 <Tab title="General Monitor">
 
-  <GeneralMonitorOptionsTable />
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `name` | `string` | ✅ | - | Friendly name for your check |
+| `activated` | `boolean` | ❌ | `true` | Whether the check is enabled |
+| `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Array of AlertChannel objects for notifications |
+| `alertEscalationPolicy` | `AlertEscalationPolicy` | ❌ | - | Advanced alert settings |
+| `environmentVariables` | `object[]` | ❌ | `[]` | Check-level environment variables |
+| `frequency` | `Frequency` | ❌ | - | How often to run your check |
+| `group` | `CheckGroup` | ❌ | - | The CheckGroup this check belongs to |
+| `locations` | `string[]` | ❌ | `[]` | Array of public location codes |
+| `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
+| `privateLocations` | `string[]` | ❌ | `[]` | Array of Private Location slugs |
+| `runParallel` | `boolean` | ❌ | `false` | Run checks in parallel or round-robin |
+| `tags` | `string[]` | ❌ | `[]` | Array of tags to organize checks |
+| `testOnly` | `boolean` | ❌ | `false` | Only run with test, not during deploy |
+| `triggerIncident` | `IncidentTrigger` | ❌ | - | Create and resolve an incident based on the check's alert configuration |
 
 </Tab>
 </Tabs>

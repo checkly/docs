@@ -53,17 +53,16 @@ For Browser checks, several performance metrics are shown in separate charts:
 ![check overview browser session duration graph](/images/docs/images/monitoring/check-overview-performance-browser.png)
 
 
-2. [Load timings](/browser-checks/tracing-web-vitals/#first-contentful-paint) for the first page navigation
+2. Load timings for the first page navigation
 ![check overview load timings graph](/images/docs/images/monitoring/check-overview-performance-loading.png)
 
 3. A breakdown of different error types
 ![check overview errors graph](/images/docs/images/monitoring/check-overview-errors.png)
 
-
-4. An [interactivity](/browser-checks/tracing-web-vitals/#total-blocking-time) summary
+4. An interactivity summary
 ![check overview interactivity graph](/images/docs/images/monitoring/check-overview-interactivity.png)
 
-5. A [visual stability](/browser-checks/tracing-web-vitals/#cumulative-layout-shift) breakdown
+5. A visual stability breakdown
 ![check overview visual stability graph](/images/docs/images/monitoring/check-overview-visual-stability.png)
 
 For API checks, a detailed response time breakdown is shown:
@@ -76,134 +75,18 @@ A performance comparison by location will also be included for both types of che
 ![check overview location performance graph](/images/docs/images/monitoring/check-overview-locations.png)
 
 ## Navigating individual check results
+
 The check result page will contain results from multiple locations when using [parallel scheduling](/monitoring/global-locations/#scheduling-strategies). Navigate between each location using the sidebar.
 ![Viewing multiple attempts from the dropdown](/images/docs/images/monitoring/location-select.gif)
 
-## Browser check results
-
-Individual browser check results contain:
-
-1. A short check summary, including errors broken down by category.
-![check results browser summary](/images/docs/images/monitoring/check-results-browser-summary.png)
-
-2. When using Playwright Test Runner you will have an additional section displaying the test steps, error message, and assets (traces, videos, screenshots). [Read more](/browser-checks/playwright-test/) about the additonal functionalities of Playwright Test.
-![check results browser playwright test report](/images/docs/images/monitoring/check-results-browser-pwt-report.png)
-
-3. An error log, only if your script failed.
-![check results browser error log](/images/docs/images/monitoring/check-results-browser-error-log.png)
-
-4. Expandable tabs on page your script navigated to.
-![check results browser page navigation](/images/docs/images/monitoring/check-results-browser-page-navigations.png)
-
-When expanded, each tab shows its own navigation/loading time ribbon and web vitals...
-![check results browser page navigation top](/images/docs/images/monitoring/check-results-browser-navigation-top.png)
-
-...together with browser console logs, network logs and any screenshots that had been taken (including one screenshot taken automatically on failure).
-![check results browser page navigation bottom](/images/docs/images/monitoring/check-results-browser-navigation-bottom.png)
-
-5. A job log for the check.
-![check results browser job log](/images/docs/images/monitoring/check-results-browser-job-log.png)
-
-## API check results
-
-API check results will expose key performance and correctness data about the HTTP response received from the target endpoint.
-
-![api check results detail page](/images/docs/images/monitoring/check-results-api.png)
-
-These include:
-
-1. The request performed
-2. Any assertions that were included in the check
-3. All data related to the request and its response, such as
-
-    a. Response body
-
-    b. Request & response headers
-    
-    c. Query params
-    
-    d. Check job log
-
-4. Timings, such as
-
-    a. Wait
-
-    b. DNS
-
-    c. TCP
-
-    d. First Byte
-
-    e. Download
-
-## Heartbeat monitor results
-
-Heartbeat monitor results show information about the ping request, like when it was recieved and its source.
-
-![Using the Heartbeat monitor results view](/images/docs/images/monitoring/check-results-heartbeat.png)
-
-The state indicates when your scheduled job pinged the Heartbeat monitor, relative to the expected time:
-
-| State    | Description |
-| -------- | ------- |
-| `EARLY` | Ping recieved before the expected time. |
-| `RECEIVED` | Ping recieved right at the expected time. |
-| `GRACE` | Ping recieved after the expected time, during the grace period. |
-| `LATE` | Ping recieved during the few seconds between the end of the grace period and before the monitor is marked as failing. This is very rare. |
-| `FAILING` | No ping recieved by the end of the grace period. Indicates a failing Heartbeat monitor. |
-
-The source shows where your ping originated, determined by the `origin` and `referer` request headers. [Learn more about configuring the ping source](/heartbeat-monitors/#pinging-your-heartbeat-monitor).
-
-## URL monitor results
-
-URL monitor results show details about each request and help you understand if your endpoint was available and performing as expected at the time of the check.
-
-![http check results detail page](/images/docs/images/monitoring/check-results-url.png)
-
-Each result includes:
-
-1. The HTTP request that was made
-2. The response time
-3. The result of any status code assertions configured in the monitor
-4. For each request, we capture the following timing metrics:
-    * wait: time spent initializing the socket
-	* dns: DNS lookup time
-	* tcp: time to establish the TCP connection
-	* firstByte: time until the first byte of the response is received
-	* download: duration of the HTTP download
-
-## Multistep check results
-
-Multistep check results are navigated using the tree on the left side of the screen. If you are running checks in parallel, first select the location you are interested in.
-
-In the result tree, the top node shows the check run log and the check run configuration.
-
-Any errors encountered can be viewed in the 'Errors' node. 
-
-Each Playwright request is shown as a separate node under the test step in which it was performed. Selecting a request node opens the request details. Here you can view the request and response body, headers and any request parameters. A breakdown of the request timings is also available. If you've made assertions in the same test step as this request, then those assertions will be shown here.
-
-The default request user-agent is `Checkly/1.0 (https://www.checklyhq.com)`.
-If you would like to use a different user-agent, you can add `test.use({userAgent: 'customUserAgent'})` to your script.
-
-Currently, only requests done using the Playwright `request` are shown as nodes in the tree, requests done via e.g Axios or HTTPS are not.
-
-<video
-  controls
-  className="w-full aspect-video rounded-xl"
-  src="/images/docs/images/monitoring/check-retries.gif"
-></video>
-
-## TCP monitor results
-
-On the [monitor results overview page](/images/docs/monitoring/check-results/#check-results-overview), select a specific check run to review its results:
-
-* **Summary:** Displays the monitor target (URL and port), the monitor state (`success` for passed and degraded runs, or `error` for failed runs), the request status code and the total check run duration.
-
-* **Error details:** If the check failed, the error status code and message log will be shown.
-
-* **Timing phases:** For each request, we capture the following timing metrics:
-  * DNS: Time taken to resolve the hostname to an IP address (if a hostname was provided)
-  * Connect: Time taken to establish the TCP connection (SYN, SYN-ACK, ACK)
+To learn more about the results shown for each check type, refer to the documentation for the specific monitor:
+* [API checks](/detect/synthetic-monitoring/api-checks/overview#api-check-results)
+* [Browser checks](/detect/synthetic-monitoring/browser-checks/overview#browser-check-results)
+* [Multistep checks](/detect/synthetic-monitoring/multistep-checks/overview#multistep-check-results)
+* [Heartbeat monitors](/detect/uptime-monitoring/heartbeat-monitors/overview#heartbeat-monitor-results)
+* [TCP monitors](/detect/uptime-monitoring/tcp-monitors/overview#tcp-monitor-results)
+* [DNS monitors](/detect/uptime-monitoring/tcp-monitors/overview#dns-monitor-results)
+* [URL monitors](/detect/uptime-monitoring/url-monitors/overview#url-monitor-results)
 
 ## Check results with retries
 

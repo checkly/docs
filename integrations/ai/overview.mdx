@@ -5,9 +5,11 @@ sidebarTitle: 'Overview'
 keywords: ['mcp', 'ai', 'rules', 'generate checks', 'agents', 'context']
 ---
 
-import { YoutubeEmbed } from "/snippets/youtube-embed.jsx"
+import AgentExamples from "/snippets/agent-example.mdx"
 
-From the beginning, Checkly has bet on [Monitoring as Code](/concepts/monitoring-as-code) which lets you create and control your monitoring infrastructure entirely using code. [Checkly constructs](/constructs/overview) can reflect all your monitoring properties.
+From the beginning, Checkly has bet on [Monitoring as Code](/concepts/monitoring-as-code) which lets you create and control your monitoring infrastructure entirely using code.
+
+By default, [Checkly constructs](/constructs/overview) reflect all your monitoring properties.
 
 ```ts api.check.ts
 import { ApiCheck, AssertionBuilder } from "checkly/constructs"
@@ -36,40 +38,32 @@ npx checkly deploy
 
 **The Monitoring as Code workflow is by default AI-native** because LLMs are excellent at writing and editing Checkly constructs code and modern AI agents can execute CLI commands easily.
 
-You only need to provide the necessary context about Checkly and your monitoring setup to your AI agent of choice.
+Provide the necessary Checkly context and let your AI agent of choice do the rest.
 
-## Add custom Checkly rules to your AI conversation
+<AgentExamples />
 
-The [`checkly.rules.md` file](https://www.checklyhq.com/docs/ai/checkly.rules.md) includes best practices, example code and required CLI commands to give your AI workflow enough context to perform Checkly-related tasks.
+## Add Checkly context to your AI agent conversation
 
-Once the Checkly rules are included in your AI context window, your agent can effectively assist you in managing your monitoring setup.
+Install [Checkly Skills](/integrations/ai/skills) or add the [Checkly Rules](/integrations/ai/rules) to your AI conversation to give your AI agent enough context to perform Checkly-related tasks.
 
-It will be able to:
-
-<Card title="Create new checks, alert channels or other constructs" horizontal>
- "Can you create a new `BrowserCheck` monitoring `example.com`"
+<Columns cols={2}>
+<Card title="Checkly Skills" href="/integrations/ai/skills" cta="Get started">
+Let your agents pull in all required Checkly context on demand.
 </Card>
 
-<Card title="Gather information about the current monitoring setup" horizontal>
- "What are the currently used monitoring locations?"
+<Card title="Checkly Rules" href="/integrations/ai/rules" cta="Get started">
+Include the entire Checkly context in commands or documentation.
 </Card>
+</Columns>
 
-<Card title="Bulk-update your monitoring resources" horizontal>
- "Can you change all checks to run every 5 minutes instead of every 10 minutes?"
-</Card>
+### Skills vs Rules
 
-With enough application context you can even create checks for your specific use cases.
+**Use Skills** when your AI agent supports the [Agent Skills](https://agentskills.io) standard. Skills load context on demand, keeping your agent's context window lean until Checkly-related tasks arise. This is the recommended approach for compatible agents.
 
-<Card title="Analyze application code and create the monitoring setup" horizontal>
- "Can you create new API Checks for the application API endpoints?"
-</Card>
-
-Find a live session explaining how to automate Checkly monitoring with AI below and [read the "Agentic Workflows" guide](/guides/agentic-workflows) for more details.
-
-<YoutubeEmbed id="WqTXa7GCk-k" title="No Coding! Just Prompting! Getting the most out of AI for Application Reliability." />
+**Use Rules** when your agent doesn't support skills or when you want the Checkly context always available. Rules files are loaded at session start and provide consistent context throughout your conversation.
 
 
-## Why is there no Checkly MCP server?
+## Why is there no Checkly MCP server (yet)?
 
 The MCP concept is often used to enable LLMs to interact with external systems. It acts as a bridge between the AI model and the target system, translating natural language commands into actionable API calls or code snippets.
 
@@ -77,10 +71,6 @@ The MCP concept is often used to enable LLMs to interact with external systems. 
 
 Whether you need to create new resources or update existing ones, AI can write and update the necessary construct files and execute the Checkly CLI commands autonomously.
 
-## Additional Resources
-
-Follow these guides if you use one of the popular AI coding tools:
-
-- [Claude Code](/integrations/ai/claude)
-- [Cursor](/integrations/ai/cursor)
-- [GitHub Copilot](/integrations/ai/copilot)
+<Tip>
+We are investigating additional AI-native workflows. [Let us know in the public roadmap](https://feedback.checklyhq.com/p/checkly-mcp) if you are interested in more agent-friendly integrations.
+</Tip>

@@ -1,0 +1,38 @@
+---
+title: 'Checkly Skills'
+description: 'Use the provided Checkly skills to control, update and deploy your monitoring.'
+sidebarTitle: 'Checkly Skills'
+---
+
+Skills are reusable and modular capabilities for AI agents. They provide procedural knowledge that helps agents accomplish Checkly tasks more effectively. Think of Checkly Skills as plugins or extensions that enhance what your AI agent can do with your monitoring infrastructure.
+
+[Agent Skills](https://agentskills.io) are an open standard supported by many AI agents and coding assistants including Claude Code, Cursor, OpenAI Codex, Gemini CLI, GitHub Copilot, and others. If your agent supports skills, you can use the Checkly Skills to manage your monitoring setup.
+
+Use [the `skills` CLI](https://www.npmjs.com/package/skills) to install [Checkly skills](https://github.com/checkly/checkly-cli/tree/main/skills/monitoring) globally or in your project:
+
+```bash
+npx skills add checkly/checkly-cli
+```
+
+This will make the Checkly Skills available to your AI agent. When your agent needs to perform a Checkly-related task, it can automatically pull in the relevant context and use the provided instructions and resources to execute the task effectively.
+
+```txt Claude Code Example highlight={3-4}
+❯ Can you create a new URLMonitor with Checkly for example.com?
+
+⏺ Skill(monitoring)
+  ⎿  Successfully loaded skill · 2 tools allowed
+
+⏺ Let me first check the existing Checkly setup in this project.
+
+⏺ Searched for 2 patterns, read 2 files (ctrl+o to expand)
+
+⏺ I'll create a new URLMonitor for example.com!
+```
+
+Using [Monitoring as Code](/concepts/monitoring-as-code), you can now control your monitoring setup with AI agents without needing a specific MCP server or API for your monitoring. Just give your agent the necessary context and let it use the Checkly Skills to manage your monitoring setup effectively.
+
+## Additional resources
+
+- [Checkly CLI Documentation](/cli/overview/)
+- [Checkly Constructs Reference](/constructs/overview/)
+- [Agent Skills Specification](https://agentskills.io/specification.md)

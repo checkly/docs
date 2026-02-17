@@ -1,6 +1,6 @@
 ---
 title: A Step-by-Step Engineering Guide for Checkly
-description: 
+description:
   How to get started with Checkly and Monitoring as Code.
 sidebarTitle: A Step-by-Step Engineering Guide for Checkly
 ---
@@ -26,7 +26,7 @@ Here's a preview of our goal:
 ![a checkly dashboard](/images/guides/images/startup-tutorial-00.png)
 *Once you complete this tutorial, you'll have an easy way to monitor your service from locations across the globe, share check results with your team, and resolve issues faster.*
 
-We'll walk you through every step of the process—all you need is a site, API, or online service to monitor. 
+We'll walk you through every step of the process—all you need is a site, API, or online service to monitor.
 
 You may have already tried adding monitors from the Checkly web UI. While you can configure everything through the web UI, Monitoring as Code is more comfortable for engineers and enables faster setup of comprehensive monitoring. A huge benefit of monitoring as code is managing your monitors with source control, meaning any update to your monitoring configuration is trackable. Never again will you wonder if something changed about a monitor that is suddenly failing, you'll know how it changed, when it was updated, and by whom!
 
@@ -59,12 +59,12 @@ Hi Nica Mellifera! Let's get you started on your monitoring as code journey!
     An advanced JavaScript project with multiple examples and best practices
     A boilerplate TypeScript project with basic config
     A boilerplate JavaScript project with basic config
-    
+
 ✔ Would you like to install NPM dependencies? (recommended) … yes
 ✔ Packages installed successfully
 ✔ Would you like to initialize a new git repo? (optional) … no
 ```
-*Dialog on setting up a new Checkly repository.* 
+*Dialog on setting up a new Checkly repository.*
 
 This will create a new project with this structure:
 
@@ -92,7 +92,7 @@ import { UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs' // Import r
 new UrlMonitor('url-monitor-example', { // Create new URL monitor with unique logical ID
   name: 'Example URL Monitor', // Human-readable name for the monitor
   activated: true, // Enable the monitor to run checks
-  frequency: 1, // Run check every 1 minute 
+  frequency: 1, // Run check every 1 minute
   maxResponseTime: 10000, // Maximum response time in milliseconds before marking as failed
   degradedResponseTime: 5000, // Response time in milliseconds for degraded performance warning
   request: { // Configure the HTTP request settings (required)
@@ -130,24 +130,24 @@ new ApiCheck('books-api-advanced-check', {
     assertions: [
       // Validate HTTP response status
       AssertionBuilder.statusCode().equals(200),
-      
+
       // Check response headers
       AssertionBuilder.headers('content-type').contains('application/json'),
-      
+
       // Validate first book has required fields
       AssertionBuilder.jsonBody('$[0].id').isNotNull(),
       AssertionBuilder.jsonBody('$[0].price').isNotNull(),
-      
+
       // Check that title and author are not empty
       AssertionBuilder.jsonBody('$[0].title').notEmpty(),
       AssertionBuilder.jsonBody('$[0].author').notEmpty(),
-      
+
       // Validate price is positive
       AssertionBuilder.jsonBody('$[0].price').greaterThan(0),
-      
+
       // Check that we have multiple books in the catalog
       AssertionBuilder.jsonBody('$.length').greaterThan(1),
-      
+
       // Validate response time
       AssertionBuilder.responseTime().lessThan(3000)
     ],
@@ -201,7 +201,7 @@ urlsToMonitor.forEach((url, index) => {
 
 > Notice that the check above isn’t configured with a `maxResponseTime` , `alertChannels` , and several other settings. Without these settings the project defaults in `checkly.config.ts` will be used. We could also assign checks to a group to manage a subset of checks with one configuration. [More detail on groups is covered in the Checkly documentation](https://www.checklyhq.com/docs/groups/). There’s more detail on alert thresholds and how alerts are communicated in part 2, below.
 
-We can test this file (and the others added above) with the `npx checkly test` command, which will scan the `/__checks__` directory and run all of our checks through the Checkly monitoring network. 
+We can test this file (and the others added above) with the `npx checkly test` command, which will scan the `/__checks__` directory and run all of our checks through the Checkly monitoring network.
 
 ```bash
 __checks__/multiple-url-monitor.check.ts
@@ -217,7 +217,7 @@ __checks__/books-api-advanced-check.check.ts
 6 passed, 6 total
 ```
 
-With tests passing, we’re ready to deploy our first set of checks. 
+With tests passing, we’re ready to deploy our first set of checks.
 
 - Open `checkly.config.ts` and edit the `projectName` and `logicalId` values in the config file. You’ll also want to look at the other defaults set here to make sure they make sense as global defaults for your Checkly project.
 - Run `npx checkly deploy -p` to see a preview of what checks will be created, make sure this list is consistent with what you expect to change in your Checkly project.
@@ -226,7 +226,7 @@ With tests passing, we’re ready to deploy our first set of checks.
 Here’s the response from a deployment:
 
 ```bash
-$npx checkly deploy   
+$npx checkly deploy
 Parsing your project... ✅
 
 Validating project resources... ✅
@@ -320,9 +320,9 @@ Much of the content of the `.check.ts` file will look familiar by this point, as
 
 You can see in the script one of the many advantages of the Playwright framework by noticing what’s missing: there are no `wait()` lines for the check to pause and wait for the site to load! [Playwright’s auto-waiting](https://www.checklyhq.com/blog/playwright-auto-waiting/) makes it unnecessary to add manual waiting to have our script work. Instead, Playwright will continually attempt to click the item, and do so as soon as it’s available.
 
-In this first check, we’ve made only straightforward assertions of visible page elements, but this script will run in a full environment when deployed to Checkly, so we can do any type of scripted assertion we like: compare the page contents to the result of an API request, or parse the page in detail to compare to configuration value, it’s all possible. Our documentation site goes very [deep into Playwright fundamentals and advanced use cases](https://www.checklyhq.com/learn/playwright/what-is-playwright/). 
+In this first check, we’ve made only straightforward assertions of visible page elements, but this script will run in a full environment when deployed to Checkly, so we can do any type of scripted assertion we like: compare the page contents to the result of an API request, or parse the page in detail to compare to configuration value, it’s all possible. Our documentation site goes very [deep into Playwright fundamentals and advanced use cases](https://www.checklyhq.com/learn/playwright/what-is-playwright/).
 
-Once our check looks right, it’s time to run 
+Once our check looks right, it’s time to run
 
 ```bash
 npx checkly test homepage-browse
@@ -349,23 +349,18 @@ By setting up alert rules, you can define conditions—such as consecutive failu
 
 ```ts
 alertSettings: {
-      reminders: { // Controls reminder notifications after initial alert
-        amount: 0, // Number of reminder notifications to send (0 = no 
-  reminders)
-        interval: 5 // Time interval in minutes between each reminder 
-  notification
-      },
-      escalationType: "RUN_BASED", // Sets escalation trigger type (RUN_BASED or TIME_BASED)
-      runBasedEscalation: { // Configuration for run-based escalation 
-  triggers
-        failedRunThreshold: 1 // Number of consecutive failed runs before 
-  escalating alert
-      },
-      timeBasedEscalation: { // Configuration for time-based escalation 
-  triggers
-        minutesFailingThreshold: 5 // Minutes check must be failing before
-   escalating alert
-      }
+  reminders: { // Controls reminder notifications after initial alert
+    amount: 0, // Number of reminder notifications to send (0 = no reminders)
+    interval: 5 // Time interval in minutes between each reminder notification
+  },
+  escalationType: "RUN_BASED", // Sets escalation trigger type (RUN_BASED or TIME_BASED)
+  runBasedEscalation: { // Configuration for run-based escalation triggers
+    failedRunThreshold: 1 // Number of consecutive failed runs before escalating alert
+  },
+  timeBasedEscalation: { // Configuration for time-based escalation triggers
+    minutesFailingThreshold: 5 // Minutes check must be failing before escalating alert
+  }
+}
 ```
 
 These settings just like all the settings in this section can be managed at the individual check level, [as a group](https://www.checklyhq.com/docs/groups/), or across the whole project in the `checkly.config.ts` file.
@@ -402,24 +397,24 @@ export const slackChannel = new SlackAlertChannel('slack-channel-1', {
 Now we can go back to our URL monitor from part 1 and update it to include multiple alert channels:
 
 ```ts {tile="url-monitor.check.ts"}
-import { UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs' 
-import { emailChannel } from './email-alert-channel' 
-import { slackChannel } from './slack-alert-channel' 
-import { webhookChannel } from './webhook-alert-channel' 
+import { UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs'
+import { emailChannel } from './email-alert-channel'
+import { slackChannel } from './slack-alert-channel'
+import { webhookChannel } from './webhook-alert-channel'
 
-new UrlMonitor('url-monitor-example', { 
+new UrlMonitor('url-monitor-example', {
   name: 'Example URL Monitor',
-  activated: true, 
-  frequency: 1, 
+  activated: true,
+  frequency: 1,
   maxResponseTime: 10000,
-  degradedResponseTime: 5000, 
+  degradedResponseTime: 5000,
   alertChannels: [emailChannel, slackChannel, webhookChannel], // Array of alert channels to notify when check fails or recovers
   request: {
-    url: 'https://httpbin.org/get', 
-    followRedirects: false, 
-    skipSSL: false, 
-    assertions: [ 
-      UrlAssertionBuilder.statusCode().equals(200), 
+    url: 'https://httpbin.org/get',
+    followRedirects: false,
+    skipSSL: false,
+    assertions: [
+      UrlAssertionBuilder.statusCode().equals(200),
     ]
   }
 })
@@ -431,7 +426,7 @@ For communicating directly with your users, teams should [explore status pages](
 
 ## Part 3. Resolve Issues Faster with Checkly Dashboards
 
-Now that the problem is detected and our team has been alerted, it’s time to repair the issue. This will take us away from Monitoring as Code and into the Checkly dashboard UI where we can get a high level view of monitor performance, then zoom in to individual failures and their causes. 
+Now that the problem is detected and our team has been alerted, it’s time to repair the issue. This will take us away from Monitoring as Code and into the Checkly dashboard UI where we can get a high level view of monitor performance, then zoom in to individual failures and their causes.
 
 ![a Checkly dashboard](/images/guides/images/startup-tutorial-02.png)
 

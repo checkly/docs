@@ -190,9 +190,9 @@ This file contains all valid URLs extracted from docs.json organized by director
 ## Integrations
 
 ### Integrations - AI
-- /integrations/ai/claude
-- /integrations/ai/cursor
-- /integrations/ai/copilot
+- /integrations/ai/overview
+- /integrations/ai/skills
+- /integrations/ai/rules
 
 ### Integrations - Alerts & Notifications
 - /integrations/alerts/discord

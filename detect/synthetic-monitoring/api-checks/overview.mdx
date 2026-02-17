@@ -59,14 +59,26 @@ API checks perform comprehensive endpoint validation:
 API checks are ideal for testing both internal services and external API dependencies your application relies on.
 </Tip>
 
-## Response Metrics
+## API Check Results
 
-With each request, we record the most relevant timing phases:
+API check results will expose key performance and correctness data about the HTTP response received from the target endpoint.
 
-- `dns`: Duration of DNS lookup
-- `tcp`: Duration of TCP connection
-- `firstByte`: Duration of HTTP server response
-- `download`: Duration of HTTP download
+![api check results detail page](/images/docs/images/monitoring/check-results-api.png)
 
-This can help you troubleshoot slow responses, e.g. your DNS might be slow.
+These include:
 
+* The request performed
+* Any assertions that were included in the check
+* All data related to the request and its response, such as:
+  * Response body
+  * Request & response headers
+  * Query params
+  * Check job log
+
+* Timings phases: 
+  * `dns`: Duration of DNS lookup
+  * `tcp`: Duration of TCP connection
+  * `firstByte`: Duration of HTTP server response
+  * `download`: Duration of HTTP download
+
+Learn more in our documentation on [Results](/concepts/results).

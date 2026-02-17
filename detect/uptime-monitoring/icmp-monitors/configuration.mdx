@@ -8,7 +8,10 @@ sidebarTitle: 'Configuration'
 
 Configure your ICMP monitor by specifying the target host:
 
-[IMG]
+<Frame>
+  <img src="/images/icmp_monitor_request_configuration.png" alt="ICMP monitor request configuration options showing target host and ping count" />
+</Frame>
+
 
 * **Hostname or IP address:** The server you want to monitor (e.g. `db.example.com` or `203.0.113.1`)
 * **IP family:** Choose between IPv4 (default) or IPv6
@@ -23,7 +26,15 @@ Validate latency metrics to ensure your infrastructure meets performance require
 You can create assertions based on:
 
 * **Latency metrics:** Validate `min`, `max`, `avg`, or `stddev` latency values
-* **JSON response:** Assert against the full JSON response structure
+* **JSON response:** Assert against the JSON response structure. This allows you to target specific fields using JSON path assertions.
+
+  With JSON path assertions, you can:
+  * $.latency.max → catch latency spikes
+  * $.packetsReceived → detect dropped ping respondes
+  * $.dnsResolutionTime → separate DNS issues from ICMP latency
+  * $.pingResults[*].ttl → check TTL values
+
+  Learn more about JSON path assertions: [JSON responses with JSON path](/detect/assertions/#json-responses-with-json-path).
 
 ### Packet Loss Limits
 

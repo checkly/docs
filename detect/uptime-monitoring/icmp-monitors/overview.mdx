@@ -11,34 +11,30 @@ sidebarTitle: Overview
 
 ICMP monitors verify that a host is reachable and responding. Typical use cases include:
 
+* Verifying reachability for servers, load balancers, or network appliances that don't expose HTTP endpoints or open TCP ports
 * Detecting network-level outages before they're visible via HTTP endpoints
 * Monitoring latency across regions to identify geographic performance issues
-* Verifying reachability for servers, load balancers, or network appliances that don't expose HTTP endpoints or open TCP ports
 * Tracking packet loss to catch network quality degradation early
 
 ## How do ICMP monitors work?
 
 ICMP monitors perform ping tests:
 
-* Hostname resolution: If a hostname is provided, Checkly resolves it to an IP address.
-* Ping execution: Multiple ICMP Echo Request packets (configurable from 1–50, default: 10) are sent from your configured location(s).
-* Response valildation: ICMP Echo Reply packets are received. Round-trip latency and packet loss are measured and evaluated against your configured assertions.
+* Hostname resolution: If a hostname is provided, Checkly resolves it to an IP address
+* Ping execution: Multiple ICMP Echo Request packets (configurable from 1–50, default: 10) are sent from your configured location(s)
+* Response valildation: ICMP Echo Reply packets are received. Round-trip latency and packet loss are measured and evaluated against your configured assertions
 
-For example, pinging checklyhq.com with 10 pings returns:
+For example, pinging `checklyhq.com` with 3 pings returns:
 
 ```json
-{
-  "latency": {
-    "min": 12.3,
-    "max": 18.7,
-    "avg": 14.2,
-    "stddev": 2.1
-  },
-  "packetLoss": 0,
-  "timingPhases": { "dns": 5.2 },
-  "pingsSucceeded": 10,
-  "pingsFailed": 0
-}
+PING checklyhq.com (18.239.105.69): 56 bytes of data
+64 bytes from 18.239.105.69: icmp_seq=0 ttl=247 time=6.6 ms
+64 bytes from 18.239.105.69: icmp_seq=1 ttl=247 time=49.8 ms
+64 bytes from 18.239.105.69: icmp_seq=2 ttl=247 time=6.6 ms
+
+--- checklyhq.com ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss
+round-trip min/avg/max/stddev = 6.573/20.993/49.812/24.958 ms
 ```
 
 The response appears on the results page as both raw output and parsed JSON. You can use it as a reference to define [assertions](/detect/uptime-monitoring/icmp-monitors/configuration#assertions) for expected values.
@@ -48,15 +44,15 @@ The response appears on the results page as both raw output and parsed JSON. You
 <Accordion title="100% packet loss but the host is reachable via HTTP">
 **Symptom**: ICMP monitor shows complete packet loss, but the website/API works fine
 
-**Root cause**:
-- **Firewall rules blocking ICMP**: Many organizations block ICMP echo request packets at the firewall, load balancer, or host level as a security measure
+**Root cause**: 
+* Many organizations block ICMP echo request packets at the firewall, load balancer, or host level as a security measure
 
 **How to detect and fix**:
 1. **Verify HTTP connectivity**: Create an API or URL monitor for the same hostname to confirm it's reachable
 2. **Check both protocols**: Test both IPv4 and IPv6, some hosts allow ICMP on one protocol but not the other
 3. **Confirm with infrastructure team**: Ask if ICMP is intentionally blocked in security policies
 
-**When to use a different monitor type**: If ICMP is deliberately blocked, use TCP, URL, or API checks instead to verify availability at the application layer.
+**When to use a different monitor type**: If ICMP is deliberately blocked, use TCP, URL, or API checks instead to verify availability at the application layer
 </Accordion>
 
 <Accordion title="High latency or packet loss from specific regions">
@@ -73,5 +69,5 @@ The response appears on the results page as both raw output and parsed JSON. You
 3. **Cross-reference with other monitor types**: Compare ICMP latency with TCP/HTTP latency from the same locations
 4. **Use latency assertions**: Set region-specific assertions, e.g., `latency.avg` less than `50ms` for nearby regions, `200ms` for distant ones
 
-**Investigation tip**: Persistent high latency from a specific region often indicates routing issues with your hosting provider or CDN configuration.
+**Investigation tip**: Persistent high latency from a specific region often indicates routing issues with your hosting provider or CDN configuration
 </Accordion>

@@ -25,14 +25,14 @@ Validate latency metrics to ensure your infrastructure meets performance require
 
 You can create assertions based on:
 
-* **Latency metrics:** Validate `min`, `max`, `avg`, or `stddev` latency values
+* **Latency metrics:** ICMP monitors send 10 pings per run by default and measure round-trip time (RTT) for every received packet. You can validate the resulting min, max, avg, or stddev latency values.
 * **JSON response:** Assert against the JSON response structure. This allows you to target specific fields using JSON path assertions.
 
   With JSON path assertions, you can:
-  * $.latency.max → catch latency spikes
-  * $.packetsReceived → detect dropped ping respondes
-  * $.dnsResolutionTime → separate DNS issues from ICMP latency
-  * $.pingResults[*].ttl → check TTL values
+  * `$.latency.max` → catch latency spikes
+  * `$.packetsReceived` → detect dropped ping respondes
+  * `$.dnsResolutionTime` → separate DNS issues from ICMP latency
+  * `$.pingResults[*].ttl` → check TTL values
 
   Learn more about JSON path assertions: [JSON responses with JSON path](/detect/assertions/#json-responses-with-json-path).
 

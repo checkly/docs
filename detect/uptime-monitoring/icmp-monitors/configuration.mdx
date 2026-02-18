@@ -12,29 +12,9 @@ Configure your ICMP monitor by specifying the target host:
   <img src="/images/icmp_monitor_request_configuration.png" alt="ICMP monitor request configuration options showing target host and ping count" />
 </Frame>
 
-
 * **Hostname or IP address:** The server you want to monitor (e.g. `db.example.com` or `203.0.113.1`)
 * **IP family:** Choose between IPv4 (default) or IPv6
 * **Pings per run:** Number of ICMP Echo Request packets to send per check run (1-50, default: 10)
-
-### Assertions
-
-Validate latency metrics to ensure your infrastructure meets performance requirements:
-
-[IMG]
-
-You can create assertions based on:
-
-* **Latency metrics:** ICMP monitors send 10 pings per run by default and measure round-trip time (RTT) for every received packet. You can validate the resulting min, max, avg, or stddev latency values.
-* **JSON response:** Assert against the JSON response structure. This allows you to target specific fields using JSON path assertions.
-
-  With JSON path assertions, you can:
-  * `$.latency.max` → catch latency spikes
-  * `$.packetsReceived` → detect dropped ping respondes
-  * `$.dnsResolutionTime` → separate DNS issues from ICMP latency
-  * `$.pingResults[*].ttl` → check TTL values
-
-  Learn more about JSON path assertions: [JSON responses with JSON path](/detect/assertions/#json-responses-with-json-path).
 
 ### Packet Loss Limits
 
@@ -44,6 +24,61 @@ Define packet loss thresholds to determine when an ICMP monitor should be consid
   <img className="block dark:hidden" src="/images/icmp-packet-loss-threshold.png" alt="ICMP monitor packet loss limits interface" />
   <img className="hidden dark:block" src="/images/icmp-packet-loss-threshold-dark.png" alt="ICMP monitor packet loss limits interface" />
 </Frame>
+
+### Assertions
+
+Use assertions to validate ICMP results and make sure your host meets availability and performance expectations.
+
+<Frame>
+  <img src="/images/icmp_monitor_assertion_example.png" alt="ICMP monitor assertion example for latency and JSON response" />
+</Frame>
+
+You can create assertions based on:
+
+* **Latency metrics:** ICMP monitors send 10 pings per run by default and measure round-trip time (RTT) for every received packet. You can validate the resulting `min`, `max`, `avg`, or `stddev` latency values.
+* **JSON response:** Assert against the JSON response structure. This allows you to target specific fields using JSON path assertions. For example:
+
+  * `$.latency.max` → catch latency spikes
+  * `$.packetsReceived` → detect dropped ping respondes
+  * `$.dnsResolutionTime` → separate DNS issues from ICMP latency
+  * `$.pingResults[*].ttl` → check TTL values
+
+  Learn more about JSON path assertions: [JSON responses with JSON path](/detect/assertions/#json-responses-with-json-path).
+
+### JSON Response Schemas
+
+The ICMP response is parsed into a structured JSON format. All responses share a common structure:
+
+```json
+{
+  "hostname": "example.com",
+  "resolvedIp": "203.0.113.10",
+  "ipFamily": "IPv4",
+  "pingCount": 10,
+  "packetsSent": 10,
+  "packetsReceived": 10,
+  "packetSize": 64,
+  "packetLoss": 0,
+  "dnsResolutionTime": 0.824772,
+  "latency": {
+    "avg": 5.71058,
+    "min": 0.686062,
+    "max": 50.593323,
+    "stdDev": 15.770236
+  },
+  "pingResults": [
+    {
+      "sequence": 0,
+      "type": 0,
+      "code": 0,
+      "success": true,
+      "rtt": 0.705368,
+      "ttl": 57
+    }
+    // ... one entry per ping attempt
+  ]
+}
+```
 
 ### Frequency
 
@@ -63,12 +98,12 @@ Set how often the monitor runs (every 10 seconds to 24 hours):
 
 * **Strategy:** Choose between round-robin or parallel execution. Learn more about [scheduling strategies](/concepts/scheduling)
 * **Locations:** Select one or more [public](/concepts/locations/#public-locations) locations to run the monitor from
-* **Private locations**: ICMP monitors do not currently support private locations
+* **Private locations**: ICMP monitors do not currently support [private locations](/platform/private-locations/overview)
 
 ### Additional Settings
 
 * **Name:** Give your monitor a clear name to identify it in dashboards and alerts
-* **Tags:** Use tags to organize monitors across dashboards and [maintenance windows](/communicate/maintenance-windows/overview)
+* **Tags:** Use tags to organize monitors across [dashboards](/communicate/dashboards/overview/) and [maintenance windows](/communicate/maintenance-windows/overview)
 * **Retries:** Define how failed runs should be retried. See [retry strategies](/communicate/alerts/retries)
 * **Alerting:** Configure your [alert settings](/communicate/alerts/configuration), [alert channels](/communicate/alerts/channels), or set up [webhooks](/integrations/alerts/webhooks) for custom integrations
 

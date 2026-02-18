@@ -85,7 +85,7 @@ ICMP monitors have their own ICMP-specific settings, plus the standard monitor o
 
 <ResponseField name="request" type="object" required >
 
-ICMP request configuration that defines the ICMP Echo Request to perform and how to validate the response.
+ICMP request configuration, including ping settings and response validation.
 
 **Usage:**
 
@@ -108,8 +108,8 @@ new IcmpMonitor('icmp-monitor', {
 |-----------|------|----------|---------|-------------|
 | `hostname` | `string` | ✅ | - | The target host (domain name or IP address) |
 | `pingCount` | `number` | ❌ | `10` | Number of ICMP Echo Request packets to send per check run (1-50, default: 10) |
-| `assertions` | `IcmpAssertion[]` | ❌ | `[]` | Response assertions using `IcmpAssertionBuilder` |
-| `ipFamily` | `string` | ❌ | `IPv4` | IP family selection (Ipv4 | Ipv6) |
+| `assertions` | `IcmpAssertion[]` | ❌ | `[]` | Response assertions using the `IcmpAssertionBuilder` |
+| `ipFamily` | `string` | ❌ | `IPv4` | IP family selection (Ipv4, Ipv6) |
 
 </ResponseField>
 
@@ -152,8 +152,8 @@ new IcmpMonitor("icmp-performance-tiers", {
 
 Assertions for ICMP monitors can be defined using the `IcmpAssertionBuilder`. The following sources are available:
 
-- `latency(property)`: Validate round-trip time (RTT) for ICMP pings. The property parameter is required and must be one of: `avg`, `min`, `max`, or `stdDev`.
-- `jsonResponse(property?)`: Assert against the JSON response structure. This allows you to target specific fields using JSON path assertions.
+- `latency(property)`: Validate round-trip time (RTT) for ICMP pings. The property parameter is required and must be one of: `avg`, `min`, `max`, or `stdDev`
+- `jsonResponse(property?)`: Assert against the JSON response structure. This allows you to target specific fields using JSON path assertions
 
 Here are some examples:
 

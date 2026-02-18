@@ -109,7 +109,7 @@ new IcmpMonitor('icmp-monitor', {
 | `hostname` | `string` | ✅ | - | The target host (domain name or IP address) |
 | `pingCount` | `number` | ❌ | `10` | Number of ICMP Echo Request packets to send per check run (1-50, default: 10) |
 | `assertions` | `IcmpAssertion[]` | ❌ | `[]` | Response assertions using the `IcmpAssertionBuilder` |
-| `ipFamily` | `string` | ❌ | `IPv4` | IP family selection (Ipv4, Ipv6) |
+| `ipFamily` | `string` | ❌ | `IPv4` | IP family selection (IPv4, IPv6) |
 
 </ResponseField>
 
@@ -153,7 +153,7 @@ new IcmpMonitor("icmp-performance-tiers", {
 Assertions for ICMP monitors can be defined using the `IcmpAssertionBuilder`. The following sources are available:
 
 - `latency(property)`: Validate round-trip time (RTT) for ICMP pings. The property parameter is required and must be one of: `avg`, `min`, `max`, or `stdDev`
-- `jsonResponse(property?)`: Assert against the JSON response structure. This allows you to target specific fields using JSON path assertions
+- `jsonResponse(property?)`: Assert against the [JSON response structure](/detect/uptime-monitoring/icmp-monitors/configuration#json-response-schemas). This allows you to target specific fields using JSON path assertions
 
 Here are some examples:
 
@@ -168,9 +168,9 @@ IcmpAssertionBuilder.latency('avg').lessThan(100)
 - Assert against specific JSON fields in the response
 
 ```ts
-IcmpAssertionBuilder.jsonResponse('$.packetLoss').lessThan(10)
+IcmpAssertionBuilder.jsonResponse('$.packetsReceived').equals(10)
 // Equivalent to:
-{ source: 'JSON_RESPONSE', property: '$.packetLoss', comparison: 'LESS_THAN', target: '10' }
+{ source: 'JSON_RESPONSE', property: '$.packetsReceived', comparison: 'EQUALS', target: '10' }
 ```
 
 Learn more in our docs on [Assertions](/detect/assertions).

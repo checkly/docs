@@ -39,6 +39,27 @@ round-trip min/avg/max/stddev = 6.573/20.993/49.812/24.958 ms
 
 The response appears on the results page as both raw output and parsed JSON. You can use it as a reference to define [assertions](/detect/uptime-monitoring/icmp-monitors/configuration#assertions) for expected values.
 
+## ICMP Monitor Results
+
+Select a specific check run to inspect its results:
+
+<Frame>
+  <img src="/images/icmp_monitor_results_page.png" alt="ICMP monitor results page" />
+</Frame>
+
+* **Summary:** Shows the target (hostname or IP), the monitor state (success for passed or degraded runs, error for failures), and average latency
+
+* **Error details:** If a run fails, you’ll see the error status code and message to help diagnose what went wrong
+
+* **Response metrics:** Network metrics collected during the run:
+    * Packet info: packets sent, packets received, packet loss, and packet size
+    * DNS resolution time: how long it took to resolve the hostname to an IP address
+    * Latency: min, max, avg, and std dev of round-trip times (RTT) across all received packets
+
+* **Response payload:** Shows the raw ping result. Also available as [parsed JSON](/detect/uptime-monitoring/icmp-monitors/configuration#json-response-schemas)
+
+Learn more in our documentation on [Results](/concepts/results).
+
 ## Troubleshooting Common Issues
 
 <Accordion title="100% packet loss but the host is reachable via HTTP">

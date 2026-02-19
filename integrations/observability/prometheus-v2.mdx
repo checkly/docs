@@ -59,6 +59,9 @@ The following metrics are available to monitor checks:
 | `checkly_api_check_timing_seconds` | Histogram | The response time for the API request, as well as the duration of the different phases. |
 | `checkly_url_monitor_timing_seconds` | Histogram | The response time for the HTTP request, as well as the duration of the different phases. |
 | `checkly_tcp_check_timing_seconds` | Histogram | The response time for the TCP request, as well as the duration of the different phases. |
+| `checkly_icmp_check_timing_seconds` | Histogram | The timing phases of the ICMP check, including DNS resolution and latency measurements (avg, min, max). |
+| `checkly_icmp_check_packet_loss_ratio` | Gauge | The average packet loss ratio (0-1) for the ICMP check. |
+| `checkly_dns_check_timing_seconds` | Histogram | The total duration of the DNS check. |
 | `checkly_multistep_check_duration_seconds` | Histogram | The total check duration. This includes all requests done and any waits. |
 | `checkly_time_to_ssl_expiry_seconds` | Gauge | The amount of time remaining before the SSL certificate of the monitored domain expires. See the [SSL certificate expiration docs](/alerting-and-retries/ssl-expiration/) for more information on monitoring SSL certificates with checks. |
 
@@ -74,8 +77,11 @@ checkly_check_status{name="Passing Browser Check",status="degraded"} 0
 
 `checkly_check_status` can be useful for viewing the current status of a check, whereas `checkly_check_result_total` can be useful for calculating overall statistics.
 
-The metrics `checkly_browser_check_web_vitals_seconds`, `checkly_browser_check_errors`, and `checkly_api_check_timing_seconds` contain a `type` label.
+The metrics `checkly_browser_check_web_vitals_seconds`, `checkly_browser_check_errors`, `checkly_api_check_timing_seconds`, `checkly_icmp_check_timing_seconds`, and `checkly_dns_check_timing_seconds` contain a `type` label.
 This label indicates the different Web Vitals, error types, and timing phases being measured.
+
+For `checkly_icmp_check_timing_seconds`, the `type` label has the following values: `dns` (DNS resolution time), `latency_avg`, `latency_min`, and `latency_max`.
+For `checkly_dns_check_timing_seconds`, the `type` label has the value `total`.
 
 `checkly_time_to_ssl_expiry_seconds` contains a `domain` label giving the domain of the monitored SSL certificate.
 
@@ -85,7 +91,7 @@ In addition, the check metrics all contain the following labels:
 |-------|-------------|
 | `name` | The name of the check. |
 | `check_id` | The unique UUID of the check. |
-| `check_type` | Either `api` or `browser`. |
+| `check_type` | The type of check: `api`, `browser`, `tcp`, `icmp`, `dns`, etc. |
 | `muted` | Whether the check is muted, configured to not send alerts. |
 | `activated` | Whether the check is activated. Deactivated checks aren't be run. |
 | `group` | The name of the check group. |

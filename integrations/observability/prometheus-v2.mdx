@@ -59,7 +59,12 @@ The following metrics are available to monitor checks:
 | `checkly_api_check_timing_seconds` | Histogram | The response time for the API request, as well as the duration of the different phases. |
 | `checkly_url_monitor_timing_seconds` | Histogram | The response time for the HTTP request, as well as the duration of the different phases. |
 | `checkly_tcp_check_timing_seconds` | Histogram | The response time for the TCP request, as well as the duration of the different phases. |
+| `checkly_icmp_check_timing_seconds` | Histogram | The timing phases of the ICMP check, including DNS resolution and latency measurements (avg, min, max). |
+| `checkly_icmp_check_packet_loss_ratio` | Gauge | The average packet loss ratio (0-1) for the ICMP check. |
+| `checkly_dns_check_timing_seconds` | Histogram | The total duration of the DNS check. |
 | `checkly_multistep_check_duration_seconds` | Histogram | The total check duration. This includes all requests done and any waits. |
+| `checkly_heartbeat_last_success_timestamp_seconds` | Gauge | The Unix timestamp of the last successful heartbeat ping. A value of `0` means no successful ping has ever been received. |
+| `checkly_heartbeat_expected_interval_seconds` | Gauge | The configured maximum interval between heartbeat pings, in seconds. Derived from the heartbeat monitor's period and period unit settings. |
 | `checkly_time_to_ssl_expiry_seconds` | Gauge | The amount of time remaining before the SSL certificate of the monitored domain expires. See the [SSL certificate expiration docs](/alerting-and-retries/ssl-expiration/) for more information on monitoring SSL certificates with checks. |
 
 The `checkly_check_status` and `checkly_check_result_total` metrics contain a `status` label with values `passing`, `failing`, and `degraded`.
@@ -74,8 +79,11 @@ checkly_check_status{name="Passing Browser Check",status="degraded"} 0
 
 `checkly_check_status` can be useful for viewing the current status of a check, whereas `checkly_check_result_total` can be useful for calculating overall statistics.
 
-The metrics `checkly_browser_check_web_vitals_seconds`, `checkly_browser_check_errors`, and `checkly_api_check_timing_seconds` contain a `type` label.
+The metrics `checkly_browser_check_web_vitals_seconds`, `checkly_browser_check_errors`, `checkly_api_check_timing_seconds`, `checkly_icmp_check_timing_seconds`, and `checkly_dns_check_timing_seconds` contain a `type` label.
 This label indicates the different Web Vitals, error types, and timing phases being measured.
+
+For `checkly_icmp_check_timing_seconds`, the `type` label has the following values: `dns` (DNS resolution time), `latency_avg`, `latency_min`, and `latency_max`.
+For `checkly_dns_check_timing_seconds`, the `type` label has the value `total`.
 
 `checkly_time_to_ssl_expiry_seconds` contains a `domain` label giving the domain of the monitored SSL certificate.
 
@@ -85,7 +93,7 @@ In addition, the check metrics all contain the following labels:
 |-------|-------------|
 | `name` | The name of the check. |
 | `check_id` | The unique UUID of the check. |
-| `check_type` | Either `api` or `browser`. |
+| `check_type` | The type of check: `API`, `BROWSER`, `MULTI_STEP`, `HEARTBEAT`, `TCP`, `ICMP`, `DNS`, etc. |
 | `muted` | Whether the check is muted, configured to not send alerts. |
 | `activated` | Whether the check is activated. Deactivated checks aren't be run. |
 | `group` | The name of the check group. |
@@ -100,7 +108,7 @@ In addition, the check metrics all contain the following labels:
 
 To avoid creating a high volume of metrics, by default the metrics don't include a label for the check run location. It is possible to enable this by adding the query param `locationLabelEnabled=true` to your API request. This will add a `location` label giving the location where the checks ran.
 
-Since check status and SSL days remaining is only tracked on a per-check basis rather than by location, `checkly_check_status` and `checkly_time_to_ssl_expiry_seconds` do not have the `location` label included. All other [check metrics](#check-metrics) will have the `location` label added.
+Since check status and SSL days remaining is only tracked on a per-check basis rather than by location, `checkly_check_status` and `checkly_time_to_ssl_expiry_seconds` do not have the `location` label included. Heartbeat metrics (`checkly_heartbeat_last_success_timestamp_seconds`, `checkly_heartbeat_expected_interval_seconds`, and heartbeat entries in `checkly_check_result_total`) also do not have a `location` label, since heartbeat monitors receive pings rather than running from specific locations. All other [check metrics](#check-metrics) will have the `location` label added.
 
 Here is an example for how to set this in your `prometheus.yml` config:
 
@@ -144,6 +152,49 @@ The different histogram metrics can all be used to compute averages. For example
 
 ```bash
 sum by(type) (rate(checkly_browser_check_web_vitals_seconds_sum{name="Check Name"}[30m])) / sum by(type) (rate(checkly_browser_check_web_vitals_seconds_count{name="Check Name"}[30m]))
+```
+
+## Heartbeat Metrics
+
+[Heartbeat monitors](/detect/uptime-monitoring/heartbeat-monitors/overview) are passive checks that wait for your scheduled jobs and automated processes to send a ping. The Prometheus exporter includes heartbeat checks in the standard `checkly_check_status` and `checkly_check_result_total` metrics, plus two heartbeat-specific gauges designed for [dead man's switch](https://en.wikipedia.org/wiki/Dead_man%27s_switch) alerting.
+
+- **`checkly_heartbeat_last_success_timestamp_seconds`** — The Unix timestamp of the last successful ping, searched across the entire event history (no time window). A value of `0` means no successful ping has ever been received — this immediately triggers a dead man's switch alert since `time() - 0` produces a very large value.
+- **`checkly_heartbeat_expected_interval_seconds`** — The maximum expected time between pings, derived from the heartbeat monitor's configured period and period unit (e.g., `5 minutes` = `300` seconds). Use this as a threshold for alerting.
+
+### How heartbeats map to `checkly_check_result_total`
+
+Heartbeat checks contribute to `checkly_check_result_total` using a 1-hour count window, the same as other check types. The `status` label values map to heartbeat event states as follows:
+
+| `status` label | Heartbeat states counted |
+|----------------|--------------------------|
+| `passing` | `RECEIVED`, `EARLY`, `GRACE`, `LATE` — any ping that arrived |
+| `failing` | `FAILING` — no ping received before the grace period expired |
+| `degraded` | Always `0` — heartbeat monitors do not have a degraded state |
+
+### Dead Man's Switch PromQL Examples
+
+#### Alert when a heartbeat ping is overdue
+
+Compare the current time against the last success timestamp. If the difference exceeds the expected interval, the job has missed its window:
+
+```bash
+time() - checkly_heartbeat_last_success_timestamp_seconds > checkly_heartbeat_expected_interval_seconds
+```
+
+#### Alert with a safety margin
+
+Add a grace period multiplier (e.g., 1.5x) to avoid false alarms from minor delays:
+
+```bash
+time() - checkly_heartbeat_last_success_timestamp_seconds > 1.5 * checkly_heartbeat_expected_interval_seconds
+```
+
+#### Grafana table of heartbeat health
+
+Show how long ago each heartbeat was last seen:
+
+```bash
+time() - checkly_heartbeat_last_success_timestamp_seconds
 ```
 
 ## Private Location Metrics

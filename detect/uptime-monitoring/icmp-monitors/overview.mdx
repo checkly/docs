@@ -21,7 +21,7 @@ ICMP monitors check if a host is reachable by sending ICMP Echo Requests (pings)
 ICMP monitors perform ping tests:
 
 * Hostname resolution: If a hostname is provided, Checkly resolves it to an IP address
-* Ping execution: Multiple ICMP Echo Request packets (configurable from 1–50, default: 10) are sent from your configured locations
+* Ping execution: Multiple ICMP Echo Request packets (configurable from 1–50, default: 10) are sent from your configured locations, with a 500 ms interval between each ping
 * Response valildation: ICMP Echo Reply packets are received. Round-trip latency and packet loss are measured and evaluated against your configured assertions
 
 For example, pinging `checklyhq.com` with 3 pings returns:
@@ -47,7 +47,7 @@ Select a specific check run to inspect its results:
   <img src="/images/icmp_monitor_results_page.png" alt="ICMP monitor results page" />
 </Frame>
 
-* **Summary:** Shows the target (hostname or IP), the monitor state (success for passed or degraded runs, error for failures), and average latency
+* **Summary:** Shows the target (hostname or IP), the monitor state (passed, degraded or failed), and average latency
 
 * **Error details:** If a run fails, you’ll see the error status code and message to help diagnose what went wrong
 
@@ -57,6 +57,12 @@ Select a specific check run to inspect its results:
     * Latency: min, max, avg, and std dev of round-trip times (RTT) across all received packets
 
 * **Response payload:** Shows the raw ping result. Also available as [parsed JSON](/detect/uptime-monitoring/icmp-monitors/configuration#json-response-schemas)
+
+The monitor's overview page aggregates historical run data, allowing you to analyze latency and packet loss trends over time.
+
+<Frame>
+  <img src="/images/icmp_monitor_latency_packet_loss_chart.png" alt="ICMP monitor chart showing a breakdown of latency metrics and packet loss over time" />
+</Frame>
 
 Learn more in our documentation on [Results](/concepts/results).
 

@@ -45,35 +45,34 @@ You can create assertions based on:
 
   Learn more about JSON path assertions: [JSON responses with JSON path](/detect/assertions/#json-responses-with-json-path).
 
-### JSON Response Schemas
+### JSON Response Schema
 
 The ICMP response is parsed into a structured JSON format. All responses share a common structure:
 
 ```json
 {
-  "hostname": "example.com",
-  "resolvedIp": "203.0.113.10",
-  "ipFamily": "IPv4",
-  "pingCount": 10,
-  "packetsSent": 10,
-  "packetsReceived": 10,
-  "packetSize": 64,
-  "packetLoss": 0,
-  "dnsResolutionTime": 0.824772,
+  "hostname": "46.225.5.223", // Target hostname or IP provided in the monitor
+  "resolvedIp": "46.225.5.223", // Final IP address used for the ping
+  "ipFamily": "IPv4", // IP version (IPv4 or IPv6)
+  "pingCount": 10, // Number of ICMP Echo Requests to sent
+  "packetsSent": 10, // Number of packets transmitted
+  "packetsReceived": 9, // Number of packets received
+  "packetSize": 64, // ICMP payload size in bytes
+  "packetLoss": 10, // Packet loss percentage
   "latency": {
-    "avg": 5.71058,
-    "min": 0.686062,
-    "max": 50.593323,
-    "stdDev": 15.770236
+    "avg": 104.67472366666668, // Average round-trip time of all ICMP Echo Requests in milliseconds
+    "min": 104.024927, // Minimum RTT in milliseconds
+    "max": 105.107583, // Maximum RTT in milliseconds
+    "stdDev": 0.3808160582180707 // Standard deviation of RTT in milliseconds
   },
   "pingResults": [
     {
-      "sequence": 0,
-      "type": 0,
-      "code": 0,
-      "success": true,
-      "rtt": 0.705368,
-      "ttl": 57
+      "sequence": 0, // ICMP sequence number
+      "type": 0, // ICMP type (0 = Echo Reply)
+      "code": 0, // ICMP code (usually 0 for Echo Reply)
+      "success": true, // Whether this ping received a valid reply
+      "rtt": 104.917277, // Round-trip time for this packet in milliseconds
+      "ttl": 53  // Time To Live value from the reply
     }
     // ... one entry per ping attempt
   ]

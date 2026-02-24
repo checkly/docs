@@ -198,7 +198,7 @@ The `npx checkly test` command runs your Playwright tests locally using the same
 
 ### Configuration errors
 
-**Invalid `logicalId`**
+#### Invalid `logicalId`
 
 ```
 Error: logicalId must be unique across all checks
@@ -206,7 +206,7 @@ Error: logicalId must be unique across all checks
 
 Ensure each Playwright Check Suite has a unique `logicalId`. The `logicalId` is used as a stable reference across deployments.
 
-**Missing Playwright configuration**
+#### Missing Playwright configuration
 
 ```
 Error: Cannot find playwright.config.ts at path: ./playwright.config.ts
@@ -214,9 +214,86 @@ Error: Cannot find playwright.config.ts at path: ./playwright.config.ts
 
 Verify that `playwrightConfigPath` points to the correct relative path from your `checkly.config.ts` file.
 
+### Alert optimization
+
+#### Alerts are triggered too late
+
+Playwright Check Suites wait for `npx playwright test` to finish before triggering an alert on test failure. Use [Playwright's `maxFailures` option](https://playwright.dev/docs/api/class-testconfig#test-config-max-failures) to stop the test run and trigger alerts earlier. This setting halts the entire suite after reaching the specified number of failures, allowing you to receive alerts faster.
+
+Specify this option in your `playwright.config` or the `testCommand` in your `checkly.config`.
+
+<Tabs>
+  <Tab title="playwright.config.ts">
+    ```typescript playwright.config.ts highlight={5}
+    import { defineConfig } from '@playwright/test';
+
+    export default defineConfig({
+      // Setting to zero (default) disables max failures.
+      maxFailures: process.env.CHECKLY === '1' ? 1 : 0,
+    })
+    ```
+  </Tab>
+  <Tab title="checkly.config.ts">
+    ```typescript checkly.config.ts highlight={11}
+    import { defineConfig } from 'checkly'
+
+    export default defineConfig({
+      checks: {
+        playwrightConfigPath: './playwright.config.ts',
+        playwrightChecks: [
+          {
+            name: 'E2E test suite',
+            logicalId: 'e2e-test-suite',
+            pwTags: '@e2e',
+            testCommand: 'npx playwright test --max-failures=1',
+          }
+        ]
+      },
+    })
+    ```
+  </Tab>
+</Tabs>
+
+#### Alerts are triggered too often
+
+End-to-end testing for complex or flaky applications can be difficult. While it's best if your Playwright tests are not flaky, you can use the [`retries` option](https://playwright.dev/docs/test-retries#retries) to automatically rerun failed tests and prevent false alarms in your Playwright Check Suites monitoring.
+
+Specify this option in your `playwright.config` or the `testCommand` in your `checkly.config`.
+
+<Tabs>
+  <Tab title="playwright.config.ts">
+    ```typescript playwright.config.ts highlight={4}
+    import { defineConfig } from '@playwright/test';
+
+    export default defineConfig({
+      retries: process.env.CHECKLY === '1' ? 3 : 0,
+    })
+    ```
+  </Tab>
+  <Tab title="checkly.config.ts">
+    ```typescript checkly.config.ts highlight={11}
+    import { defineConfig } from 'checkly'
+
+    export default defineConfig({
+      checks: {
+        playwrightConfigPath: './playwright.config.ts',
+        playwrightChecks: [
+          {
+            name: 'E2E test suite',
+            logicalId: 'e2e-test-suite',
+            pwTags: '@e2e',
+            testCommand: 'npx playwright test --retries=3',
+          }
+        ]
+      },
+    })
+    ```
+  </Tab>
+</Tabs>
+
 ### Test execution issues
 
-**Tests exceed 30-minute limit**
+#### Tests exceed 30-minute limit
 
 If your Playwright Check Suite times out after 30 minutes:
 
@@ -225,7 +302,7 @@ If your Playwright Check Suite times out after 30 minutes:
 - Optimize slow tests by reducing wait times and parallelizing where possible
 - [Contact Checkly support](https://app.checklyhq.com/?support=true) if you need further help
 
-**Dependency installation failures**
+#### Dependency installation failures
 
 If dependencies fail to install:
 
@@ -233,7 +310,7 @@ If dependencies fail to install:
 - Verify that the private registry authentication is configured correctly. See the [custom dependencies guide](/detect/synthetic-monitoring/playwright-checks/custom-dependencies/) for more details.
 - Adjust the `installCommand` to match your project's expectation.
 
-**Authentication failures in tests**
+#### Authentication failures in tests
 
 If tests fail due to authentication issues:
 

@@ -17,22 +17,35 @@ if [ ! -s "$TEMP_FILE" ]; then
 fi
 
 echo "🔧 Cleaning up HTML in descriptions..."
-# Convert common HTML tags to Markdown in the authorization description
+# Convert common HTML tags to Markdown
+# Order matters: convert <code> first so <b> patterns work on remaining content
 # Use cross-platform sed syntax (works on both macOS and Linux)
 if sed --version 2>&1 | grep -q GNU; then
   # GNU sed (Linux)
   sed -i 's|<a[^>]*href=\\"\([^"]*\)\\"[^>]*>\([^<]*\)</a>|[\2](\1)|g' "$TEMP_FILE"
-  sed -i 's|</br>|\n|g' "$TEMP_FILE"
-  sed -i 's|<br>|\n|g' "$TEMP_FILE"
-  sed -i 's|<b>\([^<]*\)</b>|**\1**|g' "$TEMP_FILE"
+  # Convert <code> tags first
   sed -i 's|<code>\([^<]*\)</code>|`\1`|g' "$TEMP_FILE"
+  # Handle line breaks
+  sed -i 's|</br>|\n|g' "$TEMP_FILE"
+  sed -i 's|<br />|\n|g' "$TEMP_FILE"
+  sed -i 's|<br>|\n|g' "$TEMP_FILE"
+  # Handle malformed <b>...<b> (missing slash in closing tag)
+  sed -i 's|<b>\([^<]*\)<b>|**\1**|g' "$TEMP_FILE"
+  # Handle properly formed <b>...</b>
+  sed -i 's|<b>\([^<]*\)</b>|**\1**|g' "$TEMP_FILE"
 else
   # BSD sed (macOS)
   sed -i.tmp 's|<a[^>]*href=\\"\([^"]*\)\\"[^>]*>\([^<]*\)</a>|[\2](\1)|g' "$TEMP_FILE"
-  sed -i.tmp 's|</br>|\n|g' "$TEMP_FILE"
-  sed -i.tmp 's|<br>|\n|g' "$TEMP_FILE"
-  sed -i.tmp 's|<b>\([^<]*\)</b>|**\1**|g' "$TEMP_FILE"
+  # Convert <code> tags first
   sed -i.tmp 's|<code>\([^<]*\)</code>|`\1`|g' "$TEMP_FILE"
+  # Handle line breaks
+  sed -i.tmp 's|</br>|\n|g' "$TEMP_FILE"
+  sed -i.tmp 's|<br />|\n|g' "$TEMP_FILE"
+  sed -i.tmp 's|<br>|\n|g' "$TEMP_FILE"
+  # Handle malformed <b>...<b> (missing slash in closing tag)
+  sed -i.tmp 's|<b>\([^<]*\)<b>|**\1**|g' "$TEMP_FILE"
+  # Handle properly formed <b>...</b>
+  sed -i.tmp 's|<b>\([^<]*\)</b>|**\1**|g' "$TEMP_FILE"
 fi
 
 echo "✅ Validating OpenAPI specification..."

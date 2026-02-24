@@ -18,15 +18,19 @@ Dive straight into the API reference at [developers.checklyhq.com](/api-referenc
 
 ## Analytics API basics
 
-There are three main endpoints.
+There are several endpoints, with one for each check or monitor type.
 
 | Endpoint | Description | API Reference |
 |----------|-------------|---------------|
 | `/v1/analytics/metrics/` | Returns all the available metrics for a specific check-type (`API`, `URL`, `TCP` or `BROWSER`) | [Learn more](/api-reference/analytics/list-all-available-reporting-metrics) |
-| `/v1/analytics/browser-checks/{checkId}` | Returns metrics for Browser checks | [Learn more](/api-reference/analytics/browser-checks) |
 | `/v1/analytics/api-checks/{checkId}` | Returns metrics for API checks | [Learn more](/api-reference/analytics/api-checks) |
-| `/v1/analytics/url-monitors/{checkId}` | Returns metrics for URL monitors | [Learn more](/api-reference/analytics/url-monitors) |
+| `/v1/analytics/browser-checks/{checkId}` | Returns metrics for Browser checks | [Learn more](/api-reference/analytics/browser-checks) |
+| `/v1/analytics/multistep-checks/{id}` | Returns metrics for Multistep checks | [Learn more](/api-reference/analytics/multistep-checks) |
+| `/v1/analytics/playwright-checks/{id}` | Returns metrics for Playwright check suites | [Learn more](/api-reference/analytics/playwright-checks) |
+| `/v1/analytics/dns/{id}` | Returns metrics for DNS monitors | [Learn more](/api-reference/analytics/dns-monitors) |
+| `/v1/analytics/heartbeat-checks/{id}` | Returns metrics for Heartbeat monitors | [Learn more](/api-reference/analytics/heartbeat-checks) |
 | `/v1/analytics/tcp-checks/{checkId}` | Returns metrics for TCP monitors | [Learn more](/api-reference/analytics/tcp-checks) |
+| `/v1/analytics/url-monitors/{checkId}` | Returns metrics for URL monitors | [Learn more](/api-reference/analytics/url-monitors) |
 
 The specific endpoints per check type return a JSON response that includes a check's attributes, period requested, 
 grouped `series` and a `metadata` section where you'll have additional information about the metrics to create rich reports.

@@ -1,0 +1,278 @@
+---
+title: checkly checks
+description: 'List and inspect checks in your Checkly account.'
+sidebarTitle: 'checkly checks'
+---
+
+The `checkly checks` command lets you list and inspect checks in your Checkly account directly from the terminal. You can filter, search, and drill into individual check details, recent results, and error groups.
+
+<Accordion title="Prerequisites">
+Before using `checkly checks`, ensure you have:
+
+- Checkly CLI installed
+- Valid Checkly account authentication (run `npx checkly login` if needed)
+
+For additional setup information, see [CLI overview](/cli/overview).
+</Accordion>
+
+## Usage
+
+```bash Terminal
+npx checkly checks <subcommand> [arguments] [options]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List all checks in your account. |
+| `get` | Get details of a specific check, including recent results. |
+
+## `checkly checks list`
+
+List all checks in your account with optional filtering by name, tag, or check type.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks list [options]
+```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--limit, -l` | Number of checks to return (1-100). Default: `25`. |
+| `--page, -p` | Page number. Default: `1`. |
+| `--search, -s` | Filter checks by name (case-insensitive). |
+| `--tag, -t` | Filter by tag. Can be specified multiple times. |
+| `--type` | Filter by check type. |
+| `--hide-id` | Hide check IDs in table output. |
+| `--output, -o` | Output format: `table`, `json`, or `md`. Default: `table`. |
+
+### List Options
+
+<ResponseField name="--limit, -l" type="number" default="25">
+
+Number of checks to return per page, between 1 and 100.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks list --limit=50
+npx checkly checks list -l 10
+```
+
+</ResponseField>
+
+<ResponseField name="--page, -p" type="number" default="1">
+
+Page number for paginated results.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks list --page=2
+npx checkly checks list -p 3
+```
+
+</ResponseField>
+
+<ResponseField name="--search, -s" type="string">
+
+Filter checks by name using a case-insensitive search.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks list --search="homepage"
+npx checkly checks list -s "api"
+```
+
+</ResponseField>
+
+<ResponseField name="--tag, -t" type="string">
+
+Filter checks by tag. Specify multiple times to filter by multiple tags.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks list --tag=production
+npx checkly checks list -t production -t critical
+```
+
+</ResponseField>
+
+<ResponseField name="--type" type="string">
+
+Filter checks by type. Available types: `API`, `BROWSER`, `MULTI_STEP`, `HEARTBEAT`, `PLAYWRIGHT`, `TCP`, `DNS`, `ICMP`, `URL`.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks list --type=API
+npx checkly checks list --type=BROWSER
+```
+
+</ResponseField>
+
+<ResponseField name="--hide-id" type="boolean">
+
+Hide check IDs in table output for a cleaner view.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks list --hide-id
+```
+
+</ResponseField>
+
+<ResponseField name="--output, -o" type="string" default="table">
+
+Set the output format. Use `json` for programmatic access or `md` for markdown.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks list --output=json
+npx checkly checks list -o md
+```
+
+</ResponseField>
+
+### List Examples
+
+```bash Terminal
+# List all checks with default settings
+npx checkly checks list
+
+# Search for checks by name
+npx checkly checks list --search="homepage"
+
+# Filter by tag and type
+npx checkly checks list --tag=production --type=API
+
+# Get results as JSON
+npx checkly checks list --output=json
+
+# Page through results
+npx checkly checks list --limit=10 --page=2
+```
+
+## `checkly checks get`
+
+Get details of a specific check, including recent results. Use `--result` to drill into a specific result or `--error-group` to view error details.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks get <id> [options]
+```
+
+**Arguments:**
+
+| Argument | Description |
+|----------|-------------|
+| `ID` | The ID of the check to retrieve. |
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--result, -r` | Show details for a specific result ID. |
+| `--error-group, -e` | Show full details for a specific error group ID. |
+| `--results-limit` | Number of recent results to show. Default: `10`. |
+| `--results-cursor` | Cursor for results pagination (from previous output). |
+| `--output, -o` | Output format: `detail`, `json`, or `md`. Default: `detail`. |
+
+### Get Options
+
+<ResponseField name="--result, -r" type="string">
+
+Drill into a specific check result by its result ID. Shows detailed information including logs and timing data.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks get <check-id> --result=<result-id>
+npx checkly checks get <check-id> -r <result-id>
+```
+
+</ResponseField>
+
+<ResponseField name="--error-group, -e" type="string">
+
+Show full details for a specific error group, including error messages and affected results.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks get <check-id> --error-group=<error-group-id>
+npx checkly checks get <check-id> -e <error-group-id>
+```
+
+</ResponseField>
+
+<ResponseField name="--results-limit" type="number" default="10">
+
+Number of recent results to display.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks get <check-id> --results-limit=20
+```
+
+</ResponseField>
+
+<ResponseField name="--results-cursor" type="string">
+
+Cursor for paginating through results. The cursor value is provided in the output of a previous `checks get` command.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks get <check-id> --results-cursor=<cursor>
+```
+
+</ResponseField>
+
+<ResponseField name="--output, -o" type="string" default="detail">
+
+Set the output format. Use `json` for programmatic access or `md` for markdown.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks get <check-id> --output=json
+npx checkly checks get <check-id> -o md
+```
+
+</ResponseField>
+
+### Get Examples
+
+```bash Terminal
+# View check details and recent results
+npx checkly checks get 12345
+
+# Drill into a specific result
+npx checkly checks get 12345 --result=abc-123
+
+# View an error group
+npx checkly checks get 12345 --error-group=err-456
+
+# Get check details as JSON
+npx checkly checks get 12345 --output=json
+
+# Show more results
+npx checkly checks get 12345 --results-limit=25
+```
+
+## Related Commands
+
+- [`checkly status-pages`](/cli/checkly-status-pages) - List and inspect status pages
+- [`checkly trigger`](/cli/checkly-trigger) - Trigger checks on-demand
+- [`checkly whoami`](/cli/checkly-whoami) - Display current account information

@@ -16,6 +16,14 @@ Learn more about:
 
 ## Full release history
 
+<Update label="v6.3.1" tags={["February 2026"]}>
+  The agent now exposes HTTP health probe endpoints:
+  - **GET /-/readiness**: Returns `200 OK` when the agent is ready, `503 Service Unavailable` during shutdown
+  - **GET /-/liveness**: Returns `200 OK`
+  - **GET /health**: Returns `200 OK`
+  Health endpoints run on port 8081 by default, configurable via the `AGENT_HEALTH_PORT` environment variable
+</Update>
+
 <Update label="v6.3.0" tags={["December 2025"]}>
   - Added [agent-dev image](https://www.checklyhq.com/docs/platform/private-locations/dev-agent/) including build tools to support building native npm packages. Going forward, the dev variant is published as a separate image rather than a tag on the main agent image
   - Improved secret scrubbing speed

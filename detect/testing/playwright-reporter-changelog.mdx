@@ -13,6 +13,25 @@ Learn more about:
 
 ## Full release history
 
+<Update label="v1.6.1" tags={["February 2026"]}>
+  **Fixed**
+
+  - **System metrics memory readings** - Fixed inaccurate memory usage and total memory reported in containerized environments.
+</Update>
+
+<Update label="v1.6.0" tags={["February 2026"]}>
+  **Added**
+
+  - **Test source code** - The source code of each executed test and its dependency files (helpers, page objects, utilities) are now included in the report. View the exact test body alongside results in the Checkly UI.
+  - **System metrics** - CPU and memory usage are sampled throughout the test run, helping diagnose resource-constrained failures.
+  - **Active duration** - Reports now distinguish actual test execution time from total wall-clock time, so idle gaps from worker scheduling don't inflate your numbers.
+  - **Prefix-based secret scrubbing** - Environment variables starting with `CHECKLY_SECRET_` are now automatically scrubbed from reports, traces, and logs. Customize the prefix or disable it via the `scrubbing.prefix` option.
+
+  **Changed**
+
+  - **Scrubbing now covers logs** - Secret scrubbing now extends to reporter log entries, not just the JSON report and trace files.
+</Update>
+
 <Update label="v1.5.0" tags={["February 2026"]}>
   **Added**
 

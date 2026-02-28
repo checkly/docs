@@ -13,6 +13,12 @@ Learn more about:
 
 ## Full release history
 
+<Update label="v1.7.0" tags={["February 2026"]}>
+  **Added**
+
+  - **Sensitive header scrubbing** - HTTP headers like `Authorization`, `Cookie`, `Set-Cookie`, `Proxy-Authorization`, `X-API-Key`, and `X-Auth-Token` are now automatically redacted from reports and traces when scrubbing is enabled — no configuration needed. This prevents tokens and session cookies from leaking through network request data, even if their values aren't registered as secrets. Disable with `scrubbing: { sensitiveHeaders: false }` or pass a custom list of header names to control which headers are redacted.
+</Update>
+
 <Update label="v1.6.1" tags={["February 2026"]}>
   **Fixed**
 

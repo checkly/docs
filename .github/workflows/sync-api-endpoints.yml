@@ -1,0 +1,56 @@
+name: Sync API Endpoint Documentation
+
+on:
+  # Run after the spec update workflow completes
+  workflow_run:
+    workflows: ["Update API Specification"]
+    types: [completed]
+
+  # Allow manual trigger for testing
+  workflow_dispatch:
+
+concurrency:
+  group: sync-api-endpoints
+  cancel-in-progress: false
+
+jobs:
+  detect-and-create-prs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Only run if spec update succeeded (or manual trigger)
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Configure git
+        run: |
+          git config user.name "API Docs Bot"
+          git config user.email "noreply@checkly.com"
+
+      - name: Ensure labels exist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create "auto-generated" --color "0e8a16" --description "Automatically generated PR" --force
+          gh label create "api-docs" --color "1d76db" --description "API documentation changes" --force
+
+      - name: Detect new endpoints and create PRs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node .github/scripts/detect-new-endpoints.mjs

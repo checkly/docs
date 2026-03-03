@@ -15,6 +15,7 @@ Variable|Description
 `LOG_LEVEL`|(Default: `INFO`) Set the log level of the agent. Can be one of `DEBUG`, `LOG`, `INFO`, `WARN` or `ERROR`.
 `USE_OS_DNS_RESOLVER`|When set to true, TCP monitors will resolve DNS using `getaddrinfo` C function, instead of using the network. This enables easier DNS resolution for internal services e.g. services running in the same Kubernetes cluster.
 `DEPENDENCY_CACHE`|(Default: `OFF`) Set to `CHECKLY_S3` to enable dependency caching for [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview). Caches installed dependencies between runs to speed up check execution. Learn more about [dependency caching](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#dependency-caching).
+`AGENT_HEALTH_PORT`|(Default: `8081`) Port for the HTTP [health probe endpoints](#health-probe-endpoints).
 
 For example, you can add these variables to the standard docker run command like this:
 
@@ -150,6 +151,18 @@ To configure the agent to trust the certificate, first copy the certificate as a
 ```bash Terminal
 docker run -v ~/certificate.pem:/checkly/certificate.pem -e NODE_EXTRA_CA_CERTS=/checkly/certificate.pem -e API_KEY="pl_...." -d checkly/agent:latest
 ```
+
+## Health Probe Endpoints
+
+The Checkly Agent exposes HTTP health probe endpoints on port `8081` by default. You can change this port using the `AGENT_HEALTH_PORT` environment variable.
+
+Endpoint|Description
+---|---
+`GET /-/readiness`|Returns `200 OK` when the agent is ready to accept work. Returns `503 Service Unavailable` during shutdown.
+`GET /-/liveness`|Returns `200 OK` to indicate the agent process is running.
+`GET /health`|Returns `200 OK` as a general health check.
+
+These endpoints are useful for configuring [Kubernetes readiness and liveness probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) or any other container orchestration health checks.
 
 ## Agent Version and Runtimes
 

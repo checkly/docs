@@ -1,0 +1,64 @@
+---
+title: checkly skills
+description: 'Print Checkly project, CLI and workflow context as Markdown for AI agents and LLMs.'
+sidebarTitle: 'checkly skills'
+---
+
+<Note>Available since CLI v7.5.0.</Note>
+
+The `checkly skills` command outputs Markdown-formatted context about your Checkly project, describing monitoring capabilities and how to use them programmatically. **This context is designed to be discovered and consumed by AI agents and LLMs**, giving them the information they need to work with your monitoring setup.
+
+You can also install [Checkly Skills as an agent skill](/integrations/ai/skills) to let your AI agent automatically discover and use the `checkly skills` command.
+
+<Accordion title="Prerequisites">
+Before using `checkly skills`, ensure you have:
+
+- Checkly CLI installed
+
+No existing Checkly account is required to access Checkly skills and documentation.
+</Accordion>
+
+## Usage
+
+`checkly skills` provides your agent with all the required information to manage your Checkly monitoring setup. All resources and workflows are discoverable to provide your agent the right information at the right time.
+
+```bash Terminal
+npx checkly skills
+npx checkly skills <action> [resource]
+```
+
+## Subcommands
+
+| Subcommand | Description |
+|------------|-------------|
+| `initialize` | Let your agent initialize [a new Checkly project](/constructs/project). |
+| `configure` | Let your agent configure [Checkly constructs](/constructs/overview). |
+
+## `checkly skills initialize` (experimental)
+
+The `initialize` subcommand outputs LLM-optimized Markdown with all the context an agent needs to set up a new Checkly project from scratch. The context will instruct your agent to install required packages, create config files and scan your current project for resources to monitor.
+
+**Usage:**
+
+```bash Terminal
+npx checkly skills initialize
+```
+
+<Tip>
+You can prompt your agent with **"run `npx checkly skills initialize` and follow the instructions"** and the agent will have everything it needs to scaffold your Checkly monitoring setup.
+</Tip>
+
+## `checkly skills configure [resource]`
+
+The `configure` subcommand is an umbrella command that provides Markdown context about all available Checkly resources. The CLI outputs everything your agent needs to configure [Checkly constructs](/constructs/overview) directly — no additional docs fetching or file reading required.
+
+Run `configure` without arguments to see all available resources, or pass a specific resource name to get targeted context.
+
+**Usage:**
+
+```bash Terminal
+npx checkly skills configure
+npx checkly skills configure api-checks
+npx checkly skills configure browser-checks
+# ...and more
+```

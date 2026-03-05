@@ -32,32 +32,32 @@ npx checkly pw-test [checkly options] -- [playwright options]
 
 Define `checkly pw-test` specific options before the `--` separator:
 
-| Option | Description |
-|--------|-------------|
-| `--config` | The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts\|js` file in the current directory. |
-| `--create-check` | Create a Checkly check from the Playwright test. |
-| `--env, -e` | Env vars to be passed to the test run. Default: [] |
-| `--env-file` | dotenv file path to be passed. For example `--env-file="./.env"` |
-| `--installCommand` | Override the command used to install dependencies before running tests. |
-| `--location, -l` | The location to run the checks at. |
-| `--private-location` | The private location to run checks at. |
-| `--[no-]record` | Record test results in Checkly as a test session with full logs, traces and videos. |
-| `--reporter` | A list of custom reporters for the test output. |
-| `--stream-logs` | Stream logs from the test run to the console. |
-| `--test-session-name` | A name to use when storing results in Checkly |
-| `--timeout` | A timeout (in seconds) to wait for checks to complete. |
-| `--verbose` | Always show the full logs of the checks. |
+| Option | Required | Description |
+|--------|----------|-------------|
+| `--config` | - | The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts\|js` file in the current directory. |
+| `--create-check` | - | Create a Checkly check from the Playwright test. |
+| `--env, -e` | - | Env vars to be passed to the test run. Default: [] |
+| `--env-file` | - | dotenv file path to be passed. For example `--env-file="./.env"` |
+| `--installCommand` | - | Override the command used to install dependencies before running tests. |
+| `--location, -l` | - | The location to run the checks at. |
+| `--private-location` | - | The private location to run checks at. |
+| `--[no-]record` | - | Record test results in Checkly as a test session with full logs, traces and videos. |
+| `--reporter` | - | A list of custom reporters for the test output. |
+| `--stream-logs` | - | Stream logs from the test run to the console. |
+| `--test-session-name` | - | A name to use when storing results in Checkly |
+| `--timeout` | - | A timeout (in seconds) to wait for checks to complete. |
+| `--verbose` | - | Always show the full logs of the checks. |
 
 </Tab>
 <Tab title="Playwright Test Options">
 
 Define Playwright test runner flags after the `--` separator:
 
-| Option | Description |
-|------|-------------|
-| `--project` | Select Playwright projects |
-| `--grep` | Filter tests by pattern |
-| `--grep-invert` | Exclude tests by pattern |
+| Option | Required | Description |
+|------|----------|-------------|
+| `--project` | - | Select Playwright projects |
+| `--grep` | - | Filter tests by pattern |
+| `--grep-invert` | - | Exclude tests by pattern |
 
 <Tip>The `--reporter` and `--headed` options are not supported. Find more Playwright options in the [Playwright test runner docs](https://playwright.dev/docs/test-cli).</Tip>
 
@@ -123,7 +123,7 @@ const config = defineConfig({
 
 </ResponseField>
 
-<ResponseField name="--env, -e">
+<ResponseField name="--env, -e" type="string[]">
 
 Pass environment variables to the test run. Can be specified multiple times to set multiple variables.
 

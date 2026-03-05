@@ -18,25 +18,25 @@ The basic command triggers all checks in your account that are already deployed.
 npx checkly trigger [options]
 ```
 
-| Option | Description |
-|--------|-------------|
-| `--config, -c` | The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts\|js` file in the current directory. |
-| `--env, -e` | Env vars to be passed to the check run. Default: empty. Multiple values can be passed. |
-| `--env-file` | dotenv file path to be passed. For example `--env-file="./.env"` |
-| `--fail-on-no-matching` | Exit with a failing status code when there are no matching tests. |
-| `--location, -l` | The location to run the checks at. |
-| `--private-location` | The private location to run checks at. |
-| `--record` | Record check results in Checkly as a test session with full logs, traces and videos. |
-| `--reporter, -r` | A list of custom reporters for the test output. |
-| `--retries` | How many times to retry a check run. |
-| `--tags, -t` | Filter the checks to be run using a comma separated list of tags. |
-| `--test-session-name, -n` | A name to use when storing results in Checkly with `--record`. |
-| `--timeout` | A timeout (in seconds) to wait for checks to complete. |
-| `--verbose, -v` | Always show the full logs of the checks. |
+| Option | Required | Description |
+|--------|----------|-------------|
+| `--config, -c` | - | The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts\|js` file in the current directory. |
+| `--env, -e` | - | Env vars to be passed to the check run. Default: empty. Multiple values can be passed. |
+| `--env-file` | - | dotenv file path to be passed. For example `--env-file="./.env"` |
+| `--fail-on-no-matching` | - | Exit with a failing status code when there are no matching tests. |
+| `--location, -l` | - | The location to run the checks at. |
+| `--private-location` | - | The private location to run checks at. |
+| `--record` | - | Record check results in Checkly as a test session with full logs, traces and videos. |
+| `--reporter, -r` | - | A list of custom reporters for the test output. |
+| `--retries` | - | How many times to retry a check run. |
+| `--tags, -t` | - | Filter the checks to be run using a comma separated list of tags. |
+| `--test-session-name, -n` | - | A name to use when storing results in Checkly with `--record`. |
+| `--timeout` | - | A timeout (in seconds) to wait for checks to complete. |
+| `--verbose, -v` | - | Always show the full logs of the checks. |
 
 ## Command Options
 
-<ResponseField name="--config" type="string" alias="-c">
+<ResponseField name="--config, -c" type="string">
 
 Specify a configuration file to use instead of the `checkly.config.ts` or `checkly.config.js` in the current directory.
 
@@ -49,7 +49,7 @@ npx checkly trigger -c="./checkly.staging.config.ts"
 
 </ResponseField>
 
-<ResponseField name="--env">
+<ResponseField name="--env, -e" type="string[]">
 
 [Environment variables](/cli/environment-variables) to be passed to the check run. Multiple values can be passed and passed variables overwrite any existing variables stored in your Checkly account.
 
@@ -99,7 +99,7 @@ The dotenv file should contain KEY=value pairs, one per line.
 
 </ResponseField>
 
-<ResponseField name="--location" type="string" alias="-l">
+<ResponseField name="--location, -l" type="string">
 The location to run the checks at.
 
 **Usage:**
@@ -138,7 +138,7 @@ npx checkly trigger --private-location"vpc-location" --config="internal.config.j
 Private locations must be configured in your Checkly account before use.
 </ResponseField>
 
-<ResponseField name="--tags">
+<ResponseField name="--tags, -t" type="string[]">
 Filter checks using tags. Checks run if they contain all specified tags in a single --tags flag. Multiple --tags flags create OR conditions.
 
 **Usage:**
@@ -165,7 +165,7 @@ npx checkly trigger --tags="production,webapp" --tags="production,backend"
 Tags are comma-separated within a single flag for AND logic, multiple flags for OR logic.
 </ResponseField>
 
-<ResponseField name="--test-session-name" type="string" >
+<ResponseField name="--test-session-name, -n" type="string">
 
 A name to use when storing results in Checkly with `--record`.
 
@@ -177,7 +177,7 @@ npx checkly trigger --record --test-session-name="Custom session name"
 
 </ResponseField>
 
-<ResponseField name="--reporter" type="string">
+<ResponseField name="--reporter, -r" type="string">
 
 Custom reporters for test output formatting.
 
@@ -210,7 +210,7 @@ npx checkly trigger --reporter json > results.json
 Available options: `list`, `dot`, `ci`, `github`, `json`. Each provides different output formatting.
 </ResponseField>
 
-<ResponseField name="--verbose" type="boolean">
+<ResponseField name="--verbose, -v" type="boolean">
 
 Always show the full logs of the checks.
 

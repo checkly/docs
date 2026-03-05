@@ -6,7 +6,7 @@ set -e
 
 LIVE_API_URL="https://api.checklyhq.com/openapi.json"
 API_SPEC_PATH="./api-reference/openapi.json"
-TEMP_FILE="/tmp/checkly_openapi.json"
+TEMP_FILE="./.checkly_openapi_tmp.json"
 
 echo "📥 Fetching live API specification from $LIVE_API_URL..."
 curl -s "$LIVE_API_URL" > "$TEMP_FILE"

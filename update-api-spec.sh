@@ -16,6 +16,11 @@ if [ ! -s "$TEMP_FILE" ]; then
     exit 1
 fi
 
+echo "🔧 Fixing invalid OpenAPI schema fields..."
+# Fix maxPacketLossThreshold.minimum which contains a Joi.ref() object instead of a number
+jq '.components.schemas.IcmpMonitorCreate.properties.maxPacketLossThreshold.minimum = 0
+  | .components.schemas.IcmpMonitorUpdate.properties.maxPacketLossThreshold.minimum = 0' "$TEMP_FILE" > "${TEMP_FILE}.fixed" && mv "${TEMP_FILE}.fixed" "$TEMP_FILE"
+
 echo "🔧 Cleaning up HTML in descriptions..."
 # Convert common HTML tags to Markdown
 # Order matters: convert <code> first so <b> patterns work on remaining content

@@ -4,7 +4,7 @@
 
 set -e
 
-LIVE_API_URL="https://api-dev.checklyhq.com/openapi.json"
+LIVE_API_URL="https://api.checklyhq.com/openapi.json"
 API_SPEC_PATH="./api-reference/openapi.json"
 TEMP_FILE="./.tmp_checkly_openapi.json"
 

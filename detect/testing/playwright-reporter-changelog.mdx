@@ -13,6 +13,27 @@ Learn more about:
 
 ## Full release history
 
+<Update label="v1.8.0" tags={["March 2026"]}>
+  **Breaking Changes**
+
+  - **`verbose` renamed to `debug`** — The previous `verbose` option has been renamed to `debug` (disabled by default) for Checkly reporter diagnostic logging. The `verbose` option now controls worker output forwarding instead. If you were using `verbose: true` for debug logging, update to `debug: true`.
+
+  **Added**
+
+  - **Worker output forwarding** — `stdout` and `stderr` from your test workers now appear directly in your terminal, so you can see `console.log` output and error messages alongside test results as they run. Control this with the `verbose` option (enabled by default).
+
+  **Improved**
+
+  - **Faster, more reliable config annotation** — The Playwright config source view in Checkly now works consistently across all environments, including projects that don't use TypeScript.
+  - **Smaller report sizes** — Network requests and console messages are no longer embedded in the JSON report. They're still captured in the trace and displayed in the Checkly UI exactly as before, but reports are now significantly smaller — especially for tests with heavy network traffic.
+
+  **Fixed**
+
+  - **Compatibility with bundled environments** — Fixed an issue where the reporter could fail to load in certain CI or runner configurations due to module format mismatches.
+  - **JavaScript config annotation** — Fixed config annotation failing for JavaScript Playwright config files.
+  - **Trace extraction for non-browser tests** — Fixed console logs and network requests not being extracted from traces when the test doesn't open a browser context.
+</Update>
+
 <Update label="v1.7.1" tags={["March 2026"]}>
   **Added**
 

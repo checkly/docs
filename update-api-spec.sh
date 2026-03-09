@@ -6,7 +6,7 @@ set -e
 
 LIVE_API_URL="https://api.checklyhq.com/openapi.json"
 API_SPEC_PATH="./api-reference/openapi.json"
-TEMP_FILE="/tmp/checkly_openapi.json"
+TEMP_FILE="./.checkly_openapi_tmp.json"
 
 echo "📥 Fetching live API specification from $LIVE_API_URL..."
 curl -s "$LIVE_API_URL" > "$TEMP_FILE"
@@ -15,6 +15,11 @@ if [ ! -s "$TEMP_FILE" ]; then
     echo "❌ Failed to fetch API specification"
     exit 1
 fi
+
+echo "🔧 Fixing invalid OpenAPI schema fields..."
+# Fix maxPacketLossThreshold.minimum which contains a Joi.ref() object instead of a number
+jq '.components.schemas.IcmpMonitorCreate.properties.maxPacketLossThreshold.minimum = 0
+  | .components.schemas.IcmpMonitorUpdate.properties.maxPacketLossThreshold.minimum = 0' "$TEMP_FILE" > "${TEMP_FILE}.fixed" && mv "${TEMP_FILE}.fixed" "$TEMP_FILE"
 
 echo "🔧 Cleaning up HTML in descriptions..."
 # Convert common HTML tags to Markdown

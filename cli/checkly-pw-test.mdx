@@ -42,7 +42,7 @@ Define `checkly pw-test` specific options before the `--` separator:
 | `--location, -l` | - | The location to run the checks at. |
 | `--private-location` | - | The private location to run checks at. |
 | `--[no-]record` | - | Record test results in Checkly as a test session with full logs, traces and videos. |
-| `--reporter` | - | A list of custom reporters for the test output. |
+| `--reporter` | - | One or more custom reporters for the test output. Supports comma-separated values and repeated flags. |
 | `--stream-logs` | - | Stream logs from the test run to the console. |
 | `--test-session-name` | - | A name to use when storing results in Checkly |
 | `--timeout` | - | A timeout (in seconds) to wait for checks to complete. |
@@ -200,15 +200,27 @@ npx checkly pw-test --no-record
 
 </ResponseField>
 
-<ResponseField name="--reporter" type="string">
+<ResponseField name="--reporter" type="string[]">
 
-Specify a custom reporter for the test output. Available options: `list`, `dot`, `ci`, `github`, `json`
+One or more custom reporters for the test output. Options: `list`, `dot`, `ci`, `github`, `json`.
+
+You can combine multiple reporters by passing multiple `--reporter` flags or using a comma-separated list.
 
 **Usage:**
 
 ```bash Terminal
 npx checkly pw-test --reporter="json"
 npx checkly pw-test --reporter="github"
+```
+
+**Examples:**
+
+```bash Terminal
+# Multiple reporters using comma-separated values
+npx checkly pw-test --reporter list,json
+
+# Multiple reporters using repeated flags
+npx checkly pw-test --reporter list --reporter json
 ```
 
 </ResponseField>

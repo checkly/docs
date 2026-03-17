@@ -33,11 +33,11 @@ You can use the following event-related variables in both URL and payload.
 
 | Variable                         | Description                                                                                                                                                                        |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AI_ANALYSIS_CLASSIFICATION`     | Classification of the failure / error. Available when AI automation is enabled.                                                                                                    |
-| `AI_ANALYSIS_CODE_FIX`           | A code fix to resolve the analyzed problem. Available when AI automation is enabled.                                                                                               |
-| `AI_ANALYSIS_LINK`               | Direct link to full AI analysis. Available when AI automation is enabled.                                                                                                          |
-| `AI_ANALYSIS_ROOT_CAUSE`         | Description of possible root cause. Available when AI automation is enabled.                                                                                                       |
-| `AI_ANALYSIS_USER_IMPACT`        | Description of the user impact. Available when AI automation is enabled.                                                                                                           |
+| `AI_ANALYSIS_CLASSIFICATION`     | Classification of the failure / error. Available when RockyAI automation is enabled.                                                                                                    |
+| `AI_ANALYSIS_CODE_FIX`           | A code fix to resolve the analyzed problem. Available when RockyAI automation is enabled.                                                                                               |
+| `AI_ANALYSIS_LINK`               | Direct link to full AI analysis. Available when RockyAI automation is enabled.                                                                                                          |
+| `AI_ANALYSIS_ROOT_CAUSE`         | Description of possible root cause. Available when RockyAI automation is enabled.                                                                                                       |
+| `AI_ANALYSIS_USER_IMPACT`        | Description of the user impact. Available when RockyAI automation is enabled.                                                                                                           |
 | `ALERT_TITLE`                    | Human readable title, e.g. 'Check "My API check" has failed'                                                                                                                       |
 | `ALERT_TYPE`                     | Type of alert, e.g. "ALERT_FAILURE", "ALERT_RECOVERY", "ALERT_DEGRADED", "ALERT_DEGRADED_RECOVERY". See [alert states](/communicate/alerts/overview#alert-states) for all options. |
 | `API_CHECK_RESPONSE_STATUS_CODE` | The response status code, e.g. 200. Only populated for API checks.                                                                                                                 |
@@ -56,6 +56,27 @@ You can use the following event-related variables in both URL and payload.
 | `SSL_DAYS_REMAINING`             | How many days remain on the SSL certificate. For ALERT_SSL only.                                                                                                                   |
 | `STARTED_AT`                     | The ISO timestamp from when this check run started                                                                                                                                 |
 | `TAGS`                           | An array of tags assigned to the check. Have a look at our Opsgenie example below on how to render this to a JSON array.                                                           |
+
+### Using AI analysis data in alerts
+
+When [automatic RockyAI analysis](/resolve/ai-root-cause-analysis/overview#automatic-analysis) is enabled, you can include AI-generated root cause and user impact data in your webhook payloads. Use `{{#if}}` guards so the payload works whether AI analysis data is available or not.
+
+```json
+{
+  "message": "{{ALERT_TITLE}}",
+  "link": "{{RESULT_LINK}}",
+  {{#if AI_ANALYSIS_ROOT_CAUSE}}
+  "root_cause": "{{AI_ANALYSIS_ROOT_CAUSE}}",
+  {{/if}}
+  {{#if AI_ANALYSIS_USER_IMPACT}}
+  "user_impact": "{{AI_ANALYSIS_USER_IMPACT}}",
+  {{/if}}
+  {{#if AI_ANALYSIS_LINK}}
+  "ai_analysis_link": "{{AI_ANALYSIS_LINK}}",
+  {{/if}}
+  "classification": "{{AI_ANALYSIS_CLASSIFICATION}}"
+}
+```
 
 ### Handlebars Helpers
 

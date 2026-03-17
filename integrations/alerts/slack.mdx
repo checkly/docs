@@ -216,9 +216,39 @@ The following template uses conditional logic (`{{#if}}`) to change the message 
 }
 ```
 
-<Note> 
+<Note>
 Be sure to update or remove the placeholder button links to Runbooks, OTel provider and anything else that is not needed for your use case.
 </Note>
+
+<Tip>
+**Include AI analysis data**: If you have [automatic RockyAI analysis](/resolve/ai-root-cause-analysis/overview#automatic-analysis) enabled, you can add RockyAI fields to your custom Slack template. Add the following block before the "View full result" section to show root cause and user impact when available:
+
+```json
+{{#if AI_ANALYSIS_ROOT_CAUSE}}
+{
+  "type": "section",
+  "text": {
+    "type": "mrkdwn",
+    "text": "*AI Root Cause:*\n{{AI_ANALYSIS_ROOT_CAUSE}}"
+  }
+},
+{
+  "type": "section",
+  "text": {
+    "type": "mrkdwn",
+    "text": "*User Impact:*\n{{AI_ANALYSIS_USER_IMPACT}}"
+  }
+},
+{
+  "type": "section",
+  "text": {
+    "type": "mrkdwn",
+    "text": "View full AI analysis: <{{AI_ANALYSIS_LINK}}|Open in Checkly>"
+  }
+},
+{{/if}}
+```
+</Tip>
 
 <Note> 
 Be sure each check mapped in the runbook logic has a corresponding URL. If a match isn’t found, fallback to a default documentation page.

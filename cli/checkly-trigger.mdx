@@ -27,7 +27,7 @@ npx checkly trigger [options]
 | `--location, -l` | - | The location to run the checks at. |
 | `--private-location` | - | The private location to run checks at. |
 | `--record` | - | Record check results in Checkly as a test session with full logs, traces and videos. |
-| `--reporter, -r` | - | A list of custom reporters for the test output. |
+| `--reporter, -r` | - | One or more custom reporters for the test output. Supports comma-separated values and repeated flags. |
 | `--retries` | - | How many times to retry a check run. |
 | `--tags, -t` | - | Filter the checks to be run using a comma separated list of tags. |
 | `--test-session-name, -n` | - | A name to use when storing results in Checkly with `--record`. |
@@ -177,9 +177,11 @@ npx checkly trigger --record --test-session-name="Custom session name"
 
 </ResponseField>
 
-<ResponseField name="--reporter, -r" type="string">
+<ResponseField name="--reporter, -r" type="string[]">
 
-Custom reporters for test output formatting.
+One or more custom reporters for the test output. Options: `list`, `dot`, `ci`, `github`, `json`.
+
+You can combine multiple reporters by passing multiple `--reporter` flags or using a comma-separated list.
 
 **Usage:**
 
@@ -205,9 +207,17 @@ npx checkly trigger --reporter github
 
 # JSON output for programmatic use
 npx checkly trigger --reporter json > results.json
+
+# Multiple reporters using comma-separated values
+npx checkly trigger --reporter list,json
+
+# Multiple reporters using repeated flags
+npx checkly trigger --reporter list --reporter json
+
+# Short form with multiple reporters
+npx checkly trigger -r github -r json
 ```
 
-Available options: `list`, `dot`, `ci`, `github`, `json`. Each provides different output formatting.
 </ResponseField>
 
 <ResponseField name="--verbose, -v" type="boolean">

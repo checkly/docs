@@ -3,64 +3,47 @@ title: 'Agent Images'
 sidebarTitle: 'Agent Images'
 ---
 
-Checkly provides different agent images tailored to specific use cases:
+Checkly provides different agent images:
 
-* **Standard**: The full agent image, supporting all check types
+* [Standard](#standard-image): The full agent image, supporting all check types
 
-* **Dev**: The standard image with build tools for compiling npm packages with native dependencies
+* [Dev](#dev-image): The standard image with build tools for compiling npm packages with native dependencies
 
-* **Uptime**: A lightweight image for running uptime monitors only
+* [Uptime](#uptime-image): A lightweight image for running uptime monitors only
 
 ## Image Tag Format
 
 Image tags define which agent variant and version you run.
 
-#### Versioned Tags (Recommended)
-
 ```bash
-# Runtime (production)
-docker pull checkly/agent:1.2.3
+# Standard
+docker pull checkly/agent:X.Y.Z
 
 # Dev (with build tools)
-docker pull checkly/agent-dev:1.2.3
+docker pull checkly/agent-dev:X.Y.Z
 
 # Uptime
-docker pull checkly/agent-uptime:1.2.3
+docker pull checkly/agent-uptime:X.Y.Z
 ```
 
-#### Floating Tags
-
-```bash
-# Latest runtime release
-docker pull checkly/agent:latest
-
-# Latest dev release
-docker pull checkly/agent-dev:latest
-
-# Latest uptime release
-docker pull checkly/agent-uptime:latest
-```
-
-<Note>  Use versioned tags for reproducible deployments. Floating tags (like `:latest`) may change between pulls.</Note>
+<Note>Use versioned tags for reproducible deployments. Floating tags (like `:latest`) may change between pulls. Browse available versions on [Docker Hub](https://hub.docker.com/r/checkly/agent/tags).</Note>
 
 ## Standard Image
 
-The standard image (checkly/agent:X.Y.Z) is the default and recommended option for most setups.
+The standard image (`checkly/agent:X.Y.Z`) is the default and recommended option for most setups.
 
 It supports the full range of Checkly monitors:
 
-* Synthetic checks: API, Multistep, Browser and Playwright Check Suites
-* Uptime monitors: URL, DNS, TCP, ICMP, Heartbeat
+* [Synthetic checks](/detect/synthetic-monitoring/overview): API, Multistep, Browser and Playwright Check Suites
+* [Uptime monitors](/detect/uptime-monitoring/overview): URL, DNS, TCP, ICMP, Heartbeat
 
 Use the standard image unless you have a specific need for the dev or uptime variants.
 
 ## Uptime Image
 
-The uptime image (checkly/agent:uptime) is a lightweight version of the agent designed for uptime monitoring only.
+The uptime image (`checkly/agent-uptime:X.Y.Z`) is a lightweight version of the agent designed for [uptime monitoring](/detect/uptime-monitoring/overview) only.
 
 It supports URL, DNS, TCP, ICMP and Heartbeat monitors.
-
-Use this image if you only need uptime checks and want a smaller, more focused runtime.
 
 ## Dev Image
 
@@ -68,7 +51,7 @@ If any of the checks you run on Private Locations rely on npm packages with nati
 
 The standard agent is optimized for size and doesn’t ship with build tools. In those cases, you’ll need to use the dev image instead.
 
-### When to Use the Dev Image
+#### When to Use the Dev Image
 
 Use the dev image (`checkly/agent-dev:X.Y.Z`) when your checks require npm packages with native dependencies that need compilation. Common examples include:
 
@@ -77,7 +60,7 @@ Use the dev image (`checkly/agent-dev:X.Y.Z`) when your checks require npm packa
 
 If your checks only use pure JavaScript packages, the standard runtime image is recommended for its smaller size and faster startup.
 
-### What's Included in the Dev Image
+#### What's Included in the Dev Image
 
 The dev agent works exactly like the standard agent, but includes the build tools required to compile native modules. 
 
@@ -90,7 +73,7 @@ It adds the following to the standard image:
 
 These tools enable compilation of native Node.js modules during `npm install`.
 
-### FAQ
+#### FAQ
 
 <Accordion title="Can I use the dev image in production?">
 Yes, the dev image is production-ready. It contains the same runtime as the standard image, plus build tools. The only tradeoff is a larger image size.

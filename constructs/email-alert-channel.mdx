@@ -37,6 +37,10 @@ const emailChannel = new EmailAlertChannel("ops-email-channel", {
 
 </CodeGroup>
 
+<Note>
+  If you need to reference existing alert channels that were created outside of your CLI project, use [`fromId()`](/constructs/alert-channel#using-fromid-to-reference-an-existing-channel).
+</Note>
+
 ## Configuration
 
 <Tabs>
@@ -300,35 +304,3 @@ new ApiCheck("comprehensive-monitoring", {
 **Email Delivery**: Email notifications may be subject to spam filters or delivery delays. For critical alerts, consider combining email with other notification methods like SMS or Slack.
 </Warning>
 
-## Reference an alert channel by ID
-
-If your Checkly account includes alert channels that are not controlled via Checkly constructs, find the email channel ID in the Checkly web UI or via the API and set it using `EmailAlertChannel.fromId()`.
-
-<Tabs>
-  <Tab title="Web UI">
-    1. Go to [Alert Channels](https://app.checklyhq.com/alerts/) in your Checkly dashboard
-    2. Find your email channel and note the ID in the URL or channel details
-  </Tab>
-
-  <Tab title="API">
-    ```bash
-    curl -H "Authorization: Bearer YOUR_API_KEY" \
-         -H "X-Checkly-Account: YOUR_ACCOUNT_ID" \
-         https://api.checklyhq.com/v1/alert-channels/
-    ```
-  </Tab>
-</Tabs>
-
-```ts Using Existing Channel
-// Reference an existing email channel by ID
-const existingEmailChannel = EmailAlertChannel.fromId(123)
-
-new ApiCheck("existing-channel-check", {
-  name: "Check with Existing Channel",
-  alertChannels: [existingEmailChannel],
-  request: {
-    method: "GET",
-    url: "https://api.acme.com/endpoint",
-  },
-})
-```

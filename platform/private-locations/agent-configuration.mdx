@@ -16,7 +16,7 @@ Variable|Description
 `USE_OS_DNS_RESOLVER`|When set to true, TCP monitors will resolve DNS using `getaddrinfo` C function, instead of using the network. This enables easier DNS resolution for internal services e.g. services running in the same Kubernetes cluster.
 `DEPENDENCY_CACHE`|(Default: `OFF`) Set to `CHECKLY_S3` to enable dependency caching for [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview). Caches installed dependencies between runs to speed up check execution. Learn more about [dependency caching](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#dependency-caching).
 `AGENT_HEALTH_PORT`|(Default: `8081`) Port for the HTTP [health probe endpoints](#health-probe-endpoints).
-`EXTERNAL_OBSERVABILITY`|(Default: `ON`) Set to `OFF` to disable [external observability](#external-observability) reporting of agent runtime errors to Checkly.
+`EXTERNAL_OBSERVABILITY`| Enabled by default. Set to `off` to disable [external observability](#external-observability) reporting of agent runtime errors to Checkly.
 
 For example, you can add these variables to the standard docker run command like this:
 
@@ -171,10 +171,10 @@ The Checkly Agent reports error-level events to Checkly to help detect crashes, 
 
 Only limited technical metadata is collected (e.g. error messages, stack traces, agent version, platform, go runtime information). Sensitive data such as API keys, environment variables, check configuration, URLs, headers, and response bodies is **never** sent.
 
-To disable external observability, set the `EXTERNAL_OBSERVABILITY` environment variable to `OFF`:
+To disable external observability, set the `EXTERNAL_OBSERVABILITY` environment variable to `off`:
 
 ```bash Terminal
--e EXTERNAL_OBSERVABILITY=OFF
+-e EXTERNAL_OBSERVABILITY=off
 ```
 
 ## Agent Version and Runtimes

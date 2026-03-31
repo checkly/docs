@@ -187,12 +187,15 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /resolve/traces/instrumentation/java
 - /resolve/traces/instrumentation/dotnet
 
-## Integrations
+## AI
 
-### Integrations - AI
-- /integrations/ai/overview
-- /integrations/ai/skills
-- /integrations/ai/rules
+- /ai/overview
+- /ai/skills
+- /ai/markdown-access
+- /ai/llms-txt
+- /ai/rules
+
+## Integrations
 
 ### Integrations - Alerts & Notifications
 - /integrations/alerts/discord

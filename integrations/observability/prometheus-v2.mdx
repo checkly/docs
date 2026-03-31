@@ -127,6 +127,29 @@ Here is an example for how to set this in your `prometheus.yml` config:
     locationLabelEnabled: ['true']
 ```
 
+### Check Retry Attempts
+
+By default, [retry attempts](/communicate/alerts/retries/) are not included in the reported metrics. For example, if a check is failing on the initial attempt and passing on the retry, `checkly_check_result_total` and other metrics will only report the final passing check result.
+
+It is possible to include retry attempts by adding the query param `includeRetryAttempts=true` to your API request. Metrics reporting information on check results will then include retry attempts.
+
+An exception to this behaviour is `checkly_check_status`, which reports whether the check is currently in a passing, degraded, or failing state. Since retry attempts don't affect the checks state and only the final check result determines the state, this metric ignores retry attempts regardless of the `includeRetryAttempts` setting. For example, if a check is failing on retry attempts and passing on the retry, `checkly_check_status` will report that the check is passing.
+
+Here is an example for how to configure `includeRetryAttempts` in your `prometheus.yml` config:
+
+```yaml
+# prometheus.yml
+- job_name: 'checkly'
+  scrape_interval: 60s
+  metrics_path: '/accounts/<your account ID>/v2/prometheus/metrics'
+  bearer_token: '<your bearer token>'
+  scheme: https
+  static_configs:
+  - targets: ['api.checklyhq.com']
+  params:
+    includeRetryAttempts: ['true']
+```
+
 ### PromQL Examples
 
 This section contains a few PromQL queries that you can use to start working with the Prometheus data.

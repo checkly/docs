@@ -16,6 +16,17 @@ Learn more about:
 
 ## Full release history
 
+<Update label="v7.0.0" tags={["March 2026"]}>
+  - Added support for running [ICMP](/detect/uptime-monitoring/icmp-monitors/overview) and [DNS monitors](/detect/uptime-monitoring/dns-monitors/overview) on Private Locations
+  - Introduced the [uptime agent image](/platform/private-locations/agent-images#uptime-image), a lightweight version of the agent for running uptime monitors (URL, DNS, TCP, ICMP, Heartbeat) only
+  - Added [external observability](/platform/private-locations/agent-configuration#external-observability) for Private Location agents to capture runtime errors
+    - Error-level events can be reported to Checkly to help detect crashes, bugs, and environment-related issues
+    - Only limited technical metadata is collected (error message, stack trace, agent version, platform, Go runtime)
+    - Sensitive data such as API keys, environment variables, check configuration, URLs, headers, and response bodies is never sent
+    - Enabled by default, can be disabled with `EXTERNAL_OBSERVABILITY=off`
+  - Support for runtime `2026.04`
+</Update>
+
 <Update label="v6.3.2" tags={["March 2026"]}>
   - Improved error logging for failed Playwright test report uploads, including the report file size
   - Increased the maximum artifact upload size from 75 MB to 150 MB
@@ -30,7 +41,7 @@ Learn more about:
 </Update>
 
 <Update label="v6.3.0" tags={["December 2025"]}>
-  - Added [agent-dev image](https://www.checklyhq.com/docs/platform/private-locations/dev-agent/) including build tools to support building native npm packages. Going forward, the dev variant is published as a separate image rather than a tag on the main agent image
+  - Added [agent-dev image](https://www.checklyhq.com/docs/platform/private-locations/agent-images/) including build tools to support building native npm packages. Going forward, the dev variant is published as a separate image rather than a tag on the main agent image
   - Improved secret scrubbing speed
   - Improved error logging for hanging or long running Playwright Check Suite jobs
 </Update>
@@ -40,7 +51,7 @@ Learn more about:
 </Update>
 
 <Update label="v6.1.7" tags={["December 2025"]}>
-  - Added support for a [dev image](https://www.checklyhq.com/docs/platform/private-locations/dev-agent/) including build tools to support building native npm packages
+  - Added support for a [dev image](https://www.checklyhq.com/docs/platform/private-locations/agent-images/) including build tools to support building native npm packages
   - Improved internal logging and metrics for [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview)
   - Browser and Multistep checks using runtime 2025.04 now automatically scrub the `Authorization` header from requests
 </Update>

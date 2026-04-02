@@ -10,43 +10,43 @@ jobs:
   update-api-spec:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    
+
     permissions:
       contents: write
       pull-requests: write
-    
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-    
+
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-    
+
     - name: Install dependencies
       run: |
         npm install -g swagger2openapi
         npm install -g mintlify
-    
+
     - name: Configure git
       run: |
         git config user.name "API Spec Updater"
         git config user.email "noreply@checkly.com"
-    
+
     - name: Fetch and update API specification
       run: |
         # Store current spec hash for comparison
         CURRENT_HASH=$(sha256sum api-reference/openapi.json | cut -d' ' -f1)
-        
+
         # Run the update script
         ./update-api-spec.sh
-        
+
         # Check if spec actually changed
         NEW_HASH=$(sha256sum api-reference/openapi.json | cut -d' ' -f1)
-        
+
         if [ "$CURRENT_HASH" != "$NEW_HASH" ]; then
           echo "API specification has changed"
           echo "spec_changed=true" >> $GITHUB_ENV
@@ -54,7 +54,7 @@ jobs:
           echo "API specification is unchanged"
           echo "spec_changed=false" >> $GITHUB_ENV
         fi
-    
+
     - name: Commit and Push Changes
       if: env.spec_changed == 'true'
       run: |
@@ -66,8 +66,12 @@ jobs:
 
         # Push directly to main
         git push origin main
-    
+
     - name: Report no changes
       if: env.spec_changed == 'false'
       run: |
         echo "✅ API specification is up to date - no changes needed"
+
+    - name: Ping Checkly
+      run: curl -fsS --retry 3 https://ping.checklyhq.com/ad576f21-3f3e-4a6a-b8e4-67fd0f6ed92d
+

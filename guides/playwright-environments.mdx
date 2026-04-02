@@ -119,10 +119,10 @@ export function getLocationCountry() {
   if (process.env.CHECKLY !== "1") return null;
 
   const region = process.env.CHECKLY_REGION;
-  if (region?.startsWith("eu-central")) return "DE";
+  if (region === "eu-central-1") return "DE";
   if (region === "eu-west-1") return "IE";
-  if (region?.startsWith("us")) return "US";
-  if (region?.startsWith("ap")) return "AU";
+  if (region?.startsWith("us-")) return "US";
+  if (region === "ap-southeast-2") return "AU";
   // more regions ...
 
   return null;

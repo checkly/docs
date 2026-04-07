@@ -29,6 +29,7 @@ import { Frequency, IcmpMonitor } from "checkly/constructs"
 
 new IcmpMonitor('icmp-welcome', {
   name: 'Welcome Site Reachability',
+  description: "Pings `welcome.checklyhq.com` to verify **host reachability**.",
   frequency: Frequency.EVERY_1M,
   request: {
     hostname: 'welcome.checklyhq.com',
@@ -43,6 +44,7 @@ import { Frequency, IcmpAssertionBuilder, IcmpMonitor } from "checkly/constructs
 
 new IcmpMonitor('cloudflare-dns-icmp', {
   name: 'Cloudflare DNS ICMP Monitor',
+  description: "Cloudflare DNS reachability and latency check.",
   activated: true,
   frequency: Frequency.EVERY_1M,
   maxPacketLossThreshold: 20, // percentage

@@ -7,6 +7,21 @@ sidebarTitle: Overview
 **Monitoring as Code**: Learn more about the [ICMP Monitor Construct](/constructs/icmp-monitor).
 </Tip>
 
+<Frame>
+<img
+  className="block dark:hidden"
+  src="/images/next/icmp-monitor-overview-light.png"
+  alt="ICMP monitor overview"
+  style={{width: "100%"}}
+/>
+<img
+  className="hidden dark:block"
+  src="/images/next/icmp-monitor-overview-dark.png"
+  alt="ICMP monitor overview"
+  style={{width: "100%"}}
+/>
+</Frame>
+
 ## What are ICMP Monitors?
 
 ICMP monitors check if a host is reachable by sending ICMP Echo Requests (pings). Typical use cases include:
@@ -68,10 +83,32 @@ Learn more in our documentation on [Results](/concepts/results).
 
 ## Troubleshooting Common Issues
 
+<Accordion title="NET_RAW capability error on private locations">
+Container runtimes drop the `NET_RAW` capability by default. ICMP requires raw sockets, so the Checkly Agent needs this capability explicitly granted.
+
+**How to fix**:
+
+In **Kubernetes**, update your pod spec or Helm values:
+
+```yaml
+securityContext:
+  capabilities:
+    add: ["NET_RAW"]
+```
+
+In **Docker**:
+
+```bash
+docker run --cap-add=NET_RAW ghcr.io/checkly/agent:latest
+```
+
+`NET_RAW` only grants permission to create raw sockets. It does not escalate broader container privileges.
+</Accordion>
+
 <Accordion title="100% packet loss but the host is reachable via HTTP">
 **Symptom**: ICMP monitor shows complete packet loss, but the website/API works fine
 
-**Root cause**: 
+**Root cause**:
 * Many organizations block ICMP echo request packets at the firewall, load balancer, or host level as a security measure
 
 **How to detect and fix**:
@@ -80,21 +117,4 @@ Learn more in our documentation on [Results](/concepts/results).
 3. **Confirm with infrastructure team**: Ask if ICMP is intentionally blocked in security policies
 
 **When to use a different monitor type**: If ICMP is deliberately blocked, use TCP, URL, or API checks instead to verify availability at the application layer
-</Accordion>
-
-<Accordion title="High latency or packet loss from specific regions">
-**Symptom**: ICMP monitor shows high latency or packet loss from certain locations but not others
-
-**Root causes**:
-- **Geographic routing**: Network paths vary by region, some routes may be congested
-- **Transit provider issues**: Problems with specific ISPs or peering connections
-- **Rate limiting**: Some hosts rate-limit ICMP responses, affecting distant locations more
-
-**How to detect and fix**:
-1. **Compare across locations**: Run monitors from multiple regions to identify which paths are affected
-2. **Monitor trends over time**: Check if issues are persistent or intermittent
-3. **Cross-reference with other monitor types**: Compare ICMP latency with TCP/HTTP latency from the same locations
-4. **Use latency assertions**: Set region-specific assertions, e.g., `latency.avg` less than `50ms` for nearby regions, `200ms` for distant ones
-
-**Investigation tip**: Persistent high latency from a specific region often indicates routing issues with your hosting provider or CDN configuration
 </Accordion>

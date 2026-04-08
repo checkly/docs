@@ -25,15 +25,18 @@ jobs:
       env:
         ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Pass attacker-controlled fields via env to avoid shell injection.
+        # GitHub Actions template expansion (${{ ... }}) is substituted into
+        # the run script verbatim, so interpolating issue/comment content
+        # directly would allow command injection. Env vars are expanded by
+        # bash at runtime and are not re-parsed.
+        ISSUE_BODY: ${{ github.event.issue.body || github.event.comment.body }}
+        ISSUE_NUMBER: ${{ github.event.issue.number }}
+        ISSUE_TITLE: ${{ github.event.issue.title }}
       run: |
         # Install Claude Code
         curl -fsSL https://claude.ai/install.sh | bash
-        
-        # Get issue content
-        ISSUE_BODY="${{ github.event.issue.body || github.event.comment.body }}"
-        ISSUE_NUMBER="${{ github.event.issue.number }}"
-        ISSUE_TITLE="${{ github.event.issue.title }}"
-        
+
         # Create branch name
         BRANCH_NAME="claude/issue-${ISSUE_NUMBER}"
         

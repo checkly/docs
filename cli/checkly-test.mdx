@@ -28,6 +28,7 @@ npx checkly test [arguments] [options]
 | `--location, -l` | - | The location to run the checks at. |
 | `--private-location` | - | The private location to run checks at. |
 | `--record` | - | Record test results in Checkly as a test session with full logs, traces and videos. |
+| `--refresh-cache` | - | Force a fresh install of dependencies and update the cached version. |
 | `--reporter, -r` | - | One or more custom reporters for the test output. Supports comma-separated values and repeated flags. |
 | `--retries` | - | How many times to retry a failing test run. |
 | `--tags, -t` | - | Filter the checks to be run using a comma separated list of tags. |
@@ -236,6 +237,18 @@ Record test results in Checkly as [a test session](/detect/testing/overview) wit
 ```bash Terminal
 npx checkly test --record
 npx checkly test --record --test-session-name="CI Build #123"
+```
+
+</ResponseField>
+
+<ResponseField name="--refresh-cache" type="boolean" default="false">
+
+Force a fresh install of dependencies and update the cached version. Use this when you've changed your project's dependencies and need Checkly to pick up the latest versions instead of using the cache from a previous run.
+
+**Usage:**
+
+```bash Terminal
+npx checkly test --refresh-cache
 ```
 
 </ResponseField>

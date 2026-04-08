@@ -42,6 +42,7 @@ Define `checkly pw-test` specific options before the `--` separator:
 | `--location, -l` | - | The location to run the checks at. |
 | `--private-location` | - | The private location to run checks at. |
 | `--[no-]record` | - | Record test results in Checkly as a test session with full logs, traces and videos. |
+| `--refresh-cache` | - | Force a fresh install of dependencies and update the cached version. |
 | `--reporter` | - | One or more custom reporters for the test output. Supports comma-separated values and repeated flags. |
 | `--stream-logs` | - | Stream logs from the test run to the console. |
 | `--test-session-name` | - | A name to use when storing results in Checkly |
@@ -183,6 +184,18 @@ Run checks at a specific private location. Private locations allow you to test i
 ```bash Terminal
 npx checkly pw-test --private-location="office-network"
 npx checkly pw-test --private-location="staging-vpc"
+```
+
+</ResponseField>
+
+<ResponseField name="--refresh-cache" type="boolean" default="false">
+
+Force a fresh install of dependencies and update the cached version. Use this when you've changed your project's dependencies and need Checkly to pick up the latest versions instead of using the cache from a previous run.
+
+**Usage:**
+
+```bash Terminal
+npx checkly pw-test --refresh-cache
 ```
 
 </ResponseField>

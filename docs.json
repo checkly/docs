@@ -4,7 +4,7 @@
   "name": "Checkly Docs",
   "colors": {
     "primary": "#0075FF",
-    "light": "#0075FF",
+    "light": "#2B8AFF",
     "dark": "#031834"
   },
   "seo": {
@@ -22,9 +22,6 @@
     }
   ],
   "integrations": {
-    "intercom": {
-      "appId": "ep3ft8gg"
-    },
     "segment": {
       "key": "Bjlk6vx065LS2B25zVBzcfsjTaGrrpAM"
     },
@@ -83,7 +80,7 @@
                     "pages": [
                       "platform/private-locations/overview",
                       "platform/private-locations/agent-configuration",
-                      "platform/private-locations/dev-agent",
+                      "platform/private-locations/agent-images",
                       "platform/private-locations/kubernetes-deployment",
                       "platform/private-locations/proxy-setup",
                       "platform/private-locations/scaling-redundancy",
@@ -104,7 +101,6 @@
                       "platform/runtimes/runtime-specification"
                     ]
                   },
-                  "platform/rocky-ai",
                   "platform/secrets",
                   "platform/dynamic-secret-scrubbing",
                   "platform/data-storage",
@@ -137,8 +133,7 @@
                   },
                   "admin/changing-your-email-password"
                 ]
-              },
-              "changelog/changelog"
+              }
             ]
           },
           {
@@ -297,6 +292,7 @@
             "group": "Resolve",
             "pages": [
               "resolve/overview",
+                "resolve/ai-root-cause-analysis/overview",
               {
                 "group": "Traces",
                 "pages": [
@@ -336,21 +332,22 @@
                     ]
                   }
                 ]
-              },
-              "resolve/ai-root-cause-analysis/overview"
+              }
+            
+            ]
+          },
+          {
+            "group": "AI",
+            "pages": [
+              "ai/rocky-ai",
+                  "ai/overview",
+                  "ai/skills",
+                  "ai/rules"
             ]
           },
           {
             "group": "Integrations",
             "pages": [
-              {
-                "group": "AI Agents & Coding Assistants",
-                "pages": [
-                  "integrations/ai/overview",
-                  "integrations/ai/skills",
-                  "integrations/ai/rules"
-                ]
-              },
               {
                 "group": "Alerts & Notifications",
                 "pages": [
@@ -516,7 +513,7 @@
         ]
       },
       {
-        "tab": "CLI",
+        "tab": "CLI Reference",
         "pages": [
           {
             "group": "Getting Started",
@@ -541,9 +538,11 @@
               "cli/checkly-env",
               "cli/checkly-import",
               "cli/checkly-incidents",
+              "cli/checkly-init",
               "cli/checkly-login",
               "cli/checkly-logout",
               "cli/checkly-pw-test",
+              "cli/checkly-rca",
               "cli/checkly-runtimes",
               "cli/checkly-skills",
               "cli/checkly-status-pages",
@@ -557,7 +556,7 @@
         ]
       },
       {
-        "tab": "API",
+        "tab": "API Reference",
         "pages": [
           {
             "group": "Getting Started",
@@ -831,6 +830,14 @@
                 ]
               },
               {
+                "group": "Rocky AI",
+                "pages": [
+                  "api-reference/rocky-ai/retrieve-one-root-cause-analysis",
+                  "api-reference/rocky-ai/generate-a-root-cause-analysis-for-an-error-group",
+                  "api-reference/rocky-ai/generate-a-root-cause-analysis-for-a-test-session-error-group"
+                ]
+              },
+              {
                 "group": "Runtimes",
                 "pages": [
                   "api-reference/runtimes/lists-all-supported-runtimes",
@@ -904,6 +911,15 @@
                   "api-reference/status-pages/get-all-subscriptions-for-a-specific-status-page",
                   "api-reference/status-pages/delete-a-subscription-belonging-to-a-specific-status-page"
                 ]
+              },
+              {
+                "group": "Test Session Error Groups",
+                "pages": [
+                  "api-reference/test-session-error-groups/list-all-test-session-error-groups",
+                  "api-reference/test-session-error-groups/list-all-test-session-error-groups-for-a-project",
+                  "api-reference/test-session-error-groups/retrieve-a-test-session-error-group",
+                  "api-reference/test-session-error-groups/update-a-test-session-error-group"
+                ]
               }
             ]
           }
@@ -916,6 +932,12 @@
             "group": "Overview",
             "pages": [
               "guides/overview"
+            ]
+          },
+          {
+            "group": "AI and LLMs",
+            "pages": [
+              "guides/agentic-workflows"
             ]
           },
           {
@@ -954,15 +976,11 @@
               "guides/moving-from-puppeteer-to-playwright",
               "guides/developer-fixtures",
               "guides/auto-waiting-methods",
-              "guides/reading-traces"
+              "guides/reading-traces",
+              "guides/playwright-environments"
             ]
           },
-          {
-            "group": "AI and LLMs",
-            "pages": [
-              "guides/agentic-workflows"
-            ]
-          },
+          
           {
             "group": "Advanced Topics",
             "pages": [
@@ -1215,6 +1233,10 @@
       {
         "label": "Home",
         "href": "https://www.checklyhq.com"
+      },
+      {
+        "label": "Changelog",
+        "href": "https://www.checklyhq.com/docs/changelog/changelog/"
       }
     ],
     "primary": {
@@ -1273,6 +1295,10 @@
     {
       "source": "/api-reference/error-groups/retrieve-one-error-group/",
       "destination": "/api-reference/error-groups/retrieve-an-error-group"
+    },
+     {
+      "source": "/platform/private-locations/dev-agent",
+      "destination": "/platform/private-locations/agent-images"
     },
     {
       "source": "/api-reference/error-groups/update-an-error-group-mainly-used-for-archiving-error-groups/",

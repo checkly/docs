@@ -1,0 +1,350 @@
+# Playwright to Checkly — Check Suite Setup Prompt
+
+You are helping me add Checkly Playwright monitoring to an existing repository that already contains Playwright tests.
+
+## Goal
+
+Set up the smallest possible working Checkly Playwright Check Suite from this repository, prove it works with `npx checkly test --record`, and prepare it for deployment with `npx checkly deploy`.
+
+## Success Criteria
+
+1. Create or update the minimal files needed so this repo has a valid `checkly.config.ts`.
+2. Reuse my existing `playwright.config.ts`.
+3. Select only a small subset of tests that are most suitable for synthetic monitoring. Do NOT try to cover the full codebase.
+4. Make sure the selected checks are fast, stable, and understandable.
+5. Let me choose the monitoring frequency and locations.
+6. Ask the user for their alert notification email and/or Slack webhook, then create at least one alert channel in code and assign it to all checks.
+7. Get me to a point where:
+
+   * `npx checkly test --record` succeeds
+   * `npx checkly deploy` is ready to run successfully
+8. Explain what you changed and why.
+
+**You are NOT done until `npx checkly deploy` succeeds.**
+
+## Important Constraints
+
+* Start small: prefer 1 check suite for 1 critical user flow.
+* Do not migrate the whole Playwright suite.
+* Avoid brittle or slow tests.
+* Prefer existing tagged tests or existing Playwright projects when available.
+* If there are no good tags/projects yet, choose the smallest viable test file or test group and propose the lightest-touch way to isolate it. You can use a custom `testCommand:` specifying exactly the file, grep or reverse grep that makes sense for Checkly to run.
+* Keep the monitoring setup easy to extend later.
+
+---
+
+## Checkly-Specific Requirements
+
+* Use `checkly.config.ts` with `defineConfig`.
+* Point `checks.playwrightConfigPath` to my existing Playwright config.
+* Add at least one entry to `checks.playwrightChecks`.
+* Every Playwright Check Suite entry must have `name` and `logicalId`.
+* Use `pwProjects` and/or `pwTags` when that is the cleanest way to select tests.
+* Configure `frequency` and `locations` for the check suite based on my choices.
+* If needed, set `cli.runLocation` to one of the chosen locations for local validation.
+* If this repo uses TypeScript for config/tests, make sure `checkly` is installed and add `jiti` if needed.
+* Only customize `installCommand` or `testCommand` if the repo layout or package manager requires it.
+
+### Alert Channel Setup
+
+**Always create at least one alert channel in `checkly.config.ts` and assign it to all checks.**
+
+**Before generating the config, you MUST ask the user for at least one of the following:**
+
+- **Email alerts:** Ask for their alert notification email address, then create an `EmailAlertChannel` with it.
+- **Slack alerts:** Ask for their Slack incoming webhook URL and channel name, then create a `SlackAlertChannel` with them.
+
+The user can provide one or both. At minimum, one must be configured. **Do NOT use placeholder values like `alerts@example.com` or `<ALERT_EMAIL>` — always use the real values the user gives you.**
+
+If the user explicitly tells you they already have an alert channel configured in the Checkly UI and want to reuse it, use `EmailAlertChannel.fromId(<numeric_id>)` or `SlackAlertChannel.fromId(<numeric_id>)` instead. In that case, ask them for the numeric alert channel ID from the Checkly UI.
+
+### checkly.config.ts — Exact Pattern
+
+This is the ONLY file structure you should generate. All checks are defined inline in `playwrightChecks`. No separate check files, no `__checks__/` directory.
+
+```typescript
+import { defineConfig } from 'checkly';
+import { EmailAlertChannel, SlackAlertChannel, Frequency } from 'checkly/constructs';
+
+// Email alert channel — remove this block if user does not provide an email
+const emailAlert = new EmailAlertChannel('default-email-alert', {
+  address: 'THE_ACTUAL_EMAIL_THE_USER_GAVE_YOU',
+  sendFailure: true,
+  sendRecovery: true,
+  sendDegraded: false,
+});
+
+// Slack alert channel — remove this block if user does not provide a Slack webhook
+const slackAlert = new SlackAlertChannel('default-slack-alert', {
+  url: 'THE_ACTUAL_SLACK_WEBHOOK_URL_THE_USER_GAVE_YOU',
+  channel: 'THE_ACTUAL_SLACK_CHANNEL_THE_USER_GAVE_YOU',
+  sendFailure: true,
+  sendRecovery: true,
+  sendDegraded: false,
+});
+
+export default defineConfig({
+  projectName: 'my-checkly-project',
+  logicalId: 'my-checkly-project',
+  repoUrl: '<REPO_URL_IF_AVAILABLE>',
+  checks: {
+    // Point to the EXISTING Playwright config — do not create a new one
+    playwrightConfigPath: './playwright.config.ts',
+    // Monitoring locations
+    locations: ['eu-west-1', 'us-east-1'],
+    // Alerting declared in code — include whichever channels are configured
+    alertChannels: [emailAlert, slackAlert],
+
+    playwrightChecks: [
+      {
+        name: 'Critical happy path',
+        logicalId: 'critical-happy-path',
+        pwProjects: ['checkly'],
+        frequency: Frequency.EVERY_10M,
+      },
+    ],
+  },
+  cli: {
+    runLocation: 'eu-west-1',
+    retries: 0,
+  },
+});
+```
+
+**Import rules:**
+
+* `defineConfig` from `'checkly'`
+* `Frequency`, `EmailAlertChannel`, and `SlackAlertChannel` from `'checkly/constructs'` (NOT from `'checkly'`)
+
+**Test selection — four strategies:**
+
+1. **`pwProjects`** — reference Playwright projects by name. Most common. The project name in `playwright.config.ts` MUST exactly match the string in `pwProjects`.
+2. **`pwTags`** — filter by Playwright `@tags` in test titles/annotations. Useful when you want to select tests across projects without creating a new project.
+3. **Project dependencies** — for auth flows, reference a Playwright project that has `dependencies` on a setup project in the Playwright config.
+4. **`testCommand`** — specify a working Playwright test command targeting a single spec, grep, or reverse grep option.
+
+**Do NOT use any of the following — they are wrong for Playwright Check Suites:**
+
+* `checkMatch` — not needed; checks are inline in `playwrightChecks`
+* `__checks__/` directory or separate `.check.ts` files
+* `runtimeId` — Playwright Check Suites auto-detect the runtime from `package.json`
+* `playwrightConfig` block in `defineConfig` — that is for Browser Checks, a different Checkly product
+
+### Playwright Config Changes
+
+You will likely need to add a new Playwright project to the existing `playwright.config.ts` so that `pwProjects` has something to reference.
+
+You MUST also make Checkly-specific behavior obvious in `playwright.config.ts` using `CHECKLY`.
+
+When `process.env.CHECKLY` is set:
+
+* `retries` MUST be `2`
+* traces MUST be enabled
+* if a valid public monitoring URL is provided, use that URL instead of relying on the local `webServer`
+
+When `process.env.CHECKLY` is not set:
+
+* preserve existing local behavior as much as possible
+* do not unnecessarily slow down local or CI runs
+
+**Example — adding a `checkly` project and obvious `CHECKLY` behavior:**
+
+```typescript
+const isCheckly = !!process.env.CHECKLY;
+
+// Add this to the projects array in playwright.config.ts
+{
+  name: 'checkly',
+  use: {
+    ...devices['Desktop Chrome'],
+    baseURL: isCheckly && process.env.PUBLIC_MONITOR_URL
+      ? process.env.PUBLIC_MONITOR_URL
+      : 'https://staging.example.com',
+  },
+},
+
+export default defineConfig({
+  retries: isCheckly ? 2 : 0,
+  use: {
+    trace: isCheckly ? 'on' : 'retain-on-failure',
+  },
+});
+```
+
+**Rules for modifying `playwright.config.ts`:**
+
+* Prefer additive changes.
+* Do NOT modify existing projects or their defaults unless required.
+* If possible, add a dedicated `checkly` project.
+* If the config already has a project that works for monitoring (e.g. an existing `chromium` project), you can reference it directly in `pwProjects` without creating a new one.
+* Ensure `devices` is imported from `@playwright/test` if not already.
+* Preserve existing local developer behavior as much as possible outside Checkly runs.
+
+---
+
+## Environment and Runtime Guidance
+
+* Preserve existing Playwright behavior as much as possible.
+* If the tests need environment variables, identify them clearly.
+* Use Checkly environment variables where helpful, especially `CHECKLY`, to distinguish Checkly runs from local runs.
+* Do not invent secrets. Instead, leave placeholders and tell me exactly what I must set.
+
+## Timeout and Reliability Guidance
+
+* Optimize for a short-running check suite.
+* Avoid hard waits and unnecessarily long flows.
+* If a test is flaky, either avoid it or use the lightest reasonable retry/timeout adjustment.
+* Keep in mind that Playwright Check Suites can run up to 30 minutes, but we want something much shorter and better suited for alerting.
+
+---
+
+## URL Strategy
+
+Before choosing a `baseURL` for the monitoring project, understand what pages the tests actually navigate to.
+
+**Option A: Public URL** — Use when a deployed site serves ALL the pages the selected tests visit.
+
+Verify the public URL actually has every path the tests navigate to. For example, if tests call `page.goto('/test')` and the public site only serves `/` and `/docs`, the public URL will NOT work.
+
+If the public URL works, conditionally disable the `webServer` so local dev still works:
+
+```typescript
+webServer: process.env.CHECKLY
+  ? undefined
+  : { /* keep existing webServer config exactly as-is */ },
+```
+
+Only do this if you've verified the public URL serves ALL the test pages. If in doubt, keep the webServer.
+
+**Option B: Local webServer** — Use when test pages only exist on the dev server (test fixtures, demo apps, special endpoints). Keep the `webServer` enabled and use `http://localhost:<PORT>` as `baseURL`. This is more common for libraries/frameworks with test harnesses.
+
+If a public URL is not provided, or does not make sense for the monitored flow:
+
+* keep the `webServer`
+* make sure the Playwright Check Suite uses an `include` block to bundle all files required to start the app/server remotely in Checkly
+* do not assume test files alone are sufficient
+* explicitly include additional app/server/source/build/config files as needed, because Checkly includes test-related files by default
+
+**If the webServer has native dependencies** (`node-pty`, `sharp`, `canvas`, `bcrypt`, `sqlite3` etc. imported at the top level of the server entry file), the project is NOT a Check Suite candidate. Route to the [Reporter Fallback](#reporter-fallback) instead.
+
+**Hardcoded localhost URLs in test files:** If selected test files have hardcoded `localhost` or `127.0.0.1` URLs and you're using a public URL (Option A), replace them with a `BASE` variable:
+
+```typescript
+const BASE = process.env.CHECKLY ? 'https://staging.example.com' : 'http://localhost:<PORT>';
+await request.get(`${BASE}/api/health`);
+```
+
+Only do this for files that have hardcoded URLs. Don't touch files that use relative paths — those work via `baseURL`.
+
+---
+
+## Reporter Fallback
+
+Use the Reporter path ONLY when Check Suites truly cannot work:
+
+* Tests don't navigate to any page (no `page.goto()`, no `webServer`)
+* ALL test files have hard blockers (browser extensions, hardware dependencies, native deps in webServer)
+
+**Before choosing this path, verify:** Does any Playwright config have a `webServer`? Do the tests use `page.goto()`? Is there a public URL? If any of these could make Check Suites work, go back and try.
+
+```bash
+npm install --save-dev @checkly/playwright-reporter
+```
+
+```typescript
+import { createChecklyReporter } from '@checkly/playwright-reporter';
+
+reporter: [
+  // ... existing reporters stay as-is ...
+  createChecklyReporter({
+    sessionName: process.env.CI
+      ? `CI — ${process.env.GITHUB_REF_NAME ?? 'main'} @ ${(process.env.GITHUB_SHA ?? '').slice(0, 7)}`
+      : `Local — ${new Date().toISOString().slice(0, 16)}`,
+  }),
+],
+```
+
+If the config has a single reporter string (e.g., `reporter: 'list'`), convert it to array format first. Optionally add asset capture if missing:
+
+```typescript
+use: {
+  screenshot: 'only-on-failure',
+  video: 'retain-on-failure',
+  trace: 'on',
+},
+```
+
+---
+
+## What I Want From You
+
+1. Inspect the repository structure and identify:
+
+   * the Playwright config file
+   * whether `webServer` is used
+   * candidate smoke/critical tests
+   * any existing tags or Playwright projects
+   * any environment variables the selected tests need
+2. Recommend the best first monitoring target and briefly justify it.
+3. Implement the minimal Checkly setup.
+4. Show me the exact `checkly.config.ts` you create or the exact diff.
+5. Show me the exact `playwright.config.ts` changes needed to:
+
+   * enable traces when `CHECKLY` is set
+   * set retries to `2` when `CHECKLY` is set
+   * use a public URL for Checkly runs when appropriate
+   * otherwise preserve the local `webServer` path
+6. Ensure the final config creates and assigns at least one alert channel (Email and/or Slack).
+7. If no public URL is used, show the exact `include` entries needed.
+8. Show me any test edits you make, but keep them minimal.
+9. Give me the exact commands to run in order.
+10. Tell me what values I need to choose for:
+
+* frequency
+* locations
+* environment variables / secrets
+* alert notification email and/or Slack webhook
+
+11. After implementation, provide a short final checklist confirming I should be able to run:
+
+* `npm install` or equivalent
+* `npx checkly test --record`
+* `npx checkly deploy`
+
+## Decision Rules
+
+* Prefer one check suite over many.
+* Prefer one critical happy-path flow over broad coverage.
+* Prefer existing `pwProjects` or `pwTags` over restructuring tests.
+* If multiple options exist, choose the one with the fewest code changes.
+* If something is ambiguous, make the most conservative choice that gets to a working setup quickly.
+
+---
+
+## User-Provided Monitoring Settings
+
+Use these defaults unless the repo makes them invalid. **For values marked "ASK USER", you MUST ask the user before proceeding — do not use placeholders or example values.**
+
+* Desired frequency: `EVERY_10M`
+* Desired locations: `['eu-west-1', 'us-east-1']`
+* Target environment/base URL: `https://staging.example.com`
+* Extra environment variables to wire in: `none`
+* Alert notification email: **ASK USER** — ask for their real email address
+* Slack webhook URL: **ASK USER** — ask for their Slack incoming webhook URL (optional if email is provided)
+* Slack channel: **ASK USER** — ask for their Slack channel name (optional if email is provided)
+
+## Reference Documentation
+
+Use these Checkly docs as the source of truth for the implementation:
+
+* [Quickstart — Playwright Check](https://www.checklyhq.com/docs/quickstarts/playwright-check/)
+* [Test Organization](https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/test-organization/)
+* [Configuration](https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/configuration/)
+* [Environment Variables](https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/environment-variables/)
+* [Timeouts](https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/timeouts/)
+* [Email Alert Channel](https://www.checklyhq.com/docs/constructs/email-alert-channel/)
+* [Slack Alert Channel](https://www.checklyhq.com/docs/constructs/slack-alert-channel/)
+
+---
+
+Now inspect this repository and implement the smallest viable working Checkly Playwright Check Suite.

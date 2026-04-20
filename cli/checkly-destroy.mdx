@@ -26,6 +26,7 @@ npx checkly destroy [options]
 |--------|----------|-------------|
 | `--config, -c` | - | The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts\|js` file in the current directory. |
 | `--force, -f` | - | Force mode. Skips the confirmation dialog. |
+| `--preserve-resources` | - | Delete the project but keep its resources in your account, unbound from any project. |
 
 ## Command Options
 
@@ -60,6 +61,17 @@ npx checkly destroy -f
 ```
 
 <Warning>Use with extreme caution as this command option bypasses safety prompts.</Warning>
+</ResponseField>
+
+<ResponseField name="--preserve-resources" type="boolean">
+Delete the project but keep its resources (checks, groups, alert channels, etc.) in your Checkly account. The resources become unbound from the project and can be imported into another project later.
+
+**Usage:**
+
+```bash Terminal
+npx checkly destroy --preserve-resources
+```
+
 </ResponseField>
 
 ## What Gets Destroyed

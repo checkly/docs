@@ -83,15 +83,18 @@ Learn more in our documentation on [Results](/concepts/results).
 
 ## Troubleshooting Common Issues
 
-<Accordion title="NET_RAW capability error on private locations">
-Container runtimes drop the `NET_RAW` capability by default. ICMP requires raw sockets, so the Checkly Agent needs this capability explicitly granted.
+<Accordion title="Raw socket permission denied for ICMP monitors on private locations">
+Container runtimes drop `NET_RAW` by default. ICMP monitors need raw sockets, so the Checkly Agent needs this capability explicitly granted.
 
 **How to fix**:
 
 In **Kubernetes**, update your pod spec or Helm values:
+* `allowPrivilegeEscalation=true` — prevents Kubernetes from setting the `no_new_privs` bit on the container process, which would otherwise block file capabilities (like `cap_net_raw+ep` on the ping binary) from taking effect.
+* `capabilities.add=["NET_RAW"]` — adds `CAP_NET_RAW` to the container's bounding and permitted capability sets, allowing the kernel to open the raw sockets (`SOCK_RAW`).
 
 ```yaml
 securityContext:
+  allowPrivilegeEscalation: true
   capabilities:
     add: ["NET_RAW"]
 ```
@@ -101,6 +104,8 @@ In **Docker**:
 ```bash
 docker run --cap-add=NET_RAW ghcr.io/checkly/agent:latest
 ```
+
+Docker does not set `no_new_privs` by default, so `--cap-add` is sufficient. If you run with `--security-opt no-new-privileges`, file capabilities on binaries will be blocked — remove that flag to allow `NET_RAW`.
 
 `NET_RAW` only grants permission to create raw sockets. It does not escalate broader container privileges.
 </Accordion>

@@ -201,8 +201,36 @@ As each agent version only supports specific runtimes, we recommend pinning agen
 
 ## Troubleshooting
 
+<Accordion title="Self-signed proxy certificate not trusted">
 If you're using a self-signed certificate for your proxy, the Agent's HTTP client will not trust it by default. There are two ways to fix this.
 
 1. Add your Certificate Authority's (CA) root certificate to the system's CA store. On Debian, and related Linux distributions, you can do this by copying your `*.crt` certificate to `/usr/local/share/ca-certificates/` and running `sudo update-ca-certificates`.
 2. Alternatively, you can tell the node process in the Agent's container to accept unauthorized certificates with the following environment variable, `NODE_TLS_REJECT_UNAUTHORIZED=0`. This can be appended to your `docker run ..` command with the `-e` flag.
+</Accordion>
 
+<Accordion title="Raw socket permission denied for Traceroute or Packet Capture on private locations">
+Container runtimes drop `NET_RAW` by default. Traceroute and Packet Capture need raw sockets, so the Checkly Agent needs this capability explicitly granted.
+
+**How to fix**:
+
+In **Kubernetes**, update your pod spec or Helm values:
+* `allowPrivilegeEscalation=true` — prevents Kubernetes from setting the `no_new_privs` bit on the container process, which would otherwise block file capabilities (like `cap_net_raw+ep`) from taking effect.
+* `capabilities.add=["NET_RAW"]` — adds `CAP_NET_RAW` to the container's bounding and permitted capability sets, allowing the kernel to open the raw sockets (`SOCK_RAW`).
+
+```yaml
+securityContext:
+  allowPrivilegeEscalation: true
+  capabilities:
+    add: ["NET_RAW"]
+```
+
+In **Docker**:
+
+```bash
+docker run --cap-add=NET_RAW ghcr.io/checkly/agent:latest
+```
+
+Docker does not set `no_new_privs` by default, so `--cap-add` is sufficient. If you run with `--security-opt no-new-privileges`, file capabilities on binaries will be blocked — remove that flag to allow `NET_RAW`.
+
+`NET_RAW` only grants permission to create raw sockets. It does not escalate broader container privileges.
+</Accordion>

@@ -28,12 +28,11 @@ It will also provide a suggested code fix for any check based on (Playwright) co
 
 ## Getting Started with Rocky AI Root Cause Analysis
 
-1. Make sure [Rocky AI is enabled in its settings page](https://app.checklyhq.com/accounts/rocky-ai).
-2. Click the "Analyze Root Cause" button on any failing check result, test session result and / or error group.
+To use Rocky AI Root Cause Analysis, make sure [Rocky AI is enabled on its settings page](https://app.checklyhq.com/accounts/rocky-ai).
 
 <Info> Rocky AI Root Cause Analysis is available for all synthetic and monitor check types in both testing and monitoring use cases.</Info>
 
-## Automatic analysis
+### Automatic analysis
 
 When Rocky AI is enabled, it automatically generates a root cause analysis for every new error group. This is **on by default** — no manual action is needed for new errors to be analyzed.
 
@@ -45,6 +44,68 @@ You can disable automatic analysis in the [Rocky AI settings](https://app.checkl
 When automatic analysis is enabled, AI-generated fields like root cause and user impact are included in your alert notifications.
 You can use these fields in custom webhook payloads — see [Using AI analysis data in webhooks](/integrations/alerts/webhooks#using-ai-analysis-data-in-alerts).
 </Note>
+
+### On-demand analysis
+
+#### Via the UI
+
+Click the "Analyze root cause" button on any failing check result, test session result and / or error group.
+
+<Frame>
+  <img
+      className="block dark:hidden"
+      src="/images/docs/images/ai/ai-rca-analysis-3-light.png"
+      alt="Light mode Rocky AI Root Cause Analysis"
+  />
+  <img
+      className="hidden dark:block"
+      src="/images/docs/images/ai/ai-rca-analysis-3-dark.png"
+      alt="Dark mode Rocky AI Root Cause Analysis"
+  />
+</Frame>
+
+#### Via the CLI
+
+Use [`checkly rca run`](/cli/checkly-rca/#checkly-rca-run) to trigger a new analysis for an error group.
+
+```bash
+$ npx checkly rca run --error-group 714... --watch
+Root cause analysis triggered.
+RCA ID:  8c3...
+
+ROOT CAUSE ANALYSIS
+
+Classification: CONFIGURATION_ERROR
+Root cause:     The check is calling a ...
+```
+
+Retrieve an existing analysis by error group with [`checkly checks get --error-group`](/cli/checkly-checks/#checkly-checks-get) or by RCA ID with [`checkly rca get`](/cli/checkly-rca/#checkly-rca-get).
+
+<CodeGroup>
+```bash checkly checks get
+$ npx checkly checks get d3c... --error-group 714...
+ERROR GROUP
+
+HTTP 404 Not Found
+
+First seen:    2026-04-21 11:39:15 UTC
+Last seen:     2026-04-21 11:58:15 UTC
+Error group:   714...
+
+ROOT CAUSE ANALYSIS
+
+Classification: CONFIGURATION_ERROR
+Root cause:     The check is calling a ...
+```
+
+```bash checkly rca get
+$ npx checkly rca get 8c3...
+ROOT CAUSE ANALYSIS
+
+Classification: CONFIGURATION_ERROR
+Root cause:     The check is calling a ...
+```
+</CodeGroup>
 
 ## Key Capabilities
 

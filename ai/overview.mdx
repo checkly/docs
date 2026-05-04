@@ -1,7 +1,7 @@
 ---
 title: 'AI Agents & Coding Assistants'
 description: 'Use AI agents and coding assistants to create, update, and deploy your Checkly monitoring setup with skills and rules.'
-sidebarTitle: 'Overview'
+sidebarTitle: 'Agents & Checkly'
 keywords: ['mcp', 'ai', 'rules', 'generate checks', 'agents', 'context']
 ---
 
@@ -74,3 +74,92 @@ Whether you need to configure your monitoring setup, access check data or declar
 <Tip>
 We are researching additional AI-native workflows. [Let us know in the public roadmap](https://feedback.checklyhq.com/p/checkly-mcp) if you are interested in more agent-friendly integrations.
 </Tip>
+
+## Markdown access
+
+Every page in the Checkly documentation is available as markdown. This makes it easy to feed specific documentation pages into AI assistants like Claude, ChatGPT, Cursor, or any other AI tool.
+
+<Tip>
+Use [Checkly Skills](/ai/skills) to automatically provide your agent with up-to-date, agent-optimized documentation.
+</Tip>
+
+### .md endpoints
+
+Append `.md` to any documentation URL to get the markdown version of that page.
+
+**Example:**
+
+- **HTML:** `https://www.checklyhq.com/docs/what-is-checkly/`
+- **Markdown:** `https://www.checklyhq.com/docs/what-is-checkly.md`
+
+The markdown version includes the full page content in plain markdown, code blocks, links preserved as markdown links, and tables formatted as markdown tables.
+
+```bash
+# Fetch documentation content with curl
+curl https://www.checklyhq.com/docs/what-is-checkly.md
+
+# Pipe directly to your clipboard
+curl https://www.checklyhq.com/docs/what-is-checkly.md | pbcopy
+```
+
+### Content negotiation
+
+You can also request markdown by setting the `Accept` header to `text/markdown`:
+
+```bash
+curl -H "Accept: text/markdown" https://www.checklyhq.com/docs/what-is-checkly/
+```
+
+This is useful when integrating with tools or scripts that set request headers programmatically.
+
+<Tip>
+Modern coding agents set [these headers automatically when querying documentation](https://www.checklyhq.com/blog/state-of-ai-agent-content-negotation/).
+</Tip>
+
+### Copy as Markdown button
+
+Every documentation page includes a **Copy as Markdown** button at the top of the page. Click it to copy the full page content as markdown to your clipboard.
+
+This is the fastest way to grab documentation for a specific topic and paste it into your AI assistant's context.
+
+```text
+Here is the Checkly Browser Checks documentation:
+
+[paste markdown content]
+
+Based on this, how do I set up a browser check with a custom user agent?
+```
+
+
+## LLMs.txt 
+
+
+The [llms.txt standard](https://llmstxt.org/) provides a machine-readable index of all available documentation pages. Checkly publishes an `llms.txt` file at [`checklyhq.com/llms.txt`](https://www.checklyhq.com/llms.txt) that lists every documentation page with its markdown URL and a short description.
+
+```txt llms.txt (first 15 lines)
+# Checkly Docs
+
+## Docs
+
+- [Changing your email or password in Checkly](https://checklyhq.com/docs/admin/changing-your-email-password.md): Learn how to change your email address or password in your Checkly account
+- [Creating an API key in Checkly](https://checklyhq.com/docs/admin/creating-api-key.md): Learn how to create and manage user and service API keys for the Checkly API and CLI
+- [Adding team members to your Checkly account](https://checklyhq.com/docs/admin/team-management/adding-team-members.md): Learn how to invite team members to join your Checkly account and manage team collaboration
+- [Using Microsoft Entra ID for Single Sign-on in Checkly](https://checklyhq.com/docs/admin/team-management/microsoft-azure-ad.md): This page illustrates the standard procedure to follow in order to get started with Microsoft Entra ID SSO (formerly Azure AD) on Checkly.
+- [Multi-Factor Authentication in Checkly](https://checklyhq.com/docs/admin/team-management/multi-factor-authentication.md): Learn how to set up and manage multi-factor authentication for enhanced account security
+- [Using Okta for Single Sign-on in Checkly](https://checklyhq.com/docs/admin/team-management/okta.md): This page illustrates the standard procedure to follow in order to get started with Okta SSO on Checkly.
+- [Role Based Access Control in Checkly](https://checklyhq.com/docs/admin/team-management/rbac.md): Checkly roles and permissions for team members
+- [Removing team members from your Checkly account](https://checklyhq.com/docs/admin/team-management/removing-team-members.md): Learn how to remove team members from your Checkly account and understand how it affects your billing
+- [Using SAML for Single Sign-On in Checkly](https://checklyhq.com/docs/admin/team-management/saml-sso.md): Learn how to set up SAML-based SSO for your Checkly account with supported identity providers
+- [Using SCIM provisioning in Checkly](https://checklyhq.com/docs/admin/team-management/scim-provisioning.md): Learn how to set up SCIM provisioning for Checkly using your identity provider
+- [Team management in Checkly](https://checklyhq.com/docs/admin/team-management.md): Manage your team and collaborate effectively in Checkly
+```
+
+Use the `llms.txt` file to crawl and index the entire Checkly documentation. Every link in the file points to [the `.md` version of the page](/ai/markdown-access#md-endpoints), so you can fetch each URL directly to get the markdown content.
+
+```bash
+# Fetch the llms.txt index
+curl https://www.checklyhq.com/llms.txt
+
+# Fetch a specific page from the index
+curl https://checklyhq.com/docs/detect/synthetic-monitoring/browser-checks/overview.md
+```

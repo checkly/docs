@@ -6,7 +6,7 @@ sidebarTitle: 'checkly trigger'
 
 import CliCommandPrerequisites from '/snippets/cli-command-prerequisites.mdx';
 
-The `checkly trigger` command executes checks that are already deployed in your Checkly account. Unlike the `test` command, `trigger` works with any checks in your account regardless of how they were created - via CLI constructs, the web UI, or Terraform.
+The `checkly trigger` command executes checks that are already deployed in your Checkly account as [a test session](/detect/testing/overview/). Unlike the `test` command, `trigger` works with any checks in your account regardless of how they were created - via CLI constructs, the web UI, or Terraform.
 
 <CliCommandPrerequisites command="checkly trigger" />
 
@@ -26,7 +26,8 @@ npx checkly trigger [options]
 | `--fail-on-no-matching` | - | Exit with a failing status code when there are no matching tests. |
 | `--location, -l` | - | The location to run the checks at. |
 | `--private-location` | - | The private location to run checks at. |
-| `--record` | - | Record check results in Checkly as a test session with full logs, traces and videos. |
+| `--record` | - | Record test session results in Checkly with full logs, traces and videos. |
+| `--refresh-cache` | - | Force a fresh install of dependencies and update the cached version. |
 | `--reporter, -r` | - | One or more custom reporters for the test output. Supports comma-separated values and repeated flags. |
 | `--retries` | - | How many times to retry a check run. |
 | `--tags, -t` | - | Filter the checks to be run using a comma separated list of tags. |
@@ -282,6 +283,18 @@ npx checkly trigger --record --tags critical
 ```
 
 Records provide full visibility including logs, traces, and videos for debugging failed checks.
+</ResponseField>
+
+<ResponseField name="--refresh-cache" type="boolean" default="false">
+
+Force a fresh install of dependencies and update the cached version. Use this when you've changed your project's dependencies and need Checkly to pick up the latest versions instead of using the cache from a previous run.
+
+**Usage:**
+
+```bash Terminal
+npx checkly trigger --refresh-cache
+```
+
 </ResponseField>
 
 <ResponseField name="--retries" type="number" default="0">

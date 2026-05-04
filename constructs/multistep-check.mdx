@@ -28,6 +28,7 @@ import * as path from "path"
 
 new MultiStepCheck("multistep-check-1", {
   name: "Multistep Check #1",
+  description: "Validates user signup and login flow.",
   locations: ["us-east-1", "eu-west-1"],
   code: {
     entrypoint: path.join(__dirname, "multi-step.spec.ts"),
@@ -41,6 +42,7 @@ import * as path from "path"
 
 new MultiStepCheck("complex-multistep-check", {
   name: "Complex User Journey",
+  description: "Validates user signup and login flow.",
   activated: true,
   runtimeId: "2025.04",
   frequency: Frequency.EVERY_15M,
@@ -74,6 +76,7 @@ new MultiStepCheck("complex-multistep-check", {
 | Property | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `name` | `string` | ✅ | - | Friendly name for your check |
+| `description` | `string` | ❌ | `null` | A description of the check. Supports markdown. Max 500 characters |
 | `activated` | `boolean` | ❌ | `true` | Whether the check is enabled |
 | `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Array of AlertChannel objects for notifications |
 | `alertEscalationPolicy` | `AlertEscalationPolicy` | ❌ | - | Advanced alert settings |

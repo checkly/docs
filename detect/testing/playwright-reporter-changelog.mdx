@@ -13,6 +13,33 @@ Learn more about:
 
 ## Full release history
 
+<Update label="v1.11.1" tags={["April 2026"]}>
+  **Improved**
+
+  - **More reliable uploads for large test suites** — Large asset uploads are now more resilient, with automatic retries and fallback mechanisms.
+  - **Fixed EPIPE crashes** — Fixed unhandled EPIPE errors during large uploads.
+</Update>
+
+<Update label="v1.11.0" tags={["April 2026"]}>
+  **Improved**
+
+  - **Smaller uploads with smart compression** — Text-based files in the report archive (JSON report, logs, text attachments) are now DEFLATE-compressed, significantly reducing upload size.
+  - **Reliable uploads for large test suites** — Added support for reporter sessions with large assets.
+  - **Better error reporting for failed uploads** — When an asset upload fails due to size limits, the error is now clearly surfaced in the Checkly UI with actionable troubleshooting suggestions instead of showing a blank test session.
+</Update>
+
+<Update label="v1.10.0" tags={["April 2026"]}>
+  **Added**
+
+  - **Error grouping for reporter results** — Failed tests now automatically create error groups in Checkly, making it easier to identify and track recurring failures across runs. Errors are extracted from the Playwright report and grouped by similarity, matching the behavior of CLI-triggered runs.
+</Update>
+
+<Update label="v1.9.0" tags={["March 2026"]}>
+  **Improved**
+
+  - **Faster secret scrubbing** — Trace scrubbing now runs in parallel across CPU cores and the scrubbing engine has been optimized to skip unnecessary work, making the reporter noticeably faster for test suites with traces enabled.
+</Update>
+
 <Update label="v1.8.0" tags={["March 2026"]}>
   **Breaking Changes**
 

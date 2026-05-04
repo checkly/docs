@@ -1,12 +1,12 @@
 ---
 title: Rocky AI Root Cause Analysis
 description: Automatically perform root cause and user impact analysis with Rocky AI
-sidebarTitle: Rocky AI Root Cause Analysis
+sidebarTitle: AI Root Cause Analysis
 ---
 
 ## What is Rocky AI Root Cause Analysis?
 
-Rocky AI — Checkly's AI service — can automatically analyze, categorize and summarize any failure or error from one of Checkly's
+Rocky AI — Checkly's Agent — can automatically analyze, categorize and summarize any failure or error from one of Checkly's
 synthetic checks and / or monitoring checks.
 
 <Frame>
@@ -22,22 +22,21 @@ synthetic checks and / or monitoring checks.
   />
 </Frame>
 
-Using any available artifacts like error message, user code, logs, metrics, trace routes, packet captures, Playwright traces, screenshots
+Using any available artifacts like error message, user code, check description, logs, metrics, trace routes, packet captures, Playwright traces, screenshots
 and other evidence, it will quickly assess what the impact is of a failure and what the underlying (possible) root cause is.
 It will also provide a suggested code fix for any check based on (Playwright) code.
 
-## How do I use Rocky AI Root Cause Analysis?
+## Getting Started with Rocky AI Root Cause Analysis
 
-1. Make sure [Rocky AI is enabled in its settings page](https://app.checklyhq.com/accounts/rocky-ai).
-2. Click the "Analyze Root Cause" button on any failing check result, test session result and / or error group.
+To use Rocky AI Root Cause Analysis, make sure [Rocky AI is enabled on its settings page](https://app.checklyhq.com/accounts/rocky-ai).
 
 <Info> Rocky AI Root Cause Analysis is available for all synthetic and monitor check types in both testing and monitoring use cases.</Info>
 
-## Automatic analysis
+### Automatic analysis
 
 When Rocky AI is enabled, it automatically generates a root cause analysis for every new error group. This is **on by default** — no manual action is needed for new errors to be analyzed.
 
-Each automatic analysis counts as **one AI invocation** against your [plan's invocation quota](/platform/rocky-ai#ai-invocations). If the same analysis is sent to multiple alert channels, it still counts as a single invocation.
+Each automatic analysis counts as **one AI invocation** against your [plan's invocation quota](/ai/rocky-ai#consumption-and-invocations). If the same analysis is sent to multiple alert channels, it still counts as a single invocation.
 
 You can disable automatic analysis in the [Rocky AI settings](https://app.checklyhq.com/accounts/rocky-ai) if you prefer to only run analyses manually.
 
@@ -45,6 +44,68 @@ You can disable automatic analysis in the [Rocky AI settings](https://app.checkl
 When automatic analysis is enabled, AI-generated fields like root cause and user impact are included in your alert notifications.
 You can use these fields in custom webhook payloads — see [Using AI analysis data in webhooks](/integrations/alerts/webhooks#using-ai-analysis-data-in-alerts).
 </Note>
+
+### On-demand analysis
+
+#### Via the UI
+
+Click the "Analyze root cause" button on any failing check result, test session result and / or error group.
+
+<Frame>
+  <img
+      className="block dark:hidden"
+      src="/images/docs/images/ai/ai-rca-analysis-3-light.png"
+      alt="Light mode Rocky AI Root Cause Analysis"
+  />
+  <img
+      className="hidden dark:block"
+      src="/images/docs/images/ai/ai-rca-analysis-3-dark.png"
+      alt="Dark mode Rocky AI Root Cause Analysis"
+  />
+</Frame>
+
+#### Via the CLI
+
+Use [`checkly rca run`](/cli/checkly-rca/#checkly-rca-run) to trigger a new analysis for an error group.
+
+```bash
+$ npx checkly rca run --error-group 714... --watch
+Root cause analysis triggered.
+RCA ID:  8c3...
+
+ROOT CAUSE ANALYSIS
+
+Classification: CONFIGURATION_ERROR
+Root cause:     The check is calling a ...
+```
+
+Retrieve an existing analysis by error group with [`checkly checks get --error-group`](/cli/checkly-checks/#checkly-checks-get) or by RCA ID with [`checkly rca get`](/cli/checkly-rca/#checkly-rca-get).
+
+<CodeGroup>
+```bash checkly checks get
+$ npx checkly checks get d3c... --error-group 714...
+ERROR GROUP
+
+HTTP 404 Not Found
+
+First seen:    2026-04-21 11:39:15 UTC
+Last seen:     2026-04-21 11:58:15 UTC
+Error group:   714...
+
+ROOT CAUSE ANALYSIS
+
+Classification: CONFIGURATION_ERROR
+Root cause:     The check is calling a ...
+```
+
+```bash checkly rca get
+$ npx checkly rca get 8c3...
+ROOT CAUSE ANALYSIS
+
+Classification: CONFIGURATION_ERROR
+Root cause:     The check is calling a ...
+```
+</CodeGroup>
 
 ## Key Capabilities
 
@@ -73,6 +134,6 @@ You can use these fields in custom webhook payloads — see [Using AI analysis d
 - **Better Understanding**: Gain deeper insights into system behavior
 - **Proactive Management**: Identify issues before they become problems
 
-<Note>For more information on AI, security and data privacy [see the general Rocky AI page](/platform/rocky-ai)</Note>
+<Note>For more information on AI, security and data privacy [see the general Rocky AI page](/ai/rocky-ai)</Note>
 
 

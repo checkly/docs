@@ -38,6 +38,7 @@ Define `checkly pw-test` specific options before the `--` separator:
 | `--create-check` | - | Create a Checkly check from the Playwright test. |
 | `--env, -e` | - | Env vars to be passed to the test run. Default: [] |
 | `--env-file` | - | dotenv file path to be passed. For example `--env-file="./.env"` |
+| `--include, -i` | - | File patterns to include when bundling the test project (e.g., `"utils/**/*"`). Can be repeated. |
 | `--install-command` | - | Override the command used to install dependencies before running tests. |
 | `--location, -l` | - | The location to run the checks at. |
 | `--private-location` | - | The private location to run checks at. |
@@ -144,6 +145,21 @@ Load environment variables from a dotenv file.
 
 ```bash Terminal
 npx checkly pw-test --env-file="./.env"
+```
+
+</ResponseField>
+
+<ResponseField name="--include, -i" type="string[]">
+
+File patterns to include when bundling the test project. Use this to add files that aren't automatically detected as dependencies, such as fixtures, helpers, or assets referenced at runtime. Can be specified multiple times to include multiple patterns.
+
+If not provided, falls back to the `checks.include` value in your `checkly.config`.
+
+**Usage:**
+
+```bash Terminal
+npx checkly pw-test --include="utils/**/*"
+npx checkly pw-test -i="fixtures/**/*" -i="data/*.json"
 ```
 
 </ResponseField>

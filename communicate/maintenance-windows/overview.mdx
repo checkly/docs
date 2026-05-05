@@ -8,13 +8,7 @@ sidebarTitle: 'Maintenance Windows'
 **Monitoring as Code**: Learn more about the [Maintenance Window Construct](/constructs/maintenance-window).
 </Tip>
 
-Maintenance windows allow you to schedule planned downtime for your services, preventing false alerts and preserving accurate availability metrics during system updates, deployments, and infrastructure maintenance activities.
-
-During a maintenance window you can independently control two behaviors:
-- **Pause check execution** — scheduled check runs are skipped entirely.
-- **Silence alerts** — checks keep running and collecting data, but alert channel notifications (email, Slack, etc.) are suppressed.
-
-You can enable a combination of these settings depending on what you need.
+Maintenance windows allow you to schedule planned downtime for your services, preventing false alerts and preserving accurate availability metrics during system updates, deployments, and infrastructure maintenance activities. During a maintenance window you can pause check execution, silence alert notifications, or both.
 
 <Note>
 Manual and triggered check runs (e.g. via the API or the Checkly UI) always execute, even when check execution is paused. However, if alert silencing is enabled, alerts from these runs will still be suppressed.
@@ -62,7 +56,7 @@ When enabled, alert channel notifications are suppressed while checks continue t
 - **Checks matching tags** — only checks (and check groups) with matching tags have their alerts silenced.
 
 <Warning>
-If a check starts failing during the maintenance window and continues failing after the window ends, Checkly will **not** retroactively send an alert once the window is over — the alert is suppressed. Enable **Firewatch** on your home dashboard to surface checks that started failing during maintenance.
+If a check starts failing during the maintenance window and continues failing after the window ends, Checkly will **not** retroactively send an alert once the window is over — the alert is suppressed. After maintenance, check the **Firewatch** section on the home dashboard — it shows checks that started failing recently. Firewatch can be enabled and configured in your account preferences.
 </Warning>
 
 <Tip>

@@ -12,7 +12,8 @@
  */
 
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { join, basename, dirname } from 'node:path';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { execSync } from 'node:child_process';
 import { parse as yamlParse } from './yaml-lite.mjs';
 
@@ -33,6 +34,7 @@ const TAG_MAP = {
   'Alert notifications':   { dir: 'alert-notifications', group: 'Alert Notifications' },
   'Analytics':             { dir: 'analytics',           group: 'Analytics' },
   'Badges':                { dir: 'badges',              group: 'Badges' },
+  'cancel':                { dir: 'cancel',              group: 'Cancel' },
   'Check alerts':          { dir: 'check-alerts',        group: 'Check Alerts' },
   'Check groups':          { dir: 'check-groups',        group: 'Check Groups' },
   'Check results':         { dir: 'check-results',       group: 'Check Results' },
@@ -58,6 +60,7 @@ const TAG_MAP = {
   'Status Page Services':   { dir: 'status-page-services', group: 'Status Page Services' },
   'Status Pages':          { dir: 'status-pages',        group: 'Status Pages' },
   'Subscriptions':         { dir: 'status-pages',        group: 'Status Page Subscribers' },
+  'Test sessions':         { dir: 'test-sessions',       group: 'Test Sessions' },
   'Triggers':              { dir: 'triggers',            group: 'Check Triggers' },
 };
 
@@ -88,6 +91,10 @@ function run(cmd, opts = {}) {
     return '';
   }
   return execSync(cmd, { encoding: 'utf-8', cwd: ROOT, ...opts }).trim();
+}
+
+function shellQuote(value) {
+  return `'${String(value).replace(/'/g, `'\\''`)}'`;
 }
 
 function loadSpec() {
@@ -153,10 +160,42 @@ function generateFilename(summary) {
   return slug || 'unnamed-endpoint';
 }
 
-function prExists(branchName) {
+function getVersionSuffix(path) {
+  const match = path.match(/^\/(v\d+)\//);
+  return match ? `-${match[1]}` : '';
+}
+
+function getUniqueFilename(ep) {
+  const baseFilename = generateFilename(ep.summary);
+  const candidates = [
+    baseFilename,
+    `${baseFilename}${getVersionSuffix(ep.path)}`,
+    `${baseFilename}-${ep.method.toLowerCase()}-${slugify(ep.path)}`,
+  ];
+
+  for (const filename of candidates) {
+    const mdxPath = join(ROOT, 'api-reference', ep.dir, `${filename}.mdx`);
+    if (!existsSync(mdxPath)) {
+      return filename;
+    }
+
+    const content = readFileSync(mdxPath, 'utf-8');
+    const match = content.match(/openapi:\s*(get|post|put|delete|patch)\s+(\/\S+)/i);
+    if (match && `${match[1].toUpperCase()} ${match[2]}` === ep.key) {
+      return filename;
+    }
+  }
+
+  return `${baseFilename}-${Date.now()}`;
+}
+
+function openPrExistsForBranchBase(branchBaseName) {
   try {
     const result = run(
-      `gh pr list --head "${branchName}" --state all --json number --jq 'length'`,
+      [
+        'gh pr list --state open --limit 100 --json headRefName --jq',
+        shellQuote(`[.[] | select(.headRefName == "${branchBaseName}" or (.headRefName | startswith("${branchBaseName}-")))] | length`),
+      ].join(' '),
       { allowInDryRun: true }
     );
     return parseInt(result, 10) > 0;
@@ -165,16 +204,36 @@ function prExists(branchName) {
   }
 }
 
+function remoteBranchExists(branchName) {
+  try {
+    const result = run(`git ls-remote --heads origin ${shellQuote(branchName)}`, { allowInDryRun: true });
+    return result.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+function getBranchName(branchBaseName) {
+  if (!remoteBranchExists(branchBaseName)) {
+    return branchBaseName;
+  }
+
+  const runId = process.env.GITHUB_RUN_ID;
+  const runAttempt = process.env.GITHUB_RUN_ATTEMPT;
+  const suffix = runId ? `${runId}${runAttempt ? `-${runAttempt}` : ''}` : Date.now();
+  return `${branchBaseName}-${suffix}`;
+}
+
 // ---------------------------------------------------------------------------
 // docs.json updater
 // ---------------------------------------------------------------------------
 
 function addToDocsJson(docsJson, pagePath, groupName, subgroupName) {
-  // Structure: docsJson.navigation.tabs[] → { tab: "API", pages: [...] }
+  // Structure: docsJson.navigation.tabs[] → { tab: "API Reference", pages: [...] }
   const tabs = docsJson.navigation?.tabs ?? [];
-  const apiTab = tabs.find((t) => t.tab === 'API');
+  const apiTab = tabs.find((t) => t.tab === 'API Reference');
   if (!apiTab) {
-    console.warn('  ⚠ Could not find API tab in docs.json');
+    console.warn('  ⚠ Could not find API Reference tab in docs.json');
     return false;
   }
 
@@ -209,9 +268,13 @@ function addToDocsJson(docsJson, pagePath, groupName, subgroupName) {
       targetGroup.pages.push(subgroup);
       console.log(`  + Created new subgroup "${subgroupName}" in docs.json`);
     }
-    subgroup.pages.push(pagePath);
+    if (!subgroup.pages.includes(pagePath)) {
+      subgroup.pages.push(pagePath);
+    }
   } else {
-    targetGroup.pages.push(pagePath);
+    if (!targetGroup.pages.includes(pagePath)) {
+      targetGroup.pages.push(pagePath);
+    }
   }
 
   return true;
@@ -249,9 +312,9 @@ async function main() {
       const tag = details.tags?.[0] ?? '';
       const summary = details.summary ?? '';
       const { dir, group, subgroup } = resolveMapping(tag, summary);
-      const filename = generateFilename(summary);
 
-      undocumented.push({ key, method: method.toUpperCase(), path, tag, summary, dir, group, subgroup, filename });
+      const ep = { key, method: method.toUpperCase(), path, tag, summary, dir, group, subgroup };
+      undocumented.push({ ...ep, filename: getUniqueFilename(ep) });
     }
   }
 
@@ -273,24 +336,25 @@ async function main() {
   const mainBranch = run('git rev-parse --abbrev-ref HEAD', { allowInDryRun: true });
 
   for (const ep of undocumented) {
-    const branchName = `api-doc/${ep.dir}/${ep.filename}`;
+    const branchBaseName = `api-doc/${ep.dir}/${ep.filename}`;
+    const branchName = getBranchName(branchBaseName);
     const mdxRelPath = `api-reference/${ep.dir}/${ep.filename}.mdx`;
     const docsJsonPagePath = `api-reference/${ep.dir}/${ep.filename}`;
 
     console.log(`\n--- Processing: ${ep.key} ---`);
 
     // Check for existing PR
-    if (prExists(branchName)) {
-      console.log(`  ⏭ PR already exists for branch ${branchName}`);
+    if (openPrExistsForBranchBase(branchBaseName)) {
+      console.log(`  ⏭ Open PR already exists for branch ${branchBaseName}`);
       skipped++;
       continue;
     }
 
     // Ensure we're on main and up to date
-    run(`git checkout ${mainBranch}`);
+    run(`git checkout ${shellQuote(mainBranch)}`);
 
     // Create branch
-    run(`git checkout -b "${branchName}"`);
+    run(`git checkout -b ${shellQuote(branchName)}`);
 
     // Create MDX stub
     const mdxDir = join(ROOT, 'api-reference', ep.dir);
@@ -309,18 +373,21 @@ async function main() {
     // Update docs.json
     const docsJson = JSON.parse(readFileSync(DOCS_JSON_PATH, 'utf-8'));
     const added = addToDocsJson(docsJson, docsJsonPagePath, ep.group, ep.subgroup);
+    if (!added) {
+      throw new Error(`Could not add ${docsJsonPagePath} to docs.json`);
+    }
     if (added && !DRY_RUN) {
       writeFileSync(DOCS_JSON_PATH, JSON.stringify(docsJson, null, 2) + '\n');
     }
     console.log(`  + Updated docs.json → ${ep.group}${ep.subgroup ? ' > ' + ep.subgroup : ''}`);
 
     // Commit
-    run(`git add "${mdxRelPath}" docs.json`);
+    run(`git add ${shellQuote(mdxRelPath)} docs.json`);
     const commitMsg = `docs(api): add ${ep.summary.replace(/\[.*?\]\s*/g, '').trim()} endpoint`;
-    run(`git commit -m "${commitMsg.replace(/"/g, '\\"')}"`);
+    run(`git commit -m ${shellQuote(commitMsg)}`);
 
     // Push
-    run(`git push origin "${branchName}"`);
+    run(`git push origin ${shellQuote(branchName)}`);
 
     // Create PR
     const prTitle = commitMsg;
@@ -340,13 +407,27 @@ async function main() {
       '*Auto-generated by sync-api-endpoints workflow*',
     ].join('\n');
 
-    run(`gh pr create --title "${prTitle.replace(/"/g, '\\"')}" --body "${prBody.replace(/"/g, '\\"')}" --label "auto-generated" --label "api-docs" --head "${branchName}"`);
+    const prBodyPath = join(tmpdir(), `api-doc-pr-body-${process.pid}.md`);
+    if (!DRY_RUN) {
+      writeFileSync(prBodyPath, prBody);
+    }
+    run([
+      'gh pr create',
+      '--title',
+      shellQuote(prTitle),
+      '--body-file',
+      shellQuote(prBodyPath),
+      '--label auto-generated',
+      '--label api-docs',
+      '--head',
+      shellQuote(branchName),
+    ].join(' '));
 
-    console.log(`  ✅ PR created for ${ep.key}`);
+    console.log(DRY_RUN ? `  ✅ PR would be created for ${ep.key}` : `  ✅ PR created for ${ep.key}`);
     created++;
 
     // Return to main for next iteration
-    run(`git checkout ${mainBranch}`);
+    run(`git checkout ${shellQuote(mainBranch)}`);
   }
 
   console.log(`\n========================================`);

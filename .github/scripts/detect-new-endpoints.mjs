@@ -222,6 +222,29 @@ function getOpenPrUrlForBranch(branchName) {
   }
 }
 
+function getOpenPrNumberForBranch(branchName) {
+  try {
+    return run(
+      [
+        'gh pr list --state open --limit 100 --json headRefName,number --jq',
+        shellQuote(`[.[] | select(.headRefName == "${branchName}")][0].number // ""`),
+      ].join(' '),
+      { allowInDryRun: true }
+    );
+  } catch {
+    return '';
+  }
+}
+
+function ensurePrLabels(branchName) {
+  const prNumber = getOpenPrNumberForBranch(branchName);
+  if (!prNumber) {
+    return;
+  }
+
+  run(`gh pr edit ${prNumber} --add-label auto-generated --add-label api-docs`);
+}
+
 function remoteBranchExists(branchName) {
   try {
     const result = run(`git ls-remote --heads origin ${shellQuote(branchName)}`, { allowInDryRun: true });
@@ -255,14 +278,21 @@ function createPullRequest({ title, bodyFilePath, branchName }) {
     shellQuote(branchName),
   ].join(' ');
 
+  if (DRY_RUN) {
+    run(command);
+    return;
+  }
+
   const maxAttempts = 3;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       run(command);
+      ensurePrLabels(branchName);
       return;
     } catch (err) {
       const existingUrl = getOpenPrUrlForBranch(branchName);
       if (existingUrl) {
+        ensurePrLabels(branchName);
         console.log(`  + PR exists after create error: ${existingUrl}`);
         return;
       }

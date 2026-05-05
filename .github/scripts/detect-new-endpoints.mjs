@@ -97,6 +97,10 @@ function shellQuote(value) {
   return `'${String(value).replace(/'/g, `'\\''`)}'`;
 }
 
+function sleep(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
 function loadSpec() {
   const raw = readFileSync(SPEC_PATH, 'utf-8');
   // OpenAPI descriptions may contain literal control chars (newlines in JSON strings)
@@ -204,6 +208,20 @@ function openPrExistsForBranchBase(branchBaseName) {
   }
 }
 
+function getOpenPrUrlForBranch(branchName) {
+  try {
+    return run(
+      [
+        'gh pr list --state open --limit 100 --json headRefName,url --jq',
+        shellQuote(`[.[] | select(.headRefName == "${branchName}")][0].url // ""`),
+      ].join(' '),
+      { allowInDryRun: true }
+    );
+  } catch {
+    return '';
+  }
+}
+
 function remoteBranchExists(branchName) {
   try {
     const result = run(`git ls-remote --heads origin ${shellQuote(branchName)}`, { allowInDryRun: true });
@@ -222,6 +240,42 @@ function getBranchName(branchBaseName) {
   const runAttempt = process.env.GITHUB_RUN_ATTEMPT;
   const suffix = runId ? `${runId}${runAttempt ? `-${runAttempt}` : ''}` : Date.now();
   return `${branchBaseName}-${suffix}`;
+}
+
+function createPullRequest({ title, bodyFilePath, branchName }) {
+  const command = [
+    'gh pr create',
+    '--title',
+    shellQuote(title),
+    '--body-file',
+    shellQuote(bodyFilePath),
+    '--label auto-generated',
+    '--label api-docs',
+    '--head',
+    shellQuote(branchName),
+  ].join(' ');
+
+  const maxAttempts = 3;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      run(command);
+      return;
+    } catch (err) {
+      const existingUrl = getOpenPrUrlForBranch(branchName);
+      if (existingUrl) {
+        console.log(`  + PR exists after create error: ${existingUrl}`);
+        return;
+      }
+
+      if (attempt === maxAttempts) {
+        throw err;
+      }
+
+      const delay = attempt * 5000;
+      console.warn(`  ⚠ PR creation failed; retrying in ${delay / 1000}s (${attempt}/${maxAttempts})`);
+      sleep(delay);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -411,17 +465,7 @@ async function main() {
     if (!DRY_RUN) {
       writeFileSync(prBodyPath, prBody);
     }
-    run([
-      'gh pr create',
-      '--title',
-      shellQuote(prTitle),
-      '--body-file',
-      shellQuote(prBodyPath),
-      '--label auto-generated',
-      '--label api-docs',
-      '--head',
-      shellQuote(branchName),
-    ].join(' '));
+    createPullRequest({ title: prTitle, bodyFilePath: prBodyPath, branchName });
 
     console.log(DRY_RUN ? `  ✅ PR would be created for ${ep.key}` : `  ✅ PR created for ${ep.key}`);
     created++;

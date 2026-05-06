@@ -95,6 +95,16 @@ The Agentic Check construct intentionally does not expose `privateLocations`, `r
 
 The monitoring goal the agent should verify. Write the prompt in terms of user-visible behavior and expected outcomes.
 
+See [Prompt best practices](/detect/synthetic-monitoring/agentic-checks/overview#prompt-best-practices) for guidance on scope, strictness, and nondeterministic flows.
+
+A reliable Agentic Check prompt usually states:
+
+- **Goal**: The user journey or system behavior to monitor.
+- **What you are given**: The start URL, test account context, and any required environment variables.
+- **Success looks like**: The exact outcome that should pass.
+- **Failure looks like**: The states that should fail the check.
+- **Strictness**: Whether the agent should assert exact values or evaluate the outcome more flexibly.
+
 ```typescript
 new AgenticCheck('checkout-flow', {
   name: 'Checkout Flow',
@@ -105,6 +115,53 @@ new AgenticCheck('checkout-flow', {
   `,
 })
 ```
+
+Use stricter prompts when the output should be predictable:
+
+```typescript
+new AgenticCheck('login-flow', {
+  name: 'Login Flow',
+  prompt: `
+    ## Goal
+    Sign in to https://app.example.com/login and confirm the dashboard loads.
+
+    ## What you are given
+    Use TEST_USER_EMAIL and TEST_USER_PASSWORD from the environment.
+
+    ## Success looks like
+    The authenticated dashboard is visible, the account name appears, and the final URL is inside app.example.com.
+
+    ## Failure looks like
+    The login form rejects valid credentials, the page stays on the login screen, an MFA prompt blocks the flow, or the dashboard shows a 4xx/5xx error.
+  `,
+  agentRuntime: {
+    exposeEnvironmentVariables: ['TEST_USER_EMAIL', 'TEST_USER_PASSWORD'],
+  },
+})
+```
+
+Use outcome-based prompts when the application is intentionally nondeterministic:
+
+```typescript
+new AgenticCheck('support-assistant-flow', {
+  name: 'Support Assistant Flow',
+  prompt: `
+    ## Goal
+    Verify that the support assistant can help a user understand how to update billing details.
+
+    ## What you are given
+    Start at https://app.example.com/support and ask: "How do I update my billing details?"
+
+    ## Success looks like
+    The assistant gives a relevant answer, asks for missing context if needed, and guides the user toward a billing-settings or support handoff path.
+
+    ## Failure looks like
+    The assistant does not respond, answers an unrelated question, loops without progress, or gives instructions that cannot lead to completion.
+  `,
+})
+```
+
+Keep prompts focused on one flow. If you want to monitor navigation, login, and record creation, create separate Agentic Checks for each flow.
 
 ### `frequency`
 
@@ -146,13 +203,17 @@ Controls what the agent can access while executing the check.
 `exposeEnvironmentVariables` accepts either a string variable name or an object with `name` and optional `description`.
 
 ```typescript
-agentRuntime: {
-  skills: ['addyosmani/web-quality-skills'],
-  exposeEnvironmentVariables: [
-    'API_KEY',
-    { name: 'TEST_USER_PASSWORD', description: 'Login password for the test account' },
-  ],
-}
+new AgenticCheck('authenticated-api-check', {
+  name: 'Authenticated API Check',
+  prompt: 'Verify that the authenticated API health endpoint returns a healthy response.',
+  agentRuntime: {
+    skills: ['addyosmani/web-quality-skills'],
+    exposeEnvironmentVariables: [
+      'API_KEY',
+      { name: 'TEST_USER_PASSWORD', description: 'Login password for the test account' },
+    ],
+  },
+})
 ```
 
 <Warning>

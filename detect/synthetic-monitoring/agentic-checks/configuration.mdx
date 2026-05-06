@@ -1,6 +1,6 @@
 ---
 title: 'Agentic Checks Configuration'
-description: 'Configure Agentic Checks with prompts, runtime access, scheduling, locations, and active capacity.'
+description: 'Configure Agentic Checks with prompts, variables, skills, scheduling, locations, and active capacity.'
 sidebarTitle: 'Configuration'
 ---
 
@@ -10,7 +10,7 @@ Before creating Agentic Checks, ensure you have:
 - Access to Agentic Checks on your Checkly account
 - Available Agentic Check active capacity if the check will be active
 - An initialized Checkly CLI project if you want to manage the check as code
-- Any required test credentials saved as Checkly environment variables
+- Any required test credentials saved as Checkly variables or secrets
 
 For CLI setup, see the [CLI overview](/cli/overview).
 </Accordion>
@@ -37,32 +37,26 @@ Good prompts include:
 
 Avoid prompts that ask the agent to test too many unrelated paths in one check. Create separate Agentic Checks for separate critical flows.
 
-## Configure runtime access
+## Reference variables and secrets
 
-Agentic Checks do **not** automatically expose account environment variables to the agent. Add only the variables the agent needs with `agentRuntime.exposeEnvironmentVariables`.
+Agentic Checks do **not** automatically expose all account variables or secrets to the agent. To expose one to an Agentic Check, reference it directly in the prompt with double curly brackets, such as `{{TEST_USER_EMAIL}}`.
 
 ```typescript checkout.agentic.check.ts
 import { AgenticCheck, Frequency } from 'checkly/constructs'
 
 new AgenticCheck('checkout-flow', {
   name: 'Checkout Flow',
-  prompt: 'Sign in to the test account and verify that a user can reach the checkout review step.',
+  prompt: 'Sign in with {{TEST_USER_EMAIL}} and {{TEST_USER_PASSWORD}}, then verify that a user can reach the checkout review step.',
   frequency: Frequency.EVERY_1H,
   activated: true,
-  agentRuntime: {
-    exposeEnvironmentVariables: [
-      { name: 'TEST_USER_EMAIL', description: 'Email address for the checkout test account' },
-      { name: 'TEST_USER_PASSWORD', description: 'Password for the checkout test account' },
-    ],
-  },
 })
 ```
 
 <Warning>
-Do not paste secrets directly into the prompt. Store secrets as Checkly environment variables and expose only the variables the agent needs for this check.
+Do not paste secret values directly into the prompt. Store secrets in Checkly and reference them by name with `{{SECRET_NAME}}`.
 </Warning>
 
-Some applications block automated monitoring unless requests include required headers, test bypass tokens, or feature flags. If your flow depends on a header value, expose that value as an environment variable and say in the prompt which header the agent should send. Do not paste the header value directly into the prompt.
+Some applications block automated monitoring unless requests include required headers, test bypass tokens, or feature flags. If your flow depends on a header value, store that value as a Checkly variable or secret and say in the prompt which header the agent should send. Do not paste the header value directly into the prompt.
 
 ## Add skills
 

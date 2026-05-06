@@ -22,6 +22,26 @@ Agentic Checks are useful when the behavior you need to monitor is clear, but th
 - Pages where you want the monitor to adapt when implementation details change
 - Early monitoring coverage before you invest in a hand-written Browser Check or Playwright Check Suite
 
+## Prompt best practices
+
+The prompt is the monitoring contract for an Agentic Check. Write it as a focused objective with clear pass and fail criteria.
+
+A reliable prompt usually includes:
+
+- **Goal**: The user journey or system behavior to monitor.
+- **What you are given**: The start URL, test account context, and any required environment variables.
+- **Success looks like**: The exact outcome that should pass.
+- **Failure looks like**: The states that should fail the check.
+- **Strictness**: Whether the agent should assert exact values or evaluate the outcome more flexibly.
+
+Choose strictness based on the application behavior:
+
+- Use strict assertions for deterministic flows, such as a login page loading, an API response containing a required field, or a dashboard showing an account name.
+- Use outcome-based assertions for nondeterministic flows, such as an AI support assistant answering a billing question or a search experience returning relevant results. In these cases, describe the intent and acceptance criteria instead of requiring exact copy.
+- Avoid vague prompts like "monitor my app". If the prompt is broad, tell the agent what surface to cover and what failures should matter.
+
+Keep prompts focused on one flow. If you want to monitor navigation, login, and record creation, create separate Agentic Checks for each flow.
+
 ## How Agentic Checks work
 
 The first run uses your prompt to discover the target and create a reusable check script. Later runs execute the saved script first for faster, lower-cost monitoring. If the saved script fails, the agent can wake up in self-heal mode, diagnose the failure, update the script, and verify the result before the run finishes.

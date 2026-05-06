@@ -29,7 +29,7 @@ The prompt is the monitoring contract for an Agentic Check. Write it as a focuse
 A reliable prompt usually includes:
 
 - **Goal**: The user journey or system behavior to monitor.
-- **What you are given**: The start URL, test account context, and any required environment variables.
+- **What you are given**: The start URL, test account context, and any required variables or secrets using `{{VARIABLE_NAME}}` notation.
 - **Success looks like**: The exact outcome that should pass.
 - **Failure looks like**: The states that should fail the check.
 - **Strictness**: Whether the agent should assert exact values or evaluate the outcome more flexibly.
@@ -59,18 +59,19 @@ Each run can produce:
 Agentic Checks are not a replacement for every deterministic check. Use them for important flows where the agent's discovery and self-healing behavior is valuable. Use [API Checks](/detect/synthetic-monitoring/api-checks/overview), [Browser Checks](/detect/synthetic-monitoring/browser-checks/overview), or [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview) when you need fully deterministic scripted monitoring.
 </Note>
 
-## Runtime access
+## Variables, secrets, and skills
 
-Agentic Checks run with a small default runtime for browser automation. You can extend that runtime with skills and explicitly expose environment variables that the agent is allowed to read.
+Agentic Checks run with a small default runtime for browser automation. You can extend that runtime with skills.
 
-Treat runtime access as a security boundary:
+To use account variables or secrets, reference them directly in the prompt with double curly brackets, such as `{{TEST_USER_EMAIL}}` or `{{API_TOKEN}}`. This is the only way to expose Checkly account variables and secrets to an Agentic Check.
 
-- Only expose the variables the agent needs.
-- Add descriptions for credentials so the agent knows when to use them.
+Treat this access as a security boundary:
+
+- Only reference the variables and secrets the agent needs.
 - Do not put secrets directly in prompts.
 - Review generated checks before deploying them to production monitoring.
 
-Learn how to configure runtime access in the [Agentic Checks configuration guide](/detect/synthetic-monitoring/agentic-checks/configuration).
+Learn how to configure variables, secrets, and skills in the [Agentic Checks configuration guide](/detect/synthetic-monitoring/agentic-checks/configuration).
 
 ## Billing and entitlements
 
@@ -91,7 +92,7 @@ Your billing page is the source of truth for the exact Agentic Check capacity in
 
 <Columns cols={2}>
 <Card title="Configure Agentic Checks" href="/detect/synthetic-monitoring/agentic-checks/configuration">
-Define prompts, runtime access, and scheduling behavior.
+Define prompts, skills, variables, and scheduling behavior.
 </Card>
 
 <Card title="Agentic Check Construct" href="/constructs/agentic-check">

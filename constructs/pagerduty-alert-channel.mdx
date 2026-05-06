@@ -1,0 +1,87 @@
+---
+title: 'PagerdutyAlertChannel Construct'
+description: 'Learn how to configure Pagerduty alert channels with the Checkly CLI.'
+sidebarTitle: 'Pagerduty'
+---
+
+import AlertChannelOptionsTable from '/snippets/alert-channel-options-table.mdx';
+import AlertChannelOptionsText from '/snippets/alert-channel-options-text.mdx';
+
+
+<Tip>
+For general information about alerting, see our docs on [the Pagerduty integration](/integrations/incident-management/pagerduty) and [alerting with Checkly](/communicate/alerts/overview/).
+</Tip>
+
+Sends an alert notification to a specific service in your Pagerduty account.
+
+<CodeGroup>
+
+```ts Basic Example
+import { PagerdutyAlertChannel } from 'checkly/constructs'
+
+const pagerdutyChannel = new PagerdutyAlertChannel('pagerduty-channel-1', {
+  account: 'ACME',
+  serviceName: 'ACME products',
+  serviceKey: '872b9b58ff4a9n06d0dl9f20487bbqwew'
+})
+```
+
+```ts Advanced Example
+import { PagerdutyAlertChannel } from 'checkly/constructs'
+
+const pagerdutyChannel = new PagerdutyAlertChannel('pagerduty-channel-1', {
+  account: 'ACME',
+  serviceName: 'ACME products',
+  serviceKey: '872b9b58ff4a9n06d0dl9f20487bbqwew',
+  sendRecovery: true,
+  sendFailure: true,
+  sendDegraded: true,
+  sslExpiry: true,
+  sslExpiryThreshold: 30,
+})
+```
+
+</CodeGroup>
+
+<Note>
+  If you need to reference existing alert channels that were created outside of your CLI project, use [`fromId()`](/constructs/alert-channel#using-fromid-to-reference-an-existing-channel).
+</Note>
+
+## Configuration
+
+<Tabs>
+<Tab title="Pagerduty Alert Channel">
+
+Configure Pagerduty-specific settings:
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `account` | `string` | ✅ | - | The name of your Pagerduty account |
+| `serviceName` | `string` | ✅ | - | The name of your service in Pagerduty under which the alerts should be nested |
+| `serviceKey` | `string` | ✅ | - | The API key created by installing the Checkly integration in Pagerduty. [Install the integration from our UI](https://app.checklyhq.com/alerts/settings/channels/new/pagerduty/) to get this. |
+
+</Tab>
+<Tab title="General Alert Channel">
+
+  <AlertChannelOptionsTable />
+
+</Tab>
+</Tabs>
+
+### Pagerduty Alert Channel Options
+
+<ResponseField name="account" type="string" required>
+The name of your Pagerduty account.
+</ResponseField>
+
+<ResponseField name="serviceName" type="string" required>
+The name of your service defined in Pagerduty under which the alerts should be nested.
+</ResponseField>
+
+<ResponseField name="serviceKey" type="string" required>
+The API key created by installing the Checkly integration in Pagerduty. We advise you to [install the Pagerduty alert channel first from the UI](https://app.checklyhq.com/alerts/settings/channels/new/pagerduty/) to grab the `serviceKey`.
+</ResponseField>
+
+### General Alert Channel Options
+
+<AlertChannelOptionsText />

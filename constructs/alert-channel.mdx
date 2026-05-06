@@ -1,0 +1,46 @@
+---
+title: 'Alert Channel Overview'
+description: 'Learn how to configure alert channels with the Checkly CLI.'
+sidebarTitle: 'Overview'
+---
+
+import AlertChannelOptionsTable from '/snippets/alert-channel-options-table.mdx';
+
+Alert channels let you get alert notifications when a check or monitor fails. [Learn more about alerting in our docs](/communicate/alerts/overview/).
+
+## Common properties
+
+All alert channels share a set of common properties to define when / how they should alert derived from the abstract class
+`AlertChannel`.
+
+<AlertChannelOptionsTable />
+
+Alert channels are assigned to checks, monitors, and groups by instantiating a class and adding the resulting object to the
+`alertChannels` array. 
+
+To assign alert channels to `CheckGroupV2` constructs, you'll also need to set the [`alertEscalationPolicy`](/constructs/check-group-v2#param-alert-escalation-policy) to enable the group alerting override.
+
+## Using `fromId()` to reference an existing channel 
+
+You can reference an existing alert channel in your Checkly account using the `fromId()` method on any `AlertChannel`
+class. When your CLI project is responsible for creating and managing alert channels, it integrates seamlessly with Checkly's deployment control mechanisms. This ensures that any changes made are thoroughly validated.
+
+For users with multiple Checkly CLI projects:
+
+- Alert channels can be set up through the Checkly UI or any other method, ensuring they remain intact and unaffected by individual CLI project operations.
+
+For users managing a single Checkly CLI project:
+
+- The entire process of creating and subscribing to alert channels can be handled within that single project. This is made possible because the project references the logical ID of the alert channel, rather than an ID generated post-deployment.
+
+<Note>
+If you attempt to deploy a project that references alert channels which have been removed or are no longer valid, the deployment process will not proceed. This feature helps maintain the integrity and reliability of your monitoring and alerting setup.
+</Note>
+
+```ts
+export const emailChannel = EmailAlertChannel.fromId(20)
+```
+
+You can obtain the ID for your alert channel either from the [Checkly web UI](https://app.checklyhq.com/accounts/alerts/settings) or by utilizing our [REST API](/api-reference/alert-channels/list-all-alert-channels/).
+
+![email channel id](/images/docs/images/cli/constructs_email_id@2x.jpg)

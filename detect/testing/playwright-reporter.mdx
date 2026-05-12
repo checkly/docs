@@ -175,6 +175,10 @@ export default defineConfig({
 If your Checkly reports don't include traces or videos, ensure that your `playwright.config.ts` enables these Playwright features. The reporter only uploads what your Playwright test run creates.
 </Tip>
 
+<Tip>
+**Using UI mode?** The reporter uploads results from UI mode runs, too. Enable [`dryRun`](#dry-run-mode) to skip uploads during local development.
+</Tip>
+
 ## Understanding Test Sessions
 
 The reporter creates **suite-level test sessions**, not individual test file results.
@@ -244,7 +248,7 @@ createChecklyReporter({
 })
 ```
 
-Both approaches create `checkly-report.json` and `checkly-report.zip` in your output directory for local inspection.
+Dry runs will create a `checkly-report.zip` in your output directory for local inspection.
 
 ## CI/CD Integration
 

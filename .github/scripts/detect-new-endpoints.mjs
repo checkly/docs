@@ -193,6 +193,29 @@ function getUniqueFilename(ep) {
   return `${baseFilename}-${Date.now()}`;
 }
 
+function getDocumentabilityIssues(ep, details) {
+  const issues = [];
+  const responseCodes = Object.keys(details.responses ?? {});
+  const nonDefaultResponses = responseCodes.filter(code => code !== 'default');
+
+  if (nonDefaultResponses.length === 0) {
+    issues.push('only has a default response');
+  }
+
+  const pathParams = [...ep.path.matchAll(/\{([^}]+)\}/g)].map(match => match[1]);
+  const documentedPathParams = new Set(
+    (details.parameters ?? [])
+      .filter(param => param?.in === 'path')
+      .map(param => param.name)
+  );
+  const missingPathParams = pathParams.filter(param => !documentedPathParams.has(param));
+  if (missingPathParams.length > 0) {
+    issues.push(`missing path parameter metadata: ${missingPathParams.join(', ')}`);
+  }
+
+  return issues;
+}
+
 function openPrExistsForBranchBase(branchBaseName) {
   try {
     const result = run(
@@ -382,6 +405,7 @@ async function main() {
 
   // 2. Find undocumented endpoints
   const undocumented = [];
+  const skippedPoorSpec = [];
   for (const [path, methods] of Object.entries(spec.paths)) {
     for (const [method, details] of Object.entries(methods)) {
       if (!['get', 'post', 'put', 'delete', 'patch'].includes(method)) continue;
@@ -398,8 +422,22 @@ async function main() {
       const { dir, group, subgroup } = resolveMapping(tag, summary);
 
       const ep = { key, method: method.toUpperCase(), path, tag, summary, dir, group, subgroup };
+      const documentabilityIssues = getDocumentabilityIssues(ep, details);
+      if (documentabilityIssues.length > 0) {
+        skippedPoorSpec.push({ ...ep, issues: documentabilityIssues });
+        continue;
+      }
+
       undocumented.push({ ...ep, filename: getUniqueFilename(ep) });
     }
+  }
+
+  if (skippedPoorSpec.length > 0) {
+    console.log(`\n⚠️  Skipping ${skippedPoorSpec.length} endpoint(s) with incomplete OpenAPI metadata:\n`);
+    for (const ep of skippedPoorSpec) {
+      console.log(`  ${ep.key} — ${ep.issues.join('; ')}`);
+    }
+    console.log('\n  Fix the upstream OpenAPI metadata before generating API reference pages for these endpoints.');
   }
 
   if (undocumented.length === 0) {

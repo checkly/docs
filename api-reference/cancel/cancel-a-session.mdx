@@ -3,3 +3,12 @@ openapi: post /v1/cancel
 title: Cancel a check or test session
 sidebarTitle: Cancel a session
 ---
+
+Stops an in-progress check session or test session by ID. The request body discriminates by which ID you pass:
+
+- Pass a `checkSessionId` to cancel a [check session](/api-reference/check-sessions/retrieve-a-check-session-v2) (UI "Schedule now" or `checkly deploy`).
+- Pass a `testSessionId` to cancel a [test session](/detect/testing/overview) (`checkly test`, `checkly trigger`, or `checkly pw-test`).
+
+Optionally pass `sequenceId` (a single UUID or an array) to cancel only specific runs within the session. Omit it to cancel every in-progress run.
+
+Only Playwright Check Suite runs are cancellable. If a test session also contains URL, API, Browser, Multistep, Heartbeat, TCP, DNS, or ICMP runs, those continue executing until they finish normally. See [Cancellation](/concepts/cancellation) for the full flow, the effect on alerts and metrics, and how the `CANCELLED` status and `isCancelled` flag surface in responses.

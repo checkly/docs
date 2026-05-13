@@ -175,7 +175,7 @@ The reporter automatically removes sensitive values from reports, trace files, a
 | Category | What is redacted | Default behavior |
 |----------|-----------------|------------------|
 | **Secret env vars** | Values of environment variables you specify | Requires explicit `envVars` list |
-| **Auto-detected env vars** | Values of env vars matching common patterns (`SECRET`, `KEY`, `TOKEN`, `PASSWORD`, `CREDENTIAL`, `AUTH`, `PRIVATE`, `API`) | Enabled by default (`autoDetect: true`) |
+| **Auto-detected env vars** | Values of env vars matching common patterns (`SECRET`, `KEY`, `TOKEN`, `PASSWORD`, `CREDENTIAL`, `AUTH`, `PRIVATE`, `API`) | Disabled by default; opt in with `autoDetect: true` |
 | **Prefixed env vars** | Values of env vars starting with `CHECKLY_SECRET_` | Enabled by default |
 | **Sensitive HTTP headers** | `Authorization`, `Cookie`, `Set-Cookie`, `Proxy-Authorization`, `X-API-Key`, `X-Auth-Token` in network requests | Enabled by default |
 
@@ -200,8 +200,9 @@ export default defineConfig({
         // Scrub env vars starting with this prefix (set to false to disable)
         prefix: 'CHECKLY_SECRET_',
 
-        // Redact sensitive HTTP headers (pass an array to customize the list)
-        sensitiveHeaders: true,
+        // Redact sensitive HTTP headers — omit to use the defaults,
+        // or pass an array of header names to customize the list
+        // sensitiveHeaders: ['Authorization', 'X-Custom-Token'],
 
         // Custom replacement string
         replacement: '*********',
@@ -214,9 +215,9 @@ export default defineConfig({
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `envVars` | `string[]` | `[]` | Env var names whose values should be scrubbed |
-| `autoDetect` | `boolean` | `true` | Auto-detect secrets from env vars matching common patterns |
+| `autoDetect` | `boolean` | `false` | Auto-detect secrets from env vars matching common patterns |
 | `prefix` | `string \| false` | `'CHECKLY_SECRET_'` | Scrub env vars with this prefix; set `false` to disable |
-| `sensitiveHeaders` | `boolean \| string[]` | `true` | Redact sensitive HTTP headers; pass an array for a custom list |
+| `sensitiveHeaders` | `string[] \| false` | Built-in list | Redact sensitive HTTP headers; pass an array for a custom list, or `false` to disable |
 | `replacement` | `string` | `'*********'` | Replacement text for scrubbed values |
 
 ### Disabling Scrubbing

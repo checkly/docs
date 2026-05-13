@@ -80,7 +80,7 @@ Because no alert is sent and the check status does not change, [automated incide
 
 Cancellation introduces two API additions: a new `CANCELLED` value on the check-session status enum, and a new `isCancelled` boolean on individual check results. The status enum change is breaking for clients that switch on status values exhaustively, so it's only exposed through the v2 check-session endpoints; v1 clients continue to work unchanged. The `isCancelled` flag is additive and ships on the existing check-result endpoints without a version bump.
 
-<ResponseField name="v1 check sessions" type="backwards-compatible">
+<ResponseField name="v1 check sessions" type="deprecated">
 [`POST /v1/check-sessions/trigger`](/api-reference/check-sessions/trigger-a-new-check-session), [`GET /v1/check-sessions/{checkSessionId}`](/api-reference/check-sessions/retrieve-a-check-session), and [`GET /v1/check-sessions/{checkSessionId}/completion`](/api-reference/check-sessions/await-the-completion-of-a-check-session) never return `CANCELLED` in `status` and do not include `isCancelled` on per-result objects.
 </ResponseField>
 

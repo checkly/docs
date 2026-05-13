@@ -182,24 +182,33 @@ The reporter automatically removes sensitive values from reports, trace files, a
 ### Configuration
 
 ```ts playwright.config.ts
-createChecklyReporter({
-  scrubbing: {
-    // Explicitly list env var names to scrub
-    envVars: ['API_KEY', 'DB_PASSWORD'],
+import { defineConfig } from '@playwright/test';
+import { createChecklyReporter } from '@checkly/playwright-reporter';
 
-    // Auto-detect secrets from env vars matching common patterns
-    autoDetect: true,
+export default defineConfig({
+  reporter: [
+    ['list'],
+    createChecklyReporter({
+      scrubbing: {
+        // Explicitly list env var names to scrub
+        envVars: ['API_KEY', 'DB_PASSWORD'],
 
-    // Scrub env vars starting with this prefix (set to false to disable)
-    prefix: 'CHECKLY_SECRET_',
+        // Auto-detect secrets from env vars matching common patterns
+        // (SECRET, KEY, TOKEN, PASSWORD, CREDENTIAL, AUTH, PRIVATE, API)
+        autoDetect: true,
 
-    // Redact sensitive HTTP headers (pass an array to customize the list)
-    sensitiveHeaders: true,
+        // Scrub env vars starting with this prefix (set to false to disable)
+        prefix: 'CHECKLY_SECRET_',
 
-    // Custom replacement string
-    replacement: '*********',
-  },
-})
+        // Redact sensitive HTTP headers (pass an array to customize the list)
+        sensitiveHeaders: true,
+
+        // Custom replacement string
+        replacement: '*********',
+      },
+    }),
+  ],
+});
 ```
 
 | Option | Type | Default | Description |

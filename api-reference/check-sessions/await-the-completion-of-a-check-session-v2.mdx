@@ -1,3 +1,13 @@
 ---
 openapi: get /v2/check-sessions/{checkSessionId}/completion
 ---
+
+Call this endpoint to await the completion of a check session. A successful response will be returned once the check session reaches its final state (i.e. when it passes, fails, or is cancelled).
+
+If the check session takes a long time to complete, the endpoint will return a timeout error code. You should keep calling the endpoint until you receive a successful response, or a non-timeout related error code. If using *curl*, its `--retry` option is suitable.
+
+The successful response of this endpoint is equivalent to the [retrieve a check session](/api-reference/check-sessions/retrieve-a-check-session-v2) endpoint's response for a completed check session.
+
+<Note>
+**What's new in v2:** `status` may return the new `CANCELLED` value for sessions that were [cancelled](/concepts/cancellation), and every per-result object includes an `isCancelled` boolean. v1 clients continue to work unchanged and never see these additions.
+</Note>

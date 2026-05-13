@@ -1,3 +1,15 @@
 ---
 openapi: post /v2/check-sessions/trigger
 ---
+
+Starts a check session for each check that matches the provided target filters. If no filters are given, matches all eligible checks.
+
+This endpoint does not wait for the check session to complete. Use the [await completion](/api-reference/check-sessions/await-the-completion-of-a-check-session-v2) or [retrieve check session](/api-reference/check-sessions/retrieve-a-check-session-v2) endpoints to track progress if needed.
+
+Standard alerting rules apply to finished check runs.
+
+Equivalent to the _Schedule Now_ button in the UI.
+
+<Note>
+**What's new in v2:** `status` may return the new `CANCELLED` value for sessions that were [cancelled](/concepts/cancellation), and every per-result object includes an `isCancelled` boolean. v1 clients continue to work unchanged and never see these additions.
+</Note>

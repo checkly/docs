@@ -5,12 +5,35 @@ sidebarTitle: 'Playwright Check Suite'
 ---
 
 import { YoutubeEmbed } from "/snippets/youtube-embed.jsx"
+import { CopyPromptButton } from "/snippets/copy-prompt-button.jsx"
+import SetupPrompt from "/snippets/playwright-check-suite-setup-prompt.mdx"
 
-Turn your Playwright tests into production monitors. This guide walks through creating a `checkly.config.ts`, testing it, and deploying your first check suites.
+Turn your Playwright tests into production monitors. Generate a working configuration with AI, or configure manually.
+
+## Set up with AI
+
+Copy the setup prompt and paste it into your AI coding tool — Claude Code, Cursor, GitHub Copilot, or similar — from your project directory.
+
+The prompt analyzes your Playwright configuration and generates a `checkly.config.ts` tailored to your project.
+
+<CopyPromptButton />
+
+The prompt guides your AI tool to:
+
+1. Inspect your Playwright configuration and test files
+2. Recommend which tests to monitor first
+3. Generate a minimal `checkly.config.ts` with alert channels
+4. Run `npx checkly test --record` and `npx checkly deploy`
+
+<Accordion title="View the full prompt">
+<SetupPrompt />
+</Accordion>
 
 <Tip>
-Explore all [Playwright Check Suite capabilities](/detect/synthetic-monitoring/playwright-checks/overview).
+This prompt is also available in the Checkly UI when [creating a Playwright Check Suite](https://app.checklyhq.com/checks/playwright/create).
 </Tip>
+
+## Configure manually
 
 <Accordion title="Prerequisites">
 

@@ -33,7 +33,7 @@ npx checkly checks <subcommand> [arguments] [options]
 
 ## `checkly checks list`
 
-List all checks in your account with optional filtering by name, tag, or check type.
+List all checks in your account with optional filtering by name, tag, check type, or status.
 
 **Usage:**
 
@@ -50,6 +50,7 @@ npx checkly checks list [options]
 | `--search, -s` | - | Filter checks by name (case-insensitive). |
 | `--tag, -t` | - | Filter by tag. Can be specified multiple times. |
 | `--type` | - | Filter by check type. |
+| `--status` | - | Filter by check status: `passing`, `failing`, or `degraded`. |
 | `--hide-id` | - | Hide check IDs in table output. |
 | `--output, -o` | - | Output format: `table`, `json`, or `md`. Default: `table`. |
 
@@ -120,6 +121,19 @@ npx checkly checks list --type=BROWSER
 
 </ResponseField>
 
+<ResponseField name="--status" type="string">
+
+Filter checks by current status. Available values: `passing`, `failing`, `degraded`.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks list --status=failing
+npx checkly checks list --status=degraded
+```
+
+</ResponseField>
+
 <ResponseField name="--hide-id" type="boolean">
 
 Hide check IDs in table output for a cleaner view.
@@ -156,6 +170,9 @@ npx checkly checks list --search="homepage"
 
 # Filter by tag and type
 npx checkly checks list --tag=production --type=API
+
+# Show only failing checks
+npx checkly checks list --status=failing
 
 # Get results as JSON
 npx checkly checks list --output=json
@@ -219,6 +236,10 @@ Show full details for a specific error group, including error messages and affec
 npx checkly checks get <check-id> --error-group=<error-group-id>
 npx checkly checks get <check-id> -e <error-group-id>
 ```
+
+<Tip>
+If your account has [Rocky AI Root Cause Analysis](/resolve/ai-root-cause-analysis/overview/) enabled, the returned error group details include the AI-generated root cause analysis for that error group.
+</Tip>
 
 </ResponseField>
 

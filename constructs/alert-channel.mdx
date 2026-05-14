@@ -4,8 +4,6 @@ description: 'Learn how to configure alert channels with the Checkly CLI.'
 sidebarTitle: 'Overview'
 ---
 
-import AlertChannelOptionsTable from '/snippets/alert-channel-options-table.mdx';
-
 Alert channels let you get alert notifications when a check or monitor fails. [Learn more about alerting in our docs](/communicate/alerts/overview/).
 
 ## Common properties
@@ -13,7 +11,15 @@ Alert channels let you get alert notifications when a check or monitor fails. [L
 All alert channels share a set of common properties to define when / how they should alert derived from the abstract class
 `AlertChannel`.
 
-<AlertChannelOptionsTable />
+Configure common alert channel properties:
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `sendRecovery` | `boolean` | ❌ | `true` | Send notifications when checks recover |
+| `sendFailure` | `boolean` | ❌ | `true` | Send notifications when checks fail |
+| `sendDegraded` | `boolean` | ❌ | `false` | Send notifications when checks degrade |
+| `sslExpiry` | `boolean` | ❌ | `false` | Send notifications for SSL certificate expiry |
+| `sslExpiryThreshold` | `number` | ❌ | `30` | Days before SSL expiry to send notification |
 
 Alert channels are assigned to checks, monitors, and groups by instantiating a class and adding the resulting object to the
 `alertChannels` array. 

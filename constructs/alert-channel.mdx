@@ -22,7 +22,26 @@ Configure common alert channel properties:
 | `sslExpiryThreshold` | `number` | ❌ | `30` | Days before SSL expiry to send notification |
 
 Alert channels are assigned to checks, monitors, and groups by instantiating a class and adding the resulting object to the
-`alertChannels` array. 
+`alertChannels` array:
+
+```ts api-health.check.ts
+import { ApiCheck, EmailAlertChannel } from 'checkly/constructs'
+
+// Create a new alert channel
+const emailChannel = new EmailAlertChannel('email-channel-1', {
+  address: 'alerts@example.com',
+})
+
+// Create a new API check
+new ApiCheck('api-health-check', {
+  name: 'API Health',
+  request: {
+    method: 'GET',
+    url: 'https://api.example.com',
+  },
+  alertChannels: [emailChannel], // Assign our email alert channel to this API check
+})
+```
 
 To assign alert channels to `CheckGroupV2` constructs, you'll also need to set the [`alertEscalationPolicy`](/constructs/check-group-v2#param-alert-escalation-policy) to enable the group alerting override.
 

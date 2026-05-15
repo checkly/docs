@@ -78,14 +78,14 @@ Because no alert is sent and the check status does not change, [automated incide
 
 ## API versioning
 
-Cancellation introduces two API additions: a new `CANCELLED` value on the check-session status enum, and a new `isCancelled` boolean on individual check results. The status enum change is breaking for clients that switch on status values exhaustively, so it's only exposed through the v2 check-session endpoints; v1 clients continue to work unchanged. The `isCancelled` flag is additive and ships on the existing check-result endpoints without a version bump.
+Cancellation introduces two API additions: a new `CANCELLED` value on the check-session status enum, and a new `isCancelled` boolean on individual check results. The `isCancelled` flag is additive and ships on every check-result and check-session response without a version bump. The status enum change is breaking for clients that switch on status values exhaustively, so the new `CANCELLED` value is only returned by the v2 check-session endpoints; v1 maps cancelled sessions to `TIMED_OUT` in `status` so existing clients continue to work unchanged.
 
 <ResponseField name="v1 check sessions" type="deprecated">
-[`POST /v1/check-sessions/trigger`](/api-reference/check-sessions/trigger-a-new-check-session), [`GET /v1/check-sessions/{checkSessionId}`](/api-reference/check-sessions/retrieve-a-check-session), and [`GET /v1/check-sessions/{checkSessionId}/completion`](/api-reference/check-sessions/await-the-completion-of-a-check-session) never return `CANCELLED` in `status` and do not include `isCancelled` on per-result objects.
+[`POST /v1/check-sessions/trigger`](/api-reference/check-sessions/trigger-a-new-check-session), [`GET /v1/check-sessions/{checkSessionId}`](/api-reference/check-sessions/retrieve-a-check-session), and [`GET /v1/check-sessions/{checkSessionId}/completion`](/api-reference/check-sessions/await-the-completion-of-a-check-session) report cancelled sessions as `TIMED_OUT` in `status` rather than `CANCELLED`. Per-result objects still include `isCancelled`, so individual cancelled runs remain identifiable.
 </ResponseField>
 
 <ResponseField name="v2 check sessions" type="recommended">
-[`POST /v2/check-sessions/trigger`](/api-reference/check-sessions/trigger-a-new-check-session-v2), [`GET /v2/check-sessions/{checkSessionId}`](/api-reference/check-sessions/retrieve-a-check-session-v2), and [`GET /v2/check-sessions/{checkSessionId}/completion`](/api-reference/check-sessions/await-the-completion-of-a-check-session-v2) return `CANCELLED` in `status` and include `isCancelled` on each per-result object.
+[`POST /v2/check-sessions/trigger`](/api-reference/check-sessions/trigger-a-new-check-session-v2), [`GET /v2/check-sessions/{checkSessionId}`](/api-reference/check-sessions/retrieve-a-check-session-v2), and [`GET /v2/check-sessions/{checkSessionId}/completion`](/api-reference/check-sessions/await-the-completion-of-a-check-session-v2) return `CANCELLED` in `status` for cancelled sessions. Response shape is otherwise the same as v1.
 </ResponseField>
 
 <ResponseField name="check results" type="additive change">
@@ -96,4 +96,4 @@ Cancellation introduces two API additions: a new `CANCELLED` value on the check-
 [`POST /v1/cancel`](/api-reference/cancel/cancel-a-session) is the action endpoint itself. It accepts either a `checkSessionId` or a `testSessionId` in the body, so a single endpoint covers both.
 </ResponseField>
 
-If you build automation against check sessions and want to handle cancelled runs explicitly, switch to the v2 endpoints.
+If you build automation against check sessions and need to distinguish cancelled sessions from genuine timeouts at the session level, switch to the v2 endpoints. Otherwise, the `isCancelled` flag on per-result objects is available in both versions.

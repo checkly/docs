@@ -11,5 +11,5 @@ Standard alerting rules apply to finished check runs.
 Equivalent to the _Schedule Now_ button in the UI.
 
 <Note>
-**What's new in v2:** `status` may return the new `CANCELLED` value for sessions that were [cancelled](/concepts/cancellation), and every per-result object includes an `isCancelled` boolean. v1 clients continue to work unchanged and never see these additions.
+**v2 vs v1:** v2 returns the new `CANCELLED` value in `status` for sessions that were [cancelled](/concepts/cancellation). v1 reports the same sessions as `TIMED_OUT` for backward compatibility. The response shape is otherwise identical, including the `isCancelled` boolean on per-result objects.
 </Note>

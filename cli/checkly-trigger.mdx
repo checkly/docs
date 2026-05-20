@@ -21,6 +21,7 @@ npx checkly trigger [options]
 | Option | Required | Description |
 |--------|----------|-------------|
 | `--config, -c` | - | The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts\|js` file in the current directory. |
+| `--detach, -d` | - | Keep checks running in the cloud when you stop the CLI with Ctrl+C; skips the cancellation prompt. |
 | `--env, -e` | - | Env vars to be passed to the check run. Default: empty. Multiple values can be passed. |
 | `--env-file` | - | dotenv file path to be passed. For example `--env-file="./.env"` |
 | `--fail-on-no-matching` | - | Exit with a failing status code when there are no matching tests. |
@@ -46,6 +47,18 @@ Specify a configuration file to use instead of the `checkly.config.ts` or `check
 ```bash Terminal
 npx checkly trigger --config checkly.config.ts
 npx checkly trigger -c="./checkly.staging.config.ts"
+```
+
+</ResponseField>
+
+<ResponseField name="--detach, -d" type="boolean" default="false">
+
+Skip the cancellation prompt. By default, pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> during a recorded run opens a prompt to cancel the test session. With `--detach`, the CLI exits immediately instead, and the checks keep running in the cloud.
+
+**Usage:**
+
+```bash Terminal
+npx checkly trigger --record --detach
 ```
 
 </ResponseField>
@@ -377,7 +390,9 @@ npx checkly trigger --tags staging --record --test-session-name "Pre-prod valida
 {/* TODO: confirm CLI version that ships trigger Ctrl+C handling and fill in the Note below. */}
 <Note>Available in CLI vX.X+.</Note>
 
-When you started the run with `--record`, pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> prompts you to either **cancel** the recorded test session in Checkly or **detach** and let it finish in the background. Detach is the default. Cancellation only applies to Playwright Check Suite runs inside the session.
+When you run with `--record`, pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> opens a prompt to cancel the recorded test session. Cancellation applies only to Playwright Check Suite runs inside the session; other check types finish normally.
+
+Pass the `--detach` flag to skip the prompt — <kbd>Ctrl</kbd>+<kbd>C</kbd> then exits the CLI immediately and the checks keep running in the cloud.
 
 See [Cancellation](/concepts/cancellation) for the full flow.
 

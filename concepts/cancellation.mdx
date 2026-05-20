@@ -12,7 +12,7 @@ You can cancel two kinds of sessions, and the behaviour differs:
 
 **Check sessions** — created by the UI "Schedule now" button and `checkly deploy`. A check session is one execution of a single Playwright Check Suite, fanned out across the locations you configured. Cancelling the session stops every in-progress run; cancelling a single run leaves the rest of the session going.
 
-**Test sessions** — created by `checkly test`, `checkly trigger`, and `checkly pw-test`. A test session can contain multiple checks of different types. Cancelling the test session stops only the Playwright Check Suite runs inside it; any URL, API, Browser, Multistep, Heartbeat, TCP, DNS, or ICMP runs in the same session continue until they finish normally. You can also cancel a single Playwright run within the session.
+**Test sessions** — created by `checkly test --record`, `checkly trigger --record`, and `checkly pw-test` (which records by default). A test session can contain multiple checks of different types. Cancelling the test session stops only the Playwright Check Suite runs inside it; any URL, API, Browser, Multistep, Heartbeat, TCP, DNS, or ICMP runs in the same session continue until they finish normally. You can also cancel a single Playwright run within the session.
 
 <Warning>
 **Only Playwright Check Suite runs are cancellable.** Other check types cannot be cancelled, even when they appear inside a test session alongside Playwright runs. Scheduled runs are also excluded; cancellation is for user-initiated runs only.
@@ -46,7 +46,7 @@ curl -X POST https://api.checklyhq.com/v1/cancel \
 </Tab>
 
 <Tab title="CLI">
-Press <kbd>Ctrl</kbd>+<kbd>C</kbd> during `checkly pw-test`, `checkly test`, `checkly trigger`, or `checkly deploy`. The CLI prompts you to either cancel the running session or detach (let it finish in the background).
+Press <kbd>Ctrl</kbd>+<kbd>C</kbd> during a recorded test session run — `checkly pw-test` (records by default), `checkly test --record`, or `checkly trigger --record` — to open a cancellation prompt.
 
 See the [CLI reference](/cli/overview) for command-specific behavior.
 </Tab>

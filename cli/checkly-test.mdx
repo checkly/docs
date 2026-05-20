@@ -21,6 +21,7 @@ npx checkly test [arguments] [options]
 | Option | Required | Description |
 |--------|----------|-------------|
 | `--config, -c` | - | The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts\|js` file in the current directory. |
+| `--detach, -d` | - | Keep checks running in the cloud when you stop the CLI with Ctrl+C; skips the cancellation prompt. |
 | `--env, -e` | - | Env vars to be passed to the test run. Can be used multiple times. |
 | `--env-file` | - | dotenv file path to be passed. For example `--env-file="./.env"` |
 | `--grep, -g` | - | Only run checks where the check name matches a regular expression. Default: `.*` |
@@ -49,6 +50,18 @@ The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts|j
 ```bash Terminal
 npx checkly test --config="./checkly.staging.config.ts"
 npx checkly test -c="./checkly.staging.config.ts"
+```
+
+</ResponseField>
+
+<ResponseField name="--detach, -d" type="boolean" default="false">
+
+Skip the cancellation prompt. By default, pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> during a recorded run opens a prompt to cancel the test session. With `--detach`, the CLI exits immediately instead, and the checks keep running in the cloud.
+
+**Usage:**
+
+```bash Terminal
+npx checkly test --record --detach
 ```
 
 </ResponseField>
@@ -379,6 +392,17 @@ Specify [environment variables](/cli/environment-variables) to dry run checks wi
 ```bash Terminal
 npx checkly test --env ENVIRONMENT_URL="https://preview.acme.com" --env PASSWORD=doremiabc123
 ```
+
+## Cancelling a run
+
+{/* TODO: confirm CLI version that ships test Ctrl+C handling and fill in the Note below. */}
+<Note>Available in CLI vX.X+.</Note>
+
+When you run with `--record`, pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> opens a prompt to cancel the recorded test session. Cancellation applies only to Playwright Check Suite runs inside the session; other check types finish normally.
+
+Pass the `--detach` flag to skip the prompt — <kbd>Ctrl</kbd>+<kbd>C</kbd> then exits the CLI immediately and the checks keep running in the cloud.
+
+See [Cancellation](/concepts/cancellation) for the full flow.
 
 ## Related Commands
 

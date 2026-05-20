@@ -36,6 +36,7 @@ Define `checkly pw-test` specific options before the `--` separator:
 |--------|----------|-------------|
 | `--config` | - | The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts\|js` file in the current directory. |
 | `--create-check` | - | Create a Checkly check from the Playwright test. |
+| `--detach, -d` | - | Keep checks running in the cloud when you stop the CLI with Ctrl+C; skips the cancellation prompt. |
 | `--env, -e` | - | Env vars to be passed to the test run. Default: [] |
 | `--env-file` | - | dotenv file path to be passed. For example `--env-file="./.env"` |
 | `--include, -i` | - | File patterns to include when bundling the test project (e.g., `"utils/**/*"`). Can be repeated. |
@@ -122,6 +123,18 @@ const config = defineConfig({
 ```
 
 <Note>If there's no existing `checkly.config.ts` file, the `--create-check` option will create one.</Note>
+
+</ResponseField>
+
+<ResponseField name="--detach, -d" type="boolean" default="false">
+
+Skip the cancellation prompt. By default, pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> during a `pw-test` run opens a prompt to cancel the recorded test session. With `--detach`, the CLI exits immediately instead, and the checks keep running in the cloud.
+
+**Usage:**
+
+```bash Terminal
+npx checkly pw-test --detach
+```
 
 </ResponseField>
 
@@ -431,6 +444,17 @@ npx checkly pw-test -- test.spec.ts
 - Your Playwright configuration applies automatically (traces, videos, screenshots)
 - Test sessions are recorded by default with full logs, traces, and videos
 - View all artifacts in Checkly's UI
+
+## Cancelling a run
+
+{/* TODO: confirm CLI version that ships pw-test Ctrl+C handling and fill in the Note below. */}
+<Note>Available in CLI vX.X+.</Note>
+
+Cancellation is available only for recorded test sessions. `pw-test` records by default, so its runs can be cancelled unless you pass `--no-record`.
+
+Press <kbd>Ctrl</kbd>+<kbd>C</kbd> during a `checkly pw-test` run to open a cancellation prompt. Pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> a second time exits the CLI without waiting. Pass the `--detach` flag to skip the prompt entirely — <kbd>Ctrl</kbd>+<kbd>C</kbd> then exits immediately and the checks keep running in the cloud.
+
+See [Cancellation](/concepts/cancellation) for the full flow.
 
 ## Related Commands
 

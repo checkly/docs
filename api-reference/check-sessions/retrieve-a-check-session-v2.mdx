@@ -1,13 +1,3 @@
 ---
 openapi: get /v2/check-sessions/{checkSessionId}
 ---
-
-Retrieves a check session. Results may be incomplete if the check session is still in progress.
-
-Once a check session has finished, results will include at least one check result for each run location: one result with `resultType` equal to `"FINAL"`, and zero or more results with `resultType` equal to `"ATTEMPT"` (one for each failed attempt, if any).
-
-Each result contains just enough information to quickly determine whether the check run was successful or not. To dive even deeper into individual results, use the [retrieve a check result](/api-reference/check-results/retrieve-a-check-result) endpoint.
-
-<Note>
-**v2 vs v1:** v2 returns the new `CANCELLED` value in `status` for sessions that were [cancelled](/concepts/cancellation). v1 reports the same sessions as `TIMED_OUT` for backward compatibility. The response shape is otherwise identical, including the `isCancelled` boolean on per-result objects.
-</Note>

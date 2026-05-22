@@ -26,22 +26,22 @@ On a check session or test session page, click **Cancel session** in the header 
 </Tab>
 
 <Tab title="Public API">
-Send a `POST` request to [`/v1/cancel`](/api-reference/cancel/cancel-a-session) with either a `checkSessionId` or a `testSessionId`. Pass an optional `sequenceId` (or array) to cancel only specific runs within the session.
+Send a `POST` request to the cancel endpoint for the session type: [`/v1/check-sessions/{checkSessionId}/cancel`](/api-reference/check-sessions/cancel-a-check-session) or [`/v1/test-sessions/{testSessionId}/cancel`](/api-reference/test-sessions/cancel-a-test-session). The session ID goes in the path. Pass an optional `sequenceId` array in the body to cancel only specific runs within the session; send `{}` to cancel everything still running.
 
 ```bash Cancel a whole check session
-curl -X POST https://api.checklyhq.com/v1/cancel \
+curl -X POST https://api.checklyhq.com/v1/check-sessions/a1b2c3d4-e5f6-7890-abcd-ef1234567890/cancel \
   -H "Authorization: Bearer $CHECKLY_API_KEY" \
   -H "X-Checkly-Account: $CHECKLY_ACCOUNT_ID" \
   -H "Content-Type: application/json" \
-  -d '{"checkSessionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"}'
+  -d '{}'
 ```
 
 ```bash Cancel specific runs in a test session
-curl -X POST https://api.checklyhq.com/v1/cancel \
+curl -X POST https://api.checklyhq.com/v1/test-sessions/a1b2c3d4-e5f6-7890-abcd-ef1234567890/cancel \
   -H "Authorization: Bearer $CHECKLY_API_KEY" \
   -H "X-Checkly-Account: $CHECKLY_ACCOUNT_ID" \
   -H "Content-Type: application/json" \
-  -d '{"testSessionId": "a1b2c3d4-...", "sequenceId": ["b2c3d4e5-..."]}'
+  -d '{"sequenceId": ["b2c3d4e5-f6a7-8901-bcde-f12345678901"]}'
 ```
 </Tab>
 
@@ -92,8 +92,8 @@ Cancellation introduces two API additions: a new `CANCELLED` value on the check-
 [`GET /v1/check-results/{checkId}/{checkResultId}`](/api-reference/check-results/retrieve-a-check-result) and the list endpoints include `isCancelled` on every result.
 </ResponseField>
 
-<ResponseField name="cancel action" type="new endpoint">
-[`POST /v1/cancel`](/api-reference/cancel/cancel-a-session) is the action endpoint itself. It accepts either a `checkSessionId` or a `testSessionId` in the body, so a single endpoint covers both.
+<ResponseField name="cancel action" type="new endpoints">
+[`POST /v1/check-sessions/{checkSessionId}/cancel`](/api-reference/check-sessions/cancel-a-check-session) and [`POST /v1/test-sessions/{testSessionId}/cancel`](/api-reference/test-sessions/cancel-a-test-session) are the action endpoints. Each takes the session ID in the path and an optional `sequenceId` array in the body.
 </ResponseField>
 
 If you build automation against check sessions and need to distinguish cancelled sessions from genuine timeouts at the session level, switch to the v2 endpoints. Otherwise, the `isCancelled` flag on per-result objects is available in both versions.

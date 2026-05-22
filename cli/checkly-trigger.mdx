@@ -27,12 +27,12 @@ npx checkly trigger [options]
 | `--fail-on-no-matching` | - | Exit with a failing status code when there are no matching tests. |
 | `--location, -l` | - | The location to run the checks at. |
 | `--private-location` | - | The private location to run checks at. |
-| `--record` | - | Record test session results in Checkly with full logs, traces and videos. |
+| `--[no-]record` | - | Record test session results in Checkly with full logs, traces and videos. Records by default since CLI v8.0.0. |
 | `--refresh-cache` | - | Force a fresh install of dependencies and update the cached version. |
 | `--reporter, -r` | - | One or more custom reporters for the test output. Supports comma-separated values and repeated flags. |
 | `--retries` | - | How many times to retry a check run. |
 | `--tags, -t` | - | Filter the checks to be run using a comma separated list of tags. |
-| `--test-session-name, -n` | - | A name to use when storing results in Checkly with `--record`. |
+| `--test-session-name, -n` | - | A name to use when recording results in Checkly. |
 | `--timeout` | - | A timeout (in seconds) to wait for checks to complete. |
 | `--verbose, -v` | - | Always show the full logs of the checks. |
 
@@ -58,7 +58,7 @@ Skip the cancellation prompt. By default, pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> 
 **Usage:**
 
 ```bash Terminal
-npx checkly trigger --record --detach
+npx checkly trigger --detach
 ```
 
 </ResponseField>
@@ -181,12 +181,12 @@ Tags are comma-separated within a single flag for AND logic, multiple flags for 
 
 <ResponseField name="--test-session-name, -n" type="string">
 
-A name to use when storing results in Checkly with `--record`.
+A name to use when recording results in Checkly.
 
 **Usage:**
 
 ```bash Terminal
-npx checkly trigger --record --test-session-name="Custom session name"
+npx checkly trigger --test-session-name="Custom session name"
 ```
 
 </ResponseField>
@@ -272,27 +272,30 @@ npx checkly trigger --no-fail-on-no-matching --tags optional-tag
 Enabled by default. Use `--no-fail-on-no-matching` to allow zero matches without failure.
 </ResponseField>
 
-<ResponseField name="--record" type="boolean">
+<ResponseField name="--[no-]record" type="boolean" default="true">
 
-Record check results in Checkly as a test session with full logs, traces and videos.
+Record check results in Checkly as a test session with full logs, traces and videos. Recording is enabled by default; use `--no-record` to disable it.
+
+<Note>Recording defaults to enabled since CLI v8.0.0. In earlier versions, recording was opt-in via `--record`.</Note>
 
 **Usage:**
 
 ```bash Terminal
-npx checkly trigger --record
+npx checkly trigger
+npx checkly trigger --no-record
 ```
 
 **Examples:**
 
 ```bash Terminal
-# Basic recording
-npx checkly trigger --record
-
-# Record with custom name
-npx checkly trigger --record --test-session-name "Deploy validation"
+# Record with a custom session name
+npx checkly trigger --test-session-name "Deploy validation"
 
 # Record specific checks
-npx checkly trigger --record --tags critical
+npx checkly trigger --tags critical
+
+# Run without recording
+npx checkly trigger --no-record
 ```
 
 Records provide full visibility including logs, traces, and videos for debugging failed checks.
@@ -380,17 +383,16 @@ Default: 600 seconds (10 minutes). Adjust based on your longest-running checks.
 Run your deployed checks before promoting code to production:
 
 ```bash Terminal
-npx checkly trigger --tags staging --record --test-session-name "Pre-prod validation"
+npx checkly trigger --tags staging --test-session-name "Pre-prod validation"
 ```
 
 <Tip>If your production deployment includes monitoring changes and updates, [use `npx checkly test`](/cli/checkly-test) to validate your preview environment with the updated monitoring configuration.</Tip>
 
 ## Cancelling a run
 
-{/* TODO: confirm CLI version that ships trigger Ctrl+C handling and fill in the Note below. */}
-<Note>Available in CLI vX.X+.</Note>
+<Note>Available in CLI v8.0.0+.</Note>
 
-When you run with `--record`, pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> opens a prompt to cancel the recorded test session. Cancellation applies only to Playwright Check Suite runs inside the session; other check types finish normally.
+`checkly trigger` records a test session by default, so pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> opens a prompt to cancel it. Cancellation applies only to Playwright Check Suite runs inside the session; other check types finish normally. Runs started with `--no-record` cannot be cancelled.
 
 Pass the `--detach` flag to skip the prompt — <kbd>Ctrl</kbd>+<kbd>C</kbd> then exits the CLI immediately and the checks keep running in the cloud.
 

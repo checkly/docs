@@ -186,7 +186,7 @@ A name to use when recording results in Checkly.
 **Usage:**
 
 ```bash Terminal
-npx checkly trigger --test-session-name="Custom session name"
+npx checkly trigger --record --test-session-name="Custom session name"
 ```
 
 </ResponseField>
@@ -281,7 +281,7 @@ Record check results in Checkly as a test session with full logs, traces and vid
 **Usage:**
 
 ```bash Terminal
-npx checkly trigger
+npx checkly trigger --record
 npx checkly trigger --no-record
 ```
 
@@ -289,10 +289,10 @@ npx checkly trigger --no-record
 
 ```bash Terminal
 # Record with a custom session name
-npx checkly trigger --test-session-name "Deploy validation"
+npx checkly trigger --record --test-session-name "Deploy validation"
 
 # Record specific checks
-npx checkly trigger --tags critical
+npx checkly trigger --record --tags critical
 
 # Run without recording
 npx checkly trigger --no-record
@@ -383,7 +383,7 @@ Default: 600 seconds (10 minutes). Adjust based on your longest-running checks.
 Run your deployed checks before promoting code to production:
 
 ```bash Terminal
-npx checkly trigger --tags staging --test-session-name "Pre-prod validation"
+npx checkly trigger --tags staging --record --test-session-name "Pre-prod validation"
 ```
 
 <Tip>If your production deployment includes monitoring changes and updates, [use `npx checkly test`](/cli/checkly-test) to validate your preview environment with the updated monitoring configuration.</Tip>

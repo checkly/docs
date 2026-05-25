@@ -4,7 +4,12 @@ on:
   schedule:
     # Run every 48 hours (at 2 AM UTC every 2 days)
     - cron: '0 2 */2 * *'
-  workflow_dispatch: # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Open the PR but skip auto-merge so it can be inspected and closed."
+        type: boolean
+        default: false
 
 concurrency:
   group: update-api-spec
@@ -96,6 +101,8 @@ jobs:
                    -m "Updated on $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
         git push origin "$BRANCH"
 
+        DRY_RUN="${{ inputs.dry_run }}"
+
         # Build PR body
         BODY_FILE=$(mktemp)
         {
@@ -105,7 +112,11 @@ jobs:
           echo "- New endpoint pages: $NEW_PAGES"
           echo "- \`docs.json\` updated: $([ "$DOCS_JSON_CHANGED" = "1" ] && echo yes || echo no)"
           echo ""
-          echo "This PR will auto-merge once all required checks pass."
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "**Dry run** — auto-merge is disabled for this PR. Close it (and delete the branch) once you've reviewed."
+          else
+            echo "This PR will auto-merge once all required checks pass."
+          fi
           echo ""
           echo "---"
           echo "_Run: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})_"
@@ -119,6 +130,11 @@ jobs:
           --label auto-generated \
           --label api-docs)
         echo "Created $PR_URL"
+
+        if [ "$DRY_RUN" = "true" ]; then
+          echo "Dry run — leaving PR open without auto-merge."
+          exit 0
+        fi
 
         # Try auto-merge first (waits for required checks to pass).
         # Fall back to an immediate squash-merge ONLY when auto-merge isn't

@@ -6,10 +6,14 @@ on:
     - cron: '0 2 */2 * *'
   workflow_dispatch: # Allow manual triggering
 
+concurrency:
+  group: update-api-spec
+  cancel-in-progress: false
+
 jobs:
   update-api-spec:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     permissions:
       contents: write
@@ -20,6 +24,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
@@ -36,42 +41,91 @@ jobs:
         git config user.name "API Spec Updater"
         git config user.email "noreply@checkly.com"
 
-    - name: Fetch and update API specification
+    - name: Ensure labels exist
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        # Store current spec hash for comparison
-        CURRENT_HASH=$(sha256sum api-reference/openapi.json | cut -d' ' -f1)
+        gh label create "auto-generated" --color "0e8a16" --description "Automatically generated PR" --force
+        gh label create "api-docs" --color "1d76db" --description "API documentation changes" --force
 
-        # Run the update script
-        ./update-api-spec.sh
+    - name: Fetch latest API specification
+      run: ./update-api-spec.sh
 
-        # Check if spec actually changed
-        NEW_HASH=$(sha256sum api-reference/openapi.json | cut -d' ' -f1)
+    - name: Generate pages for any new endpoints
+      run: node .github/scripts/detect-new-endpoints.mjs
 
-        if [ "$CURRENT_HASH" != "$NEW_HASH" ]; then
-          echo "API specification has changed"
-          echo "spec_changed=true" >> $GITHUB_ENV
-        else
-          echo "API specification is unchanged"
-          echo "spec_changed=false" >> $GITHUB_ENV
+    - name: Open auto-merging PR if anything changed
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Stage everything that might have changed
+        git add api-reference docs.json
+
+        if git diff --cached --quiet; then
+          echo "✅ No changes — nothing to do"
+          exit 0
         fi
 
-    - name: Commit and Push Changes
-      if: env.spec_changed == 'true'
-      run: |
-        # Commit changes
-        git add api-reference/openapi.json
-        git commit -m "Update API specification from live endpoint" \
+        # Summarise the diff for the commit/PR body
+        SPEC_CHANGED=0
+        if git diff --cached --name-only | grep -q '^api-reference/openapi\.json$'; then
+          SPEC_CHANGED=1
+        fi
+        NEW_PAGES=$(git diff --cached --name-only --diff-filter=A | grep -c '^api-reference/.*\.mdx$' || true)
+        DOCS_JSON_CHANGED=0
+        if git diff --cached --name-only | grep -q '^docs\.json$'; then
+          DOCS_JSON_CHANGED=1
+        fi
+
+        # Title reflects what actually changed
+        if [ "$SPEC_CHANGED" = "1" ] && [ "$NEW_PAGES" -gt 0 ]; then
+          TITLE="chore(api): update API spec and add $NEW_PAGES new endpoint page(s)"
+        elif [ "$SPEC_CHANGED" = "1" ]; then
+          TITLE="chore(api): update API specification"
+        elif [ "$NEW_PAGES" -gt 0 ]; then
+          TITLE="docs(api): add $NEW_PAGES new endpoint page(s)"
+        else
+          TITLE="chore(api): refresh API reference"
+        fi
+
+        BRANCH="auto/update-api-spec-${{ github.run_id }}"
+        git checkout -b "$BRANCH"
+
+        git commit -m "$TITLE" \
                    -m "Automatically fetched from https://api.checklyhq.com/openapi.json" \
                    -m "Updated on $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+        git push origin "$BRANCH"
 
-        # Push directly to main
-        git push origin main
+        # Build PR body
+        BODY_FILE=$(mktemp)
+        {
+          echo "Auto-generated from the API spec sync workflow."
+          echo ""
+          echo "- Spec changed: $([ "$SPEC_CHANGED" = "1" ] && echo yes || echo no)"
+          echo "- New endpoint pages: $NEW_PAGES"
+          echo "- \`docs.json\` updated: $([ "$DOCS_JSON_CHANGED" = "1" ] && echo yes || echo no)"
+          echo ""
+          echo "This PR will auto-merge once all required checks pass."
+          echo ""
+          echo "---"
+          echo "_Run: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})_"
+        } > "$BODY_FILE"
 
-    - name: Report no changes
-      if: env.spec_changed == 'false'
-      run: |
-        echo "✅ API specification is up to date - no changes needed"
+        PR_URL=$(gh pr create \
+          --title "$TITLE" \
+          --body-file "$BODY_FILE" \
+          --base main \
+          --head "$BRANCH" \
+          --label auto-generated \
+          --label api-docs)
+        echo "Created $PR_URL"
+
+        # Try auto-merge (requires the repo to allow it). Fall back to an
+        # immediate merge if auto-merge isn't enabled or the PR is already
+        # mergeable with no required checks.
+        gh pr merge "$PR_URL" --squash --auto --delete-branch \
+          || gh pr merge "$PR_URL" --squash --delete-branch
 
     - name: Ping Checkly
+      if: always()
       run: curl -fsS --retry 3 https://ping.checklyhq.com/ad576f21-3f3e-4a6a-b8e4-67fd0f6ed92d
-

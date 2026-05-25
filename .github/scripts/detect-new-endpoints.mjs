@@ -100,7 +100,12 @@ function loadExclusions() {
   const raw = readFileSync(IGNORE_PATH, 'utf-8');
   const parsed = yamlParse(raw);
   const list = parsed?.excluded_endpoints ?? [];
-  return new Set(list.map((e) => e.trim()));
+  // Normalise so entries match regardless of slash convention or method case.
+  return new Set(list.map((e) => {
+    const m = e.trim().match(/^([A-Z]+)\s+(\/\S+)$/i);
+    if (!m) return e.trim();
+    return `${m[1].toUpperCase()} ${normalisePath(m[2])}`;
+  }));
 }
 
 // Trailing slashes are equivalent in OpenAPI but the spec and existing MDX

@@ -120,21 +120,9 @@ jobs:
           --label api-docs)
         echo "Created $PR_URL"
 
-        # Try auto-merge first (waits for required checks to pass).
-        # Fall back to an immediate squash-merge ONLY when auto-merge isn't
-        # available on the repo — never on a failed-check or conflict error,
-        # since that would silently merge over a real failure.
-        ERR_FILE=$(mktemp)
-        if ! gh pr merge "$PR_URL" --squash --auto --delete-branch 2>"$ERR_FILE"; then
-          if grep -qiE "auto.?merge.+(not (allowed|enabled)|disabled)" "$ERR_FILE"; then
-            echo "Auto-merge not enabled on this repo; performing immediate squash-merge."
-            gh pr merge "$PR_URL" --squash --delete-branch
-          else
-            echo "gh pr merge failed for a reason other than missing auto-merge:" >&2
-            cat "$ERR_FILE" >&2
-            exit 1
-          fi
-        fi
+        # Enable auto-merge; branch protection requires status checks to pass
+        # before the PR is actually merged.
+        gh pr merge "$PR_URL" --squash --auto --delete-branch
 
     - name: Ping Checkly
       if: always()

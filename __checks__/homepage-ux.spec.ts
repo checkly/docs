@@ -13,7 +13,7 @@ test('docs homepage loads with key UI', async ({ page }) => {
   expect(response?.status()).toBeLessThan(400)
 
   await expect(page).toHaveTitle(/Checkly/i)
-  await expect(page.locator('nav, [role="navigation"]').first()).toBeVisible()
+  await expect(page.getByRole('navigation').first()).toBeVisible()
 
   expect(consoleErrors, `console errors: ${consoleErrors.join(' | ')}`).toEqual([])
 })

@@ -1,4 +1,4 @@
-import { CheckGroupV2, Frequency, RetryStrategyBuilder } from 'checkly/constructs'
+import { CheckGroupV2, RetryStrategyBuilder } from 'checkly/constructs'
 import { slackChannelOps } from './alertChannels'
 
 export const docsGroup = new CheckGroupV2('docs-monitoring', {
@@ -8,7 +8,6 @@ export const docsGroup = new CheckGroupV2('docs-monitoring', {
   muted: true,
   locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
   runParallel: true,
-  frequency: Frequency.EVERY_10M,
   retryStrategy: RetryStrategyBuilder.fixedStrategy({
     baseBackoffSeconds: 30,
     maxRetries: 2,

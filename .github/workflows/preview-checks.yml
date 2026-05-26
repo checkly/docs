@@ -110,4 +110,9 @@ jobs:
           npx checkly test \
             --env "DOCS_BASE_URL=$DOCS_BASE_URL" \
             --record \
-            --reporter=github
+            --reporter=github \
+            --timeout=1200
+
+      - name: Publish Checkly report to step summary
+        if: always() && steps.detect.outputs.docs_changed == 'true'
+        run: cat checkly-github-report.md >> "$GITHUB_STEP_SUMMARY" || true

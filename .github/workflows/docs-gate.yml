@@ -74,6 +74,22 @@ jobs:
           for attempt in $(seq 1 $MAX_ATTEMPTS); do
             CHECKS=$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA/check-runs" --paginate)
 
+            # Short-circuit: if the Mintlify Deployment was skipped (e.g.
+            # Mintlify decided the change is a no-op), the dependent
+            # link-rot and vale-spellcheck checks never get posted. Exit
+            # successfully rather than time out waiting for them.
+            DEPLOY_CONCLUSION=$(echo "$CHECKS" | jq -r '
+              [.check_runs[] | select(.name == "Mintlify Deployment")]
+              | sort_by(.started_at) | reverse | .[0]
+              | if . == null or .status != "completed" then ""
+                else .conclusion // ""
+                end
+            ')
+            if [ "$DEPLOY_CONCLUSION" = "skipped" ]; then
+              echo "Mintlify Deployment was skipped — no preview to validate. Exiting successfully."
+              exit 0
+            fi
+
             ALL_DONE=true
             FAILED=""
 

@@ -1,6 +1,7 @@
 import { CheckGroupV2, RetryStrategyBuilder } from 'checkly/constructs'
 import { slackChannelOps } from './alertChannels'
 
+// Synthetic monitoring for www.checklyhq.com/docs.
 export const docsGroup = new CheckGroupV2('docs-monitoring', {
   name: 'checklyhq.com/docs',
   tags: ['docs'],

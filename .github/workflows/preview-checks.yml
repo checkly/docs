@@ -107,10 +107,12 @@ jobs:
           CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
           SLACK_OPS_WEBHOOK_URL: ${{ secrets.SLACK_OPS_WEBHOOK_URL }}
           DOCS_BASE_URL: ${{ steps.preview.outputs.url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           npx checkly test \
             --env "DOCS_BASE_URL=$DOCS_BASE_URL" \
             --record \
+            --test-session-name="Checkly Docs preview — PR #$PR_NUMBER" \
             --reporter=github \
             --timeout=1200
 

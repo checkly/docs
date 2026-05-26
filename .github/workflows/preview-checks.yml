@@ -3,11 +3,25 @@ name: Preview checks
 # Runs the Checkly synthetic checks against the Mintlify PR preview URL.
 # Skips silently when a PR touches no docs files. Fails when the Mintlify
 # preview itself failed (no URL to target).
+#
+# `paths-ignore` keeps the runner from spinning up at all on non-docs PRs.
+# The in-workflow detection below is the fine-grained backstop for the
+# rare case where a PR mixes docs and non-docs paths.
 
 on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - '.github/**'
+      - '**/*.sh'
+      - '*.md'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'node_modules/**'
+      - 'checkly.config.ts'
+      - 'block-headless.js'
+      - '__checks__/**'
 
 concurrency:
   group: preview-checks-${{ github.event.pull_request.number }}
@@ -51,12 +65,28 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
           MAX_ATTEMPTS=40   # 40 * 30s = 20 min
           SLEEP=30
 
           for attempt in $(seq 1 $MAX_ATTEMPTS); do
+            # Short-circuit: if Mintlify Deployment was skipped, no preview
+            # URL will ever appear. Skip the Checkly test run cleanly.
+            DEPLOY_CONCLUSION=$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA/check-runs" --paginate --jq '
+              [.check_runs[] | select(.name == "Mintlify Deployment")]
+              | sort_by(.started_at) | reverse | .[0]
+              | if . == null or .status != "completed" then ""
+                else .conclusion // ""
+                end
+            ')
+            if [ "$DEPLOY_CONCLUSION" = "skipped" ]; then
+              echo "Mintlify Deployment was skipped — no preview to test."
+              echo "skipped=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
             COMMENT_BODY=$(gh api "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" \
               --jq '[.[] | select(.user.login == "mintlify[bot]" and (.body | contains("mintlify-preview-comment")))] | last | .body // empty')
 
@@ -90,30 +120,32 @@ jobs:
           exit 1
 
       - name: Set up Node
-        if: steps.detect.outputs.docs_changed == 'true'
+        if: steps.detect.outputs.docs_changed == 'true' && steps.preview.outputs.skipped != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
-        if: steps.detect.outputs.docs_changed == 'true'
+        if: steps.detect.outputs.docs_changed == 'true' && steps.preview.outputs.skipped != 'true'
         run: npm ci
 
       - name: Run Checkly checks against preview
-        if: steps.detect.outputs.docs_changed == 'true'
+        if: steps.detect.outputs.docs_changed == 'true' && steps.preview.outputs.skipped != 'true'
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
           CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
           SLACK_OPS_WEBHOOK_URL: ${{ secrets.SLACK_OPS_WEBHOOK_URL }}
           DOCS_BASE_URL: ${{ steps.preview.outputs.url }}
+          CHECKLY_TEST_ENVIRONMENT: preview-pr-${{ github.event.pull_request.number }}
         run: |
           npx checkly test \
             --env "DOCS_BASE_URL=$DOCS_BASE_URL" \
             --record \
+            --test-session-name="Checkly docs" \
             --reporter=github \
             --timeout=1200
 
       - name: Publish Checkly report to step summary
-        if: always() && steps.detect.outputs.docs_changed == 'true'
+        if: always() && steps.detect.outputs.docs_changed == 'true' && steps.preview.outputs.skipped != 'true'
         run: cat checkly-github-report.md >> "$GITHUB_STEP_SUMMARY" || true

@@ -10,7 +10,6 @@ new UrlMonitor('docs-homepage-uptime', {
   group: docsGroup,
   activated: true,
   frequency: Frequency.EVERY_5M,
-  locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
   tags: ['docs'],
   degradedResponseTime: 3000,
   maxResponseTime: 10000,
@@ -27,7 +26,6 @@ new UrlMonitor('docs-api-reference-uptime', {
   group: docsGroup,
   activated: true,
   frequency: Frequency.EVERY_10M,
-  locations: ['us-east-1', 'eu-west-1'],
   degradedResponseTime: 4000,
   maxResponseTime: 10000,
   request: {
@@ -43,7 +41,6 @@ new UrlMonitor('docs-cli-uptime', {
   group: docsGroup,
   activated: true,
   frequency: Frequency.EVERY_10M,
-  locations: ['us-east-1', 'eu-west-1'],
   degradedResponseTime: 4000,
   maxResponseTime: 10000,
   request: {

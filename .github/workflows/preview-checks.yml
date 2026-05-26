@@ -1,0 +1,113 @@
+name: Preview checks
+
+# Runs the Checkly synthetic checks against the Mintlify PR preview URL.
+# Skips silently when a PR touches no docs files. Fails when the Mintlify
+# preview itself failed (no URL to target).
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: preview-checks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect docs changes
+        id: detect
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          NON_DOCS_RE='^(\.github/|.*\.sh$|[^/]+\.md$|package(-lock)?\.json$|node_modules/|checkly\.config\.ts$|block-headless\.js$|__checks__/)'
+          MERGE_BASE=$(git merge-base "$BASE_SHA" "$HEAD_SHA")
+          CHANGED=$(git diff --name-only "$MERGE_BASE" "$HEAD_SHA" | grep -vE "$NON_DOCS_RE" || true)
+          if [ -z "$CHANGED" ]; then
+            echo "No docs changes — skipping preview checks."
+            echo "docs_changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Docs changed:"
+            echo "$CHANGED"
+            echo "docs_changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Wait for Mintlify preview URL
+        if: steps.detect.outputs.docs_changed == 'true'
+        id: preview
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          MAX_ATTEMPTS=40   # 40 * 30s = 20 min
+          SLEEP=30
+
+          for attempt in $(seq 1 $MAX_ATTEMPTS); do
+            COMMENT_BODY=$(gh api "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" \
+              --jq '[.[] | select(.user.login == "mintlify" and (.body | contains("mintlify-preview-comment")))] | last | .body // empty')
+
+            if [ -z "$COMMENT_BODY" ]; then
+              echo "[$attempt/$MAX_ATTEMPTS] Waiting for Mintlify preview comment..."
+              sleep $SLEEP
+              continue
+            fi
+
+            # Status emoji-prefixed token in the table row
+            if echo "$COMMENT_BODY" | grep -q '🔴 Failed'; then
+              echo "Mintlify preview deployment failed — cannot run checks."
+              echo "Preview comment:"
+              echo "$COMMENT_BODY"
+              exit 1
+            fi
+
+            URL=$(echo "$COMMENT_BODY" | grep -oE 'https://checkly-[a-z0-9-]+\.mintlify\.app' | head -1 || true)
+
+            if echo "$COMMENT_BODY" | grep -q '🟢 Ready' && [ -n "$URL" ]; then
+              echo "Mintlify preview ready: $URL"
+              echo "url=$URL" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            echo "[$attempt/$MAX_ATTEMPTS] Preview not ready yet..."
+            sleep $SLEEP
+          done
+
+          echo "Timed out waiting for Mintlify preview URL."
+          exit 1
+
+      - name: Set up Node
+        if: steps.detect.outputs.docs_changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        if: steps.detect.outputs.docs_changed == 'true'
+        run: npm ci
+
+      - name: Run Checkly checks against preview
+        if: steps.detect.outputs.docs_changed == 'true'
+        env:
+          CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
+          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+          DOCS_BASE_URL: ${{ steps.preview.outputs.url }}
+        run: |
+          npx checkly test \
+            --env "DOCS_BASE_URL=$DOCS_BASE_URL" \
+            --record \
+            --reporter=github

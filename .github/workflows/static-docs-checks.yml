@@ -2,7 +2,8 @@ name: Static docs checks
 
 # Runs static validations on every PR — works without a Mintlify preview URL,
 # so it fills the gap for PRs (e.g. the auto-update API spec ones) where the
-# preview deployment is skipped or fails.
+# preview deployment is skipped or fails. Fails the PR if `mint broken-links`
+# reports any broken internal links.
 #
 # Required check in the branch ruleset. When no docs files changed the
 # conditional steps skip and the job still succeeds.
@@ -65,15 +66,14 @@ jobs:
         if: steps.detect.outputs.openapi_changed == 'true'
         run: npx mint openapi-check api-reference/openapi.json
 
-      - name: Broken-links scan (informational)
+      - name: Broken-links scan
         if: steps.detect.outputs.docs_changed == 'true'
         run: |
           REPORT=$(mktemp)
-          npx mint broken-links > "$REPORT" 2>&1 || true
+          STATUS=0
+          npx mint broken-links > "$REPORT" 2>&1 || STATUS=$?
           {
             echo "## Broken-links scan"
-            echo ""
-            echo "_Informational only — does not fail the PR. See [tracking issue] for cleanup._"
             echo ""
             echo '<details><summary>Full output</summary>'
             echo ""
@@ -83,3 +83,4 @@ jobs:
             echo ""
             echo '</details>'
           } >> "$GITHUB_STEP_SUMMARY"
+          exit $STATUS

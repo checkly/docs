@@ -82,7 +82,7 @@ jobs:
               MATCH=$(echo "$CHECKS" | jq -r --arg p "$pattern" '
                 [.check_runs[] | select(.name | test($p))]
                 | sort_by(.started_at) | reverse | .[0]
-                | if . == null then "missing missing missing"
+                | if . == null then "missing\tmissing\tmissing"
                   else "\(.name)\t\(.status)\t\(.conclusion // "null")"
                   end
               ')

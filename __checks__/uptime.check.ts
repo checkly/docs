@@ -11,7 +11,7 @@ new UrlMonitor('docs-homepage-uptime', {
   activated: true,
   frequency: Frequency.EVERY_5M,
   locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
-  tags: ['critical'],
+  tags: ['docs'],
   degradedResponseTime: 3000,
   maxResponseTime: 10000,
   request: {

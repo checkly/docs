@@ -10,7 +10,7 @@ export default defineConfig({
     activated: true,
     frequency: Frequency.EVERY_5M,
     locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
-    tags: ['docs', 'production', 'critical'],
+    tags: ['docs'],
     checkMatch: '**/__checks__/**/*.check?(-group).{js,ts}',
     runtimeId: '2026.04',
     retryStrategy: RetryStrategyBuilder.fixedStrategy({

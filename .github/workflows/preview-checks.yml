@@ -74,7 +74,7 @@ jobs:
               exit 1
             fi
 
-            URL=$(echo "$COMMENT_BODY" | grep -oE 'https://checkly-[a-z0-9-]+\.mintlify\.app' | head -1 || true)
+            URL=$(echo "$COMMENT_BODY" | grep -oE 'https://[a-z0-9-]+\.mintlify\.app' | head -1 || true)
 
             if echo "$COMMENT_BODY" | grep -q '🟢 Ready' && [ -n "$URL" ]; then
               echo "Mintlify preview ready: $URL"

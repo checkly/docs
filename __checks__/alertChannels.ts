@@ -1,19 +1,25 @@
-import { OpsgenieAlertChannel, SlackAlertChannel } from 'checkly/constructs'
+import { SlackAlertChannel } from 'checkly/constructs'
 
-// Fill in the IDs from Checkly: Alert Settings → Alert Channels → channel → copy ID.
-// Leave as 0 for channels you don't use; the placeholders below are commented out
-// until you wire them up.
-export const alertChannelIds = {
-  slack: 0,
-  opsGenieP1: 0,
-  opsGenieP3: 0,
+// Set via GitHub secret in CI (deploy-checks.yml, preview-checks.yml).
+// For local `checkly test` runs, export any valid URL — the test run doesn't
+// actually fire alerts, it just needs the URL to parse.
+const slackWebhookUrl = process.env.SLACK_OPS_WEBHOOK_URL
+if (!slackWebhookUrl) {
+  throw new Error(
+    'SLACK_OPS_WEBHOOK_URL is required. ' +
+      'Set it as a GitHub Actions secret for CI, ' +
+      'or export it locally (any valid URL works for `checkly test`).',
+  )
 }
 
-// export const slackOps = SlackAlertChannel.fromId(alertChannelIds.slack)
-// export const opsGenieP1 = OpsgenieAlertChannel.fromId(alertChannelIds.opsGenieP1)
-// export const opsGenieP3 = OpsgenieAlertChannel.fromId(alertChannelIds.opsGenieP3)
+const sendDefaults = {
+  sendFailure: true,
+  sendRecovery: true,
+  sendDegraded: false,
+}
 
-export const alertChannels: (SlackAlertChannel | OpsgenieAlertChannel)[] = [
-  // slackOps,
-  // opsGenieP3,
-]
+export const slackChannelOps = new SlackAlertChannel('slack-channel-ops', {
+  url: new URL(slackWebhookUrl),
+  channel: '#ops',
+  ...sendDefaults,
+})

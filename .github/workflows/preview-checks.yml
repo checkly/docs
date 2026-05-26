@@ -58,7 +58,7 @@ jobs:
 
           for attempt in $(seq 1 $MAX_ATTEMPTS); do
             COMMENT_BODY=$(gh api "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" \
-              --jq '[.[] | select(.user.login == "mintlify" and (.body | contains("mintlify-preview-comment")))] | last | .body // empty')
+              --jq '[.[] | select(.user.login == "mintlify[bot]" and (.body | contains("mintlify-preview-comment")))] | last | .body // empty')
 
             if [ -z "$COMMENT_BODY" ]; then
               echo "[$attempt/$MAX_ATTEMPTS] Waiting for Mintlify preview comment..."
@@ -105,6 +105,7 @@ jobs:
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
           CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+          SLACK_OPS_WEBHOOK_URL: ${{ secrets.SLACK_OPS_WEBHOOK_URL }}
           DOCS_BASE_URL: ${{ steps.preview.outputs.url }}
         run: |
           npx checkly test \

@@ -1,28 +1,33 @@
 # Checkly docs
 
-Click on `Use this template` to copy the Mintlify starter kit. The starter kit contains examples including
+Documentation for Checkly, built with [Mintlify](https://mintlify.com).
 
-- Guide pages
-- Navigation
-- Customizations
-- API Reference pages
-- Use of popular components
+## Development
 
-### Development
+The [Mintlify CLI](https://www.npmjs.com/package/mint) is installed as a `devDependency` so you can preview documentation changes locally.
 
-The [Mintlify CLI](https://www.npmjs.com/package/mint) will be installed as `devDependency` to preview the documentation changes locally.
-
-Run the following command at the root of your documentation (where docs.json is)
+Run the following command at the root of the docs (where `docs.json` lives):
 
 ```
 npm run dev
 ```
 
-### Publishing Changes
+## Editing content
 
-Install our Github App to auto propagate changes from your repo to your deployment. Changes will be deployed to production automatically after pushing to the default branch. Find the link to install on your dashboard.
+Add content directly in `.mdx` files with MDX syntax and React components. The Mintlify component reference is the best place to look up what's available:
 
-#### Troubleshooting
+- [Text and headers](https://mintlify.com/docs/text)
+- [Code blocks](https://mintlify.com/docs/code)
+- [Images and embeds](https://mintlify.com/docs/image-embeds)
+- [Reusable snippets](https://mintlify.com/docs/reusable-snippets)
 
-- If the dev environment isn't running - Run `mint update` to ensure you have the most recent version of the CLI.
-- Page loads as a 404 - Make sure you are running in a folder with `docs.json`
+See `CLAUDE.md` for project-specific writing conventions (frontmatter, voice, component usage rules).
+
+## Publishing changes
+
+The Mintlify GitHub app auto-propagates changes from this repo to the live docs. Changes pushed to `main` deploy to production automatically.
+
+## Troubleshooting
+
+- **Dev environment isn't running:** run `mint update` to ensure you have the most recent version of the CLI.
+- **Page loads as a 404:** make sure you're running in a folder with `docs.json`.

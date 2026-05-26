@@ -1,182 +1,61 @@
-# Checkly Documentation Site Monitoring Setup
+# Checkly Documentation Site Monitoring
 
-This document provides a complete overview of the monitoring setup for the Checkly documentation site.
+Synthetic monitoring for `www.checklyhq.com/docs`, defined with the Checkly CLI.
 
-## 🎯 Overview
-
-I've created a comprehensive monitoring solution for your Checkly documentation site that includes:
-
-1. **Homepage Availability Monitoring** - Checks if the main docs site is accessible
-2. **API Documentation Monitoring** - Monitors the API reference section
-3. **CLI Documentation Monitoring** - Monitors the CLI documentation section
-4. **User Experience Monitoring** - Browser-based checks for the homepage UX
-
-## 📁 File Structure
+## Layout
 
 ```
 docs/
-├── checkly.config.ts                    # Main Checkly configuration
-├── package.json                         # Dependencies and scripts
-├── tsconfig.json                        # TypeScript configuration
-├── .gitignore                           # Git ignore rules
-├── deploy-monitoring.sh                 # Deployment script
-├── MONITORING_SETUP.md                  # This file
-└── monitoring/
-    ├── README.md                        # Monitoring documentation
-    ├── docs-monitoring-group.ts         # Main monitoring group
-    ├── homepage.check.ts                # Homepage checks
-    └── homepage.spec.ts                 # Playwright UX test
+├── checkly.config.ts        # Project config (locations, defaults, checkMatch)
+└── __checks__/
+    ├── alertChannels.ts     # Alert channel definitions (Slack via env var)
+    ├── group.ts             # CheckGroupV2 — `docs-monitoring`
+    ├── uptime.check.ts      # URL monitors for homepage, /api-reference, /cli
+    ├── homepage-ux.check.ts # Browser check (Playwright)
+    └── homepage-ux.spec.ts  # Playwright spec used by homepage-ux.check.ts
 ```
 
-## 🚀 Quick Start
+`checkly.config.ts` discovers checks via `checkMatch: '**/__checks__/**/*.check?(-group).{js,ts}'`.
 
-### 1. Install Dependencies
+## Checks
 
-```bash
-npm install
-```
+All checks belong to the `docs-monitoring` group, which sets the shared defaults:
 
-### 2. Login to Checkly
+- **Locations:** us-east-1, eu-west-1, ap-southeast-1 (parallel)
+- **Retry strategy:** fixed 30s backoff, 2 retries, same region
+- **Alert channel:** Slack `#ops`
 
-```bash
-npx checkly login
-```
+| Check                       | Type    | Path             | Frequency |
+| --------------------------- | ------- | ---------------- | --------- |
+| `docs-homepage-uptime`      | URL     | `/`              | 5 min     |
+| `docs-api-reference-uptime` | URL     | `/api-reference` | 10 min    |
+| `docs-cli-uptime`           | URL     | `/cli`           | 10 min    |
+| `docs-homepage-ux`          | Browser | `/`              | 15 min    |
 
-### 3. Deploy Monitoring
+Paths are appended to `DOCS_BASE_URL` (defaults to `https://www.checklyhq.com/docs`). URL monitors follow redirects and assert the final response is HTTP 200 within `degradedResponseTime` / `maxResponseTime` thresholds. The browser check verifies the page loads, the title matches `/Checkly/i`, and primary navigation is visible.
 
-```bash
-# Option 1: Use the deployment script
-./deploy-monitoring.sh
+Note: CheckGroupV2 makes `locations`, `runParallel`, and `retryStrategy` non-overridable from individual checks once set on the group.
 
-# Option 2: Manual deployment
-npm run deploy
-```
+The group is `muted: true` while the new monitoring is being shaken out — checks still run but no alerts fire. Unmute in `__checks__/group.ts` when ready.
 
-## 📊 Monitoring Checks
+## Deploys
 
-### Homepage Availability Check
-- **URL**: `https://docs.checklyhq.com`
-- **Frequency**: Every 5 minutes
-- **Locations**: US East, EU West, AP Southeast
-- **Checks**:
-  - Status code 200
-  - Response time < 3 seconds
-  - Page contains "Checkly Documentation"
+Deploys are handled by `.github/workflows/deploy-checks.yml` on merge to `main`. The workflow runs `checkly deploy --force` and sources `CHECKLY_API_KEY`, `CHECKLY_ACCOUNT_ID`, and `SLACK_OPS_WEBHOOK_URL` from GitHub Actions secrets.
 
-### API Documentation Check
-- **URL**: `https://docs.checklyhq.com/api-reference`
-- **Frequency**: Every 10 minutes
-- **Locations**: US East, EU West
-- **Checks**:
-  - Status code 200
-  - Response time < 4 seconds
+PR previews run via `.github/workflows/preview-checks.yml`, which targets the Mintlify PR preview URL with `checkly test --env DOCS_BASE_URL=<preview>`.
 
-### CLI Documentation Check
-- **URL**: `https://docs.checklyhq.com/cli`
-- **Frequency**: Every 10 minutes
-- **Locations**: US East, EU West
-- **Checks**:
-  - Status code 200
-  - Response time < 4 seconds
-
-### Homepage User Experience Check
-- **URL**: `https://docs.checklyhq.com`
-- **Frequency**: Every 15 minutes
-- **Locations**: US East, EU West
-- **Checks**:
-  - Page loads correctly
-  - Key navigation elements are visible
-  - No console errors
-  - Load time < 5 seconds
-
-## 🔔 Alerting Configuration
-
-All checks are configured with:
-- **Run-based escalation**: 1-2 failed runs before alerting
-- **Reminder notifications**: 2-3 reminders every 10-15 minutes
-- **Critical tags**: Homepage checks are tagged as critical
-
-## 🛠️ Customization
-
-### Adding New Checks
-
-1. Create a new check file in the `monitoring/` directory
-2. Follow the pattern in `docs-monitoring-group.ts`
-3. Test locally: `npm run test`
-4. Deploy: `npm run deploy`
-
-### Modifying Existing Checks
-
-1. Edit the appropriate check file
-2. Test changes: `npm run test`
-3. Deploy updates: `npm run deploy`
-
-## 🔍 Testing
-
-### Local Testing
+## Running locally
 
 ```bash
-# Test all checks locally
-npm run test
-
-# Test specific checks
-npx checkly test --tags homepage
-```
-
-### Manual Triggering
-
-```bash
-# Trigger all checks
-npm run trigger
-
-# Trigger specific checks
+npx checkly login                 # one-time
+export SLACK_OPS_WEBHOOK_URL=...   # required for config to parse
+npx checkly test                  # dry-run all checks
+npx checkly deploy --preview      # preview the diff before deploying
 npx checkly trigger --tags critical
 ```
 
-## 📈 Monitoring Dashboard
+## Adding a check
 
-Once deployed, you can view your monitoring checks at:
-- **Checkly Dashboard**: https://app.checklyhq.com
-- **Check Results**: Real-time results and historical data
-- **Alert History**: Past alerts and notifications
-
-## 🆘 Troubleshooting
-
-### Common Issues
-
-1. **Authentication Error**
-   ```bash
-   npx checkly login
-   ```
-
-2. **Deployment Failed**
-   - Check your Checkly account permissions
-   - Verify the target URLs are accessible
-
-3. **Test Failures**
-   - Review the check configuration
-   - Check if the target site is responding
-
-### Support Resources
-
-- [Checkly Documentation](https://docs.checklyhq.com)
-- [Checkly CLI Documentation](https://docs.checklyhq.com/cli)
-- [Playwright Documentation](https://playwright.dev)
-
-## 🎉 Next Steps
-
-1. **Review the monitoring setup** in the `monitoring/` directory
-2. **Customize checks** based on your specific needs
-3. **Set up alert channels** (email, Slack, etc.) in the Checkly dashboard
-4. **Monitor the results** and adjust thresholds as needed
-
-## 📞 Support
-
-If you need help with the monitoring setup:
-1. Check the `monitoring/README.md` file
-2. Review the Checkly documentation
-3. Contact the Checkly support team
-
----
-
-**Happy Monitoring! 🎯**
+1. Add a `*.check.ts` file under `__checks__/`.
+2. Attach it to `docsGroup` from `group.ts` so it inherits tags and alert channels.
+3. `npx checkly test` to validate; commit and let CI deploy on merge.

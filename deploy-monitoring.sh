@@ -31,4 +31,4 @@ npm run deploy
 echo "✅ Monitoring deployment complete!"
 echo ""
 echo "📊 You can view your checks at: https://app.checklyhq.com"
-echo "🔍 Check the monitoring/README.md file for more information"
+echo "🔍 See MONITORING_SETUP.md for more information"

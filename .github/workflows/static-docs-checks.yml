@@ -29,15 +29,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
       - name: Detect changed paths
         id: detect
         env:
@@ -61,6 +52,17 @@ jobs:
           else
             echo "docs_changed=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Set up Node
+        if: steps.detect.outputs.openapi_changed == 'true' || steps.detect.outputs.docs_changed == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        if: steps.detect.outputs.openapi_changed == 'true' || steps.detect.outputs.docs_changed == 'true'
+        run: npm ci
 
       - name: Validate OpenAPI spec
         if: steps.detect.outputs.openapi_changed == 'true'

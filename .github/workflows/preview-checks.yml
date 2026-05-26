@@ -3,11 +3,25 @@ name: Preview checks
 # Runs the Checkly synthetic checks against the Mintlify PR preview URL.
 # Skips silently when a PR touches no docs files. Fails when the Mintlify
 # preview itself failed (no URL to target).
+#
+# `paths-ignore` keeps the runner from spinning up at all on non-docs PRs.
+# The in-workflow detection below is the fine-grained backstop for the
+# rare case where a PR mixes docs and non-docs paths.
 
 on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - '.github/**'
+      - '**/*.sh'
+      - '*.md'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'node_modules/**'
+      - 'checkly.config.ts'
+      - 'block-headless.js'
+      - '__checks__/**'
 
 concurrency:
   group: preview-checks-${{ github.event.pull_request.number }}

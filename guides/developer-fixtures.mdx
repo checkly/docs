@@ -86,11 +86,9 @@ So group settings will override global settings, and individual settings will ov
 * While groups are a useful feature of Checkly, and will make sense for some applications, you may also be served by using Javascript and Typescript's native features for [inheritance](https://www.typescriptlang.org/docs/handbook/2/classes.html). Since files can inherit modules from others, it's possible to share configuration very cleanly, is as complex a heirarchy as you'd like, using these native features. This especially may make sense if you're going deep into [Monitoring as Code](https://docs.checklyhq.com/guides/getting-started-with-monitoring-as-code/) and want to set up a complex repository for all monitoring. Native features also help support the next section on using fixtures to share code blocks.
 
 ## Sharing code for repeated tasks
-While there are sophisticated ways to share authentication across checks discussed in other guides, it's good to know how to share code with fixtures for common repeated tasks. Let's imagine an example where we've got a web shop with a login modal that we need to fill out before doing further account actions. The goal of my check isn't really to test this modal, it just needs to be filled out before my *real* testing, where I look at my demo user's recent orders:
+While there are sophisticated ways to share authentication across checks discussed in other guides, it's good to know how to share code with fixtures for common repeated tasks. Let's imagine an example where we've got a web shop with a login modal that we need to fill out before doing further account actions. The goal of my check isn't really to test this modal, it just needs to be filled out before my *real* testing, where I look at my demo user's recent orders.
 
-![A web shop login dialog](/images/samples/images/webshop-login.png)
-
-To open this modal and log in, we might use some lines like the following:
+To open a modal and log in, we might use some lines like the following:
 
 ```ts RecentOrders.test.ts
 import { test, expect } from '@playwright/test';

@@ -19,14 +19,23 @@ docs/
 
 ## Checks
 
-| Check                       | Type    | Path                       | Frequency | Locations                          |
-| --------------------------- | ------- | -------------------------- | --------- | ---------------------------------- |
-| `docs-homepage-uptime`      | URL     | `/`                        | 5 min     | us-east-1, eu-west-1, ap-southeast-1 |
-| `docs-api-reference-uptime` | URL     | `/api-reference`           | 10 min    | us-east-1, eu-west-1               |
-| `docs-cli-uptime`           | URL     | `/cli`                     | 10 min    | us-east-1, eu-west-1               |
-| `docs-homepage-ux`          | Browser | `/`                        | 15 min    | us-east-1, eu-west-1               |
+All checks belong to the `docs-monitoring` group, which sets the shared defaults:
+
+- **Locations:** us-east-1, eu-west-1, ap-southeast-1 (parallel)
+- **Frequency:** 10 min default (overridable per check)
+- **Retry strategy:** fixed 30s backoff, 2 retries, same region
+- **Alert channel:** Slack `#ops`
+
+| Check                       | Type    | Path             | Frequency override |
+| --------------------------- | ------- | ---------------- | ------------------ |
+| `docs-homepage-uptime`      | URL     | `/`              | 5 min              |
+| `docs-api-reference-uptime` | URL     | `/api-reference` | —                  |
+| `docs-cli-uptime`           | URL     | `/cli`           | —                  |
+| `docs-homepage-ux`          | Browser | `/`              | 15 min             |
 
 Paths are appended to `DOCS_BASE_URL` (defaults to `https://www.checklyhq.com/docs`). URL monitors follow redirects and assert the final response is HTTP 200 within `degradedResponseTime` / `maxResponseTime` thresholds. The browser check verifies the page loads, the title matches `/Checkly/i`, and primary navigation is visible.
+
+Note: CheckGroupV2 makes `locations`, `runParallel`, and `retryStrategy` non-overridable from individual checks once set on the group. `frequency` and `tags` are inherited defaults that checks can override.
 
 The group is `muted: true` while the new monitoring is being shaken out — checks still run but no alerts fire. Unmute in `__checks__/group.ts` when ready.
 

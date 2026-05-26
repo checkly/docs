@@ -6,7 +6,6 @@ new BrowserCheck('docs-homepage-ux', {
   group: docsGroup,
   activated: true,
   frequency: Frequency.EVERY_15M,
-  locations: ['us-east-1', 'eu-west-1'],
   tags: ['docs'],
   code: {
     entrypoint: './homepage-ux.spec.ts',

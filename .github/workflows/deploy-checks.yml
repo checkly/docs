@@ -1,0 +1,43 @@
+name: Deploy Checkly monitoring
+
+# Pushes the contents of __checks__/ to Checkly's cloud after a PR merges
+# to main. Idempotent — safe to re-run. Path-filtered so unrelated merges
+# don't trigger a deploy.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '__checks__/**'
+      - 'checkly.config.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/deploy-checks.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: checkly-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy Checkly checks
+        env:
+          CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
+          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+        run: npx checkly deploy --force

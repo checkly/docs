@@ -103,9 +103,15 @@ jobs:
                 continue
               fi
 
-              if [ "$CONCLUSION" != "success" ]; then
-                FAILED="$FAILED  - $NAME: $CONCLUSION"$'\n'
-              fi
+              # GitHub check conclusions: success, neutral, skipped are
+              # non-failure outcomes. Mintlify's vale-spellcheck returns
+              # `neutral` when there are warnings but no blocking errors.
+              case "$CONCLUSION" in
+                success|neutral|skipped) ;;
+                *)
+                  FAILED="$FAILED  - $NAME: $CONCLUSION"$'\n'
+                  ;;
+              esac
             done
 
             if [ -n "$FAILED" ]; then

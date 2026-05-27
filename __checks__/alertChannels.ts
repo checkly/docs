@@ -1,4 +1,4 @@
-import { SlackAlertChannel } from 'checkly/constructs'
+import { SlackAppAlertChannel } from 'checkly/constructs'
 
 const sendDefaults = {
   sendFailure: true,
@@ -6,8 +6,7 @@ const sendDefaults = {
   sendDegraded: false,
 }
 
-export const slackChannelOps = new SlackAlertChannel('slack-channel-ops', {
-  url: new URL(process.env.SLACK_OPS_WEBHOOK_URL!),
-  channel: '#ops',
+export const slackChannelOps = new SlackAppAlertChannel('slack-app-channel-ops', {
+  slackChannels: ['#ops'],
   ...sendDefaults,
 })

@@ -243,6 +243,26 @@ new BrowserCheck("standard-check", {
 **Available frequencies**: `EVERY_1M`, `EVERY_2M`, `EVERY_5M`, `EVERY_10M`, `EVERY_15M`, `EVERY_30M`, `EVERY_1H`, `EVERY_2H`, `EVERY_6H`, `EVERY_12H`, `EVERY_24H`
 </ResponseField>
 
+<ResponseField name="runtimeId" type="string">
+
+The Checkly runtime version used to execute the Browser Check. Runtimes are managed execution environments for Browser and Multistep Checks. They include fixed Checkly-provided dependencies, such as Playwright, browser binaries, and runtime libraries.
+
+Use `runtimeId` for Browser Checks and Multistep Checks. For Playwright Check Suites, use [`engine`](/constructs/playwright-check#engine) instead to select the JavaScript engine version that runs your own Playwright project.
+
+**Usage:**
+
+```ts highlight={3}
+new BrowserCheck("my-check", {
+  name: "My Browser Check",
+  runtimeId: "2025.04",
+  /* More options... */
+})
+```
+
+<Tip>Learn more about [Checkly runtimes in the general documentation](/platform/runtimes/overview).</Tip>
+
+</ResponseField>
+
 <ResponseField name="locations" type="string[]" default="[]">
 Array of public location codes where the Browser Check should run. Multiple locations provide geographic coverage and redundancy.
 

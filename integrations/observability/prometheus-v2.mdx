@@ -224,7 +224,7 @@ time() - checkly_heartbeat_last_success_timestamp_seconds
 
 ## Private Location Metrics
 
-The Prometheus exporter also contains metrics for monitoring [Private Locations](/platform/private-locations/overview). These metrics can be used to ensure that your Private Locations have enough Checkly Agent instances running to execute all of your checks.
+The Prometheus exporter also contains metrics for monitoring [Private Locations](/platform/private-locations/overview). These metrics can be used to ensure that your Private Locations have enough Checkly Agent instances running to execute all of your checks, and to drive [agent autoscaling](/platform/private-locations/autoscaling).
 
 The following metrics are available to monitor Private Locations:
 
@@ -232,7 +232,9 @@ The following metrics are available to monitor Private Locations:
 |--------|------|-------------|
 | `checkly_private_location_queue_size` | Gauge | The number of check runs scheduled to the Private Location and waiting to be executed. A high value indicates that checks are becoming backlogged and that you may need to [scale your Checkly Agents](/platform/private-locations/scaling-redundancy). |
 | `checkly_private_location_oldest_scheduled_check_run` | Gauge | The age in seconds of the oldest check run job scheduled to the Private Location queue. A high value indicates that checks are becoming backlogged. |
+| `checkly_private_location_queue_duration_ms` | Gauge | The scheduling delay in milliseconds for check runs routed through a Private Location, by queue and `stat`. Derived from the last 2 minutes of check run data. |
 | `checkly_private_location_agent_count` | Gauge | The number of agents connected for the Private Location. |
+| `checkly_private_location_check_runs` | Gauge | The count of check runs in the Private Location, broken down by lifecycle state via the `state` label. Used as the signal for [autoscaling Checkly Agents](/platform/private-locations/autoscaling). |
 
 The Private Location metrics all contain the following labels:
 
@@ -241,3 +243,17 @@ The Private Location metrics all contain the following labels:
 | `private_location_name` | the name of the Private Location. |
 | `private_location_slug_name` | the Private Location's human readable unique identifier. |
 | `private_location_id` | the Private Location's UUID. |
+
+`checkly_private_location_check_runs` additionally carries a `state` label. The values relevant for autoscaling are:
+
+- `queued` — the check run has been scheduled but not yet picked up by an agent.
+- `inflight` — the check run is currently being executed by an agent.
+
+`checkly_private_location_queue_duration_ms` additionally carries two labels:
+
+- `stat` — the statistical aggregation over the 2-minute window. Values: `avg`, `p90`, `p99`.
+- `queue` — the internal routing queue the check run was scheduled to. Values: `uptime`, `main`.
+
+<Note>
+This gauge is aggregated on a ~1 minute interval, so check runs that start and finish within that window may be excluded.
+</Note>

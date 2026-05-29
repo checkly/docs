@@ -32,12 +32,12 @@ npx checkly rca <subcommand> [arguments] [options]
 
 | Subcommand | Description |
 |------------|-------------|
-| `run` | Trigger a root cause analysis for an error group. |
+| `run` | Trigger a root cause analysis for a check or test session error group. |
 | `get` | Retrieve a root cause analysis by ID. |
 
 ## `checkly rca run`
 
-Trigger a new root cause analysis for an error group. The analysis runs asynchronously — use `--watch` to wait for the result in your terminal.
+Trigger a new root cause analysis for a check or test session error group. The analysis runs asynchronously — use `--watch` to wait for the result in your terminal.
 
 **Usage:**
 
@@ -49,21 +49,54 @@ npx checkly rca run [options]
 
 | Option | Required | Description |
 |--------|----------|-------------|
-| `--error-group, -e` | yes | The error group ID to analyze. |
+| `--error-group, -e` | yes* | The check error group ID to analyze. |
+| `--test-session-error-group, -te` | yes* | The test session error group ID to analyze. |
+| `--user-context` | - | Extra context to pass into the root cause analysis. |
 | `--watch, -w` | - | Wait for the analysis to complete and display the result. |
 | `--output, -o` | - | Output format: `detail`, `json`, or `md`. Default: `detail`. |
+
+*Pass either `--error-group` or `--test-session-error-group`.
 
 ### Run Options
 
 <ResponseField name="--error-group, -e" type="string">
 
-The error group ID to trigger the analysis for. You can find error group IDs in the output of [`checkly checks get`](/cli/checkly-checks) when viewing a check with errors.
+The check error group ID to trigger the analysis for. You can find error group IDs in the output of [`checkly checks get`](/cli/checkly-checks) when viewing a check with errors.
 
 **Usage:**
 
 ```bash Terminal
 npx checkly rca run --error-group=<error-group-id>
 npx checkly rca run -e <error-group-id>
+```
+
+</ResponseField>
+
+<ResponseField name="--test-session-error-group, -te" type="string">
+
+<Note>Available since CLI v8.0.0.</Note>
+
+The test session error group ID to trigger the analysis for. You can find these IDs in the output of [`checkly test-sessions get`](/cli/checkly-test-sessions).
+
+**Usage:**
+
+```bash Terminal
+npx checkly rca run --test-session-error-group=<error-group-id>
+npx checkly rca run -te <error-group-id>
+```
+
+</ResponseField>
+
+<ResponseField name="--user-context" type="string">
+
+<Note>Available in CLI v8.5.0+.</Note>
+
+Extra context to pass into the root cause analysis. Use this to add details the error group does not contain, such as recent deploy changes or known service incidents.
+
+**Usage:**
+
+```bash Terminal
+npx checkly rca run --error-group=<error-group-id> --user-context="Started after the checkout deploy"
 ```
 
 </ResponseField>
@@ -104,6 +137,12 @@ npx checkly rca run --error-group=err-abc-123 --watch
 
 # Trigger an RCA without waiting
 npx checkly rca run --error-group=err-abc-123
+
+# Trigger an RCA for a test session error group
+npx checkly rca run --test-session-error-group=err-abc-123
+
+# Add extra context for the analysis
+npx checkly rca run --error-group=err-abc-123 --user-context="Started after the checkout deploy"
 
 # Get the result as JSON
 npx checkly rca run --error-group=err-abc-123 --output=json
@@ -189,3 +228,4 @@ A completed root cause analysis includes:
 ## Related Commands
 
 - [`checkly checks`](/cli/checkly-checks) - List, inspect, and analyze checks (includes error groups)
+- [`checkly test-sessions`](/cli/checkly-test-sessions) - Inspect recorded test sessions and test session error groups

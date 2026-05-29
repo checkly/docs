@@ -21,6 +21,7 @@ npx checkly trigger [options]
 | Option | Required | Description |
 |--------|----------|-------------|
 | `--config, -c` | - | The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts\|js` file in the current directory. |
+| `--check-id` | - | Trigger specific checks by ID. Supports comma-separated values and repeated flags. |
 | `--detach, -d` | - | Keep checks running in the cloud when you stop the CLI with Ctrl+C, instead of cancelling the run. |
 | `--env, -e` | - | Env vars to be passed to the check run. Default: empty. Multiple values can be passed. |
 | `--env-file` | - | dotenv file path to be passed. For example `--env-file="./.env"` |
@@ -47,6 +48,22 @@ Specify a configuration file to use instead of the `checkly.config.ts` or `check
 ```bash Terminal
 npx checkly trigger --config checkly.config.ts
 npx checkly trigger -c="./checkly.staging.config.ts"
+```
+
+</ResponseField>
+
+<ResponseField name="--check-id" type="string[]">
+
+<Note>Available since CLI v8.4.0.</Note>
+
+Trigger specific checks by ID. You can pass a comma-separated list or repeat the flag. Combine `--check-id` with `--tags` to further filter the matching checks.
+
+**Usage:**
+
+```bash Terminal
+npx checkly trigger --check-id=<check-id>
+npx checkly trigger --check-id=<check-id-1>,<check-id-2>
+npx checkly trigger --check-id=<check-id-1> --check-id=<check-id-2>
 ```
 
 </ResponseField>
@@ -293,6 +310,9 @@ npx checkly trigger --record --test-session-name "Deploy validation"
 
 # Record specific checks
 npx checkly trigger --record --tags critical
+
+# Record selected checks by ID
+npx checkly trigger --record --check-id=<check-id>
 
 # Run without recording
 npx checkly trigger --no-record

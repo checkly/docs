@@ -37,11 +37,27 @@ spec:
   scaleTargetRef:
     namespace: <namespace_for_agent_deployment>
     name: <agent_deployment_name>
-    minReplicaCount: 2                              # Optional. Default: 0.
-    maxReplicaCount: 10                             # Optional. Default: 100.
-    pollingInterval: 30                             # Optional. Default: 30 (seconds).
-    cooldownPeriod: 300                             # Optional. Default: 300. Scale-to-zero only; see below.
-    maxReplicaCount: 10
+  minReplicaCount: 2                                # Optional. Default: 0.
+  maxReplicaCount: 10                               # Optional. Default: 100.
+  pollingInterval: 30                               # Optional. Default: 30 (seconds).
+  cooldownPeriod: 300                               # Optional. Default: 300. Scale-to-zero only; see below.
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleUp:
+          stabilizationWindowSeconds: 0
+          selectPolicy: Max
+          policies:
+            - type: Pods
+              value: 1
+              periodSeconds: 60
+        scaleDown:
+          stabilizationWindowSeconds: 300   # 5m dampening
+          selectPolicy: Min
+          policies:
+            - type: Pods
+              value: 1
+              periodSeconds: 60
   triggers:
     - type: prometheus
       metadata:
@@ -91,7 +107,7 @@ In-flight checks on a terminating pod are rerun on another agent after a 300-sec
 spec:
   template:
     spec:
-      terminationGracePeriodSeconds: 330    # Aligns with the longest-running checktype.
+      terminationGracePeriodSeconds: 330    # Set to your longest-running check type; up to 1800 for Playwright Check Suites.
 ```
 
 Maximum runtime by check type:

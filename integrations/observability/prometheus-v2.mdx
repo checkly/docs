@@ -232,7 +232,7 @@ The following metrics are available to monitor Private Locations:
 |--------|------|-------------|
 | `checkly_private_location_queue_size` | Gauge | The number of check runs scheduled to the Private Location and waiting to be executed. A high value indicates that checks are becoming backlogged and that you may need to [scale your Checkly Agents](/platform/private-locations/scaling-redundancy). |
 | `checkly_private_location_oldest_scheduled_check_run` | Gauge | The age in seconds of the oldest check run job scheduled to the Private Location queue. A high value indicates that checks are becoming backlogged. |
-| `checkly_private_location_queue_duration_ms` | Gauge | The scheduling delay in milliseconds for check runs routed through a Private Location, by queue and `stat`. Derived from the last 2 minutes of check run data. |
+| `checkly_private_location_queue_duration_ms` | Gauge | The scheduling delay in milliseconds for check runs routed through a Private Location, by queue and `stat`. Derived from the last 2 minutes of check run data. Used to evaluate whether sufficient agent capacity is provisioned for the Private Location. |
 | `checkly_private_location_agent_count` | Gauge | The number of agents connected for the Private Location. |
 | `checkly_private_location_check_runs` | Gauge | The count of check runs in the Private Location, broken down by lifecycle state via the `state` label. Used as the signal for [autoscaling Checkly Agents](/platform/private-locations/autoscaling). |
 

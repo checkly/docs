@@ -1,0 +1,53 @@
+---
+title: 'Autoscaling'
+sidebarTitle: 'Autoscaling'
+description: 'TO BE ADDED'
+---
+
+Checkly provides Prometheus metrics for a private location to enable automatic scaling and right-sizing of agents running against it.
+
+<Accordion title="Prerequisites">
+
+Setting up autoscaling requires Prometheus metrics to be ingested.
+
+For more information and setup guide go to [Exporting Metrics & Data via Prometheus V2](/integrations/observability/prometheus-v2/)
+
+</Accordion>
+
+## Metric-based autoscaling
+
+The method of scaling is based on Checkly's internal scaling where the autoscaling is set-up to match the total load going through the system.
+This is achieved using the `checkly_private_location_check_runs` gauge metric which representes the best-effort* estimate of the check runs going through the private location.
+* * Short-running checks are often excluded from the metric as their impact is negligible on the Private Location.
+
+## Example using KEDA
+
+While this can be achieved using any autoscaling component, the example below will be using [KEDA](https://keda.sh) as it is the most popular autoscaler for Kubernetes.
+
+```yaml
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+spec:
+  scaleTargetRef:
+    kind:          Deployment                           # Optional. Default: Deployment
+    namespace: <namesapce_to_which_agent_is_deployed>   # Optional.
+    name: <deployment_name_for_your_agent>              # Required. The name of the Checkly agent deployment.
+  minReplicaCount: 2                                    # Optional. Default: 0
+  maxReplicaCount: 10                                   # Optional. Default: 100
+  pollingInterval: 30                                   # Optional. Default: 30 seconds
+  cooldownPeriod:   300                                 # Optional. Default: 300 seconds
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
+        metricName: checkly_private_location_check_runs
+        threshold: "2"
+        query: sum(checkly_private_location_check_runs{state=~"queued|inflight", private_location_slug_name="<private_location_slug>"})
+```
+
+### Query Explanation:
+
+sum(checkly_private_location_check_runs{state=~"queued|inflight", private_location_slug_name="<private_location_slug>"})
+* `state` - the state at which the job is queued = check has been scheduled but yet to be picked up by a consumer
+* `inflight` - the job is being executed by the agent
+

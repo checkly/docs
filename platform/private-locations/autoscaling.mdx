@@ -37,22 +37,17 @@ spec:
   scaleTargetRef:
     namespace: <namespace_for_agent_deployment>
     name: <agent_deployment_name>
-  minReplicaCount: 2                                # Optional. Default: 0.
-  maxReplicaCount: 10                               # Optional. Default: 100.
-  pollingInterval: 30                               # Optional. Default: 30 (seconds).
-  cooldownPeriod: 300                               # Optional. Default: 300. Scale-to-zero only; see below.
+  minReplicaCount: 2
+  maxReplicaCount: 10
   advanced:
     horizontalPodAutoscalerConfig:
       behavior:
         scaleUp:
-          stabilizationWindowSeconds: 60
-          selectPolicy: Max
           policies:
             - type: Pods
               value: 1
               periodSeconds: 60
         scaleDown:
-          stabilizationWindowSeconds: 300   # 5m dampening
           selectPolicy: Min
           policies:
             - type: Pods
@@ -63,7 +58,7 @@ spec:
       metadata:
         serverAddress: http://prometheus-k8s.monitoring.svc.cluster.local:9090
         metricName: checkly_private_location_check_runs
-        threshold: "1"                                                                                                # Match this to the agent's JOB_CONCURRENCY.
+        threshold: "1"                # Match the agent's JOB_CONCURRENCY.
         query: sum(checkly_private_location_check_runs{state=~"queued|inflight", private_location_slug_name="<slug>"})
 ```
 

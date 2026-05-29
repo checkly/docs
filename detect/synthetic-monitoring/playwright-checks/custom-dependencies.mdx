@@ -7,14 +7,14 @@ sidebarTitle: 'Custom Dependencies'
 Use the [Checkly CLI](/cli/) to turn your Playwright tests into globally distributed monitors. Checkly uses your existing `package.json` dependencies and Playwright configuration.
 
 <Info>
-**Runtime Environment**: Playwright Check Suites run in a Node.js runtime containing your custom dependencies. See the [runtime specification](/platform/runtimes/runtime-specification) for further details.
+Playwright Check Suites do not use Checkly runtimes. Browser Checks and Multistep Checks use `runtimeId` to select a managed runtime with fixed Checkly-provided dependencies. Playwright Check Suites install your project dependencies and use `engine` to select the JavaScript engine version.
 </Info>
 
 ## Using JavaScript/Node.js dependencies
 
 Checkly installs dependencies from your `package.json` and lock files. It works with [npm](https://www.npmjs.com/), [yarn](https://yarnpkg.com/), and [pnpm](https://pnpm.io/).
 
-By default, Checkly installs all dependencies (both `dependencies` and `devDependencies`). 
+By default, Checkly installs all dependencies (both `dependencies` and `devDependencies`).
 
 ```json package.json
 {
@@ -33,15 +33,15 @@ Checkly detects your package manager from your lock file:
 | Lock file           | Package manager |
 |---------------------|-----------------|
 | `package-lock.json` | npm             |
-| `pnpm-lock.yaml`    | pnpm            | 
-| `yarn.lock`         | yarn            | 
+| `pnpm-lock.yaml`    | pnpm            |
+| `yarn.lock`         | yarn            |
 
 ### Workspace support
 
 Starting from [Checkly CLI 7.1.](https://github.com/checkly/checkly-cli/releases/tag/7.1.0), Checkly supports `npm` and `pnpm` workspaces in Playwright Check Suites, while Yarn workspaces remain unsupported.
 
-If your Playwright tests are stored in a monorepo, Checkly automatically recognizes and manages dependencies based on your workspace configuration. 
-When using workspaces, packages in your workspace can depend on other packages in the same workspace, including those from the root package. Check out [pnpm workspaces docs](https://pnpm.io/workspaces)(https://pnpm.io/workspaces) or [npm workspaces docs](https://docs.npmjs.com/cli/v8/using-npm/workspaces) to get an overview on workspaces. 
+If your Playwright tests are stored in a monorepo, Checkly automatically recognizes and manages dependencies based on your workspace configuration.
+When using workspaces, packages in your workspace can depend on other packages in the same workspace, including those from the root package. See the [pnpm workspaces docs](https://pnpm.io/workspaces) or [npm workspaces docs](https://docs.npmjs.com/cli/v8/using-npm/workspaces) to learn how workspaces work.
 
 **Requirements:**
 - Place your lock file (`package-lock.json` or `pnpm-lock.yaml`) at the workspace root

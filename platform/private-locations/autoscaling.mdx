@@ -1,41 +1,49 @@
 ---
 title: 'Autoscaling'
-sidebarTitle: 'Autoscaling'
-description: 'TO BE ADDED'
+description: 'Autoscale Checkly Agents in a Private Location with KEDA based on queued and in-flight check runs.'
 ---
 
-Checkly provides Prometheus metrics for a private location to enable automatic scaling and right-sizing of agents running against it.
+Scale Checkly Agent pods automatically so capacity tracks live load on a Private Location. This page covers the KEDA-based recipe; for static capacity planning, see [Scaling and Redundancy](/platform/private-locations/scaling-redundancy).
 
 <Accordion title="Prerequisites">
 
-Setting up autoscaling requires Prometheus metrics to be ingested.
-
-For more information and setup guide go to [Exporting Metrics & Data via Prometheus V2](/integrations/observability/prometheus-v2/)
+- Prometheus V2 metrics are being ingested for your account. See [Exporting Metrics & Data via Prometheus V2](/integrations/observability/prometheus-v2/).
+- Checkly Agents are deployed as a Kubernetes `Deployment`. See [Kubernetes Deployment](/platform/private-locations/kubernetes-deployment).
+- [KEDA](https://keda.sh) is installed in the cluster.
 
 </Accordion>
 
-## Metric-based autoscaling
+## The signal
 
-The method of scaling is based on Checkly's internal scaling where the autoscaling is set-up to match the total load going through the system.
-This is achieved using the `checkly_private_location_check_runs` gauge metric which representes the best-effort* estimate of the check runs going through the private location.
-* * Short-running checks are often excluded from the metric as their impact is negligible on the Private Location.
+Checkly exposes the `checkly_private_location_check_runs` gauge through the Prometheus V2 exporter. Filtered by `state` and a `private_location_slug_name`, it gives a near-real-time count of pending and currently-executing check runs in a single Private Location — the signal you drive replica count from.
 
-## Example using KEDA
+The relevant `state` values are:
 
-While this can be achieved using any autoscaling component, the example below will be using [KEDA](https://keda.sh) as it is the most popular autoscaler for Kubernetes.
+- `queued` — the check run has been scheduled but not yet picked up by an agent.
+- `inflight` — the check run is currently being executed by an agent.
+
+Summing both gives total live load and is what you want to scale on.
+
+<Note>
+Short-running checks may be excluded from the gauge because their impact on Private Location capacity is negligible.
+</Note>
+
+## KEDA `ScaledObject`
 
 ```yaml
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
+metadata:
+  name: checkly-agent-autoscaler
 spec:
   scaleTargetRef:
-    kind:          Deployment                           # Optional. Default: Deployment
-    namespace: <namesapce_to_which_agent_is_deployed>   # Optional.
-    name: <deployment_name_for_your_agent>              # Required. The name of the Checkly agent deployment.
-  minReplicaCount: 2                                    # Optional. Default: 0
-  maxReplicaCount: 10                                   # Optional. Default: 100
-  pollingInterval: 30                                   # Optional. Default: 30 seconds
-  cooldownPeriod:   300                                 # Optional. Default: 300 seconds
+    kind: Deployment                            # Optional. Default: Deployment.
+    namespace: <namespace_for_agent_deployment> # Optional.
+    name: <agent_deployment_name>               # Required.
+  minReplicaCount: 2                            # Optional. Default: 0.
+  maxReplicaCount: 10                           # Optional. Default: 100.
+  pollingInterval: 30                           # Optional. Default: 30 (seconds).
+  cooldownPeriod: 300                           # Optional. Default: 300. Scale-to-zero only; see below.
   triggers:
     - type: prometheus
       metadata:
@@ -45,9 +53,84 @@ spec:
         query: sum(checkly_private_location_check_runs{state=~"queued|inflight", private_location_slug_name="<private_location_slug>"})
 ```
 
-### Query Explanation:
+The query is scoped to a single Private Location by `private_location_slug_name`, so create one `ScaledObject` per Private Location.
 
-sum(checkly_private_location_check_runs{state=~"queued|inflight", private_location_slug_name="<private_location_slug>"})
-* `state` - the state at which the job is queued = check has been scheduled but yet to be picked up by a consumer
-* `inflight` - the job is being executed by the agent
+For a Prometheus instance outside the cluster, add an [`authenticationRef`](https://keda.sh/docs/latest/scalers/prometheus/) pointing at a `TriggerAuthentication` resource with the appropriate credentials.
 
+## How desired replica count is computed
+
+KEDA publishes the PromQL result as an external metric and the HPA it creates applies:
+
+```
+desiredReplicas = ceil( PromQL_result / threshold )
+```
+
+clamped to `[minReplicaCount, maxReplicaCount]`. `threshold` is a per-pod target value, not a trigger boundary.
+
+With `threshold: "2"`, `minReplicaCount: 2`, `maxReplicaCount: 10`:
+
+| `sum(...)` result | `ceil(result / 2)` | After clamp | Resulting pods |
+|---|---|---|---|
+| 0  | 0  | 2  | 2 (idle floor) |
+| 1  | 1  | 2  | 2 |
+| 4  | 2  | 2  | 2 |
+| 5  | 3  | 3  | 3 |
+| 11 | 6  | 6  | 6 |
+| 25 | 13 | 10 | 10 (capped) |
+
+## Tuning the bounds
+
+- **`threshold`** — lower values produce more pods per unit of work. A reasonable starting point is the per-agent `JOB_CONCURRENCY` configured on the Deployment; halve it to add headroom.
+- **`minReplicaCount`** — the redundancy floor. Keep at `2` or higher so a single agent failure doesn't take the Private Location offline. See [Scaling and Redundancy](/platform/private-locations/scaling-redundancy).
+- **`maxReplicaCount`** — must exceed `ceil(peak_load / threshold)`. If the cap is too low, queued check runs accumulate above it and are dropped after the 6-minute queue TTL.
+
+## Scale-down behavior and `cooldownPeriod`
+
+`cooldownPeriod` governs scale-to-zero only — the wait between the trigger going inactive and KEDA scaling the workload to `0`. With `minReplicaCount: 2`, scale-to-zero never happens, so this field is dormant.
+
+Scale-in between `maxReplicaCount` and `minReplicaCount` is controlled by the HPA's own scale-down stabilization window (default 300 seconds). To dampen scale-in more aggressively, override the HPA behavior on the `ScaledObject`:
+
+```yaml
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 600
+          policies:
+            - type: Pods
+              value: 1
+              periodSeconds: 60
+```
+
+## Graceful termination
+
+In-flight checks on a terminating pod are rerun on another agent after a 300-second timeout. Set `terminationGracePeriodSeconds` above this on the agent pod spec so an evicted pod has room to drain before `SIGKILL`:
+
+```yaml
+spec:
+  template:
+    spec:
+      terminationGracePeriodSeconds: 330
+```
+
+## Verify
+
+1. Confirm KEDA created the HPA and is reading the metric:
+
+   ```bash
+   kubectl get scaledobject,hpa -n <namespace_for_agent_deployment>
+   ```
+
+2. Probe the signal directly:
+
+   ```
+   sum(checkly_private_location_check_runs{state=~"queued|inflight", private_location_slug_name="<private_location_slug>"})
+   ```
+
+3. Schedule a burst of checks against the Private Location and watch the replica count climb toward `maxReplicaCount`, then settle back to `minReplicaCount` after the scale-down stabilization window elapses.
+
+## See also
+
+- [Scaling and Redundancy](/platform/private-locations/scaling-redundancy)
+- [Exporting Metrics & Data via Prometheus V2](/integrations/observability/prometheus-v2/)
+- [Kubernetes Deployment](/platform/private-locations/kubernetes-deployment)

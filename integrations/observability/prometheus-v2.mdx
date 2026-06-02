@@ -20,13 +20,15 @@ Activating this integration is simple.
 2. We directly create an endpoint for you and provide its URL and the required Bearer token.
 ![Prometheus integration step 2](/images/docs/images/integrations/prometheus_v2_step2.png)
 
-3. Create a new job in your Prometheus `prometheus.yml` config and set up a scraping interval. The scrape interval should be above 60 seconds. Add the URL (divided into `metrics_path`, `scheme` and `target`) and `bearer_token`.
+3. Create a new job in your Prometheus `prometheus.yml` config and set up a scraping interval. Use a 60-second scrape interval and enable compression. Add the URL (divided into `metrics_path`, `scheme` and `target`) and `bearer_token`.
 Here is an example
 
 ```yaml
 # prometheus.yml
 - job_name: 'checkly'
   scrape_interval: 60s
+  scrape_timeout: 30s
+  enable_compression: true
   metrics_path: '/accounts/<your account ID>/v2/prometheus/metrics'
   bearer_token: '<your bearer token>'
   scheme: https
@@ -38,10 +40,15 @@ Now restart Prometheus and you should see metrics coming in.
 
 <Callout type="warning">
 The Prometheus metrics endpoint has a rate limit of 50 requests per minute.
-The responses from this endpoint are cached during 60 seconds.
+The responses from this endpoint are cached for 60 seconds.
 Any request made to this endpoint within 60 seconds of the initial request will receive the cached response.
-We recommend using a scrape interval of 60 seconds.
+Use a scrape interval of 60 seconds. Shorter intervals fetch the same cached data.
+If you run multiple Prometheus instances, each instance scrapes independently. Align their scrape intervals where possible.
 </Callout>
+
+<Tip>
+Keep `enable_compression` set to `true` to reduce response size and make scrapes faster. Prometheus supports this setting in version 2.49 and later. If your account has many checks, use a longer `scrape_timeout`, such as 30 seconds, to give Prometheus enough time to scrape all metrics.
+</Tip>
 
 ## Check Metrics
 
@@ -118,6 +125,8 @@ Here is an example for how to set this in your `prometheus.yml` config:
 # prometheus.yml
 - job_name: 'checkly'
   scrape_interval: 60s
+  scrape_timeout: 30s
+  enable_compression: true
   metrics_path: '/accounts/<your account ID>/v2/prometheus/metrics'
   bearer_token: '<your bearer token>'
   scheme: https
@@ -141,6 +150,8 @@ Here is an example for how to configure `includeRetryAttempts` in your `promethe
 # prometheus.yml
 - job_name: 'checkly'
   scrape_interval: 60s
+  scrape_timeout: 30s
+  enable_compression: true
   metrics_path: '/accounts/<your account ID>/v2/prometheus/metrics'
   bearer_token: '<your bearer token>'
   scheme: https

@@ -45,7 +45,7 @@ new PlaywrightCheck("critical-e2e-monitor", {
   playwrightConfigPath: "./playwright.config.ts",
   engine: Engine.node("24"), // Optional: override the auto-detected engine.
   installCommand: "npm ci",
-  testCommand: "npx playwright test --retries=2",
+  testCommand: "npx playwright test --max-failures=5",
   pwProjects: ["chromium"],
   pwTags: ["e2e"],
 })
@@ -144,6 +144,10 @@ new PlaywrightCheck("critical-e2e-monitor", {
 ```
 
 <Info>If you configure the `testCommand` property and `pwTags` or `pwProjects` the options will be merged and all configurations applied to `npx playwright test`.</Info>
+
+<Info>
+Checkly applies these Playwright defaults when you do not set them yourself: `workers: 4`, `retries: 2`, `use.video: "on-first-retry"`, and `use.screenshot: "on-first-retry"`. Checkly also records traces on every run, uses the Checkly reporter, and appends a Checkly user-agent suffix. Checkly supports Playwright's `globalTimeout`; the timer starts when `npx playwright test` begins.
+</Info>
 
 </ResponseField>
 

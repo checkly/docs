@@ -7,7 +7,7 @@ sidebarTitle: 'Configuration'
 Use the `checkly.config.ts/js` file to define your Playwright Check Suite. Each Playwright Check Suite can be connected to references in your `playwright.config.ts/js` file.
 
 <Info>
-**A Playwright Check Suite can run up to 30 minutes**. [Please contact us in the Checkly Web App](https://app.checklyhq.com/?support=true) or get in touch with your account executive if you're interested in longer runs.
+**The Playwright test execution stage can run for up to 30 minutes**. Use Playwright's `globalTimeout` to set a custom suite-level limit. [Contact us in the Checkly Web App](https://app.checklyhq.com/?support=true) or get in touch with your account executive if you need longer runs.
 </Info>
 
 ## Playwright Check Suite definition
@@ -103,14 +103,39 @@ A Playwright Check Suite inherits multiple properties from the abstract `Check` 
 Check out [the reference documentation](/constructs/project#param-checks-playwright-checks) for more information on these settings.
 
 <Note>
-**Checks' Retry strategy is not applicable for Playwright checks.** Playwright includes its own retry features that can be set up directly in your `playwright.config.ts/js` file with the [`retries`](https://playwright.dev/docs/test-retries) option. This allows for more detailed management of test retries within Playwright, when your check runs.
+**Checkly retry strategies do not apply to Playwright Check Suites.** Use Playwright's [`retries`](https://playwright.dev/docs/test-retries) option in your `playwright.config.ts/js` file or `testCommand` to control test retries.
 </Note>
 
-Additionally, Playwright Check Suites provide specific configuration for your Playwright monitoring.
+### Checkly-applied Playwright settings
+
+When Checkly runs a Playwright Check Suite, it applies Playwright settings that produce useful monitoring results and artifacts.
+
+Checkly applies these defaults only when you do not set the option yourself:
+
+| Playwright option | Checkly default |
+|-------------------|-----------------|
+| `workers` | `4` |
+| `retries` | `2` |
+| `use.video` | `on-first-retry` |
+| `use.screenshot` | `on-first-retry` |
+
+Your Playwright config or `testCommand` value takes precedence for these options.
+
+Checkly enforces these options for every run. User configuration does not override them:
+
+| Playwright setting | Checkly behavior |
+|--------------------|------------------|
+| `use.trace` | `on` for every run |
+| Reporter | [Checkly reporter](/detect/testing/playwright-reporter) |
+| User agent | Checkly appends a [user-agent suffix](/platform/allowlisting-traffic#default-checkly-user-agent) |
+
+Checkly supports Playwright's [`globalTimeout`](https://playwright.dev/docs/api/class-testconfig#test-config-global-timeout). Use it to control the maximum duration of the Playwright suite after `npx playwright test` starts.
+
+Playwright Check Suites also provide specific configuration for your Playwright monitoring.
 
 * `installCommand:` Override the command to install dependencies. `npm install --dev` is used by default.
 
-* `testCommand:` Override the command to test. `npx playwright test` is used by default with the tags, projects, and config file options your check specifies.
+* `testCommand:` Override the command that runs tests. `npx playwright test` is used by default with the tags, projects, and config file options your check specifies.
 
 * `group:` The group construct this check belongs to.
 
@@ -132,22 +157,28 @@ installCommand: 'yarn install --frozen-lockfile'
 installCommand: 'npm install --prefix ./e2e'
 ```
 
-**Enable Playwright tracing to debug failures**
-
-```typescript
-testCommand: 'npx playwright test --trace=on'
-```
-
-**Set a specific test timeout:**
+**Set a lower test timeout:**
 
 ```typescript
 testCommand: 'npx playwright test --timeout=60000'
 ```
 
+**Set a global suite timeout:**
+
+```typescript
+testCommand: 'npx playwright test --global-timeout=120000'
+```
+
+**Stop early after failures:**
+
+```typescript
+testCommand: 'npx playwright test --max-failures=5'
+```
+
 **Combine multiple test flags:**
 
 ```typescript
-testCommand: 'npx playwright test --trace=retain-on-failure --max-failures=5'
+testCommand: 'npx playwright test --timeout=60000 --max-failures=5'
 ```
 
 ### Example Checkly config
@@ -169,7 +200,7 @@ export default defineConfig({
         pwProjects: ['chromium', 'firefox', 'webkit'],
         pwTags: '@e2e',
         installCommand: 'npm install --dev',
-        testCommand: 'npx playwright test --trace=on',
+        testCommand: 'npx playwright test --max-failures=5',
         activated: true,
         muted: false,
         group: productionGroup,
@@ -318,7 +349,7 @@ If tests fail due to authentication issues:
 - Verify environment variables are set correctly in Checkly. You can verify your environment variables using `npx checkly env ls`, or looking at your Global or Check's environment variables in the Checkly Webapp to ensure any `process.env.VARIABLE_NAME` call from your test is defined.
 - For persistent authentication, use Playwright's [`storageState`](https://playwright.dev/docs/auth#reuse-authentication-state) feature.
 
-**webServer configuration requires additional files**
+#### webServer configuration requires additional files
 
 When using `webServer` in your Playwright config, you need to include the server files in your check configuration:
 
@@ -326,9 +357,9 @@ When using `webServer` in your Playwright config, you need to include the server
 - Include all files needed to start the server (e.g., server scripts, config files)
 - Alternatively, skip `webServer` on Checkly and use your deployed URL: `...(process.env.CHECKLY ? {} : { webServer: { ... } })`
 
-**No tests found**
+#### No tests found
 
-If Playwright couldn't find any tests to run, this usually means a mismatch between your config and your test files:
+If Playwright does not find any tests to run, this usually means a mismatch between your config and your test files:
 
 - Verify your `--grep` pattern matches actual test tags or projects
 - Verify the `testDir` path in `playwright.config.ts` matches the actual directory containing your test files

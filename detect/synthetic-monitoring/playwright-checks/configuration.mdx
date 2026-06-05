@@ -134,9 +134,11 @@ Playwright Check Suites also provide specific configuration for your Playwright 
 
 * `installCommand:` Override the command to install dependencies. `npm install --dev` is used by default.
 
-* `testCommand:` Override the command that runs tests. `npx playwright test` is used by default with the tags, projects, and config file options your check specifies.
+* `testCommand:` Append to the command that runs tests. `npx playwright test` is used by default with the tags, projects, and config file options your check specifies.
 
-* `group:` The group construct this check belongs to.
+* `engine:` Override the runtime engine for the check (Node.js or Bun). See [`engine`](/constructs/playwright-check#param-engine).
+
+* `group:` The group id construct this check belongs to.
 
 ### Customize install and test commands
 
@@ -224,6 +226,21 @@ npx checkly test --grep=e2e-test-suite
 ```
 
 The `npx checkly test` command runs your Playwright tests locally using the same configuration that Checkly will use in production. This helps catch configuration errors before deployment.
+
+## Cancelling runs
+
+You can cancel queued or in-progress Playwright Check Suite runs from the UI or CLI. Cancellation applies to runs from **Schedule Now** and from test sessions started with:
+
+- `npx checkly test`
+- `npx checkly pw-test`
+- `npx checkly trigger`
+
+Two ways to cancel:
+
+- In the UI, click **Cancel Run** on the Check Suite Runs page or the Test Session Run page
+- Press <kbd>Ctrl</kbd>+<kbd>C</kbd> in the CLI (v8.0.0+) to cancel a recorded test session
+
+Cancelled runs show a **Cancelled** status in run history. See [Cancellation](/concepts/cancellation) for details on what happens after a run is cancelled.
 
 ## Common issues & troubleshooting
 

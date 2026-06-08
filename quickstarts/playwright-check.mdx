@@ -23,7 +23,7 @@ The prompt guides your AI tool to:
 1. Inspect your Playwright configuration and test files
 2. Recommend which tests to monitor first
 3. Generate a minimal `checkly.config.ts` with alert channels
-4. Run `npx checkly test --record` and `npx checkly deploy`
+4. Run `npx checkly test` and `npx checkly deploy`
 
 <Accordion title="View the full prompt">
 <SetupPrompt />
@@ -132,12 +132,10 @@ Per-check `frequency` and `locations` override the global defaults set in Step 2
 Before deploying, validate your monitoring setup locally:
 
 ```bash terminal
-npx checkly test --record
+npx checkly test
 ```
 
-The `--record` flag uploads results to Checkly so you can review traces, logs, and screenshots in the UI.
-
-This runs your check suites in Checkly's infrastructure and shows results:
+This runs your check suites in Checkly's infrastructure and shows results in the terminal. You can also review traces, logs, and screenshots in the Checkly UI.
 
 ```bash
 Parsing your project... ✅
@@ -156,7 +154,7 @@ playwright.config.ts
 **Test specifying the environment type:**
 
 ```bash terminal
-npx checkly test --record --env ENVIRONMENT=staging
+npx checkly test --env ENVIRONMENT=staging
 ```
 
 <Info>

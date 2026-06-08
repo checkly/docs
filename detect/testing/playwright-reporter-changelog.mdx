@@ -13,6 +13,28 @@ Learn more about:
 
 ## Full release history
 
+<Update label="v1.13.0" tags={["May 2026"]}>
+  **Added**
+
+  - **Test errors in check result logs** — Test failures and setup errors are now surfaced in the user-visible log on [Checkly](https://checklyhq.com), alongside the existing report.
+</Update>
+
+<Update label="v1.12.0" tags={["May 2026"]}>
+  **Added**
+
+  - **Run-level status on the JSON report** — Reports now include `_checkly.status` reflecting Playwright's `FullResult.status` (`passed`, `failed`, `timedout`, or `interrupted`). Lets downstream consumers distinguish a timed-out or interrupted run from a passed one without having to infer it from test counts.
+
+  **Fixed**
+
+  - **Tests killed by `globalTimeout` are now visible in the report** — Previously, tests that started but never finished (for example because Playwright's `globalTimeout` fired mid-run) were silently dropped from `report.suites[]`. They now appear in the report with an empty `results` array, so the run summary accurately reflects what was attempted.
+
+  ## 1.11.2
+
+  **Added**
+
+  - **Post-processing timing in check result logs** — When enabled via `CHECKLY_REPORTER_PROFILE_LOGS`, the reporter now includes timing breakdowns for internal processing steps (trace processing, sanitizing, report building) in the check result logs.
+</Update>
+
 <Update label="v1.11.1" tags={["April 2026"]}>
   **Improved**
 

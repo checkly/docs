@@ -1,0 +1,148 @@
+name: Docs gate
+
+# Single required check for the main branch protection ruleset.
+# Succeeds immediately when a PR touches no docs files, otherwise waits
+# for the Mintlify checks to complete successfully. This is needed because
+# Mintlify's app only posts its checks on docs-affecting PRs, so requiring
+# those checks directly would block non-docs PRs forever.
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: docs-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  docs-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+      checks: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect docs changes
+        id: detect
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          # Paths that don't affect the rendered Mintlify site.
+          # Anything NOT matching one of these counts as a docs change.
+          NON_DOCS_RE='^(\.github/|.*\.sh$|[^/]+\.md$|package(-lock)?\.json$|node_modules/|checkly\.config\.ts$|block-headless\.js$|__checks__/)'
+
+          MERGE_BASE=$(git merge-base "$BASE_SHA" "$HEAD_SHA")
+          CHANGED_DOCS=$(git diff --name-only "$MERGE_BASE" "$HEAD_SHA" | grep -vE "$NON_DOCS_RE" || true)
+
+          if [ -z "$CHANGED_DOCS" ]; then
+            echo "No docs changes — gate passes immediately."
+            echo "docs_changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Docs changed — will wait for Mintlify checks:"
+            echo "$CHANGED_DOCS"
+            echo "docs_changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Wait for Mintlify checks
+        if: steps.detect.outputs.docs_changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          # Patterns matched against check-run names. Loose on the
+          # "checkly-422f444a" instance id in case it ever rotates.
+          REQUIRED=(
+            '^Mintlify Deployment$'
+            '^Mintlify Validation .* - link-rot$'
+            '^Mintlify Validation .* - vale-spellcheck$'
+          )
+
+          MAX_ATTEMPTS=60   # 60 * 30s = 30 min
+          SLEEP=30
+
+          for attempt in $(seq 1 $MAX_ATTEMPTS); do
+            CHECKS=$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA/check-runs" --paginate)
+
+            # Short-circuit: if the Mintlify Deployment was skipped (e.g.
+            # Mintlify decided the change is a no-op), the dependent
+            # link-rot and vale-spellcheck checks never get posted. Exit
+            # successfully rather than time out waiting for them.
+            DEPLOY_CONCLUSION=$(echo "$CHECKS" | jq -r '
+              [.check_runs[] | select(.name == "Mintlify Deployment")]
+              | sort_by(.started_at) | reverse | .[0]
+              | if . == null or .status != "completed" then ""
+                else .conclusion // ""
+                end
+            ')
+            if [ "$DEPLOY_CONCLUSION" = "skipped" ]; then
+              echo "Mintlify Deployment was skipped — no preview to validate. Exiting successfully."
+              exit 0
+            fi
+
+            ALL_DONE=true
+            FAILED=""
+
+            for pattern in "${REQUIRED[@]}"; do
+              # Most recent run for this name (API returns started_at desc).
+              MATCH=$(echo "$CHECKS" | jq -r --arg p "$pattern" '
+                [.check_runs[] | select(.name | test($p))]
+                | sort_by(.started_at) | reverse | .[0]
+                | if . == null then "missing\tmissing\tmissing"
+                  else "\(.name)\t\(.status)\t\(.conclusion // "null")"
+                  end
+              ')
+
+              NAME=$(echo "$MATCH" | cut -f1)
+              STATUS=$(echo "$MATCH" | cut -f2)
+              CONCLUSION=$(echo "$MATCH" | cut -f3)
+
+              if [ "$NAME" = "missing" ]; then
+                echo "[$attempt/$MAX_ATTEMPTS] pending: $pattern (no check posted yet)"
+                ALL_DONE=false
+                continue
+              fi
+
+              if [ "$STATUS" != "completed" ]; then
+                echo "[$attempt/$MAX_ATTEMPTS] $STATUS: $NAME"
+                ALL_DONE=false
+                continue
+              fi
+
+              # GitHub check conclusions: success, neutral, skipped are
+              # non-failure outcomes. Mintlify's vale-spellcheck returns
+              # `neutral` when there are warnings but no blocking errors.
+              case "$CONCLUSION" in
+                success|neutral|skipped) ;;
+                *)
+                  FAILED="$FAILED  - $NAME: $CONCLUSION"$'\n'
+                  ;;
+              esac
+            done
+
+            if [ -n "$FAILED" ]; then
+              echo "Mintlify check(s) did not succeed:"
+              printf '%s' "$FAILED"
+              exit 1
+            fi
+
+            if [ "$ALL_DONE" = "true" ]; then
+              echo "All required Mintlify checks passed."
+              exit 0
+            fi
+
+            sleep $SLEEP
+          done
+
+          echo "Timed out after $((MAX_ATTEMPTS * SLEEP / 60))m waiting for Mintlify checks."
+          exit 1

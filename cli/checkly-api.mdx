@@ -14,7 +14,7 @@ The `checkly api` command makes authenticated HTTP requests to the Checkly API. 
 Before using `checkly api`, ensure you have:
 
 - Checkly CLI installed
-- A valid Checkly account authentication (run `npx checkly login` if needed)
+- Valid Checkly account authentication (run `npx checkly login` if needed)
 
 See the [Authentication section](/cli/authentication) for other authentication options.
 </Accordion>
@@ -42,7 +42,7 @@ All flags are optional.
 | Option | Description |
 |--------|-------------|
 | `-X, --method` | HTTP method: `GET`, `POST`, `PUT`, `PATCH`, or `DELETE`. Defaults to `GET`, or `POST` when fields are present. |
-| `-F, --field` | Add a request body field as `key=value` (string) or `key:=value` (JSON-parsed). Can be used multiple times. |
+| `-F, --field` | Add a field as `key=value` (string) or `key:=value` (JSON-parsed). Sent as a query parameter for `GET` requests and in the request body otherwise. Can be used multiple times. |
 | `-H, --header` | Add a custom HTTP header as `"Key: Value"`. Can be used multiple times. |
 | `--input` | Read the request body from a file path, or `-` to read from stdin. |
 | `--jq` | Filter JSON output using a [jq](https://jqlang.org/) expression. Requires `jq` to be installed. |
@@ -148,7 +148,7 @@ content-range: 0-9/11
 ...
 ```
 
-The `content-range` header tells you the total number of results (`0-9/11` means page 1 of 11 items).
+The `content-range` header tells you the total number of results (`0-9/11` means items 0–9 of 11 total).
 
 ### Debug a request
 

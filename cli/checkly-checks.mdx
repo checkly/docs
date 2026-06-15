@@ -30,6 +30,7 @@ npx checkly checks <subcommand> [arguments] [options]
 | `list` | List all checks in your account. |
 | `get` | Get details of a specific check, including recent results and analytics stats. |
 | `stats` | Show analytics stats for your checks. |
+| `delete` | Delete a check by ID. |
 
 ## `checkly checks list`
 
@@ -534,6 +535,75 @@ npx checkly checks stats --search="homepage" --output=json
 
 # Page through results
 npx checkly checks stats --limit=10 --page=2
+```
+
+## `checkly checks delete`
+
+<Note>The `checkly checks delete` command is only available since CLI v8.8.0.</Note>
+
+Delete a check by ID. By default, the command shows the check to be deleted and prompts for confirmation before proceeding.
+
+<Warning>
+Checks managed by a CLI project are recreated on the next `checkly deploy`. To permanently remove a project-managed check, delete it from your project code instead of using this command.
+</Warning>
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks delete <id> [options]
+```
+
+**Arguments:**
+
+| Argument | Description |
+|----------|-------------|
+| `id` | The ID of the check to delete. |
+
+**Options:**
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `--force, -f` | - | Skip the confirmation prompt. |
+| `--dry-run` | - | Preview what would happen without deleting the check. |
+
+### Delete Options
+
+<ResponseField name="--force, -f" type="boolean" default="false">
+
+Skip the confirmation prompt and delete the check immediately. Useful in scripts and CI.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks delete 12345 --force
+npx checkly checks delete 12345 -f
+```
+
+</ResponseField>
+
+<ResponseField name="--dry-run" type="boolean" default="false">
+
+Preview the deletion without making any changes. Shows the check that would be deleted.
+
+**Usage:**
+
+```bash Terminal
+npx checkly checks delete 12345 --dry-run
+```
+
+</ResponseField>
+
+### Delete Examples
+
+```bash Terminal
+# Delete a check with a confirmation prompt
+npx checkly checks delete 12345
+
+# Preview the deletion without making changes
+npx checkly checks delete 12345 --dry-run
+
+# Delete without a confirmation prompt
+npx checkly checks delete 12345 --force
 ```
 
 ## Related Commands

@@ -21,17 +21,23 @@ See the [Authentication section](/cli/authentication) for other authentication o
 
 ## Usage
 
+The basic command takes an API endpoint path and optional flags.
+
 ```bash Terminal
 npx checkly api <endpoint> [options]
 ```
 
 ## Arguments
 
+The command takes a single required argument.
+
 | Argument | Description |
 |----------|-------------|
 | `ENDPOINT` | API endpoint path, e.g. `/v1/checks`. |
 
 ## Options
+
+All flags are optional.
 
 | Option | Description |
 |--------|-------------|
@@ -45,13 +51,19 @@ npx checkly api <endpoint> [options]
 
 ## Examples
 
+The following examples cover common use cases for the `checkly api` command.
+
 ### List all checks
+
+Returns all checks in your account as JSON.
 
 ```bash Terminal
 npx checkly api /v1/checks
 ```
 
 ### Extract specific fields with jq
+
+Use `--jq` to filter or reshape the JSON response inline.
 
 <Note>`--jq` requires [jq](https://jqlang.org/) to be installed on your system.</Note>
 
@@ -79,11 +91,15 @@ npx checkly api /v1/checks -F limit=5 -F page=2
 
 ### Get a single resource
 
+Append the resource ID to the endpoint path to fetch a specific item.
+
 ```bash Terminal
 npx checkly api /v1/checks/<check-id>
 ```
 
 ### List alert channels
+
+Use `--jq` to extract only the fields you need from the response.
 
 ```bash Terminal
 npx checkly api /v1/alert-channels --jq '[.[] | {id, type}]'
@@ -146,6 +162,8 @@ npx checkly api /v1/checks --verbose
 ```
 
 ## Related Commands
+
+These commands are commonly used alongside `checkly api`.
 
 - [`checkly login`](/cli/checkly-login) - Sign in to your Checkly account
 - [`checkly whoami`](/cli/checkly-whoami) - Display current account and user information

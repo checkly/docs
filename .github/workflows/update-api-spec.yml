@@ -54,10 +54,12 @@ jobs:
     - name: Generate pages for any new endpoints
       run: node .github/scripts/detect-new-endpoints.mjs
 
-    - name: Open auto-merging PR if anything changed
+    - name: Create or update API spec PR if anything changed
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        set -euo pipefail
+
         # Stage everything that might have changed
         git add api-reference docs.json
 
@@ -88,13 +90,13 @@ jobs:
           TITLE="chore(api): refresh API reference"
         fi
 
-        BRANCH="auto/update-api-spec-${{ github.run_id }}"
-        git checkout -b "$BRANCH"
+        BRANCH="auto/update-api-spec"
+        git checkout -B "$BRANCH"
 
         git commit -m "$TITLE" \
                    -m "Automatically fetched from https://api.checklyhq.com/openapi.json" \
                    -m "Updated on $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-        git push origin "$BRANCH"
+        git push --force-with-lease origin "$BRANCH"
 
         # Build PR body
         BODY_FILE=$(mktemp)
@@ -105,24 +107,42 @@ jobs:
           echo "- New endpoint pages: $NEW_PAGES"
           echo "- \`docs.json\` updated: $([ "$DOCS_JSON_CHANGED" = "1" ] && echo yes || echo no)"
           echo ""
-          echo "This PR will auto-merge once all required checks pass."
+          echo "This PR reuses the \`$BRANCH\` branch so future runs update this PR instead of opening duplicates."
           echo ""
           echo "---"
           echo "_Run: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})_"
         } > "$BODY_FILE"
 
-        PR_URL=$(gh pr create \
-          --title "$TITLE" \
-          --body-file "$BODY_FILE" \
+        PR_URL=$(gh pr list \
           --base main \
           --head "$BRANCH" \
-          --label auto-generated \
-          --label api-docs)
-        echo "Created $PR_URL"
+          --state open \
+          --json url \
+          --jq '.[0].url // ""')
 
-        # Enable auto-merge; branch protection requires status checks to pass
-        # before the PR is actually merged.
-        gh pr merge "$PR_URL" --squash --auto --delete-branch
+        if [ -n "$PR_URL" ]; then
+          gh pr edit "$PR_URL" \
+            --title "$TITLE" \
+            --body-file "$BODY_FILE" \
+            --add-label auto-generated \
+            --add-label api-docs
+          echo "Updated $PR_URL"
+        else
+          PR_URL=$(gh pr create \
+            --title "$TITLE" \
+            --body-file "$BODY_FILE" \
+            --base main \
+            --head "$BRANCH" \
+            --label auto-generated \
+            --label api-docs)
+          echo "Created $PR_URL"
+        fi
+
+        # Try to enable auto-merge, but do not create another PR if GitHub
+        # requires manual approval before pull_request workflows can run.
+        if ! gh pr merge "$PR_URL" --squash --auto --delete-branch; then
+          echo "::notice::Could not enable auto-merge for $PR_URL. The stable branch will be updated by the next run instead of opening another PR."
+        fi
 
     - name: Ping Checkly
       if: always()

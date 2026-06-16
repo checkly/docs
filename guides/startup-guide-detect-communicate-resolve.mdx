@@ -380,14 +380,13 @@ const smsChannel = new SmsAlertChannel('sms-channel-1', {
 })
 ```
 
-Here's another alert channel, this one for Slack.
+Here's another alert channel, this one for Slack using the Checkly Slack App.
 
-```ts {title="slack-alert-channel.ts"}
-import { SlackAlertChannel } from 'checkly/constructs'
+```ts {title="slack-app-alert-channel.ts"}
+import { SlackAppAlertChannel } from 'checkly/constructs'
 
-export const slackChannel = new SlackAlertChannel('slack-channel-1', {
-  url: new URL('https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'),
-  channel: '#alerts',
+export const slackChannel = new SlackAppAlertChannel('slack-channel-1', {
+  slackChannels: ['#alerts'],
   sendRecovery: true,
   sendFailure: true,
   sslExpiry: true,

@@ -18,28 +18,17 @@ Rocky AI is Checkly's AI agent. Rocky AI can help you automatically determine us
 
 ## Consumption and Invocations
 
-By default, Rocky AI automatically analyzes every new error group, and each analysis consumes an invocation. You can disable automatic analysis in the [AI settings](https://app.checklyhq.com/accounts/rocky-ai) to only spend invocations on manual analyses.
+By default, Rocky AI automatically analyzes every new *error group*. You can disable automatic analysis in the [AI settings](https://app.checklyhq.com/accounts/rocky-ai) to only spend invocations on manual analyses.
 
-Every AI analysis — whether triggered automatically or manually — counts as one invocation against your plan's quota. If the same analysis result is pushed to multiple alert channels, it is still counted as a single invocation.
+Every AI analysis, triggered automatically or manually, counts as one invocation against your plan's quota. If the same analysis result is pushed to multiple alert channels, it is still counted as a single invocation.
 
 When your invocation quota is reached, no overages are charged. Invocations refresh at the start of your next billing cycle. You can monitor your current usage and configure automatic analysis in the [AI settings](https://app.checklyhq.com/accounts/rocky-ai).
 
 ### Error groups
 
-An **error group** is a deduplicated bucket of check failures that share the same underlying error. Instead of treating every failure as a separate event, Checkly cleans the raw error message — stripping out dynamic values like timestamps, IDs, and file paths — and clusters failures with matching cleaned messages into a single group per check. A group records when the error was first and last seen, so it reads as "this specific error has occurred on this check, starting on date X, most recently on date Y."
+An **error group** is a deduplicated bucket of check failures that share the same underlying error. Instead of treating every failure as a separate event, Checkly cleans the raw error message and clusters failures with matching cleaned messages into a single group per check. A group records when the error was first and last seen, so it reads as "this specific error has occurred on this check, starting on date X, most recently on date Y."
 
 A new group is created the first time a check fails with an error that doesn't match any existing group — and that's the event that triggers an automatic analysis. Because minor variations are normalized away, repeated failures of the same error reuse the existing group and don't consume additional invocations.
-
-<Accordion title="How Checkly decides an error is new">
-  An incoming failure only creates a new error group if it fails to match any existing group for that check on both of these passes:
-
-  1. **Exact match** — the cleaned error message is hashed; an identical hash reuses the existing group.
-  2. **Fuzzy match** — if no hash matches, Checkly compares the cleaned message against existing groups and attributes the failure to any group that is at least **80% similar**.
-
-  Only when both passes come up empty is a new group created. This means small differences — a different query parameter, temp file path, or call log — still land in the same group.
-
-  For API, URL, DNS, ICMP, and TCP checks, each failing assertion is recorded as its own error group, so Rocky AI can analyze distinct assertion failures independently.
-</Accordion>
 
 ## Data Privacy and Security
 

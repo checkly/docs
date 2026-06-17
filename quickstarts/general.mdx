@@ -45,45 +45,33 @@ If you'd rather create a single check in the web UI, start with one of the check
   </Step>
 
   <Step title="Write your first check">
-  Checks are plain TypeScript or JavaScript. Open `__checks__/api.check.ts` and point it at an endpoint you want to monitor. An [API Check](/quickstarts/api-check) sends an HTTP request and asserts on the response:
+  Checks are code. The scaffolded `__checks__/homepage.spec.ts` is a [Browser Check](/quickstarts/browser-check): a standard `@playwright/test` file that Checkly runs as a monitor. Edit it to load a page and assert on what matters:
 
   <CodeGroup dropdown>
-  ```ts api.check.ts
-  import { ApiCheck, AssertionBuilder, Frequency } from 'checkly/constructs'
+  ```ts homepage.spec.ts
+  import { test, expect } from '@playwright/test'
 
-  new ApiCheck('hello-api-1', {
-    name: 'Hello API',
-    activated: true,
-    frequency: Frequency.EVERY_1M,
-    request: {
-      method: 'GET',
-      url: 'https://mac-demo-repo.vercel.app/api/hello',
-      assertions: [
-        AssertionBuilder.statusCode().equals(200),
-      ],
-    },
+  test('homepage loads', async ({ page }) => {
+    const response = await page.goto('https://www.checklyhq.com')
+    expect(response?.status()).toBeLessThan(400)
+    await expect(page).toHaveTitle(/Checkly/)
+    await page.screenshot({ path: 'homepage.jpg' })
   })
   ```
 
-  ```js api.check.js
-  const { ApiCheck, AssertionBuilder, Frequency } = require('checkly/constructs')
+  ```js homepage.spec.js
+  const { test, expect } = require('@playwright/test')
 
-  new ApiCheck('hello-api-1', {
-    name: 'Hello API',
-    activated: true,
-    frequency: Frequency.EVERY_1M,
-    request: {
-      method: 'GET',
-      url: 'https://mac-demo-repo.vercel.app/api/hello',
-      assertions: [
-        AssertionBuilder.statusCode().equals(200),
-      ],
-    },
+  test('homepage loads', async ({ page }) => {
+    const response = await page.goto('https://www.checklyhq.com')
+    expect(response?.status()).toBeLessThan(400)
+    await expect(page).toHaveTitle(/Checkly/)
+    await page.screenshot({ path: 'homepage.jpg' })
   })
   ```
   </CodeGroup>
 
-  To monitor a realistic user flow instead, edit `__checks__/homepage.spec.ts`, a standard `@playwright/test` file that runs as a [Browser Check](/quickstarts/browser-check). For every construct and option, see the [Constructs reference](/constructs/overview).
+  Checkly turns every `*.spec.ts` file into a Browser Check through the `browserChecks.testMatch` pattern in your `checkly.config.ts`. To monitor an endpoint instead, edit `__checks__/api.check.ts`, which defines an [API Check](/quickstarts/api-check). For every construct and option, see the [Constructs reference](/constructs/overview).
   </Step>
 
   <Step title="Run your checks locally">
@@ -98,10 +86,10 @@ If you'd rather create a single check in the web UI, start with one of the check
   ```
   Running 2 checks in eu-west-1.
 
+  __checks__/homepage.spec.ts
+    ✔ homepage loads (24s)
   __checks__/api.check.ts
     ✔ Hello API (222ms)
-  __checks__/homepage.spec.ts
-    ✔ Homepage (24s)
 
   2 passed, 2 total
   ```
@@ -120,7 +108,7 @@ If you'd rather create a single check in the web UI, start with one of the check
   </Step>
 
   <Step title="Set up alerts">
-  Add an [alert channel](/communicate/alerts/overview) so you're notified when a check fails. Define it as a construct and attach it to your check through the `alertChannels` array.
+  Add an [alert channel](/communicate/alerts/overview) so you're notified when a check fails. Define it in a new `__checks__/alert-channels.ts` file, then attach it to your checks through the `alertChannels` defaults in your config.
 
   <Tabs>
     <Tab title="Slack">
@@ -158,28 +146,23 @@ If you'd rather create a single check in the web UI, start with one of the check
     </Tab>
   </Tabs>
 
-  Import the channel into your check and add it to `alertChannels`:
+  Set the channel as a default in your `checkly.config.ts` so every check, including your Browser Check, uses it:
 
-  ```ts api.check.ts
-  import { ApiCheck, AssertionBuilder, Frequency } from 'checkly/constructs'
-  import { slackChannel } from './alert-channels'
+  ```ts checkly.config.ts
+  import { defineConfig } from 'checkly'
+  import { slackChannel } from './__checks__/alert-channels'
 
-  new ApiCheck('hello-api-1', {
-    name: 'Hello API',
-    activated: true,
-    frequency: Frequency.EVERY_1M,
-    alertChannels: [slackChannel],
-    request: {
-      method: 'GET',
-      url: 'https://mac-demo-repo.vercel.app/api/hello',
-      assertions: [
-        AssertionBuilder.statusCode().equals(200),
-      ],
+  export default defineConfig({
+    projectName: 'My Project',
+    logicalId: 'my-project',
+    checks: {
+      // ...your existing check defaults
+      alertChannels: [slackChannel],
     },
   })
   ```
 
-  Run `npx checkly deploy` again to apply your alerting. See the [alert channels overview](/communicate/alerts/channels) for every supported channel.
+  You can also attach `alertChannels` to an individual check or a [check group](/constructs/check-group-v2) for finer control. Run `npx checkly deploy` again to apply your alerting, and see the [alert channels overview](/communicate/alerts/channels) for every supported channel.
   </Step>
 </Steps>
 

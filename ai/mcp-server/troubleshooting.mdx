@@ -30,26 +30,24 @@ codex mcp login checkly
 
 ## No tools are listed
 
-Visible tools depend on the OAuth scopes granted to the MCP session. If no tools appear, reconnect and complete OAuth again.
+Visible tools depend on the OAuth permissions granted to the MCP session. If no tools appear:
 
-Use this prompt to verify identity and account access:
+1. Use your MCP client's refresh tools option.
+2. Restart the client if the tools list still does not update.
+3. Reconnect and complete OAuth again.
 
-```text
-Use Checkly to show who I am and which accounts I can access.
-```
-
-If `whoami` is unavailable, the session does not have `checkly:account:read`.
+After the tools list refreshes, call `whoami` or ask Checkly which accounts you can access to verify the connection.
 
 ## A specific tool is missing
 
-Each tool requires a scope. For example:
+Each tool requires an OAuth permission. For example:
 
-- Check status and results require `checkly:checks:read`.
-- Test sessions require `checkly:test-sessions:read`.
-- Asset tools require `checkly:assets:read` plus the related result scope.
-- Incident write tools require `checkly:incidents:write`.
+- Check status and results require permission to list checks, their status and results.
+- Test sessions require permission to read your Checkly test sessions.
+- Asset tools require permission to read Checkly assets plus the related result permission.
+- Incident write tools require permission to create and update your Checkly incidents.
 
-See [MCP tools](/ai/mcp-server/tools) for the full scope list.
+See [MCP tools](/ai/mcp-server/tools) for the full tool list.
 
 ## The tool asks for an account
 
@@ -57,7 +55,7 @@ If you belong to multiple Checkly accounts, pass `accountId` in the tool call or
 
 Ask your client:
 
-```text
+```text title="Prompt" wrap
 Use Checkly to show the accounts I can access, then use accountId <account-id> for the next Checkly request.
 ```
 
@@ -67,7 +65,7 @@ The MCP server runs remotely and cannot access your local project files. It cann
 
 Ask for a CLI handoff instead:
 
-```text
+```text title="Prompt" wrap
 Use Checkly to prepare the local check authoring runbook for a browser check.
 ```
 
@@ -89,15 +87,4 @@ Before approving write tool calls, check:
 Some browser-based clients require CORS support and may handle OAuth differently from command-line clients. If a browser-based client cannot connect:
 
 1. Try a command-line client such as Codex or Claude Code.
-2. Test the endpoint with MCP Inspector.
-3. Confirm the client supports Streamable HTTP MCP servers with OAuth.
-
-## MCP Inspector cannot connect
-
-Use Streamable HTTP, not SSE or stdio, and enter:
-
-```text
-https://api.checklyhq.com/mcp
-```
-
-Complete OAuth in the browser window opened by Inspector, then call `whoami`.
+2. Confirm the client supports Streamable HTTP MCP servers with OAuth.

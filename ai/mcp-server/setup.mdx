@@ -13,7 +13,7 @@ Before setting up the Checkly MCP Server, ensure you have:
 - The Checkly MCP endpoint: `https://api.checklyhq.com/mcp`.
 </Accordion>
 
-The Checkly MCP Server uses OAuth. Your MCP client connects to the endpoint, opens a browser-based login flow, and receives a token scoped to the Checkly tools it can use.
+The Checkly MCP Server uses OAuth. Your MCP client connects to the endpoint, opens a browser-based login flow, and receives access to the Checkly tools it can use.
 
 ## Endpoint
 
@@ -117,30 +117,14 @@ If you belong to multiple accounts and do not provide an account, the tool retur
 
 After authentication, ask your MCP client:
 
-```text
-Use Checkly to show who I am and which accounts I can access.
+```text title="Prompt" wrap
+Use Checkly to show which accounts I can access.
 ```
 
 Then verify tool access:
 
-```text
+```text title="Prompt" wrap
 Use Checkly to list the tools available to this session.
 ```
 
-The visible tools depend on the OAuth scopes granted to your MCP session. See [Security and permissions](/ai/mcp-server/security-and-permissions) for the scope list.
-
-## Test with MCP Inspector
-
-Use MCP Inspector when you need to debug the connection outside your regular client.
-
-```bash Terminal
-npx @modelcontextprotocol/inspector
-```
-
-In the Inspector UI:
-
-1. Select Streamable HTTP.
-2. Enter `https://api.checklyhq.com/mcp`.
-3. Connect and complete the OAuth flow.
-4. Call `whoami`.
-5. Open Tools and confirm the expected tools are listed.
+The visible tools depend on the OAuth permissions granted to your MCP session. See [Security and permissions](/ai/mcp-server/security-and-permissions) for details.

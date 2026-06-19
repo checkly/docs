@@ -1,10 +1,10 @@
 ---
 title: 'MCP security and permissions'
-description: 'Understand how the Checkly MCP Server authenticates users, filters tools by scope, resolves account context, and handles write actions.'
+description: 'Understand how the Checkly MCP Server authenticates users, filters tools by permission, resolves account context, and handles write actions.'
 sidebarTitle: 'Security & permissions'
 ---
 
-The Checkly MCP Server uses OAuth and Checkly account authorization together. OAuth scopes decide which tools are visible to your MCP client. Checkly account membership, role, and feature entitlements decide whether a specific tool call can operate on an account.
+The Checkly MCP Server uses OAuth and Checkly account authorization together. OAuth permissions decide which tools are visible to your MCP client. Checkly account membership, role, and feature entitlements decide whether a specific tool call can operate on an account.
 
 ## Authentication
 
@@ -12,25 +12,25 @@ The MCP Server accepts Auth0-issued bearer tokens for `https://api.checklyhq.com
 
 Checkly maps the token subject to a Checkly user, then loads that user's account memberships and account context for tool calls.
 
-## Tool scopes
+## OAuth permissions
 
-| Scope | Allows |
+| Permission | Description |
 | --- | --- |
-| `checkly:account:read` | Account identity, entitlements, members, and local CLI handoff runbooks. |
-| `checkly:account:invite` | Account member invites. |
-| `checkly:checks:read` | Check status, check results, and performance summaries. |
-| `checkly:checks:run` | On-demand runs for existing deployed checks. |
-| `checkly:test-sessions:read` | Test sessions and test-session result summaries. |
-| `checkly:assets:read` | Result asset manifests and selected asset fetches. |
-| `checkly:rca:read` | Error groups and existing root cause analyses. |
-| `checkly:rca:run` | New root cause analysis runs. |
-| `checkly:environment-variables:read` | Account-level environment variable metadata. |
-| `checkly:environment-variables:write` | Create and update account-level variables and secrets. |
-| `checkly:status-pages:read` | Status pages, cards, and services. |
-| `checkly:incidents:read` | Status page incidents. |
-| `checkly:incidents:write` | Create, update, and resolve status page incidents. |
+| `checkly:account:read` | Read your Checkly account membership and status |
+| `checkly:account:invite` | Invite members to your Checkly account |
+| `checkly:checks:read` | List checks, their status and results |
+| `checkly:checks:run` | Trigger Checkly checks and on-demand test sessions |
+| `checkly:incidents:read` | Read your Checkly incidents |
+| `checkly:incidents:write` | Create and update your Checkly incidents |
+| `checkly:environment-variables:read` | Read your Checkly account environment variables (secret values excluded) |
+| `checkly:environment-variables:write` | Create, update and delete your Checkly account environment variables |
+| `checkly:status-pages:read` | Read your Checkly status pages |
+| `checkly:rca:read` | Read your Checkly root cause analyses |
+| `checkly:rca:run` | Run Checkly root cause analysis for your account |
+| `checkly:test-sessions:read` | Read your Checkly test sessions |
+| `checkly:assets:read` | Read your Checkly assets |
 
-Tools are filtered from `tools/list` when the MCP session does not include the required scope. Tool calls are also rejected if the session lacks the required scope.
+Tools are filtered from `tools/list` when the MCP session does not include the required permission. Tool calls are also rejected if the session lacks the required permission.
 
 ## Account resolution
 
@@ -46,7 +46,7 @@ Accounts that require mTLS are not available through the MCP Server.
 
 ## Role checks
 
-Some tools require both an OAuth scope and a Checkly account role:
+Some tools require both an OAuth permission and a Checkly account role:
 
 | Tool or action | Additional account access required |
 | --- | --- |

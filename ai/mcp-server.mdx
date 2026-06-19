@@ -1,14 +1,16 @@
 ---
 title: 'Checkly MCP Server'
 description: 'Connect MCP-compatible AI clients to Checkly to inspect checks, test sessions, RCA, result assets, status pages, incidents, and account context.'
-sidebarTitle: 'MCP Server'
+sidebarTitle: 'Overview'
 ---
 
 The Checkly MCP Server lets MCP-compatible AI clients connect to Checkly over Streamable HTTP and use Checkly tools from your conversation.
 
 Use it when your agent needs live Checkly account context, check status, check results, test sessions, root cause analyses, result assets, status pages, incidents, account environment variables, or when it needs to trigger existing checks.
 
+<Note>
 Use [Checkly Skills](/ai/skills) and the [Checkly CLI](/cli/overview) when your agent needs to create, edit, test, bundle, or deploy check code. The MCP server runs remotely and cannot access your local filesystem.
+</Note>
 
 ## What you can do
 
@@ -34,8 +36,8 @@ Before connecting an MCP client, ensure you have:
 
 Add the Checkly MCP endpoint to your client, complete the OAuth flow, then ask your client to verify the connection:
 
-```text
-Use Checkly to show who I am and which accounts I can access.
+```text title="Prompt" wrap
+Use Checkly to show which accounts I can access.
 ```
 
 If you belong to more than one Checkly account, set the account in your client configuration with the `X-Checkly-Account` header when your client supports headers, or pass `accountId` in tool calls.
@@ -46,29 +48,29 @@ See [Set up the MCP server](/ai/mcp-server/setup) for client configuration examp
 
 Basic prompts:
 
-```text
+```text title="Prompt" wrap
 Show me the current status of my Checkly checks.
 ```
 
-```text
+```text title="Prompt" wrap
 List open status page incidents.
 ```
 
-```text
+```text title="Prompt" wrap
 What features are available on my current Checkly plan?
 ```
 
 Advanced prompts:
 
-```text
+```text title="Prompt" wrap
 Investigate the latest failed result for the checkout API check. If there is an error group, check whether an RCA already exists before triggering a new one.
 ```
 
-```text
+```text title="Prompt" wrap
 Trigger the checks tagged production-smoke, then follow the test session until results are available.
 ```
 
-```text
+```text title="Prompt" wrap
 Create a major status page incident for the API outage, but do not notify subscribers until I confirm the message.
 ```
 

@@ -1,0 +1,103 @@
+---
+title: 'Troubleshoot the Checkly MCP Server'
+description: 'Resolve common Checkly MCP Server setup, authentication, account selection, and tool access issues.'
+sidebarTitle: 'Troubleshooting'
+---
+
+<Accordion title="Before you begin">
+Before troubleshooting, confirm:
+
+- Your MCP client is configured with `https://api.checklyhq.com/mcp`.
+- You completed the OAuth login flow.
+- You restarted your MCP client after editing configuration.
+- Your Checkly user has access to the account you want to use.
+</Accordion>
+
+## Authentication fails
+
+If your client reports that authentication is required or invalid:
+
+1. Re-run your client's MCP login flow.
+2. Confirm the endpoint is exactly `https://api.checklyhq.com/mcp`.
+3. Remove stale Checkly MCP credentials from the client if it keeps reusing an old token.
+4. Reconnect and call `whoami`.
+
+For Codex, run:
+
+```bash Terminal
+codex mcp login checkly
+```
+
+## No tools are listed
+
+Visible tools depend on the OAuth scopes granted to the MCP session. If no tools appear, reconnect and complete OAuth again.
+
+Use this prompt to verify identity and account access:
+
+```text
+Use Checkly to show who I am and which accounts I can access.
+```
+
+If `whoami` is unavailable, the session does not have `checkly:account:read`.
+
+## A specific tool is missing
+
+Each tool requires a scope. For example:
+
+- Check status and results require `checkly:checks:read`.
+- Test sessions require `checkly:test-sessions:read`.
+- Asset tools require `checkly:assets:read` plus the related result scope.
+- Incident write tools require `checkly:incidents:write`.
+
+See [MCP tools](/ai/mcp-server/tools) for the full scope list.
+
+## The tool asks for an account
+
+If you belong to multiple Checkly accounts, pass `accountId` in the tool call or configure the `X-Checkly-Account` header when your client supports headers.
+
+Ask your client:
+
+```text
+Use Checkly to show the accounts I can access, then use accountId <account-id> for the next Checkly request.
+```
+
+## The MCP server cannot create or deploy check code
+
+The MCP server runs remotely and cannot access your local project files. It cannot author, bundle, test, or deploy check code.
+
+Ask for a CLI handoff instead:
+
+```text
+Use Checkly to prepare the local check authoring runbook for a browser check.
+```
+
+Then run the returned Checkly CLI steps in your local project.
+
+## Write tools did more than expected
+
+Some write tools are not idempotent. Retrying a call can create another invite, another incident, or another incident update.
+
+Before approving write tool calls, check:
+
+- The target account ID.
+- The target status page or check ID.
+- Whether subscribers will be notified.
+- Whether the action consumes check-run or RCA quota.
+
+## Browser clients or web IDEs cannot connect
+
+Some browser-based clients require CORS support and may handle OAuth differently from command-line clients. If a browser-based client cannot connect:
+
+1. Try a command-line client such as Codex or Claude Code.
+2. Test the endpoint with MCP Inspector.
+3. Confirm the client supports Streamable HTTP MCP servers with OAuth.
+
+## MCP Inspector cannot connect
+
+Use Streamable HTTP, not SSE or stdio, and enter:
+
+```text
+https://api.checklyhq.com/mcp
+```
+
+Complete OAuth in the browser window opened by Inspector, then call `whoami`.

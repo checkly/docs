@@ -1,0 +1,146 @@
+---
+title: 'Set up the Checkly MCP Server'
+description: 'Configure an MCP-compatible client to connect to the Checkly MCP Server over Streamable HTTP.'
+sidebarTitle: 'Set up'
+---
+
+<Accordion title="Before you begin">
+Before setting up the Checkly MCP Server, ensure you have:
+
+- A Checkly user account.
+- Access to the Checkly account you want your MCP client to use.
+- An MCP-compatible client that supports Streamable HTTP and OAuth.
+- The Checkly MCP endpoint: `https://api.checklyhq.com/mcp`.
+</Accordion>
+
+The Checkly MCP Server uses OAuth. Your MCP client connects to the endpoint, opens a browser-based login flow, and receives a token scoped to the Checkly tools it can use.
+
+## Endpoint
+
+Use the production MCP endpoint:
+
+```text
+https://api.checklyhq.com/mcp
+```
+
+The server exposes protected-resource metadata for OAuth discovery. Most MCP clients discover this automatically when they connect to the endpoint.
+
+## Codex
+
+Add the server:
+
+```bash Terminal
+codex mcp add checkly --url https://api.checklyhq.com/mcp
+```
+
+Then log in:
+
+```bash Terminal
+codex mcp login checkly
+```
+
+Restart Codex after adding the server.
+
+## Claude Code
+
+Add the server with the HTTP transport:
+
+```bash Terminal
+claude mcp add --transport http checkly https://api.checklyhq.com/mcp
+```
+
+Start a Claude Code session and complete the OAuth flow when prompted.
+
+## Cursor
+
+Add the server to `.cursor/mcp.json` in your project, or to `~/.cursor/mcp.json` for all projects:
+
+```json mcp.json
+{
+  "mcpServers": {
+    "checkly": {
+      "url": "https://api.checklyhq.com/mcp"
+    }
+  }
+}
+```
+
+Restart Cursor after changing the configuration.
+
+## VS Code
+
+Add the server to `.vscode/mcp.json` in your workspace, or to your VS Code user profile:
+
+```json mcp.json
+{
+  "servers": {
+    "checkly": {
+      "type": "http",
+      "url": "https://api.checklyhq.com/mcp"
+    }
+  }
+}
+```
+
+Restart VS Code after changing the configuration.
+
+## Other MCP clients
+
+For clients that accept a generic `mcpServers` configuration, use:
+
+```json mcp.json
+{
+  "mcpServers": {
+    "checkly": {
+      "url": "https://api.checklyhq.com/mcp",
+      "headers": {
+        "X-Checkly-Account": "<account-id>"
+      }
+    }
+  }
+}
+```
+
+Omit `headers` if you want Checkly to resolve the account from tool arguments or your user membership.
+
+## Choose an account
+
+Most tools need an account context. Checkly resolves the account in this order:
+
+1. The `accountId` argument passed to the tool.
+2. The `X-Checkly-Account` header on the MCP connection.
+3. Your sole account, if your user belongs to exactly one account.
+
+If you belong to multiple accounts and do not provide an account, the tool returns a message with the accounts you can access.
+
+## Verify the connection
+
+After authentication, ask your MCP client:
+
+```text
+Use Checkly to show who I am and which accounts I can access.
+```
+
+Then verify tool access:
+
+```text
+Use Checkly to list the tools available to this session.
+```
+
+The visible tools depend on the OAuth scopes granted to your MCP session. See [Security and permissions](/ai/mcp-server/security-and-permissions) for the scope list.
+
+## Test with MCP Inspector
+
+Use MCP Inspector when you need to debug the connection outside your regular client.
+
+```bash Terminal
+npx @modelcontextprotocol/inspector
+```
+
+In the Inspector UI:
+
+1. Select Streamable HTTP.
+2. Enter `https://api.checklyhq.com/mcp`.
+3. Connect and complete the OAuth flow.
+4. Call `whoami`.
+5. Open Tools and confirm the expected tools are listed.

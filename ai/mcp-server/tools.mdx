@@ -1,0 +1,144 @@
+---
+title: 'Checkly MCP tools'
+description: 'Reference for the tools exposed by the Checkly MCP Server, grouped by workflow and required OAuth scope.'
+sidebarTitle: 'Tools'
+---
+
+This reference reflects the current MCP Server v1 tool surface. It is not a roadmap or a commitment to future tools.
+
+Each tool is shown only when the MCP session has the required OAuth scope. Some write tools also require a matching Checkly account role, such as Admin or Read & Write.
+
+## Account tools
+
+| Tool | Scope | Type | Description |
+| --- | --- | --- | --- |
+| `whoami` | `checkly:account:read` | Read | Return the authenticated user and account memberships visible to the MCP session. |
+| `get-account-entitlements` | `checkly:account:read` | Read | Return the resolved account plan and feature entitlement state. |
+| `list-account-members` | `checkly:account:read` | Read | List account members and pending invites. |
+| `invite-account-member` | `checkly:account:invite` | Write | Invite a user to the resolved account. Requires Owner or Admin access, sends an invite email, and is not idempotent. |
+| `prepare-local-check-authoring` | `checkly:account:read` | Read | Return an account-aware runbook for creating, testing, and deploying check code with the local Checkly CLI. |
+
+Example prompts:
+
+```text
+Use Checkly to show who I am and which accounts I can access.
+```
+
+```text
+Prepare the local Checkly CLI steps to create a browser check for checkout.
+```
+
+## Check tools
+
+| Tool | Scope | Type | Description |
+| --- | --- | --- | --- |
+| `get-check-status` | `checkly:checks:read` | Read | Return current status for checks in the account, including check type, activation state, and passing or failing state. |
+| `list-check-results` | `checkly:checks:read` | Read | List recent compact results for one check. Raw logs, traces, screenshots, videos, and download URLs are omitted. |
+| `get-check-result` | `checkly:checks:read` | Read | Return compact detail for one check result. |
+| `get-check-performance-summary` | `checkly:checks:read` | Read | Return average, P50, P95, and P99 response-time metrics for one check over a date range when data is available. |
+| `trigger-checks` | `checkly:checks:run` | Write | Run existing deployed checks on demand and record the run as a test session. Consumes check-run execution quota. |
+
+`trigger-checks` only runs checks that already exist on the account. Use `prepare-local-check-authoring` and the Checkly CLI when you need to create, test, or deploy local check code.
+
+Example prompts:
+
+```text
+Show me failing checks and summarize what changed in their latest results.
+```
+
+```text
+Trigger the checks tagged production-smoke, then poll the test session until results are available.
+```
+
+## Test session tools
+
+| Tool | Scope | Type | Description |
+| --- | --- | --- | --- |
+| `list-test-sessions` | `checkly:test-sessions:read` | Read | List recent test sessions with filters and cursor ordering. |
+| `get-test-session` | `checkly:test-sessions:read` | Read | Return one test session and compact result rows. |
+| `get-test-session-result` | `checkly:test-sessions:read` | Read | Return compact detail for one test-session result, including useful run metadata and small summaries. |
+
+Example prompt:
+
+```text
+Find the latest failed test session and show me the failed result IDs.
+```
+
+## Result asset tools
+
+| Tool | Scope | Type | Description |
+| --- | --- | --- | --- |
+| `list-check-result-assets` | `checkly:checks:read`, `checkly:assets:read` | Read | Return a normalized asset manifest for a check result. |
+| `fetch-check-result-asset` | `checkly:checks:read`, `checkly:assets:read` | Read | Fetch one selected check-result asset. Text assets may be returned inline with a byte limit; binary or large assets return a download link. |
+| `list-test-session-result-assets` | `checkly:test-sessions:read`, `checkly:assets:read` | Read | Return a normalized asset manifest for a test-session result. |
+| `fetch-test-session-result-asset` | `checkly:test-sessions:read`, `checkly:assets:read` | Read | Fetch one selected test-session-result asset. Text assets may be returned inline with a byte limit; binary or large assets return a download link. |
+
+Example prompt:
+
+```text
+For the failed check result, list available assets and fetch the text log if one exists.
+```
+
+## Root cause analysis tools
+
+| Tool | Scope | Type | Description |
+| --- | --- | --- | --- |
+| `get-error-group-root-cause-analyses` | `checkly:rca:read` | Read | Return a check or test-session error group and any existing root cause analyses. |
+| `get-root-cause-analysis` | `checkly:rca:read` | Read | Return one root cause analysis by RCA ID. Pending analyses return compact polling status. |
+| `trigger-root-cause-analysis` | `checkly:rca:run` | Write | Trigger a new RCA for a check or test-session error group. Requires run access and consumes RCA invocation quota. |
+
+Call `get-error-group-root-cause-analyses` before triggering a new RCA so your agent can reuse existing analysis when available.
+
+Example prompt:
+
+```text
+Check whether this error group already has an RCA. If it does not, ask me before triggering a new one.
+```
+
+## Environment variable tools
+
+| Tool | Scope | Type | Description |
+| --- | --- | --- | --- |
+| `list-account-environment-variables` | `checkly:environment-variables:read` | Read | List account-level variables and secrets. Secret values are returned as `null`. |
+| `get-account-environment-variable` | `checkly:environment-variables:read` | Read | Get one account-level variable by key. Secret values are returned as `null`. |
+| `create-account-environment-variable` | `checkly:environment-variables:write` | Write | Create an account-level variable or secret. Secret values are encrypted and not echoed back. |
+| `update-account-environment-variable` | `checkly:environment-variables:write` | Write | Update an account-level variable or secret by key. To update a secret, pass `secret: true`. |
+
+Example prompt:
+
+```text
+List account environment variables and tell me whether API_TOKEN is stored as a secret.
+```
+
+## Status page tools
+
+| Tool | Scope | Type | Description |
+| --- | --- | --- | --- |
+| `list-status-pages` | `checkly:status-pages:read` | Read | List status pages, including cards and services needed for incident targeting. |
+| `get-status-page` | `checkly:status-pages:read` | Read | Get one status page with cards and services. |
+
+Example prompt:
+
+```text
+List my status pages and show the service IDs for the production page.
+```
+
+## Incident tools
+
+| Tool | Scope | Type | Description |
+| --- | --- | --- | --- |
+| `list-status-page-incidents` | `checkly:incidents:read` | Read | List status page incidents, optionally filtered by page and incident status. |
+| `get-status-page-incident` | `checkly:incidents:read` | Read | Get one status page incident with services and incident updates. |
+| `create-status-page-incident` | `checkly:incidents:write`, `checkly:status-pages:read` | Write | Create a new status page incident and optionally notify subscribers. Not idempotent. |
+| `update-status-page-incident` | `checkly:incidents:write` | Write | Post a progress update to an existing incident and optionally notify subscribers. Not idempotent. |
+| `resolve-status-page-incident` | `checkly:incidents:write` | Write | Resolve an incident by posting a final resolved update and optionally notifying subscribers. Not idempotent. |
+
+Example prompts:
+
+```text
+Show open status page incidents and summarize their latest updates.
+```
+
+```text
+Draft a major status page incident for the API outage and wait for confirmation before notifying subscribers.
+```

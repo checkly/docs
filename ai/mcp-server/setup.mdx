@@ -1,6 +1,6 @@
 ---
 title: 'Set up the Checkly MCP Server'
-description: 'Configure an MCP-compatible client to connect to the Checkly MCP Server over Streamable HTTP.'
+description: 'Configure a CIMD-capable MCP client to connect to the Checkly MCP Server over Streamable HTTP.'
 sidebarTitle: 'Setup'
 ---
 
@@ -10,17 +10,25 @@ Use the production MCP endpoint in your client:
 https://api.checklyhq.com/mcp
 ```
 
+<Warning>
+The Checkly MCP Server only supports MCP clients that use OAuth Client ID Metadata Documents (CIMD). Clients that only support Dynamic Client Registration (DCR) cannot connect.
+</Warning>
+
 <Accordion title="Before you begin">
 Before setting up the Checkly MCP Server, ensure you have:
 
 - A Checkly user account.
 - Access to the Checkly account you want your MCP client to use.
-- An MCP-compatible client that supports Streamable HTTP and OAuth.
+- An MCP-compatible client that supports Streamable HTTP and OAuth Client ID Metadata Documents (CIMD).
 </Accordion>
 
 The Checkly MCP Server uses OAuth. Your MCP client connects to the endpoint, opens a browser-based login flow, and receives access to the Checkly tools it can use.
 
-The server exposes protected-resource metadata for OAuth discovery. Most MCP clients discover this automatically when they connect to the endpoint.
+The server exposes protected-resource metadata for OAuth discovery. Most compatible MCP clients discover this automatically when they connect to the endpoint.
+
+Checkly does not support Dynamic Client Registration (DCR) for the public MCP Server. If your client attempts to register dynamically during OAuth, Checkly rejects the connection.
+
+The examples below assume your client version supports CIMD. If your client only supports DCR, the OAuth flow will fail.
 
 ## Codex
 
@@ -83,7 +91,7 @@ Restart VS Code after changing the configuration.
 
 ## Other MCP clients
 
-For clients that accept a generic `mcpServers` configuration, use:
+For CIMD-capable clients that accept a generic `mcpServers` configuration, use:
 
 ```json mcp.json
 {

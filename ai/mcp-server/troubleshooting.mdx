@@ -8,6 +8,7 @@ sidebarTitle: 'Troubleshooting'
 Before troubleshooting, confirm:
 
 - Your MCP client is configured with `https://api.checklyhq.com/mcp`.
+- Your MCP client supports OAuth Client ID Metadata Documents (CIMD).
 - You completed the OAuth login flow.
 - You restarted your MCP client after editing configuration.
 - Your Checkly user has access to the account you want to use.
@@ -27,6 +28,12 @@ For Codex, run:
 ```bash Terminal
 codex mcp login checkly
 ```
+
+## OAuth registration fails
+
+The Checkly MCP Server supports OAuth Client ID Metadata Documents (CIMD). It does not support Dynamic Client Registration (DCR).
+
+If your client reports a dynamic registration error, a failed client registration, or never opens the expected OAuth flow, confirm that the client supports CIMD. Clients that only support DCR cannot connect to the public Checkly MCP Server.
 
 ## No tools are listed
 
@@ -87,4 +94,4 @@ Before approving write tool calls, check:
 Some browser-based clients require CORS support and may handle OAuth differently from command-line clients. If a browser-based client cannot connect:
 
 1. Try a command-line client such as Codex or Claude Code.
-2. Confirm the client supports Streamable HTTP MCP servers with OAuth.
+2. Confirm the client supports Streamable HTTP MCP servers with OAuth Client ID Metadata Documents (CIMD).

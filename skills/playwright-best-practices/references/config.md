@@ -29,7 +29,7 @@ export default defineConfig({
 })
 ```
 
-The `process.env.CI ? … : …` pattern tunes each option to its environment: locally you optimize for fast, focused iteration (auto-picked workers, `test.only` allowed, **no retries so you notice flakes immediately**); CI optimizes for determinism and guardrails (capped workers for repeatable ordering, `test.only` rejected, a couple of retries to absorb genuine infra hiccups). Retries are a safety net for infrastructure, not a fix for flaky tests — see [flakiness.md](./flakiness.md).
+The `process.env.CI ? … : …` pattern tunes each option to its environment: locally you optimize for fast, focused iteration (auto-picked workers, `test.only` allowed, **no retries so you notice flakes immediately**); CI optimizes for determinism and guardrails (capped workers for repeatable ordering, `test.only` rejected, a couple of retries to absorb genuine infra hiccups). Retries are a safety net for infrastructure, not a fix for flaky tests — see [flakiness.md](./flakiness.md). `fullyParallel: true` also runs tests *within* a file concurrently, which has real isolation trade-offs — also covered in [flakiness.md](./flakiness.md).
 
 ## Shared options (`use`)
 

@@ -33,7 +33,7 @@ Cross-cutting rules from Stefan's feedback — apply to every reference file:
 
 - [x] Phase 1 — `SKILL.md` scaffold (reviewed; verify loop reworked to be agent-friendly/no-GUI; version-check + scope notes added).
 - [x] Phase 2 — core references: `locators.md` ✓, `assertions.md` ✓, `waiting.md` ✓, `test-structure.md` ✓, `config.md` ✓ (split out), `auth.md` ✓.
-- [~] Phase 3 — gap-fill references: `network.md` ✓, `debugging.md` ✓ (centered on `playwright-cli`: failure primitives, agent-CLI discovery, `--debug=cli` live stepping, `init-agents` healer; corrected the bogus trace-CLI). **`flakiness.md` next.** Remaining: `ci.md`, `performance.md`.
+- [~] Phase 3 — gap-fill references: `network.md` ✓, `debugging.md` ✓ (centered on `playwright-cli`: failure primitives, agent-CLI discovery, `--debug=cli` live stepping; corrected the bogus trace-CLI), `flakiness.md` ✓ (root-cause table, retries-as-safety-net, isolation + `fullyParallel`/within-file parallelism, detecting via `--repeat-each`). **`ci.md` next.** Remaining: `performance.md`.
 - [ ] Phase 4 — `scenarios.md` + final pass.
 
 ## Design
@@ -107,7 +107,7 @@ These are decoupled from the skill: the skill writes correct guidance now; docs 
 
 ## TODOs
 
-- [ ] **Within-file parallelism / `fullyParallel`** — `config.md`'s baseline sets `fullyParallel: true`. This is important and needs a proper discussion of the trade-offs (tests within a file run concurrently → shared-state/isolation implications, worker isolation, when to opt a file out with `test.describe.configure({ mode: 'serial' })`). Cover it in `flakiness.md` (parallel isolation) and make sure `config.md`'s one-liner links there once written.
+- [x] **Within-file parallelism / `fullyParallel`** — covered in `flakiness.md` (Isolation & parallelism: within-file concurrency, worker isolation, opting out with `test.describe.configure({ mode: 'serial' })`). `config.md`'s baseline now links to `flakiness.md` for the trade-offs.
 - [x] **Sign-up funnel decision** — *Decision:* keep it light. One attribution byline in `SKILL.md` linking to checklyhq.com with `?utm_source=ai-skill`, plus the natural light-Checkly touches where they're genuinely in context. No hard sign-up CTA in the skill. (Note: the `/learn` pages themselves already end with a `SignUpCta` snippet, so the funnel lives in the docs we link to, not the skill.) Done in `SKILL.md`.
 - [x] Reference-file granularity — **~11 focused files** (splitting further where it saves tokens, e.g. `config.md`).
 - [x] `/learn` doc-gap workstream — **deferred. Skill first, docs later.**

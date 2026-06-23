@@ -1,0 +1,101 @@
+---
+title: 'Troubleshoot the Checkly MCP Server'
+description: 'Resolve common Checkly MCP Server setup, authentication, account selection, and tool access issues.'
+sidebarTitle: 'Troubleshooting'
+---
+
+<Accordion title="Before you begin">
+Before troubleshooting, confirm:
+
+- Your MCP client is configured with `https://api.checklyhq.com/mcp`.
+- Your MCP client is in the [supported clients list](/ai/mcp-server/setup#supported-clients).
+- You completed the OAuth login flow.
+- You restarted your MCP client after editing configuration.
+- Your Checkly user has access to the account you want to use.
+</Accordion>
+
+## Authentication fails
+
+If your client reports that authentication is required or invalid:
+
+1. Re-run your client's MCP login flow.
+2. Confirm the endpoint is exactly `https://api.checklyhq.com/mcp`.
+3. Remove stale Checkly MCP credentials from the client if it keeps reusing an old token.
+4. Reconnect and call `whoami`.
+
+<Warning>
+If the browser login page shows an Auth0 "Something went wrong" error, contact [Checkly Support](mailto:support@checklyhq.com). Include the MCP client you used, the Checkly account you were trying to access, and the approximate time of the error.
+</Warning>
+
+## OAuth registration fails
+
+The Checkly MCP Server only supports clients that Checkly has approved in Auth0. Supported clients use OAuth Client ID Metadata Documents (CIMD). Checkly does not support Dynamic Client Registration (DCR).
+
+If your client reports a dynamic registration error, a failed client registration, or never opens the expected OAuth flow, confirm that the client is in the [supported clients list](/ai/mcp-server/setup#supported-clients). Unsupported clients cannot connect to the public Checkly MCP Server, even if they support remote MCP servers.
+
+## No tools are listed
+
+Visible tools depend on the OAuth permissions granted to the MCP session. If no tools appear:
+
+1. Use your MCP client's refresh tools option.
+2. Restart the client if the tools list still does not update.
+3. Reconnect and complete OAuth again.
+
+After the tools list refreshes, call `whoami` or ask Checkly which accounts you can access to verify the connection.
+
+## A specific tool is missing
+
+Each tool requires an OAuth permission. For example:
+
+- Check status and results require permission to list checks, their status and results.
+- Test sessions require permission to read your Checkly test sessions.
+- Asset tools require permission to read Checkly assets plus the related result permission.
+- Incident write tools require permission to create and update your Checkly incidents.
+
+See [MCP tools](/ai/mcp-server/tools) for the full tool list.
+
+If the tool you expected is not part of the current MCP Server, [share feedback or requests](https://feedback.checklyhq.com) so we can understand the workflow your agent was trying to complete.
+
+## The tool asks for an account
+
+If you belong to multiple Checkly accounts, tell your MCP client which account to use in your prompt.
+
+Ask your client:
+
+```text title="Prompt" wrap
+Use Checkly to show the accounts I can access, then show failing checks for <account-name>.
+```
+
+To always use the same account, set the `X-Checkly-Account` header in your MCP server configuration. See [Use a specific account](/ai/mcp-server/setup#use-a-specific-account).
+
+## The MCP server cannot create or deploy check code
+
+The MCP server runs remotely and cannot access your local project files. It cannot author, bundle, test, or deploy check code.
+
+Ask for a CLI handoff instead:
+
+```text title="Prompt" wrap
+Use Checkly to prepare the local check authoring runbook for a browser check.
+```
+
+Then run the returned Checkly CLI steps in your local project.
+
+## Write tools did more than expected
+
+Some write tools are not idempotent. Retrying a call can create another invite, another incident, or another incident update.
+
+If a write tool changed more than you expected, contact [Checkly Support](mailto:support@checklyhq.com). Include the MCP client you used, the Checkly account, the tool name, and the approximate time of the action.
+
+Before approving write tool calls, check:
+
+- The target account ID.
+- The target status page or check ID.
+- Whether subscribers will be notified.
+- Whether the action consumes check-run or RCA quota.
+
+## Browser clients or web IDEs cannot connect
+
+Some browser-based clients require CORS support and may handle OAuth differently from command-line clients. If a browser-based client cannot connect:
+
+1. Confirm the client is in the [supported clients list](/ai/mcp-server/setup#supported-clients).
+2. Try another supported client, such as Claude Code.

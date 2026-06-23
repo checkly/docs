@@ -26,7 +26,7 @@ The locator must first resolve to **exactly one** element (strict mode). The act
 
 Different actions run different checks. `click` waits for all five. `fill` waits for visible, enabled, and editable. The exact list per action is in the [official actionability table](https://playwright.dev/docs/actionability#actionability).
 
-A few low-level calls — `focus`, `press`, and `dispatchEvent` — run **no checks at all**. That means they do not auto-wait: they fire immediately, even if the element is invisible, still animating, or covered by another element. So they will not retry and will not protect you from acting on an element that isn't ready. Only use them when you deliberately want to bypass the checks (for example, dispatching a synthetic event a real user couldn't trigger). For normal interactions, prefer the real action so you keep auto-waiting.
+A few low-level calls — `focus`, `press`, and `dispatchEvent` — run **no checks at all**: they fire immediately even if the element is invisible, animating, or covered, and won't retry. Use them only when you deliberately want to bypass the checks (e.g. dispatching a synthetic event a real user couldn't trigger); for normal interactions prefer the real action so you keep auto-waiting.
 
 Use `{ force: true }` only as a last resort: it skips the non-essential checks (e.g. receives-events), so a click can land on a covered or wrong element and hide a real bug.
 

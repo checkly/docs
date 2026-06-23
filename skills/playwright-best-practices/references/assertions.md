@@ -61,7 +61,7 @@ Web-first assertions retry against the **expect timeout** (default **5s**) — s
 await expect(page.getByText('Report ready')).toBeVisible({ timeout: 30_000 }) // per call
 ```
 
-Be deliberate about which knob you turn. If one step is legitimately slow, a per-assertion `timeout` keeps the rest of the suite fast and signals intent at the call site. If your whole app is just slower (a heavy staging environment, say), raising the project-wide default is the honest fix rather than peppering every assertion with overrides. Set a project-wide default in config via `expect: { timeout: 10_000 }`. For a reusable variant, build a preconfigured `expect` once and import it where needed:
+Be deliberate about which knob you turn: a per-assertion `timeout` for one genuinely slow step keeps the rest of the suite fast and signals intent at the call site; raising the project-wide default (`expect: { timeout: 10_000 }` in config) is the honest fix when the whole app is slower (a heavy staging environment), rather than peppering overrides everywhere. For a reusable variant, preconfigure `expect` once and import it:
 
 ```ts
 const slowExpect = expect.configure({ timeout: 10_000 })

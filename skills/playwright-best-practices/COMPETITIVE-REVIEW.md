@@ -24,13 +24,13 @@ We're **narrower but sharper**. Currents built an encyclopedia (73 files, ~50 to
 - [x] Extend the one-line agentic note to every applicable reference — added the missing one to `network.md` ("verify the mock fired via `playwright-cli snapshot`/`network`"). locators/auth/debugging/ci already carried it; assertions/waiting/test-structure/config intentionally stay test-code-focused per `PLAN.md`.
 - [x] Frame every human-GUI tool as "capture for a human; as an agent, do X." — audited; all mentions of `--ui`/`--debug`/`show-trace`/`show-report`/`codegen`/Inspector already carry the framing.
 
-### 2. Tighten over-written prose (~150-250 words total)
-- [ ] `assertions.md:64` — timeout-knob paragraph restates itself; cut ~40%.
-- [ ] `flakiness.md:33` — `fullyParallel` run-on; break or trim.
-- [ ] `waiting.md:29` — `focus`/`press`/`dispatchEvent` paragraph long for an edge case.
-- [ ] `network.md:87-92` — "Don't over-mock" drifts preachy/listy.
-- [ ] Remove duplicate "Stay current / version-check" note (full copies at `SKILL.md:54` and `debugging.md:58`) — pick one home.
-- [ ] Reconsider front-loading two large blockquotes in `SKILL.md` before the core rules.
+### 2. Tighten over-written prose — DONE 2026-06-23
+- [x] `assertions.md` — timeout-knob paragraph condensed (~40% shorter).
+- [x] `flakiness.md` — `fullyParallel` run-on merged into one clause.
+- [x] `waiting.md` — `focus`/`press`/`dispatchEvent` paragraph tightened.
+- [~] `network.md` "Don't over-mock" — left as-is on review: the bullets are concrete/scannable; editing would be churn for its own sake.
+- [x] Removed the version-check redundancy in `SKILL.md` (it appeared 3×): the top agent-CLI blockquote is now identity-only, the workflow note owns check+install, and the closing "Stay current" note is a one-liner pointing to `debugging.md` (the detailed home).
+- [x] Front-loaded blockquote trimmed: the agent-CLI blockquote before the core rules is now ~half its length.
 
 ### 3. Close high-frequency breadth gaps — selectively, NOT gap-for-gap (bigger lift; scope with Stefan first)
 - [ ] Add ~5-7 lean, agentic-flavored references for topics agents actually hit: visual regression/screenshots, accessibility (axe), component testing, file upload/download, iframes, mobile/device emulation.

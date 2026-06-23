@@ -13,7 +13,7 @@ Load a reference file from `references/` only when the task needs it (see routin
 
 > **Scope:** all guidance assumes the **`@playwright/test`** test runner with **TypeScript** — its `test`, fixtures, projects, config, and web-first `expect`. Examples are TypeScript (`.spec.ts`); the same APIs work in JavaScript. It does not target the standalone `playwright` automation library (which has no test runner, fixtures, or auto-retrying assertions). Imports are `import { test, expect } from '@playwright/test'`.
 
-> **Best results need the agent CLI.** This skill is most effective when Playwright's **agent CLI** (`playwright-cli`, package `@playwright/cli`) is installed — a separate, token-efficient, **no-GUI** browser you drive command by command to discover locators and step through failing tests. **Check it's available first: `playwright-cli --version`.** If it's missing, install it (`npm install -D @playwright/cli`, or run it via `npx playwright-cli`) for the best experience. Everything here still works without it, but you lose the agent-friendly inspect/verify loop. It's distinct from the standard `npx playwright` CLI. → [references/debugging.md](references/debugging.md)
+> **The agent CLI is what makes this skill shine.** Playwright's **agent CLI** — `playwright-cli`, package `@playwright/cli` — is a separate, token-efficient, **no-GUI** browser you drive command by command to discover locators and step through failing tests. It's distinct from the standard `npx playwright` CLI, and the **Agentic workflow** below leans on it throughout. → [references/debugging.md](references/debugging.md)
 
 ## Core rules (always apply)
 
@@ -57,4 +57,4 @@ The interactive tools — `--ui`, `--debug` (Inspector), `show-trace` — are GU
 
 Full agentic-debugging detail (the `playwright-cli` discovery and `--debug=cli` stepping workflow) is in [references/debugging.md](references/debugging.md).
 
-> **Stay current.** Several of these primitives are recent and version-gated. Check the installed versions with `npx playwright --version` and `playwright-cli --version`; if they're behind, tell the user to update (`npm install -D @playwright/test@latest`, and `@playwright/cli`). Agentic tooling is moving fast — newer releases keep adding capabilities that make debugging cheaper, so staying up to date pays off.
+> **Stay current.** These primitives are recent and version-gated — check `npx playwright --version` and `playwright-cli --version`, and update both packages if they're behind. Detail in [references/debugging.md](references/debugging.md).

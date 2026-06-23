@@ -33,7 +33,7 @@ Cross-cutting rules from Stefan's feedback — apply to every reference file:
 
 - [x] Phase 1 — `SKILL.md` scaffold (reviewed; verify loop reworked to be agent-friendly/no-GUI; version-check + scope notes added).
 - [x] Phase 2 — core references: `locators.md` ✓, `assertions.md` ✓, `waiting.md` ✓, `test-structure.md` ✓, `config.md` ✓ (split out), `auth.md` ✓.
-- [~] Phase 3 — gap-fill references: `network.md` ✓ (route mocking, HAR record/replay, `request`/APIRequestContext, don't-over-mock). **`debugging.md` next.** Remaining: `flakiness.md`, `ci.md`, `performance.md`.
+- [~] Phase 3 — gap-fill references: `network.md` ✓, `debugging.md` ✓ (centered on `playwright-cli`: failure primitives, agent-CLI discovery, `--debug=cli` live stepping, `init-agents` healer; corrected the bogus trace-CLI). **`flakiness.md` next.** Remaining: `ci.md`, `performance.md`.
 - [ ] Phase 4 — `scenarios.md` + final pass.
 
 ## Design
@@ -72,13 +72,16 @@ Researched against Playwright release notes/docs (the `/learn` debugging pages p
 
 - **stdout reporter + call log** — the failing assertion and what Playwright saw print to stdout. Primary signal. (always available)
 - **`error-context.md`** *(≥ 1.60)* — on an `expect` failure Playwright writes an aria-snapshot of the page at failure time to `test-results/.../error-context.md`. Machine-readable page state, no GUI. `testInfo.errorContext`. Highest-value agent primitive.
-- **CLI trace analysis** *(≥ 1.59)* — explore a trace without a GUI: `npx playwright trace open <trace.zip>` → `trace actions --grep=...` → `trace action <n>` → `trace snapshot <n> --name after` → `trace close`. Zero extra setup. **In SKILL verify loop.**
-- **`npx playwright test --debug=cli`** *(≥ 1.59)* — non-interactive stepping. Prints attach id → `playwright-cli attach <id>` → `playwright-cli --session=<id> step-over`; read snapshot/URL/title. Requires `npm install -g @playwright/cli@latest`. **Lives in `references/debugging.md`, not the core loop** (extra global install).
-- **artifacts not GUIs** — `--trace on --screenshot only-on-failure` produce `trace.zip` + screenshots in `test-results/`. (Avoid GUI `show-trace`, `--ui`, Inspector `--debug`.)
-- **Version check** — agent runs `npx playwright --version`; if outdated, tell the user to update (`npm install -D @playwright/test@latest`). These primitives are version-gated and the tooling moves fast. **In SKILL verify loop.**
-- **`npx playwright init-agents`** *(≥ 1.56)* — installs planner/generator/**healer** agent definitions; **supports Claude Code**. Healer auto-repairs failing tests. Mention as higher-level workflow.
+- **❌ CORRECTED — there is no `npx playwright trace open/actions/snapshot/close` CLI.** Earlier research wrongly listed a no-GUI trace-reader subcommand. **Verified false** against the official CLI reference *and* by running `npx playwright` on the local install (1.54.2): the only trace command is `show-trace`, which is a **GUI**. This bogus flow had shipped in the SKILL verify loop (step 4) and is now replaced by the `--debug=cli` + `playwright-cli` live flow below.
+- **The agent CLI: `playwright-cli`** (package `@playwright/cli`) — a **separate tool** from `npx playwright`, daemon-backed, ref-based (snapshots return element refs like `e15`), token-efficient (doesn't dump the DOM into context). Install local (`npm install -D @playwright/cli`) or run via `npx playwright-cli` — **do not advise global `-g`** (Stefan). This is the centerpiece of the skill's agentic value. Discovery flow: `open` → `snapshot` → act on refs → `generate-locator <ref>`. Ships its own skill via `playwright-cli install --skills`. Docs: playwright.dev/agent-cli/introduction.
+- **`npx playwright test --debug=cli`** *(≥ 1.59)* — non-interactive stepping. Prints a session name → `playwright-cli attach <session-name>` → `snapshot` / `step-over` / `console error` / `network` / `eval` / `pause-at <file>:<line>` / `resume`. **Now in the SKILL verify loop** (step 4).
+- **artifacts not GUIs** — `--trace on --screenshot only-on-failure` produce `trace.zip` + screenshots in `test-results/`. The Trace Viewer (`show-trace`, trace.playwright.dev) is a GUI — capture for a human, but as an agent prefer `error-context.md` + the live `--debug=cli` session.
+- **Version check** — agent runs `npx playwright --version` and `playwright-cli --version`; if outdated, tell the user to update `@playwright/test` and `@playwright/cli`. Version-gated; tooling moves fast. **In SKILL verify loop.**
+- **`npx playwright init-agents`** *(≥ 1.56)* — **DEFERRED from the skill for now (Stefan).** `--loop=claude|vscode|codex|opencode` installs planner/generator/**healer** agent definitions into `.claude/agents/`; **supports Claude Code**. Healer replays failing steps, relocates elements, patches, re-runs until green (or skips). Research kept here; revisit later as a higher-level workflow.
 
-Sources: playwright.dev/docs/release-notes, /docs/test-agents, /docs/getting-started-cli, /docs/aria-snapshots.
+Sources: playwright.dev/agent-cli/introduction, /agent-cli/commands/test-debugging, /docs/test-agents, /docs/test-cli, /docs/release-notes, /docs/aria-snapshots, microsoft/playwright-cli repo skill.
+
+**Cross-cutting refocus (Stefan, this session):** the skill's agentic value *is* `playwright-cli`. Added a "best results need the agent CLI" capability check to `SKILL.md` (run `playwright-cli --version`, install if missing — local, not global). Wove the CLI into `locators.md` (discover via `snapshot`/`generate-locator`) and centered `debugging.md` on it. Other references (assertions/waiting/test-structure/config) stay test-code-focused — CLI doesn't belong there.
 | `references/flakiness.md` | root causes, **retries**, anti-patterns catalog, parallel isolation, **detecting flaky tests** (`--repeat-each=100`), **`fullyParallel` + within-file parallelism (see TODO)** | testing-in-parallel, waits, assertions | **retries, anti-patterns catalog** |
 | `references/ci.md` | running in CI, **sharding, reporters, GitHub Actions**; light Checkly (run as monitors) | testing-in-parallel | **CI guide (mostly new)** |
 | `references/performance.md` | Web Vitals via Playwright, CDP throttling, Lighthouse | performance | — |

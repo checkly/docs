@@ -24,6 +24,10 @@ CSS/XPath tie the test to markup. A class rename (`button-frontpage` → `button
 
 If `getByRole`/`getByLabel` *can't* find your elements, that's often an accessibility smell worth fixing in the app — not a reason to drop to CSS.
 
+## Discover locators with the agent CLI
+
+Don't guess selectors from source — read them off the live page. Drive the [`playwright-cli` agent CLI](./debugging.md): `playwright-cli open <url>`, then `playwright-cli snapshot` to print the accessibility tree (the roles and names that power `getByRole`/`getByLabel`), and `playwright-cli generate-locator <ref>` to turn an element into a user-facing locator you can paste in. Because it reads the real accessibility tree, it naturally yields priority-ladder locators. (`npx playwright codegen` does the same but only through a GUI you can't drive as an agent.)
+
 ## Strict mode & narrowing
 
 Locators run in strict mode: matching >1 element throws. Resolve by narrowing, not by silencing.

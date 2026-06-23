@@ -39,9 +39,15 @@ Load a reference file from `references/` only when the task needs it (see routin
 | Flaky tests, retries, parallelism, anti-patterns | [references/flakiness.md](references/flakiness.md) |
 | Running in CI, sharding, reporters, GitHub Actions | [references/ci.md](references/ci.md) |
 
-## Verify loop (agent-friendly — no GUI)
+## Agentic workflow (no GUI)
 
-`--ui`, `--debug` (Inspector) and `show-trace` are interactive GUIs you can't drive. Use the non-interactive signals instead:
+The interactive tools — `--ui`, `--debug` (Inspector), `show-trace` — are GUIs you can't drive. Author and debug through the non-interactive signals instead.
+
+> **Having `playwright-cli` available is highly encouraged** — both phases below lean on it. Confirm with `playwright-cli --version` and install it if missing (`npm install -D @playwright/cli`). Everything still works without it, but you lose the inspect/verify loop and fall back to guessing.
+
+**Author — discover, don't guess.** Read locators off the live page rather than from source: `playwright-cli open <url>` → `playwright-cli snapshot` (accessibility tree + element refs) → `playwright-cli generate-locator <ref>` hands back a user-facing locator to paste into the spec. → [references/locators.md](references/locators.md)
+
+**Run & debug:**
 
 1. **Run and read stdout:** `npx playwright test path/to/file.spec.ts`. The reporter prints the failing assertion and the **call log** — which locator/assertion timed out and what Playwright actually saw. Read it; don't guess.
 2. **Read `error-context.md`:** on an `expect` failure Playwright writes an aria-snapshot of the page *at the moment it failed* to the test's `test-results/.../error-context.md`. This is machine-readable page state — open it to see what was actually rendered. *(Playwright ≥ 1.60)*

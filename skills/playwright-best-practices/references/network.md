@@ -13,6 +13,8 @@ page.on('response', res => console.log('←', res.status(), res.url()))
 
 Prefer waiting on the **UI change** a request causes — a web-first assertion on the element that updates is the most reliable signal. Reach for `page.waitForResponse` only when there's no visible change to assert on (e.g. a background fetch or fire-and-forget call). Never a hard wait. See [waiting.md](./waiting.md).
 
+**As an agent**, skip wiring up listeners: drive the flow with [`playwright-cli`](./debugging.md) and run `playwright-cli network` to watch requests and responses live. After adding a `route` mock, `playwright-cli snapshot` confirms the stubbed response actually produced the expected UI — verify the mock fired, don't assume it did.
+
 ## Mock with `page.route`
 
 `page.route(urlPattern, handler)` intercepts matching requests before they leave the browser. The handler decides what happens. Glob patterns like `*/**/api/books/*` match regardless of host/port.

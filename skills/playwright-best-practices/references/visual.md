@@ -14,6 +14,24 @@ await expect(page.getByRole('article')).toHaveScreenshot('card.png')   // one el
 
 Prefer it over the older `toMatchSnapshot` for anything rendered — `toMatchSnapshot` is for arbitrary buffers or text (a downloaded file, a JSON blob), not pages.
 
+## Structure over pixels — `toMatchAriaSnapshot`
+
+Pixel screenshots are powerful but brittle: any restyle diffs them, and baselines are platform-bound (below). When you care about **structure and content** — the right headings, items, and controls, in the right order — assert the accessibility tree instead. It's auto-retrying like any web-first matcher, stable across platforms, and produces a readable diff:
+
+```ts
+await expect(page.getByRole('main')).toMatchAriaSnapshot(`
+  - heading "Checkout" [level=1]
+  - list:
+    - listitem: "Coffee — €4.00"
+    - listitem: "Tea — €3.50"
+  - button "Pay"
+`)
+```
+
+Store the expected tree in a file with the `{ name }` form and regenerate it with `--update-snapshots`, the same workflow as screenshots — but without the platform-specific baseline problem.
+
+**Agent tie-in:** this YAML *is* the accessibility tree that `playwright-cli snapshot` prints and that Playwright writes to `error-context.md` on failure ([debugging.md](./debugging.md)) — capture it from a driven session and paste it straight in as the expected value.
+
 ## Baselines are platform-specific — generate them where CI runs
 
 Browsers render differently across operating systems (fonts, anti-aliasing), so Playwright suffixes each baseline per platform — `card-chromium-darwin.png`. A baseline captured on your Mac will **always** diff against a Linux CI runner. Generate and commit baselines on the same platform CI uses: run the update inside the [Playwright Docker image](https://playwright.dev/docs/docker) or in the CI job itself. This is the #1 cause of "passes locally, fails in CI" for visual tests.

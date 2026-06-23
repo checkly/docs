@@ -39,8 +39,23 @@ Tools are filtered from `tools/list` when the MCP session does not include the r
 Most tools operate on one Checkly account. Checkly resolves the account in this order:
 
 1. `accountId` in the tool arguments.
-2. `X-Checkly-Account` on the MCP connection.
+2. `X-Checkly-Account` on the MCP connection, if your client supports custom headers.
 3. Your sole account, if your user belongs to exactly one account.
+
+Most clients configure headers in the MCP server entry. For example:
+
+```json mcp.json
+{
+  "mcpServers": {
+    "checkly": {
+      "url": "https://api.checklyhq.com/mcp",
+      "headers": {
+        "X-Checkly-Account": "<account-id>"
+      }
+    }
+  }
+}
+```
 
 If you belong to multiple accounts and no account can be resolved, the tool returns a message with the accounts available to your session.
 

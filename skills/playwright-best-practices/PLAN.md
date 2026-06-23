@@ -32,7 +32,7 @@ Cross-cutting rules from Stefan's feedback — apply to every reference file:
 ## Progress
 
 - [x] Phase 1 — `SKILL.md` scaffold (reviewed; verify loop reworked to be agent-friendly/no-GUI; version-check + scope notes added).
-- [~] Phase 2 — core references: `locators.md` ✓, `assertions.md` ✓, `waiting.md` ✓, `test-structure.md` ✓, `config.md` ✓ (split out). **`auth.md` next.**
+- [x] Phase 2 — core references: `locators.md` ✓, `assertions.md` ✓, `waiting.md` ✓, `test-structure.md` ✓, `config.md` ✓ (split out), `auth.md` ✓.
 - [ ] Phase 3 — gap-fill references: `network.md`, `debugging.md`, `flakiness.md`, `ci.md`, `performance.md`.
 - [ ] Phase 4 — `scenarios.md` + final pass.
 
@@ -62,7 +62,7 @@ Proposed set (~11 files). Each is condensed rules-as-data + links out.
 | `references/waiting.md` | auto-waiting, actionability, explicit waits, anti hard-wait | waits-and-timeouts, navigation | — |
 | `references/test-structure.md` | test design, fixtures (+scope), POM, steps/decorators | test-fixtures, steps-decorators, writing-tests | **POM** |
 | `references/config.md` | `playwright.config.ts`, projects, baseURL, devices, setup dependencies, parameterization | parameterize | **config & projects guide** (split out of test-structure for token savings) |
-| `references/auth.md` | storageState + setup project, env creds, TOTP, SSO, API login, conditional auth | authentication, bypass-totp, login-*, signup | conditional/skip-if-logged-in |
+| `references/auth.md` | storageState + setup project, env creds, TOTP, SSO, API login, multiple roles; agent bootstrap via `playwright-cli` (not codegen GUI) | authentication, bypass-totp, login-*, signup | API login as setup, `playwright-cli` discovery |
 | `references/network.md` | route mocking (partial/full), interception, **HAR**, request context, API testing | mock-api, intercept-requests, testing-apis | **HAR record/replay** |
 | `references/debugging.md` | **agent-friendly debugging (no GUI)**, codegen, modernized error catalog | debugging, debugging-errors, error-*, codegen | **agentic primitives below**; fix outdated `waitForSelector` advice |
 

@@ -1,6 +1,6 @@
 ---
 name: playwright-best-practices
-description: Best practices for writing, structuring, debugging, and stabilizing Playwright tests in TypeScript/JavaScript. Use when authoring or reviewing Playwright tests, choosing locators, writing assertions, fixing flaky tests, handling authentication, mocking network/API requests, structuring projects and fixtures, or running Playwright in CI.
+description: Best practices for writing, structuring, debugging, and stabilizing Playwright tests in TypeScript/JavaScript. Use when authoring or reviewing Playwright tests: choosing locators, writing web-first assertions, fixing flaky tests, handling authentication (SSO/2FA), mocking network/API requests, structuring projects and fixtures, generating test data, building forms and validation, uploading or downloading files, testing iframes, multiple tabs/popups or multi-user flows, mobile and device emulation, mocking time and dates, visual regression and screenshots, tagging and annotating tests, catching console errors, testing error/offline/loading states, configuring global setup, or running Playwright in CI.
 metadata:
   author: checkly
 ---
@@ -38,6 +38,18 @@ Load a reference file from `references/` only when the task needs it (see routin
 | Debugging failures, `playwright-cli`, `--debug=cli`, traces, common errors | [references/debugging.md](references/debugging.md) |
 | Flaky tests, retries, parallelism, anti-patterns | [references/flakiness.md](references/flakiness.md) |
 | Running in CI, sharding, reporters, GitHub Actions | [references/ci.md](references/ci.md) |
+| Test data, factories, unique data, seeding/cleanup | [references/test-data.md](references/test-data.md) |
+| Forms, inputs, validation, error messages | [references/forms.md](references/forms.md) |
+| File upload & download | [references/files.md](references/files.md) |
+| iframes, frames, `frameLocator` | [references/iframes.md](references/iframes.md) |
+| Multiple tabs, popups, multiple users/contexts | [references/multi-context.md](references/multi-context.md) |
+| Mobile, device emulation, touch, viewport/breakpoints | [references/mobile.md](references/mobile.md) |
+| Time/date, clock mocking, countdowns, timeouts | [references/clock.md](references/clock.md) |
+| Visual regression, screenshots, `toHaveScreenshot`, aria snapshots | [references/visual.md](references/visual.md) |
+| Tags (`@smoke`), `--grep`, `skip`/`fixme`/`slow` annotations | [references/tags-annotations.md](references/tags-annotations.md) |
+| Failing tests on `console`/`pageerror` | [references/console-errors.md](references/console-errors.md) |
+| `globalSetup`/`globalTeardown`, setup projects | [references/global-setup.md](references/global-setup.md) |
+| Error, offline, network-failure, loading states | [references/error-states.md](references/error-states.md) |
 
 ## Agentic workflow (no GUI)
 

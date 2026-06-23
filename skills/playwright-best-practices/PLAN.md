@@ -33,7 +33,7 @@ Cross-cutting rules from Stefan's feedback — apply to every reference file:
 
 - [x] Phase 1 — `SKILL.md` scaffold (reviewed; verify loop reworked to be agent-friendly/no-GUI; version-check + scope notes added).
 - [x] Phase 2 — core references: `locators.md` ✓, `assertions.md` ✓, `waiting.md` ✓, `test-structure.md` ✓, `config.md` ✓ (split out), `auth.md` ✓.
-- [~] Phase 3 — gap-fill references: `network.md` ✓, `debugging.md` ✓ (centered on `playwright-cli`: failure primitives, agent-CLI discovery, `--debug=cli` live stepping; corrected the bogus trace-CLI), `flakiness.md` ✓ (root-cause table, retries-as-safety-net, isolation + `fullyParallel`/within-file parallelism, detecting via `--repeat-each`). **`ci.md` next.** Remaining: `performance.md`.
+- [~] Phase 3 — gap-fill references: `network.md` ✓, `debugging.md` ✓ (centered on `playwright-cli`: failure primitives, agent-CLI discovery, `--debug=cli` live stepping; corrected the bogus trace-CLI), `flakiness.md` ✓ (root-cause table, retries-as-safety-net, isolation + `fullyParallel`/within-file parallelism, detecting via `--repeat-each`), `ci.md` ✓ (GitHub Actions workflow, reporters, sharding + blob/merge-reports, artifact capture, tests-as-monitors). **`performance.md` next** — last Phase 3 file.
 - [ ] Phase 4 — `scenarios.md` + final pass.
 
 ## Design

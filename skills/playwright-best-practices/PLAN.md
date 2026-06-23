@@ -100,7 +100,7 @@ Rationale: the "best practice" weight goes into the first 10 files; `scenarios.m
 
 Goal: out-cover currents.dev on the topics agents actually hit, **without** going gap-for-gap (no clone). Granular files — one topic each — for progressive disclosure. Build one file at a time; Stefan reviews each before the next.
 
-New reference files (10 → 24):
+New reference files (10 → 23):
 
 **Thin-spot fills (4):**
 - `test-data.md` — factories, per-worker unique data, seed + cleanup via API
@@ -109,9 +109,9 @@ New reference files (10 → 24):
 - `global-setup.md` — `globalSetup`/`globalTeardown` vs setup projects
 
 **Tier 1 (4):** `visual.md`, `files.md`, `iframes.md`, `mobile.md`
-**Tier 2 (6):** `clock.md`, `multi-context.md`, `drag-drop.md`, `forms.md`, `error-states.md`, `graphql.md`
+**Tier 2 (5):** `clock.md`, `multi-context.md`, `forms.md`, `error-states.md`, `graphql.md`
 
-Dropped from Tier 1 (Stefan): accessibility, component testing.
+Dropped from Tier 1 (Stefan): accessibility, component testing. Dropped from Tier 2 (Stefan, 2026-06-23): `drag-drop.md`.
 
 **Deliberately skipped (Tier 3 — scope decision, NOT an oversight):** framework-specific (React/Vue/Angular/Next — contradicts the framework-agnostic scope), Electron, browser extensions, canvas/WebGL, service workers/PWA, WebSockets, i18n, security (XSS/CSRF), performance/Lighthouse (already dropped), multi-user real-time collaboration, third-party payment/email mocking, Docker, GitLab/other CI providers, test-coverage.
 

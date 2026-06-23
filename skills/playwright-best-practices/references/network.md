@@ -90,7 +90,7 @@ Mocking isolates the frontend and stabilizes dynamic data, but every mocked call
 - Mock `/checkout` and you'll miss a broken payment flow.
 - Stub third-parties and a tracking script that breaks layout slips through.
 
-Mock to isolate a component or fix a value for a deterministic assertion; keep the path under test real. The same tests then run unchanged as [Checkly monitors](https://www.checklyhq.com/?utm_source=ai-skill) against production.
+Mock to isolate a component or fix a value for a deterministic assertion; keep the path under test real.
 
 ## Deeper in the docs
 

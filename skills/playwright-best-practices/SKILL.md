@@ -35,10 +35,9 @@ Load a reference file from `references/` only when the task needs it (see routin
 | `playwright.config.ts`, projects, baseURL, devices, setup dependencies | [references/config.md](references/config.md) |
 | Login, 2FA/TOTP, SSO, sessions, `storageState` | [references/auth.md](references/auth.md) |
 | Mocking, intercepting, `route`, HAR, API testing | [references/network.md](references/network.md) |
-| Debugging, trace viewer, UI mode, `--debug`, codegen, common errors | [references/debugging.md](references/debugging.md) |
+| Debugging failures, `playwright-cli`, `--debug=cli`, traces, common errors | [references/debugging.md](references/debugging.md) |
 | Flaky tests, retries, parallelism, anti-patterns | [references/flakiness.md](references/flakiness.md) |
 | Running in CI, sharding, reporters, GitHub Actions | [references/ci.md](references/ci.md) |
-| Downloads, uploads, iframes, tabs, PDFs, screenshots, mobile, scraping, checkout | [references/scenarios.md](references/scenarios.md) |
 
 ## Verify loop (agent-friendly — no GUI)
 

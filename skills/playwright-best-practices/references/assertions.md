@@ -14,7 +14,7 @@ await expect(page.getByRole('button', { name: 'Pay' })).toBeEnabled()
 
 Common matchers: `toBeVisible`, `toBeHidden`, `toBeAttached`, `toBeEnabled`, `toBeDisabled`, `toBeEditable`, `toBeChecked`, `toBeFocused`, `toBeInViewport`, `toHaveText`, `toContainText`, `toHaveValue`, `toHaveValues`, `toHaveCount`, `toHaveAttribute`, `toHaveClass`, `toHaveURL`, `toHaveTitle`. Accessibility-focused matchers exist too — `toHaveRole`, `toHaveAccessibleName`, `toHaveAccessibleDescription` — and `toBeOK` checks a response. All support `.not`, and negation auto-retries too.
 
-Visual/structure assertions — `toHaveScreenshot` (pixel) and `toMatchAriaSnapshot` (accessibility-tree YAML) — are also auto-retrying. See [scenarios.md](./scenarios.md).
+Visual/structure assertions — `toHaveScreenshot` (pixel) and `toMatchAriaSnapshot` (accessibility-tree YAML) — are also auto-retrying.
 
 This is a curated set, not the full list. For every matcher (including `toHaveCSS`, `toHaveJSProperty`, `toContainClass`, `toHaveId`, and more) see the [Playwright assertions reference](https://playwright.dev/docs/test-assertions).
 

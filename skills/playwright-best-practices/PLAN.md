@@ -33,7 +33,7 @@ Cross-cutting rules from Stefan's feedback — apply to every reference file:
 
 - [x] Phase 1 — `SKILL.md` scaffold (reviewed; verify loop reworked to be agent-friendly/no-GUI; version-check + scope notes added).
 - [x] Phase 2 — core references: `locators.md` ✓, `assertions.md` ✓, `waiting.md` ✓, `test-structure.md` ✓, `config.md` ✓ (split out), `auth.md` ✓.
-- [ ] Phase 3 — gap-fill references: `network.md`, `debugging.md`, `flakiness.md`, `ci.md`, `performance.md`.
+- [~] Phase 3 — gap-fill references: `network.md` ✓ (route mocking, HAR record/replay, `request`/APIRequestContext, don't-over-mock). **`debugging.md` next.** Remaining: `flakiness.md`, `ci.md`, `performance.md`.
 - [ ] Phase 4 — `scenarios.md` + final pass.
 
 ## Design

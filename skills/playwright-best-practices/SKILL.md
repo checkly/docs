@@ -1,6 +1,6 @@
 ---
 name: playwright-best-practices
-description: Best practices for writing, structuring, debugging, and stabilizing Playwright tests in TypeScript/JavaScript. Use when authoring or reviewing Playwright tests, choosing locators, writing assertions, fixing flaky tests, handling authentication, mocking network/API requests, structuring projects and fixtures, measuring performance, or running Playwright in CI.
+description: Best practices for writing, structuring, debugging, and stabilizing Playwright tests in TypeScript/JavaScript. Use when authoring or reviewing Playwright tests, choosing locators, writing assertions, fixing flaky tests, handling authentication, mocking network/API requests, structuring projects and fixtures, or running Playwright in CI.
 metadata:
   author: checkly
 ---
@@ -38,7 +38,6 @@ Load a reference file from `references/` only when the task needs it (see routin
 | Debugging, trace viewer, UI mode, `--debug`, codegen, common errors | [references/debugging.md](references/debugging.md) |
 | Flaky tests, retries, parallelism, anti-patterns | [references/flakiness.md](references/flakiness.md) |
 | Running in CI, sharding, reporters, GitHub Actions | [references/ci.md](references/ci.md) |
-| Web Vitals, page performance, throttling | [references/performance.md](references/performance.md) |
 | Downloads, uploads, iframes, tabs, PDFs, screenshots, mobile, scraping, checkout | [references/scenarios.md](references/scenarios.md) |
 
 ## Verify loop (agent-friendly — no GUI)

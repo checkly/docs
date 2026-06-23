@@ -33,7 +33,7 @@ Cross-cutting rules from Stefan's feedback — apply to every reference file:
 
 - [x] Phase 1 — `SKILL.md` scaffold (reviewed; verify loop reworked to be agent-friendly/no-GUI; version-check + scope notes added).
 - [x] Phase 2 — core references: `locators.md` ✓, `assertions.md` ✓, `waiting.md` ✓, `test-structure.md` ✓, `config.md` ✓ (split out), `auth.md` ✓.
-- [~] Phase 3 — gap-fill references: `network.md` ✓, `debugging.md` ✓ (centered on `playwright-cli`: failure primitives, agent-CLI discovery, `--debug=cli` live stepping; corrected the bogus trace-CLI), `flakiness.md` ✓ (root-cause table, retries-as-safety-net, isolation + `fullyParallel`/within-file parallelism, detecting via `--repeat-each`), `ci.md` ✓ (GitHub Actions workflow, reporters, sharding + blob/merge-reports, artifact capture, tests-as-monitors). **`performance.md` next** — last Phase 3 file.
+- [~] Phase 3 — gap-fill references: `network.md` ✓, `debugging.md` ✓ (centered on `playwright-cli`: failure primitives, agent-CLI discovery, `--debug=cli` live stepping; corrected the bogus trace-CLI), `flakiness.md` ✓ (root-cause table, retries-as-safety-net, isolation + `fullyParallel`/within-file parallelism, detecting via `--repeat-each`), `ci.md` ✓ (GitHub Actions workflow, reporters, sharding + blob/merge-reports, artifact capture, tests-as-monitors). `performance.md` **dropped (Stefan — not needed).** Phase 3 complete.
 - [ ] Phase 4 — `scenarios.md` + final pass.
 
 ## Design
@@ -84,7 +84,7 @@ Sources: playwright.dev/agent-cli/introduction, /agent-cli/commands/test-debuggi
 **Cross-cutting refocus (Stefan, this session):** the skill's agentic value *is* `playwright-cli`. Added a "best results need the agent CLI" capability check to `SKILL.md` (run `playwright-cli --version`, install if missing — local, not global). Wove the CLI into `locators.md` (discover via `snapshot`/`generate-locator`) and centered `debugging.md` on it. Other references (assertions/waiting/test-structure/config) stay test-code-focused — CLI doesn't belong there.
 | `references/flakiness.md` | root causes, **retries**, anti-patterns catalog, parallel isolation, **detecting flaky tests** (`--repeat-each=100`), **`fullyParallel` + within-file parallelism (see TODO)** | testing-in-parallel, waits, assertions | **retries, anti-patterns catalog** |
 | `references/ci.md` | running in CI, **sharding, reporters, GitHub Actions**; light Checkly (run as monitors) | testing-in-parallel | **CI guide (mostly new)** |
-| `references/performance.md` | Web Vitals via Playwright, CDP throttling, Lighthouse | performance | — |
+| ~~`references/performance.md`~~ | **dropped (Stefan — not needed)** | performance | — |
 | `references/scenarios.md` | pointer hub: downloads, uploads, iframes, multitab, PDFs, screenshots, mobile, checkout, scraping, broken-links | many | mostly links out (recipes, not "best practices") |
 
 Rationale: the "best practice" weight goes into the first 10 files; `scenarios.md` stays a thin router to `/learn` recipes so we don't bloat tokens with one-off how-tos.
@@ -117,7 +117,7 @@ These are decoupled from the skill: the skill writes correct guidance now; docs 
 
 1. **Scaffold** — create `skills/playwright-best-practices/SKILL.md` (frontmatter + core rules + routing table + verify loop). Review with Stefan.
 2. **Core references** — write `locators`, `assertions`, `waiting`, `test-structure`, `auth` (the highest-value, best-covered topics). Review.
-3. **Gap-fill references** — `network`, `debugging`, `flakiness`, `ci`, `performance` (these carry the most original content). Review.
+3. **Gap-fill references** — `network`, `debugging`, `flakiness`, `ci` (these carry the most original content; `performance` dropped). Review.
 4. **Scenarios router** — `scenarios.md` linking out to `/learn`.
 5. **Final pass** — token budget, link validity, light-Checkly tone.
 6. **(Optional) docs gap fixes** in `/learn/playwright`.

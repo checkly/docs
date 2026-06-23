@@ -32,10 +32,12 @@ We're **narrower but sharper**. Currents built an encyclopedia (73 files, ~50 to
 - [x] Removed the version-check redundancy in `SKILL.md` (it appeared 3×): the top agent-CLI blockquote is now identity-only, the workflow note owns check+install, and the closing "Stay current" note is a one-liner pointing to `debugging.md` (the detailed home).
 - [x] Front-loaded blockquote trimmed: the agent-CLI blockquote before the core rules is now ~half its length.
 
-### 3. Close high-frequency breadth gaps — selectively, NOT gap-for-gap (bigger lift; scope with Stefan first)
-- [ ] Add ~5-7 lean, agentic-flavored references for topics agents actually hit: visual regression/screenshots, accessibility (axe), component testing, file upload/download, iframes, mobile/device emulation.
-- [ ] Alternative: revive the dropped `scenarios.md` as an agentic recipe hub (not a link dump).
-- [ ] Do NOT replicate all ~50 currents files — that's bloat and copycat.
+### 3. Close high-frequency breadth gaps — LOCKED 2026-06-23 (granular: one topic per file; see PLAN.md Phase 5)
+Build one at a time, Stefan reviews each. 10 → 24 references.
+- Thin-spot fills: [ ] `test-data.md`  [ ] `tags-annotations.md`  [ ] `console-errors.md`  [ ] `global-setup.md`
+- Tier 1: [ ] `visual.md`  [ ] `files.md`  [ ] `iframes.md`  [ ] `mobile.md`  (dropped: accessibility, component testing)
+- Tier 2: [ ] `clock.md`  [ ] `multi-context.md`  [ ] `drag-drop.md`  [ ] `forms.md`  [ ] `error-states.md`  [ ] `graphql.md`
+- [x] Tier 3 skipped as a deliberate scope decision (documented in PLAN.md), NOT gap-for-gap.
 
 ### 4. Widen description keyword surface for triggering
 - [ ] Expand `description` with activity keywords for the new breadth topics so the skill triggers on them.

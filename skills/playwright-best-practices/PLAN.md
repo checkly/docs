@@ -96,6 +96,27 @@ Rationale: the "best practice" weight goes into the first 10 files; `scenarios.m
 - CI: "the same tests can run as scheduled monitors."
 - Performance: synthetic monitoring vs. one-off measurement.
 
+## Phase 5 — breadth expansion (locked 2026-06-23)
+
+Goal: out-cover currents.dev on the topics agents actually hit, **without** going gap-for-gap (no clone). Granular files — one topic each — for progressive disclosure. Build one file at a time; Stefan reviews each before the next.
+
+New reference files (10 → 24):
+
+**Thin-spot fills (4):**
+- `test-data.md` — factories, per-worker unique data, seed + cleanup via API
+- `tags-annotations.md` — `skip`/`fixme`/`slow`/`fail`, tags + `--grep`, `test.step`
+- `console-errors.md` — fail the test on unexpected `console`/`pageerror`
+- `global-setup.md` — `globalSetup`/`globalTeardown` vs setup projects
+
+**Tier 1 (4):** `visual.md`, `files.md`, `iframes.md`, `mobile.md`
+**Tier 2 (6):** `clock.md`, `multi-context.md`, `drag-drop.md`, `forms.md`, `error-states.md`, `graphql.md`
+
+Dropped from Tier 1 (Stefan): accessibility, component testing.
+
+**Deliberately skipped (Tier 3 — scope decision, NOT an oversight):** framework-specific (React/Vue/Angular/Next — contradicts the framework-agnostic scope), Electron, browser extensions, canvas/WebGL, service workers/PWA, WebSockets, i18n, security (XSS/CSRF), performance/Lighthouse (already dropped), multi-user real-time collaboration, third-party payment/email mocking, Docker, GitLab/other CI providers, test-coverage.
+
+After the files exist: update `SKILL.md` routing table + `description` keywords (review point 4) so the new topics trigger. Each new file keeps house conventions: agentic `playwright-cli` framing where it applies, curated lists + "Deeper in the docs", log `/learn` gaps below.
+
 ## `/learn` doc-gap workstream (separate, optional, parallel)
 
 Candidate new/updated `/learn/playwright` pages (confirm scope with Stefan before writing docs):

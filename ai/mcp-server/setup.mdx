@@ -1,6 +1,6 @@
 ---
 title: 'Set up the Checkly MCP Server'
-description: 'Configure a CIMD-capable MCP client to connect to the Checkly MCP Server over Streamable HTTP.'
+description: 'Configure a supported MCP client to connect to the Checkly MCP Server over Streamable HTTP.'
 sidebarTitle: 'Setup'
 ---
 
@@ -11,40 +11,31 @@ https://api.checklyhq.com/mcp
 ```
 
 <Warning>
-The Checkly MCP Server only supports MCP clients that use [OAuth Client ID Metadata Documents (CIMD)](https://datatracker.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/). Clients that only support [Dynamic Client Registration (DCR)](https://datatracker.ietf.org/doc/html/rfc7591) cannot connect.
+The Checkly MCP Server only supports the clients listed below. Clients that use [Dynamic Client Registration (DCR)](https://datatracker.ietf.org/doc/html/rfc7591) are rejected.
 </Warning>
 
-<Accordion title="Before you begin">
-Before setting up the Checkly MCP Server, ensure you have:
+## Supported clients
 
-- A Checkly user account.
-- Access to the Checkly account you want your MCP client to use.
-- An MCP-compatible client that supports Streamable HTTP and OAuth Client ID Metadata Documents (CIMD).
-</Accordion>
+The public Checkly MCP Server currently supports:
 
-The Checkly MCP Server uses OAuth. Your MCP client connects to the endpoint, opens a browser-based login flow, and receives access to the Checkly tools it can use.
+- ChatGPT
+- Claude Desktop
+- Claude Code
+- Antigravity
+- Cursor
+- VS Code
 
-The server exposes protected-resource metadata for OAuth discovery. Most compatible MCP clients discover this automatically when they connect to the endpoint.
+Each supported client uses [OAuth Client ID Metadata Documents (CIMD)](https://datatracker.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/) and must be allowed by Checkly in Auth0 before it can connect. Clients that rely on DCR are not supported.
 
-Checkly does not support Dynamic Client Registration (DCR) for the public MCP Server. If your client attempts to register dynamically during OAuth, Checkly rejects the connection.
+If you want Checkly to support another CIMD-capable client, [share feedback or requests](https://feedback.checklyhq.com).
 
-The examples below assume your client version supports CIMD. If your client only supports DCR, the OAuth flow will fail.
+## ChatGPT
 
-## Codex
+Follow OpenAI's [Developer mode and MCP apps in ChatGPT](https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt) guide. Use the Checkly MCP endpoint from this page as the MCP server endpoint.
 
-Add the server:
+## Claude Desktop
 
-```bash Terminal
-codex mcp add checkly --url https://api.checklyhq.com/mcp
-```
-
-Then log in:
-
-```bash Terminal
-codex mcp login checkly
-```
-
-Restart Codex after adding the server.
+Follow Claude's [custom connectors using remote MCP](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp) guide. Use the Checkly MCP endpoint from this page as the remote MCP server URL.
 
 ## Claude Code
 
@@ -56,6 +47,10 @@ claude mcp add --transport http checkly https://api.checklyhq.com/mcp
 
 Start a Claude Code session and complete the OAuth flow when prompted.
 
+## Antigravity
+
+Follow Google's [Antigravity MCP integration](https://antigravity.google/docs/mcp) guide. Use the Checkly MCP endpoint from this page as the MCP server URL.
+
 ## Cursor
 
 Add the server to `.cursor/mcp.json` in your project, or to `~/.cursor/mcp.json` for all projects:
@@ -64,7 +59,26 @@ Add the server to `.cursor/mcp.json` in your project, or to `~/.cursor/mcp.json`
 {
   "mcpServers": {
     "checkly": {
-      "url": "https://api.checklyhq.com/mcp"
+      "type": "http",
+      "url": "https://api.checklyhq.com/mcp",
+      "auth": {
+        "CLIENT_ID": "tpc_6UZKE6SnYVKGZKExoSK3FT",
+        "scopes": [
+          "checkly:account:read",
+          "checkly:account:invite",
+          "checkly:checks:read",
+          "checkly:checks:run",
+          "checkly:incidents:read",
+          "checkly:incidents:write",
+          "checkly:environment-variables:read",
+          "checkly:environment-variables:write",
+          "checkly:status-pages:read",
+          "checkly:rca:read",
+          "checkly:rca:run",
+          "checkly:test-sessions:read",
+          "checkly:assets:read"
+        ]
+      }
     }
   }
 }
@@ -89,9 +103,39 @@ Add the server to `.vscode/mcp.json` in your workspace, or to your VS Code user 
 
 Restart VS Code after changing the configuration.
 
-## Other MCP clients
+## Known client limitations
 
-For CIMD-capable clients that accept a generic `mcpServers` configuration, use:
+Some MCP clients support remote MCP servers but do not work with the public Checkly MCP Server yet. If your preferred CIMD-capable client is missing, [share feedback or requests](https://feedback.checklyhq.com).
+
+### Cline
+
+Cline is not currently supported for Checkly MCP OAuth because of its current OAuth limitation. You can follow or upvote the [Checkly Cline support request](https://feedback.checklyhq.com/p/support-cline-as-mcp-client).
+
+### Windsurf / Devin Desktop
+
+Windsurf / Devin Desktop is not currently supported for Checkly MCP OAuth because of its current OAuth limitation. You can follow or upvote the [Checkly Devin support request](https://feedback.checklyhq.com/p/support-devin-devin-cli-for-checkly-mcp).
+
+### Devin CLI
+
+Devin CLI is not currently supported for Checkly MCP OAuth because of its current OAuth limitation. You can follow or upvote the [Checkly Devin support request](https://feedback.checklyhq.com/p/support-devin-devin-cli-for-checkly-mcp).
+
+## Use a specific account
+
+If you belong to multiple Checkly accounts, tell your MCP client which account you want to use in your prompt:
+
+```text title="Prompt" wrap
+Use Checkly to show the accounts I can access, then show failing checks for <account-name>.
+```
+
+To make every request from an MCP server configuration use the same account, set the `X-Checkly-Account` header when your client supports custom MCP headers.
+
+For Claude Code, add the header when you register the server:
+
+```bash Terminal
+claude mcp add --transport http checkly https://api.checklyhq.com/mcp --header "X-Checkly-Account: <account-id>"
+```
+
+For clients that use an `mcpServers` JSON configuration, add `headers` to the Checkly server entry:
 
 ```json mcp.json
 {
@@ -106,39 +150,7 @@ For CIMD-capable clients that accept a generic `mcpServers` configuration, use:
 }
 ```
 
-Omit `headers` if you want Checkly to resolve the account from tool arguments or your user membership.
-
-## Known client limitations
-
-Some MCP clients support remote MCP servers but do not yet support the OAuth registration mode Checkly requires. If your preferred client cannot connect, [share feedback or requests](https://feedback.checklyhq.com).
-
-### Cline
-
-Cline is not currently supported for Checkly MCP OAuth. Cline's MCP OAuth flow requires Dynamic Client Registration, which Checkly does not enable.
-
-We can support Cline once it supports CIMD or pre-registered static OAuth clients for MCP servers. You can follow or upvote Cline's [static OAuth credentials request](https://github.com/cline/cline/discussions/10289).
-
-### Windsurf / Devin Desktop
-
-[Windsurf / Devin Desktop](https://docs.devin.ai/desktop/cascade/mcp) is not currently supported for Checkly MCP OAuth. It supports remote MCP servers with OAuth, but Checkly does not currently have a supported CIMD or pre-registered static OAuth setup for Windsurf / Devin Desktop.
-
-We can support Windsurf / Devin Desktop once it supports CIMD or pre-registered static OAuth clients for custom MCP servers.
-
-### Devin CLI
-
-[Devin CLI](https://docs.devin.ai/cli/extensibility/mcp/configuration) is not currently supported for Checkly MCP OAuth. Devin CLI supports pre-registered OAuth clients through `oauthClientId` and `oauthClientSecret`, but Checkly does not currently publish a pre-registered Devin OAuth client configuration for the public MCP Server.
-
-We can support Devin CLI once CIMD support or a Checkly-provided static OAuth setup is available.
-
-## Choose an account
-
-Most tools need an account context. Checkly resolves the account in this order:
-
-1. The `accountId` argument passed to the tool.
-2. The `X-Checkly-Account` header on the MCP connection.
-3. Your sole account, if your user belongs to exactly one account.
-
-If you belong to multiple accounts and do not provide an account, the tool returns a message with the accounts you can access.
+Use the account ID from Checkly. Omit the header when you want to choose the account in your prompts.
 
 ## Verify the connection
 

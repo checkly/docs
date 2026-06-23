@@ -1,6 +1,6 @@
 ---
 title: 'MCP security and permissions'
-description: 'Understand how the Checkly MCP Server authenticates users, filters tools by permission, resolves account context, and handles write actions.'
+description: 'Understand how the Checkly MCP Server authenticates users, filters tools by permission, handles account context, and protects write actions.'
 sidebarTitle: 'Security & permissions'
 ---
 
@@ -10,7 +10,7 @@ The Checkly MCP Server uses OAuth and Checkly account authorization together. OA
 
 The MCP Server accepts Auth0-issued bearer tokens for `https://api.checklyhq.com/mcp`. Your MCP client completes the OAuth flow and sends the token with requests to the MCP endpoint.
 
-The public MCP Server only supports OAuth clients that use [Client ID Metadata Documents (CIMD)](https://datatracker.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/). Checkly rejects clients that attempt to use [Dynamic Client Registration (DCR)](https://datatracker.ietf.org/doc/html/rfc7591).
+The public MCP Server only supports OAuth clients that Checkly has approved in Auth0. Supported clients use [Client ID Metadata Documents (CIMD)](https://datatracker.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/). Checkly rejects clients that attempt to use [Dynamic Client Registration (DCR)](https://datatracker.ietf.org/doc/html/rfc7591). See [known client limitations](setup#known-client-limitations) for unsupported clients.
 
 Checkly maps the token subject to a Checkly user, then loads that user's account memberships and account context for tool calls.
 
@@ -34,32 +34,13 @@ Checkly maps the token subject to a Checkly user, then loads that user's account
 
 Tools are filtered from `tools/list` when the MCP session does not include the required permission. Tool calls are also rejected if the session lacks the required permission.
 
-## Account resolution
+## Account context
 
-Most tools operate on one Checkly account. Checkly resolves the account in this order:
+Most tools operate on one Checkly account. You can select a specific account in your prompt or pin an account in your MCP client configuration. See [Use a specific account](setup#use-a-specific-account) for setup examples.
 
-1. `accountId` in the tool arguments.
-2. `X-Checkly-Account` on the MCP connection, if your client supports custom headers.
-3. Your sole account, if your user belongs to exactly one account.
-
-Most clients configure headers in the MCP server entry. For example:
-
-```json mcp.json
-{
-  "mcpServers": {
-    "checkly": {
-      "url": "https://api.checklyhq.com/mcp",
-      "headers": {
-        "X-Checkly-Account": "<account-id>"
-      }
-    }
-  }
-}
-```
-
-If you belong to multiple accounts and no account can be resolved, the tool returns a message with the accounts available to your session.
-
-Accounts that require mTLS are not available through the MCP Server.
+<Warning>
+Accounts that require mTLS are not available through the public MCP Server.
+</Warning>
 
 ## Role checks
 

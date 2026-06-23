@@ -33,10 +33,10 @@ We're **narrower but sharper**. Currents built an encyclopedia (73 files, ~50 to
 - [x] Front-loaded blockquote trimmed: the agent-CLI blockquote before the core rules is now ~half its length.
 
 ### 3. Close high-frequency breadth gaps — LOCKED 2026-06-23 (granular: one topic per file; see PLAN.md Phase 5)
-Build one at a time, Stefan reviews each. 10 → 23 references.
+Build one at a time, Stefan reviews each. 10 → 22 references.
 - Thin-spot fills: [x] `test-data.md`  [x] `tags-annotations.md`  [x] `console-errors.md`  [x] `global-setup.md`
 - Tier 1: [x] `visual.md`  [x] `files.md`  [x] `iframes.md`  [x] `mobile.md`  (dropped: accessibility, component testing)
-- Tier 2: [x] `clock.md`  [x] `multi-context.md`  [ ] `forms.md`  [ ] `error-states.md`  [ ] `graphql.md`  (dropped: drag-drop)
+- Tier 2: [x] `clock.md`  [x] `multi-context.md`  [ ] `forms.md`  [ ] `error-states.md`  (dropped: drag-drop, graphql)
 - [x] Tier 3 skipped as a deliberate scope decision (documented in PLAN.md), NOT gap-for-gap.
 
 ### 4. Widen description keyword surface for triggering

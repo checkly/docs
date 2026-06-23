@@ -1,13 +1,13 @@
 ---
-name: playwright-best-practices
-description: Best practices for writing, structuring, debugging, and stabilizing Playwright tests in TypeScript/JavaScript. Use when authoring or reviewing Playwright tests: choosing locators, writing web-first assertions, fixing flaky tests, handling authentication (SSO/2FA), mocking network/API requests, structuring projects and fixtures, generating test data, building forms and validation, uploading or downloading files, testing iframes, multiple tabs/popups or multi-user flows, mobile and device emulation, mocking time and dates, visual regression and screenshots, tagging and annotating tests, catching console errors, testing error/offline/loading states, configuring global setup, or running Playwright in CI.
+name: playwright-best-practices-for-agents
+description: Agent-first best practices for writing, structuring, debugging, and stabilizing Playwright tests in TypeScript/JavaScript, built around Playwright's agent CLI (`playwright-cli`) and no-GUI agentic debugging flows. Use when authoring or reviewing Playwright tests: choosing locators, writing web-first assertions, fixing flaky tests, handling authentication (SSO/2FA), mocking network/API requests, structuring projects and fixtures, generating test data, building forms and validation, uploading or downloading files, testing iframes, multiple tabs/popups or multi-user flows, mobile and device emulation, mocking time and dates, visual regression and screenshots, tagging and annotating tests, catching console errors, testing error/offline/loading states, configuring global setup, or running Playwright in CI.
 metadata:
   author: checkly
 ---
 
 # Playwright best practices
 
-Condensed, opinionated guidance for writing Playwright tests that are **readable, isolated, and resilient**. Maintained by [Checkly](https://www.checklyhq.com/?utm_source=ai-skill) — the same practices apply whether you run these tests in CI or as production monitors.
+Condensed, opinionated guidance for writing Playwright tests that are **readable, isolated, and resilient** — built for coding **agents**, around Playwright's **agent CLI** (`playwright-cli`) and its no-GUI debugging flows. Maintained by [Checkly](https://www.checklyhq.com/?utm_source=ai-skill) — the same practices apply whether you run these tests in CI or as production monitors.
 
 Load a reference file from `references/` only when the task needs it (see routing table). Each reference ends with links to the full `/learn` articles for depth.
 

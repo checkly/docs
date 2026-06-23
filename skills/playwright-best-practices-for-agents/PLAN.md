@@ -1,14 +1,14 @@
-# Plan: `playwright-best-practices` skill
+# Plan: `playwright-best-practices-for-agents` skill
 
 > Working/planning doc. **Not** part of the distributed skill — packaging (plugin manifest / ignore rules) must exclude `PLAN.md`.
 
 ## Goal
 
-A condensed, token-efficient, well-structured Playwright best-practices skill for AI-agent consumption. Lives at `skills/playwright-best-practices/`. A `checkly-plugin` pulls it in.
+A condensed, token-efficient, well-structured Playwright best-practices skill for AI-agent consumption. Lives at `skills/playwright-best-practices-for-agents/`. A `checkly-plugin` pulls it in.
 
 ## Constraints (from Stefan)
 
-- **Location:** `skills/playwright-best-practices/SKILL.md` + reference files.
+- **Location:** `skills/playwright-best-practices-for-agents/SKILL.md` + reference files.
 - **Content model:** Hybrid. Skill holds *condensed, original* best-practice rules and **links out** to `/learn/playwright/...` for depth.
 - **Do NOT** mirror the `/learn` structure 1:1. **Do NOT** copy any third-party reference skill. Base content on *our* `/learn` material, but reorganize by agent activity.
 - **Scope:** Playwright best practices, framework-agnostic. *Light* Checkly mentions sprinkled in (not a sales pitch).
@@ -100,7 +100,7 @@ Rationale: the "best practice" weight goes into the first 10 files; `scenarios.m
 
 Goal: out-cover currents.dev on the topics agents actually hit, **without** going gap-for-gap (no clone). Granular files — one topic each — for progressive disclosure. Build one file at a time; Stefan reviews each before the next.
 
-New reference files (10 → 23):
+New reference files (10 → 22):
 
 **Thin-spot fills (4):**
 - `test-data.md` — factories, per-worker unique data, seed + cleanup via API
@@ -109,9 +109,9 @@ New reference files (10 → 23):
 - `global-setup.md` — `globalSetup`/`globalTeardown` vs setup projects
 
 **Tier 1 (4):** `visual.md`, `files.md`, `iframes.md`, `mobile.md`
-**Tier 2 (5):** `clock.md`, `multi-context.md`, `forms.md`, `error-states.md`, `graphql.md`
+**Tier 2 (4):** `clock.md`, `multi-context.md`, `forms.md`, `error-states.md`
 
-Dropped from Tier 1 (Stefan): accessibility, component testing. Dropped from Tier 2 (Stefan, 2026-06-23): `drag-drop.md`.
+Dropped from Tier 1 (Stefan): accessibility, component testing. Dropped from Tier 2 (Stefan, 2026-06-23): `drag-drop.md`, `graphql.md`.
 
 **Deliberately skipped (Tier 3 — scope decision, NOT an oversight):** framework-specific (React/Vue/Angular/Next — contradicts the framework-agnostic scope), Electron, browser extensions, canvas/WebGL, service workers/PWA, WebSockets, i18n, security (XSS/CSRF), performance/Lighthouse (already dropped), multi-user real-time collaboration, third-party payment/email mocking, Docker, GitLab/other CI providers, test-coverage.
 
@@ -136,7 +136,7 @@ These are decoupled from the skill: the skill writes correct guidance now; docs 
 
 ## Execution phases
 
-1. **Scaffold** — create `skills/playwright-best-practices/SKILL.md` (frontmatter + core rules + routing table + verify loop). Review with Stefan.
+1. **Scaffold** — create `skills/playwright-best-practices-for-agents/SKILL.md` (frontmatter + core rules + routing table + verify loop). Review with Stefan.
 2. **Core references** — write `locators`, `assertions`, `waiting`, `test-structure`, `auth` (the highest-value, best-covered topics). Review.
 3. **Gap-fill references** — `network`, `debugging`, `flakiness`, `ci` (these carry the most original content; `performance` dropped). Review.
 4. **Scenarios router** — `scenarios.md` linking out to `/learn`.

@@ -63,6 +63,20 @@ A test now takes `{ page, pageAdmin }` — `page` is the customer (the default f
 - **New tab, same user** (a link that opens a window, a multi-tab flow) → the popup event or `context.newPage()`.
 - **Different user, role, or session** → `browser.newContext()`. Isolation is the whole point — never share one context between two users.
 
+## Drive multiple users with the agent CLI
+
+The agent CLI's **named sessions** are the CLI mirror of contexts: each `-s=<name>` is an isolated browser — its own cookies and storage — so two sessions are two independent users, exactly like two contexts ([debugging.md](./debugging.md)).
+
+```bash
+playwright-cli -s=customer open https://danube-web.shop/checkout
+playwright-cli -s=admin    open https://danube-web.shop/admin/orders
+playwright-cli -s=customer click e12             # the customer places the order
+playwright-cli -s=admin    snapshot              # verify it shows up in the admin view
+playwright-cli list                              # the active sessions
+```
+
+Each session can load its own saved auth (`state-load`) to act as a different role — the CLI counterpart of `newContext({ storageState })` ([auth.md](./auth.md)). `close-all` tears them down.
+
 ## Deeper in the docs
 
 - [Playwright: Pages & popups](https://playwright.dev/docs/pages)

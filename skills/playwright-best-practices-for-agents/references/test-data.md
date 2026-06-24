@@ -68,6 +68,7 @@ Expensive setup that every test only *reads* — a seeded product catalog, a ref
 
 ## Deeper in the docs
 
+- [Handling test data](https://www.checklyhq.com/learn/playwright/handling-test-data/)
 - [Testing APIs with Playwright](https://www.checklyhq.com/learn/playwright/testing-apis/)
 - [Playwright: API testing](https://playwright.dev/docs/api-testing)
 - [Playwright: `TestInfo` (`workerIndex`, `parallelIndex`)](https://playwright.dev/docs/api/class-testinfo)

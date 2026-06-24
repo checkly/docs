@@ -79,6 +79,8 @@ An error state shouldn't spew uncaught exceptions while it renders. Pair these t
 
 ## Deeper in the docs
 
+- [Mocking API responses](https://www.checklyhq.com/learn/playwright/mock-api/)
+- [Intercepting requests](https://www.checklyhq.com/learn/playwright/intercept-requests/)
 - [Playwright: Mock APIs (`abort`, `fulfill`)](https://playwright.dev/docs/mock)
 - [Playwright: Network](https://playwright.dev/docs/network)
 - [Playwright: `context.setOffline`](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-offline)

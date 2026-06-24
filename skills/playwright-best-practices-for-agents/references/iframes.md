@@ -46,6 +46,7 @@ The older `page.frame({ name })` / `elementHandle.contentFrame()` handle approac
 
 ## Deeper in the docs
 
+- [Handling iframes](https://www.checklyhq.com/learn/playwright/iframe-interaction/)
 - [Playwright: Frames](https://playwright.dev/docs/frames)
 - [Playwright: `FrameLocator`](https://playwright.dev/docs/api/class-framelocator)
 - [Playwright: `locator.contentFrame()`](https://playwright.dev/docs/api/class-locator#locator-content-frame)

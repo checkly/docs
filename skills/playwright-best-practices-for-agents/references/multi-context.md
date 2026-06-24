@@ -79,6 +79,7 @@ Each session can load its own saved auth (`state-load`) to act as a different ro
 
 ## Deeper in the docs
 
+- [Handling multiple tabs](https://www.checklyhq.com/learn/playwright/multitab-flows/)
 - [Playwright: Pages & popups](https://playwright.dev/docs/pages)
 - [Playwright: Browser contexts](https://playwright.dev/docs/browser-contexts)
 - [Playwright: Multiple sign-in roles](https://playwright.dev/docs/auth#testing-multiple-roles-together)

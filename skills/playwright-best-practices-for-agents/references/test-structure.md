@@ -62,6 +62,7 @@ Group actions with `test.step('label', async () => { ... })` so reports and trac
 ## Deeper in the docs
 
 - [Best practices for writing tests](https://www.checklyhq.com/learn/playwright/writing-tests/)
+- [The testing pyramid](https://www.checklyhq.com/learn/playwright/testing-pyramid/)
 - [Custom test fixtures](https://www.checklyhq.com/learn/playwright/test-fixtures/)
 - [Self-documenting tests with step decorators](https://www.checklyhq.com/learn/playwright/steps-decorators/)
 - [Playwright: Page Object Model](https://playwright.dev/docs/pom)

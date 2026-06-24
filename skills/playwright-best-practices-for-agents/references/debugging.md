@@ -61,3 +61,4 @@ Modernized — auto-waiting and web-first assertions replace the old `waitForSel
 - [Playwright agent CLI: introduction](https://playwright.dev/agent-cli/introduction)
 - [Agent CLI: test debugging](https://playwright.dev/agent-cli/commands/test-debugging)
 - [Debugging scripts](https://www.checklyhq.com/learn/playwright/debugging/) — the human/GUI workflow
+- [Debugging common errors](https://www.checklyhq.com/learn/playwright/debugging-errors/)

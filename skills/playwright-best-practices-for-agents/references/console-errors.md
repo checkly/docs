@@ -54,6 +54,7 @@ When chasing one error rather than gating the whole suite, `playwright-cli conso
 
 ## Deeper in the docs
 
+- [Debugging common errors](https://www.checklyhq.com/learn/playwright/debugging-errors/)
 - [Playwright: `page.on('console')`](https://playwright.dev/docs/api/class-page#page-event-console)
 - [Playwright: `page.on('pageerror')`](https://playwright.dev/docs/api/class-page#page-event-page-error)
 - [Playwright: `ConsoleMessage`](https://playwright.dev/docs/api/class-consolemessage)

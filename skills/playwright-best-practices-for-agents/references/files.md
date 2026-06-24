@@ -71,6 +71,8 @@ Not sure whether a page uses an `<input>` or a button-triggered chooser? Drive i
 
 ## Deeper in the docs
 
+- [Testing file uploads](https://www.checklyhq.com/learn/playwright/testing-file-uploads/)
+- [Downloading files](https://www.checklyhq.com/learn/playwright/file-download/)
 - [Playwright: Uploading files](https://playwright.dev/docs/input#upload-files)
 - [Playwright: Downloads](https://playwright.dev/docs/downloads)
 - [Playwright: `FileChooser`](https://playwright.dev/docs/api/class-filechooser)

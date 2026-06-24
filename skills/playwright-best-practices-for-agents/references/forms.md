@@ -71,6 +71,7 @@ A file field is just an upload — use `setInputFiles`, covered in [files.md](./
 
 ## Deeper in the docs
 
+- [Clicking, typing, hovering](https://www.checklyhq.com/learn/playwright/clicking-typing-hovering/)
 - [Playwright: Text input (`fill`, `selectOption`, `check`)](https://playwright.dev/docs/input)
 - [Playwright: Locators (`getByLabel`)](https://playwright.dev/docs/locators)
 - [Assertions](./assertions.md)

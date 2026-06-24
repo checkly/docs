@@ -69,6 +69,7 @@ Or run the same specs across several viewport projects to cover multiple breakpo
 
 ## Deeper in the docs
 
+- [Emulating mobile devices](https://www.checklyhq.com/learn/playwright/emulating-mobile-devices/)
 - [Playwright: Emulation (devices, viewport, touch)](https://playwright.dev/docs/emulation)
 - [Playwright: `locator.tap()`](https://playwright.dev/docs/api/class-locator#locator-tap)
 - [Config & projects](./config.md)

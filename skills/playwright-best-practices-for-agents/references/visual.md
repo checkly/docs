@@ -73,6 +73,7 @@ On a mismatch Playwright writes `…-actual.png`, `…-expected.png`, and `…-d
 
 ## Deeper in the docs
 
+- [Taking & automating screenshots](https://www.checklyhq.com/learn/playwright/taking-screenshots/)
 - [Playwright: Visual comparisons](https://playwright.dev/docs/test-snapshots)
 - [Playwright: `toHaveScreenshot`](https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-have-screenshot)
 - [Playwright: Docker](https://playwright.dev/docs/docker)

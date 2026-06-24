@@ -112,6 +112,8 @@ A persisted `storageState` is the same idea Checkly uses to keep authenticated m
 ## Deeper in the docs
 
 - [Managing authentication in Playwright](https://www.checklyhq.com/learn/playwright/authentication/)
+- [Login automation](https://www.checklyhq.com/learn/playwright/login-automation/)
 - [Bypassing TOTP / 2FA login flows](https://www.checklyhq.com/learn/playwright/bypass-totp/)
 - [Automating Google login](https://www.checklyhq.com/learn/playwright/google-login-automation/)
+- [Automating Microsoft login](https://www.checklyhq.com/learn/playwright/microsoft-login-automation/)
 - [Playwright: Authentication](https://playwright.dev/docs/auth)

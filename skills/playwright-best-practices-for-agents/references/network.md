@@ -99,5 +99,6 @@ Mock to isolate a component or fix a value for a deterministic assertion; keep t
 - [Mocking API responses](https://www.checklyhq.com/learn/playwright/mock-api/)
 - [Intercepting requests](https://www.checklyhq.com/learn/playwright/intercept-requests/)
 - [Testing APIs with Playwright](https://www.checklyhq.com/learn/playwright/testing-apis/)
+- [Detecting broken links](https://www.checklyhq.com/learn/playwright/how-to-detect-broken-links/)
 - [Playwright: Mock APIs (incl. HAR)](https://playwright.dev/docs/mock)
 - [Playwright: API testing](https://playwright.dev/docs/api-testing)

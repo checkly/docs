@@ -51,6 +51,20 @@ For field-level errors, Playwright has a purpose-built matcher: `toHaveAccessibl
 await expect(page.getByLabel('Email')).toHaveAccessibleErrorMessage('Enter a valid email')
 ```
 
+## Discover and verify the form with the agent CLI
+
+Forms are where you'd otherwise guess — the exact label text, which control carries which role, the precise wording of each validation message. Read it off the live page instead ([debugging.md](./debugging.md)):
+
+```bash
+playwright-cli open https://danube-web.shop/signup
+playwright-cli snapshot                       # labels + roles for every field → author getByLabel/getByRole
+playwright-cli fill e5 "not-an-email"         # act on a ref from the snapshot
+playwright-cli click e9                        # submit
+playwright-cli snapshot                       # the rendered validation state → copy the real error text
+```
+
+The post-submit snapshot shows the messages the app actually renders and which fields it flags invalid, so you assert against real copy (`getByText('…')`, `toHaveAccessibleErrorMessage`) instead of guessing — the same accessibility tree that powers those locators and matchers.
+
 ## File inputs
 
 A file field is just an upload — use `setInputFiles`, covered in [files.md](./files.md).

@@ -28,6 +28,8 @@ npx checkly account <subcommand> [arguments] [options]
 | Subcommand | Description |
 |------------|-------------|
 | `members` | List account members and pending invites. |
+| `members update` | Update an account member role. |
+| `members delete` | Delete an account member. |
 | `plan` | Show your account plan, entitlements, and feature limits. |
 
 ## `checkly account members`
@@ -230,6 +232,219 @@ Key fields:
 - **`members[].status`** — `ACTIVE` for members, or `PENDING` / `EXPIRED` for invites.
 - **`length`** — number of items returned in the current response.
 - **`nextId`** — cursor for the next page. Use it with `--limit` and `--next-id`.
+
+## `checkly account members update`
+
+<Note>The `checkly account members update` command is only available since CLI v8.7.0.</Note>
+
+Update an account member's role. Identify the member by email or user ID. By default, the command shows the change and prompts for confirmation before proceeding.
+
+**Usage:**
+
+```bash Terminal
+npx checkly account members update <member> --role=<role> [options]
+```
+
+**Arguments:**
+
+| Argument | Description |
+|----------|-------------|
+| `member` | The account member email or user ID. |
+
+**Options:**
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `--role, -r` | Yes | New member role: `admin`, `read_write`, `read_run`, or `read_only`. |
+| `--email` | - | Treat the member argument as an email address. |
+| `--id` | - | Treat the member argument as a user ID. |
+| `--force, -f` | - | Skip the confirmation prompt. |
+| `--dry-run` | - | Preview what would happen without updating the member. |
+| `--output, -o` | - | Output format: `table`, `json`, or `md`. Default: `table`. |
+
+### Members Update Options
+
+<ResponseField name="--role, -r" type="string" required>
+
+The new role to assign. Available values: `admin`, `read_write`, `read_run`, `read_only`.
+
+**Usage:**
+
+```bash Terminal
+npx checkly account members update alex@example.com --role=read_write
+npx checkly account members update alex@example.com -r admin
+```
+
+</ResponseField>
+
+<ResponseField name="--email" type="boolean" default="false">
+
+Treat the member argument as an email address. Use this to disambiguate when a value could be either an email or a user ID. Mutually exclusive with `--id`.
+
+**Usage:**
+
+```bash Terminal
+npx checkly account members update alex@example.com --email --role=read_only
+```
+
+</ResponseField>
+
+<ResponseField name="--id" type="boolean" default="false">
+
+Treat the member argument as a user ID. Mutually exclusive with `--email`.
+
+**Usage:**
+
+```bash Terminal
+npx checkly account members update usr_123 --id --role=read_only
+```
+
+</ResponseField>
+
+<ResponseField name="--force, -f" type="boolean" default="false">
+
+Skip the confirmation prompt and update the member immediately. Useful in scripts and CI.
+
+**Usage:**
+
+```bash Terminal
+npx checkly account members update alex@example.com --role=admin --force
+```
+
+</ResponseField>
+
+<ResponseField name="--dry-run" type="boolean" default="false">
+
+Preview the role change without making any changes.
+
+**Usage:**
+
+```bash Terminal
+npx checkly account members update alex@example.com --role=admin --dry-run
+```
+
+</ResponseField>
+
+<ResponseField name="--output, -o" type="string" default="table">
+
+Set the output format. Use `json` for programmatic access or `md` for markdown.
+
+**Usage:**
+
+```bash Terminal
+npx checkly account members update alex@example.com --role=admin --output=json
+```
+
+</ResponseField>
+
+### Members Update Examples
+
+```bash Terminal
+# Update a member's role by email (with a confirmation prompt)
+npx checkly account members update alex@example.com --role=read_write
+
+# Update by user ID
+npx checkly account members update usr_123 --id --role=admin
+
+# Preview the change without applying it
+npx checkly account members update alex@example.com --role=admin --dry-run
+
+# Update without a confirmation prompt
+npx checkly account members update alex@example.com --role=admin --force
+```
+
+## `checkly account members delete`
+
+<Note>The `checkly account members delete` command is only available since CLI v8.7.0.</Note>
+
+Delete an account member. Identify the member by email or user ID. By default, the command shows the member to be removed and prompts for confirmation before proceeding.
+
+**Usage:**
+
+```bash Terminal
+npx checkly account members delete <member> [options]
+```
+
+**Arguments:**
+
+| Argument | Description |
+|----------|-------------|
+| `member` | The account member email or user ID. |
+
+**Options:**
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `--email` | - | Treat the member argument as an email address. |
+| `--id` | - | Treat the member argument as a user ID. |
+| `--force, -f` | - | Skip the confirmation prompt. |
+| `--dry-run` | - | Preview what would happen without deleting the member. |
+
+### Members Delete Options
+
+<ResponseField name="--email" type="boolean" default="false">
+
+Treat the member argument as an email address. Use this to disambiguate when a value could be either an email or a user ID. Mutually exclusive with `--id`.
+
+**Usage:**
+
+```bash Terminal
+npx checkly account members delete alex@example.com --email
+```
+
+</ResponseField>
+
+<ResponseField name="--id" type="boolean" default="false">
+
+Treat the member argument as a user ID. Mutually exclusive with `--email`.
+
+**Usage:**
+
+```bash Terminal
+npx checkly account members delete usr_123 --id
+```
+
+</ResponseField>
+
+<ResponseField name="--force, -f" type="boolean" default="false">
+
+Skip the confirmation prompt and delete the member immediately. Useful in scripts and CI.
+
+**Usage:**
+
+```bash Terminal
+npx checkly account members delete alex@example.com --force
+```
+
+</ResponseField>
+
+<ResponseField name="--dry-run" type="boolean" default="false">
+
+Preview the deletion without making any changes.
+
+**Usage:**
+
+```bash Terminal
+npx checkly account members delete alex@example.com --dry-run
+```
+
+</ResponseField>
+
+### Members Delete Examples
+
+```bash Terminal
+# Delete a member by email (with a confirmation prompt)
+npx checkly account members delete alex@example.com
+
+# Delete by user ID
+npx checkly account members delete usr_123 --id
+
+# Preview the deletion without applying it
+npx checkly account members delete alex@example.com --dry-run
+
+# Delete without a confirmation prompt
+npx checkly account members delete alex@example.com --force
+```
 
 ## `checkly account plan`
 

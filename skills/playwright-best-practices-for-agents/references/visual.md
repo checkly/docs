@@ -69,7 +69,7 @@ On a mismatch Playwright writes `…-actual.png`, `…-expected.png`, and `…-d
 
 ## Plain screenshots ≠ visual assertions
 
-`page.screenshot({ path: 'shot.png' })` just captures an image — useful as a debug artifact, but it asserts nothing. And the config option `screenshot: 'only-on-failure'` ([config.md](./config.md)) captures **failure** artifacts, which is unrelated to `toHaveScreenshot` baselines. Don't conflate the two.
+`page.screenshot({ path: 'shot.png' })` just captures an image — useful as a one-off debug artifact, but it asserts nothing. Don't confuse it with `toHaveScreenshot`, which compares against a committed baseline and fails on a diff.
 
 ## Deeper in the docs
 

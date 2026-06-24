@@ -19,7 +19,6 @@ export default defineConfig({
   use: {
     baseURL: process.env.BASE_URL ?? 'https://danube-web.shop',
     trace: 'on-first-retry',                // capture a trace when a test retries
-    screenshot: 'only-on-failure',
   },
   projects: [
     { name: 'setup', testMatch: /.*\.setup\.ts/ },
@@ -36,7 +35,7 @@ The `process.env.CI ? … : …` pattern tunes each option to its environment: l
 Everything under `use` applies to every test's browser context (a project's `use` overrides it):
 
 - **`baseURL`** — the one to always set. Lets tests call `page.goto('/login')` and keeps environments swappable via an env var.
-- **Artifact capture** — `trace`, `screenshot`, `video` (e.g. `'on-first-retry'`, `'only-on-failure'`, `'retain-on-failure'`). The "turn it on" knobs live here; reading a trace is in [debugging.md](./debugging.md).
+- **Artifact capture** — `trace` (and `video`), e.g. `trace: 'on-first-retry'` or `'retain-on-failure'`. The "turn it on" knobs live here; reading a trace is in [debugging.md](./debugging.md). A trace already bundles a per-step screenshot timeline, so reach for traces over standalone screenshots.
 - **Emulation** — `viewport`, `locale`, `timezoneId`, `colorScheme: 'dark'`, `ignoreHTTPSErrors`.
 - **`headless`** — `false` to watch a run locally; leave `true` in CI.
 

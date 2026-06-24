@@ -69,7 +69,7 @@ reporter: process.env.CI ? 'blob' : 'html',
 npx playwright merge-reports --reporter html ./all-blob-reports
 ```
 
-Don't merge by hand — `merge-reports` reconciles retries, flaky markers, and attachments (traces, screenshots) across shards into a single coherent report.
+Don't merge by hand — `merge-reports` reconciles retries, flaky markers, and attachments (traces) across shards into a single coherent report.
 
 ## Capture artifacts for failures
 
@@ -78,7 +78,6 @@ Turn on the artifacts that make a CI failure debuggable without re-running — t
 ```ts
 use: {
   trace: 'on-first-retry',       // a trace the moment a test retries
-  screenshot: 'only-on-failure',
 }
 ```
 

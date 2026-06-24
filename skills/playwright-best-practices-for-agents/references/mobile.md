@@ -35,6 +35,24 @@ await page.getByRole('button', { name: 'Menu' }).tap()
 
 `tap()` requires touch to be enabled — it is under a mobile device, or set `use: { hasTouch: true }` directly. For low-level taps by coordinate there's `page.touchscreen.tap(x, y)`. Playwright's built-in touch is basic: multi-touch gestures like pinch and swipe aren't first-class, so simulate a swipe by dispatching touch events, or fall back to the equivalent scroll/click where the UI allows.
 
+## Geolocation & permissions
+
+A location-aware UI needs both the coordinates *and* the permission granted — set them on the context, per test or per project:
+
+```ts
+test.use({
+  geolocation: { latitude: 48.8584, longitude: 2.2945 },   // near the Eiffel Tower
+  permissions: ['geolocation'],
+})
+
+test('shows nearby stores', async ({ page }) => {
+  await page.goto('/stores')
+  await expect(page.getByText('Paris')).toBeVisible()
+})
+```
+
+Move the pin mid-test with `context.setGeolocation({ latitude, longitude })` (the permission must already be granted). Other capabilities ride the same `permissions` option — `'notifications'`, `'camera'`, `'clipboard-read'` — granted in config or at runtime with `context.grantPermissions([...])`.
+
 ## Responsive breakpoints
 
 To check a layout at a breakpoint without a full device, set the viewport:

@@ -28,6 +28,20 @@ Actions auto-scroll and auto-wait for actionability already, so you rarely need 
 
 > **Hover reveals; assert the thing it reveals.** Check that the menu or tooltip became visible with a web-first matcher — don't assert "is hovered."
 
+## Clipboard
+
+Reading the clipboard needs permission; grant it, then assert what a "Copy" button actually wrote:
+
+```ts
+test.use({ permissions: ['clipboard-read', 'clipboard-write'] })
+
+await page.getByRole('button', { name: 'Copy link' }).click()
+const copied = await page.evaluate(() => navigator.clipboard.readText())
+expect(copied).toBe('https://danube-web.shop/i/42')
+```
+
+Clipboard access is most reliable on Chromium; where it isn't, assert the app's own "Copied!" confirmation instead. Permissions are a context capability ([mobile.md](./mobile.md)).
+
 ## Native dialogs (alert / confirm / prompt)
 
 **Playwright auto-dismisses every dialog by default** — so a `confirm()` your flow depends on is *cancelled* unless you say otherwise, silently breaking the path. Register a handler **before** the action that triggers it:

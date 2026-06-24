@@ -1,6 +1,6 @@
 ---
 name: playwright-best-practices-for-agents
-description: Agent-first best practices for writing, structuring, debugging, and stabilizing Playwright tests in TypeScript/JavaScript, built around Playwright's agent CLI (`playwright-cli`) and no-GUI agentic debugging flows. Use when authoring or reviewing Playwright tests: choosing locators, writing web-first assertions, fixing flaky tests, handling authentication (SSO/2FA), mocking network/API requests, structuring projects and fixtures, generating test data, building forms and validation, uploading or downloading files, testing iframes, multiple tabs/popups or multi-user flows, mobile and device emulation, mocking time and dates, visual regression and screenshots, tagging and annotating tests, catching console errors, testing error/offline/loading states, configuring global setup, or running Playwright in CI.
+description: Agent-first best practices for writing, structuring, debugging, and stabilizing Playwright tests in TypeScript/JavaScript, built around Playwright's agent CLI (`playwright-cli`) and no-GUI agentic debugging flows. Use when authoring or reviewing Playwright tests: choosing locators, writing web-first assertions, fixing flaky tests, handling authentication (SSO/2FA), mocking network/API requests, structuring projects and fixtures, generating test data, building forms and validation, pressing keys and keyboard shortcuts, hovering and other mouse actions, handling native alert/confirm/prompt dialogs, uploading or downloading files, testing iframes, multiple tabs/popups or multi-user flows, mobile and device emulation, mocking time and dates, visual regression and screenshots, tagging and annotating tests, catching console errors, testing error/offline/loading states, configuring global setup, or running Playwright in CI.
 metadata:
   author: checkly
 ---
@@ -40,6 +40,7 @@ Load a reference file from `references/` only when the task needs it (see routin
 | Running in CI, sharding, reporters, GitHub Actions | [references/ci.md](references/ci.md) |
 | Test data, factories, unique data, seeding/cleanup | [references/test-data.md](references/test-data.md) |
 | Forms, inputs, validation, error messages | [references/forms.md](references/forms.md) |
+| Keyboard, mouse, hover, scroll, native dialogs (alert/confirm/prompt) | [references/interactions.md](references/interactions.md) |
 | File upload & download | [references/files.md](references/files.md) |
 | iframes, frames, `frameLocator` | [references/iframes.md](references/iframes.md) |
 | Multiple tabs, popups, multiple users/contexts | [references/multi-context.md](references/multi-context.md) |

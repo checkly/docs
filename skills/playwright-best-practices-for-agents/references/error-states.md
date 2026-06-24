@@ -59,6 +59,20 @@ await page.getByRole('button', { name: 'Retry' }).click()
 await expect(page.getByRole('listitem')).toHaveCount(3)
 ```
 
+## Reproduce the error state with the agent CLI
+
+Mock the failure live and confirm the app actually renders an error state — the right alert, a retry affordance, the real copy — before you commit the assertions ([debugging.md](./debugging.md)):
+
+```bash
+playwright-cli open https://danube-web.shop/orders
+playwright-cli route "**/api/orders" --status=500   # force the server error
+playwright-cli reload                                 # re-fetch through the mock
+playwright-cli snapshot                               # the rendered error UI → author assertions from it
+playwright-cli console error                          # confirm it degrades without throwing
+```
+
+The snapshot tells you whether the app degraded gracefully or just blanked — the bug this test exists to catch — and hands you the real alert role and message text to assert against. `network --filter=orders` shows the request fired; `route-list` / `unroute` manage the active mocks.
+
 ## Don't forget console errors
 
 An error state shouldn't spew uncaught exceptions while it renders. Pair these tests with the console-error gate in [console-errors.md](./console-errors.md).

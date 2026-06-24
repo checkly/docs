@@ -59,6 +59,10 @@ await responsePromise
 
 Avoid `networkidle` (in `waitForLoadState`/`waitForURL`) — it's discouraged and racy. Wait for app state instead.
 
+## Find the right wait with the agent CLI
+
+When you're unsure what a flow actually waits on, watch it instead of guessing: drive the page with `playwright-cli`, then `playwright-cli network --filter=<path>` shows which request gates the UI — the one to `waitForResponse` — and a `playwright-cli snapshot` after it confirms the state arrived. You end up waiting for app state, never a timer ([debugging.md](./debugging.md)).
+
 ## Deeper in the docs
 
 - [Waits and timeouts](https://www.checklyhq.com/learn/playwright/waits-and-timeouts/)

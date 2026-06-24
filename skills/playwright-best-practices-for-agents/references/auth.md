@@ -75,6 +75,25 @@ setup('authenticate via API', async ({ request }) => {
 
 Test the login *page itself* through the UI; use API login as setup for everything else. See [network.md](./network.md) for the `request` context.
 
+## Seed session & app state directly
+
+`storageState` and API login replay a whole session; sometimes you just need one piece of state in place before the page loads. Seed it on the **context**, before the first navigation:
+
+```ts
+// a known session cookie — skip even the API round-trip
+await context.addCookies([
+  { name: 'session', value: process.env.SESSION_TOKEN!, url: 'https://danube-web.shop' },
+])
+
+// runs before the page's own scripts: stub a global, force a flag, dismiss a consent banner
+await context.addInitScript(() => {
+  window.localStorage.setItem('feature.newCheckout', 'on')
+  window.localStorage.setItem('cookie-consent', 'accepted')
+})
+```
+
+`addInitScript` runs after the document exists but **before the page's own scripts**, so flags and stubs are in place by first paint. Set these in a fixture or `beforeEach` so every test starts from the same clean state. Reach for them for non-auth bootstrapping — feature flags, dismissing banners, freezing a global; for the full signed-in session, prefer `storageState` above.
+
 ## Multiple roles
 
 Give each role its own setup step and state file, then opt a test into one with `test.use`:

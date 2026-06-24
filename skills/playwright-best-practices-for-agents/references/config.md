@@ -30,6 +30,21 @@ export default defineConfig({
 
 The `process.env.CI ? … : …` pattern tunes each option to its environment: locally you optimize for fast, focused iteration (auto-picked workers, `test.only` allowed, **no retries so you notice flakes immediately**); CI optimizes for determinism and guardrails (capped workers for repeatable ordering, `test.only` rejected, a couple of retries to absorb genuine infra hiccups). Retries are a safety net for infrastructure, not a fix for flaky tests — see [flakiness.md](./flakiness.md). `fullyParallel: true` also runs tests *within* a file concurrently, which has real isolation trade-offs — also covered in [flakiness.md](./flakiness.md).
 
+## Environment & secrets
+
+The config and tests read `process.env` throughout (`BASE_URL`, `CI`, credentials in [auth.md](./auth.md)). `CI` is set for you; load the rest from a `.env` file with [`dotenv`](https://www.npmjs.com/package/dotenv) at the top of the config, so a local run and CI resolve the same names:
+
+```ts playwright.config.ts
+import { defineConfig } from '@playwright/test'
+import 'dotenv/config'                 // populate process.env before defineConfig reads it
+
+export default defineConfig({
+  use: { baseURL: process.env.BASE_URL ?? 'https://danube-web.shop' },
+})
+```
+
+Git-ignore `.env` (it holds secrets) and commit a `.env.example` with just the names. In CI, set the same variables as secrets instead of shipping the file.
+
 ## Shared options (`use`)
 
 Everything under `use` applies to every test's browser context (a project's `use` overrides it):

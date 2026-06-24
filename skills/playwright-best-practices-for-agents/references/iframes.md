@@ -42,7 +42,7 @@ The older `page.frame({ name })` / `elementHandle.contentFrame()` handle approac
 
 ## Discovering frame content (agent)
 
-`playwright-cli snapshot` includes the accessibility tree **inside** iframes, so you can read the roles and names to target — then `generate-locator` on an element gives you a locator to chain off the frame. → [debugging.md](./debugging.md)
+`playwright-cli snapshot` includes the accessibility tree **inside** iframes, so you can read the roles and names to target and author the locator to chain off the frame. → [debugging.md](./debugging.md)
 
 ## Deeper in the docs
 

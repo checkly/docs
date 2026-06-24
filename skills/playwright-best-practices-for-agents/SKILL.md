@@ -55,15 +55,15 @@ Load a reference file from `references/` only when the task needs it (see routin
 
 The interactive tools — `--ui`, `--debug` (Inspector), `show-trace` — are GUIs you can't drive. Author and debug through the non-interactive signals instead.
 
-> **Having `playwright-cli` available is highly encouraged** — both phases below lean on it. Confirm with `playwright-cli --version` and install it if missing (`npm install -D @playwright/cli`). Everything still works without it, but you lose the inspect/verify loop and fall back to guessing.
+> **Having `playwright-cli` available is highly encouraged** — both phases below lean on it. Confirm with `playwright-cli --version` and install it if missing — `npm install -D @playwright/cli`, then run it via `npx playwright-cli` (or install globally with `npm install -g @playwright/cli` to call `playwright-cli` directly). Everything still works without it, but you lose the inspect/verify loop and fall back to guessing.
 
-**Author — discover, don't guess.** Read locators off the live page rather than from source: `playwright-cli open <url>` → `playwright-cli snapshot` (accessibility tree + element refs) → `playwright-cli generate-locator <ref>` hands back a user-facing locator to paste into the spec. → [references/locators.md](references/locators.md)
+**Author — discover, don't guess.** Read locators off the live page rather than from source: `playwright-cli open <url>` → `playwright-cli snapshot` prints the accessibility tree — the roles and accessible names that power `getByRole`/`getByLabel` — so you author the user-facing locator straight from what it shows. → [references/locators.md](references/locators.md)
 
 **Run & debug:**
 
 1. **Run and read stdout:** `npx playwright test path/to/file.spec.ts`. The reporter prints the failing assertion and the **call log** — which locator/assertion timed out and what Playwright actually saw. Read it; don't guess.
 2. **Read `error-context.md`:** on an `expect` failure Playwright writes an aria-snapshot of the page *at the moment it failed* to the test's `test-results/.../error-context.md`. This is machine-readable page state — open it to see what was actually rendered. *(Playwright ≥ 1.60)*
-3. **Capture artifacts, not GUIs:** add `--trace on --screenshot only-on-failure` to drop `trace.zip` + screenshots into `test-results/` for inspection.
+3. **Capture artifacts, not GUIs:** add `--trace on` to drop `trace.zip` into `test-results/` for inspection.
 4. **Step through it live with `playwright-cli`** (no GUI): run `npx playwright test path/to/file.spec.ts --debug=cli` in the background — it pauses and prints a session name. Then `playwright-cli attach <session-name>` and drive it: `playwright-cli snapshot` (page state + element refs), `playwright-cli step-over`, `playwright-cli console error`, `playwright-cli network`, `playwright-cli eval "…"`. Inspect why the locator didn't resolve or what actually rendered, then fix and re-run. *(needs the agent CLI; full detail in [references/debugging.md](references/debugging.md))*
 5. **Fix the root cause** (usually a locator, a missing web-first assertion, or a hard wait), then re-run until green. Don't paper over flakiness with retries — see [references/flakiness.md](references/flakiness.md).
 

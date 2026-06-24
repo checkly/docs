@@ -6,11 +6,11 @@ Playwright's classic debugging tools — the Inspector (`--debug`), UI mode (`--
 
 1. **stdout call log** — the reporter prints the failing assertion *and* the call log: which locator/assertion timed out and what Playwright actually saw. This is the primary signal — read it before changing anything.
 2. **`error-context.md`** — on an `expect` failure, Playwright writes an aria snapshot of the page *at the moment it failed* to `test-results/<test>/error-context.md` (also on `testInfo.errors`). Machine-readable page structure, no re-run needed. *(recent Playwright, ≈1.60)*
-3. **Artifacts, not GUIs** — `--trace on --screenshot only-on-failure` drops `trace.zip` + screenshots into `test-results/`. The Trace Viewer (`npx playwright show-trace`, [trace.playwright.dev](https://trace.playwright.dev)) is a GUI — fine to hand a human, but as an agent prefer the live session below.
+3. **Artifacts, not GUIs** — `--trace on` drops `trace.zip` into `test-results/`. The Trace Viewer (`npx playwright show-trace`, [trace.playwright.dev](https://trace.playwright.dev)) is a GUI — fine to hand a human, but as an agent prefer the live session below.
 
 ## The agent CLI: `playwright-cli`
 
-A **separate tool** from `npx playwright`, purpose-built for coding agents — install it as a dev dependency (`npm install -D @playwright/cli`) or run it through `npx playwright-cli`. It runs a persistent browser daemon and, after every command, prints an accessibility **snapshot with element refs** (`e5`, `e15`) you act on. That makes actions deterministic and keeps it token-efficient: it surfaces a structured snapshot instead of dumping the raw DOM into your context. It also ships its own skill — `playwright-cli install --skills`.
+A **separate tool** from `npx playwright`, purpose-built for coding agents — install it as a dev dependency (`npm install -D @playwright/cli`) and run it through `npx playwright-cli`, or install it globally (`npm install -g @playwright/cli`) to call `playwright-cli` directly. It runs a persistent browser daemon and, after every command, prints an accessibility **snapshot with element refs** (`e5`, `e15`) you act on. That makes actions deterministic and keeps it token-efficient: it surfaces a structured snapshot instead of dumping the raw DOM into your context. It also ships its own skill — `playwright-cli install --skills`.
 
 Use it to explore a flow and discover locators — the agent-drivable replacement for `codegen`'s GUI recorder:
 
@@ -19,10 +19,9 @@ playwright-cli open https://danube-web.shop
 playwright-cli snapshot                      # accessibility tree + element refs
 playwright-cli click e15                     # act on a ref
 playwright-cli fill e5 "user@example.com"
-playwright-cli generate-locator e15          # → getByRole(...) to paste into the spec
 ```
 
-`generate-locator` turns what you clicked into a real user-facing locator for the test. Prefix any command with `-s=<name>` for named, isolated sessions.
+Each snapshot labels every ref with its role and accessible name — write the `getByRole`/`getByLabel` locator straight from those. (The `eN` refs drive the live session; they don't go into the spec.) Prefix any command with `-s=<name>` for named, isolated sessions.
 
 ## Step through a failing test live: `--debug=cli`
 
@@ -44,7 +43,7 @@ Attach at the failing step, see why the locator didn't resolve or what the page 
 
 ## codegen is human-only
 
-`npx playwright codegen` records into the Inspector GUI — you can't drive it as an agent. Use the `playwright-cli` snapshot → `generate-locator` flow above instead. (Same point in [auth.md](./auth.md).)
+`npx playwright codegen` records into the Inspector GUI — you can't drive it as an agent. Use the `playwright-cli` snapshot flow above instead — read roles and names off the snapshot and author the locator yourself. (Same point in [auth.md](./auth.md).)
 
 ## Common failures → root cause
 

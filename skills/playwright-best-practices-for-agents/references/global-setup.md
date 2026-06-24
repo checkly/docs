@@ -17,7 +17,7 @@ Reach for a setup project for anything that benefits from the browser or fixture
 
 ## `globalSetup` — bootstrapping outside the runner
 
-`globalSetup` is a single function run **once** before everything, *outside* the test runner — no fixtures, no `page`, and no `use` options (so no `baseURL` or tracing). Reach for it for non-test, non-browser bootstrapping: seed a database, start an external service, mint an API token.
+`globalSetup` is a single function run **once** before everything, *outside* the test runner — no fixtures, no `page`, and none of the `use` options applied for you (no automatic `baseURL`, no tracing). It does receive the resolved `config`, so you can still read values like `config.projects[0].use.baseURL` when you need them. Reach for it for non-test, non-browser bootstrapping: seed a database, start an external service, mint an API token.
 
 ```ts playwright.config.ts
 export default defineConfig({

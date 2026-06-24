@@ -18,17 +18,18 @@ The Checkly MCP Server only supports the clients listed below. Clients that use 
 
 The public Checkly MCP Server currently supports these clients:
 
-| Client | Support status | Notes |
-| --- | --- | --- |
-| ChatGPT | Supported | Use the Checkly MCP endpoint from this page. |
-| Claude Desktop | Supported | Use the Checkly MCP endpoint as the remote MCP server URL. |
-| Claude Code | Supported | Add the server with the HTTP transport. |
-| Devin CLI | Supported | Requires Devin CLI and uses Checkly's static Devin MCP OAuth client. |
-| Antigravity | Supported | Use the Checkly MCP endpoint as the MCP server URL. |
-| Cursor | Supported | Uses Checkly's static Cursor MCP OAuth client. Configure `.cursor/mcp.json` or `~/.cursor/mcp.json`. |
-| VS Code | Supported | Configure `.vscode/mcp.json` or your VS Code user profile. |
+| Client | Support status | Auth method | Notes |
+| --- | --- | --- | --- |
+| ChatGPT | Supported | Checkly-approved OAuth client | Use the Checkly MCP endpoint from this page. |
+| Claude Desktop | Supported | Checkly-approved OAuth client | Use the Checkly MCP endpoint as the remote MCP server URL. |
+| Claude Code | Supported | Checkly-approved OAuth client | Add the server with the HTTP transport. |
+| Codex | Supported | Pre-registered OAuth client ID | Requires Codex MCP OAuth setup with a fixed callback port. Checkly does not support Dynamic Client Registration. |
+| Devin CLI | Supported | Pre-registered OAuth client ID | Requires Devin CLI and uses Checkly's Devin MCP OAuth client. |
+| Antigravity | Supported | Checkly-approved OAuth client | Use the Checkly MCP endpoint as the MCP server URL. |
+| Cursor | Supported | Pre-registered OAuth client ID | Uses Checkly's Cursor MCP OAuth client. Configure `.cursor/mcp.json` or `~/.cursor/mcp.json`. |
+| VS Code | Supported | Checkly-approved OAuth client | Configure `.vscode/mcp.json` or your VS Code user profile. |
 
-Supported clients must use a Checkly-approved OAuth client in Auth0. Most supported clients use [OAuth Client ID Metadata Documents (CIMD)](https://datatracker.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/). Cursor and Devin CLI use Checkly's static MCP OAuth clients. Clients that rely on DCR are not supported.
+Supported clients must use a Checkly-approved OAuth client in Auth0. Most supported clients use [OAuth Client ID Metadata Documents (CIMD)](https://datatracker.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/). Codex, Cursor, and Devin CLI use Checkly's pre-registered MCP OAuth clients. Clients that rely on DCR are not supported.
 
 If you want Checkly to support another compatible client, [share feedback or requests](https://feedback.checklyhq.com).
 
@@ -49,6 +50,62 @@ claude mcp add --transport http checkly https://api.checklyhq.com/mcp
 ```
 
 Start a Claude Code session and complete the OAuth flow when prompted.
+
+## Codex
+
+Use direct Codex MCP setup with Checkly's pre-registered public OAuth client:
+
+- MCP endpoint: `https://api.checklyhq.com/mcp`
+- OAuth client ID: `tpc_5ikE8sEowYzDB2YYWoxrbK`
+- OAuth resource/audience: `https://api.checklyhq.com/mcp`
+- Fixed MCP OAuth callback port: `8766`
+
+Add the server with Checkly's Codex OAuth client ID and OAuth resource:
+
+```bash Terminal
+codex mcp add checkly \
+  --url https://api.checklyhq.com/mcp \
+  --oauth-client-id tpc_5ikE8sEowYzDB2YYWoxrbK \
+  --oauth-resource https://api.checklyhq.com/mcp
+```
+
+Then ensure `~/.codex/config.toml` includes:
+
+```toml ~/.codex/config.toml
+mcp_oauth_callback_port = 8766
+
+[mcp_servers.checkly]
+url = "https://api.checklyhq.com/mcp"
+oauth_resource = "https://api.checklyhq.com/mcp"
+scopes = [
+  "checkly:account:read",
+  "checkly:account:invite",
+  "checkly:checks:read",
+  "checkly:checks:run",
+  "checkly:incidents:read",
+  "checkly:incidents:write",
+  "checkly:environment-variables:read",
+  "checkly:environment-variables:write",
+  "checkly:status-pages:read",
+  "checkly:rca:read",
+  "checkly:rca:run",
+  "checkly:test-sessions:read",
+  "checkly:assets:read",
+]
+
+[mcp_servers.checkly.oauth]
+client_id = "tpc_5ikE8sEowYzDB2YYWoxrbK"
+```
+
+Codex appends a server-specific callback path internally, so this setup requires the fixed callback port and exact OAuth client ID shown above.
+
+Authenticate after saving the configuration:
+
+```bash Terminal
+codex mcp login checkly
+```
+
+Complete the OAuth flow when prompted.
 
 ## Devin CLI
 

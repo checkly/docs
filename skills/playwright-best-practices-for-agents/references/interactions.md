@@ -73,5 +73,3 @@ The agent CLI mirrors each — `press` for key presses, `hover` on a ref, and `d
 - [Playwright: Keyboard & mouse input](https://playwright.dev/docs/input)
 - [Playwright: Dialogs](https://playwright.dev/docs/dialogs)
 - [Clicking, typing, hovering](https://www.checklyhq.com/learn/playwright/clicking-typing-hovering/)
-</content>
-</invoke>

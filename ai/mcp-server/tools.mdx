@@ -32,19 +32,21 @@ Prepare the local Checkly CLI steps to create a browser check for checkout.
 
 | Tool | Type | Description |
 | --- | --- | --- |
-| `get-check-status` | Read | Return a paginated, filterable list of current check status rows, including check type, activation state, and passing, degraded, or failing state. |
+| `list-check-stats` | Read | Return a paginated, filterable list of checks with current pass, fail, and degraded status. Set `includeReliability` to also return availability, response-time percentiles, and ICMP latency or packet loss over a quick range. |
 | `list-check-results` | Read | List recent compact results for one check, including HTTP response status and assertion counts when available. Raw logs, traces, screenshots, videos, and download URLs are omitted. |
 | `get-check-result` | Read | Return compact detail for one check result. |
 | `get-check-performance-summary` | Read | Return average, P50, P95, and P99 response-time metrics for one check over a date range when data is available. |
 | `trigger-checks` | Write | Run existing deployed checks on demand and record the run as a test session. Consumes check-run execution quota. |
 
-For large accounts, start with `get-check-status` filters instead of asking for every check at once. The tool supports:
+For large accounts, start with `list-check-stats` filters instead of asking for every check at once. The default response is status-only. The tool supports:
 
 - `tag`: filter by one or more tags.
 - `type` or `checkType`: filter by check type.
 - `search`: filter by check name.
 - `status`: filter by `passing`, `failing`, or `degraded`.
 - `limit` and `page`: page through matching checks. The default page size is 25 and the maximum is 100.
+- `includeReliability`: set to `true` to include availability, response-time percentiles, and ICMP latency or packet-loss metrics.
+- `range`: set the analytics range when `includeReliability` is `true`. The default is `last24Hours`.
 
 The response includes pagination metadata (`length`, `total`, `page`, `limit`, and `totalPages`) plus the applied `filters`, so your client can continue with the next page only when needed.
 

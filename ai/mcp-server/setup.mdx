@@ -25,10 +25,11 @@ The public Checkly MCP Server currently supports these clients:
 | Claude Code | Supported | Add the server with the HTTP transport. |
 | Devin CLI | Supported | Requires Devin CLI and uses Checkly's static Devin MCP OAuth client. |
 | Antigravity | Supported | Use the Checkly MCP endpoint as the MCP server URL. |
+| OpenCode | Supported | Uses Checkly's static OpenCode MCP OAuth client with OpenCode's default redirect URI. |
 | Cursor | Supported | Uses Checkly's static Cursor MCP OAuth client. Configure `.cursor/mcp.json` or `~/.cursor/mcp.json`. |
 | VS Code | Supported | Configure `.vscode/mcp.json` or your VS Code user profile. |
 
-Supported clients must use a Checkly-approved OAuth client in Auth0. Most supported clients use [OAuth Client ID Metadata Documents (CIMD)](https://datatracker.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/). Cursor and Devin CLI use Checkly's static MCP OAuth clients. Clients that rely on DCR are not supported.
+Supported clients must use a Checkly-approved OAuth client in Auth0. Most supported clients use [OAuth Client ID Metadata Documents (CIMD)](https://datatracker.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/). Cursor, Devin CLI, and OpenCode use Checkly's static MCP OAuth clients. Clients that rely on DCR are not supported.
 
 If you want Checkly to support another compatible client, [share feedback or requests](https://feedback.checklyhq.com).
 
@@ -75,6 +76,40 @@ Complete the OAuth flow when prompted.
 ## Antigravity
 
 Follow Google's [Antigravity MCP integration](https://antigravity.google/docs/mcp) guide. Use the Checkly MCP endpoint from this page as the MCP server URL.
+
+## OpenCode
+
+<Accordion title="Before you begin">
+Before configuring OpenCode, ensure you have:
+
+- OpenCode installed
+- Port `19876` available for the OAuth callback
+</Accordion>
+
+Add the server to your OpenCode configuration:
+
+```json opencode.json
+{
+  "mcp": {
+    "checkly": {
+      "type": "remote",
+      "url": "https://api.checklyhq.com/mcp",
+      "oauth": {
+        "clientId": "tpc_q3CQpmc7tU8LGwAbTLwDR6",
+        "redirectUri": "http://127.0.0.1:19876/mcp/oauth/callback"
+      }
+    }
+  }
+}
+```
+
+Then authenticate:
+
+```bash Terminal
+opencode mcp auth checkly
+```
+
+OpenCode must use the redirect URI shown above. If port `19876` is already in use, this static OAuth client will not work with a different local callback port unless Checkly has approved that redirect URI.
 
 ## Cursor
 

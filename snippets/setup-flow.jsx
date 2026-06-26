@@ -273,6 +273,7 @@ export const SetupFlow = () => {
               <button
                 key={`${step.label}-tile`}
                 type="button"
+                aria-label={step.label}
                 aria-pressed={isActive}
                 aria-controls="cklyflow-detail"
                 onFocus={() => setSelected(i)}

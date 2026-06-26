@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 
 /**
+ * Note: this component was AI generated.
+ *
  * Interactive pipeline that shows the Checkly workflow on an existing project:
  * setup → generate → test → deploy → monitor.
  *

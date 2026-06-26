@@ -112,8 +112,8 @@ export const SetupFlow = () => {
     if (name === "agent") {
       return (
         <svg {...common} stroke="none" fill="currentColor">
-          <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3Z" />
-          <path d="M18.5 14l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7.7-1.9Z" />
+          <path d="M12 6l1.6 4.4L18 12l-4.4 1.6L12 18l-1.6-4.4L6 12l4.4-1.6L12 6Z" />
+          <path d="M18 4.5l.8 1.2L20 6.5l-1.2.8L18 8.5l-.8-1.2L16 6.5l1.2-.8L18 4.5Z" />
         </svg>
       );
     }

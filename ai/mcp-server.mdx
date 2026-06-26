@@ -1,0 +1,97 @@
+---
+title: 'Checkly MCP Server'
+description: 'Connect supported AI clients to Checkly to inspect checks, test sessions, RCA, result assets, status pages, incidents, and account context.'
+sidebarTitle: 'Overview'
+---
+
+The Checkly MCP Server lets supported AI clients connect to Checkly over Streamable HTTP and use Checkly tools from your conversation.
+
+Use the production MCP endpoint in your client:
+
+```text
+https://api.checklyhq.com/mcp
+```
+
+<Warning>
+The Checkly MCP Server only supports Checkly-approved OAuth clients listed in setup. Clients that use Dynamic Client Registration (DCR) are rejected. See [setup requirements](/ai/mcp-server/setup) for supported clients and details.
+</Warning>
+
+Use it when your agent needs live Checkly account context, check status, check results, test sessions, root cause analyses, result assets, status pages, incidents, account environment variables, or when it needs to trigger existing checks.
+
+<Note>
+Use [Checkly Skills](/ai/skills) and the [Checkly CLI](/cli/overview) when your agent needs to create, edit, test, bundle, or deploy check code. The MCP server runs remotely and cannot access your local filesystem.
+</Note>
+
+## What you can do
+
+- Inspect account membership, plan, and feature entitlements.
+- Check which checks are passing, failing, muted, or deactivated.
+- Read compact check results and test-session results.
+- Fetch normalized result asset manifests and bounded text assets.
+- Start or read Rocky AI root cause analyses.
+- Trigger existing deployed checks on demand.
+- Manage account-level environment variables and secrets.
+- Read status pages and manage status page incidents.
+
+## Quick start
+
+<Accordion title="Before you begin">
+Before connecting an MCP client, ensure you have:
+
+- A Checkly user account.
+- Access to the Checkly account you want the MCP client to use.
+- A [supported MCP client](/ai/mcp-server/setup#supported-clients).
+</Accordion>
+
+[Add the Checkly MCP endpoint to your client](/ai/mcp-server/setup), complete the OAuth flow, then ask your client to verify the connection:
+
+```text title="Prompt" wrap
+Use Checkly to show which accounts I can access.
+```
+
+If you belong to more than one Checkly account, tell your client which account to use in your prompt. To always use the same account, set the `X-Checkly-Account` header when your client supports custom MCP headers.
+
+See [Set up the MCP server](/ai/mcp-server/setup) for client configuration examples.
+
+## Example prompts
+
+Basic prompts:
+
+```text title="Prompt" wrap
+Show me the current status of my Checkly checks.
+```
+
+```text title="Prompt" wrap
+List open status page incidents.
+```
+
+```text title="Prompt" wrap
+What features are available on my current Checkly plan?
+```
+
+Advanced prompts:
+
+```text title="Prompt" wrap
+Investigate the latest failed result for the checkout API check. If there is an error group, check whether an RCA already exists before triggering a new one.
+```
+
+```text title="Prompt" wrap
+Trigger the checks tagged production-smoke, then follow the test session until results are available.
+```
+
+```text title="Prompt" wrap
+Create a major status page incident for the API outage, but do not notify subscribers until I confirm the message.
+```
+
+## MCP, Skills, and CLI
+
+MCP, Checkly Skills, and the Checkly CLI are complementary. Use the MCP Server for a quick, OAuth-based connection from a supported client. Use Checkly Skills with the CLI when your agent needs to create, edit, test, or deploy code from your local project.
+
+See [Skills, MCP, and the CLI](/ai/overview#skills-mcp-and-the-cli) for a full comparison of when to use each.
+
+## Learn more
+
+- [Set up the MCP server](/ai/mcp-server/setup)
+- [MCP tools reference](/ai/mcp-server/tools)
+- [Security and permissions](/ai/mcp-server/security-and-permissions)
+- [Troubleshooting](/ai/mcp-server/troubleshooting)

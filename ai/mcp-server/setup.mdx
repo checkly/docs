@@ -1,0 +1,229 @@
+---
+title: 'Set up the Checkly MCP Server'
+description: 'Configure a supported MCP client to connect to the Checkly MCP Server over Streamable HTTP.'
+sidebarTitle: 'Setup'
+---
+
+Use the production MCP endpoint in your client:
+
+```text
+https://api.checklyhq.com/mcp
+```
+
+<Warning>
+The Checkly MCP Server only supports the clients listed below. Clients that use [Dynamic Client Registration (DCR)](https://datatracker.ietf.org/doc/html/rfc7591) are rejected.
+</Warning>
+
+## Supported clients
+
+The public Checkly MCP Server currently supports these clients:
+
+| Client | Support status | Notes |
+| --- | --- | --- |
+| ChatGPT | Supported | Use the Checkly MCP endpoint from this page. |
+| Claude Desktop | Supported | Use the Checkly MCP endpoint as the remote MCP server URL. |
+| Claude Code | Supported | Add the server with the HTTP transport. |
+| Devin CLI | Supported | Requires Devin CLI and uses Checkly's static Devin MCP OAuth client. |
+| Antigravity | Supported | Use the Checkly MCP endpoint as the MCP server URL. |
+| OpenCode | Supported | Uses Checkly's static OpenCode MCP OAuth client with OpenCode's default redirect URI. |
+| Cursor | Supported | Uses Checkly's static Cursor MCP OAuth client. Configure `.cursor/mcp.json` or `~/.cursor/mcp.json`. |
+| VS Code | Supported | Configure `.vscode/mcp.json` or your VS Code user profile. |
+
+Supported clients must use a Checkly-approved OAuth client in Auth0. Most supported clients use [OAuth Client ID Metadata Documents (CIMD)](https://datatracker.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/). Cursor, Devin CLI, and OpenCode use Checkly's static MCP OAuth clients. Clients that rely on DCR are not supported.
+
+If you want Checkly to support another compatible client, [share feedback or requests](https://feedback.checklyhq.com).
+
+## ChatGPT
+
+Follow OpenAI's [Developer mode and MCP apps in ChatGPT](https://help.openai.com/en/articles/12584461-developer-mode-and-mcp-apps-in-chatgpt) guide. Use the Checkly MCP endpoint from this page as the MCP server endpoint.
+
+## Claude Desktop
+
+Follow Claude's [custom connectors using remote MCP](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp) guide. Use the Checkly MCP endpoint from this page as the remote MCP server URL.
+
+## Claude Code
+
+Add the server with the HTTP transport:
+
+```bash Terminal
+claude mcp add --transport http checkly https://api.checklyhq.com/mcp
+```
+
+Start a Claude Code session and complete the OAuth flow when prompted.
+
+## Devin CLI
+
+Use this configuration:
+
+- MCP endpoint: `https://api.checklyhq.com/mcp`
+- OAuth client ID: `tpc_5apxvvouctRhwLo7ARsjYA`
+- Transport: `http`
+
+Add the server with the HTTP transport and Checkly's Devin OAuth client ID:
+
+```bash Terminal
+devin mcp add checkly https://api.checklyhq.com/mcp --transport http --oauth-client-id tpc_5apxvvouctRhwLo7ARsjYA
+```
+
+Then authenticate:
+
+```bash Terminal
+devin mcp login checkly --oauth-client-id tpc_5apxvvouctRhwLo7ARsjYA
+```
+
+Complete the OAuth flow when prompted.
+
+## Antigravity
+
+Follow Google's [Antigravity MCP integration](https://antigravity.google/docs/mcp) guide. Use the Checkly MCP endpoint from this page as the MCP server URL.
+
+## OpenCode
+
+<Accordion title="Before you begin">
+Before configuring OpenCode, ensure you have:
+
+- OpenCode installed
+- Port `19876` available for the OAuth callback
+</Accordion>
+
+Add the server to your OpenCode configuration:
+
+```json opencode.json
+{
+  "mcp": {
+    "checkly": {
+      "type": "remote",
+      "url": "https://api.checklyhq.com/mcp",
+      "oauth": {
+        "clientId": "tpc_q3CQpmc7tU8LGwAbTLwDR6",
+        "redirectUri": "http://127.0.0.1:19876/mcp/oauth/callback"
+      }
+    }
+  }
+}
+```
+
+Then authenticate:
+
+```bash Terminal
+opencode mcp auth checkly
+```
+
+OpenCode must use the redirect URI shown above. If port `19876` is already in use, this static OAuth client will not work with a different local callback port unless Checkly has approved that redirect URI.
+
+## Cursor
+
+Add the server to `.cursor/mcp.json` in your project, or to `~/.cursor/mcp.json` for all projects:
+
+```json mcp.json
+{
+  "mcpServers": {
+    "checkly": {
+      "type": "http",
+      "url": "https://api.checklyhq.com/mcp",
+      "auth": {
+        "CLIENT_ID": "tpc_6UZKE6SnYVKGZKExoSK3FT",
+        "scopes": [
+          "checkly:account:read",
+          "checkly:account:invite",
+          "checkly:checks:read",
+          "checkly:checks:run",
+          "checkly:incidents:read",
+          "checkly:incidents:write",
+          "checkly:environment-variables:read",
+          "checkly:environment-variables:write",
+          "checkly:status-pages:read",
+          "checkly:rca:read",
+          "checkly:rca:run",
+          "checkly:test-sessions:read",
+          "checkly:assets:read"
+        ]
+      }
+    }
+  }
+}
+```
+
+Restart Cursor after changing the configuration.
+
+## VS Code
+
+Add the server to `.vscode/mcp.json` in your workspace, or to your VS Code user profile:
+
+```json mcp.json
+{
+  "servers": {
+    "checkly": {
+      "type": "http",
+      "url": "https://api.checklyhq.com/mcp"
+    }
+  }
+}
+```
+
+Restart VS Code after changing the configuration.
+
+## Known client limitations
+
+Some MCP clients support remote MCP servers but do not work with the public Checkly MCP Server yet. If your preferred compatible client is missing, [share feedback or requests](https://feedback.checklyhq.com).
+
+### Cline
+
+Cline is not currently supported for Checkly MCP OAuth because of its current OAuth limitation. You can follow or upvote the [Checkly Cline support request](https://feedback.checklyhq.com/p/support-cline-as-mcp-client).
+
+### Codex
+
+Codex is not currently supported for Checkly MCP OAuth. Codex does not support CIMD for this flow, and Checkly cannot use a static OAuth client because Codex changes the callback port expected during OAuth. You can follow or upvote the [Checkly Codex support request](https://feedback.checklyhq.com/p/support-codex-for-checkly-mcp).
+
+### Windsurf / Devin Desktop
+
+Windsurf / Devin Desktop is not currently supported for Checkly MCP OAuth because of its current OAuth limitation. You can follow or upvote the [Checkly Devin support request](https://feedback.checklyhq.com/p/support-devin-devin-cli-for-checkly-mcp).
+
+## Use a specific account
+
+If you belong to multiple Checkly accounts, tell your MCP client which account you want to use in your prompt:
+
+```text title="Prompt" wrap
+Use Checkly to show the accounts I can access, then show failing checks for <account-name>.
+```
+
+To make every request from an MCP server configuration use the same account, set the `X-Checkly-Account` header when your client supports custom MCP headers.
+
+For Claude Code, add the header when you register the server:
+
+```bash Terminal
+claude mcp add --transport http checkly https://api.checklyhq.com/mcp --header "X-Checkly-Account: <account-id>"
+```
+
+For clients that use an `mcpServers` JSON configuration, add `headers` to the Checkly server entry:
+
+```json mcp.json
+{
+  "mcpServers": {
+    "checkly": {
+      "url": "https://api.checklyhq.com/mcp",
+      "headers": {
+        "X-Checkly-Account": "<account-id>"
+      }
+    }
+  }
+}
+```
+
+Use the account ID from Checkly. Omit the header when you want to choose the account in your prompts.
+
+## Verify the connection
+
+After authentication, ask your MCP client:
+
+```text title="Prompt" wrap
+Use Checkly to show which accounts I can access.
+```
+
+Then verify tool access:
+
+```text title="Prompt" wrap
+Use Checkly to list the tools available to this session.
+```
+
+The visible tools depend on the OAuth permissions granted to your MCP session. See [Security and permissions](/ai/mcp-server/security-and-permissions) for details.

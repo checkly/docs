@@ -138,7 +138,7 @@ import { test, expect } from '@playwright/test'
 test('Upload a file using a POST request', async ({ request }) => {
   const fileUrl  = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
   const fileBuffer  = await request.get(fileUrl)
-  const response = await request.post('https://filebin.net/pp9on3zvwv7zq6lm/dummy.pdf', {
+  const response = await request.post('https://httpbin.org/post', {
     data: await fileBuffer.body(),
   })
   await expect(response).toBeOK()
@@ -151,7 +151,7 @@ const { test, expect } = require('@playwright/test')
 test('Upload a file using a POST request', async ({ request }) => {
   const fileUrl  = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
   const fileBuffer  = await request.get(fileUrl)
-  const response = await request.post('https://filebin.net/pp9on3zvwv7zq6lm/dummy.pdf', {
+  const response = await request.post('https://httpbin.org/post', {
     data: await fileBuffer.body(),
   })
   await expect(response).toBeOK()

@@ -65,3 +65,11 @@ title: API checks
 If you need to update your local copy of the OpenAPI spec, run `./update-api-spec.sh`
 
 That's it! Your new endpoint should be showing properly now.
+
+## Legacy `/reference/*` redirects
+
+The pre-Mintlify API reference lived on ReadMe.io at `developers.checklyhq.com/reference/<slug>`, where `<slug>` was the lowercased OpenAPI `operationId` (e.g. `getv1checks`). To keep those old deep links alive, `docs.json` carries redirects generated from `.github/reference-slug-map.json` — a **frozen** snapshot of the ReadMe-era slug set. Don't regenerate it from a newer spec: endpoints added after the ReadMe era never had `/reference/` URLs.
+
+* One explicit redirect per historical slug maps to its endpoint page, so old bookmarks deep-link correctly.
+* A trailing catch-all `/reference/:slug*` → `/api-reference/overview` backstops slugs whose endpoints were removed after the ReadMe era. Mintlify resolves exact sources before wildcards, so the catch-all never shadows the explicit entries. **If you ever add a real docs page under `/reference/`, this catch-all will intercept it — narrow or remove it first.**
+* `mint broken-links` does **not** validate these destinations (nothing links to `/reference/*` in page content), so `.github/scripts/check_redirect_destinations.py` runs in the static-docs-checks workflow on every docs PR and fails if a page rename/delete breaks any of them.

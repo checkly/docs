@@ -139,7 +139,12 @@ request: {
 | `followRedirects` | `boolean` | ❌ | `true` | Whether to automatically follow 30x redirects |
 | `headers` | `array` | ❌ | `[]` | Array of `{ key, value }` objects for HTTP headers |
 | `skipSSL` | `boolean` | ❌ | `false` | Whether to skip SSL certificate validation |
+| `treatResponseBodyAsText` | `boolean` | ❌ | `false` | Feature-flagged support override for known text responses served with a binary `Content-Type` header |
 | `queryParameters` | `array` | ❌ | `[]` | Array of `{ key, value }` objects for query parameters |
+
+<Warning>
+`treatResponseBodyAsText` is only available when Checkly has enabled the API response body text override for your account. Use it only for endpoints that return text payloads with misleading binary response headers, such as `application/octet-stream`.
+</Warning>
 
 **Examples:**
 
@@ -157,6 +162,18 @@ request: {
     AssertionBuilder.statusCode().equals(200),
     AssertionBuilder.jsonBody("$.length").greaterThan(0),
     AssertionBuilder.responseTime().lessThan(1000),
+  ],
+},
+```
+
+```ts Binary-labelled text response
+request: {
+  method: "GET",
+  url: "https://api.example.com/status",
+  treatResponseBodyAsText: true,
+  assertions: [
+    AssertionBuilder.statusCode().equals(200),
+    AssertionBuilder.textBody().contains("OK"),
   ],
 },
 ```

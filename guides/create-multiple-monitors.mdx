@@ -15,8 +15,8 @@ Checkly's model of [Monitoring as Code](https://www.checklyhq.com/guides/getting
 
 ### Creating a Single URL Monitor With CLI Constructs
 
-Checkly's Monitoring as Code workflow starts with creating a [project](https://www.checklyhq.com/docs/cli/project-structure/) where all your checks will be stored. You can use Checkly constructs to describe new Checkly monitors within your Checkly dashboard. 
-If you haven't worked with Checkly at all, or have only created new monitors from our web UI, [install the Checkly CLI and create a new project for our checks with our getting started guide here](https://www.checklyhq.com/docs/cli/). A basic URL monitor with minimal configuration looks like this:
+Checkly's Monitoring as Code workflow starts with creating a [project](/constructs/overview) where all your checks will be stored. You can use Checkly constructs to describe new Checkly monitors within your Checkly dashboard. 
+If you haven't worked with Checkly at all, or have only created new monitors from our web UI, [install the Checkly CLI and create a new project for our checks with our getting started guide here](/cli/overview). A basic URL monitor with minimal configuration looks like this:
 
 ```ts {title="first-url-monitor.check.ts"}
 import { UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs' 
@@ -234,7 +234,7 @@ With these methods we could continue to extend the dynamic capabilities of this 
 
 ### Manage Configuration for Multiple Monitors with Groups
 
-As you handle monitors for multiple sites and environments, inevitably you'll want to manage the configuration for a number of monitors all at once. Currently, by creating many monitors from a single file we're giving each one the same configuration, and any configuration not specified will take the default values in `checkly.config.ts` in the project's root directory. We can create specific groups to receive configuration by adding the monitor to a [group with Checkly constructs](https://www.checklyhq.com/docs/cli/constructs-reference/#checkgroupv2). Groups offer a convenient interface to configure your monitors, setting their retry strategy, alert thresholds, and where the group's alerts will be sent. Groups also [show up as folders in your Checkly web UI](https://www.checklyhq.com/docs/groups/); making it easier to see the status of every check in the group.
+As you handle monitors for multiple sites and environments, inevitably you'll want to manage the configuration for a number of monitors all at once. Currently, by creating many monitors from a single file we're giving each one the same configuration, and any configuration not specified will take the default values in `checkly.config.ts` in the project's root directory. We can create specific groups to receive configuration by adding the monitor to a [group with Checkly constructs](/constructs/overview#checkgroupv2). Groups offer a convenient interface to configure your monitors, setting their retry strategy, alert thresholds, and where the group's alerts will be sent. Groups also [show up as folders in your Checkly web UI](/platform/groups); making it easier to see the status of every check in the group.
 
 ![Checkly dashboard showing a check group with multiple monitors](/images/guides/images/monitor-creation-01.png)
 
@@ -287,7 +287,7 @@ This single monitor’s file is now quite a bit more compact and clean, with mor
 
 ## Conclusion: Scale Your Monitoring Effortlessly with Checkly
 
-Monitoring hundreds or even thousands of pages doesn’t have to be a tedious, manual process. With Checkly’s **Monitoring as Code** approach, you can dynamically create, update, and manage URL monitors at scale—whether from a local JSON file, a CSV, or even a sitemap. Remember that this approach works for more than just URL monitors, you can extend the automatic creation of monitors to [API checks](https://www.checklyhq.com/docs/api-checks/) and even [browser checks](https://www.checklyhq.com/docs/browser-checks/).
+Monitoring hundreds or even thousands of pages doesn’t have to be a tedious, manual process. With Checkly’s **Monitoring as Code** approach, you can dynamically create, update, and manage URL monitors at scale—whether from a local JSON file, a CSV, or even a sitemap. Remember that this approach works for more than just URL monitors, you can extend the automatic creation of monitors to [API checks](/detect/synthetic-monitoring/api-checks/overview) and even [browser checks](/detect/synthetic-monitoring/browser-checks/overview).
 
 ### Key Takeaways:
 
@@ -297,15 +297,15 @@ Monitoring hundreds or even thousands of pages doesn’t have to be a tedious, m
 
 ### Next Steps
 
-- **Explore Advanced Checks**: Beyond URL monitoring, Checkly supports  [API checks](https://www.checklyhq.com/docs/api-checks/) with deeper validation and setup/teardown scripts, and [browser checks](https://www.checklyhq.com/docs/browser-checks/) for full user flow validation.
-- **Set Up Alerts**: Configure [alert channels](https://www.checklyhq.com/docs/alerting/) to notify your team of issues via Slack, email, or PagerDuty.
-- **Automate Deployments**: [Integrate Checkly into your CI/CD pipeline](https://www.checklyhq.com/docs/cicd/) to ensure monitoring updates with every code change.
+- **Explore Advanced Checks**: Beyond URL monitoring, Checkly supports  [API checks](/detect/synthetic-monitoring/api-checks/overview) with deeper validation and setup/teardown scripts, and [browser checks](/detect/synthetic-monitoring/browser-checks/overview) for full user flow validation.
+- **Set Up Alerts**: Configure [alert channels](/communicate/alerts/overview) to notify your team of issues via Slack, email, or PagerDuty.
+- **Automate Deployments**: [Integrate Checkly into your CI/CD pipeline](/integrations/ci-cd/overview) to ensure monitoring updates with every code change.
 
 Ready to scale your monitoring? [Sign up for Checkly](https://www.checklyhq.com/) today and deploy your first batch of monitors in minutes!
 
 **Further Reading:**
 
-- [Checkly CLI Documentation](https://www.checklyhq.com/docs/cli/)
+- [Checkly CLI Documentation](/cli/overview)
 - [Monitoring as Code Best Practices](https://www.checklyhq.com/guides/monitoring-as-code-best-practices/)
 - [The Defense-in-Depth Approach To Application Monitoring](https://www.checklyhq.com/blog/the-defense-in-depth-approach-to-app-monitoring/)
 

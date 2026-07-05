@@ -84,7 +84,7 @@ With a project set up, we can start writing our first monitors. Monitors come in
 
 ### Adding Uptime Monitoring for Every Endpoint
 
-All monitors are created as `.check.ts` files implementing the [Checkly CLI construct](https://www.checklyhq.com/docs/cli/using-constructs/). Here’s an example URL Monitor:
+All monitors are created as `.check.ts` files implementing the [Checkly CLI construct](/constructs/overview). Here’s an example URL Monitor:
 
 ```ts
 import { UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs' // Import required constructs from Checkly CLI
@@ -108,7 +108,7 @@ new UrlMonitor('url-monitor-example', { // Create new URL monitor with unique lo
 
 To create a new URL monitor, add a new file like `url-monitor.check.ts` in the `__checks__/` directory. Import `UrlMonitor` and `UrlAssertionBuilder` from `checkly/constructs`, then instantiate a new monitor with a unique logical ID, name, and request configuration. The monitor will send GET requests to your specified URL and validate HTTP status codes with `UrlAssertionBuilder.statusCode().equals(200)` to ensure the endpoint returns successful responses.
 
-URL monitors have limited assertion features, they’re primarily there to guarantee uptime with a broad reach. Uptime monitoring also includes low level checks like [TCP monitors](https://www.checklyhq.com/docs/tcp-monitors/), and [Heartbeat monitors](https://www.checklyhq.com/docs/heartbeat-monitors/) which listen for pings from your automated tasks. For deeper synthetics monitoring of your endpoints, to test and monitor correctness of responses in depth, reach for synthetics checks like API checks. Thankfully, the constructs signature is very similar:
+URL monitors have limited assertion features, they’re primarily there to guarantee uptime with a broad reach. Uptime monitoring also includes low level checks like [TCP monitors](/detect/uptime-monitoring/tcp-monitors/overview), and [Heartbeat monitors](/detect/uptime-monitoring/heartbeat-monitors/overview) which listen for pings from your automated tasks. For deeper synthetics monitoring of your endpoints, to test and monitor correctness of responses in depth, reach for synthetics checks like API checks. Thankfully, the constructs signature is very similar:
 
 ```ts
 import { ApiCheck, AssertionBuilder } from 'checkly/constructs'
@@ -156,10 +156,10 @@ new ApiCheck('books-api-advanced-check', {
 })
 ```
 
-All of these assertions are available in the `AssertionBuilder` [section of the constructs API](https://www.checklyhq.com/docs/cli/constructs-reference/#assertionbuilder). You can go even further with API checks: from running scripts before each check to evaluating JSON responses. These advanced options are [covered in detail in our documentation site](https://www.checklyhq.com/docs/cli/constructs-reference/#apicheck). With Checkly CLI constructs you can create and configure every type of monitor, and feed it any variation of configuration. Some extensions of API checks include:
+All of these assertions are available in the `AssertionBuilder` [section of the constructs API](/constructs/overview#assertionbuilder). You can go even further with API checks: from running scripts before each check to evaluating JSON responses. These advanced options are [covered in detail in our documentation site](/constructs/overview#apicheck). With Checkly CLI constructs you can create and configure every type of monitor, and feed it any variation of configuration. Some extensions of API checks include:
 
-- Using [variables and secrets](https://www.checklyhq.com/docs/api-checks/variables/) to configure checks at runtime. Environment variables can be scoped to your whole account, or specific to a group of checks.
-- Execute arbitrary code (e.g. to fetch and assign session tokens), and clean up after yourself (e.g. to remove any new records created as part of the check), with [setup and teardown scripts for API checks](https://www.checklyhq.com/docs/api-checks/setup-teardown-scripts/).
+- Using [variables and secrets](/platform/variables) to configure checks at runtime. Environment variables can be scoped to your whole account, or specific to a group of checks.
+- Execute arbitrary code (e.g. to fetch and assign session tokens), and clean up after yourself (e.g. to remove any new records created as part of the check), with [setup and teardown scripts for API checks](/detect/synthetic-monitoring/api-checks/setup-and-teardown).
 
 ### Create and Manage Multiple Monitors at Once
 
@@ -199,7 +199,7 @@ urlsToMonitor.forEach((url, index) => {
 
 *This example shows the power of constructs for creating monitors. However, real world implementations would probably query a list of URLs from an endpoint rather than having the array of URLs hard-coded.*
 
-> Notice that the check above isn’t configured with a `maxResponseTime` , `alertChannels` , and several other settings. Without these settings the project defaults in `checkly.config.ts` will be used. We could also assign checks to a group to manage a subset of checks with one configuration. [More detail on groups is covered in the Checkly documentation](https://www.checklyhq.com/docs/groups/). There’s more detail on alert thresholds and how alerts are communicated in part 2, below.
+> Notice that the check above isn’t configured with a `maxResponseTime` , `alertChannels` , and several other settings. Without these settings the project defaults in `checkly.config.ts` will be used. We could also assign checks to a group to manage a subset of checks with one configuration. [More detail on groups is covered in the Checkly documentation](/platform/groups). There’s more detail on alert thresholds and how alerts are communicated in part 2, below.
 
 We can test this file (and the others added above) with the `npx checkly test` command, which will scan the `/__checks__` directory and run all of our checks through the Checkly monitoring network.
 
@@ -255,7 +255,7 @@ A Chromium browser and a new "Playwright inspector" window should appear. As you
 
 *`codegen` captures your inputs and lets you add assertions, the process is [fully documented on our documentation site](https://www.checklyhq.com/learn/playwright/codegen/).*
 
-Once you’re happy with the scripted test, copy the code into a `.spec.ts` file, and create a construct for your check as a `.check.ts` file, based  on the CLI [constructs; this time for browser checks](https://www.checklyhq.com/docs/cli/constructs-reference/#browsercheck). Here’s an example of a check for the demo site [Danube Web Shop](https://danube-web.shop/):
+Once you’re happy with the scripted test, copy the code into a `.spec.ts` file, and create a construct for your check as a `.check.ts` file, based  on the CLI [constructs; this time for browser checks](/constructs/overview#browsercheck). Here’s an example of a check for the demo site [Danube Web Shop](https://danube-web.shop/):
 
 ```ts {title="homepage-browse.check.ts"}
 import { AlertEscalationBuilder, BrowserCheck, RetryStrategyBuilder } from 'checkly/constructs'
@@ -363,7 +363,7 @@ alertSettings: {
 }
 ```
 
-These settings just like all the settings in this section can be managed at the individual check level, [as a group](https://www.checklyhq.com/docs/groups/), or across the whole project in the `checkly.config.ts` file.
+These settings just like all the settings in this section can be managed at the individual check level, [as a group](/platform/groups), or across the whole project in the `checkly.config.ts` file.
 
 ### Manage alert channels
 
@@ -419,9 +419,9 @@ new UrlMonitor('url-monitor-example', {
 })
 ```
 
-Integrating alerting with incident management tools ensures seamless communication during outages. For example, connecting Checkly with [PagerDuty](https://www.checklyhq.com/docs/cli/constructs-reference/#pagerdutyalertchannel) can [automatically open incidents](https://www.checklyhq.com/docs/integrations/pagerduty/), while Slack alerts keep the team informed in real time. Of course you can also [send alerts out to a webhook](https://www.checklyhq.com/docs/cli/constructs-reference/#webhookalertchannel) to connect with your DIY alerting solution. By combining proactive alerting with smart retry logic, you create a robust monitoring system that keeps your DevOps or SRE team focused on resolving critical issues.
+Integrating alerting with incident management tools ensures seamless communication during outages. For example, connecting Checkly with [PagerDuty](/constructs/overview#pagerdutyalertchannel) can [automatically open incidents](/integrations/incident-management/pagerduty), while Slack alerts keep the team informed in real time. Of course you can also [send alerts out to a webhook](/constructs/overview#webhookalertchannel) to connect with your DIY alerting solution. By combining proactive alerting with smart retry logic, you create a robust monitoring system that keeps your DevOps or SRE team focused on resolving critical issues.
 
-For communicating directly with your users, teams should [explore status pages](https://www.checklyhq.com/docs/status-pages/) to automatically communicate downtime or degraded performance.
+For communicating directly with your users, teams should [explore status pages](/communicate/status-pages/overview) to automatically communicate downtime or degraded performance.
 
 ## Part 3. Resolve Issues Faster with Checkly Dashboards
 
@@ -442,7 +442,7 @@ For browser checks, Checkly provides [detailed traces and execution logs](https:
 
 *When your browser check fails, Checkly stores a Playwright trace to offer in-depth, moment-by-moment reviews of what the browser saw as it tried to load the page.*
 
-If you're interested in adding back-end tracing information, explore Checkly Traces to send back-end OpenTelemetry trace data to Checkly for requests initiated by Checkly synthetic requests. [See the whole process on our documentation site](https://www.checklyhq.com/docs/traces-open-telemetry/).
+If you're interested in adding back-end tracing information, explore Checkly Traces to send back-end OpenTelemetry trace data to Checkly for requests initiated by Checkly synthetic requests. [See the whole process on our documentation site](/resolve/traces/overview).
 
 ![When your browser check fails, Checkly stores a Playwright trace to offer in-depth, moment-by-moment reviews of what the browser saw as it tried to load the page.](/images/guides/images/startup-tutorial-05.png)
 *A failed browser check. With Checkly Traces we also get backend trace information from services like Redis and our Postgres database*
@@ -457,7 +457,7 @@ Checkly’s monitoring tools—from simple uptime checks to complex Playwright-b
 
 **Communicate Clearly During Outages**
 
-With customizable alerting policies and multiple notification channels (Slack, PagerDuty, SMS, and more), your team stays informed the moment an issue arises. Well-tuned alerting reduces noise while ensuring critical failures get immediate attention. Teams can use [status pages](https://www.checklyhq.com/docs/status-pages/) to communicate directly with their users.
+With customizable alerting policies and multiple notification channels (Slack, PagerDuty, SMS, and more), your team stays informed the moment an issue arises. Well-tuned alerting reduces noise while ensuring critical failures get immediate attention. Teams can use [status pages](/communicate/status-pages/overview) to communicate directly with their users.
 
 **Resolve Issues Faster with Deep Insights**
 
@@ -466,8 +466,8 @@ All checks offer high-level views of the status of your monitors, which can show
 ### Further Reading
 
 - [Learn: Playwright](https://www.checklyhq.com/learn/playwright/) - Go deep on the best web automation framework.
-- [Use Checkly With an AI IDE](https://www.checklyhq.com/docs/ai/use-checkly-with-ai-ide/) - For writing your monitoring faster and more consistently.
-- [Environment Variables](https://www.checklyhq.com/docs/cli/using-environment-variables/) - To configure checks at runtime.
+- [Use Checkly With an AI IDE](/ai/overview) - For writing your monitoring faster and more consistently.
+- [Environment Variables](/cli/environment-variables) - To configure checks at runtime.
 - [Use Setup Scripts for Better API Monitoring](https://www.checklyhq.com/guides/setup-scripts-for-apis/) - Advanced techniques for keeping monitoring code DRY.
 - [Monitoring as Code with Terraform & Pulumi](https://www.checklyhq.com/docs/cli/cli-vs-terraform-pulumi/) - The Checkly CLI isn't the only way to do Monitoring as Code.
 

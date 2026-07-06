@@ -30,14 +30,14 @@ With the answers to these, you should be able to give general guidance to your t
 
 During total outages, where some or all users are totally unable to use your service, no amount of delay in notifying affected users will feel acceptable to those users. Users expect that the second your service goes down, the login box on your page will be replaced with a ‘technical difficulties, please stand by’ message.
 
-While users always have high expectations, this one does feel reasonable: after all shouldn’t it be trivial to detect that a service is completely down, then list that on a [status page](https://www.checklyhq.com/docs/status-pages/) automatically? On the other hand, we don’t want to tell users not to log in when the service is working fine. So while it’s best to automate status messages, we require a robust tool to detect these outages.
+While users always have high expectations, this one does feel reasonable: after all shouldn’t it be trivial to detect that a service is completely down, then list that on a [status page](/communicate/status-pages/overview) automatically? On the other hand, we don’t want to tell users not to log in when the service is working fine. So while it’s best to automate status messages, we require a robust tool to detect these outages.
 
 You should, wherever possible, have an automated system that shows the availability of your service. Such an automated communication tool should do the following:
 
 - Regularly make requests of your key services
 - Implement retry logic, checking again if any request fails
 - Make requests from a broad geographic area, not relying on a single network route or availability zone
-- Output the results of these checks to a publicly available [status page](https://www.checklyhq.com/docs/status-pages/)
+- Output the results of these checks to a publicly available [status page](/communicate/status-pages/overview)
 
 Of course, not every outage can result in automated communication. As an example: if a datastore starts returning gibberish records for all users, the service is likely to look healthy to most automated monitors (we’ll note that a sophisticated Playwright check could identify functional problems like this one, but still). As such, it is critical that even with a high quality detection and status communication system, your on-call team still needs the ability to communicate with users, preferably in the same channel as the status automation. This also adds a fallback if the automated system isn’t working during an outage.
 

@@ -48,7 +48,7 @@ Remember to add `await` as necessary.
 | `page.waitForXPath(XPathSelector)`          | `page.waitForSelector(XPathSelector)`            |
 | `page.$x(xpath_selector)`                   | `page.$(xpath_selector)`                         |
 | `page.waitForNetworkIdle(...)`              | `page.waitForLoadState({ state: 'networkidle' })` |
-| `page.waitForFileChooser(...)`              | Removed, [handled differently](https://playwright.dev/docs/input/#upload-files). |
+| `page.waitForFileChooser(...)`              | Removed, [handled differently](https://playwright.dev/docs/input#upload-files). |
 | `page.waitFor(timeout)`                     | `page.waitForTimeout(timeout)` |
 | `page.type(selector, text)`                 | `page.fill(selector, text)` |
 | `page.cookies([...urls])`                   | `browserContext.cookies([urls])` |
@@ -235,7 +235,7 @@ await page.route('**/*', (route) => {
 
 See our [full guide](/learn/playwright/intercept-requests) on request interception for more examples.
 
-> For many of the points in the list above, variations of the same function exist at [Page](https://playwright.dev/docs/api/class-page/), [Frame](https://playwright.dev/docs/api/class-frame/) and [ElementHandle](https://playwright.dev/docs/api/class-elementhandle/) level. For simplicity, we reported only one.
+> For many of the points in the list above, variations of the same function exist at [Page](https://playwright.dev/docs/api/class-page), [Frame](https://playwright.dev/docs/api/class-frame) and [ElementHandle](https://playwright.dev/docs/api/class-elementhandle) level. For simplicity, we reported only one.
 
 ## New possibilities to be aware of
 
@@ -291,7 +291,7 @@ You can use the [Playwright Test Generator](https://playwright.dev/docs/codegen)
 
 ## Switching to Playwright for richer browser check results
 
-Checkly users switching to Playwright can take advantage of its new Rich Browser Check Results, which come with [tracing and Web Vitals](https://www.checklyhq.com/docs/browser-checks/tracing-web-vitals/) and make it easier to isolate the root cause of a failed check and remediate faster.
+Checkly users switching to Playwright can take advantage of its new Rich Browser Check Results, which come with [tracing and Web Vitals](/detect/synthetic-monitoring/browser-checks/performance-metrics) and make it easier to isolate the root cause of a failed check and remediate faster.
 
 ![performance and error tracing check results on checkly](/images/docs/images/browser-checks/tracing_web_vitals.png "A browser check result with performance and error tracing")
 
@@ -301,9 +301,9 @@ This reveals additional information about the check execution, including:
 3. For each page visited, a network & timing timeline, Web Vitals, console and network tabs.
 4. In case of a failing check, a screenshot on failure.
 
-> Aside from running a Playwright script, performance and error tracing also require the use of [Runtime](https://www.checklyhq.com/docs/runtimes/) `2021.06` or newer.
+> Aside from running a Playwright script, performance and error tracing also require the use of [Runtime](/platform/runtimes/overview) `2021.06` or newer.
 
-> Note that cross-browser support is not available on Checkly - [our Browser checks run on Chromium](https://www.checklyhq.com/docs/browser-checks/) only.
+> Note that cross-browser support is not available on Checkly - [our Browser checks run on Chromium](/detect/synthetic-monitoring/browser-checks/overview) only.
 
 ## Read More
 

@@ -46,7 +46,7 @@ Automated tools like [Checkly](https://www.checklyhq.com/) can make sure that ev
 Many of the points listed in this article will revolve around making sure that an alert is emitted as soon as the service isn’t working for some users. But when analyzing slow incident response, there’s another way that our outage detection can fail: alert fatigue. While alert fatigue sounds like a quality of life issue, generating too many alerts can essentially disable your outage detection. If recent incident post-mortems have identified that 1) the recent outage did trigger an alert, but 2) that alert was one of dozens emitted every day, it’s likely that no one is reading those alerts at all. Over-alerting isn’t much better than generating no alerts at all. To control alert fatigue, here are some suggestions in brief:
 
 - Take alert fatigue seriously — false positives (alerts when there was no problem) should trigger investigations and fixes just like false negatives (undetected outages).
-- Set retry policies — requests sometimes fail via the internet. Set a reasonable [retry policy](https://www.checklyhq.com/docs/alerting-and-retries/) on your checks so you’re not generating false alarms.
+- Set retry policies — requests sometimes fail via the internet. Set a reasonable [retry policy](/communicate/alerts/overview) on your checks so you’re not generating false alarms.
 - Use smart tests — using the [auto-waiting](https://www.checklyhq.com/learn/playwright/waits-and-timeouts/) and intelligent user-centric assertions of Playwright will help ensure your tests aren’t too strict and therefore flaky (generating lots of false positives).
 - Route alerts intelligently — use a tool like Rootly or Pagerduty to make sure only the right people are getting alerts.
 
@@ -70,7 +70,7 @@ In the early days of ‘synthetic user monitoring’ the synthetic user was a he
 
 Beyond parsing pages and following links, a true automated browser is necessary to monitor if our services are online. Further we want to have complex [assertions](https://www.checklyhq.com/learn/playwright/assertions/) available to ask the same questions that our users do. For example, when our user visits our ecommerce site, and searches for products, they expect to get more than one result, and they expect each item will have an ‘add to cart’ button. Users care about these things more than they do exact response times or JavaScript errors, so it’s these complex user paths that should be tested when monitoring our service. 
 
-A tool like [Playwright](https://www.checklyhq.com/docs/browser-checks/playwright-test/) is the best way to really act like a user when interacting with our service. Checkly uses Playwright to let engineers test every aspect of their service with the same expectations their users bring.
+A tool like [Playwright](/detect/synthetic-monitoring/browser-checks/playwright-support) is the best way to really act like a user when interacting with our service. Checkly uses Playwright to let engineers test every aspect of their service with the same expectations their users bring.
 
 ## Gather real evidence of failure
 

@@ -16,7 +16,7 @@ Set up the smallest possible working Checkly Playwright Check Suite from this re
 3. Select only a small subset of tests that are most suitable for synthetic monitoring. Do NOT try to cover the full codebase.
 4. Make sure the selected checks are fast, stable, and understandable.
 5. Let me choose the monitoring frequency and locations.
-6. Ask the user for their alert notification email and/or Slack webhook, then create at least one alert channel in code and assign it to all checks.
+6. Ask the user for their alert notification email and/or Slack App destination, then create at least one alert channel in code and assign it to all checks.
 7. Get me to a point where:
 
    * `npx checkly test --record` succeeds
@@ -45,7 +45,7 @@ Set up the smallest possible working Checkly Playwright Check Suite from this re
 * Use `pwProjects` and/or `pwTags` when that is the cleanest way to select tests.
 * Configure `frequency` and `locations` for the check suite based on my choices.
 * If needed, set `cli.runLocation` to one of the chosen locations for local validation.
-* If this repo uses TypeScript for config/tests, make sure `checkly` is installed and add `jiti` if needed.
+* If this repo uses TypeScript for config/tests, make sure `checkly` is installed.
 * Only customize `installCommand` or `testCommand` if the repo layout or package manager requires it.
 
 ### Alert Channel Setup
@@ -55,11 +55,12 @@ Set up the smallest possible working Checkly Playwright Check Suite from this re
 **Before generating the config, you MUST ask the user for at least one of the following:**
 
 - **Email alerts:** Ask for their alert notification email address, then create an `EmailAlertChannel` with it.
-- **Slack alerts:** Ask for their Slack incoming webhook URL and channel name, then create a `SlackAlertChannel` with them.
+- **Slack App alerts:** Ask whether the Checkly Slack App is installed for their Slack workspace, then ask for the Slack `#channel` names or `@user` handles to notify and create a `SlackAppAlertChannel` with them.
+- **Legacy Slack webhook alerts:** Only ask for a Slack incoming webhook URL if the user explicitly needs to preserve or import an existing deprecated webhook-based Slack alert channel. Do not ask users to create a new Slack webhook for a new monitoring setup.
 
 The user can provide one or both. At minimum, one must be configured. **Do NOT use placeholder values like `alerts@example.com` or `<ALERT_EMAIL>` — always use the real values the user gives you.**
 
-If the user explicitly tells you they already have an alert channel configured in the Checkly UI and want to reuse it, use `EmailAlertChannel.fromId(<numeric_id>)` or `SlackAlertChannel.fromId(<numeric_id>)` instead. In that case, ask them for the numeric alert channel ID from the Checkly UI.
+If the user explicitly tells you they already have an alert channel configured in the Checkly UI and want to reuse it, use `EmailAlertChannel.fromId(<numeric_id>)` or `SlackAppAlertChannel.fromId(<numeric_id>)` instead. In that case, ask them for the numeric alert channel ID from the Checkly UI.
 
 ### checkly.config.ts — Exact Pattern
 
@@ -67,7 +68,7 @@ This is the ONLY file structure you should generate. All checks are defined inli
 
 ```typescript
 import { defineConfig } from 'checkly';
-import { EmailAlertChannel, SlackAlertChannel, Frequency } from 'checkly/constructs';
+import { EmailAlertChannel, SlackAppAlertChannel, Frequency } from 'checkly/constructs';
 
 // Email alert channel — remove this block if user does not provide an email
 const emailAlert = new EmailAlertChannel('default-email-alert', {
@@ -77,10 +78,9 @@ const emailAlert = new EmailAlertChannel('default-email-alert', {
   sendDegraded: false,
 });
 
-// Slack alert channel — remove this block if user does not provide a Slack webhook
-const slackAlert = new SlackAlertChannel('default-slack-alert', {
-  url: 'THE_ACTUAL_SLACK_WEBHOOK_URL_THE_USER_GAVE_YOU',
-  channel: 'THE_ACTUAL_SLACK_CHANNEL_THE_USER_GAVE_YOU',
+// Slack App alert channel — remove this block if user does not provide Slack App destinations
+const slackAlert = new SlackAppAlertChannel('default-slack-alert', {
+  slackChannels: ['THE_ACTUAL_SLACK_CHANNEL_OR_HANDLE_THE_USER_GAVE_YOU'],
   sendFailure: true,
   sendRecovery: true,
   sendDegraded: false,
@@ -117,7 +117,7 @@ export default defineConfig({
 **Import rules:**
 
 * `defineConfig` from `'checkly'`
-* `Frequency`, `EmailAlertChannel`, and `SlackAlertChannel` from `'checkly/constructs'` (NOT from `'checkly'`)
+* `Frequency`, `EmailAlertChannel`, and `SlackAppAlertChannel` from `'checkly/constructs'` (NOT from `'checkly'`)
 
 **Test selection — four strategies:**
 
@@ -306,7 +306,7 @@ use: {
 * frequency
 * locations
 * environment variables / secrets
-* alert notification email and/or Slack webhook
+* alert notification email and/or Slack App destination
 
 11. After implementation, provide a short final checklist confirming I should be able to run:
 
@@ -333,20 +333,20 @@ Use these defaults unless the repo makes them invalid. **For values marked "ASK 
 * Target environment/base URL: `https://staging.example.com`
 * Extra environment variables to wire in: `none`
 * Alert notification email: **ASK USER** — ask for their real email address
-* Slack webhook URL: **ASK USER** — ask for their Slack incoming webhook URL (optional if email is provided)
-* Slack channel: **ASK USER** — ask for their Slack channel name (optional if email is provided)
+* Slack App installed: **ASK USER** — ask whether the Checkly Slack App is installed for their Slack workspace (optional if email is provided)
+* Slack App destinations: **ASK USER** — ask for Slack `#channel` names or `@user` handles (optional if email is provided)
 
 ## Reference Documentation
 
 Use these Checkly docs as the source of truth for the implementation:
 
-* [Quickstart — Playwright Check](https://www.checklyhq.com/docs/quickstarts/playwright-check/)
+* [Quickstart — Playwright Check](https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/quickstart/)
 * [Test Organization](https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/test-organization/)
 * [Configuration](https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/configuration/)
 * [Environment Variables](https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/environment-variables/)
 * [Timeouts](https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/timeouts/)
 * [Email Alert Channel](https://www.checklyhq.com/docs/constructs/email-alert-channel/)
-* [Slack Alert Channel](https://www.checklyhq.com/docs/constructs/slack-alert-channel/)
+* [Slack App Alert Channel](https://www.checklyhq.com/docs/constructs/slack-app-alert-channel/)
 
 ---
 

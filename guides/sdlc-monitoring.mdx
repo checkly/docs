@@ -208,7 +208,7 @@ This command overrides the `SCREENSHOT_URL` variable for that specific test run,
 
 ### Optional: Private locations for running Checkly within your cloud
 
-For enterprise users, you may want to run Checkly monitors from within your cloud. This is especially helpful if your API isn’t available on the public internet, or you want to run checks from a geographic location not covered by the Checkly system. If your development and staging locations are running on private clouds, a [Checkly Private Location](https://www.checklyhq.com/docs/detect/private-locations/overview) makes testing easier.
+For enterprise users, you may want to run Checkly monitors from within your cloud. This is especially helpful if your API isn’t available on the public internet, or you want to run checks from a geographic location not covered by the Checkly system. If your development and staging locations are running on private clouds, a [Checkly Private Location](/platform/private-locations/overview) makes testing easier.
 
 ![a diagram showing A container on your cloud running a Checkly Private Location](/images/guides/images/sdlc-monitoring-06.png)
 
@@ -225,7 +225,7 @@ Once you’ve set up your private location, pick your private location when crea
 
 ### Checkly Traces for OpenTelemetry insights
 
-At any layer of running tests against your services, it’s helpful to connect the information from synthetic testing with backend trace data. With [Checkly Traces](https://www.checklyhq.com/docs/traces-open-telemetry/), it’s possible to export backend data captured with [OpenTelemetry](https://www.checklyhq.com/learn/opentelemetry/getting-started-with-observability/) and gather trace data from your backend services as they’re handling the requests sent during a Checkly Test. 
+At any layer of running tests against your services, it’s helpful to connect the information from synthetic testing with backend trace data. With [Checkly Traces](/resolve/traces/overview), it’s possible to export backend data captured with [OpenTelemetry](https://www.checklyhq.com/learn/opentelemetry/getting-started-with-observability/) and gather trace data from your backend services as they’re handling the requests sent during a Checkly Test. 
 
 Implementation is straightforward and results in a highly efficient observability setup that doesn’t use bandwidth for 
 unnecessary monitoring data. In most cases the setup will look like this:
@@ -238,7 +238,7 @@ unnecessary monitoring data. In most cases the setup will look like this:
 
 *With Checkly Traces you can see the database calls and other timespans as your backend services handle requests kicked off by a Checkly test.*
 
-Checkly Traces is easy to implement even if you aren’t currently using OpenTelemetry, [check out our documentation](https://www.checklyhq.com/docs/traces-open-telemetry/) on how to get started.
+Checkly Traces is easy to implement even if you aren’t currently using OpenTelemetry, [check out our documentation](/resolve/traces/overview) on how to get started.
 
 ## 3. Production - Finding failures in real time with Playwright & Checkly
 
@@ -247,14 +247,14 @@ Checkly Traces is easy to implement even if you aren’t currently using OpenTel
 Once you’ve moved to production, it’s time to run your tests on a cadence, creating a monitor that tell you within minutes if any part of your service goes down. The process for setting this cadence looks like:
 
 1. [Determine the right check frequency](https://www.checklyhq.com/blog/check-frequency/) based on SLA
-2. Configure your tests either in the web UI or by editing your [test repository’s config](https://www.checklyhq.com/cli/overviewproject-structure/) file
-3. [Group or tag tests](https://www.checklyhq.com/docs/groups/#organizing-checks-with-groups---checkly-docs) by criticality to have consistent cadence for high value services - this also makes it easier to see checks together in the web UI
+2. Configure your tests either in the web UI or by editing your [test repository’s config](/constructs/project) file
+3. [Group or tag tests](/platform/groups) by criticality to have consistent cadence for high value services - this also makes it easier to see checks together in the web UI
 
 With alerts running on a cadence, you can ensure that you’re hearing about failures before your users report them. The final step is setting up the alerting your team receives when a monitor detects problems.
 
 ### Alerting on failures
 
-Finally, now that we’re monitoring production with Checkly, we’ll need to send alerts to an on-call team and/or key stakeholders when something is detected as not working. [Checkly supports multiple alert channels](https://www.checklyhq.com/docs/alerting-and-retries/#alerting-and-retries-with-checkly---checkly-docs), with configuration available either for a single check, at the group level, or all checks. Some best practices:
+Finally, now that we’re monitoring production with Checkly, we’ll need to send alerts to an on-call team and/or key stakeholders when something is detected as not working. [Checkly supports multiple alert channels](/communicate/alerts/overview), with configuration available either for a single check, at the group level, or all checks. Some best practices:
 
 - Configure retry logic for minimal alert fatigue - Checkly offers fine-grained retries on checks, and it’s important to double-check that failures aren’t transitory. Balance alert fatigue with time efficiency, as multiple retries can significantly impact time to detection.
 - Don’t rely on a single alert channel, always have at least one backup like a slack message or email to make sure that a delivery failure doesn't aggravate an outage.

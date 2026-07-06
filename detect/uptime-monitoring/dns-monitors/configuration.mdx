@@ -288,8 +288,48 @@ Common assertions:
 - Text response contains expected serial number
 </Accordion>
 
+<Accordion title="HTTPS Record (RFC 9460)">
+HTTPS records carry [SvcParams](https://www.rfc-editor.org/rfc/rfc9460) — the
+parameters a browser uses to connect over HTTP/3 on its first request (`alpn`,
+`ipv4hint`/`ipv6hint`, `ech`, …). The whole record is rendered into the `data`
+field in DNS presentation format.
+
+```json
+{
+  "Answer": [
+    {
+      "name": "is.checkly.online.",
+      "type": "HTTPS",
+      "TTL": 300,
+      "data": "1 . alpn=\"h3,h2\" ipv4hint=\"188.114.96.0,188.114.97.0\" ipv6hint=\"2a06:98c1:3120::,2a06:98c1:3121::\""
+    }
+  ],
+  "Question": [
+    {
+      "name": "is.checkly.online.",
+      "type": "HTTPS"
+    }
+  ],
+  "Status": "NOERROR"
+}
+```
+
+Common assertions:
+- Text answer with the regex `alpn="([^"]*)"` contains `h3` - verify HTTP/3 is advertised (the capture group scopes the match to the `alpn` value)
+- Text answer with the regex `alpn="([^"]*)"` contains `h2` - verify HTTP/2 is advertised
+- `$.Answer[0].data` contains `ipv4hint` - verify IPv4 address hints are published
+- `$.Answer[0].data` contains `ipv6hint` - verify IPv6 address hints are published
+
+<Tip>
+Use a text-answer **capture group** (`alpn="([^"]*)"`) rather than a bare
+`contains('h3')` over the whole record. A bare substring check can false-match
+unrelated bytes such as an `ipv4hint` octet or the `ech` blob; the capture group
+scopes the match to the advertised protocols.
+</Tip>
+</Accordion>
+
 <Note>
-**Record type support**: DNS monitors currently support A, AAAA, CNAME, MX, NS, SOA, and TXT record types. Additional record types (SRV, CAA, PTR, etc.) may be added in future updates.
+**Record type support**: DNS monitors currently support A, AAAA, CNAME, MX, NS, SOA, TXT, and HTTPS record types. Additional record types (SRV, CAA, PTR, etc.) may be added in future updates.
 </Note>
 
 ### Response Time Limits
@@ -382,4 +422,16 @@ For DMARC:
   - Monitor 2: DNS server `ns2.example.com:53`
 - **Assertions**:
   - `$.Answer[0].data` equals `ns1.example.com.` or `ns2.example.com.`
+</Accordion>
+
+<Accordion title="Verify a domain advertises HTTP/3 (HTTPS record)">
+**Scenario**: Publishing an HTTPS DNS record lets browsers connect over HTTP/3 (QUIC) on the first request, saving a round trip. Monitor that the record stays published and keeps advertising `h3`.
+
+**Configuration**:
+- **Domain**: `example.com`
+- **Record type**: HTTPS
+- **Assertions**:
+  - Response code equals `NOERROR` (the record resolves)
+  - Text answer with regex `alpn="([^"]*)"` contains `h3` (HTTP/3 advertised)
+  - `$.Answer[0].data` contains `ipv4hint` (IPv4 address hints published)
 </Accordion>

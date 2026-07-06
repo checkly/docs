@@ -68,6 +68,13 @@ jobs:
         if: steps.detect.outputs.openapi_changed == 'true'
         run: npx mint openapi-check api-reference/openapi.json
 
+      # Legacy /reference/* redirects are inbound-only, so `mint broken-links`
+      # never validates their destinations. Runs on any docs change (.mdx or
+      # docs.json) because a page rename/delete is exactly what breaks them.
+      - name: Check legacy redirect destinations
+        if: steps.detect.outputs.docs_changed == 'true'
+        run: python3 .github/scripts/check_redirect_destinations.py
+
       - name: Broken-links scan
         if: steps.detect.outputs.docs_changed == 'true'
         run: |

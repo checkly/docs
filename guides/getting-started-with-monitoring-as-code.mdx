@@ -24,7 +24,7 @@ The [Checkly CLI](https://www.checklyhq.com/cli/overview) gives you a JavaScript
 
 Getting started is pretty easy. You can be up and running in no time to ensure your crucial web apps and sites are performing up to spec. The Checkly CLI provides two main workflows:
 
-- **Coding**: These encompass scripts (such as ApiCheck, BrowserCheck, or SlackAlertChannel) written in JavaScript/TypeScript. They are intended to be deployed and executed on the Checkly cloud backend.
+- **Coding**: These encompass scripts (such as ApiCheck, BrowserCheck, or SlackAppAlertChannel) written in JavaScript/TypeScript. They are intended to be deployed and executed on the Checkly cloud backend.
 - **Command**: These constitute the fundamental commands for executing your monitoring scripts. The `test` command is utilized for running monitoring checks locally or in continuous integration, while the `deploy` command is employed to push your monitoring scripts to the Checkly cloud backend.
 
 Let's jump into the step-by-step process.
@@ -85,7 +85,7 @@ test('Checkly Docs', async ({ page }) => {
 
 ---
 
-This test uses the page.goto method to navigate to the specified URL (‘[https://www.checklyhq.com/docs/browser-checks/’](https://www.checklyhq.com/docs/browser-checks/%E2%80%99)). The method returns a response object, which is stored in the response variable.
+This test uses the page.goto method to navigate to the specified URL (`https://www.checklyhq.com/docs/browser-checks/`). The method returns a response object, which is stored in the response variable.
 
 Then we use the expect function to assert that the HTTP status code of the response is less than 400. This is a way to ensure that the page is loaded successfully without any HTTP errors.
 
@@ -110,7 +110,7 @@ There are also links to the detailed summary of the test at the end of the resul
 
 ![test summary](/images/guides/images/guides-getting-started-test-summary.jpeg "Test Summary Example")
 
-As seen in the result, the test failed because if you browse the URL (https://www.checklyhq.com/docs/browser-checks/) the title of the site is “Getting started | Checkly” and not “Introduction to Checkly | Checkly” as expected in the test case.
+As seen in the result, the test failed because if you browse the URL (`https://www.checklyhq.com/docs/browser-checks/`) the title of the site is “Getting started | Checkly” and not “Introduction to Checkly | Checkly” as expected in the test case.
 
 If we update the test case to expect “Getting started | Checkly” we will have a passed test. Here is the result of the test after updating the correct title:
 
@@ -142,7 +142,7 @@ To set up alerts for your check, go to the specific project, in this case, "home
 
 ![setting up alerts with checkly](/images/guides/images/guides-getting-started-alerts.jpeg "Setting up Alerts with Checkly")
 
-Here, configure monitoring parameters according to your needs, including check frequency, locations, retries and alerting. You can also set up your preferred alert channel using the Checkly CLI. Learn more about the alert channels from the [official documentation](https://www.checklyhq.com/cli/overviewconstructs-reference/#alertchannel).
+Here, configure monitoring parameters according to your needs, including check frequency, locations, retries and alerting. You can also set up your preferred alert channel using the Checkly CLI. Learn more about the alert channels from the [official documentation](/constructs/alert-channel).
 
 With the appropriate alert channels set up, there is no need for customers to regularly visit the dashboard. Instead, they will be promptly notified, allowing them to react immediately upon receiving alerts.
 
@@ -152,13 +152,13 @@ As you just saw, with Checkly’s CLI, you can run your checks directly from you
 
 Here’s how to integrate your checks and the Checkly CLI if you’re already using one of the popular CI/CD platforms:
 
-- [**GitHub Actions**](https://www.checklyhq.com/docs/cicd/github-actions/): Run the Checkly CLI from GitHub Actions, export summary reports, and integrate with monorepos for streamlined monitoring across multiple projects.
-- [**GitLab CI**](https://www.checklyhq.com/docs/cicd/gitlabci/): Use GitLab CI pipelines to run the Checkly CLI, setting up separate jobs for E2E testing and deployment.
-- [**Jenkins**](https://www.checklyhq.com/docs/cicd/jenkins/): Integrate the Checkly CLI into a Jenkins pipeline using a Jenkinsfile to automate your monitoring checks and deployments.
+- [**GitHub Actions**](/integrations/ci-cd/github/actions): Run the Checkly CLI from GitHub Actions, export summary reports, and integrate with monorepos for streamlined monitoring across multiple projects.
+- [**GitLab CI**](/integrations/ci-cd/gitlab/overview): Use GitLab CI pipelines to run the Checkly CLI, setting up separate jobs for E2E testing and deployment.
+- [**Jenkins**](/integrations/ci-cd/jenkins/overview): Integrate the Checkly CLI into a Jenkins pipeline using a Jenkinsfile to automate your monitoring checks and deployments.
 
 ### CI/CD Integration Using Vendor Webhooks
 
-For platforms like [Vercel](https://www.checklyhq.com/docs/cicd/vercel/) or [GitHub deployments](https://www.checklyhq.com/docs/cicd/github/), you can trigger your Checkly checks using vendor-specific webhooks. This method provides a streamlined way to initiate monitoring as part of your deployment process without needing a fully-fledged CI/CD pipeline.
+For platforms like [Vercel](/integrations/ci-cd/vercel/overview) or [GitHub deployments](/integrations/ci-cd/github/deployments), you can trigger your Checkly checks using vendor-specific webhooks. This method provides a streamlined way to initiate monitoring as part of your deployment process without needing a fully-fledged CI/CD pipeline.
 
 By integrating Checkly’s monitoring checks into your CI/CD pipeline, you ensure that your application is thoroughly validated before and after deployment, reducing the risk of issues in production and maintaining a high level of reliability.
 

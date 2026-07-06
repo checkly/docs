@@ -60,7 +60,7 @@ However this approach has several challenges:
 
 **Synthetic Monitoring**
 
-[Synthetic monitoring](https://www.checklyhq.com/blog/what-is-synthetic-monitoring/) can be as simple as sending requests to a service and making sure the response has a `200 OK` status code, but the term is generally used to describe an automated browser that can simulate user behavior. [Checkly uses the open source Playwright framework](https://www.checklyhq.com/docs/browser-checks/playwright-test/) to simulate user behavior in great detail, and make complex assertions about the results. 
+[Synthetic monitoring](https://www.checklyhq.com/blog/what-is-synthetic-monitoring/) can be as simple as sending requests to a service and making sure the response has a `200 OK` status code, but the term is generally used to describe an automated browser that can simulate user behavior. [Checkly uses the open source Playwright framework](/detect/synthetic-monitoring/browser-checks/playwright-support) to simulate user behavior in great detail, and make complex assertions about the results. 
 
 Synthetic monitoring solves many of the problems listed above with RUM: 
 
@@ -102,7 +102,7 @@ Key metrics in detail:
 
 - **Core Web Vitals**: [Largest Contentful Paint](https://web.dev/articles/lcp) (LCP), [Interaction to Next Pain](https://web.dev/articles/inp) (INP), Cumulative Layout Shift (CLS). These metrics are considered to be quite critical for search engine optimization.
 - **JavaScript Error Rates**: Frequency of client-side code failures. You may need to implement filtering for common errors.
-- **API Response Times**: Speed and reliability of API calls. This may be called ‘[heartbeat monitoring](https://www.checklyhq.com/docs/heartbeat-monitors/#heartbeat-monitoring---checkly-docs)’ if you’re only measuring the reliability of straightforward `get` requests.
+- **API Response Times**: Speed and reliability of API calls. This may be called ‘[heartbeat monitoring](/detect/uptime-monitoring/heartbeat-monitors/overview)’ if you’re only measuring the reliability of straightforward `get` requests.
 - **Network Request Failures**: Broken or delayed network requests
 - **Errors and Crashes**: Stability of the application under different conditions
 - **User Interactions and Engagement**: Clicks, scrolls, and session durations
@@ -111,7 +111,7 @@ Key metrics in detail:
 
 ## Common Use Cases of Frontend Monitoring
 
-- **Monitoring Page Load Times**: [Ensure optimal page rendering speed](https://www.checklyhq.com/docs/browser-checks/tracing-web-vitals/#total-blocking-time).
+- **Monitoring Page Load Times**: [Ensure optimal page rendering speed](/detect/synthetic-monitoring/browser-checks/performance-metrics#total-blocking-time).
 - **Tracking Third-Party Services**: No amount of pre-deploy testing with stubs of third party services can find all the possible interaction problems with those services. Frontend monitoring can detect issues caused by external libraries or APIs.
 - **User Interaction Monitoring**: Analyze behavior patterns and engagement levels.
 - **Analyzing Client-Side Errors**: Identify and resolve JavaScript issues, especially those happening on single platforms or with particular browser versions.
@@ -126,7 +126,7 @@ Frontend monitoring empowers teams to detect potential problems before they esca
 
 **Precise Performance Insights**
 
-[Performance monitoring](https://www.checklyhq.com/docs/browser-checks/tracing-web-vitals/) provides actionable data that highlights bottlenecks and inefficiencies in applications. Metrics such as Largest Contentful Paint or Interaction to Next Paint help developers understand where delays occur and prioritize optimization efforts. These insights shift the focus from merely reacting to known issues toward analyzing anomalies, such as unexpectedly fast or slow responses. This phase aligns with "known unknowns," where developers explore statistical questions to assess how normal or abnormal system behavior is.
+[Performance monitoring](/detect/synthetic-monitoring/browser-checks/performance-metrics) provides actionable data that highlights bottlenecks and inefficiencies in applications. Metrics such as Largest Contentful Paint or Interaction to Next Paint help developers understand where delays occur and prioritize optimization efforts. These insights shift the focus from merely reacting to known issues toward analyzing anomalies, such as unexpectedly fast or slow responses. This phase aligns with "known unknowns," where developers explore statistical questions to assess how normal or abnormal system behavior is.
 
 **Real-Time User Experience Analysis**
 
@@ -158,13 +158,13 @@ Entry-level monitoring tools often focus on surface-level insights, such as erro
 
 **Ensuring Full-Stack Visibility**
 
-Frontend monitoring alone cannot provide a complete view of an application’s health. Many issues arise at the intersection of the frontend and backend, requiring integrated observability across the entire stack. Without this integration, teams risk spending excessive time proving whether an issue is frontend- or backend-related. Implementing [context propagation](https://www.checklyhq.com/learn/opentelemetry/context-propagation/) and unified tracing, such as through OpenTelemetry, helps connect frontend events to backend processes, enabling a more holistic understanding of system behavior and streamlining troubleshooting efforts. For more detail on connecting backend [OpenTelemetry traces](https://www.checklyhq.com/learn/opentelemetry/traces/) with frontend performance see how [Checkly Traces connects data from across your stack](https://www.checklyhq.com/docs/traces-open-telemetry/how-it-works/).
+Frontend monitoring alone cannot provide a complete view of an application’s health. Many issues arise at the intersection of the frontend and backend, requiring integrated observability across the entire stack. Without this integration, teams risk spending excessive time proving whether an issue is frontend- or backend-related. Implementing [context propagation](https://www.checklyhq.com/learn/opentelemetry/context-propagation/) and unified tracing, such as through OpenTelemetry, helps connect frontend events to backend processes, enabling a more holistic understanding of system behavior and streamlining troubleshooting efforts. For more detail on connecting backend [OpenTelemetry traces](https://www.checklyhq.com/learn/opentelemetry/traces/) with frontend performance see how [Checkly Traces connects data from across your stack](/resolve/traces/how-it-works).
 
 ## Top frontend monitoring tools
 
 | Tool | Features | Notes |
 | --- | --- | --- |
-| **Checkly** | Uses Playwright [end-to-end tests for synthetic monitoring](https://www.checklyhq.com/docs/monitoring/). Robust alerts to detect issues early. Integrates with OpenTelemetry traces. | Excellent for proactive monitoring and integration with backend systems. |
+| **Checkly** | Uses Playwright [end-to-end tests for synthetic monitoring](/detect/synthetic-monitoring/overview). Robust alerts to detect issues early. Integrates with OpenTelemetry traces. | Excellent for proactive monitoring and integration with backend systems. |
 | **Sematext** | Backend monitoring with [an open-source data collection agent](https://github.com/sematext/sematext-agent-java). | Suitable for teams needing a lightweight, open-source-friendly solution. |
 | **Pingdom** | Specializes in uptime monitoring and performance tracking. | Focused on simple up-or-down monitoring. Limited in scope compared to other tools. |
 | **Google PageSpeed Insights** | Provides performance recommendations based on real-world data. | Primarily an auditing tool, best for reactive monitoring. |

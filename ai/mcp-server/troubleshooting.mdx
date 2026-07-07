@@ -8,8 +8,8 @@ sidebarTitle: 'Troubleshooting'
 Before troubleshooting, confirm:
 
 - Your MCP client is configured with `https://api.checklyhq.com/mcp`.
-- Your MCP client is in the [supported clients list](/ai/mcp-server/setup#supported-clients).
-- You completed the OAuth login flow.
+- Your OAuth client is in the [supported clients list](/ai/mcp-server/setup#supported-clients), or your API-key client can send custom HTTP headers.
+- You completed the OAuth login flow, or configured an `Authorization: Bearer <checkly-api-key>` header for API-key authentication.
 - You restarted your MCP client after editing configuration.
 - Your Checkly user has access to the account you want to use.
 </Accordion>
@@ -18,34 +18,37 @@ Before troubleshooting, confirm:
 
 If your client reports that authentication is required or invalid:
 
-1. Re-run your client's MCP login flow.
-2. Confirm the endpoint is exactly `https://api.checklyhq.com/mcp`.
-3. Remove stale Checkly MCP credentials from the client if it keeps reusing an old token.
-4. Reconnect and call `whoami`.
+1. If you use OAuth, re-run your client's MCP login flow.
+2. If you use API-key authentication, confirm the header is exactly `Authorization: Bearer <checkly-api-key>`.
+3. Confirm the endpoint is exactly `https://api.checklyhq.com/mcp`.
+4. Remove stale Checkly MCP credentials from the client if it keeps reusing an old token.
+5. Reconnect and call `whoami`.
+
+For API-key authentication, use a current `cu_...` user API key, or a current `sv_...` service API key. Deprecated account API keys and old `sk_...` service-key formats are rejected.
 
 <Warning>
-If the browser login page shows an Auth0 "Something went wrong" error, contact [Checkly Support](mailto:support@checklyhq.com). Include the MCP client you used, the Checkly account you were trying to access, and the approximate time of the error.
+If the browser login page shows a "Something went wrong" error, contact [Checkly Support](mailto:support@checklyhq.com). Include the MCP client you used, the Checkly account you were trying to access, and the approximate time of the error.
 </Warning>
 
 ## OAuth registration fails
 
-The Checkly MCP Server only supports clients that Checkly has approved in Auth0. Checkly does not support Dynamic Client Registration (DCR).
+The Checkly MCP Server only supports Checkly-approved OAuth clients. Checkly does not support Dynamic Client Registration (DCR).
 
-If your client reports a dynamic registration error, a failed client registration, or never opens the expected OAuth flow, confirm that the client is in the [supported clients list](/ai/mcp-server/setup#supported-clients). Unsupported clients cannot connect to the public Checkly MCP Server, even if they support remote MCP servers.
+If your client reports a dynamic registration error, a failed client registration, or never opens the expected OAuth flow, confirm that the client is in the [supported clients list](/ai/mcp-server/setup#supported-clients). Unsupported OAuth clients cannot complete the Checkly OAuth flow, even if they support remote MCP servers.
 
 ## No tools are listed
 
-Visible tools depend on the OAuth permissions granted to the MCP session. If no tools appear:
+Visible tools depend on the permissions granted to the MCP session. If no tools appear:
 
 1. Use your MCP client's refresh tools option.
 2. Restart the client if the tools list still does not update.
-3. Reconnect and complete OAuth again.
+3. Reconnect and complete OAuth again, or confirm your API-key header is still configured.
 
 After the tools list refreshes, call `whoami` or ask Checkly which accounts you can access to verify the connection.
 
 ## A specific tool is missing
 
-Each tool requires an OAuth permission. For example:
+Each tool requires an MCP session permission. For example:
 
 - Check status and results require permission to list checks, their status and results.
 - Test sessions require permission to read your Checkly test sessions.
@@ -53,6 +56,8 @@ Each tool requires an OAuth permission. For example:
 - Incident write tools require permission to create and update your Checkly incidents.
 
 See [MCP tools](/ai/mcp-server/tools) for the full tool list.
+
+The `invite-account-member` tool is not available with API-key authentication. Reconnect with OAuth if you need to invite account members through MCP.
 
 If the tool you expected is not part of the current MCP Server, [share feedback or requests](https://feedback.checklyhq.com) so we can understand the workflow your agent was trying to complete.
 
@@ -97,5 +102,6 @@ Before approving write tool calls, check:
 
 Some browser-based clients require CORS support and may handle OAuth differently from command-line clients. If a browser-based client cannot connect:
 
-1. Confirm the client is in the [supported clients list](/ai/mcp-server/setup#supported-clients).
-2. Try another supported client, such as Claude Code.
+1. If you use OAuth, confirm the client is in the [supported clients list](/ai/mcp-server/setup#supported-clients).
+2. If you use API-key authentication, confirm the client sends custom headers with remote MCP requests.
+3. Try another supported client, such as Claude Code.

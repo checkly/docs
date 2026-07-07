@@ -190,6 +190,12 @@ Additionally, if your API responds with a binary type body, i.e. a PDF or video 
 it with a short text saying that we scrubbed it. We determine the body content type by looking at the `Content-Type`
 response header.
 
+<Warning>
+If an endpoint returns a text payload with a binary `Content-Type` header, such as `application/octet-stream`, Checkly treats the response as binary and scrubs the body before text body assertions run. For endpoints you know return text despite the header, contact support to enable the feature-flagged **Treat response body as text** override for API checks.
+
+Only use this override for known text responses. Enabling it for true binary responses can expose binary payloads in check results and make assertions unreliable.
+</Warning>
+
 This list shows all content types that we scrub from the response data.
 
 | content type |

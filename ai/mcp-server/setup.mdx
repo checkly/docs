@@ -1,6 +1,6 @@
 ---
 title: 'Set up the Checkly MCP Server'
-description: 'Configure a supported MCP client to connect to the Checkly MCP Server over Streamable HTTP.'
+description: 'Configure OAuth or API-key authentication for the Checkly MCP Server over Streamable HTTP.'
 sidebarTitle: 'Setup'
 ---
 
@@ -11,12 +11,12 @@ https://api.checklyhq.com/mcp
 ```
 
 <Warning>
-The Checkly MCP Server only supports the clients listed below. Clients that use [Dynamic Client Registration (DCR)](https://datatracker.ietf.org/doc/html/rfc7591) are rejected.
+OAuth is the recommended way to connect. The OAuth flow only supports the clients listed below. Clients that use [Dynamic Client Registration (DCR)](https://datatracker.ietf.org/doc/html/rfc7591) are rejected.
 </Warning>
 
 ## Supported clients
 
-The public Checkly MCP Server currently supports these clients:
+The public Checkly MCP Server currently supports OAuth for these clients:
 
 | Client | Support status | Notes |
 | --- | --- | --- |
@@ -29,7 +29,7 @@ The public Checkly MCP Server currently supports these clients:
 | Cursor | Supported | Uses Checkly's static Cursor MCP OAuth client. Configure `.cursor/mcp.json` or `~/.cursor/mcp.json`. |
 | VS Code | Supported | Configure `.vscode/mcp.json` or your VS Code user profile. |
 
-Supported clients must use a Checkly-approved OAuth client in Auth0. Most supported clients use [OAuth Client ID Metadata Documents (CIMD)](https://datatracker.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/). Cursor, Devin CLI, and OpenCode use Checkly's static MCP OAuth clients. Clients that rely on DCR are not supported.
+Supported OAuth clients must use a Checkly-approved OAuth client. Most supported clients use [OAuth Client ID Metadata Documents (CIMD)](https://datatracker.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/). Cursor, Devin CLI, and OpenCode use Checkly's static MCP OAuth clients. Clients that rely on DCR are not supported.
 
 If you want Checkly to support another compatible client, [share feedback or requests](https://feedback.checklyhq.com).
 
@@ -50,6 +50,39 @@ claude mcp add --transport http checkly https://api.checklyhq.com/mcp
 ```
 
 Start a Claude Code session and complete the OAuth flow when prompted.
+
+## API key authentication
+
+<Accordion title="Before you begin">
+Before using API-key authentication, ensure you have:
+
+- An MCP client that can send custom HTTP headers.
+- A current Checkly user API key starting with `cu_...`, or a current service API key starting with `sv_...`.
+- A secure place to store the key outside version control.
+</Accordion>
+
+Use API-key authentication only when OAuth is not practical for your workflow. Send the API key in the `Authorization` header:
+
+```bash Terminal
+claude mcp add --transport http checkly https://api.checklyhq.com/mcp --header "Authorization: Bearer <checkly-api-key>"
+```
+
+For clients that use an `mcpServers` JSON configuration, add the header to the Checkly server entry:
+
+```json mcp.json
+{
+  "mcpServers": {
+    "checkly": {
+      "url": "https://api.checklyhq.com/mcp",
+      "headers": {
+        "Authorization": "Bearer <checkly-api-key>"
+      }
+    }
+  }
+}
+```
+
+Service API keys are limited to the key's configured account and role. Deprecated account API keys and old `sk_...` service-key formats are rejected. API-key sessions cannot use the `invite-account-member` tool.
 
 ## Devin CLI
 
@@ -165,7 +198,7 @@ Restart VS Code after changing the configuration.
 
 ## Known client limitations
 
-Some MCP clients support remote MCP servers but do not work with the public Checkly MCP Server yet. If your preferred compatible client is missing, [share feedback or requests](https://feedback.checklyhq.com).
+Some MCP clients support remote MCP servers but do not work with the public Checkly MCP Server OAuth flow yet. If your preferred compatible client is missing, [share feedback or requests](https://feedback.checklyhq.com).
 
 ### Cline
 
@@ -226,4 +259,4 @@ Then verify tool access:
 Use Checkly to list the tools available to this session.
 ```
 
-The visible tools depend on the OAuth permissions granted to your MCP session. See [Security and permissions](/ai/mcp-server/security-and-permissions) for details.
+The visible tools depend on the permissions granted to your MCP session. See [Security and permissions](/ai/mcp-server/security-and-permissions) for details.

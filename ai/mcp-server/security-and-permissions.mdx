@@ -4,17 +4,24 @@ description: 'Understand how the Checkly MCP Server authenticates users, filters
 sidebarTitle: 'Security & permissions'
 ---
 
-The Checkly MCP Server uses OAuth and Checkly account authorization together. OAuth permissions decide which tools are visible to your MCP client. Checkly account membership, role, and feature entitlements decide whether a specific tool call can operate on an account.
+The Checkly MCP Server uses bearer-token authentication and Checkly account authorization together. Session permissions decide which tools are visible to your MCP client. Checkly account membership, role, and feature entitlements decide whether a specific tool call can operate on an account.
 
 ## Authentication
 
-The MCP Server accepts Auth0-issued bearer tokens for `https://api.checklyhq.com/mcp`. Your MCP client completes the OAuth flow and sends the token with requests to the MCP endpoint.
+The MCP Server accepts two types of bearer tokens for `https://api.checklyhq.com/mcp`:
 
-The public MCP Server only supports OAuth clients that Checkly has approved in Auth0. Checkly rejects clients that attempt to use [Dynamic Client Registration (DCR)](https://datatracker.ietf.org/doc/html/rfc7591). See [supported clients](/ai/mcp-server/setup#supported-clients) for setup details.
+- OAuth bearer tokens from Checkly-approved MCP clients.
+- Checkly user API keys starting with `cu_...`, and service API keys starting with `sv_...`, sent as `Authorization: Bearer <checkly-api-key>`.
 
-Checkly maps the token subject to a Checkly user, then loads that user's account memberships and account context for tool calls.
+OAuth is recommended for interactive clients. The public MCP Server only supports Checkly-approved OAuth clients. Checkly rejects clients that attempt to use [Dynamic Client Registration (DCR)](https://datatracker.ietf.org/doc/html/rfc7591). See [supported clients](/ai/mcp-server/setup#supported-clients) for setup details.
 
-## OAuth permissions
+Checkly maps OAuth tokens and user API keys to a Checkly user, then loads that user's account memberships and account context for tool calls. Service API keys map to the key's configured account and role.
+
+<Warning>
+API keys are long-lived credentials. Use API-key authentication only when OAuth is not practical, store keys securely, and rotate them when they are no longer needed.
+</Warning>
+
+## Session permissions
 
 | Permission | Description |
 | --- | --- |
@@ -32,6 +39,8 @@ Checkly maps the token subject to a Checkly user, then loads that user's account
 | `checkly:test-sessions:read` | Read your Checkly test sessions |
 | `checkly:assets:read` | Read your Checkly assets |
 
+OAuth sessions use the permissions granted by the OAuth flow. API-key sessions receive all permissions listed above except `checkly:account:invite`, so `invite-account-member` is only available with OAuth.
+
 Tools are filtered from `tools/list` when the MCP session does not include the required permission. Tool calls are also rejected if the session lacks the required permission.
 
 ## Account context
@@ -42,9 +51,11 @@ Most tools operate on one Checkly account. You can select a specific account in 
 Accounts that require mTLS are not available through the public MCP Server.
 </Warning>
 
+Blocked accounts can be inspected with read-only tools, but write, run, and admin tools are rejected.
+
 ## Role checks
 
-Some tools require both an OAuth permission and a Checkly account role:
+Some tools require both an MCP session permission and a Checkly account role:
 
 | Tool or action | Additional account access required |
 | --- | --- |

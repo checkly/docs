@@ -117,7 +117,7 @@ new TracerouteMonitor('traceroute-monitor', {
 |-----------|------|----------|---------|-------------|
 | `url` | `string` | ✅ | - | Target hostname or IP address. Do not include a scheme or port |
 | `protocol` | `string` | ❌ | `'TCP'` | Probe protocol: `'TCP'` \| `'UDP'` \| `'ICMP'` \| `'SCTP'` |
-| `port` | `number` | ❌ | `443` (TCP), `33434` (UDP/SCTP) | Destination port (1–65535). Ignored when `protocol` is `'ICMP'` |
+| `port` | `number` | ❌ | `443` | Destination port (1–65535). Defaults to `443` for all non-ICMP protocols. For UDP/SCTP, set `port: 33434` explicitly — a high closed port so the destination returns ICMP Unreachable to confirm arrival. Ignored when `protocol` is `'ICMP'` |
 | `ipFamily` | `string` | ❌ | `'IPv4'` | IP family: `'IPv4'` \| `'IPv6'` |
 | `maxHops` | `number` | ❌ | `30` | Maximum hops to probe (1–64) |
 | `maxUnknownHops` | `number` | ❌ | `15` | Maximum consecutive unresponsive hops before stopping (1–30) |

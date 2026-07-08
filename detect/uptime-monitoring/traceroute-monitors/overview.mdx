@@ -32,12 +32,12 @@ A Traceroute monitor executes the following steps on each run:
 | Protocol | Default port | How destination is detected |
 |----------|-------------|---------------------------|
 | **TCP** (default) | 443 | SYN-ACK or RST received from destination |
-| **UDP** | 33434 | ICMP Port Unreachable from destination |
+| **UDP** | 33434 | Any ICMP Destination Unreachable from the target (port unreachable, admin-prohibited, host unreachable, etc.) |
 | **ICMP** | *(no port)* | Echo Reply from destination |
-| **SCTP** | 33434 | INIT-ACK from destination |
+| **SCTP** | 33434 | SCTP ABORT or INIT-ACK from destination, or ICMP Destination Unreachable from the target |
 
 <Note>
-UDP and SCTP probes default to port 33434 — a high, typically-closed port. Destination arrival is confirmed only when the host returns ICMP Port Unreachable, which requires the port to be closed. Using an open port (such as 443) would prevent arrival detection for these protocols.
+The default port for UDP and SCTP in the Checkly web UI is pre-filled to `33434` — a high, typically-closed port where the destination is more likely to return an ICMP Destination Unreachable. When configuring via the CLI or API, the port defaults to `443` for all non-ICMP protocols, so set `port: 33434` explicitly for UDP/SCTP probes if you want the same behavior.
 </Note>
 
 ## Traceroute Monitor Results

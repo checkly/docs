@@ -27,7 +27,7 @@ Use assertions to validate Traceroute results and alert when paths change or deg
 
 You can create assertions based on:
 
-* **Latency:** RTT statistics for the **final responding hop**. Available properties: `avg`, `min`, `max`, `stdDev` (all in milliseconds). This assertion requires the destination to be reached — if `destinationReached` is `false`, the assertion fails
+* **Latency:** RTT statistics for the **final responding hop**. Available properties: `avg`, `min`, `max`, `stdDev` (all in milliseconds). This assertion requires the destination to be reached — if `destinationReached` is `false`, `finalHopLatency` is absent and the assertion fails
 * **Hop Count:** Total number of hops recorded in the trace. Use this to detect routing changes that add or remove hops from the expected path
 * **Packet Loss:** Packet loss percentage at the **last recorded hop** (0–100). A non-zero value indicates that some probe packets were not returned
 
@@ -52,7 +52,7 @@ The Traceroute response is available as structured JSON. All responses share thi
 {
   "hostname": "api.example.com",          // Target hostname or IP as configured
   "resolvedIp": "93.184.216.34",          // IP address used for the trace
-  "port": 443,                             // Destination port (omitted for ICMP)
+  "port": 443,                             // Destination port; always present (0 for ICMP probes)
   "ipFamily": "IPv4",                      // "IPv4" or "IPv6"
   "maxHops": 30,                           // Configured max hops
   "totalHops": 12,                         // Number of hops actually recorded
@@ -61,7 +61,7 @@ The Traceroute response is available as structured JSON. All responses share thi
                                            // "destinationReached" | "maxHops" | "maxUnknownHops" | "timeout"
   "probeProtocol": "TCP",                 // Probe protocol: "TCP" | "UDP" | "ICMP" | "SCTP"
   "finalHopLatency": {                     // RTT stats for the last responding hop
-    "avg": 12.34,                         //   null when destination is not reached
+    "avg": 12.34,                         // Omitted entirely (field absent) when destination is not reached
     "min": 11.80,
     "max": 13.10,
     "stdDev": 0.42

@@ -47,9 +47,11 @@ function walk(node) {
 }
 walk(docs.navigation)
 
-const urls = [...slugs]
-  .sort()
-  .map((slug) => `  <url>\n    <loc>${BASE}${slug}/</loc>\n  </url>`)
+// The docs home (index.mdx) is served at /docs/ but is not a nav slug, so add
+// it explicitly — otherwise the homepage is missing from the sitemap.
+const locs = [BASE, ...[...slugs].sort().map((slug) => `${BASE}${slug}/`)]
+const urls = locs
+  .map((loc) => `  <url>\n    <loc>${loc}</loc>\n  </url>`)
   .join('\n')
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -59,4 +61,4 @@ ${urls}
 `
 
 writeFileSync(join(ROOT, 'sitemap.xml'), xml)
-console.log(`Wrote sitemap.xml with ${slugs.size} trailing-slash URLs`)
+console.log(`Wrote sitemap.xml with ${locs.length} trailing-slash URLs (incl. home)`)

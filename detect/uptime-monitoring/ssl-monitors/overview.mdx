@@ -26,7 +26,7 @@ Each SSL monitor run performs the following steps:
 2. **TCP connect** — A TCP connection is opened to the target host and port (default: 443)
 3. **TLS handshake** — A full TLS handshake is performed; an optional SNI server name override can be sent during this step
 4. **Certificate inspection** — The leaf certificate and chain are examined: expiry date, hostname verification, chain trust, signature algorithm, key size, SANs, and fingerprints are all captured
-5. **Security baseline evaluation** — A configurable rule set evaluates the negotiated protocol (TLS version, cipher suite, CA trust) and produces a per-rule verdict plus an overall **grade** and **verdict** (`pass` / `warn` / `fail`)
+5. **Security baseline evaluation** — On a successful handshake and certificate verification, a configurable rule set evaluates the negotiated protocol (TLS version, cipher suite, CA trust) and produces a per-rule verdict plus an overall **grade** and **verdict** (`pass` / `warn` / `fail`). The baseline is skipped when an earlier step fails (e.g. hostname mismatch or chain untrusted).
 6. **Assertions** — Optional assertions are evaluated against the certificate and handshake data
 
 ## SSL Monitor Results
@@ -35,7 +35,7 @@ Select a specific check run to inspect its results:
 
 * **Summary:** Shows the target hostname and port, the monitor state (passed, degraded, or failed), and the TLS handshake time
 
-* **Error details:** If the run failed, the error category and message explain what went wrong (e.g., `EXPIRED_CERT`, `HOSTNAME_MISMATCH`, `HANDSHAKE_TIMEOUT`)
+* **Error details:** If the run failed, the error category and message explain what went wrong. Categories map to the stage where the failure occurred: `dns` (name resolution), `connect` (TCP connection), `timeout` or `handshake` (TLS handshake), `hostname` (certificate does not cover the monitored hostname), or `chain` (certificate chain not trusted). An expired certificate surfaces as a failure via a negative `daysUntilExpiry` value rather than a separate category.
 
 * **Handshake data:** The negotiated TLS version, cipher suite, and handshake duration in milliseconds
 
@@ -49,13 +49,13 @@ Learn more in our documentation on [Results](/concepts/results).
 
 ## The Security Baseline
 
-The security baseline is a built-in rule set that evaluates each handshake against current best practices without requiring explicit assertions. Rules cover:
+The security baseline is a built-in rule set that evaluates each successful handshake and certificate verification against current best practices without requiring explicit assertions. Rules cover:
 
 | Rule | Default severity | What it checks |
 |------|-----------------|----------------|
 | `minTLSVersion` | `fail` | Negotiated TLS version is at or above the required minimum |
 | `minKeySizeBits` | `fail` | RSA key size meets the required minimum |
-| `weakSignatureAlgorithm` | `fail` | No non-root certificate in the chain uses MD2, MD5, SHA-1, or DSA-SHA1 |
+| `weakSignatureAlgorithm` | `fail` | No non-root certificate in the chain uses MD2-RSA, MD5-RSA, SHA1-RSA, DSA-SHA1, or ECDSA-SHA1 |
 | `weakCipherSuite` | `fail` | The negotiated cipher suite is not in the known-weak list |
 | `knownBadCA` | `fail` | No certificate in the chain was issued by a distrusted CA |
 | `recommendedTLSVersion` | `ignore` (advisory) | Negotiated version meets the recommended minimum |
@@ -75,14 +75,14 @@ You can override the default severity for each rule or disable the baseline enti
 
 ## Troubleshooting Common Issues
 
-<Accordion title="The monitor fails with HOSTNAME_MISMATCH but the site loads fine in a browser">
-This can happen when a server hosts multiple certificates and the default certificate served to Checkly does not cover the monitored hostname. Use the **SNI server name** (`serverName`) option in the SSL config to explicitly request the certificate for your hostname.
+<Accordion title="Hostname verification failed but the site loads fine in a browser">
+This can happen when a server hosts multiple certificates and the default certificate served to Checkly does not cover the monitored hostname. The runner reports this as failure category `hostname`. Use the **SNI server name** (`serverName`) option in the SSL config to explicitly request the certificate for your hostname.
 
 If the certificate is legitimately shared across hostnames (e.g. a wildcard `*.example.com` that covers `api.example.com`) and hostname verification still fails, confirm the SAN list on the certificate contains the monitored hostname.
 </Accordion>
 
-<Accordion title="The monitor fails with CHAIN_UNTRUSTED">
-A chain trust failure means one or more intermediate certificates are missing or the root is not trusted. Common causes:
+<Accordion title="Certificate chain is not trusted">
+A chain trust failure (failure category `chain`) means one or more intermediate certificates are missing or the root is not trusted. Common causes:
 
 * The server is not sending the full intermediate chain — verify with `openssl s_client -connect hostname:443 -showcerts`
 * The certificate was issued by a CA whose root was recently distrusted (e.g. Entrust 2024)

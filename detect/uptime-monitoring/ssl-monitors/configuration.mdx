@@ -41,7 +41,7 @@ Client certificates are stored at the account level under **Settings → Client 
 
 ### Security Baseline
 
-The security baseline is a configurable rule set that evaluates the negotiated TLS session against best-practice requirements. It runs automatically on every check and produces a **verdict** (`pass` / `warn` / `fail`) and a **grade** (`A-`, `B`, or `F`).
+The security baseline is a configurable rule set that evaluates the negotiated TLS session against best-practice requirements. It runs on each successful handshake and certificate verification, and produces a **verdict** (`pass` / `warn` / `fail`) and a **grade** (`A-`, `B`, or `F`). It is skipped when an earlier step fails (e.g. hostname mismatch or chain untrusted).
 
 You can override the default severity for each rule:
 
@@ -92,8 +92,8 @@ For more details, see our documentation on [Assertions](/detect/assertions).
 
 Set performance thresholds based on the TLS handshake duration:
 
-* **Degraded After:** Handshake time (in milliseconds) above which the monitor is marked as degraded but not failed. Default: 3,000 ms.
-* **Failed After:** Handshake time above which the monitor fails. Must be greater than or equal to the degraded threshold. Default: 10,000 ms.
+* **Degraded After:** Handshake time (in milliseconds) at or above which the monitor is marked as degraded but not failed. Range: 0–30,000 ms. Default: 3,000 ms.
+* **Failed After:** Handshake time at or above which the monitor fails. Must be greater than or equal to the degraded threshold. Range: 0–30,000 ms. Default: 10,000 ms.
 
 ### Frequency
 

@@ -137,7 +137,7 @@ new SslMonitor("my-ssl-monitor", {
 </ResponseField>
 
 <ResponseField name="degradedResponseTime" type="number" default="3000">
-TLS handshake time in milliseconds above which the monitor is marked as degraded (warning state). Must be ≤ `maxResponseTime`.
+TLS handshake time in milliseconds at or above which the monitor is marked as degraded (warning state). Range: 0–30,000 ms. Must be ≤ `maxResponseTime`.
 
 **Usage:**
 
@@ -155,7 +155,7 @@ new SslMonitor("my-ssl", {
 </ResponseField>
 
 <ResponseField name="maxResponseTime" type="number" default="10000">
-TLS handshake time in milliseconds above which the monitor is marked as failed.
+TLS handshake time in milliseconds at or above which the monitor is marked as failed. Range: 0–30,000 ms.
 
 **Usage:**
 
@@ -230,6 +230,17 @@ sslConfig: {
 ```
 </ResponseField>
 
+<ResponseField name="sslClientCertificateId" type="string">
+The ID of the stored client certificate to present during the TLS handshake. Required when `clientCertificateMode` is `'explicit'`. Client certificates are managed under **Settings → Client Certificates** in the Checkly dashboard.
+
+```ts
+sslConfig: {
+  clientCertificateMode: "explicit",
+  sslClientCertificateId: "cert_abc123",
+}
+```
+</ResponseField>
+
 <ResponseField name="securityBaseline" type="SecurityBaseline">
 Override the account-level security baseline for this monitor. Omit to inherit the account default.
 
@@ -254,7 +265,7 @@ sslConfig: {
 | `enabled` | `boolean` | `true` | Enable or disable baseline evaluation |
 | `minTLSVersion` | `{ value?: string, severity? }` | `fail` | Minimum required TLS version (e.g. `'TLS1.2'`) |
 | `minKeySizeBits` | `{ value?: number, severity? }` | `fail` | Minimum RSA key size in bits |
-| `weakSignatureAlgorithm` | `{ severity? }` | `fail` | Reject weak signature algorithms (MD5, SHA-1, DSA-SHA1) |
+| `weakSignatureAlgorithm` | `{ severity? }` | `fail` | Reject weak signature algorithms (MD2-RSA, MD5-RSA, SHA1-RSA, DSA-SHA1, ECDSA-SHA1) on non-root certificates |
 | `weakCipherSuite` | `{ severity? }` | `fail` | Reject known-weak cipher suites |
 | `knownBadCA` | `{ severity? }` | `fail` | Reject distrusted certificate authorities |
 | `recommendedTLSVersion` | `{ value?: string, severity? }` | `ignore` | Advisory minimum TLS version |

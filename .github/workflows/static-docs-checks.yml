@@ -75,6 +75,20 @@ jobs:
         if: steps.detect.outputs.docs_changed == 'true'
         run: python3 .github/scripts/check_redirect_destinations.py
 
+      # The custom sitemap.xml (trailing-slash URLs, overriding Mintlify's
+      # auto-generated one) is generated from docs.json navigation. If a nav
+      # page is added/renamed/removed without regenerating, the committed
+      # sitemap drifts — regenerate and fail if it differs.
+      - name: Sitemap up to date
+        if: steps.detect.outputs.docs_changed == 'true'
+        run: |
+          node scripts/generate-sitemap.mjs
+          if ! git diff --quiet -- sitemap.xml; then
+            echo "::error::sitemap.xml is out of date. Run 'npm run generate-sitemap' and commit the result."
+            git --no-pager diff -- sitemap.xml | head -60
+            exit 1
+          fi
+
       - name: Broken-links scan
         if: steps.detect.outputs.docs_changed == 'true'
         run: |

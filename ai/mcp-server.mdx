@@ -1,10 +1,11 @@
 ---
 title: 'Checkly MCP Server'
-description: 'Connect supported AI clients to Checkly to inspect checks, test sessions, RCA, result assets, status pages, incidents, and account context.'
+description: 'Connect MCP clients to Checkly to inspect checks, test sessions, RCA, result assets, status pages, incidents, and account context.'
 sidebarTitle: 'Overview'
+canonical: 'https://www.checklyhq.com/docs/ai/mcp-server/'
 ---
 
-The Checkly MCP Server lets supported AI clients connect to Checkly over Streamable HTTP and use Checkly tools from your conversation.
+The Checkly MCP Server lets MCP clients connect to Checkly over Streamable HTTP and use Checkly tools from your conversation.
 
 Use the production MCP endpoint in your client:
 
@@ -13,7 +14,7 @@ https://api.checklyhq.com/mcp
 ```
 
 <Warning>
-The Checkly MCP Server only supports Checkly-approved OAuth clients listed in setup. Clients that use Dynamic Client Registration (DCR) are rejected. See [setup requirements](/ai/mcp-server/setup) for supported clients and details.
+OAuth is the recommended way to connect. The OAuth flow only supports Checkly-approved clients listed in setup. API-key authentication is available for non-interactive clients that can send custom headers, but you are responsible for protecting and rotating the key.
 </Warning>
 
 Use it when your agent needs live Checkly account context, check status, check results, test sessions, root cause analyses, result assets, status pages, incidents, account environment variables, or when it needs to trigger existing checks.
@@ -40,10 +41,10 @@ Before connecting an MCP client, ensure you have:
 
 - A Checkly user account.
 - Access to the Checkly account you want the MCP client to use.
-- A [supported MCP client](/ai/mcp-server/setup#supported-clients).
+- A [supported OAuth MCP client](/ai/mcp-server/setup#supported-clients), or an MCP client that can send custom HTTP headers for API-key authentication.
 </Accordion>
 
-[Add the Checkly MCP endpoint to your client](/ai/mcp-server/setup), complete the OAuth flow, then ask your client to verify the connection:
+[Add the Checkly MCP endpoint to your client](/ai/mcp-server/setup), complete the OAuth flow, then ask your client to verify the connection. If your client cannot complete OAuth but can send custom headers, configure API-key authentication instead.
 
 ```text title="Prompt" wrap
 Use Checkly to show which accounts I can access.
@@ -85,7 +86,7 @@ Create a major status page incident for the API outage, but do not notify subscr
 
 ## MCP, Skills, and CLI
 
-MCP, Checkly Skills, and the Checkly CLI are complementary. Use the MCP Server for a quick, OAuth-based connection from a supported client. Use Checkly Skills with the CLI when your agent needs to create, edit, test, or deploy code from your local project.
+MCP, Checkly Skills, and the Checkly CLI are complementary. Use the MCP Server for a quick OAuth-based connection from a supported client. Use API-key authentication only when OAuth is not practical for a non-interactive workflow. Use Checkly Skills with the CLI when your agent needs to create, edit, test, or deploy code from your local project.
 
 See [Skills, MCP, and the CLI](/ai/overview#skills-mcp-and-the-cli) for a full comparison of when to use each.
 

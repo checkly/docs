@@ -43,7 +43,7 @@ new GrpcMonitor('grpc-health-1', {
       service: 'my.package.MyService',
     },
     assertions: [
-      GrpcAssertionBuilder.healthCheckStatus().equals('SERVING'),
+      GrpcAssertionBuilder.healthCheckStatus().equals(1), // 1 = SERVING
       GrpcAssertionBuilder.responseTime().lessThan(500),
     ],
   },
@@ -75,7 +75,7 @@ new GrpcMonitor('grpc-behavior-1', {
     assertions: [
       GrpcAssertionBuilder.statusCode().equals(0),
       GrpcAssertionBuilder.responseTime().lessThan(1000),
-      GrpcAssertionBuilder.responseMessage('$.name').isNotEmpty(),
+      GrpcAssertionBuilder.responseMessage('$.name').notEmpty(),
     ],
   },
 })
@@ -123,7 +123,7 @@ new GrpcMonitor('grpc-monitor', {
       tls: true,
     },
     assertions: [
-      GrpcAssertionBuilder.healthCheckStatus().equals('SERVING'),
+      GrpcAssertionBuilder.healthCheckStatus().equals(1), // 1 = SERVING
     ],
   },
 })
@@ -208,7 +208,7 @@ Use `GrpcAssertionBuilder` to define assertions for the `request` of a `GrpcMoni
 
 - `responseTime()`: Assert the total response time (DNS + connect + call) in milliseconds
 - `statusCode()`: Assert the numeric gRPC status code (`0` = OK, `14` = UNAVAILABLE, etc.)
-- `healthCheckStatus()`: Assert the health status string (HEALTH mode): `SERVING`, `NOT_SERVING`, `UNKNOWN`, `SERVICE_UNKNOWN`
+- `healthCheckStatus()`: Assert the health status by its **numeric** value (HEALTH mode). The runner evaluates this as a number — not a string. Enum mapping: `UNKNOWN=0`, `SERVING=1`, `NOT_SERVING=2`, `SERVICE_UNKNOWN=3`
 - `responseMessage(property?)`: Assert against the JSON response body (BEHAVIOR mode), with an optional JSON path (e.g. `'$.name'`)
 - `textBody(property?)`: Assert against the raw response body as text
 - `responseMetadata(property?)`: Assert against response metadata (header) values returned by the server, identified by key
@@ -223,18 +223,18 @@ GrpcAssertionBuilder.statusCode().equals(0)
 { source: 'GRPC_STATUS_CODE', comparison: 'EQUALS', target: '0' }
 ```
 
-- Assert the health check reports SERVING:
+- Assert the health check reports SERVING (numeric target required — the runner does not accept string labels):
 
 ```ts
-GrpcAssertionBuilder.healthCheckStatus().equals('SERVING')
+GrpcAssertionBuilder.healthCheckStatus().equals(1) // UNKNOWN=0, SERVING=1, NOT_SERVING=2, SERVICE_UNKNOWN=3
 // Equivalent to:
-{ source: 'GRPC_HEALTHCHECK_STATUS', comparison: 'EQUALS', target: 'SERVING' }
+{ source: 'GRPC_HEALTHCHECK_STATUS', comparison: 'EQUALS', target: '1' }
 ```
 
 - Assert a specific field in the JSON response body:
 
 ```ts
-GrpcAssertionBuilder.responseMessage('$.userId').isNotEmpty()
+GrpcAssertionBuilder.responseMessage('$.userId').notEmpty()
 // Equivalent to:
 { source: 'GRPC_RESPONSE', property: '$.userId', comparison: 'NOT_EMPTY', target: '' }
 ```
@@ -340,7 +340,7 @@ new GrpcMonitor('auth-health', {
       service: 'auth.AuthService',
     },
     assertions: [
-      GrpcAssertionBuilder.healthCheckStatus().equals('SERVING'),
+      GrpcAssertionBuilder.healthCheckStatus().equals(1), // 1 = SERVING
       GrpcAssertionBuilder.responseTime().lessThan(500),
     ],
   },
@@ -375,7 +375,7 @@ message Order { string order_id = 1; string status = 2; }`,
     },
     assertions: [
       GrpcAssertionBuilder.statusCode().equals(0),
-      GrpcAssertionBuilder.responseMessage('$.status').isNotEmpty(),
+      GrpcAssertionBuilder.responseMessage('$.status').notEmpty(),
     ],
   },
 })
@@ -402,7 +402,7 @@ new GrpcMonitor('secure-grpc', {
       ],
     },
     assertions: [
-      GrpcAssertionBuilder.healthCheckStatus().equals('SERVING'),
+      GrpcAssertionBuilder.healthCheckStatus().equals(1), // 1 = SERVING
     ],
   },
 })

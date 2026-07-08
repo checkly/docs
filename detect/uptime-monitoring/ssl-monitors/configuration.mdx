@@ -1,0 +1,113 @@
+---
+title: 'SSL Monitor Configuration'
+description: 'Configure your SSL monitor to track certificate health, expiry, and TLS security posture.'
+sidebarTitle: 'Configuration'
+---
+
+<Tip>
+To configure an SSL monitor using code, learn more about the [SSL Monitor Construct](/constructs/ssl-monitor).
+</Tip>
+
+### Basic Setup
+
+Configure your SSL monitor by specifying the target host:
+
+* **Hostname:** The domain or IP address to connect to (e.g. `api.example.com`). Do not include a scheme or port.
+* **Port:** The TCP port to connect to. Defaults to `443`.
+* **IP family:** Choose between IPv4 (default) or IPv6.
+
+### SSL Configuration
+
+Fine-grained control over the TLS handshake behavior:
+
+* **SNI server name (`serverName`):** Override the Server Name Indication sent during the TLS handshake. Useful when a single IP serves multiple certificates and you want to request a specific one. Defaults to the configured hostname when unset.
+
+* **Handshake timeout:** Maximum time in milliseconds to wait for the TLS handshake to complete. Range: 1,000–30,000 ms. Default: 10,000 ms.
+
+* **Alert days before expiry (`alertDaysBeforeExpiry`):** Raise a degraded alert when the certificate is within this many days of expiry. Range: 1–365 days. Default: 20 days. The monitor always fails immediately if the certificate is already expired.
+
+* **Skip chain validation:** When enabled, Checkly does not verify the certificate chain against trusted roots. The certificate is still inspected for expiry and the security baseline. Use this when monitoring internal or self-signed certificates.
+
+### Client Certificate / mTLS
+
+SSL monitors can present a client certificate during the TLS handshake to verify mTLS-protected endpoints:
+
+* **`clientCertificateMode: 'auto'`** — Checkly automatically selects a stored client certificate for the target host.
+* **`clientCertificateMode: 'explicit'`** — Use the specific certificate identified by `sslClientCertificateId`.
+
+Omit `clientCertificateMode` to connect without a client certificate (the default).
+
+Client certificates are stored at the account level under **Settings → Client Certificates**.
+
+### Security Baseline
+
+The security baseline is a configurable rule set that evaluates the negotiated TLS session against best-practice requirements. It runs automatically on every check and produces a **verdict** (`pass` / `warn` / `fail`) and a **grade** (`A-`, `B`, or `F`).
+
+You can override the default severity for each rule:
+
+| Rule | Default severity | Configurable |
+|------|-----------------|:---:|
+| `minTLSVersion` | `fail` | ✅ |
+| `minKeySizeBits` | `fail` | ✅ |
+| `weakSignatureAlgorithm` | `fail` | ✅ |
+| `weakCipherSuite` | `fail` | ✅ |
+| `knownBadCA` | `fail` | ✅ |
+| `recommendedTLSVersion` | `ignore` | ✅ |
+| `recommendedKeySizeBits` | `ignore` | ✅ |
+| `ocspMustStapleRespected` | `ignore` | ✅ |
+| `sctPresent` | `ignore` | ✅ |
+
+Each rule accepts a `severity` of `fail`, `degrade`, or `ignore`. Set `enabled: false` to disable the baseline entirely for a monitor.
+
+<Note>
+Omitting the `securityBaseline` field inherits the account-level default baseline. Override it on a per-monitor basis only when you need non-standard thresholds for a specific endpoint.
+</Note>
+
+### Assertions
+
+Use assertions to validate specific certificate and TLS handshake properties beyond what the security baseline covers.
+
+Available assertion sources:
+
+| Source | Type | Description |
+|--------|------|-------------|
+| `CERT_NOT_EXPIRED` | boolean | Certificate has not passed its `notAfter` date |
+| `CERT_EXPIRES_IN_DAYS` | number | Days until the certificate expires |
+| `HOSTNAME_VERIFIED` | boolean | The certificate's SANs cover the monitored hostname |
+| `CHAIN_TRUSTED` | boolean | The full certificate chain is trusted by the system root store |
+| `TLS_VERSION` | string | Negotiated TLS protocol version (e.g. `TLS1.2`, `TLS1.3`) |
+| `CIPHER_SUITE` | string | IANA cipher suite name negotiated during the handshake |
+| `SIGNATURE_ALGORITHM` | string | Leaf certificate signature algorithm (e.g. `SHA256-RSA`, `ECDSA-SHA256`) |
+| `KEY_SIZE_BITS` | number | Leaf certificate public key size in bits |
+| `ISSUER_CN` | string | Common name of the certificate issuer |
+| `CERT_FINGERPRINT_SHA256` | string | SHA-256 fingerprint of the leaf certificate |
+| `ISSUER_FINGERPRINT_SHA256` | string | SHA-256 fingerprint of the issuer certificate |
+| `SAN_CONTAINS` | string | True when any Subject Alternative Name matches the given value |
+| `OCSP_STAPLED` | boolean | A stapled OCSP response was included in the handshake |
+| `HANDSHAKE_TIME_MS` | number | TLS handshake duration in milliseconds |
+
+For more details, see our documentation on [Assertions](/detect/assertions).
+
+### Response Time Limits
+
+Set performance thresholds based on the TLS handshake duration:
+
+* **Degraded After:** Handshake time (in milliseconds) above which the monitor is marked as degraded but not failed. Default: 3,000 ms.
+* **Failed After:** Handshake time above which the monitor fails. Must be greater than or equal to the degraded threshold. Default: 10,000 ms.
+
+### Frequency
+
+Set how often the monitor runs (every 10 seconds to 24 hours).
+
+### Scheduling & Locations
+
+* **Strategy:** Choose between round-robin or parallel execution. Learn more about [scheduling strategies](/concepts/scheduling).
+* **Locations:** Select [public](/concepts/locations/#public-locations) or [private](/platform/private-locations/overview) locations to run the monitor from.
+
+### Additional Settings
+
+* **Name:** Give your monitor a clear name to identify it in dashboards and alerts.
+* **Description:** Add context about what this monitor does and why it matters. Supports markdown, max 500 characters. When a failure occurs, [Rocky AI](/ai/rocky-ai) uses the description to provide more accurate [root cause and user impact analysis](/resolve/ai-root-cause-analysis/overview).
+* **Tags:** Use tags to organize monitors across [dashboards](/communicate/dashboards/overview/) and [maintenance windows](/communicate/maintenance-windows/overview).
+* **Retries:** Define how failed runs should be retried. See [retry strategies](/communicate/alerts/retries).
+* **Alerting:** Configure your [alert settings](/communicate/alerts/configuration), [alert channels](/communicate/alerts/channels), or set up [webhooks](/integrations/alerts/webhooks) for custom integrations.

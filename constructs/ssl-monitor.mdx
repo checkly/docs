@@ -1,0 +1,498 @@
+---
+title: 'SslMonitor Construct'
+description: 'Learn how to configure SSL monitors with the Checkly CLI.'
+sidebarTitle: 'SSL Monitor'
+---
+
+import GeneralMonitorOptionsTable from '/snippets/general-monitor-options-table.mdx';
+
+<Tip>
+Learn more about SSL Monitors in [the SSL monitor overview](/detect/uptime-monitoring/ssl-monitors/overview).
+</Tip>
+
+Use SSL Monitors to verify the health and security posture of your TLS certificates. The examples below show how to configure monitoring for common scenarios.
+
+<Accordion title="Prerequisites">
+Before creating SSL Monitors, ensure you have:
+
+- An initialized Checkly CLI project
+- Network access to the HTTPS endpoint you want to monitor
+- The hostname (and optionally port) of the target server
+
+For additional setup information, see [CLI overview](/cli/overview).
+</Accordion>
+
+<CodeGroup>
+
+```ts Basic Example
+import { Frequency, SslMonitor } from "checkly/constructs"
+
+new SslMonitor("homepage-ssl", {
+  name: "Homepage Certificate",
+  description: "Monitors the TLS certificate for `example.com`.",
+  frequency: Frequency.EVERY_1H,
+  request: {
+    hostname: "example.com",
+    sslConfig: {
+      alertDaysBeforeExpiry: 30,
+    },
+  },
+})
+```
+
+```ts Advanced Example
+import {
+  Frequency,
+  SslAssertionBuilder,
+  SslMonitor,
+  TlsVersion,
+} from "checkly/constructs"
+
+new SslMonitor("api-ssl-advanced", {
+  name: "API Certificate — strict baseline",
+  description: "Enforces TLS 1.3, checks chain trust, and alerts 45 days before expiry.",
+  activated: true,
+  frequency: Frequency.EVERY_10M,
+  locations: ["us-east-1", "eu-west-1"],
+  degradedResponseTime: 1000,
+  maxResponseTime: 5000,
+  request: {
+    hostname: "api.example.com",
+    port: 443,
+    sslConfig: {
+      alertDaysBeforeExpiry: 45,
+      handshakeTimeout: 5000,
+      securityBaseline: {
+        enabled: true,
+        minTLSVersion: { value: "TLS1.2", severity: "fail" },
+        recommendedTLSVersion: { value: "TLS1.3", severity: "degrade" },
+        weakCipherSuite: { severity: "fail" },
+        ocspMustStapleRespected: { severity: "degrade" },
+      },
+    },
+    assertions: [
+      SslAssertionBuilder.certNotExpired().equals(true),
+      SslAssertionBuilder.chainTrusted().equals(true),
+      SslAssertionBuilder.hostnameVerified().equals(true),
+      SslAssertionBuilder.tlsVersion().greaterThanOrEqual(TlsVersion.TLS1_2),
+      SslAssertionBuilder.certExpiresInDays().greaterThan(45),
+    ],
+  },
+})
+```
+
+</CodeGroup>
+
+## Configuration
+
+SSL monitors have SSL-specific settings and inherit the standard monitor options shared across all check types.
+
+<Tabs>
+<Tab title="SSL Monitor Settings">
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `request` | `object` | ✅ | - | SSL connection and certificate configuration |
+| `degradedResponseTime` | `number` | ❌ | `3000` | Handshake time in milliseconds at which the monitor is marked degraded |
+| `maxResponseTime` | `number` | ❌ | `10000` | Handshake time in milliseconds at which the monitor is marked failed |
+
+</Tab>
+<Tab title="General Monitor Settings">
+
+  <GeneralMonitorOptionsTable />
+
+</Tab>
+</Tabs>
+
+### `SslMonitor` Options
+
+<ResponseField name="request" type="object" required>
+
+SSL connection configuration that defines the target host and all TLS-specific options.
+
+**Usage:**
+
+```ts
+new SslMonitor("my-ssl-monitor", {
+  name: "Example SSL Monitor",
+  request: {
+    hostname: "example.com",
+    sslConfig: {
+      alertDaysBeforeExpiry: 30,
+    },
+  },
+})
+```
+
+**Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `hostname` | `string` | ✅ | - | The hostname to connect to and validate (no scheme or port) |
+| `port` | `number` | ❌ | `443` | TCP port to connect to (1–65535) |
+| `ipFamily` | `string` | ❌ | `'IPv4'` | IP family: `'IPv4'` \| `'IPv6'` |
+| `sslConfig` | `SslConfig` | ✅ | - | TLS handshake and certificate options (see below) |
+| `assertions` | `SslAssertion[]` | ❌ | `[]` | Certificate/handshake assertions using `SslAssertionBuilder` |
+
+</ResponseField>
+
+<ResponseField name="degradedResponseTime" type="number" default="3000">
+TLS handshake time in milliseconds above which the monitor is marked as degraded (warning state). Must be ≤ `maxResponseTime`.
+
+**Usage:**
+
+```ts highlight={3}
+new SslMonitor("my-ssl", {
+  name: "Example SSL",
+  degradedResponseTime: 1000,
+  maxResponseTime: 5000,
+  request: {
+    hostname: "example.com",
+    sslConfig: {},
+  },
+})
+```
+</ResponseField>
+
+<ResponseField name="maxResponseTime" type="number" default="10000">
+TLS handshake time in milliseconds above which the monitor is marked as failed.
+
+**Usage:**
+
+```ts highlight={4}
+new SslMonitor("my-ssl", {
+  name: "Example SSL",
+  degradedResponseTime: 1000,
+  maxResponseTime: 5000,
+  request: {
+    hostname: "example.com",
+    sslConfig: {},
+  },
+})
+```
+</ResponseField>
+
+### `SslConfig` Options
+
+<ResponseField name="alertDaysBeforeExpiry" type="number" default="20">
+Raise a degraded alert when the certificate is within this many days of expiry. Range: 1–365.
+
+```ts
+sslConfig: {
+  alertDaysBeforeExpiry: 30, // Warn 30 days before expiry
+}
+```
+</ResponseField>
+
+<ResponseField name="serverName" type="string">
+SNI server name to send during the TLS handshake. Useful when a single IP hosts multiple certificates. Defaults to `hostname` when unset.
+
+```ts
+sslConfig: {
+  serverName: "tenant-a.example.com",
+}
+```
+</ResponseField>
+
+<ResponseField name="handshakeTimeout" type="number" default="10000">
+Maximum milliseconds to wait for the TLS handshake to complete. Range: 1,000–30,000 ms.
+
+```ts
+sslConfig: {
+  handshakeTimeout: 5000,
+}
+```
+</ResponseField>
+
+<ResponseField name="skipChainValidation" type="boolean" default="false">
+When `true`, the certificate chain is not verified against system trusted roots. The certificate is still inspected for expiry and the security baseline. Use for internal or self-signed certificates.
+
+```ts
+sslConfig: {
+  skipChainValidation: true,
+}
+```
+</ResponseField>
+
+<ResponseField name="clientCertificateMode" type="'auto' | 'explicit'">
+Enables mutual TLS by sending a client certificate during the handshake.
+
+- `'auto'` — Checkly selects a stored client certificate automatically.
+- `'explicit'` — uses the certificate referenced by `sslClientCertificateId`.
+
+Omit to connect without a client certificate.
+
+```ts
+sslConfig: {
+  clientCertificateMode: "explicit",
+  sslClientCertificateId: "cert_abc123",
+}
+```
+</ResponseField>
+
+<ResponseField name="securityBaseline" type="SecurityBaseline">
+Override the account-level security baseline for this monitor. Omit to inherit the account default.
+
+```ts
+sslConfig: {
+  securityBaseline: {
+    enabled: true,
+    minTLSVersion: { value: "TLS1.2", severity: "fail" },
+    recommendedTLSVersion: { value: "TLS1.3", severity: "degrade" },
+    weakCipherSuite: { severity: "fail" },
+    weakSignatureAlgorithm: { severity: "fail" },
+    knownBadCA: { severity: "fail" },
+    ocspMustStapleRespected: { severity: "degrade" },
+  },
+}
+```
+
+**`SecurityBaseline` parameters:**
+
+| Parameter | Type | Default severity | Description |
+|-----------|------|-----------------|-------------|
+| `enabled` | `boolean` | `true` | Enable or disable baseline evaluation |
+| `minTLSVersion` | `{ value?: string, severity? }` | `fail` | Minimum required TLS version (e.g. `'TLS1.2'`) |
+| `minKeySizeBits` | `{ value?: number, severity? }` | `fail` | Minimum RSA key size in bits |
+| `weakSignatureAlgorithm` | `{ severity? }` | `fail` | Reject weak signature algorithms (MD5, SHA-1, DSA-SHA1) |
+| `weakCipherSuite` | `{ severity? }` | `fail` | Reject known-weak cipher suites |
+| `knownBadCA` | `{ severity? }` | `fail` | Reject distrusted certificate authorities |
+| `recommendedTLSVersion` | `{ value?: string, severity? }` | `ignore` | Advisory minimum TLS version |
+| `recommendedKeySizeBits` | `{ value?: number, severity? }` | `ignore` | Advisory minimum RSA key size |
+| `ocspMustStapleRespected` | `{ severity? }` | `ignore` | Alert when must-staple cert is missing an OCSP staple |
+| `sctPresent` | `{ severity? }` | `ignore` | Alert when no Signed Certificate Timestamp is observed |
+
+Each rule's `severity` can be `'fail'` \| `'degrade'` \| `'ignore'`.
+</ResponseField>
+
+### `SslMonitor` Assertions
+
+Define `assertions` using the `SslAssertionBuilder`. The following sources are available:
+
+| Builder method | Source | Value type | Description |
+|---------------|--------|-----------|-------------|
+| `certNotExpired()` | `CERT_NOT_EXPIRED` | boolean | Certificate has not passed its expiry date |
+| `certExpiresInDays()` | `CERT_EXPIRES_IN_DAYS` | number | Days until the certificate expires |
+| `hostnameVerified()` | `HOSTNAME_VERIFIED` | boolean | Certificate SANs cover the monitored hostname |
+| `chainTrusted()` | `CHAIN_TRUSTED` | boolean | Full chain is trusted by the system root store |
+| `tlsVersion()` | `TLS_VERSION` | string | Negotiated TLS version |
+| `cipherSuite()` | `CIPHER_SUITE` | string | Negotiated IANA cipher suite name |
+| `signatureAlgorithm()` | `SIGNATURE_ALGORITHM` | string | Leaf certificate signature algorithm |
+| `keySizeBits()` | `KEY_SIZE_BITS` | number | Leaf certificate public key size in bits |
+| `issuerCn()` | `ISSUER_CN` | string | Common name of the certificate issuer |
+| `certFingerprintSha256()` | `CERT_FINGERPRINT_SHA256` | string | SHA-256 fingerprint of the leaf certificate |
+| `issuerFingerprintSha256()` | `ISSUER_FINGERPRINT_SHA256` | string | SHA-256 fingerprint of the issuer |
+| `sanContains()` | `SAN_CONTAINS` | string | Any SAN matches the given value |
+| `ocspStapled()` | `OCSP_STAPLED` | boolean | A stapled OCSP response was included in the handshake |
+| `handshakeTimeMs()` | `HANDSHAKE_TIME_MS` | number | TLS handshake duration in milliseconds |
+
+Examples:
+
+```ts
+// Certificate must not be expired
+SslAssertionBuilder.certNotExpired().equals(true)
+// Equivalent to: { source: 'CERT_NOT_EXPIRED', comparison: 'EQUALS', target: 'true' }
+
+// Alert when fewer than 30 days remain before expiry
+SslAssertionBuilder.certExpiresInDays().greaterThan(30)
+// Equivalent to: { source: 'CERT_EXPIRES_IN_DAYS', comparison: 'GREATER_THAN', target: '30' }
+
+// Require TLS 1.2 or newer
+SslAssertionBuilder.tlsVersion().greaterThanOrEqual(TlsVersion.TLS1_2)
+// Equivalent to: { source: 'TLS_VERSION', comparison: 'GREATER_THAN_OR_EQUAL', target: 'TLS1.2' }
+
+// Pin the cipher suite
+SslAssertionBuilder.cipherSuite().equals(CipherSuite.TLS_AES_256_GCM_SHA384)
+// Equivalent to: { source: 'CIPHER_SUITE', comparison: 'EQUALS', target: 'TLS_AES_256_GCM_SHA384' }
+
+// Verify a specific issuer
+SslAssertionBuilder.issuerCn().equals("Let's Encrypt")
+// Equivalent to: { source: 'ISSUER_CN', comparison: 'EQUALS', target: "Let's Encrypt" }
+
+// Require a minimum key size
+SslAssertionBuilder.keySizeBits().greaterThanOrEqual(2048)
+// Equivalent to: { source: 'KEY_SIZE_BITS', comparison: 'GREATER_THAN_OR_EQUAL', target: '2048' }
+```
+
+Use the `TlsVersion` and `CipherSuite` constants for type-safe comparisons:
+
+```ts
+import {
+  CipherSuite,
+  SslAssertionBuilder,
+  TlsVersion,
+} from "checkly/constructs"
+
+SslAssertionBuilder.tlsVersion().equals(TlsVersion.TLS1_3)
+SslAssertionBuilder.cipherSuite().equals(CipherSuite.TLS_AES_128_GCM_SHA256)
+```
+
+Learn more in our docs on [Assertions](/detect/assertions).
+
+### General Monitor Options
+
+<ResponseField name="name" type="string" required>
+Friendly name for your SSL Monitor, displayed in the Checkly dashboard and used in notifications.
+
+```ts highlight={2}
+new SslMonitor("my-ssl-monitor", {
+  name: "Homepage Certificate",
+  /* More options ... */
+})
+```
+</ResponseField>
+
+<ResponseField name="frequency" type="Frequency">
+How often the SSL Monitor should run. Use the `Frequency` enum to set the check interval.
+
+```ts highlight={3}
+new SslMonitor("my-ssl-monitor", {
+  name: "Homepage Certificate",
+  frequency: Frequency.EVERY_1H,
+  /* More options ... */
+})
+```
+
+**Available frequencies**: `EVERY_10S`, `EVERY_20S`, `EVERY_30S`, `EVERY_1M`, `EVERY_2M`, `EVERY_5M`, `EVERY_10M`, `EVERY_15M`, `EVERY_30M`, `EVERY_1H`, `EVERY_2H`, `EVERY_3H`, `EVERY_6H`, `EVERY_12H`, `EVERY_24H`
+</ResponseField>
+
+<ResponseField name="locations" type="string[]" default="[]">
+Array of [public location codes](/concepts/locations/#public-locations) where the monitor should run from. Multiple locations provide geographic coverage.
+
+```ts highlight={3}
+new SslMonitor("global-ssl", {
+  name: "Global Certificate Monitor",
+  locations: ["us-east-1", "eu-west-1", "ap-southeast-1"],
+  /* More options ... */
+})
+```
+</ResponseField>
+
+<ResponseField name="activated" type="boolean" default="true">
+Whether the SSL Monitor is enabled and will run according to its schedule.
+
+```ts highlight={3}
+new SslMonitor("my-ssl-monitor", {
+  name: "Homepage Certificate",
+  activated: false, // Disabled monitor
+  /* More options ... */
+})
+```
+</ResponseField>
+
+## Examples
+
+<Tabs>
+  <Tab title="Basic Expiry Alert">
+    ```ts
+    import { Frequency, SslMonitor } from "checkly/constructs"
+
+    new SslMonitor("homepage-ssl", {
+      name: "Homepage Certificate",
+      frequency: Frequency.EVERY_1H,
+      locations: ["us-east-1", "eu-west-1"],
+      request: {
+        hostname: "example.com",
+        sslConfig: {
+          alertDaysBeforeExpiry: 30,
+        },
+      },
+    })
+    ```
+  </Tab>
+
+  <Tab title="Strict TLS Policy">
+    ```ts
+    import { Frequency, SslAssertionBuilder, SslMonitor, TlsVersion } from "checkly/constructs"
+
+    new SslMonitor("api-strict-tls", {
+      name: "API — Strict TLS Policy",
+      frequency: Frequency.EVERY_10M,
+      locations: ["us-east-1", "eu-central-1"],
+      request: {
+        hostname: "api.example.com",
+        sslConfig: {
+          alertDaysBeforeExpiry: 45,
+          securityBaseline: {
+            enabled: true,
+            minTLSVersion: { value: "TLS1.2", severity: "fail" },
+            recommendedTLSVersion: { value: "TLS1.3", severity: "degrade" },
+          },
+        },
+        assertions: [
+          SslAssertionBuilder.chainTrusted().equals(true),
+          SslAssertionBuilder.hostnameVerified().equals(true),
+          SslAssertionBuilder.tlsVersion().greaterThanOrEqual(TlsVersion.TLS1_2),
+        ],
+      },
+    })
+    ```
+  </Tab>
+
+  <Tab title="Internal / Self-Signed Cert">
+    ```ts
+    import { Frequency, SslAssertionBuilder, SslMonitor } from "checkly/constructs"
+
+    new SslMonitor("internal-ssl", {
+      name: "Internal Service Certificate",
+      frequency: Frequency.EVERY_6H,
+      privateLocations: ["my-private-location"],
+      request: {
+        hostname: "internal.corp.example.com",
+        port: 8443,
+        sslConfig: {
+          skipChainValidation: true,
+          alertDaysBeforeExpiry: 14,
+        },
+        assertions: [
+          SslAssertionBuilder.certNotExpired().equals(true),
+          SslAssertionBuilder.certExpiresInDays().greaterThan(7),
+        ],
+      },
+    })
+    ```
+  </Tab>
+
+  <Tab title="mTLS Endpoint">
+    ```ts
+    import { Frequency, SslAssertionBuilder, SslMonitor } from "checkly/constructs"
+
+    new SslMonitor("mtls-endpoint", {
+      name: "mTLS API Gateway",
+      frequency: Frequency.EVERY_5M,
+      request: {
+        hostname: "mtls.api.example.com",
+        sslConfig: {
+          clientCertificateMode: "explicit",
+          sslClientCertificateId: "cert_abc123",
+          alertDaysBeforeExpiry: 30,
+        },
+        assertions: [
+          SslAssertionBuilder.certNotExpired().equals(true),
+          SslAssertionBuilder.hostnameVerified().equals(true),
+        ],
+      },
+    })
+    ```
+  </Tab>
+
+  <Tab title="SNI Override">
+    ```ts
+    import { Frequency, SslMonitor } from "checkly/constructs"
+
+    // Monitor a certificate served for a specific SNI name
+    // on a shared IP (e.g. a CDN or multi-tenant server).
+    new SslMonitor("tenant-ssl", {
+      name: "Tenant Certificate via SNI",
+      frequency: Frequency.EVERY_1H,
+      request: {
+        hostname: "shared-cdn.example.net",
+        sslConfig: {
+          serverName: "tenant-a.example.com",
+          alertDaysBeforeExpiry: 20,
+        },
+      },
+    })
+    ```
+  </Tab>
+</Tabs>

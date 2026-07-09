@@ -36,3 +36,26 @@ tr {
   border-color: rgba(255, 255, 255, 0.2);
   color: #e6e6e6;
 }
+
+/* Expand small header icon buttons to a 44x44 minimum touch target
+   (WCAG 2.5.5) via an invisible hit-area overlay, so the visual header
+   layout is unchanged and the theme's responsive show/hide still applies. */
+header button[aria-label="Open search"],
+header button[aria-label="Toggle assistant panel"],
+header button[aria-label="Toggle dark mode"],
+header button[aria-label="More actions"] {
+  position: relative;
+}
+
+header button[aria-label="Open search"]::after,
+header button[aria-label="Toggle assistant panel"]::after,
+header button[aria-label="Toggle dark mode"]::after,
+header button[aria-label="More actions"]::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}

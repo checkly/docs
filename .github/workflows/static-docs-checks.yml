@@ -75,6 +75,15 @@ jobs:
         if: steps.detect.outputs.docs_changed == 'true'
         run: python3 .github/scripts/check_redirect_destinations.py
 
+      # Guards the SEO frontmatter bug class: a malformed opening `---` fence
+      # (e.g. a trailing space) makes Mintlify drop a page's title/description/
+      # canonical and fall back to the no-slash canonical, which 308-redirects.
+      # Also enforces a correct self-referential trailing-slash canonical on
+      # every page. Runs on any docs change.
+      - name: Frontmatter & canonical integrity
+        if: steps.detect.outputs.docs_changed == 'true'
+        run: python3 .github/scripts/check_frontmatter.py
+
       # sitemap.xml (custom, trailing-slash — overrides Mintlify's auto-gen) is
       # generated from docs.json navigation. If a nav page is added/renamed/
       # removed without regenerating, the committed sitemap drifts. Regenerate

@@ -215,6 +215,14 @@ This list shows all content types that we scrub from the response data.
 |`video/x-flv`|
 |`video/webm`|
 
+### Asserting on binary response bodies
+
+Adding a **Text body** assertion to a check opts it out of binary scrubbing entirely: the assertion runs against
+the real response bytes, and the stored result displays those same bytes instead of the scrubbed message. This is
+useful when a server labels a textual payload with a binary content type, such as `application/octet-stream`. The
+assertion's *Actual* value is truncated to 10KB for display, and stored response bodies remain subject to the size
+limits above. Checks without a Text body assertion keep the scrubbing behavior described in this section.
+
 ## Additional Settings
 
 * **Name:** Give your check a clear name to identify it in dashboards and alerts

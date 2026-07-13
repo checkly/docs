@@ -14,12 +14,12 @@ The MCP Server accepts two types of bearer tokens for `https://api.checklyhq.com
 - OAuth bearer tokens from Checkly-approved MCP clients.
 - Checkly user API keys starting with `cu_...`, and service API keys starting with `sv_...`, sent as `Authorization: Bearer <checkly-api-key>`.
 
-OAuth is recommended for interactive clients. The public MCP Server only supports Checkly-approved OAuth clients. Checkly rejects clients that attempt to use [Dynamic Client Registration (DCR)](https://datatracker.ietf.org/doc/html/rfc7591). See [supported clients](/ai/mcp-server/setup#supported-clients) for setup details.
+OAuth is recommended for interactive clients. The public MCP Server only supports Checkly-approved OAuth clients. Checkly rejects clients that attempt to use [Dynamic Client Registration (DCR)](https://datatracker.ietf.org/doc/html/rfc7591). See [supported OAuth clients](/ai/mcp-server/setup#supported-oauth-clients) or [set up an API key](/ai/mcp-server/setup#set-up-with-an-api-key).
 
 Checkly maps OAuth tokens and user API keys to a Checkly user, then loads that user's account memberships and account context for tool calls. Service API keys map to the key's configured account and role.
 
 <Warning>
-API keys are long-lived credentials. Use API-key authentication only when OAuth is not practical, store keys securely, and rotate them when they are no longer needed.
+API keys are long-lived credentials. Use them when OAuth is unavailable or a workflow needs a service identity. Store keys securely and rotate them when they are no longer needed.
 </Warning>
 
 ## Session permissions
@@ -46,7 +46,7 @@ Tools are filtered from `tools/list` when the MCP session does not include the r
 
 ## Account context
 
-Most tools operate on one Checkly account. You can select a specific account in your prompt or pin an account in your MCP client configuration. See [Use a specific account](/ai/mcp-server/setup#use-a-specific-account) for setup examples.
+Most tools operate on one Checkly account. You can select a specific account in your prompt or pin an account in your MCP client configuration. See [Select an account](/ai/mcp-server/setup#select-an-account) for setup examples.
 
 <Warning>
 Accounts that require mTLS are not available through the public MCP Server.

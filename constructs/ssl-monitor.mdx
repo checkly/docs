@@ -71,11 +71,10 @@ new SslMonitor("api-ssl-advanced", {
       },
     },
     assertions: [
-      SslAssertionBuilder.certNotExpired().equals(true),
-      SslAssertionBuilder.chainTrusted().equals(true),
-      SslAssertionBuilder.hostnameVerified().equals(true),
-      SslAssertionBuilder.tlsVersion().greaterThanOrEqual(TlsVersion.TLS1_2),
-      SslAssertionBuilder.certExpiresInDays().greaterThan(45),
+      SslAssertionBuilder.connection("chainTrusted").equals(true),
+      SslAssertionBuilder.connection("hostnameVerified").equals(true),
+      SslAssertionBuilder.connection("tlsVersion").equals(TlsVersion.TLS1_3),
+      SslAssertionBuilder.certificate("daysUntilExpiry").greaterThan(45),
     ],
   },
 })
@@ -278,51 +277,50 @@ Each rule's `severity` can be `'fail'` \| `'degrade'` \| `'ignore'`.
 
 ### `SslMonitor` Assertions
 
-Define `assertions` using the `SslAssertionBuilder`. The following sources are available:
+Define `assertions` using the `SslAssertionBuilder`. Five entry points map to the assertion sources — `certificate`/`connection` take a `property` (a field selector); `jsonResponse`/`textResponse` take a JSONPath/regex:
 
-| Builder method | Source | Value type | Description |
-|---------------|--------|-----------|-------------|
-| `certNotExpired()` | `CERT_NOT_EXPIRED` | boolean | Certificate has not passed its expiry date |
-| `certExpiresInDays()` | `CERT_EXPIRES_IN_DAYS` | number | Days until the certificate expires |
-| `hostnameVerified()` | `HOSTNAME_VERIFIED` | boolean | Certificate SANs cover the monitored hostname |
-| `chainTrusted()` | `CHAIN_TRUSTED` | boolean | Full chain is trusted by the system root store |
-| `tlsVersion()` | `TLS_VERSION` | string | Negotiated TLS version |
-| `cipherSuite()` | `CIPHER_SUITE` | string | Negotiated IANA cipher suite name |
-| `signatureAlgorithm()` | `SIGNATURE_ALGORITHM` | string | Leaf certificate signature algorithm |
-| `keySizeBits()` | `KEY_SIZE_BITS` | number | Leaf certificate public key size in bits |
-| `issuerCn()` | `ISSUER_CN` | string | Common name of the certificate issuer |
-| `certFingerprintSha256()` | `CERT_FINGERPRINT_SHA256` | string | SHA-256 fingerprint of the leaf certificate |
-| `issuerFingerprintSha256()` | `ISSUER_FINGERPRINT_SHA256` | string | SHA-256 fingerprint of the issuer |
-| `sanContains()` | `SAN_CONTAINS` | string | Any SAN matches the given value |
-| `ocspStapled()` | `OCSP_STAPLED` | boolean | A stapled OCSP response was included in the handshake |
-| `handshakeTimeMs()` | `HANDSHAKE_TIME_MS` | number | TLS handshake duration in milliseconds |
+| Builder | Source | Description |
+|---------|--------|-------------|
+| `certificate(property)` | `CERTIFICATE` | Assert on a leaf-certificate field |
+| `connection(property)` | `CONNECTION` | Assert on a TLS handshake / connection field |
+| `responseTime()` | `RESPONSE_TIME` | TLS handshake duration in milliseconds |
+| `jsonResponse(jsonPath)` | `JSON_RESPONSE` | Assert on any response field via a JSONPath expression |
+| `textResponse(regex?)` | `TEXT_RESPONSE` | Extract a value from the serialized response with a regex, then compare |
+
+`certificate(property)` properties: `daysUntilExpiry` (number), `keySizeBits` (number), `subjectCN` / `issuerCN` / `serialNumber` / `fingerprintSha256` / `issuerFingerprintSha256` / `keyAlgorithm` / `signatureAlgorithm` (string), `sans` (list — use `CONTAINS`), `selfSigned` / `isCA` (boolean).
+
+`connection(property)` properties: `tlsVersion` / `cipherSuite` / `ocspStatus` / `resolvedIp` (string), `hostnameVerified` / `chainTrusted` / `ocspStapled` (boolean).
 
 Examples:
 
 ```ts
-// Certificate must not be expired
-SslAssertionBuilder.certNotExpired().equals(true)
-// Equivalent to: { source: 'CERT_NOT_EXPIRED', comparison: 'EQUALS', target: 'true' }
-
 // Alert when fewer than 30 days remain before expiry
-SslAssertionBuilder.certExpiresInDays().greaterThan(30)
-// Equivalent to: { source: 'CERT_EXPIRES_IN_DAYS', comparison: 'GREATER_THAN', target: '30' }
+SslAssertionBuilder.certificate("daysUntilExpiry").greaterThan(30)
+// Equivalent to: { source: 'CERTIFICATE', property: 'daysUntilExpiry', comparison: 'GREATER_THAN', target: '30' }
 
-// Require TLS 1.2 or newer
-SslAssertionBuilder.tlsVersion().greaterThanOrEqual(TlsVersion.TLS1_2)
-// Equivalent to: { source: 'TLS_VERSION', comparison: 'GREATER_THAN_OR_EQUAL', target: 'TLS1.2' }
+// The certificate chain must be trusted
+SslAssertionBuilder.connection("chainTrusted").equals(true)
+// Equivalent to: { source: 'CONNECTION', property: 'chainTrusted', comparison: 'EQUALS', target: 'true' }
+
+// Negotiate TLS 1.3 (use the security baseline's minTLSVersion for a "1.2-or-newer" policy)
+SslAssertionBuilder.connection("tlsVersion").equals(TlsVersion.TLS1_3)
+// Equivalent to: { source: 'CONNECTION', property: 'tlsVersion', comparison: 'EQUALS', target: 'TLS1.3' }
 
 // Pin the cipher suite
-SslAssertionBuilder.cipherSuite().equals(CipherSuite.TLS_AES_256_GCM_SHA384)
-// Equivalent to: { source: 'CIPHER_SUITE', comparison: 'EQUALS', target: 'TLS_AES_256_GCM_SHA384' }
+SslAssertionBuilder.connection("cipherSuite").equals(CipherSuite.TLS_AES_256_GCM_SHA384)
+// Equivalent to: { source: 'CONNECTION', property: 'cipherSuite', comparison: 'EQUALS', target: 'TLS_AES_256_GCM_SHA384' }
 
 // Verify a specific issuer
-SslAssertionBuilder.issuerCn().equals("Let's Encrypt")
-// Equivalent to: { source: 'ISSUER_CN', comparison: 'EQUALS', target: "Let's Encrypt" }
+SslAssertionBuilder.certificate("issuerCN").equals("Let's Encrypt")
+// Equivalent to: { source: 'CERTIFICATE', property: 'issuerCN', comparison: 'EQUALS', target: "Let's Encrypt" }
 
-// Require a minimum key size
-SslAssertionBuilder.keySizeBits().greaterThanOrEqual(2048)
-// Equivalent to: { source: 'KEY_SIZE_BITS', comparison: 'GREATER_THAN_OR_EQUAL', target: '2048' }
+// Reject weak keys (the security baseline's minKeySizeBits enforces a hard minimum)
+SslAssertionBuilder.certificate("keySizeBits").greaterThan(1024)
+// Equivalent to: { source: 'CERTIFICATE', property: 'keySizeBits', comparison: 'GREATER_THAN', target: '1024' }
+
+// Assert on a nested chain field with a JSONPath expression
+SslAssertionBuilder.jsonResponse("$.chain[0].keySizeBits").greaterThan(2048)
+// Equivalent to: { source: 'JSON_RESPONSE', property: '$.chain[0].keySizeBits', comparison: 'GREATER_THAN', target: '2048' }
 ```
 
 Use the `TlsVersion` and `CipherSuite` constants for type-safe comparisons:
@@ -334,8 +332,8 @@ import {
   TlsVersion,
 } from "checkly/constructs"
 
-SslAssertionBuilder.tlsVersion().equals(TlsVersion.TLS1_3)
-SslAssertionBuilder.cipherSuite().equals(CipherSuite.TLS_AES_128_GCM_SHA256)
+SslAssertionBuilder.connection("tlsVersion").equals(TlsVersion.TLS1_3)
+SslAssertionBuilder.connection("cipherSuite").equals(CipherSuite.TLS_AES_128_GCM_SHA256)
 ```
 
 Learn more in our docs on [Assertions](/detect/assertions).
@@ -431,9 +429,9 @@ new SslMonitor("my-ssl-monitor", {
           },
         },
         assertions: [
-          SslAssertionBuilder.chainTrusted().equals(true),
-          SslAssertionBuilder.hostnameVerified().equals(true),
-          SslAssertionBuilder.tlsVersion().greaterThanOrEqual(TlsVersion.TLS1_2),
+          SslAssertionBuilder.connection("chainTrusted").equals(true),
+          SslAssertionBuilder.connection("hostnameVerified").equals(true),
+          SslAssertionBuilder.connection("tlsVersion").equals(TlsVersion.TLS1_3),
         ],
       },
     })
@@ -456,8 +454,8 @@ new SslMonitor("my-ssl-monitor", {
           alertDaysBeforeExpiry: 14,
         },
         assertions: [
-          SslAssertionBuilder.certNotExpired().equals(true),
-          SslAssertionBuilder.certExpiresInDays().greaterThan(7),
+          SslAssertionBuilder.certificate("selfSigned").equals(true),
+          SslAssertionBuilder.certificate("daysUntilExpiry").greaterThan(7),
         ],
       },
     })
@@ -479,8 +477,8 @@ new SslMonitor("my-ssl-monitor", {
           alertDaysBeforeExpiry: 30,
         },
         assertions: [
-          SslAssertionBuilder.certNotExpired().equals(true),
-          SslAssertionBuilder.hostnameVerified().equals(true),
+          SslAssertionBuilder.certificate("daysUntilExpiry").greaterThan(0),
+          SslAssertionBuilder.connection("hostnameVerified").equals(true),
         ],
       },
     })

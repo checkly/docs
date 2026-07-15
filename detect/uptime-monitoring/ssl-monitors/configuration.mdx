@@ -67,24 +67,50 @@ Omitting the `securityBaseline` field inherits the account-level default baselin
 
 Use assertions to validate specific certificate and TLS handshake properties beyond what the security baseline covers.
 
-Available assertion sources:
+Each assertion has a `source`, an optional `property` (a field selector), a `comparison`, and a `target`. Available sources:
 
-| Source | Type | Description |
-|--------|------|-------------|
-| `CERT_NOT_EXPIRED` | boolean | Certificate has not passed its `notAfter` date |
-| `CERT_EXPIRES_IN_DAYS` | number | Days until the certificate expires |
-| `HOSTNAME_VERIFIED` | boolean | The certificate's SANs cover the monitored hostname |
-| `CHAIN_TRUSTED` | boolean | The full certificate chain is trusted by the system root store |
-| `TLS_VERSION` | string | Negotiated TLS protocol version (e.g. `TLS1.2`, `TLS1.3`) |
-| `CIPHER_SUITE` | string | IANA cipher suite name negotiated during the handshake |
-| `SIGNATURE_ALGORITHM` | string | Leaf certificate signature algorithm (e.g. `SHA256-RSA`, `ECDSA-SHA256`) |
-| `KEY_SIZE_BITS` | number | Leaf certificate public key size in bits |
-| `ISSUER_CN` | string | Common name of the certificate issuer |
-| `CERT_FINGERPRINT_SHA256` | string | SHA-256 fingerprint of the leaf certificate |
-| `ISSUER_FINGERPRINT_SHA256` | string | SHA-256 fingerprint of the issuer certificate |
-| `SAN_CONTAINS` | string | True when any Subject Alternative Name matches the given value |
-| `OCSP_STAPLED` | boolean | A stapled OCSP response was included in the handshake |
-| `HANDSHAKE_TIME_MS` | number | TLS handshake duration in milliseconds |
+| Source | `property` | Description |
+|--------|-----------|-------------|
+| `CERTIFICATE` | a certificate field (see below) | Assert on a leaf-certificate field |
+| `CONNECTION` | a connection field (see below) | Assert on a TLS handshake / connection field |
+| `RESPONSE_TIME` | — | TLS handshake duration in milliseconds |
+| `JSON_RESPONSE` | JSONPath | Assert on any field of the response document via a JSONPath expression (e.g. `$.chain[0].keySizeBits`) |
+| `TEXT_RESPONSE` | regex | Extract a value from the serialized response with a regex, then compare |
+
+`CERTIFICATE` `property` values:
+
+| `property` | Type | Description |
+|-----------|------|-------------|
+| `daysUntilExpiry` | number | Days until the certificate expires |
+| `subjectCN` | string | Certificate subject common name |
+| `issuerCN` | string | Common name of the certificate issuer |
+| `serialNumber` | string | Certificate serial number |
+| `fingerprintSha256` | string | SHA-256 fingerprint of the leaf certificate |
+| `issuerFingerprintSha256` | string | SHA-256 fingerprint of the issuer certificate |
+| `keySizeBits` | number | Leaf certificate public key size in bits |
+| `keyAlgorithm` | string | Public key algorithm (e.g. `RSA`, `ECDSA`) |
+| `signatureAlgorithm` | string | Leaf certificate signature algorithm (e.g. `SHA256-RSA`, `ECDSA-SHA256`) |
+| `sans` | list | Subject Alternative Names — use `CONTAINS` / `NOT_CONTAINS` to test membership |
+| `selfSigned` | boolean | The leaf certificate is self-signed |
+| `isCA` | boolean | The leaf certificate is a CA certificate |
+
+`CONNECTION` `property` values:
+
+| `property` | Type | Description |
+|-----------|------|-------------|
+| `tlsVersion` | string | Negotiated TLS protocol version (e.g. `TLS1.2`, `TLS1.3`) |
+| `cipherSuite` | string | IANA cipher suite name negotiated during the handshake |
+| `hostnameVerified` | boolean | The certificate's SANs cover the monitored hostname |
+| `chainTrusted` | boolean | The full certificate chain is trusted by the system root store |
+| `ocspStapled` | boolean | A stapled OCSP response was included in the handshake |
+| `ocspStatus` | string | Decoded stapled-OCSP status: `good`, `revoked`, or `unknown` |
+| `resolvedIp` | string | The IP address the hostname resolved to |
+
+Comparisons follow the property's type: numbers support `EQUALS`, `NOT_EQUALS`, `GREATER_THAN`, `LESS_THAN`; strings add `CONTAINS` / `NOT_CONTAINS`; booleans use `EQUALS`; the `sans` list uses `CONTAINS` / `NOT_CONTAINS`.
+
+<Note>
+Certificate validity, minimum TLS version and minimum key size are also enforced by the security baseline above — reach for assertions when you need an exact value check (a specific issuer, fingerprint pinning, a SAN, etc.).
+</Note>
 
 For more details, see our documentation on [Assertions](/detect/assertions).
 

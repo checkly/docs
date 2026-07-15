@@ -84,13 +84,13 @@ Each assertion has a `source`, an optional `property` (a field selector), a `com
 | `daysUntilExpiry` | number | Days until the certificate expires |
 | `subjectCN` | string | Certificate subject common name |
 | `issuerCN` | string | Common name of the certificate issuer |
-| `serialNumber` | string | Certificate serial number |
-| `fingerprintSha256` | string | SHA-256 fingerprint of the leaf certificate |
-| `issuerFingerprintSha256` | string | SHA-256 fingerprint of the issuer certificate |
+| `serialNumber` | exact | Certificate serial number |
+| `fingerprintSha256` | exact | SHA-256 fingerprint of the leaf certificate |
+| `issuerFingerprintSha256` | exact | SHA-256 fingerprint of the issuer certificate |
 | `keySizeBits` | number | Leaf certificate public key size in bits |
-| `keyAlgorithm` | string | Public key algorithm (e.g. `RSA`, `ECDSA`) |
-| `signatureAlgorithm` | string | Leaf certificate signature algorithm (e.g. `SHA256-RSA`, `ECDSA-SHA256`) |
-| `sans` | list | Subject Alternative Names — use `CONTAINS` / `NOT_CONTAINS` to test membership |
+| `keyAlgorithm` | exact | Public key algorithm (e.g. `RSA`, `ECDSA`) |
+| `signatureAlgorithm` | exact | Leaf certificate signature algorithm (e.g. `SHA256-RSA`, `ECDSA-SHA256`) |
+| `sans` | list | Subject Alternative Names |
 | `selfSigned` | boolean | The leaf certificate is self-signed |
 | `isCA` | boolean | The leaf certificate is a CA certificate |
 
@@ -98,15 +98,26 @@ Each assertion has a `source`, an optional `property` (a field selector), a `com
 
 | `property` | Type | Description |
 |-----------|------|-------------|
-| `tlsVersion` | string | Negotiated TLS protocol version (e.g. `TLS1.2`, `TLS1.3`) |
+| `tlsVersion` | version | Negotiated TLS protocol version (e.g. `TLS1.2`, `TLS1.3`) |
 | `cipherSuite` | string | IANA cipher suite name negotiated during the handshake |
 | `hostnameVerified` | boolean | The certificate's SANs cover the monitored hostname |
 | `chainTrusted` | boolean | The full certificate chain is trusted by the system root store |
 | `ocspStapled` | boolean | A stapled OCSP response was included in the handshake |
-| `ocspStatus` | string | Decoded stapled-OCSP status: `good`, `revoked`, or `unknown` |
+| `ocspStatus` | exact | Decoded stapled-OCSP status: `good`, `revoked`, or `unknown` |
 | `resolvedIp` | string | The IP address the hostname resolved to |
 
-Comparisons follow the property's type: numbers support `EQUALS`, `NOT_EQUALS`, `GREATER_THAN`, `LESS_THAN`; strings add `CONTAINS` / `NOT_CONTAINS`; booleans use `EQUALS`; the `sans` list uses `CONTAINS` / `NOT_CONTAINS`.
+The comparisons available depend on the property's type:
+
+| Type | Comparisons |
+|------|-------------|
+| `number` | `EQUALS`, `NOT_EQUALS`, `GREATER_THAN`, `LESS_THAN` |
+| `version` | `EQUALS`, `NOT_EQUALS`, `GREATER_THAN`, `LESS_THAN` (ordered `TLS1.0` < `TLS1.1` < `TLS1.2` < `TLS1.3`) |
+| `string` | `EQUALS`, `NOT_EQUALS`, `CONTAINS`, `NOT_CONTAINS` |
+| `exact` | `EQUALS`, `NOT_EQUALS` |
+| `list` | `CONTAINS`, `NOT_CONTAINS` (SAN membership) |
+| `boolean` | `EQUALS` |
+
+The other sources take their own comparison sets: `RESPONSE_TIME` uses the `number` set; `JSON_RESPONSE` accepts `EQUALS`, `NOT_EQUALS`, `GREATER_THAN`, `LESS_THAN`, `CONTAINS`, `NOT_CONTAINS`, `IS_EMPTY`, `NOT_EMPTY`, `IS_NULL`, `NOT_NULL`; `TEXT_RESPONSE` accepts `EQUALS`, `NOT_EQUALS`, `CONTAINS`, `NOT_CONTAINS`, `IS_EMPTY`, `NOT_EMPTY`, `GREATER_THAN`, `LESS_THAN`.
 
 <Note>
 Certificate validity, minimum TLS version and minimum key size are also enforced by the security baseline above — reach for assertions when you need an exact value check (a specific issuer, fingerprint pinning, a SAN, etc.).

@@ -287,9 +287,9 @@ Define `assertions` using the `SslAssertionBuilder`. Five entry points map to th
 | `jsonResponse(jsonPath)` | `JSON_RESPONSE` | Assert on any response field via a JSONPath expression |
 | `textResponse(regex?)` | `TEXT_RESPONSE` | Extract a value from the serialized response with a regex, then compare |
 
-`certificate(property)` properties: `daysUntilExpiry` (number), `keySizeBits` (number), `subjectCN` / `issuerCN` / `serialNumber` / `fingerprintSha256` / `issuerFingerprintSha256` / `keyAlgorithm` / `signatureAlgorithm` (string), `sans` (list — use `CONTAINS`), `selfSigned` / `isCA` (boolean).
+`certificate(property)` properties: `daysUntilExpiry` / `keySizeBits` (number — `EQUALS` / `NOT_EQUALS` / `GREATER_THAN` / `LESS_THAN`), `subjectCN` / `issuerCN` (string — also `CONTAINS` / `NOT_CONTAINS`), `serialNumber` / `fingerprintSha256` / `issuerFingerprintSha256` / `keyAlgorithm` / `signatureAlgorithm` (exact — `EQUALS` / `NOT_EQUALS` only), `sans` (list — `CONTAINS` / `NOT_CONTAINS`), `selfSigned` / `isCA` (boolean — `EQUALS`).
 
-`connection(property)` properties: `tlsVersion` / `cipherSuite` / `ocspStatus` / `resolvedIp` (string), `hostnameVerified` / `chainTrusted` / `ocspStapled` (boolean).
+`connection(property)` properties: `tlsVersion` (version — `EQUALS` / `NOT_EQUALS` / `GREATER_THAN` / `LESS_THAN`, ordered TLS1.0 < TLS1.3), `cipherSuite` / `resolvedIp` (string — also `CONTAINS` / `NOT_CONTAINS`), `ocspStatus` (exact — `good` / `revoked` / `unknown`), `hostnameVerified` / `chainTrusted` / `ocspStapled` (boolean — `EQUALS`).
 
 Examples:
 
@@ -302,7 +302,8 @@ SslAssertionBuilder.certificate("daysUntilExpiry").greaterThan(30)
 SslAssertionBuilder.connection("chainTrusted").equals(true)
 // Equivalent to: { source: 'CONNECTION', property: 'chainTrusted', comparison: 'EQUALS', target: 'true' }
 
-// Negotiate TLS 1.3 (use the security baseline's minTLSVersion for a "1.2-or-newer" policy)
+// Assert an exact TLS version — tlsVersion is ordered, so greaterThan/lessThan also work
+// (the security baseline's minTLSVersion is the usual way to enforce a "1.2-or-newer" floor)
 SslAssertionBuilder.connection("tlsVersion").equals(TlsVersion.TLS1_3)
 // Equivalent to: { source: 'CONNECTION', property: 'tlsVersion', comparison: 'EQUALS', target: 'TLS1.3' }
 

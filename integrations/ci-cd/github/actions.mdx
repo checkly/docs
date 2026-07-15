@@ -11,7 +11,7 @@ Use the Checkly GitHub Action to run `checkly test` or `checkly trigger` from Gi
   - A Checkly project with checks managed in code or deployed checks you want to trigger.
   - A GitHub repository with GitHub Actions enabled.
   - `CHECKLY_API_KEY` stored as a GitHub Actions secret.
-  - `CHECKLY_ACCOUNT_ID` stored as a GitHub Actions secret or variable.
+  - `CHECKLY_ACCOUNT_ID` stored as a GitHub Actions variable.
   - Checkly CLI `8.15.0` or newer. Use `cli-version: latest` or pin `cli-version: 8.15.0`.
   - Optional: install the [Checkly GitHub App](https://github.com/apps/checkly) on the repository to receive a separate GitHub Check for detached Checkly runs.
 </Accordion>
@@ -41,7 +41,7 @@ jobs:
           github-check-name: Checkly PR checks
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
-          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
 ```
 
 With `reporting: auto`, the action uses GitHub Check reporting when the Checkly GitHub App can report on the repository. If GitHub Check reporting is unavailable, the action waits for the test session and reports through the GitHub Actions job summary instead.
@@ -76,7 +76,7 @@ jobs:
             __checks__/**/*.check.ts
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
-          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
 ```
 
 Multiple `tags` lines are treated as OR filters. Comma-separated tags on one line are treated as AND filters.
@@ -113,7 +113,7 @@ jobs:
           github-check-name: Checkly required checks
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
-          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
 ```
 
 Use `github-check-name` to set the GitHub Check name that appears on pull requests. It defaults to `Checkly`.
@@ -150,7 +150,7 @@ jobs:
             ENVIRONMENT_URL=${{ steps.preview.outputs.url }}
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
-          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
           CHECKLY_TEST_ENVIRONMENT: preview
           ENVIRONMENT_URL: ${{ steps.preview.outputs.url }}
 ```
@@ -182,7 +182,7 @@ jobs:
             ENVIRONMENT_URL=${{ github.event.deployment_status.environment_url }}
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
-          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
 ```
 
 ## Trigger deployed checks
@@ -208,7 +208,7 @@ jobs:
           check-id: abc123,def456
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
-          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
 ```
 
 ## Use with monorepos
@@ -240,7 +240,7 @@ jobs:
           tags: webapp
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
-          CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
 ```
 
 ## Next steps

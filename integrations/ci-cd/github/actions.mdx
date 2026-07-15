@@ -13,8 +13,12 @@ Use the Checkly GitHub Action to run `checkly test` or `checkly trigger` from Gi
   - `CHECKLY_API_KEY` stored as a GitHub Actions secret.
   - `CHECKLY_ACCOUNT_ID` stored as a GitHub Actions variable.
   - Checkly CLI `8.15.0` or newer. Use `cli-version: latest` or pin `cli-version: 8.15.0`.
-  - Optional: install the [Checkly GitHub App](https://github.com/apps/checkly) on the repository to receive a separate GitHub Check for detached Checkly runs.
+  - Optional: install the Checkly GitHub integration from [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) to receive a separate GitHub Check for detached Checkly runs.
 </Accordion>
+
+<Warning>
+  Install the Checkly GitHub App from inside the Checkly web app: go to [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) and click **Integrate with GitHub**. Installing the app directly from GitHub does not create the matching Checkly integration, so GitHub Check reporting will not work correctly.
+</Warning>
 
 ## Run checks on pull requests
 
@@ -119,7 +123,7 @@ jobs:
 Use `github-check-name` to set the GitHub Check name that appears on pull requests. It defaults to `Checkly`.
 
 <Note>
-  GitHub Check reporting requires the Checkly GitHub App to be installed on the repository. Without the app, use `reporting: auto` or `reporting: github-actions`.
+  GitHub Check reporting requires the Checkly GitHub App to be installed through [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) in Checkly. Without the app, use `reporting: auto` or `reporting: github-actions`.
 </Note>
 
 ## Test preview deployments

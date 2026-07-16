@@ -12,7 +12,7 @@ Use the Checkly GitHub Action to run `checkly test` or `checkly trigger` from Gi
   - A GitHub repository with GitHub Actions enabled.
   - `CHECKLY_API_KEY` stored as a GitHub Actions secret.
   - `CHECKLY_ACCOUNT_ID` stored as a GitHub Actions variable.
-  - Checkly CLI `8.15.0` or newer. Use `cli-version: latest` or pin `cli-version: 8.15.0`.
+  - Checkly CLI `8.15.0` or newer. The action uses the latest compatible CLI version by default.
   - Optional: install the Checkly GitHub integration from [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) to receive a separate GitHub Check for detached Checkly runs.
 </Accordion>
 
@@ -48,7 +48,7 @@ jobs:
       - uses: checkly/checkly-action@v1
         with:
           command: test
-          cli-version: 8.15.0
+          cli-version: latest
           install-command: npm ci
           reporting: auto
           github-check-name: Checkly PR checks
@@ -78,7 +78,7 @@ jobs:
       - uses: checkly/checkly-action@v1
         with:
           command: test
-          cli-version: 8.15.0
+          cli-version: latest
           install-command: npm ci
           reporting: auto
           tags: |
@@ -121,7 +121,7 @@ jobs:
       - uses: checkly/checkly-action@v1
         with:
           command: test
-          cli-version: 8.15.0
+          cli-version: latest
           reporting: github-check
           github-check-name: Checkly required checks
         env:
@@ -157,7 +157,7 @@ jobs:
       - uses: checkly/checkly-action@v1
         with:
           command: test
-          cli-version: 8.15.0
+          cli-version: latest
           reporting: auto
           env: |
             ENVIRONMENT_URL=${{ steps.preview.outputs.url }}
@@ -187,7 +187,7 @@ jobs:
       - uses: checkly/checkly-action@v1
         with:
           command: trigger
-          cli-version: 8.15.0
+          cli-version: latest
           reporting: auto
           tags: production
           check-id: abc123,def456
@@ -218,7 +218,7 @@ jobs:
       - uses: checkly/checkly-action@v1
         with:
           command: test
-          cli-version: 8.15.0
+          cli-version: latest
           working-directory: apps/webapp
           install-command: npm ci
           reporting: auto

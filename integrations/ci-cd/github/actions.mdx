@@ -20,6 +20,15 @@ Use the Checkly GitHub Action to run `checkly test` or `checkly trigger` from Gi
   Install the Checkly GitHub App from inside the Checkly web app: go to [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) and click **Integrate with GitHub**. Installing the app directly from GitHub does not create the matching Checkly integration, so GitHub Check reporting will not work correctly.
 </Warning>
 
+## Choose a GitHub workflow
+
+There are two GitHub CI/CD paths in Checkly:
+
+| Use case | Guide |
+| --- | --- |
+| Run a Checkly test session from a GitHub Actions workflow and report the result on a pull request. | Continue with this guide. |
+| Listen for GitHub deployment events and trigger checks linked to a repository, using the deployment environment URL as the test target. | Use [GitHub deployment hooks](/integrations/ci-cd/github/deployments). |
+
 ## Run checks on pull requests
 
 Use `command: test` when your checks are defined in the repository. The action checks out the pull request code, installs dependencies, and runs `checkly test` on Checkly's infrastructure.
@@ -159,35 +168,7 @@ jobs:
           ENVIRONMENT_URL: ${{ steps.preview.outputs.url }}
 ```
 
-For `deployment_status` workflows, the action uses `github.event.deployment_status.environment_url` as `ENVIRONMENT_URL` when `ENVIRONMENT_URL` is not already set.
-
-```yaml .github/workflows/checkly-deployment.yml
-name: Checkly deployment
-
-on:
-  deployment_status:
-
-jobs:
-  checkly:
-    if: github.event.deployment_status.state == 'success'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.deployment_status.deployment.ref }}
-
-      - uses: checkly/checkly-action@v1
-        with:
-          command: test
-          cli-version: 8.15.0
-          install-command: npm ci
-          reporting: auto
-          env: |
-            ENVIRONMENT_URL=${{ github.event.deployment_status.environment_url }}
-        env:
-          CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
-          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
-```
+If your deployment provider already emits GitHub deployment events with an environment URL, you can also use [GitHub deployment hooks](/integrations/ci-cd/github/deployments) instead of a GitHub Actions workflow.
 
 ## Trigger deployed checks
 
@@ -251,4 +232,4 @@ jobs:
 
 - Learn more about [`checkly test`](/cli/checkly-test).
 - Learn more about [`checkly trigger`](/cli/checkly-trigger).
-- Use [GitHub deployments](/integrations/ci-cd/github/deployments) when you want Checkly to react to GitHub deployment webhook events without a GitHub Actions workflow.
+- Use [GitHub deployment hooks](/integrations/ci-cd/github/deployments) when you want Checkly to react to GitHub deployment webhook events without a GitHub Actions workflow.

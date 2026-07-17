@@ -225,24 +225,24 @@ Omit to connect without a client certificate.
 ```ts
 sslConfig: {
   clientCertificateMode: "explicit",
-  sslClientCertificateId: "cert_abc123",
+  sslClientCertificateId: "9e83b6d8-a1e5-4c7b-8f0a-3d2e1c4b5a69",
 }
 ```
 </ResponseField>
 
 <ResponseField name="sslClientCertificateId" type="string">
-The ID of the stored client certificate to present during the TLS handshake. Required when `clientCertificateMode` is `'explicit'`. Client certificates are managed under **Settings → Client Certificates** in the Checkly dashboard.
+The UUID of the stored client certificate to present during the TLS handshake. Required when `clientCertificateMode` is `'explicit'`. Client certificates are managed under **Settings → Client Certificates** in the Checkly dashboard.
 
 ```ts
 sslConfig: {
   clientCertificateMode: "explicit",
-  sslClientCertificateId: "cert_abc123",
+  sslClientCertificateId: "9e83b6d8-a1e5-4c7b-8f0a-3d2e1c4b5a69",
 }
 ```
 </ResponseField>
 
 <ResponseField name="securityBaseline" type="SecurityBaseline">
-Override the account-level security baseline for this monitor. Omit to inherit the account default.
+Override the default security baseline for this monitor. Omit to inherit the built-in default baseline.
 
 ```ts
 sslConfig: {
@@ -475,7 +475,7 @@ new SslMonitor("my-ssl-monitor", {
         hostname: "mtls.api.example.com",
         sslConfig: {
           clientCertificateMode: "explicit",
-          sslClientCertificateId: "cert_abc123",
+          sslClientCertificateId: "9e83b6d8-a1e5-4c7b-8f0a-3d2e1c4b5a69",
           alertDaysBeforeExpiry: 30,
         },
         assertions: [

@@ -2,6 +2,7 @@
 title: 'Traceroute Monitor Configuration'
 description: 'Configure your Traceroute monitor to map network paths and detect routing issues, latency, and packet loss.'
 sidebarTitle: 'Configuration'
+canonical: 'https://www.checklyhq.com/docs/detect/uptime-monitoring/traceroute-monitors/configuration/'
 ---
 
 <Tip>
@@ -46,13 +47,13 @@ Response-time thresholds apply to the **final-hop average RTT**, not the total c
 
 ### JSON Response Schema
 
-The Traceroute response is available as structured JSON. All responses share this format:
+The Traceroute response is available as structured JSON. These are the key fields (a few internal bookkeeping fields are omitted here, and fields marked as omitted are absent from the JSON rather than empty):
 
 ```json
 {
   "hostname": "api.example.com",          // Target hostname or IP as configured
   "resolvedIp": "93.184.216.34",          // IP address used for the trace
-  "port": 443,                             // Destination port; always present (0 for ICMP probes)
+  "port": 443,                             // Destination port; for ICMP probes this reports the unused fallback 443
   "ipFamily": "IPv4",                      // "IPv4" or "IPv6"
   "maxHops": 30,                           // Configured max hops
   "totalHops": 12,                         // Number of hops actually recorded
@@ -60,8 +61,8 @@ The Traceroute response is available as structured JSON. All responses share thi
   "truncationReason": "destinationReached",// Why the trace stopped:
                                            // "destinationReached" | "maxHops" | "maxUnknownHops" | "timeout"
   "probeProtocol": "TCP",                 // Probe protocol: "TCP" | "UDP" | "ICMP" | "SCTP"
-  "finalHopLatency": {                     // RTT stats for the last responding hop
-    "avg": 12.34,                         // Omitted entirely (field absent) when destination is not reached
+  "finalHopLatency": {                     // RTT stats for the last responding hop (the whole object is omitted when the destination is not reached)
+    "avg": 12.34,
     "min": 11.80,
     "max": 13.10,
     "stdDev": 0.42
@@ -70,22 +71,22 @@ The Traceroute response is available as structured JSON. All responses share thi
     {
       "hop_number": 1,
       "main_ip": "10.0.0.1",              // Primary IP observed at this hop
-      "main_host": "router.isp.net",      // Reverse-DNS hostname (empty when PTR lookup is off or lookup fails)
+      "main_host": "router.isp.net",      // Reverse-DNS hostname (omitted when PTR lookup is off or the lookup fails)
       "sent": 3,                           // Probe packets sent to this hop
       "received": 3,                       // Replies received from this hop
       "loss_percentage": 0.0,             // Packet loss at this hop
-      "rtt": {
+      "rtt": {                             // RTT stats (omitted when the hop never replied)
         "last_ms": 1.23,                 // RTT of the most recent probe
         "avg_ms": 1.10,                  // Average RTT across all probes
         "best_ms": 0.95,                 // Minimum RTT
         "worst_ms": 1.23,               // Maximum RTT
         "stddev_ms": 0.12               // Standard deviation
       },
-      "asn": 15169,                        // Autonomous System Number (0 if unknown)
-      "asn_org": "GOOGLE",               // AS organization name
-      "country": "US",                   // Two-letter country code
-      "aws_region": "",                  // AWS region name (if hop is in AWS)
-      "aws_service": ""                  // AWS service name (if hop is in AWS)
+      "asn": 15169,                        // Autonomous System Number (omitted when unknown)
+      "asn_org": "GOOGLE",               // AS organization name (omitted when unknown)
+      "country": "US",                   // Two-letter country code (omitted when unknown)
+      "aws_region": "us-east-1",         // AWS region — only present when the hop is inside AWS
+      "aws_service": "EC2"               // AWS service — only present when the hop is inside AWS
     }
     // ... one entry per recorded hop
   ],

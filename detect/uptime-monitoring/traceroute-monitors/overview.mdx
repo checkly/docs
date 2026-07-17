@@ -2,6 +2,7 @@
 title: 'Traceroute Monitors Overview'
 description: 'Map the network path to any host and detect routing issues, high-latency hops, and packet loss.'
 sidebarTitle: Overview
+canonical: 'https://www.checklyhq.com/docs/detect/uptime-monitoring/traceroute-monitors/overview/'
 ---
 
 <Tip>
@@ -22,7 +23,7 @@ Traceroute monitors map the network path between a Checkly location and your tar
 A Traceroute monitor executes the following steps on each run:
 
 1. **Hostname resolution**: If a hostname is provided, Checkly resolves it to an IP address before sending any probes
-2. **Probe execution**: The runner sends probe packets using the configured protocol (TCP by default). Each probe carries a progressively higher TTL so each router on the path responds with an ICMP Time Exceeded message before forwarding the packet
+2. **Probe execution**: The runner sends probe packets using the configured protocol (TCP by default). Each probe carries a progressively higher TTL, so each router on the path in turn drops the probe whose TTL expires there and responds with an ICMP Time Exceeded message
 3. **Hop collection**: RTT statistics (avg, min, max, stddev) and packet loss are collected for each router hop along the path
 4. **Destination detection**: When the destination host responds directly, the trace is complete and `destinationReached` is set to `true`
 5. **Assertion evaluation**: Configured assertions are evaluated against the results — including final-hop latency, total hop count, and last-hop packet loss
@@ -34,10 +35,10 @@ A Traceroute monitor executes the following steps on each run:
 | **TCP** (default) | 443 | SYN-ACK or RST received from destination |
 | **UDP** | 33434 | Any ICMP Destination Unreachable from the target (port unreachable, admin-prohibited, host unreachable, etc.) |
 | **ICMP** | *(no port)* | Echo Reply from destination |
-| **SCTP** | 33434 | SCTP ABORT or INIT-ACK from destination, or ICMP Destination Unreachable from the target |
+| **SCTP** | 33434 | Any ICMP Destination Unreachable from the target (protocol unreachable, port unreachable, etc.) |
 
 <Note>
-The default port for UDP and SCTP in the Checkly web UI is pre-filled to `33434` — a high, typically-closed port where the destination is more likely to return an ICMP Destination Unreachable. When configuring via the CLI or API, the port defaults to `443` for all non-ICMP protocols, so set `port: 33434` explicitly for UDP/SCTP probes if you want the same behavior.
+The default port is protocol-dependent everywhere — web UI, CLI, and API: `443` for TCP and `33434` for UDP/SCTP. `33434` is a high, typically-closed port: UDP and SCTP arrival is only confirmed when the destination returns an ICMP Destination Unreachable, which requires the probed port to be closed. Avoid setting an open port (like `443`) for UDP/SCTP probes — it would never confirm arrival.
 </Note>
 
 ## Traceroute Monitor Results
@@ -71,7 +72,7 @@ Learn more in our documentation on [Results](/concepts/results).
 
 **How to fix**:
 1. Switch the probe protocol — try `ICMP` if the host responds to ping, or `UDP` for a connectionless probe
-2. Change the port to one that is explicitly open on the target (e.g. `80` or `22`)
+2. For TCP probes, change the port to one that is explicitly open on the target (e.g. `80` or `22`). For UDP/SCTP, keep a *closed* port — arrival is only confirmed by an ICMP Destination Unreachable reply
 3. Confirm reachability at the application layer with an [API Monitor](/detect/synthetic-monitoring/overview) or [TCP Monitor](/detect/uptime-monitoring/tcp-monitors/overview) targeting the same host and port
 </Accordion>
 
@@ -88,7 +89,7 @@ Learn more in our documentation on [Results](/concepts/results).
 <Accordion title="SCTP or raw-socket errors on private locations">
 **Symptom**: SCTP probes fail with a socket permission error on a self-hosted Checkly Agent.
 
-**Root cause**: SCTP probes require raw sockets, which need `CAP_NET_RAW`. Container runtimes drop this capability by default.
+**Root cause**: Container runtimes drop `CAP_NET_RAW` by default. Traceroute monitors always need it — hop discovery listens for ICMP replies on a raw socket regardless of probe protocol — but SCTP is the case that surfaces an explicit socket error, because SCTP probes are also *sent* over a raw socket.
 
 **How to fix** — In **Kubernetes**, update your pod spec or Helm values:
 

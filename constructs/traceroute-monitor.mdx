@@ -2,6 +2,7 @@
 title: 'TracerouteMonitor Construct'
 description: 'Learn how to configure Traceroute monitors with the Checkly CLI.'
 sidebarTitle: 'Traceroute Monitor'
+canonical: 'https://www.checklyhq.com/docs/constructs/traceroute-monitor/'
 ---
 
 import GeneralMonitorOptionsTable from '/snippets/general-monitor-options-table.mdx';
@@ -59,7 +60,7 @@ new TracerouteMonitor('traceroute-db', {
     timeout: 15,
     assertions: [
       TracerouteAssertionBuilder.hopCount().lessThan(15),
-      TracerouteAssertionBuilder.responseTime().avg().lessThan(50),
+      TracerouteAssertionBuilder.responseTime('avg').lessThan(50),
       TracerouteAssertionBuilder.packetLoss().lessThan(5),
     ],
   },
@@ -117,7 +118,7 @@ new TracerouteMonitor('traceroute-monitor', {
 |-----------|------|----------|---------|-------------|
 | `url` | `string` | ✅ | - | Target hostname or IP address. Do not include a scheme or port |
 | `protocol` | `string` | ❌ | `'TCP'` | Probe protocol: `'TCP'` \| `'UDP'` \| `'ICMP'` \| `'SCTP'` |
-| `port` | `number` | ❌ | `443` | Destination port (1–65535). Defaults to `443` for all non-ICMP protocols. For UDP/SCTP, set `port: 33434` explicitly — a high closed port so the destination returns ICMP Unreachable to confirm arrival. Ignored when `protocol` is `'ICMP'` |
+| `port` | `number` | ❌ | `443` (TCP) / `33434` (UDP, SCTP) | Destination port (1–65535). Defaults to `443` for TCP and to `33434` — a high, typically closed port — for UDP/SCTP, so the destination returns ICMP Destination Unreachable to confirm arrival. Ignored (and not sent) when `protocol` is `'ICMP'` |
 | `ipFamily` | `string` | ❌ | `'IPv4'` | IP family: `'IPv4'` \| `'IPv6'` |
 | `maxHops` | `number` | ❌ | `30` | Maximum hops to probe (1–64) |
 | `maxUnknownHops` | `number` | ❌ | `15` | Maximum consecutive unresponsive hops before stopping (1–30) |
@@ -163,7 +164,7 @@ new TracerouteMonitor("traceroute-latency-tiers", {
 
 Assertions for Traceroute monitors are defined using the `TracerouteAssertionBuilder`. The following sources are available:
 
-- `responseTime(property?)`: Validate RTT at the final responding hop. Defaults to the `avg` property. Use `.avg()`, `.min()`, `.max()`, or `.stdDev()` to target a specific statistic. This assertion fails when `destinationReached` is `false`
+- `responseTime(property?)`: Validate RTT at the final responding hop. Pass `'avg'`, `'min'`, `'max'`, or `'stdDev'` as the argument to target a specific statistic; when omitted, it defaults to `'avg'`. This assertion fails when `destinationReached` is `false`
 - `hopCount()`: Assert against the total number of hops recorded in the trace
 - `packetLoss()`: Assert against the packet loss percentage at the last recorded hop (0–100)
 
@@ -180,7 +181,7 @@ TracerouteAssertionBuilder.responseTime().lessThan(100)
 - Assert against a specific RTT property:
 
 ```ts
-TracerouteAssertionBuilder.responseTime().max().lessThan(200)
+TracerouteAssertionBuilder.responseTime('max').lessThan(200)
 // Equivalent to:
 { source: 'RESPONSE_TIME', property: 'max', comparison: 'LESS_THAN', target: '200' }
 ```

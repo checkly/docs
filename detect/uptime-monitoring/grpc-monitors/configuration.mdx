@@ -48,7 +48,7 @@ You can create assertions based on:
 
 * **Response time**: Assert that the total gRPC call duration (including DNS and connection) is within a threshold
 * **gRPC status code**: Assert on the numeric gRPC status code. Common values: `0` (OK), `1` (CANCELLED), `2` (UNKNOWN), `4` (DEADLINE_EXCEEDED), `14` (UNAVAILABLE). See the [gRPC status codes reference](https://grpc.github.io/grpc/core/md_doc_statuscodes.html).
-* **Health check status** (HEALTH mode): Assert on the health status string. Valid values: `SERVING`, `NOT_SERVING`, `UNKNOWN`, `SERVICE_UNKNOWN`
+* **Health check status** (HEALTH mode): Assert on the health status reported by the server. In the UI you select the status by name (`SERVING`, `NOT_SERVING`, `UNKNOWN`, `SERVICE_UNKNOWN`); the assertion target is stored and evaluated as the status's **numeric** enum value (`UNKNOWN=0`, `SERVING=1`, `NOT_SERVING=2`, `SERVICE_UNKNOWN=3`), so via the API or CLI use the number (e.g. `1` for `SERVING`). Only equals / not-equals comparisons are supported.
 * **Response message** (BEHAVIOR mode): Assert against the JSON response body using a JSON path expression. For example:
   * `$.status` → assert on a top-level field
   * `$.result.id` → assert on a nested field

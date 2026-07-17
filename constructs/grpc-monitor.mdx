@@ -94,8 +94,8 @@ gRPC monitors have their own gRPC-specific settings, plus the standard monitor o
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `request` | `object` | ✅ | - | gRPC request configuration object |
-| `degradedResponseTime` | `number` | ❌ | `4000` | Response time in milliseconds at which the monitor is marked as degraded |
-| `maxResponseTime` | `number` | ❌ | `5000` | Response time in milliseconds at which the monitor is marked as failed (max 180,000) |
+| `degradedResponseTime` | `number` | ❌ | `10000` | Response time in milliseconds at which the monitor is marked as degraded |
+| `maxResponseTime` | `number` | ❌ | `20000` | Response time in milliseconds at which the monitor is marked as failed (max 180,000) |
 
 </Tab>
 <Tab title="General Monitor Settings">
@@ -163,7 +163,7 @@ gRPC-specific call configuration nested inside `request`.
 
 </ResponseField>
 
-<ResponseField name="degradedResponseTime" type="number" default="4000">
+<ResponseField name="degradedResponseTime" type="number" default="10000">
 Response time in milliseconds at which the monitor is marked as degraded (warning state). Maximum: 180,000.
 
 **Usage:**
@@ -183,7 +183,7 @@ new GrpcMonitor('grpc-thresholds', {
 
 </ResponseField>
 
-<ResponseField name="maxResponseTime" type="number" default="5000">
+<ResponseField name="maxResponseTime" type="number" default="20000">
 Response time in milliseconds at which the monitor is marked as failed. Maximum: 180,000.
 
 **Usage:**

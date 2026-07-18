@@ -1,48 +1,46 @@
 ---
-title: Integrating Checkly in GitHub Deployments
-description: "Trigger Checkly checks from GitHub deployment events fired by services like Vercel and Heroku, running against both preview and production deployments."
-sidebarTitle: GitHub Deployments
+title: GitHub deployment hooks
+description: "Trigger linked Checkly checks from GitHub deployment events and use deployment environment URLs as test targets."
+sidebarTitle: Deployment hooks
 canonical: 'https://www.checklyhq.com/docs/integrations/ci-cd/github/deployments/'
 ---
 
+Use GitHub deployment hooks when you want Checkly to listen for GitHub `deployment_status` events and trigger checks linked to a repository. This is separate from the [Checkly GitHub Action](/integrations/ci-cd/github/actions), which starts test sessions from a GitHub Actions workflow.
 
-GitHub deployments are webhook events triggered by GitHub whenever a deployment service reports a successful deployment 
-event. This works out-of-the-box with the following services. 
+<Accordion title="Prerequisites">
+  - The Checkly GitHub integration installed from the [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) page of the Checkly account that owns the checks.
+  - A deployment provider that sends successful GitHub `deployment_status` events, such as Vercel for GitHub or Heroku Pipelines.
+  - One or more Checkly checks linked to the GitHub repository from the check's **CI/CD** settings.
+</Accordion>
+
+<Warning>
+  Start the installation from [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) in Checkly and click **Integrate with GitHub**. Grant the installation access to the repository you want to link. Installing the app directly from GitHub does not connect it to the Checkly account, so deployment hooks and GitHub Check reporting will not work correctly.
+</Warning>
+
+GitHub `deployment_status` webhook events are triggered whenever a deployment service reports a successful deployment. This works with services that report successful deployment statuses through the GitHub Deployments API, including:
 
 - [Vercel for GitHub](https://vercel.com/docs/v2/git-integrations/vercel-for-github)
 - [Heroku Pipelines](https://devcenter.heroku.com/articles/pipelines)
-
-Any (SaaS) service that interacts with the [GitHub deployments API](https://developer.github.com/v3/repos/deployments/) and
-reports the correct "success" message will work, both with production and preview deployments.
+- Other deployment services that use the [GitHub deployments API](https://docs.github.com/en/rest/deployments/deployments) and report successful deployment statuses.
 
 <Warning>
-This integration has some [known limitations](/integrations/ci-cd/github/deployments#limitations). We recommend using the [Checkly CLI](/cli/overview) in your CI/CD pipeline instead.
+  This integration has some [known limitations](/integrations/ci-cd/github/deployments#limitations). Use the [Checkly GitHub Action](/integrations/ci-cd/github/actions) when you want GitHub Actions to start a recorded test session and report the result on a pull request.
 </Warning>
 
-## Setting up your GitHub integration
+## Set up GitHub deployment hooks
 
-1. Go to the **integrations tab** in your account settings and click the "Integrate with GitHub" button.    
-![set up GitHub integration step 1](/images/docs/images/cicd/github_setup_1.png)
+1. Go to [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) and click **Integrate with GitHub**.
+2. In GitHub, choose the account where you want to install the Checkly GitHub App and grant it access to the repositories you want to connect. After installation, GitHub redirects you to Checkly.
+3. Open the check or check group you want to trigger and go to its **CI/CD** settings.
+4. Click **Link GitHub repo** and select the repository that reports your deployment events.
 
-2. You will be redirected to GitHub and prompted to select an account and install the Checkly GitHub App.  
-![set up GitHub integration step 2](/images/docs/images/cicd/github_setup_2.png)
+After you link the repository, Checkly listens for successful deployment events and runs the linked check or check group. You can also choose a run location, filter deployments by environment or environment URL, and include screenshots in the pull request comment.
 
-3. When accepting the installation, you are redirected back to Checkly and the integration is installed. 
-Now, go to the **CI/CD tab** of the check you want to link to a GitHub repository. In Browser checks, this will be under "Change settings".
-![set up GitHub integration step 3](/images/docs/images/cicd/github_setup_3.png)
+<Note>
+  You can link multiple checks to the same repository. Checkly runs the linked checks as a test suite when GitHub reports a successful deployment.
+</Note>
 
-4. Click the **"Link GitHub repo"** button and select the repository you want to link.  
-![set up GitHub integration step 4](/images/docs/images/cicd/github_setup_4.png)
-
-5. On each deployment event, we will run your check and report the results directly in **your GitHub timeline and PR overview**.  
-![set up GitHub integration step 5](/images/docs/images/cicd/github_setup_5.png)
-
-6. You will also get an overview of the check result in the *details* section
-![set up GitHub integration step 6](/images/docs/images/cicd/github_setup_6.png)
- 
-> You can hook up multiple checks to the same repo. We will just run all of them as a test suite.
-
-## Using environment URLs
+## Use deployment environment URLs
 
 GitHub reports an **environment URL** on each deployment event. Depending on what deployment service you use,
 this environment URL can be used to run your check on different target environments than configured in your check.  
@@ -54,7 +52,7 @@ So, when you enable the **"Use environment URL from deployment trigger"** checkb
 
 ### API checks & environment URLs 
 
-With API checks, we replace the hostname part of your request url with the host in the environment URL. 
+With API checks, Checkly replaces the hostname part of your request URL with the host in the environment URL.
 For example:
 
 - Your configured URL: `https://api.acme.com/v1/customers?page=1`
@@ -68,7 +66,7 @@ Notice we only replace the **host** part, not the URL path or any query paramete
 For browser checks, the environment URL is exposed as the `ENVIRONMENT_URL` environment variable. This means you can use that
 variable in your code to replace any hardcoded URL you might have, i.e.:
 
-<CodeGroup dropdown>
+<CodeGroup dropdown={true}>
 ```typescript test.spec.ts
 import { expect, test } from '@playwright/test'
 
@@ -92,18 +90,18 @@ test('assert response status of page', async ({ page }) => {
 ```
 </CodeGroup>
 
-This way we are setting the `targetUrl` variable to either the `ENVIRONMENT_URL` or just our main production URL.
+This sets the `targetUrl` variable to either the `ENVIRONMENT_URL` or your main production URL.
 
-Whenever a **Preview** deploy happens on GitHub, this check gets called and runs the script against the preview environment. This check also runs on a set interval, and checks our production environment.
+When a **Preview** deployment happens on GitHub, this check runs the script against the preview environment. This check also runs on a set interval and checks your production environment.
 
-This way, we kill two birds with one stone and don't need separate checks for separate environments.
+With one check, you can validate preview deployments from GitHub events and keep running the same check on your production schedule.
 
 ## Limitations
 
-GitHub deployments lacks support for several features:
+GitHub deployment hooks lack support for several features:
 
 * Client certificates are not applied.
 * OpenTelemetry integration headers are not applied.
 * Private locations are not available.
 
-As an alternative, we recommend using the [Checkly CLI](/cli/overview) in your CI/CD pipeline. The CLI is much more powerful and fully supported.
+Use the [Checkly GitHub Action](/integrations/ci-cd/github/actions) or the [Checkly CLI](/cli/overview) in your CI/CD pipeline when you need these features.

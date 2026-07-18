@@ -254,7 +254,11 @@ on:
     types: [checks_requested]
 ```
 
-For a [`merge_group` event](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#merge_group), the Action uses `GITHUB_SHA`, which identifies the temporary merge-group commit. These requirements are GitHub branch-protection concerns; they do not require Checkly's internal CI workflows, SHA propagation, or deployment-provider setup.
+When a pull request enters a GitHub merge queue, GitHub creates a merge-group commit that combines the queued changes with the latest target branch. GitHub must receive the required checks for this new commit, even if the same checks already passed on the pull request's head commit.
+
+Adding the [`merge_group` event](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#merge_group) makes the workflow run again for that commit. The Action automatically uses `GITHUB_SHA` and attaches the external Checkly GitHub Check to the merge-group commit, so you do not need to set `github-sha` yourself.
+
+This configuration is only relevant if your repository uses a GitHub merge queue. It does not require custom SHA propagation, Checkly's internal CI workflows, or a particular deployment provider.
 
 ## Next steps
 

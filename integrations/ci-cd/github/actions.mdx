@@ -1,37 +1,27 @@
 ---
-title: Integrating Checkly in GitHub Actions
-description: "Run Checkly checks from GitHub Actions and report test session results in pull requests."
+title: Run Checkly from GitHub Actions
+description: "Run Checkly test sessions from GitHub Actions and report results through workflow jobs or external GitHub Checks."
 sidebarTitle: GitHub Actions
 canonical: 'https://www.checklyhq.com/docs/integrations/ci-cd/github/actions/'
 ---
 
-Use the Checkly GitHub Action to run `checkly test` or `checkly trigger` from GitHub Actions. This lets you validate Monitoring as Code changes in pull requests, run checks against preview deployments, and report the test session result back to GitHub.
+Use the Checkly GitHub Action to run Monitoring as Code constructs from a repository or trigger checks already deployed to Checkly. The Action uses the Checkly CLI and can report the resulting test session through the GitHub Actions job or a separate GitHub Check.
 
 <Accordion title="Prerequisites">
-  - A Checkly project with checks managed in code or deployed checks you want to trigger.
   - A GitHub repository with GitHub Actions enabled.
+  - A Checkly project that uses Checkly CLI `8.15.0` or newer.
   - `CHECKLY_API_KEY` stored as a GitHub Actions secret.
-  - `CHECKLY_ACCOUNT_ID` stored as a GitHub Actions variable.
-  - Checkly CLI `8.15.0` or newer. The action uses the latest compatible CLI version by default.
-  - Optional: install the Checkly GitHub integration from [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) to receive a separate GitHub Check for detached Checkly runs.
+  - `CHECKLY_ACCOUNT_ID` stored as a GitHub Actions variable. Account IDs do not need to be secrets.
+  - For detached GitHub Check reporting, the Checkly GitHub App connected to the same Checkly account and granted access to the repository.
 </Accordion>
 
 <Warning>
-  Install the Checkly GitHub App from inside the Checkly web app: go to [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) and click **Integrate with GitHub**. Installing the app directly from GitHub does not create the matching Checkly integration, so GitHub Check reporting will not work correctly.
+  Install the GitHub App from the Checkly account that will run the test session. Go to [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations), click **Integrate with GitHub**, and grant the installation access to the repository. Installing the app directly from its GitHub listing does not connect the installation to your Checkly account.
 </Warning>
-
-## Choose a GitHub workflow
-
-There are two GitHub CI/CD paths in Checkly:
-
-| Use case | Guide |
-| --- | --- |
-| Run a Checkly test session from a GitHub Actions workflow and report the result on a pull request. | Continue with this guide. |
-| Listen for GitHub deployment events and trigger checks linked to a repository, using the deployment environment URL as the test target. | Use [GitHub deployment hooks](/integrations/ci-cd/github/deployments). |
 
 ## Run checks on pull requests
 
-Use `command: test` when your checks are defined in the repository. The action checks out the pull request code, installs dependencies, and runs `checkly test` on Checkly's infrastructure.
+Use this workflow when your Checkly constructs are defined in the repository:
 
 ```yaml .github/workflows/checkly.yml
 name: Checkly
@@ -51,128 +41,38 @@ jobs:
           cli-version: latest
           install-command: npm ci
           reporting: auto
-          github-check-name: Checkly PR checks
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
           CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
 ```
 
-With `reporting: auto`, the action uses GitHub Check reporting when the Checkly GitHub App can report on the repository. If GitHub Check reporting is unavailable, the action waits for the test session and reports through the GitHub Actions job summary instead.
+The checkout step makes the pull request's constructs and project dependencies available to the Action. With `reporting: auto`, the Action uses a detached GitHub Check when it is available. Otherwise, the workflow waits for the test session and reports the result through the GitHub Actions job.
 
-## Run selected checks
+## Choose what to run
 
-Filter the checks that run in a pull request with `tags`, `grep`, or file patterns.
+The `command` input selects the source of the checks:
 
-```yaml .github/workflows/checkly-filtered.yml
-name: Checkly
-
-on:
-  pull_request:
-
-jobs:
-  checkly:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: checkly/checkly-action@v1
-        with:
-          command: test
-          cli-version: latest
-          install-command: npm ci
-          reporting: auto
-          tags: |
-            production,webapp
-            production,api
-          grep: checkout
-          files: |
-            __checks__/**/*.check.ts
-        env:
-          CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
-          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
-```
-
-Multiple `tags` lines are treated as OR filters. Comma-separated tags on one line are treated as AND filters.
-
-## Report results
-
-The `reporting` input controls where the Checkly result is reported.
-
-| Value | Behavior |
+| Command | What it runs |
 | --- | --- |
-| `auto` | Use a detached Checkly run with GitHub Check reporting when available. Otherwise, wait in the GitHub Actions job and report there. |
-| `github-check` | Require detached GitHub Check reporting. The action fails before running checks if the Checkly GitHub App cannot report on the repository. |
-| `github-actions` | Always wait in the GitHub Actions job and write the Checkly summary to the GitHub Actions job summary. |
+| `test` | Constructs from the checked-out repository. Use this to validate pull request changes before deploying them to Checkly. |
+| `trigger` | Checks that are already deployed to the Checkly account. It does not load or test pull request-local constructs. |
 
-Use `github-check` when the Checkly GitHub Check should be a required status check on pull requests.
+For `test`, use `tags`, `grep`, or `files` to select repository constructs:
 
-```yaml .github/workflows/checkly-required.yml
-name: Checkly required
-
-on:
-  pull_request:
-
-jobs:
-  checkly:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: checkly/checkly-action@v1
-        with:
-          command: test
-          cli-version: latest
-          reporting: github-check
-          github-check-name: Checkly required checks
-        env:
-          CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
-          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
+```yaml
+with:
+  command: test
+  tags: |
+    production,webapp
+    production,api
+  grep: checkout
+  files: |
+    __checks__/**/*.check.ts
 ```
 
-Use `github-check-name` to set the GitHub Check name that appears on pull requests. It defaults to `Checkly`.
+Each `tags` line creates a separate `--tags` filter. Comma-separated tags on one line must all match.
 
-<Note>
-  GitHub Check reporting requires the Checkly GitHub App to be installed through [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) in Checkly. Without the app, use `reporting: auto` or `reporting: github-actions`.
-</Note>
-
-## Test preview deployments
-
-For pull request preview deployments, pass the preview URL to your checks as `ENVIRONMENT_URL`. In Browser checks and Playwright Check Suites, read `process.env.ENVIRONMENT_URL` in your test code.
-
-```yaml .github/workflows/checkly-preview.yml
-name: Checkly preview
-
-on:
-  pull_request:
-
-jobs:
-  checkly:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - id: preview
-        run: echo "url=https://preview.example.com" >> "$GITHUB_OUTPUT"
-
-      - uses: checkly/checkly-action@v1
-        with:
-          command: test
-          cli-version: latest
-          reporting: auto
-          env: |
-            ENVIRONMENT_URL=${{ steps.preview.outputs.url }}
-        env:
-          CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
-          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
-          CHECKLY_TEST_ENVIRONMENT: preview
-          ENVIRONMENT_URL: ${{ steps.preview.outputs.url }}
-```
-
-If your deployment provider already emits GitHub deployment events with an environment URL, you can also use [GitHub deployment hooks](/integrations/ci-cd/github/deployments) instead of a GitHub Actions workflow.
-
-## Trigger deployed checks
-
-Use `command: trigger` when you want to run checks that are already deployed in your Checkly account. This is useful for smoke testing existing production or staging checks from a release workflow.
+For `trigger`, select deployed checks with tags or check IDs:
 
 ```yaml .github/workflows/checkly-trigger.yml
 name: Checkly trigger
@@ -190,27 +90,133 @@ jobs:
           cli-version: latest
           reporting: auto
           tags: production
-          check-id: abc123,def456
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
           CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
 ```
 
-## Use with monorepos
+## Choose a reporting mode
 
-In monorepos, combine GitHub Actions path filters with the action's `working-directory`, `tags`, `grep`, or `files` inputs.
+The `reporting` input controls whether the workflow waits for the Checkly test session:
+
+| Value | Behavior |
+| --- | --- |
+| `auto` | Use a detached Checkly run and external GitHub Check when available. Otherwise, wait and report through the GitHub Actions job. This is the default. |
+| `github-check` | Require detached GitHub Check reporting. The Action fails preflight before running checks when the Checkly GitHub App cannot report to the repository. |
+| `github-actions` | Always wait for the test session. The workflow job carries the result and the Action writes the Checkly report to the job summary. |
+
+Detached reporting produces two separate GitHub Check Runs: the GitHub Actions job and the external Checkly GitHub Check. The workflow job can finish successfully after starting the detached test session while the external Checkly GitHub Check is still running.
+
+Use `github-check-name` to set the external GitHub Check Run name. It defaults to `Checkly`; it is not the name of a Checkly check.
+
+```yaml
+with:
+  command: test
+  reporting: github-check
+  github-check-name: Checkly PR validation
+```
+
+<Note>
+  A GitHub Actions job Check Run, an external Checkly GitHub Check Run, and a Checkly check are different objects. The Action does not publish a legacy commit status. The Checkly test session contains the execution results behind either reporting mode.
+</Note>
+
+## Resolve the CLI and dependencies
+
+The Action requires Checkly CLI `8.15.0` or newer. Use `cli-version: latest` unless you need to test against a specific stable release.
+
+The Action resolves the CLI after running `install-command` inside `working-directory`:
+
+1. If the project installs the `checkly` package, the Action uses that local CLI so the CLI and imported constructs share the same module installation.
+2. Otherwise, the Action runs `npx checkly@<cli-version>`.
+
+Keep the project's `checkly` dependency at `8.15.0` or newer. If you use an exact stable `cli-version`, it must match the locally installed Checkly version.
+
+In a monorepo, `working-directory` selects where the Action resolves the config, dependencies, and CLI. When dependencies install from the repository root, install them before invoking the Action:
 
 ```yaml .github/workflows/checkly-monorepo.yml
 name: Checkly webapp
 
 on:
   pull_request:
-    paths:
-      - apps/webapp/**
-      - packages/checks/**
 
 jobs:
   checkly:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: npm ci
+
+      - uses: checkly/checkly-action@v1
+        with:
+          command: test
+          cli-version: latest
+          working-directory: apps/webapp
+          reporting: auto
+        env:
+          CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
+```
+
+If the target directory has its own package manifest and lockfile, use `install-command` instead. The command runs inside `working-directory` before the Action resolves the local CLI.
+
+## Report to the correct commit
+
+GitHub Check Runs attach to commits. By default, the Action uses:
+
+| Event | Default commit |
+| --- | --- |
+| `pull_request` or `pull_request_target` | The pull request head SHA. |
+| Any other event | `GITHUB_SHA`. |
+
+Set `github-sha` when the commit you check out and test differs from that default. This commonly applies to `repository_dispatch` and deployment workflows. Use the same SHA for checkout and Check reporting:
+
+```yaml .github/workflows/checkly-preview-dispatch.yml
+name: Validate preview
+
+on:
+  repository_dispatch:
+    types: [preview-ready]
+
+jobs:
+  checkly:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.client_payload.sha }}
+
+      - uses: checkly/checkly-action@v1
+        with:
+          command: test
+          cli-version: latest
+          install-command: npm ci
+          reporting: auto
+          github-sha: ${{ github.event.client_payload.sha }}
+          github-check-name: Checkly preview validation
+        env:
+          CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
+          ENVIRONMENT_URL: ${{ github.event.client_payload.environment_url }}
+```
+
+The commit must belong to the current repository. `github-sha` only selects the commit that receives the external Check; it does not grant repository access. Checkly still verifies that the GitHub App installation for the Checkly account can access the repository.
+
+## Test preview deployments
+
+Pull request and custom-dispatch workflows usually need to pass their preview URL explicitly as `ENVIRONMENT_URL`, as shown in the `repository_dispatch` example above.
+
+For `deployment_status` events, the Action automatically exposes `github.event.deployment_status.environment_url` as `ENVIRONMENT_URL` when the workflow has not already set it. GitHub sets `GITHUB_SHA` to the commit being deployed, so the Action can normally use its default commit metadata:
+
+```yaml .github/workflows/checkly-deployment.yml
+name: Validate deployment
+
+on:
+  deployment_status:
+
+jobs:
+  checkly:
+    if: github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -219,17 +225,39 @@ jobs:
         with:
           command: test
           cli-version: latest
-          working-directory: apps/webapp
           install-command: npm ci
           reporting: auto
-          tags: webapp
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
           CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
 ```
 
+If a custom deployment workflow checks out a commit from an event payload instead of `GITHUB_SHA`, pass that same commit through `github-sha`.
+
+If you want Checkly itself to listen for GitHub deployment events and trigger checks linked to a repository, use [GitHub deployment hooks](/integrations/ci-cd/github/deployments) instead of this workflow.
+
+## Protect merges with detached checks
+
+<Warning>
+  When you use detached reporting, require the external Checkly GitHub Check in your branch rules. Requiring only the GitHub Actions job does not wait for the external Checkly test session to finish.
+</Warning>
+
+Configure the exact `github-check-name` as a [required check](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks). Keep the required workflow active for every commit that can merge:
+
+- Avoid workflow-level path filters that prevent the required Checkly Check from being created. Prefer Action inputs such as `files`, `grep`, or `tags` to select a smaller test set.
+- If you use GitHub merge queues, run the workflow for `merge_group` events so the merge-group SHA receives a verdict.
+
+```yaml
+on:
+  pull_request:
+  merge_group:
+    types: [checks_requested]
+```
+
+For a [`merge_group` event](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#merge_group), the Action uses `GITHUB_SHA`, which identifies the temporary merge-group commit. These requirements are GitHub branch-protection concerns; they do not require Checkly's internal CI workflows, SHA propagation, or deployment-provider setup.
+
 ## Next steps
 
 - Learn more about [`checkly test`](/cli/checkly-test).
 - Learn more about [`checkly trigger`](/cli/checkly-trigger).
-- Use [GitHub deployment hooks](/integrations/ci-cd/github/deployments) when you want Checkly to react to GitHub deployment webhook events without a GitHub Actions workflow.
+- Use [GitHub deployment hooks](/integrations/ci-cd/github/deployments) when you want Checkly to react directly to GitHub deployment events.

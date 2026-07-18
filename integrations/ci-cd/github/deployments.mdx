@@ -8,13 +8,13 @@ canonical: 'https://www.checklyhq.com/docs/integrations/ci-cd/github/deployments
 Use GitHub deployment hooks when you want Checkly to listen for GitHub `deployment_status` events and trigger checks linked to a repository. This is separate from the [Checkly GitHub Action](/integrations/ci-cd/github/actions), which starts test sessions from a GitHub Actions workflow.
 
 <Accordion title="Prerequisites">
-  - The Checkly GitHub integration installed from [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations).
+  - The Checkly GitHub integration installed from the [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) page of the Checkly account that owns the checks.
   - A deployment provider that sends successful GitHub `deployment_status` events, such as Vercel for GitHub or Heroku Pipelines.
   - One or more Checkly checks linked to the GitHub repository from the check's **CI/CD** settings.
 </Accordion>
 
 <Warning>
-  Install the Checkly GitHub App from inside the Checkly web app: go to [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) and click **Integrate with GitHub**. Installing the app directly from GitHub does not create the matching Checkly integration, so deployment hooks and GitHub Check reporting will not work correctly.
+  Start the installation from [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) in Checkly and click **Integrate with GitHub**. Grant the installation access to the repository you want to link. Installing the app directly from GitHub does not connect it to the Checkly account, so deployment hooks and GitHub Check reporting will not work correctly.
 </Warning>
 
 GitHub `deployment_status` webhook events are triggered whenever a deployment service reports a successful deployment. This works with services that report successful deployment statuses through the GitHub Deployments API, including:

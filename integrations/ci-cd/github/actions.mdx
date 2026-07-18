@@ -242,23 +242,9 @@ If you want Checkly itself to listen for GitHub deployment events and trigger ch
   When you use detached reporting, require the external Checkly GitHub Check in your branch rules. Requiring only the GitHub Actions job does not wait for the external Checkly test session to finish.
 </Warning>
 
-Configure the exact `github-check-name` as a [required check](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks). Keep the required workflow active for every commit that can merge:
+Configure the exact `github-check-name` as a [required check](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks).
 
-- Avoid workflow-level path filters that prevent the required Checkly Check from being created. Prefer Action inputs such as `files`, `grep`, or `tags` to select a smaller test set.
-- If you use GitHub merge queues, run the workflow for `merge_group` events so the merge-group SHA receives a verdict.
-
-```yaml
-on:
-  pull_request:
-  merge_group:
-    types: [checks_requested]
-```
-
-When a pull request enters a GitHub merge queue, GitHub creates a merge-group commit that combines the queued changes with the latest target branch. GitHub must receive the required checks for this new commit, even if the same checks already passed on the pull request's head commit.
-
-Adding the [`merge_group` event](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#merge_group) makes the workflow run again for that commit. The Action automatically uses `GITHUB_SHA` and attaches the external Checkly GitHub Check to the merge-group commit, so you do not need to set `github-sha` yourself.
-
-This configuration is only relevant if your repository uses a GitHub merge queue. It does not require custom SHA propagation, Checkly's internal CI workflows, or a particular deployment provider.
+If the workflow uses path filters, make sure it still creates the required Checkly Check for every pull request commit. Prefer Action inputs such as `files`, `grep`, or `tags` when you need to select a smaller test set.
 
 ## Next steps
 

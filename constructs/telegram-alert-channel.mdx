@@ -33,6 +33,7 @@ const telegramChannel = new TelegramAlertChannel('my-telegramchannel-1', {
   name: 'My Telegram channel',
   apiKey: 'xxxxxx',
   chatId: 'xxxxxx',
+  messageThreadId: '42',
   sendRecovery: true,
   sendFailure: true,
   sendDegraded: true,
@@ -61,6 +62,10 @@ The API key associated with your Telegram bot.
 
 <ResponseField name="chatId" type="string" required>
 The chat ID of the Telegram channel you want to send alerts to.
+</ResponseField>
+
+<ResponseField name="messageThreadId" type="string">
+The message thread ID of a topic in a Telegram forum group. Set this option to route alerts to that topic instead of the group's General topic.
 </ResponseField>
 
 <ResponseField name="payload" type="string">

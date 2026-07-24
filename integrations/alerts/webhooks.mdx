@@ -1,6 +1,6 @@
 ---
 title: "Webhook Integrations"
-description: "Create custom webhook integrations to send Checkly alerts to any API endpoin"
+description: "Create custom webhook integrations to send Checkly alerts to any API endpoint"
 sidebarTitle: "Webhooks"
 canonical: 'https://www.checklyhq.com/docs/integrations/alerts/webhooks/'
 ---
@@ -88,21 +88,60 @@ When [automatic Rocky AI analysis](/resolve/ai-root-cause-analysis/overview#auto
 
 ### Handlebars Helpers
 
-| Helper               | Description                                                               |
-| -------------------- | ------------------------------------------------------------------------- |
-| `{{$UUID}}`          | Generates a random UUID/v4 (e.g., `9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d`) |
-| `{{$RANDOM_NUMBER}}` | Generates a random decimal number between 0 and 1000 (e.g., `345`)        |
-| `{{moment}}`         | Generates dates/times using **moment.js** with formatting:                |
+Webhook templates support [Handlebars built-in helpers](https://handlebarsjs.com/guide/builtin-helpers.html), such as `if`, `unless`, and `each`, as well as these Checkly helpers:
 
-- `{{moment "YYYY-MM-DD"}}` → `2020-08-26`
-- `{{moment "2 days ago" "YYYY-MM-DD"}}` → `2020-08-24`
-- `{{moment "last week" "X"}}` → `1597924480`
+| Helper | Example | Description |
+| --- | --- | --- |
+| `$UUID` | `{{$UUID}}` | Generates a random UUID v4, such as `9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d`. |
+| `$RANDOM_NUMBER` | `{{$RANDOM_NUMBER}}` | Generates a random integer from 0 through 10,000. |
+| `tagValue` | `{{tagValue TAGS "team" "UNKNOWN"}}` | Returns the value from the first matching `team:value` or `team=value` tag. Returns the optional final argument when no tag matches. |
+| `startsWith` | `{{startsWith value "prefix:"}}` | Returns whether a string starts with the supplied prefix. |
+| `replace` | `{{replace value "old" "new"}}` | Replaces the first matching string. |
+| `split` | `{{split "a,b,c" "," 1}}` | Splits a string and returns the item at the supplied zero-based index. |
+| `year` | `{{year}}` or `{{year 2}}` | Returns the current year with four or two digits. |
+| `date`, `moment` | `{{date "YYYY-MM-DD"}}` | Formats the current date. The two helper names are aliases. |
 
-<Note>
-  You can find the [full list of helpers in the README.md file](https://github.com/checkly/handlebars) of the underlying library we are using. For a full overview of date formatting option, check the [moment.js docs](https://momentjs.com/docs/#/displaying/format/).
-</Note>
+#### Get a value from a tag
 
-You can also use conditional helpers like `{{#eq}}` statements. Here is an example:
+Use `tagValue` when your tags store key-value metadata. Given these tags:
+
+```text
+team:payments
+environment=production
+```
+
+This template:
+
+```handlebars
+{{tagValue TAGS "team" "UNKNOWN"}}
+```
+
+renders `payments`. Both `:` and `=` separators are supported. If neither `team:...` nor `team=...` exists, the template renders the fallback `UNKNOWN`. If multiple tags match, Checkly returns the first one.
+
+<Tip>
+  Send a test message from the webhook editor to inspect the rendered request before saving your alert channel.
+</Tip>
+
+#### Format dates and times
+
+The `date` and `moment` helpers support [Day.js-compatible format tokens](https://day.js.org/docs/en/display/format). You can format the current time, an absolute date, or relative phrases such as `yesterday`, `2 days ago`, and `last week`.
+
+- `{{date "YYYY-MM-DD"}}` formats the current date, for example as `2026-07-24`.
+- `{{date "2026-07-24" "MMMM DD, YYYY"}}` renders `July 24, 2026`.
+- `{{moment "2 days ago" "YYYY-MM-DD"}}` formats the date from two days ago.
+- `{{moment "last week" "X"}}` formats last week as a Unix timestamp.
+
+#### Compare values
+
+Use comparison helpers as blocks or subexpressions where applicable. Available helpers include:
+
+- Equality and ordering: `eq`, `is`, `isnt`, `gt`, `gte`, `lt`, `lte`, and `compare`.
+- Boolean logic: `and`, `or`, `not`, `neither`, `isTruthy`, and `isFalsey`.
+- Value checks: `contains`, `has`, and `default`.
+- Numeric conditions: `ifEven`, `ifOdd`, and `ifNth`.
+- Inverse comparisons: `unlessEq`, `unlessGt`, `unlessGteq`, `unlessLt`, and `unlessLteq`.
+
+For example:
 
 ```json
 {
@@ -126,8 +165,6 @@ Two clear benefits here:
 
 - You only need to create one webhook to inform a 3rd party system.
 - You can translate Checkly terms to your 3rd party tool's term for the same concept, i.e. the "up status" of a check.
-
-You can find the [full list of helpers in the README.md file](https://github.com/checkly/handlebars) of the underlying library we are using.
 
 ## Webhook Secrets
 

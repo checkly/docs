@@ -6,10 +6,10 @@ tags: ['synthetic-monitoring', 'playwright-checks']
 canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/performance-metrics/'
 ---
 
-Checkly automatically collects Core Web Vitals for the pages your Playwright Check Suites visit. Every page is measured and scored, and the results appear in the check result. No changes to your tests are needed.
+Checkly automatically collects Web Vitals for the pages your Playwright Check Suites visit. Every page is measured and scored, and the results appear in the check result. No changes to your tests are needed.
 
-<Callout type="warning" emoji="⚠️">
-Web Vitals are collected on **Chromium** projects when your Playwright Check Suites run on Checkly. Collection is on by default.
+<Callout type="info" emoji="💡">
+Collection is on by default on all browsers. TBT and INP are available on **Chromium** and shown as a dash where unsupported.
 </Callout>
 
 <Callout type="info" emoji="🧪">
@@ -80,7 +80,7 @@ A metric can show a dash instead of a score. That is not an error. Some metrics 
 Expand a page visit to see what produced its Largest Contentful Paint and where the time went:
 
 - The **element** that painted, shown as a CSS selector you can paste into your browser devtools.
-- The LCP **resource**, matched to the request in the trace's network log so you can see its load time and transfer size.
+- The LCP **resource**, matched to the request in the trace's network log so you can see its load time.
 - A **phase breakdown** of the LCP time: time to first byte, then resource load delay, resource load time, and element render delay. For a text element the two resource phases are zero.
 
 This turns "LCP was 3.2 s" into "the hero image took 3.2 s, and most of that was the resource loading".

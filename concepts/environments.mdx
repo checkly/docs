@@ -16,7 +16,6 @@ Use a separate Checkly CLI project for every long-lived environment that you wan
 | Test an ephemeral preview deployment | Run `checkly test` with temporary environment variables. Do not deploy it as a scheduled monitor. |
 | Continuously monitor the same checks in development, staging, and production | Deploy the same check code as a separate CLI project for each environment. Give every project a unique, stable `logicalId`. |
 | Continuously monitor different checks in each environment | Use a separate project for each environment and select shared and environment-specific check files in the project configuration. |
-| Test lower environments but monitor only production | Run `checkly test` against lower environments, then deploy only the production project. |
 
 <Note>
   A Checkly CLI project is a deployment boundary, not the same thing as a Git branch or application environment. Your pipeline decides which branch deploys which project.
@@ -173,7 +172,7 @@ The following example deploys one shared API check to development, staging, and 
     CHECKLY_ENVIRONMENT=staging \
     ENVIRONMENT_URL="https://staging-api.example.com" \
     API_TOKEN="$STAGING_API_TOKEN" \
-    npx checkly deploy --force
+    npx checkly deploy
     ```
 
     The production job uses the same source files but supplies production values:
@@ -182,8 +181,10 @@ The following example deploys one shared API check to development, staging, and 
     CHECKLY_ENVIRONMENT=production \
     ENVIRONMENT_URL="https://api.example.com" \
     API_TOKEN="$PRODUCTION_API_TOKEN" \
-    npx checkly deploy --force
+    npx checkly deploy
     ```
+
+    Review the deployment changes before confirming them. After you have verified the mapping, a non-interactive CI job can use `--force` to skip the confirmation prompt.
   </Step>
 </Steps>
 

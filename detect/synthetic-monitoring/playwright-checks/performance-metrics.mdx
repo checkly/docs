@@ -8,13 +8,13 @@ canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwrigh
 
 Checkly automatically collects Web Vitals for the pages your Playwright Check Suites visit. Every page is measured and scored, and the results appear in the check result. No changes to your tests are needed.
 
-<Callout type="info" emoji="💡">
+<Note>
 Collection is on by default on all browsers. TBT and INP are available on **Chromium** and shown as a dash where unsupported.
-</Callout>
+</Note>
 
-<Callout type="info" emoji="🧪">
+<Warning>
 Web Vitals for Playwright Check Suites are in beta and under active development. The metrics and how they are presented may change.
-</Callout>
+</Warning>
 
 ## Where Web Vitals appear
 
@@ -22,6 +22,10 @@ A single run can visit many pages across its tests, so Web Vitals are reported p
 
 - The check result's **Performance** tab, which lists every page visited across the run.
 - Each test result's **Web Vitals** section.
+
+<Frame>
+  ![The Web Vitals section of a test result, listing each visited page with its LCP, CLS, FCP, TTFB, TBT, and INP scores](/images/pwn-web-vitals.png)
+</Frame>
 
 Each row is one page visit. Expand a row to see what drove its largest paint and its slowest interaction.
 
@@ -85,6 +89,10 @@ Expand a page visit to see what produced its Largest Contentful Paint and where 
 
 This turns "LCP was 3.2 s" into "the hero image took 3.2 s, and most of that was the resource loading".
 
+<Frame>
+  ![The Largest Contentful Paint breakdown of a page visit, showing the painted element, the loaded resource, and how the time split across TTFB, load delay, and render delay](/images/pwn-web-vitals-lcp.png)
+</Frame>
+
 ## What caused the INP
 
 The same panel breaks down the page's INP, its slowest interaction:
@@ -94,6 +102,10 @@ The same panel breaks down the page's INP, its slowest interaction:
 - A **phase breakdown**: input delay (time before your handlers run), processing (your handlers running), and presentation delay (time until the next frame paints).
 
 When an interaction started before a single-page route change, Checkly notes it. That interaction's latency then reflects the cost of arriving at the new route rather than a slow interaction on it.
+
+<Frame>
+  ![The Interaction to Next Paint breakdown of a page visit, showing the interacted element, the event type, and how the time split across input delay, processing, and presentation delay](/images/pwn-web-vitals-inp.png)
+</Frame>
 
 ## Single-page apps and soft navigations
 

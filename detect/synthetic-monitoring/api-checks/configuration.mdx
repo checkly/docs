@@ -186,6 +186,26 @@ In almost all cases, you have access to the HTTP response for assertions. Checkl
 body. For larger responses, only the first 25MB is available to assertions and teardown scripts. The response body
 stored with the result can be truncated further to fit result-size limits.
 
+### Previewing image response bodies
+
+Checkly displays a preview and download option in API check results when the raw response body is 50KB (50,000
+bytes) or smaller and the response `Content-Type` is one of these supported raster image types:
+
+- `image/png`
+- `image/jpeg`
+- `image/gif`
+- `image/webp`
+- `image/avif`
+- `image/apng`
+- `image/bmp`
+- `image/x-icon`
+- `image/vnd.microsoft.icon`
+
+Checkly uses the `Content-Type` header rather than the file extension to identify images. Images larger than 50KB
+are truncated when stored and cannot be previewed. SVG, TIFF, other unsupported image types, and results created
+before image preview support cannot be previewed either. Slack alerts do not include a response body preview for
+supported images.
+
 Additionally, if your API responds with a binary type body, i.e. a PDF or video file, we scrub the body and replace
 it with a short text saying that we scrubbed it. We determine the body content type by looking at the `Content-Type`
 response header.

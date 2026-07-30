@@ -25,7 +25,9 @@ After giving your window an appropriate name, the core options you have are:
 
 ![Maintenance window schedule](/images/maintenance-schedule-3.png)
 
-Set the **start** date and time, then choose how long the window **lasts** by entering a duration in hours and minutes. Quick-duration presets (30m, 1h, 4h, 24h) and a **Now** shortcut are available. **All times are in UTC**. The builder shows the equivalent time in your local timezone underneath as a reference.
+Set the **start** date and time, then choose how long the window **lasts** by entering a duration in hours and minutes. Quick-duration presets (30m, 1h, 4h, 24h) and a **Now** shortcut are available.
+
+Pick the **timezone** your times are entered in. The builder shows the equivalent **UTC** time underneath as a reference. Existing windows created before timezones were introduced stay on UTC, and their schedules are unchanged.
 
 #### Setting repeats
 
@@ -37,6 +39,21 @@ If your maintenance window repeats at a certain cadence, toggle the **repeat** o
 
 > If you schedule a window on the 31st and add a **monthly repeat cycle**, your schedule will also activate on
 > the 30th of the relevant months and the 28th or 29th of February depending on the leap year.
+
+#### Timezones and daylight saving
+
+A repeating window keeps the **local time you entered**. A window set to 2:00 AM in `Europe/Paris` runs at 2:00 AM local all year. Checkly shifts the underlying UTC time by an hour when daylight saving starts and ends, so you never have to reschedule it.
+
+Because of that shift, a repeating window in a named timezone must be **at least one hour shorter than its repeat interval**. A daily window can last up to 23 hours. Without that gap, the occurrence before a clock change would overlap the one after it.
+
+<Note>
+Changing the timezone on a **repeating** window moves its future occurrences to the new zone. On a **one-time** window the timezone is only a label, and the window still starts at the same moment.
+</Note>
+
+Clock changes create two start times that need special handling:
+
+- When clocks jump **forward**, a start time that does not exist that day moves forward by the length of the gap. In a zone where 2:00 AM becomes 3:00 AM, a window set to 2:30 AM starts at 3:30 AM.
+- When clocks fall **back**, a start time that happens twice runs at the **first** of the two.
 
 ### Check behavior
 

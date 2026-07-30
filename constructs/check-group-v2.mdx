@@ -39,6 +39,7 @@ new ApiCheck("api-check-1", {
 
 ```ts Advanced Example
 import { ApiCheck, CheckGroupV2, EmailAlertChannel, Frequency } from "checkly/constructs"
+import { secret } from "checkly/util"
 
 const emailChannel = new EmailAlertChannel("team-email", {
   address: "team@example.com",
@@ -54,7 +55,7 @@ const group = new CheckGroupV2("comprehensive-group", {
   concurrency: 5,
   environmentVariables: [
     { key: "API_BASE_URL", value: "https://api.example.com" },
-    { key: "API_KEY", value: "{{SECRET_API_KEY}}", secret: true },
+    { key: "API_KEY", value: secret("API_KEY"), secret: true },
   ],
   alertChannels: [emailChannel],
   browserChecks: {
@@ -389,4 +390,3 @@ See [Mixing Checks and Monitors in a Group](/platform/groups/#mixing-checks-and-
     ```
   </Tab>
 </Tabs>
-

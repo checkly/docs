@@ -39,6 +39,7 @@ new MultiStepCheck("multistep-check-1", {
 
 ```ts Advanced Example
 import { MultiStepCheck, Frequency } from "checkly/constructs"
+import { secret } from "checkly/util"
 import * as path from "path"
 
 new MultiStepCheck("complex-multistep-check", {
@@ -52,7 +53,7 @@ new MultiStepCheck("complex-multistep-check", {
   environmentVariables: [
     { key: "BASE_URL", value: "https://app.example.com" },
     { key: "TEST_USER_EMAIL", value: "test@example.com" },
-    { key: "TEST_USER_PASSWORD", value: "{{SECRET_PASSWORD}}", secret: true },
+    { key: "TEST_USER_PASSWORD", value: secret("TEST_USER_PASSWORD"), secret: true },
   ],
   code: {
     entrypoint: path.join(__dirname, "user-journey.spec.ts"),

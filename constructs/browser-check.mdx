@@ -40,6 +40,7 @@ new BrowserCheck("browser-check-1", {
 
 ```ts Advanced Example
 import { BrowserCheck, Frequency } from "checkly/constructs"
+import { secret } from "checkly/util"
 import * as path from "path"
 
 new BrowserCheck("advanced-browser-check", {
@@ -52,7 +53,7 @@ new BrowserCheck("advanced-browser-check", {
   runtimeId: "2025.04",
   environmentVariables: [
     { key: "TEST_USERNAME", value: "testuser" },
-    { key: "TEST_PASSWORD", value: "{{SECRET_PASSWORD}}", secret: true },
+    { key: "TEST_PASSWORD", value: secret("TEST_PASSWORD"), secret: true },
   ],
   code: {
     entrypoint: path.join(__dirname, "advanced-flow.spec.ts"),
@@ -167,6 +168,8 @@ new BrowserCheck("quick-test", {
 ```
 
 ```ts Complex Test File
+import { secret } from "checkly/util"
+
 new BrowserCheck("e2e-purchase", {
   name: "E-commerce Purchase Flow",
   code: {
@@ -174,7 +177,7 @@ new BrowserCheck("e2e-purchase", {
   },
   environmentVariables: [
     { key: "TEST_USER_EMAIL", value: "test@example.com" },
-    { key: "TEST_PASSWORD", value: "{{SECRET_PASSWORD}}", secret: true },
+    { key: "TEST_PASSWORD", value: secret("TEST_PASSWORD"), secret: true },
   ],
 })
 ```
@@ -379,12 +382,14 @@ Check-level environment variables that will be available during test execution. 
 
 **Usage:**
 
-```ts highlight={3-6}
+```ts highlight={5-8}
+import { secret } from "checkly/util"
+
 new BrowserCheck("my-check", {
   name: "My Browser Check",
   environmentVariables: [
     { key: "TEST_USERNAME", value: "testuser@example.com" },
-    { key: "TEST_PASSWORD", value: "{{SECRET_PASSWORD}}", secret: true },
+    { key: "TEST_PASSWORD", value: secret("TEST_PASSWORD"), secret: true },
   ],
   /* More options... */
 })
@@ -403,11 +408,13 @@ new BrowserCheck("my-check", {
 <CodeGroup>
 
 ```ts Test Credentials
+import { secret } from "checkly/util"
+
 new BrowserCheck("user-flow", {
   name: "User Account Flow",
   environmentVariables: [
     { key: "TEST_EMAIL", value: "test@example.com" },
-    { key: "TEST_PASSWORD", value: "{{TEST_USER_PASSWORD}}", secret: true },
+    { key: "TEST_PASSWORD", value: secret("TEST_PASSWORD"), secret: true },
     { key: "BASE_URL", value: "https://staging.example.com" },
   ],
   code: { entrypoint: path.join(__dirname, "user-flow.spec.ts") },

@@ -202,9 +202,7 @@ export const SetupFlow = () => {
         .cklyflow-list-line { flex:1 0 auto; width:2px; min-height:.85rem; margin:.4rem 0; border-radius:9999px; }
         .cklyflow-list-text { padding-bottom:1.4rem; }
         .cklyflow-list-row:last-child .cklyflow-list-text { padding-bottom:0; }
-        .cklyflow-detail-box { display:none; min-height:64px; }
-        .cklyflow-card { background:rgba(249,250,251,0.6); }
-        .dark .cklyflow-card { background:rgba(255,255,255,0.02); }
+        .cklyflow-detail-box { display:none; }
         @media (min-width:640px) {
           .cklyflow-list { display:none; }
           .cklyflow-detail-box { display:block; }
@@ -262,7 +260,7 @@ export const SetupFlow = () => {
         }
       `}</style>
 
-      <div className="cklyflow-card rounded-2xl border border-gray-200 dark:border-gray-800 p-6 sm:p-7">
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50/60 dark:bg-white/[0.02] p-6 sm:p-7">
         <div
           className="cklyflow-rail"
           style={{ "--ckly-cols": columns }}
@@ -356,7 +354,7 @@ export const SetupFlow = () => {
 
         <div
           id="cklyflow-detail"
-          className="cklyflow-detail-box mt-5 sm:mt-6 pt-5 border-t border-gray-200/80 dark:border-gray-800"
+          className="cklyflow-detail-box mt-5 sm:mt-6 pt-5 border-t border-gray-200/80 dark:border-gray-800 min-h-[64px]"
         >
           <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed m-0">
             <span className="font-semibold text-gray-900 dark:text-white">

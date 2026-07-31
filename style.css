@@ -37,6 +37,50 @@ tr {
   color: #e6e6e6;
 }
 
+/* Sign-up CTA card (snippets/sign-up-cta.mdx). Styled here instead of with
+   Tailwind utility classes because Mintlify's production build only ships
+   utilities used by its own UI — arbitrary values like from-[#0c449a] work
+   in `mint dev` but are missing in the compiled production CSS. */
+.sign-up-cta {
+  position: relative;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  background: linear-gradient(to bottom, #0c449a, #062047);
+  color: #fff;
+}
+
+.sign-up-cta-title {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  text-wrap: balance;
+  margin-bottom: 0.25rem;
+}
+
+.sign-up-cta-title img {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  vertical-align: middle;
+  margin-top: -0.25rem;
+}
+
+.sign-up-cta-body {
+  color: #e2e8f0;
+}
+
+.sign-up-cta a {
+  color: inherit;
+}
+
+/* Stretch the link's click area over the whole card. */
+.sign-up-cta a::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
 /* Expand small header icon buttons to a 44x44 minimum touch target
    (WCAG 2.5.5) via an invisible hit-area overlay, so the visual header
    layout is unchanged and the theme's responsive show/hide still applies. */

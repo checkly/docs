@@ -17,7 +17,7 @@ export const CLITip = ({ children }) => {
         {children}
       </div>
       <a
-        className="cli-tip-link no-underline text-sm font-medium inline-block hover:underline"
+        className="text-[#0075FF] dark:text-blue-400 no-underline text-sm font-medium inline-block hover:underline"
         href="/cli/overview"
       >
         Get started with the Checkly CLI →

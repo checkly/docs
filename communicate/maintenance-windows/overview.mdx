@@ -42,12 +42,12 @@ If your maintenance window repeats at a certain cadence, toggle the **repeat** o
 
 #### Timezones and daylight saving
 
-A repeating window keeps the **local time you entered**. A window set to 2:00 AM in `Europe/Paris` runs at 2:00 AM local all year. Checkly shifts the underlying UTC time by an hour when daylight saving starts and ends, so you never have to reschedule it.
+A repeating window keeps the **local time you entered**. A window set to 4:00 AM in `Europe/Paris` runs at 4:00 AM local all year. We shift the underlying UTC time by an hour when daylight saving starts and ends, so you never have to reschedule it.
 
-A clock change can skip over your start time or hit it twice. Either way the window still runs exactly once:
+A clock change adds or removes an hour from the day. If your window starts inside that hour, we resolve it like this:
 
-- When clocks jump **forward**, an hour is skipped. A window scheduled inside the skipped hour shifts forward by the same amount: where 2:00 AM becomes 3:00 AM, a 2:30 AM window starts at 3:30 AM.
-- When clocks fall **back**, an hour repeats. A window scheduled inside the repeated hour runs at the **first** of its two possible start times.
+- When clocks jump **forward**, that hour disappears: where 2:00 AM becomes 3:00 AM, a 2:30 AM window starts at 3:30 AM.
+- When clocks fall **back**, that hour happens twice: where 3:00 AM becomes 2:00 AM, a 2:30 AM window runs at the **first** 2:30 AM, not the second.
 
 ### Check behavior
 

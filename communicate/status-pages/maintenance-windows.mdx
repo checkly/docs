@@ -34,6 +34,7 @@ In the **Status page visibility** section, turn on the toggle. This is the maste
 <Step title="Choose status pages and services">
 - **Show on**: select one or more status pages the maintenance should appear on.
 - **Services affected**: choose **All services on this page**, or pick **Specific services**. With "All services", services you add to the page later are automatically covered.
+- **Show affected services**: on by default. Turn it off to publish the window without naming the services it covers. See [Hiding affected services](#hiding-affected-services).
 </Step>
 
 <Step title="Set a severity">
@@ -63,6 +64,16 @@ Once a window is visible, it appears on your status page in several places depen
 ![Maintenance on a public status page, showing the active banner and the upcoming maintenance section](/images/docs/images/status-pages/status-pages-maintenance-public-1.png)
 
 ![Public maintenance detail page showing the status, severity, affected services, and update timeline](/images/docs/images/status-pages/status-pages-maintenance-detail-1.png)
+
+## Hiding affected services
+
+To announce planned work without revealing which parts of your system it touches, turn **Show affected services** off in the **Status page visibility** section. The window still appears on your status page as a general event, with its name, schedule, severity, and updates.
+
+With the setting off:
+
+- The maintenance card and its detail page list no services, and no service on the page is marked as under maintenance.
+- Subscriber notifications leave out the affected services.
+- Incident downtime that overlaps the maintenance counts as regular downtime in your status page uptime.
 
 ## Posting updates to your status page
 
@@ -106,4 +117,4 @@ Turn on **Don't open incidents** in the status page visibility settings. While t
 This option applies only to the services covered by the maintenance on the pages it is shown on. A service that also appears on another page, where it is not under maintenance, can still get an automatic incident there.
 </Note>
 
-Maintenance periods are also excluded from your status page **uptime**, so planned maintenance does not count as downtime against your services.
+Incident downtime that overlaps a published maintenance period is excluded from your status page **uptime**. Windows with [**Show affected services**](#hiding-affected-services) turned off are the exception: their overlapping downtime still counts.

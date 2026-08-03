@@ -40,6 +40,23 @@ After you link the repository, Checkly listens for successful deployment events 
   You can link multiple checks to the same repository. Checkly runs the linked checks as a test suite when GitHub reports a successful deployment.
 </Note>
 
+## Manage deployment hooks with the API
+
+Use the Checkly Public API to create GitHub deployment hooks programmatically. A deployment trigger represents the link between one GitHub repository and either a check or a check group.
+
+- [Create a deployment trigger](/api-reference/deployment-triggers/create-a-deployment-trigger) for a check or check group. Repeating the request for the same target returns the existing trigger without changing its settings.
+- [List deployment triggers](/api-reference/deployment-triggers/list-all-deployment-triggers) for your account.
+
+The API supports GitHub deployment triggers. To configure the Checkly Vercel integration, use the [Vercel integration settings](/integrations/ci-cd/vercel/overview).
+
+<Warning>
+  If you omit both deployment filters, every successful deployment reported for the repository can trigger a run, including production deployments. Set `environmentRegexFilter` or `environmentUrlRegexFilter` when you only want to run checks against specific environments.
+</Warning>
+
+You can use deployment environment URLs with API, URL, browser, and multi-step checks. API and URL checks replace the host in the configured request URL. Browser and multi-step checks receive the deployment URL through the `ENVIRONMENT_URL` environment variable.
+
+To change or remove a trigger created through the API, open the check or check group in Checkly and use its **CI/CD** settings.
+
 ## Use deployment environment URLs
 
 GitHub reports an **environment URL** on each deployment event. Depending on what deployment service you use,

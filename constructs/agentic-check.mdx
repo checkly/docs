@@ -3,7 +3,12 @@ title: 'Agentic Check Construct'
 description: 'Learn how to configure Agentic Checks with the Checkly CLI.'
 sidebarTitle: 'Agentic Check'
 canonical: 'https://www.checklyhq.com/docs/constructs/agentic-check/'
+hidden: true
 ---
+
+<Note>
+Agentic Checks V1 is a legacy capability available only to accounts that previously used it. Existing active and deactivated Agentic Checks remain usable.
+</Note>
 
 <Tip>
 Learn more about Agentic Checks in [the Agentic Checks overview](/detect/synthetic-monitoring/agentic-checks/overview).
@@ -16,7 +21,6 @@ Before creating Agentic Checks, ensure you have:
 
 - An initialized Checkly CLI project
 - Access to Agentic Checks on your Checkly account
-- Available Agentic Check active capacity if the check is active
 - Any required test credentials saved as Checkly variables or secrets
 
 For additional setup information, see [CLI overview](/cli/overview).
@@ -209,9 +213,9 @@ new AgenticCheck('web-quality-check', {
 Do not paste secret values into the prompt. Store secrets in Checkly and reference them by name, for example `{{TEST_USER_PASSWORD}}`.
 </Warning>
 
-## Billing behavior
+## Active and deactivated checks
 
-Agentic Checks use active-capacity billing. Active checks consume capacity; inactive checks do not. Use `activated: false` to keep an Agentic Check as a deployed draft without consuming active capacity.
+Deactivating an Agentic Check preserves its configuration and history. Existing active and deactivated Agentic Checks remain usable for accounts that previously used this capability.
 
 ```typescript
 new AgenticCheck('draft-agentic-check', {
@@ -220,5 +224,3 @@ new AgenticCheck('draft-agentic-check', {
   activated: false,
 })
 ```
-
-If an active Agentic Check would exceed your available capacity, deployment fails with a billing entitlement error. Deactivate an existing Agentic Check or purchase additional Agentic Check capacity before deploying.

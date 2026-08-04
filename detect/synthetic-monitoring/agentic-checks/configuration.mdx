@@ -1,15 +1,19 @@
 ---
 title: 'Agentic Checks Configuration'
-description: 'Configure Agentic Checks with prompts, variables, skills, scheduling, locations, and active capacity.'
+description: 'Configure Agentic Checks with prompts, variables, skills, scheduling, and locations.'
 sidebarTitle: 'Configuration'
 canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/agentic-checks/configuration/'
+hidden: true
 ---
+
+<Note>
+Agentic Checks V1 is a legacy capability available only to accounts that previously used it. Existing active and deactivated Agentic Checks remain usable.
+</Note>
 
 <Accordion title="Prerequisites">
 Before creating Agentic Checks, ensure you have:
 
 - Access to Agentic Checks on your Checkly account
-- Available Agentic Check active capacity if the check will be active
 - An initialized Checkly CLI project if you want to manage the check as code
 - Any required test credentials saved as Checkly variables or secrets
 
@@ -77,9 +81,7 @@ new AgenticCheck('web-quality-check', {
 
 Keep the skill list short. Every added skill expands what the agent can do during execution.
 
-## Scheduling and locations
-
-Agentic Checks can run from up to three public locations by default. Enterprise accounts can contact sales to enable unlimited locations.
+## Scheduling
 
 The CLI construct supports these frequencies:
 
@@ -96,11 +98,9 @@ The CLI construct supports these frequencies:
 | `720` | `Frequency.EVERY_12H` |
 | `1440` | `Frequency.EVERY_24H` |
 
-## Active capacity
+## Active and deactivated checks
 
-Only active Agentic Checks consume Agentic Check capacity.
-
-Use `activated: false` when you want to deploy an Agentic Check draft without consuming active capacity:
+Use `activated: false` to keep an existing Agentic Check deactivated while preserving its configuration and history:
 
 ```typescript draft.agentic.check.ts
 import { AgenticCheck } from 'checkly/constructs'
@@ -111,8 +111,6 @@ new AgenticCheck('draft-agentic-check', {
   activated: false,
 })
 ```
-
-You can keep inactive checks in code and activate them later when your account has enough capacity.
 
 ## Test and deploy
 
@@ -127,5 +125,3 @@ Deploy the check when you are ready:
 ```bash Terminal
 npx checkly deploy
 ```
-
-If deployment fails because of active capacity, deactivate an existing Agentic Check or purchase enough Agentic Check capacity before deploying the new active check.

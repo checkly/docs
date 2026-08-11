@@ -165,6 +165,19 @@ function getVersionSuffix(path) {
   return match ? `-${match[1]}` : '';
 }
 
+// A page whose filename needed a version suffix sits next to another version of
+// the same operation, and both would render the same sidebar label — Mintlify
+// falls back to the spec summary when a page declares no title. Give the
+// suffixed page an explicit versioned title, unless the summary already names
+// the version itself (several /v2 operations end in "(V2)").
+function versionedTitle(ep) {
+  const suffix = getVersionSuffix(ep.path);
+  if (!suffix || ep.filename !== `${generateFilename(ep.summary)}${suffix}`) return null;
+  const version = suffix.slice(1);
+  if (new RegExp(`\\b${version}\\b`, 'i').test(ep.summary)) return null;
+  return `${ep.summary} (${version})`;
+}
+
 function getUniqueFilename(ep) {
   const baseFilename = generateFilename(ep.summary);
   const candidates = [
@@ -192,6 +205,21 @@ function getUniqueFilename(ep) {
 // ---------------------------------------------------------------------------
 // docs.json updater
 // ---------------------------------------------------------------------------
+
+// Append, except for a version-suffixed page whose unsuffixed sibling is
+// already in the list — that one goes directly after the sibling so the pair
+// reads together in the sidebar instead of stranding the new version at the
+// bottom of the group.
+function insertPage(pages, pagePath) {
+  if (pages.includes(pagePath)) return;
+  const sibling = pagePath.replace(/-v\d+$/, '');
+  const siblingIdx = sibling === pagePath ? -1 : pages.indexOf(sibling);
+  if (siblingIdx === -1) {
+    pages.push(pagePath);
+    return;
+  }
+  pages.splice(siblingIdx + 1, 0, pagePath);
+}
 
 function addToDocsJson(docsJson, pagePath, groupName, subgroupName) {
   // Structure: docsJson.navigation.tabs[] → { tab: "API Reference", pages: [...] }
@@ -233,13 +261,9 @@ function addToDocsJson(docsJson, pagePath, groupName, subgroupName) {
       targetGroup.pages.push(subgroup);
       console.log(`  + Created new subgroup "${subgroupName}" in docs.json`);
     }
-    if (!subgroup.pages.includes(pagePath)) {
-      subgroup.pages.push(pagePath);
-    }
+    insertPage(subgroup.pages, pagePath);
   } else {
-    if (!targetGroup.pages.includes(pagePath)) {
-      targetGroup.pages.push(pagePath);
-    }
+    insertPage(targetGroup.pages, pagePath);
   }
 
   return true;
@@ -306,12 +330,15 @@ function main() {
       console.log(`  + Created directory: api-reference/${ep.dir}/`);
     }
 
-    // Minimal frontmatter — Mintlify derives the title from the spec summary.
+    // Minimal frontmatter — Mintlify derives the title from the spec summary,
+    // so only version-suffixed pages need an explicit one.
     // The canonical is self-referential and derived from the same page path
     // docs.json gets, so it can never drift from what check_frontmatter.py
     // expects (that check fails the PR when the key is missing or wrong).
     const canonical = `${SITE_BASE}${docsJsonPagePath}/`;
-    const mdxContent = `---\nopenapi: ${ep.method.toLowerCase()} ${ep.path}\ncanonical: '${canonical}'\n---\n`;
+    const title = versionedTitle(ep);
+    const titleLine = title ? `title: '${title.replace(/'/g, "''")}'\n` : '';
+    const mdxContent = `---\nopenapi: ${ep.method.toLowerCase()} ${ep.path}\n${titleLine}canonical: '${canonical}'\n---\n`;
 
     if (!DRY_RUN) {
       writeFileSync(join(ROOT, mdxRelPath), mdxContent);

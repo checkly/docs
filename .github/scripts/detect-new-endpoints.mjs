@@ -21,6 +21,8 @@ const ROOT = process.cwd();
 const SPEC_PATH = join(ROOT, 'api-reference', 'openapi.json');
 const DOCS_JSON_PATH = join(ROOT, 'docs.json');
 const IGNORE_PATH = join(ROOT, '.api-doc-ignore');
+// Must match BASE in .github/scripts/check_frontmatter.py.
+const SITE_BASE = 'https://www.checklyhq.com/docs/';
 
 // ---------------------------------------------------------------------------
 // Tag → directory + docs.json group mapping.
@@ -305,7 +307,11 @@ function main() {
     }
 
     // Minimal frontmatter — Mintlify derives the title from the spec summary.
-    const mdxContent = `---\nopenapi: ${ep.method.toLowerCase()} ${ep.path}\n---\n`;
+    // The canonical is self-referential and derived from the same page path
+    // docs.json gets, so it can never drift from what check_frontmatter.py
+    // expects (that check fails the PR when the key is missing or wrong).
+    const canonical = `${SITE_BASE}${docsJsonPagePath}/`;
+    const mdxContent = `---\nopenapi: ${ep.method.toLowerCase()} ${ep.path}\ncanonical: '${canonical}'\n---\n`;
 
     if (!DRY_RUN) {
       writeFileSync(join(ROOT, mdxRelPath), mdxContent);

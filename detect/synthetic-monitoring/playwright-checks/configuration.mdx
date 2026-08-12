@@ -131,7 +131,9 @@ Checkly enforces these options for every run. User configuration does not overri
 
 Checkly supports Playwright's [`globalTimeout`](https://playwright.dev/docs/api/class-testconfig#test-config-global-timeout). Use it to control the maximum duration of the Playwright suite after `npx playwright test` starts.
 
-To disable automatic trace header injection, define `use.extraHTTPHeaders` in your Playwright configuration. A top-level value disables injection for the whole suite. A project-level value disables it only for that project. An empty object also disables injection. Checkly preserves the headers that you define, and the [built-in trace environment variables](/detect/synthetic-monitoring/playwright-checks/environment-variables#built-in-variables-in-playwright-check-suites) remain available.
+<Note>
+When `use.extraHTTPHeaders` is missing from the Playwright configuration, Checkly adds its trace headers automatically. See how to [add Checkly's trace headers to your custom HTTP headers](/resolve/traces/overview#add-trace-headers-to-custom-http-headers).
+</Note>
 
 Playwright Check Suites also provide specific configuration for your Playwright monitoring.
 

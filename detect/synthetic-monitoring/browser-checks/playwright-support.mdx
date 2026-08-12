@@ -111,10 +111,13 @@ We currently support the following configuration options. We will update this li
   </Tab>
 </Tabs>
 
-
 <Warning>
 A check using [the Playwright Test Runner (`@playwright/test`)](https://playwright.dev/docs/intro) will currently run around 30-50% longer than [a regular Playwright check (`playwright`)](https://playwright.dev/docs/library). This is caused by the automatic creation of trace and video assets. We are aware of this and are investigating solutions. If this is significantly degrading the performance of your check, we recommend to divide longer tests into multiple checks.
 </Warning>
+
+<Note>
+When `use.extraHTTPHeaders` is missing from the Playwright configuration, Checkly adds its trace headers automatically. See how to [add Checkly's trace headers to your custom HTTP headers](/resolve/traces/overview#add-trace-headers-to-custom-http-headers).
+</Note>
 
 ## Hooks
 Playwright Test Runner offers hook functions such as `test.afterEach()` and `test.beforeEach()` that run before or after individual test cases or `test.afterAll()` and `test.beforeAll()` that run before or after all tests have started/finished.

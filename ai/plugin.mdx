@@ -5,13 +5,12 @@ sidebarTitle: 'Plugin'
 canonical: 'https://www.checklyhq.com/docs/ai/plugin/'
 ---
 
-The [Checkly plugin](https://github.com/checkly/checkly-plugin) bundles the official Checkly skills for AI coding agents in a single installable package. It targets Claude Code, OpenAI Codex, Cursor, and any agent supporting the plugins standard.
+The [Checkly plugin](https://github.com/checkly/checkly-plugin) bundles the official Checkly skills and the Checkly MCP server for AI coding agents in a single installable package. It targets Claude Code, OpenAI Codex, Cursor, and any agent supporting the plugins standard.
 
 ## Getting started
 
 <Accordion title="Prerequisites">
-  - A supported AI coding tool: [Claude Code](https://code.claude.com/docs/), [OpenAI Codex](https://openai.com/codex/), [Cursor](https://www.cursor.com), or another agent supporting plugins
-  - [Node.js](https://nodejs.org) if you install via `npx`
+  - [Claude Code](https://code.claude.com/docs/) installed
 </Accordion>
 
 ### Installation
@@ -25,32 +24,19 @@ The [Checkly plugin](https://github.com/checkly/checkly-plugin) bundles the offi
     /plugin install checkly@checkly
     ```
   </Tab>
-  <Tab title="OpenAI Codex">
-    Add the Checkly plugin marketplace from your terminal:
-
-    ```bash
-    codex plugin marketplace add checkly/checkly-plugin
-    ```
-
-    Then open Codex and enable the Checkly plugin via `/plugins`.
-  </Tab>
-  <Tab title="Cursor">
-    Point Cursor at the [checkly/checkly-plugin](https://github.com/checkly/checkly-plugin) repository to install the plugin.
-  </Tab>
-  <Tab title="Plugins CLI">
-    For agents supporting the generic plugin format, install the plugin with the `plugins` CLI:
-
-    ```bash
-    npx plugins add checkly/checkly-plugin
-    ```
-  </Tab>
 </Tabs>
 
 After installation, restart your AI agent to load the plugin.
 
 ## What the plugin provides
 
-The plugin ships two skills. Both are synced daily from their source repositories, so you always get the latest guidance.
+### MCP server
+
+The plugin configures the [Checkly MCP server](/ai/mcp-server), connecting your agent to your Checkly account for live operations like inspecting check status and results, triggering checks, or starting root cause analyses.
+
+### Skills
+
+The plugin also ships two skills. Both are synced daily from their source repositories, so you always get the latest guidance.
 
 | Skill | Description |
 | --- | --- |

@@ -38,3 +38,17 @@ Or, if you want to set repo URL you invoke:
 ```bash Terminal
 CHECKLY_REPO_URL="https://my.git.solution/project/" npx checkly test
 ```
+
+## Working with multiple repositories
+
+Each `checkly test --record` or `checkly deploy` invocation attaches metadata for a **single** `repoUrl`. If your monitors span multiple source repositories (for example, a backend repo and a frontend repo), run the CLI separately from each repository's CI pipeline and set `CHECKLY_REPO_URL` (and the other git variables) to point at the repo that owns the checks being tested or deployed in that pipeline.
+
+```bash Terminal
+# Backend CI pipeline
+CHECKLY_REPO_URL="https://github.com/acme/backend" npx checkly deploy
+
+# Frontend CI pipeline
+CHECKLY_REPO_URL="https://github.com/acme/frontend" npx checkly deploy
+```
+
+To keep checks from different repos isolated, scope each pipeline to its own set of resources — for example by placing each repo's checks in a separate [group](/platform/groups) or by using the [`--tags`](/cli/checkly-deploy) and check-file globs in `checkly.config` so that a deploy from one repo only touches its own checks.

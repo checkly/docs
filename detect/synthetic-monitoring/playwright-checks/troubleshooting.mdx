@@ -1,0 +1,94 @@
+---
+title: 'Troubleshooting Playwright Check Suites'
+description: 'Learn how to troubleshoot Playwright Check Suites.'
+sidebarTitle: Troubleshooting
+---
+
+## Playwright feature troubleshooting
+
+<Accordion title="Webserver doesn't start">
+**Issue:** Tests fail because the `webServer` defined in `playwright.config.ts` doesn't start.
+
+**Solution:**
+
+Include your server files in the Checkly configuration using [`checks.include`](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#include-authentication-files):
+
+```typescript checkly.config.ts
+import { defineConfig } from 'checkly'
+
+export default defineConfig({
+  checks: {
+    playwrightConfigPath: './playwright.config.ts',
+    include: ['server/**/*', 'config/**/*'],
+    playwrightChecks: [
+      // ...
+    ]
+  }
+})
+```
+
+Alternatively, skip `webServer` on Checkly and point to your deployed URL:
+
+```typescript playwright.config.ts
+export default defineConfig({
+  use: {
+    baseURL: process.env.CHECKLY
+      ? 'https://your-site.com'
+      : 'http://localhost:3000',
+  },
+  ...(process.env.CHECKLY ? {} : {
+    webServer: {
+      command: 'npm run dev',
+      url: 'http://localhost:3000',
+      reuseExistingServer: !process.env.CI,
+    },
+  }),
+})
+```
+
+</Accordion>
+
+<Accordion title="No tests found">
+**Issue:** Deployed check runs no tests.
+
+**Solution:**
+
+Verify your configuration matches your Playwright setup:
+
+1. Check that `pwProjects` and `pwTags` match your Playwright config exactly
+2. Verify `playwrightConfigPath` points to the correct file
+3. Test locally with `npx checkly test` to confirm which tests run
+
+```typescript checkly.config.ts
+checks: {
+  playwrightConfigPath: './e2e/playwright.config.ts',
+  playwrightChecks: [
+    {
+      name: 'My tests',
+      logicalId: 'my-tests',
+      pwTags: ['@smoke'], // Must match tags in your test files
+    }
+  ],
+}
+```
+
+</Accordion>
+
+<Accordion title="Headed mode is not supported">
+**Issue:** Tests configured with `headless: false` still run in headless mode.
+
+Checkly runs all tests in headless mode and ignores the `headless: false` option.
+
+**Solution:**
+
+Use the `CHECKLY` environment variable to enable headed mode for local development only:
+
+```typescript playwright.config.ts
+export default defineConfig({
+  use: {
+    headless: process.env.CHECKLY ? true : false,
+  },
+})
+```
+
+</Accordion>

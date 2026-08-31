@@ -1,0 +1,187 @@
+---
+title: 'StatusPageV3 Construct'
+description: 'Learn how to configure status pages with the Checkly CLI.'
+sidebarTitle: 'Status Page'
+canonical: 'https://www.checklyhq.com/docs/constructs/status-page-v3/'
+---
+
+Use `StatusPageV3` to create a public status page. A v3 page has no cards or services: its structure is declared with [`StatusPageV3Component`](/constructs/status-page-v3-component) constructs that point at the page, and incidents can be automated with [`StatusPageV3AutomationRule`](/constructs/status-page-v3-automation-rule).
+
+<Warning>
+A page's generation cannot change in place. A logical ID that was deployed as a [`StatusPage`](/constructs/status-page) (deprecated) cannot be redeployed as a `StatusPageV3`, or vice versa. To move a v2 page to v3, use the migration wizard in the Checkly app.
+</Warning>
+
+<CodeGroup>
+
+```ts Basic Example
+import { StatusPageV3, StatusPageV3Component } from "checkly/constructs"
+
+const statusPage = new StatusPageV3("company-status", {
+  name: "Company Status",
+  url: "company-status",
+})
+
+new StatusPageV3Component("api-component", {
+  statusPage,
+  name: "API",
+  displayOrder: 0,
+})
+```
+
+```ts Complete Example
+import {
+  StatusPageV3,
+  StatusPageV3AutomationRule,
+  StatusPageV3Component,
+} from "checkly/constructs"
+
+const statusPage = new StatusPageV3("acme-status", {
+  name: "A.C.M.E Status",
+  url: "acme-status",
+  customDomain: "status.acme.com",
+  description: "Live status of all A.C.M.E services.",
+  logo: "https://acme.com/logo.png",
+  logoDark: "https://acme.com/logo-dark.png",
+  redirectTo: "https://acme.com",
+  favicon: "https://acme.com/favicon.ico",
+  defaultTheme: "AUTO",
+  footerText: "A.C.M.E Inc.",
+  privacyPolicyLink: "https://acme.com/privacy",
+  termsOfServiceLink: "https://acme.com/terms",
+})
+
+// A group with one component nested under it.
+const userFacing = new StatusPageV3Component("user-facing-group", {
+  statusPage,
+  type: "GROUP",
+  name: "User-Facing Services",
+  displayOrder: 0,
+})
+
+const webApp = new StatusPageV3Component("web-app-component", {
+  statusPage,
+  name: "Web Application",
+  parent: userFacing,
+  displayOrder: 1,
+})
+
+// Open an incident on the page when a check tagged "web" fails.
+new StatusPageV3AutomationRule("web-outage-rule", {
+  statusPage,
+  name: "Web outage",
+  tags: ["web"],
+  firstUpdate: "We are investigating an issue with the web application.",
+  lastUpdate: "The issue is resolved.",
+  components: [{ component: webApp, targetImpact: "MAJOR_OUTAGE" }],
+})
+```
+
+</CodeGroup>
+
+## Configuration
+
+### `StatusPageV3` Options
+
+<ResponseField name="name" type="string" required>
+Name of the status page, shown in the header and browser title.
+
+**Usage:**
+
+```ts highlight={2}
+new StatusPageV3("company-status", {
+  name: "Company Status",
+  /* More options... */
+})
+```
+</ResponseField>
+
+<ResponseField name="url" type="string" required>
+Subdomain under `checkly-status-page.com`. Must be unique across all Checkly accounts.
+
+**Usage:**
+
+```ts highlight={3}
+new StatusPageV3("company-status", {
+  name: "Company Status",
+  url: "company-status", // Creates company-status.checkly-status-page.com
+})
+```
+</ResponseField>
+
+<ResponseField name="customDomain" type="string">
+Custom domain for your status page (e.g., `status.example.com`). Requires DNS configuration and domain verification. See [Custom domains](/communicate/status-pages/customization#custom-domain).
+
+**Usage:**
+
+```ts highlight={4}
+new StatusPageV3("company-status", {
+  name: "Company Status",
+  url: "company-status",
+  customDomain: "status.example.com",
+})
+```
+</ResponseField>
+
+<ResponseField name="description" type="string">
+Short text shown at the top of the public page.
+</ResponseField>
+
+<ResponseField name="logo" type="string">
+URL to a logo image shown in the header. Must be publicly accessible.
+</ResponseField>
+
+<ResponseField name="logoDark" type="string">
+URL to a logo used when the page is in dark mode. Falls back to `logo` when unset.
+</ResponseField>
+
+<ResponseField name="redirectTo" type="string">
+URL to redirect users to when they click the logo.
+</ResponseField>
+
+<ResponseField name="favicon" type="string">
+URL to a favicon image shown in browser tabs. Must be publicly accessible.
+</ResponseField>
+
+<ResponseField name="defaultTheme" type="string" default="AUTO">
+Default color theme for the page: `'LIGHT'`, `'DARK'`, or `'AUTO'` (follows system preference).
+</ResponseField>
+
+<ResponseField name="privacyPolicyLink" type="string">
+Link to your privacy policy, shown in the page footer.
+</ResponseField>
+
+<ResponseField name="termsOfServiceLink" type="string">
+Link to your terms of service, shown in the page footer.
+</ResponseField>
+
+<ResponseField name="footerText" type="string">
+Free-form text shown in the page footer.
+</ResponseField>
+
+<ResponseField name="googleAnalyticsTag" type="string">
+Google Analytics tag ID (e.g. `G-XXXXXXXXXX`) embedded on the public page.
+</ResponseField>
+
+<ResponseField name="allowIndexing" type="boolean" default="true">
+Whether search engines may index the public page.
+</ResponseField>
+
+## Referencing an existing page
+
+Use `StatusPageV3.fromId()` to attach components and automation rules declared in code to a page created in the UI, without managing the page itself:
+
+```ts
+import { StatusPageV3, StatusPageV3Component } from "checkly/constructs"
+
+const statusPage = StatusPageV3.fromId("2fbb3ec1-0d32-4e1e-964a-9f4823502e2f")
+
+new StatusPageV3Component("cdn-component", {
+  statusPage,
+  name: "CDN",
+  displayOrder: 3,
+})
+```
+
+## Importing an existing page
+
+`checkly import status-page:<id>` imports a v3 page together with its components and automation rules into your project.

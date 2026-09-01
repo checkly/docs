@@ -2,6 +2,7 @@
 title: 'CheckGroup Construct'
 description: 'Learn how to configure check groups with the Checkly CLI.'
 sidebarTitle: 'Check Group (deprecated)'
+canonical: 'https://www.checklyhq.com/docs/constructs/check-group/'
 ---
 
 <Tip>
@@ -43,6 +44,7 @@ import {
   EmailAlertChannel,
   Frequency,
 } from "checkly/constructs"
+import { secret } from "checkly/util"
 
 const emailChannel = new EmailAlertChannel("team-email", {
   address: "team@example.com",
@@ -58,7 +60,7 @@ const group = new CheckGroup("comprehensive-group", {
   concurrency: 5,
   environmentVariables: [
     { key: "API_BASE_URL", value: "https://api.example.com" },
-    { key: "API_KEY", value: "{{SECRET_API_KEY}}", secret: true },
+    { key: "API_KEY", value: secret("API_KEY"), secret: true },
   ],
   alertChannels: [emailChannel],
   browserChecks: {

@@ -2,6 +2,7 @@
 title: checkly deploy
 description: 'Deploy checks and resources to your Checkly account.'
 sidebarTitle: 'checkly deploy'
+canonical: 'https://www.checklyhq.com/docs/cli/checkly-deploy/'
 ---
 
 import CliCommandPrerequisites from '/snippets/cli-command-prerequisites.mdx';
@@ -26,6 +27,7 @@ npx checkly deploy [options]
 | `--debug-bundle` | - | Generate a JSON file containing the data sent to our servers when you deploy. **Note**: This flag is in beta. The bundle’s structure is not considered a stable format and may change without notice. It’s intended for one-off troubleshooting, and note it may contain secrets before sharing. |
 | `--output, -o` | - | Show the changes made after the deploy command. |
 | `--preview, -p` | - | Show a preview of the changes made by the deploy command. |
+| `--preserve-resources` | - | Detach resources removed from code (keeping them and their run history) instead of deleting them. |
 | `--[no-]schedule-on-deploy` | - | Enables automatic check scheduling after a deploy. |
 | `--[no-]verify-runtime-dependencies` | - | Return an error if checks import dependencies that are not supported by the selected runtime. |
 
@@ -138,6 +140,22 @@ Update and Unchanged:
 
 </ResponseField>
 
+<ResponseField name="--preserve-resources" type="boolean">
+
+When a resource is removed from your code, `checkly deploy` deletes it from your account by default, which also **permanently deletes its run history**. Pass `--preserve-resources` to **detach** those resources instead: the project stops managing them, but the resources and their run history remain in your Checkly account as regular account-level resources. Detached resources can be re-attached later by adding them back to your code.
+
+This mirrors [`checkly destroy --preserve-resources`](/cli/checkly-destroy), but applies per-deploy to only the resources removed in that deploy rather than the whole project.
+
+**Usage:**
+
+```bash Terminal
+npx checkly deploy --preserve-resources
+```
+
+In the deploy output, detached resources are listed under a `Detached (kept in account, now managed in the Checkly Webapp):` section instead of `Delete:`.
+
+</ResponseField>
+
 <ResponseField name="--[no-]schedule-on-deploy" type="boolean" default="true">
 
 Prevent checks from running automatically when they are deployed.
@@ -169,6 +187,44 @@ Runtime-dependent checks run in a specific runtime with a pre-defined set of dep
 <Tip>You can provide custom dependencies in [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview) because they don't rely on a specific runtime.</Tip>
 
 </ResponseField>
+
+## Deleting vs. detaching removed resources
+
+When you remove a resource from your code and deploy, the CLI reconciles your account with your local configuration. By default, resources that no longer exist in code are **deleted** from your account, which also **permanently deletes their run history**.
+
+Before performing any deletes, a non-forced `checkly deploy` first lists the resources that would be permanently deleted and asks you to confirm:
+
+```bash Terminal
+$ npx checkly deploy
+
+The following resources were removed from code and will be DELETED, losing their run history:
+    Check: legacy-api-check
+
+Pass --preserve-resources to detach and keep them (and their run history) instead.
+
+This will:
+  - Permanently delete 1 resource(s) removed from code, losing their run history
+  - Delete Check: legacy-api-check
+
+? Proceed? › (y/N)
+```
+
+This confirmation is skipped when you pass `--force` (for CI/CD), and it does not appear when you pass `--preserve-resources`. In agent or CI environments the CLI instead returns a `confirmation_required` JSON envelope and exits with code `2` rather than prompting.
+
+To keep removed resources and their run history, deploy with [`--preserve-resources`](#command-options). Instead of deleting them, the CLI **detaches** them — they remain in your Checkly account as regular account-level resources, managed from the UI, and can be re-attached later by adding them back to your code:
+
+```bash Terminal
+$ npx checkly deploy --preserve-resources --output
+
+Detached (kept in account, now managed in the Checkly Webapp):
+    Check: legacy-api-check
+
+Successfully deployed project "Website Monitoring" to account "Monitoring as Code".
+```
+
+<Note>
+Detach-on-deploy requires a recent Checkly backend. Against older backends, `--preserve-resources` still keeps your resources, but they may be reported under `Delete:` rather than `Detach:` in the deploy output.
+</Note>
 
 ## Git Integration
 

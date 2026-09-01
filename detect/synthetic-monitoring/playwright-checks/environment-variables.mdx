@@ -3,6 +3,7 @@ title: Playwright Check Suite Environment Variables
 sidebarTitle: Environment Variables
 description: "Customize your Playwright Check Suite runs based on the execution environment."
 tags: ["synthetic-monitoring", "playwright-checks", "environment-variables"]
+canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/environment-variables/'
 ---
 
 <Note>
@@ -22,6 +23,9 @@ Checkly sets the following environment variables on every Playwright Check Suite
 | `CHECK_NAME` | The name of the check. |
 | `CHECKLY_CHECK_ID` | The UUID of the check. |
 | `CHECKLY_REGION` | The region where Checkly ran the check. |
+| `CHECKLY_TRACE_ID` | The OpenTelemetry trace ID of the check run. Only set when [Traces](/resolve/traces/overview) is active for the check; unset otherwise. |
+| `CHECKLY_TRACEPARENT` | The W3C `traceparent` header value of the check run's trace. Only set when Traces is active. |
+| `CHECKLY_TRACESTATE` | The W3C `tracestate` header value of the check run's trace. Only set when Traces is active. |
 
 ### `CHECKLY_RUN_SOURCE` values
 
@@ -111,3 +115,21 @@ test('geo-specific content test', async ({ page }) => {
   }
 });
 ```
+
+### Correlate a run with its trace
+
+When [Traces](/resolve/traces/overview) is active, use `CHECKLY_TRACE_ID` to link a check run to the trace in your observability backend — for example by logging it, or by tagging telemetry your test emits itself:
+
+```typescript highlight={5}
+import { test } from '@playwright/test';
+
+test('checkout flow', async ({ page }) => {
+  // Search for this ID in your tracing backend to find the run's full trace.
+  console.log(`Trace ID: ${process.env.CHECKLY_TRACE_ID}`);
+
+  await page.goto('https://example.com/checkout');
+  // ... assertions
+});
+```
+
+`CHECKLY_TRACEPARENT` and `CHECKLY_TRACESTATE` carry the same trace context as standard [W3C Trace Context](https://www.w3.org/TR/trace-context/) header values, ready to pass to your own tooling. All three variables are unset when Traces is not active, so `if (process.env.CHECKLY_TRACE_ID)` reliably tells you whether the run is traced.

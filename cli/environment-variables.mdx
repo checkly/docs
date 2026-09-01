@@ -2,6 +2,7 @@
 title: 'Environment Variables'
 description: 'Learn how to use environment variables in your Checkly project'
 sidebarTitle: 'Environment Variables'
+canonical: 'https://www.checklyhq.com/docs/cli/environment-variables/'
 ---
 
 import { YoutubeEmbed } from "/snippets/youtube-embed.jsx"
@@ -63,6 +64,10 @@ You will typically use remote environment variables inside the code dependencies
 a check executes on the Checkly cloud.
 
 ### Using the `-e` flag
+
+<Note>
+  Values passed to `checkly test` with `--env` or `--env-file` apply only to that test session. They do not update variables used by scheduled monitors. To continuously monitor more than one long-lived environment, deploy a separate CLI project for each environment and define its runtime values at the check or group level. See [Monitor multiple environments](/concepts/environments).
+</Note>
 
 Here is an example of a Playwright script using an `ENVIRONMENT_URL` variable to define the page to visit. We also added
 a fallback value in case that variable is not defined for some reason.
@@ -166,8 +171,7 @@ For storing and securing environment variables, we advise the following:
 
 1. Store local environment variables in your shell or in `.env` files that are not committed to your git repo. Add those
 files to your `.gitignore` file.
-2. In a CI context, e.g. GitHub Actions, store sensitive variables as secrets. Almost all CI providers have such a feature.
+2. In a CI context, load sensitive values from your CI secret store or an external secrets manager. For large secret sets, see [Manage secrets at scale](/platform/manage-secrets-at-scale).
 3. For remote variables, store sensitive data as secrets in Checkly. For more information on how to manage secrets in Checkly see [variables and secrets](/platform/variables).
 
 All variables are stored encrypted at rest and in transfer.
-

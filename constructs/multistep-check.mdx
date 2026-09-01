@@ -2,6 +2,7 @@
 title: 'Multistep Check Construct'
 description: 'Learn how to configure multistep checks with the Checkly CLI.'
 sidebarTitle: 'Multistep Check'
+canonical: 'https://www.checklyhq.com/docs/constructs/multistep-check/'
 ---
 
 <Tip>
@@ -15,7 +16,7 @@ Before creating Multistep Checks, ensure you have:
 
 - An initialized Checkly CLI project
 - Public endpoints you want to monitor
-- Runtime `2023.09` or later (Multistep Checks require [newer runtimes](platform/runtimes/runtime-specification))
+- Runtime `2023.09` or later (Multistep Checks require [newer runtimes](/platform/runtimes/runtime-specification))
 
 For additional setup information, see [CLI overview](/cli/overview).
 </Accordion>
@@ -38,6 +39,7 @@ new MultiStepCheck("multistep-check-1", {
 
 ```ts Advanced Example
 import { MultiStepCheck, Frequency } from "checkly/constructs"
+import { secret } from "checkly/util"
 import * as path from "path"
 
 new MultiStepCheck("complex-multistep-check", {
@@ -51,7 +53,7 @@ new MultiStepCheck("complex-multistep-check", {
   environmentVariables: [
     { key: "BASE_URL", value: "https://app.example.com" },
     { key: "TEST_USER_EMAIL", value: "test@example.com" },
-    { key: "TEST_USER_PASSWORD", value: "{{SECRET_PASSWORD}}", secret: true },
+    { key: "TEST_USER_PASSWORD", value: secret("TEST_USER_PASSWORD"), secret: true },
   ],
   code: {
     entrypoint: path.join(__dirname, "user-journey.spec.ts"),

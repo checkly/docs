@@ -2,6 +2,7 @@
 title: 'Playwright Check Suites Configuration'
 description: 'Complete configuration reference for Playwright Check Suites including all available options and examples.'
 sidebarTitle: 'Configuration'
+canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/configuration/'
 ---
 
 Use the `checkly.config.ts/js` file to define your Playwright Check Suite. Each Playwright Check Suite can be connected to references in your `playwright.config.ts/js` file.
@@ -129,6 +130,10 @@ Checkly enforces these options for every run. User configuration does not overri
 | User agent | Checkly appends a [user-agent suffix](/platform/allowlisting-traffic#default-checkly-user-agent) |
 
 Checkly supports Playwright's [`globalTimeout`](https://playwright.dev/docs/api/class-testconfig#test-config-global-timeout). Use it to control the maximum duration of the Playwright suite after `npx playwright test` starts.
+
+<Note>
+When `use.extraHTTPHeaders` is missing from the Playwright configuration, Checkly adds its trace headers automatically. See how to [add Checkly's trace headers to your custom HTTP headers](/resolve/traces/overview#add-trace-headers-to-custom-http-headers).
+</Note>
 
 Playwright Check Suites also provide specific configuration for your Playwright monitoring.
 

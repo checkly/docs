@@ -3,6 +3,7 @@ title: Checkly Agent Changelog
 sidebarTitle: Agent Changelog
 description: Release history for the Checkly Agent
 rss: true
+canonical: 'https://www.checklyhq.com/docs/platform/private-locations/change-log/'
 ---
 
 For major release announcements and summaries, see Checkly's [product changelog](https://feedback.checklyhq.com/changelog?c=Checkly+Agent), filtered by `Checkly Agent`.
@@ -15,6 +16,38 @@ Learn more about:
   [agent version and runtimes](/platform/private-locations/agent-configuration#agent-version-and-runtimes)
 
 ## Full release history
+
+<Update label="v8.7.0" tags={["August 2026"]}>
+- Internal errors of the agent's Node.js component (which runs browser, multistep and Playwright checks) are now reported to the private location's Errors tab, like the Go component's already were
+</Update>
+
+<Update label="v8.6.0" tags={["August 2026"]}>
+- Fixed a bug that prevented pcap files from being cleaned up
+- Expose `CHECKLY_TRACE_ID` to API check setup & teardown scripts
+- Playwright Check Suites: add support for <a href="/resolve/traces/overview/">Checkly Traces</a>
+- Update various dependencies to fix vulnerabilities
+</Update>
+
+<Update label="v8.5.0" tags={["July 2026"]}>
+- Uptime checks can run with response time limits up to 45s (TCP, API and URL), enabled per account
+- gRPC checks support server-streaming methods, plus improved encoding for advanced schema types
+- Browser checks can simulate constrained bandwidth
+- API check responses render image previews
+- Playwright Check Suites: network and console entries are extracted from traces, and trace retention now follows your account setting
+- Fixes: pnpm workspace caching on repeated runs, empty Playwright video assets, artifact upload reliability, multi-step method timeouts, and SSL hostname handling
+- Update various dependencies to fix vulnerabilities
+</Update>
+
+<Update label="v8.4.0" tags={["July 2026"]}>
+- Support for running gRPC, traceroute, and SSL checks
+- Always scrub potentially sensitive headers (Authorization, x-api-key, cookie, etc) even if they don’t contain secrets
+- Downgrade one of the dependencies that prevented the agent from running on older CPU hardware
+</Update>
+
+<Update label="v8.3.4" tags={["June 2026"]}>
+- Update various dependencies to fix vulnerabilities
+- Add `--refresh-cache` functionality
+</Update>
 
 <Update label="v8.3.3" tags={["June 2026"]}>
 - Fixed a bug that caused agent health and readiness probes to fail during graceful shutdown.

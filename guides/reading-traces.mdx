@@ -3,6 +3,7 @@ title: A guide to diagnosing failures with Playwright Traces
 description: When you get a notification of a failed check, you can often determine the cause right in the Checkly dashboard. This guide covers some the most common failure modes and where to find answers.
 tags: Playwright
 sidebarTitle: A Guide to Playwright Traces
+canonical: 'https://www.checklyhq.com/docs/guides/reading-traces/'
 ---
 
 import PlaywrightCheckSuiteTryOut from "/snippets/playwright-check-suite-tryout.mdx"
@@ -144,6 +145,8 @@ The full trace will load, let’s step through some of the information on the tr
 ![a Checkly dashboard](/images/guides/images/reading-traces-13.png)
 
 If you notice that the page took a second or two to fully load, and you’re worried it caused the `expect.toBeVisible` call to fail: probably not! Remember that [Playwright’s auto-waiting](https://www.checklyhq.com/learn/playwright/waits-and-timeouts/) ensures that the element will be found as soon as it loads, and your test won’t fail just because of a flash of unformatted content.
+
+Traces aren't only for GUIs, either. You can download a trace and analyze it in the terminal, or let a coding agent do it for you — see [Debugging with AI agents](/learn/playwright/debugging-with-ai-agents/).
 
 ### **Conclusions**
 

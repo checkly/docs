@@ -2,6 +2,7 @@
 title: 'Playwright Check Suite'
 description: 'Learn how to configure Playwright check suites with the Checkly CLI.'
 sidebarTitle: 'Playwright Check Suites'
+canonical: 'https://www.checklyhq.com/docs/constructs/playwright-check/'
 ---
 
 import GeneralMonitorOptionsTable from '/snippets/general-monitor-options-table.mdx';
@@ -459,13 +460,15 @@ Check-level environment variables that will be available during test execution. 
 
 **Usage:**
 
-```ts highlight={4-7}
+```ts highlight={6-9}
+import { secret } from "checkly/util"
+
 new PlaywrightCheck("user-flow-pwt-check-suite", {
   name: "User Flow Playwright Check Suite",
   playwrightConfigPath: "../playwright.config.ts",
   environmentVariables: [
     { key: "TEST_USERNAME", value: "testuser@example.com" },
-    { key: "TEST_PASSWORD", value: "{{SECRET_PASSWORD}}", secret: true },
+    { key: "TEST_PASSWORD", value: secret("TEST_PASSWORD"), secret: true },
   ],
 })
 ```
@@ -483,12 +486,14 @@ new PlaywrightCheck("user-flow-pwt-check-suite", {
 <CodeGroup>
 
 ```ts Test Credentials
+import { secret } from "checkly/util"
+
 new PlaywrightCheck("user-flow-pwt-check-suite", {
   name: "User Flow Playwright Check Suite",
   playwrightConfigPath: "../playwright.config.ts",
   environmentVariables: [
     { key: "TEST_USERNAME", value: "testuser@example.com" },
-    { key: "TEST_PASSWORD", value: "{{SECRET_PASSWORD}}", secret: true },
+    { key: "TEST_PASSWORD", value: secret("TEST_PASSWORD"), secret: true },
   ],
 })
 ```

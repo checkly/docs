@@ -2,6 +2,7 @@
 title: 'Configuration'
 description: 'Configure your API checks to validate responses and ensure your endpoints behave as expected.'
 sidebarTitle: 'Configuration'
+canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/api-checks/configuration/'
 ---
 
 import GenericRuntimeVariablesTable from '/snippets/generic-runtime-variables-table.mdx';
@@ -181,10 +182,29 @@ For more details, see our documentation on [Assertions](/detect/assertions).
 
 ## Responses
 
-In almost all cases, you have full access to the HTTP response for assertions. We also store the full response
-for later retrieval and triaging issues.
+In almost all cases, you have access to the HTTP response for assertions. Checkly reads up to 25MB of the response
+body. For larger responses, only the first 25MB is available to assertions and teardown scripts. The response body
+stored with the result can be truncated further to fit result-size limits.
 
-Response bodies are limited to a size of 25MB. Responses over this size will trigger a check failure.
+### Previewing image response bodies
+
+Checkly displays a preview and download option in API check results when the raw response body is 50KB or smaller
+and the response `Content-Type` is one of these supported raster image types:
+
+- `image/png`
+- `image/jpeg`
+- `image/gif`
+- `image/webp`
+- `image/avif`
+- `image/apng`
+- `image/bmp`
+- `image/x-icon`
+- `image/vnd.microsoft.icon`
+
+Checkly uses the `Content-Type` header rather than the file extension to identify images. Images larger than 50KB
+are truncated when stored and cannot be previewed. SVG, TIFF, other unsupported image types, and results created
+before image preview support cannot be previewed either. Slack alerts do not include a response body preview for
+supported images.
 
 Additionally, if your API responds with a binary type body, i.e. a PDF or video file, we scrub the body and replace
 it with a short text saying that we scrubbed it. We determine the body content type by looking at the `Content-Type`
@@ -213,6 +233,17 @@ This list shows all content types that we scrub from the response data.
 |`video/x-msvideo`|
 |`video/x-flv`|
 |`video/webm`|
+
+### Asserting on binary response bodies
+
+Adding a **Text body** assertion disables binary scrubbing for the entire check. The assertion, teardown scripts,
+and stored result receive the response body instead of the scrubbed message. Use this when a server labels a textual
+payload with a binary content type, such as `application/octet-stream`. This does not decode binary formats such as
+PDF, ZIP, audio, or video files.
+
+The assertion evaluates the response body up to the 25MB limit above. Its *Actual* value is truncated to 10KB for
+display, and the stored response body remains subject to result-size limits. Checks without a Text body assertion
+keep the scrubbing behavior described in this section.
 
 ## Additional Settings
 

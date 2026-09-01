@@ -54,6 +54,12 @@ jobs:
     - name: Generate pages for any new endpoints
       run: node .github/scripts/detect-new-endpoints.mjs
 
+    # New pages land in docs.json navigation, which is what the sitemap is
+    # generated from. Without this the static-docs-checks "Sitemap up to date"
+    # gate fails on every PR that adds an endpoint page.
+    - name: Regenerate sitemap
+      run: node .github/scripts/generate-sitemap.mjs
+
     - name: Create or update API spec PR if anything changed
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -61,7 +67,7 @@ jobs:
         set -euo pipefail
 
         # Stage everything that might have changed
-        git add api-reference docs.json
+        git add api-reference docs.json sitemap.xml
 
         if git diff --cached --quiet; then
           echo "✅ No changes — nothing to do"

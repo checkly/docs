@@ -9,7 +9,10 @@
   },
   "seo": {
     "title": "Getting started with Checkly - Checkly Docs",
-    "description": "The Application Reliability Platform built for modern engineering teams."
+    "description": "The Application Reliability Platform built for modern engineering teams.",
+    "metatags": {
+      "canonical": "https://www.checklyhq.com/docs"
+    }
   },
   "favicon": "/racoon_favicon.png",
   "customCSS": "/style.css",
@@ -19,6 +22,9 @@
     },
     {
       "src": "/unify-tracking.js"
+    },
+    {
+      "src": "/vercel-analytics.js"
     }
   ],
   "integrations": {
@@ -47,24 +53,13 @@
             "group": "Getting Started",
             "pages": [
               "/what-is-checkly",
-              {
-                "group": "Quickstarts",
-                "pages": [
-                  "quickstarts/tcp-monitor",
-                  "quickstarts/url-monitor",
-                  "quickstarts/browser-check",
-                  "quickstarts/playwright-check",
-                  "quickstarts/api-check",
-                  "quickstarts/multistep-check",
-                  "quickstarts/heartbeat-monitor",
-                  "quickstarts/openapi-spec"
-                ]
-              },
+              "quickstart",
               {
                 "group": "Concepts",
                 "pages": [
                   "concepts/checks",
                   "concepts/monitoring-as-code",
+                  "concepts/environments",
                   "concepts/locations",
                   "concepts/scheduling",
                   "concepts/results",
@@ -104,6 +99,7 @@
                     ]
                   },
                   "platform/secrets",
+                  "platform/manage-secrets-at-scale",
                   "platform/dynamic-secret-scrubbing",
                   "platform/data-storage",
                   "platform/variables",
@@ -143,6 +139,7 @@
                     "group": "URL Monitors",
                     "pages": [
                       "detect/uptime-monitoring/url-monitors/overview",
+                      "detect/uptime-monitoring/url-monitors/quickstart",
                       "detect/uptime-monitoring/url-monitors/configuration"
                     ]
                   },
@@ -150,6 +147,7 @@
                     "group": "TCP Monitors",
                     "pages": [
                       "detect/uptime-monitoring/tcp-monitors/overview",
+                      "detect/uptime-monitoring/tcp-monitors/quickstart",
                       "detect/uptime-monitoring/tcp-monitors/configuration"
                     ]
                   },
@@ -168,9 +166,31 @@
                     ]
                   },
                   {
+                    "group": "Traceroute Monitors",
+                    "pages": [
+                      "detect/uptime-monitoring/traceroute-monitors/overview",
+                      "detect/uptime-monitoring/traceroute-monitors/configuration"
+                    ]
+                  },
+                  {
+                    "group": "gRPC Monitors",
+                    "pages": [
+                      "detect/uptime-monitoring/grpc-monitors/overview",
+                      "detect/uptime-monitoring/grpc-monitors/configuration"
+                    ]
+                  },
+                  {
+                    "group": "SSL Monitors",
+                    "pages": [
+                      "detect/uptime-monitoring/ssl-monitors/overview",
+                      "detect/uptime-monitoring/ssl-monitors/configuration"
+                    ]
+                  },
+                  {
                     "group": "Heartbeat Monitors",
                     "pages": [
                       "detect/uptime-monitoring/heartbeat-monitors/overview",
+                      "detect/uptime-monitoring/heartbeat-monitors/quickstart",
                       "detect/uptime-monitoring/heartbeat-monitors/examples"
                     ]
                   }
@@ -181,21 +201,16 @@
                 "pages": [
                   "detect/synthetic-monitoring/overview",
                   {
-                    "group": "Agentic Checks",
-                    "pages": [
-                      "detect/synthetic-monitoring/agentic-checks/overview",
-                      "detect/synthetic-monitoring/agentic-checks/configuration"
-                    ]
-                  },
-                  {
                     "group": "API Checks",
                     "pages": [
                       "detect/synthetic-monitoring/api-checks/overview",
+                      "detect/synthetic-monitoring/api-checks/quickstart",
                       "detect/synthetic-monitoring/api-checks/configuration",
                       "detect/synthetic-monitoring/api-checks/setup-and-teardown",
                       "detect/synthetic-monitoring/api-checks/snippets",
                       "detect/synthetic-monitoring/api-checks/api-structure",
                       "detect/synthetic-monitoring/api-checks/client-certificates",
+                      "detect/synthetic-monitoring/api-checks/openapi-spec",
                       "detect/synthetic-monitoring/api-checks/troubleshooting"
                     ]
                   },
@@ -204,6 +219,7 @@
                     "group": "Multistep Checks",
                     "pages": [
                       "detect/synthetic-monitoring/multistep-checks/overview",
+                      "detect/synthetic-monitoring/multistep-checks/quickstart",
                       "detect/synthetic-monitoring/multistep-checks/multistep-structure",
                       "detect/synthetic-monitoring/multistep-checks/degraded-states",
                       "detect/synthetic-monitoring/multistep-checks/file-system",
@@ -215,6 +231,7 @@
                     "group": "Browser Checks",
                     "pages": [
                       "detect/synthetic-monitoring/browser-checks/overview",
+                      "detect/synthetic-monitoring/browser-checks/quickstart",
                       "detect/synthetic-monitoring/browser-checks/mac-structure",
                       "detect/synthetic-monitoring/browser-checks/performance-metrics",
                       "detect/synthetic-monitoring/browser-checks/visual-regressions",
@@ -229,8 +246,10 @@
                     "group": "Playwright Check Suites",
                     "pages": [
                       "detect/synthetic-monitoring/playwright-checks/overview",
+                      "detect/synthetic-monitoring/playwright-checks/quickstart",
                       "detect/synthetic-monitoring/playwright-checks/configuration",
                       "detect/synthetic-monitoring/playwright-checks/test-organization",
+                      "detect/synthetic-monitoring/playwright-checks/performance-metrics",
                       "detect/synthetic-monitoring/playwright-checks/add-to-group",
                       "detect/synthetic-monitoring/playwright-checks/custom-dependencies",
                       "detect/synthetic-monitoring/playwright-checks/environment-variables",
@@ -276,7 +295,8 @@
                   "communicate/status-pages/password-protection",
                   "communicate/status-pages/incidents",
                   "communicate/status-pages/maintenance-windows",
-                  "communicate/status-pages/subscriber-notifications"
+                  "communicate/status-pages/subscriber-notifications",
+                  "communicate/status-pages/v2-deprecated"
                 ]
               },
               {
@@ -342,19 +362,26 @@
             "group": "AI",
             "pages": [
               "ai/rocky-ai",
-              "ai/overview",
               {
-                "group": "MCP Server",
+                "group": "Agent Resources",
                 "pages": [
-                  "ai/mcp-server",
-                  "ai/mcp-server/setup",
-                  "ai/mcp-server/tools",
-                  "ai/mcp-server/security-and-permissions",
-                  "ai/mcp-server/troubleshooting"
+                  "ai/overview",
+                  {
+                    "group": "MCP Server",
+                    "pages": [
+                      "ai/mcp-server",
+                      "ai/mcp-server/setup",
+                      "ai/mcp-server/tools",
+                      "ai/mcp-server/security-and-permissions",
+                      "ai/mcp-server/troubleshooting"
+                    ]
+                  },
+                  "ai/plugin",
+                  "ai/skills",
+                  "ai/markdown-access",
+                  "ai/llms-txt"
                 ]
-              },
-              "ai/skills",
-              "ai/rules"
+              }
             ]
           },
           {
@@ -396,7 +423,16 @@
                     "group": "GitHub",
                     "pages": [
                       "integrations/ci-cd/github/actions",
-                      "integrations/ci-cd/github/deployments"
+                      "integrations/ci-cd/github/deployments",
+                      {
+                        "group": "External secrets",
+                        "pages": [
+                          "integrations/ci-cd/github/secrets/aws-secrets-manager",
+                          "integrations/ci-cd/github/secrets/google-secret-manager",
+                          "integrations/ci-cd/github/secrets/azure-key-vault",
+                          "integrations/ci-cd/github/secrets/hashicorp-vault"
+                        ]
+                      }
                     ]
                   },
                   "integrations/ci-cd/gitlab/overview",
@@ -469,8 +505,10 @@
               "constructs/dns-monitor",
               "constructs/tcp-monitor",
               "constructs/icmp-monitor",
+              "constructs/traceroute-monitor",
+              "constructs/grpc-monitor",
+              "constructs/ssl-monitor",
               "constructs/heartbeat-monitor",
-              "constructs/agentic-check",
               "constructs/api-check",
               "constructs/multistep-check",
               "constructs/browser-check",
@@ -502,6 +540,9 @@
               {
                 "group": "Status Pages",
                 "pages": [
+                  "constructs/status-page-v3",
+                  "constructs/status-page-v3-component",
+                  "constructs/status-page-v3-automation-rule",
                   "constructs/status-page",
                   "constructs/status-page-service",
                   "constructs/incident-trigger"
@@ -551,6 +592,7 @@
             "group": "CLI Commands",
             "pages": [
               "cli/checkly-account",
+              "cli/checkly-alert-channels",
               "cli/checkly-api",
               "cli/checkly-assets",
               "cli/checkly-checks",
@@ -562,6 +604,7 @@
               "cli/checkly-init",
               "cli/checkly-login",
               "cli/checkly-logout",
+              "cli/checkly-members",
               "cli/checkly-pw-test",
               "cli/checkly-rca",
               "cli/checkly-runtimes",
@@ -635,7 +678,8 @@
                   "api-reference/analytics/url-monitors",
                   "api-reference/analytics/list-all-available-reporting-metrics",
                   "api-reference/analytics/icmp-monitors",
-                  "api-reference/analytics/get-analytics-summary-for-multiple-checks"
+                  "api-reference/analytics/get-analytics-summary-for-multiple-checks",
+                  "api-reference/analytics/ssl-monitors"
                 ]
               },
               {
@@ -649,7 +693,11 @@
                 "group": "Checks and Monitors",
                 "pages": [
                   "api-reference/checks/list-all-checks",
+                  "api-reference/checks/list-all-checks-v3",
+                  "api-reference/checks/list-all-checks-v2",
                   "api-reference/checks/retrieve-a-check",
+                  "api-reference/checks/retrieve-a-check-v3",
+                  "api-reference/checks/retrieve-a-check-v2",
                   "api-reference/checks/delete-a-check",
                   "api-reference/checks/create-a-check",
                   "api-reference/checks/update-a-check",
@@ -711,7 +759,9 @@
                       "api-reference/monitors/create-an-icmp-monitor",
                       "api-reference/monitors/update-an-icmp-monitor"
                     ]
-                  }
+                  },
+                  "api-reference/monitors/create-an-ssl-monitor",
+                  "api-reference/monitors/update-an-ssl-monitor"
                 ]
               },
               {
@@ -725,14 +775,16 @@
                 "group": "Check Groups",
                 "pages": [
                   "api-reference/check-groups/list-all-check-groups",
-                  "api-reference/check-groups/create-a-check-group-v2",
-                  "api-reference/check-groups/update-a-check-group-v2",
                   "api-reference/check-groups/retrieve-a-check-group",
                   "api-reference/check-groups/delete-a-check-group",
                   "api-reference/check-groups/retrieve-one-check-in-a-specific-group-with-group-settings-applied",
+                  "api-reference/check-groups/retrieve-one-check-in-a-specific-group-with-group-settings-applied-v2",
                   "api-reference/check-groups/retrieve-all-checks-in-a-specific-group-with-group-settings-applied",
+                  "api-reference/check-groups/retrieve-all-checks-in-a-specific-group-with-group-settings-applied-v2",
                   "api-reference/check-groups/create-a-check-group",
-                  "api-reference/check-groups/update-a-check-group"
+                  "api-reference/check-groups/create-a-check-group-v2",
+                  "api-reference/check-groups/update-a-check-group",
+                  "api-reference/check-groups/update-a-check-group-v2"
                 ]
               },
               {
@@ -910,6 +962,67 @@
               {
                 "group": "Status Pages",
                 "pages": [
+                  "api-reference/status-pages-v3/list-v3-status-pages",
+                  "api-reference/status-pages-v3/create-a-new-v3-status-page",
+                  "api-reference/status-pages-v3/retrieve-a-single-v3-status-page-by-id",
+                  "api-reference/status-pages-v3/update-an-existing-v3-status-page",
+                  "api-reference/status-pages-v3/delete-a-v3-status-page",
+                  "api-reference/status-pages-v3/retrieve-custom-domain-verification-details-for-a-v3-status-page",
+                  "api-reference/status-pages-v3/re-check-the-custom-domain-verification-of-a-v3-status-page"
+                ]
+              },
+              {
+                "group": "Status Page Components",
+                "pages": [
+                  "api-reference/status-pages-v3/list-the-components-of-a-v3-status-page",
+                  "api-reference/status-pages-v3/create-a-component-on-a-v3-status-page",
+                  "api-reference/status-pages-v3/retrieve-a-single-component-of-a-v3-status-page",
+                  "api-reference/status-pages-v3/update-a-component-of-a-v3-status-page",
+                  "api-reference/status-pages-v3/delete-a-component-of-a-v3-status-page"
+                ]
+              },
+              {
+                "group": "Status Page Automation Rules",
+                "pages": [
+                  "api-reference/status-pages-v3/list-the-automation-rules-of-a-v3-status-page",
+                  "api-reference/status-pages-v3/create-an-automation-rule-on-a-v3-status-page",
+                  "api-reference/status-pages-v3/retrieve-a-single-automation-rule-of-a-v3-status-page",
+                  "api-reference/status-pages-v3/update-an-automation-rule-of-a-v3-status-page",
+                  "api-reference/status-pages-v3/delete-an-automation-rule-of-a-v3-status-page"
+                ]
+              },
+              {
+                "group": "Status Page Incidents",
+                "pages": [
+                  "api-reference/status-pages-v3/list-the-incidents-of-a-v3-status-page",
+                  "api-reference/status-pages-v3/open-an-incident-on-a-v3-status-page",
+                  "api-reference/status-pages-v3/retrieve-an-incident-of-a-v3-status-page",
+                  "api-reference/status-pages-v3/update-an-incident-of-a-v3-status-page",
+                  "api-reference/status-pages-v3/delete-an-incident-of-a-v3-status-page",
+                  "api-reference/status-pages-v3/replace-an-incidents-component-impact-timeline"
+                ]
+              },
+              {
+                "group": "Status Page Incident Updates",
+                "pages": [
+                  "api-reference/status-pages-v3/list-the-updates-of-an-incident",
+                  "api-reference/status-pages-v3/post-an-update-to-an-incident",
+                  "api-reference/status-pages-v3/retrieve-an-incident-update",
+                  "api-reference/status-pages-v3/edit-an-incident-update",
+                  "api-reference/status-pages-v3/delete-an-incident-update"
+                ]
+              },
+              {
+                "group": "Status Page Subscribers",
+                "pages": [
+                  "api-reference/status-pages-v3/list-the-subscribers-of-a-v3-status-page",
+                  "api-reference/status-pages-v3/subscribe-multiple-email-addresses-to-a-v3-status-page",
+                  "api-reference/status-pages-v3/delete-a-subscriber-of-a-v3-status-page"
+                ]
+              },
+              {
+                "group": "Status Pages v1 (deprecated)",
+                "pages": [
                   "api-reference/status-pages/retrieve-all-status-pages",
                   "api-reference/status-pages/create-a-new-status-page",
                   "api-reference/status-pages/retrieve-a-single-status-page-by-id",
@@ -918,7 +1031,7 @@
                 ]
               },
               {
-                "group": "Status Page Incidents",
+                "group": "Status Page Incidents v1 (deprecated)",
                 "pages": [
                   "api-reference/status-page-incidents/retrieve-the-latest-incidents-with-pagination",
                   "api-reference/status-page-incidents/create-a-new-incident",
@@ -928,7 +1041,7 @@
                 ]
               },
               {
-                "group": "Status Page Incident Updates",
+                "group": "Status Page Incident Updates v1 (deprecated)",
                 "pages": [
                   "api-reference/status-page-incidents/retrieve-the-100-latest-incident-updates-of-a-specific-incident",
                   "api-reference/status-page-incidents/add-a-new-incident-update-to-a-specific-incident",
@@ -938,7 +1051,7 @@
                 ]
               },
               {
-                "group": "Status Page Services",
+                "group": "Status Page Services v1 (deprecated)",
                 "pages": [
                   "api-reference/status-page-services/get-all-services",
                   "api-reference/status-page-services/create-a-service",
@@ -948,7 +1061,7 @@
                 ]
               },
               {
-                "group": "Status Page Subscribers",
+                "group": "Status Page Subscribers v1 (deprecated)",
                 "pages": [
                   "api-reference/status-pages/get-all-subscriptions-for-a-specific-status-page",
                   "api-reference/status-pages/bulk-create-subscriptions-for-a-specific-status-page",
@@ -974,6 +1087,19 @@
                   "api-reference/test-session-error-groups/list-all-test-session-error-groups-for-a-project",
                   "api-reference/test-session-error-groups/retrieve-a-test-session-error-group",
                   "api-reference/test-session-error-groups/update-a-test-session-error-group"
+                ]
+              },
+              {
+                "group": "Deployment Triggers",
+                "pages": [
+                  "api-reference/deployment-triggers/list-all-deployment-triggers",
+                  "api-reference/deployment-triggers/create-a-deployment-trigger"
+                ]
+              },
+              {
+                "group": "Secret scans",
+                "pages": [
+                  "api-reference/secret-scans/lists-readable-configuration-values-that-look-like-inline-credentials"
                 ]
               }
             ]
@@ -1127,6 +1253,12 @@
                   "learn/playwright/error-element-not-visible",
                   "learn/playwright/error-target-closed",
                   "learn/playwright/error-wait-not-respected"
+                ]
+              },
+              {
+                "group": "AI & Coding Agents",
+                "pages": [
+                  "learn/playwright/debugging-with-ai-agents"
                 ]
               }
             ]
@@ -1323,6 +1455,54 @@
       "destination": "/admin/team-management/single-sign-on"
     },
     {
+      "source": "/quickstarts/general",
+      "destination": "/quickstart"
+    },
+    {
+      "source": "/quickstarts/url-monitor",
+      "destination": "/detect/uptime-monitoring/url-monitors/quickstart"
+    },
+    {
+      "source": "/quickstarts/tcp-monitor",
+      "destination": "/detect/uptime-monitoring/tcp-monitors/quickstart"
+    },
+    {
+      "source": "/quickstarts/heartbeat-monitor",
+      "destination": "/detect/uptime-monitoring/heartbeat-monitors/quickstart"
+    },
+    {
+      "source": "/quickstarts/api-check",
+      "destination": "/detect/synthetic-monitoring/api-checks/quickstart"
+    },
+    {
+      "source": "/quickstarts/openapi-spec",
+      "destination": "/detect/synthetic-monitoring/api-checks/openapi-spec"
+    },
+    {
+      "source": "/quickstarts/multistep-check",
+      "destination": "/detect/synthetic-monitoring/multistep-checks/quickstart"
+    },
+    {
+      "source": "/quickstarts/browser-check",
+      "destination": "/detect/synthetic-monitoring/browser-checks/quickstart"
+    },
+    {
+      "source": "/quickstarts/playwright-check",
+      "destination": "/detect/synthetic-monitoring/playwright-checks/quickstart"
+    },
+    {
+      "source": "/quickstarts/creating-a-browser-check",
+      "destination": "/detect/synthetic-monitoring/browser-checks/quickstart"
+    },
+    {
+      "source": "/detect/synthetic-monitoring/browser-checks/creating-a-browser-check",
+      "destination": "/detect/synthetic-monitoring/browser-checks/quickstart"
+    },
+    {
+      "source": "/ai/rules",
+      "destination": "/ai/overview"
+    },
+    {
       "source": "/detect/synthetic-monitoring/api-checks/set-up-and-tear-down",
       "destination": "/detect/synthetic-monitoring/api-checks/setup-and-teardown"
     },
@@ -1344,7 +1524,7 @@
     },
     {
       "source": "/constructs/quickstarts/playwright-check",
-      "destination": "/quickstarts/playwright-check"
+      "destination": "/detect/synthetic-monitoring/playwright-checks/quickstart"
     },
     {
       "source": "/api-reference/checks/create-an-dns-monitor/",
@@ -1367,8 +1547,752 @@
       "destination": "/api-reference/error-groups/update-an-error-group"
     },
     {
+      "source": "/monitoring/check-results",
+      "destination": "/concepts/results"
+    },
+    {
+      "source": "/detect/synthetic-monitoring/browser-checks/results",
+      "destination": "/concepts/results"
+    },
+    {
       "source": "/assertions",
       "destination": "/detect/assertions"
+    },
+    {
+      "source": "/reference/getv1accounts",
+      "destination": "/api-reference/accounts/fetch-user-accounts"
+    },
+    {
+      "source": "/reference/getv1accountsme",
+      "destination": "/api-reference/accounts/fetch-current-account-details"
+    },
+    {
+      "source": "/reference/getv1accountsmeentitlements",
+      "destination": "/api-reference/accounts/fetch-current-account-entitlements"
+    },
+    {
+      "source": "/reference/getv1accountsmemembers",
+      "destination": "/api-reference/accounts/list-current-account-members-and-pending-invites"
+    },
+    {
+      "source": "/reference/deletev1accountsmemembersuserid",
+      "destination": "/api-reference/accounts/remove-a-current-account-member"
+    },
+    {
+      "source": "/reference/patchv1accountsmemembersuserid",
+      "destination": "/api-reference/accounts/update-a-current-account-member-role"
+    },
+    {
+      "source": "/reference/getv1accountsaccountid",
+      "destination": "/api-reference/accounts/fetch-a-given-account-details"
+    },
+    {
+      "source": "/reference/getv1accountsaccountidentitlements",
+      "destination": "/api-reference/accounts/fetch-account-entitlements"
+    },
+    {
+      "source": "/reference/getv1accountsaccountidmembers",
+      "destination": "/api-reference/accounts/list-account-members-and-pending-invites"
+    },
+    {
+      "source": "/reference/deletev1accountsaccountidmembersuserid",
+      "destination": "/api-reference/accounts/remove-an-account-member"
+    },
+    {
+      "source": "/reference/patchv1accountsaccountidmembersuserid",
+      "destination": "/api-reference/accounts/update-an-account-member-role"
+    },
+    {
+      "source": "/reference/getv1alertchannels",
+      "destination": "/api-reference/alert-channels/list-all-alert-channels"
+    },
+    {
+      "source": "/reference/postv1alertchannels",
+      "destination": "/api-reference/alert-channels/create-an-alert-channel"
+    },
+    {
+      "source": "/reference/deletev1alertchannelsid",
+      "destination": "/api-reference/alert-channels/delete-an-alert-channel"
+    },
+    {
+      "source": "/reference/getv1alertchannelsid",
+      "destination": "/api-reference/alert-channels/retrieve-an-alert-channel"
+    },
+    {
+      "source": "/reference/putv1alertchannelsid",
+      "destination": "/api-reference/alert-channels/update-an-alert-channel"
+    },
+    {
+      "source": "/reference/putv1alertchannelsidsubscriptions",
+      "destination": "/api-reference/alert-channels/update-the-subscriptions-of-an-alert-channel"
+    },
+    {
+      "source": "/reference/getv1alertnotifications",
+      "destination": "/api-reference/alert-notifications/lists-all-alert-notifications"
+    },
+    {
+      "source": "/reference/getv1analyticsapichecksid",
+      "destination": "/api-reference/analytics/api-checks"
+    },
+    {
+      "source": "/reference/getv1analyticsbrowserchecksid",
+      "destination": "/api-reference/analytics/browser-checks"
+    },
+    {
+      "source": "/reference/postv1analyticschecks",
+      "destination": "/api-reference/analytics/get-analytics-summary-for-multiple-checks"
+    },
+    {
+      "source": "/reference/getv1analyticsdnsid",
+      "destination": "/api-reference/analytics/dns-monitors"
+    },
+    {
+      "source": "/reference/getv1analyticsheartbeatchecksid",
+      "destination": "/api-reference/analytics/heartbeat-checks"
+    },
+    {
+      "source": "/reference/getv1analyticsicmpid",
+      "destination": "/api-reference/analytics/icmp-monitors"
+    },
+    {
+      "source": "/reference/getv1analyticsmetrics",
+      "destination": "/api-reference/analytics/list-all-available-reporting-metrics"
+    },
+    {
+      "source": "/reference/getv1analyticsmultistepchecksid",
+      "destination": "/api-reference/analytics/multistep-checks"
+    },
+    {
+      "source": "/reference/getv1analyticsplaywrightchecksid",
+      "destination": "/api-reference/analytics/playwright-checks"
+    },
+    {
+      "source": "/reference/getv1analyticstcpchecksid",
+      "destination": "/api-reference/analytics/tcp-checks"
+    },
+    {
+      "source": "/reference/getv1analyticsurlmonitorsid",
+      "destination": "/api-reference/analytics/url-monitors"
+    },
+    {
+      "source": "/reference/getv1badgescheckscheckid",
+      "destination": "/api-reference/badges/get-v1badgeschecks"
+    },
+    {
+      "source": "/reference/getv1badgesgroupsgroupid",
+      "destination": "/api-reference/badges/get-v1badgesgroups"
+    },
+    {
+      "source": "/reference/getv1checkalerts",
+      "destination": "/api-reference/check-alerts/list-all-alerts-for-your-account"
+    },
+    {
+      "source": "/reference/getv1checkalertscheckid",
+      "destination": "/api-reference/check-alerts/list-alerts-for-a-specific-check"
+    },
+    {
+      "source": "/reference/getv1checkgroups",
+      "destination": "/api-reference/check-groups/list-all-check-groups"
+    },
+    {
+      "source": "/reference/postv1checkgroups",
+      "destination": "/api-reference/check-groups/create-a-check-group"
+    },
+    {
+      "source": "/reference/getv1checkgroupsgroupidcheckscheckid",
+      "destination": "/api-reference/check-groups/retrieve-one-check-in-a-specific-group-with-group-settings-applied"
+    },
+    {
+      "source": "/reference/deletev1checkgroupsid",
+      "destination": "/api-reference/check-groups/delete-a-check-group"
+    },
+    {
+      "source": "/reference/getv1checkgroupsid",
+      "destination": "/api-reference/check-groups/retrieve-a-check-group"
+    },
+    {
+      "source": "/reference/putv1checkgroupsid",
+      "destination": "/api-reference/check-groups/update-a-check-group"
+    },
+    {
+      "source": "/reference/getv1checkgroupsidchecks",
+      "destination": "/api-reference/check-groups/retrieve-all-checks-in-a-specific-group-with-group-settings-applied"
+    },
+    {
+      "source": "/reference/getv1checkresultscheckid",
+      "destination": "/api-reference/check-results/lists-all-check-results"
+    },
+    {
+      "source": "/reference/getv1checkresultscheckidcheckresultid",
+      "destination": "/api-reference/check-results/retrieve-a-check-result"
+    },
+    {
+      "source": "/reference/getv1checkresultscheckidcheckresultidassets",
+      "destination": "/api-reference/check-results/retrieve-a-normalized-asset-manifest-for-a-check-result"
+    },
+    {
+      "source": "/reference/postv1checksessionstrigger",
+      "destination": "/api-reference/check-sessions/trigger-a-new-check-session"
+    },
+    {
+      "source": "/reference/getv1checksessionschecksessionid",
+      "destination": "/api-reference/check-sessions/retrieve-a-check-session"
+    },
+    {
+      "source": "/reference/postv1checksessionschecksessionidcancel",
+      "destination": "/api-reference/check-sessions/cancel-a-check-session"
+    },
+    {
+      "source": "/reference/getv1checksessionschecksessionidcompletion",
+      "destination": "/api-reference/check-sessions/await-the-completion-of-a-check-session"
+    },
+    {
+      "source": "/reference/getv1checkstatuses",
+      "destination": "/api-reference/check-status/list-all-check-statuses"
+    },
+    {
+      "source": "/reference/getv1checkstatusescheckid",
+      "destination": "/api-reference/check-status/retrieve-check-status-details"
+    },
+    {
+      "source": "/reference/getv1checks",
+      "destination": "/api-reference/checks/list-all-checks"
+    },
+    {
+      "source": "/reference/postv1checks",
+      "destination": "/api-reference/checks/create-a-check"
+    },
+    {
+      "source": "/reference/postv1checksapi",
+      "destination": "/api-reference/checks/create-an-api-check"
+    },
+    {
+      "source": "/reference/putv1checksapiid",
+      "destination": "/api-reference/checks/update-an-api-check"
+    },
+    {
+      "source": "/reference/postv1checksbrowser",
+      "destination": "/api-reference/checks/create-a-browser-check"
+    },
+    {
+      "source": "/reference/putv1checksbrowserid",
+      "destination": "/api-reference/checks/update-a-browser-check"
+    },
+    {
+      "source": "/reference/postv1checksdns",
+      "destination": "/api-reference/monitors/create-a-dns-monitor"
+    },
+    {
+      "source": "/reference/putv1checksdnsid",
+      "destination": "/api-reference/monitors/update-a-dns-monitor"
+    },
+    {
+      "source": "/reference/postv1checksheartbeat",
+      "destination": "/api-reference/heartbeats/create-a-heartbeat-check"
+    },
+    {
+      "source": "/reference/putv1checksheartbeatid",
+      "destination": "/api-reference/heartbeats/update-a-heartbeat-check"
+    },
+    {
+      "source": "/reference/getv1checksheartbeatscheckidavailability",
+      "destination": "/api-reference/heartbeats/get-heartbeat-availability"
+    },
+    {
+      "source": "/reference/getv1checksheartbeatscheckidevents",
+      "destination": "/api-reference/heartbeats/get-a-list-of-events-for-a-heartbeat"
+    },
+    {
+      "source": "/reference/getv1checksheartbeatscheckideventsid",
+      "destination": "/api-reference/heartbeats/get-a-specific-heartbeat-event"
+    },
+    {
+      "source": "/reference/postv1checksicmp",
+      "destination": "/api-reference/monitors/create-an-icmp-monitor"
+    },
+    {
+      "source": "/reference/putv1checksicmpid",
+      "destination": "/api-reference/monitors/update-an-icmp-monitor"
+    },
+    {
+      "source": "/reference/postv1checksmultistep",
+      "destination": "/api-reference/checks/create-a-multi-step-check"
+    },
+    {
+      "source": "/reference/putv1checksmultistepid",
+      "destination": "/api-reference/checks/update-a-multi-step-check"
+    },
+    {
+      "source": "/reference/postv1checkstcp",
+      "destination": "/api-reference/checks/create-a-tcp-check"
+    },
+    {
+      "source": "/reference/putv1checkstcpid",
+      "destination": "/api-reference/checks/update-an-tcp-check"
+    },
+    {
+      "source": "/reference/postv1checksurl",
+      "destination": "/api-reference/monitors/create-a-url-monitor"
+    },
+    {
+      "source": "/reference/putv1checksurlid",
+      "destination": "/api-reference/monitors/update-an-url-monitor"
+    },
+    {
+      "source": "/reference/deletev1checksid",
+      "destination": "/api-reference/checks/delete-a-check"
+    },
+    {
+      "source": "/reference/getv1checksid",
+      "destination": "/api-reference/checks/retrieve-a-check"
+    },
+    {
+      "source": "/reference/putv1checksid",
+      "destination": "/api-reference/checks/update-a-check"
+    },
+    {
+      "source": "/reference/getv1clientcertificates",
+      "destination": "/api-reference/client-certificates/lists-all-client-certificates"
+    },
+    {
+      "source": "/reference/postv1clientcertificates",
+      "destination": "/api-reference/client-certificates/creates-a-new-client-certificate"
+    },
+    {
+      "source": "/reference/deletev1clientcertificatesid",
+      "destination": "/api-reference/client-certificates/deletes-a-client-certificate"
+    },
+    {
+      "source": "/reference/getv1clientcertificatesid",
+      "destination": "/api-reference/client-certificates/shows-one-client-certificate"
+    },
+    {
+      "source": "/reference/getv1dashboards",
+      "destination": "/api-reference/dashboards/list-all-dashboards"
+    },
+    {
+      "source": "/reference/postv1dashboards",
+      "destination": "/api-reference/dashboards/create-a-dashboard"
+    },
+    {
+      "source": "/reference/deletev1dashboardsdashboardid",
+      "destination": "/api-reference/dashboards/delete-a-dashboard"
+    },
+    {
+      "source": "/reference/getv1dashboardsdashboardid",
+      "destination": "/api-reference/dashboards/retrieve-a-dashboard"
+    },
+    {
+      "source": "/reference/putv1dashboardsdashboardid",
+      "destination": "/api-reference/dashboards/update-a-dashboard"
+    },
+    {
+      "source": "/reference/getv1errorgroups",
+      "destination": "/api-reference/error-groups/list-all-error-groups"
+    },
+    {
+      "source": "/reference/getv1errorgroupscheckscheckid",
+      "destination": "/api-reference/error-groups/list-all-error-groups-for-a-specific-check"
+    },
+    {
+      "source": "/reference/getv1errorgroupsid",
+      "destination": "/api-reference/error-groups/retrieve-an-error-group"
+    },
+    {
+      "source": "/reference/patchv1errorgroupsid",
+      "destination": "/api-reference/error-groups/update-an-error-group"
+    },
+    {
+      "source": "/reference/postv1incidents",
+      "destination": "/api-reference/incidents/create-an-incident"
+    },
+    {
+      "source": "/reference/deletev1incidentsid",
+      "destination": "/api-reference/incidents/delete-an-incident"
+    },
+    {
+      "source": "/reference/getv1incidentsid",
+      "destination": "/api-reference/incidents/retrieve-an-incident"
+    },
+    {
+      "source": "/reference/putv1incidentsid",
+      "destination": "/api-reference/incidents/update-an-incident"
+    },
+    {
+      "source": "/reference/postv1incidentsincidentidupdates",
+      "destination": "/api-reference/incident-updates/create-an-incident-update"
+    },
+    {
+      "source": "/reference/deletev1incidentsincidentidupdatesid",
+      "destination": "/api-reference/incident-updates/delete-an-incident-update"
+    },
+    {
+      "source": "/reference/putv1incidentsincidentidupdatesid",
+      "destination": "/api-reference/incident-updates/update-an-incident-update"
+    },
+    {
+      "source": "/reference/getv1locations",
+      "destination": "/api-reference/location/lists-all-supported-locations"
+    },
+    {
+      "source": "/reference/getv1maintenancewindows",
+      "destination": "/api-reference/maintenance-windows/list-all-maintenance-windows"
+    },
+    {
+      "source": "/reference/postv1maintenancewindows",
+      "destination": "/api-reference/maintenance-windows/create-a-maintenance-window"
+    },
+    {
+      "source": "/reference/deletev1maintenancewindowsid",
+      "destination": "/api-reference/maintenance-windows/delete-a-maintenance-window"
+    },
+    {
+      "source": "/reference/getv1maintenancewindowsid",
+      "destination": "/api-reference/maintenance-windows/retrieve-a-maintenance-window"
+    },
+    {
+      "source": "/reference/putv1maintenancewindowsid",
+      "destination": "/api-reference/maintenance-windows/update-a-maintenance-window"
+    },
+    {
+      "source": "/reference/getv1maintenancewindowsidmaintenances",
+      "destination": "/api-reference/maintenance-windows/list-maintenances-for-a-maintenance-window"
+    },
+    {
+      "source": "/reference/deletev1maintenancewindowsidmaintenancesmaintenanceid",
+      "destination": "/api-reference/maintenance-windows/delete-a-maintenance"
+    },
+    {
+      "source": "/reference/getv1maintenancewindowsidmaintenancesmaintenanceid",
+      "destination": "/api-reference/maintenance-windows/retrieve-a-maintenance"
+    },
+    {
+      "source": "/reference/patchv1maintenancewindowsidmaintenancesmaintenanceid",
+      "destination": "/api-reference/maintenance-windows/update-maintenance-dates"
+    },
+    {
+      "source": "/reference/postv1maintenancewindowsidmaintenancesmaintenanceidupdates",
+      "destination": "/api-reference/maintenance-windows/create-a-maintenance-window-status-update"
+    },
+    {
+      "source": "/reference/deletev1maintenancewindowsidmaintenancesmaintenanceidupdatesupdateid",
+      "destination": "/api-reference/maintenance-windows/delete-a-maintenance-window-status-update"
+    },
+    {
+      "source": "/reference/putv1maintenancewindowsidmaintenancesmaintenanceidupdatesupdateid",
+      "destination": "/api-reference/maintenance-windows/update-a-maintenance-window-status-update"
+    },
+    {
+      "source": "/reference/getv1privatelocations",
+      "destination": "/api-reference/private-locations/list-all-private-locations"
+    },
+    {
+      "source": "/reference/postv1privatelocations",
+      "destination": "/api-reference/private-locations/create-a-private-location"
+    },
+    {
+      "source": "/reference/deletev1privatelocationsid",
+      "destination": "/api-reference/private-locations/remove-a-private-location"
+    },
+    {
+      "source": "/reference/getv1privatelocationsid",
+      "destination": "/api-reference/private-locations/retrieve-a-private-location"
+    },
+    {
+      "source": "/reference/putv1privatelocationsid",
+      "destination": "/api-reference/private-locations/update-a-private-location"
+    },
+    {
+      "source": "/reference/postv1privatelocationsidkeys",
+      "destination": "/api-reference/private-locations/generate-a-new-api-key-for-a-private-location"
+    },
+    {
+      "source": "/reference/deletev1privatelocationsidkeyskeyid",
+      "destination": "/api-reference/private-locations/remove-an-existing-api-key-for-a-private-location"
+    },
+    {
+      "source": "/reference/getv1privatelocationsidmetrics",
+      "destination": "/api-reference/private-locations/get-private-location-health-metrics-from-a-window-of-time"
+    },
+    {
+      "source": "/reference/getv1reporting",
+      "destination": "/api-reference/reporting/generates-a-report-with-aggregate-statistics-for-checks-and-check-groups"
+    },
+    {
+      "source": "/reference/postv1rootcauseanalyseserrorgroupserrorgroupid",
+      "destination": "/api-reference/rocky-ai/generate-a-root-cause-analysis-for-an-error-group"
+    },
+    {
+      "source": "/reference/postv1rootcauseanalysestestsessionerrorgroupstestsessionerrorgroupid",
+      "destination": "/api-reference/rocky-ai/generate-a-root-cause-analysis-for-a-test-session-error-group"
+    },
+    {
+      "source": "/reference/getv1rootcauseanalysesid",
+      "destination": "/api-reference/rocky-ai/retrieve-one-root-cause-analysis"
+    },
+    {
+      "source": "/reference/getv1runtimes",
+      "destination": "/api-reference/runtimes/lists-all-supported-runtimes"
+    },
+    {
+      "source": "/reference/getv1runtimesid",
+      "destination": "/api-reference/runtimes/shows-details-for-one-specific-runtime"
+    },
+    {
+      "source": "/reference/getv1snippets",
+      "destination": "/api-reference/snippets/list-all-snippets"
+    },
+    {
+      "source": "/reference/postv1snippets",
+      "destination": "/api-reference/snippets/create-a-snippet"
+    },
+    {
+      "source": "/reference/deletev1snippetsid",
+      "destination": "/api-reference/snippets/delete-a-snippet"
+    },
+    {
+      "source": "/reference/getv1snippetsid",
+      "destination": "/api-reference/snippets/retrieve-a-snippet"
+    },
+    {
+      "source": "/reference/putv1snippetsid",
+      "destination": "/api-reference/snippets/update-a-snippet"
+    },
+    {
+      "source": "/reference/getv1staticips",
+      "destination": "/api-reference/static-ips/lists-all-source-ips-for-check-runs"
+    },
+    {
+      "source": "/reference/getv1staticipsbyregion",
+      "destination": "/api-reference/static-ips/lists-all-source-ips-for-check-runs-1"
+    },
+    {
+      "source": "/reference/getv1staticipstxt",
+      "destination": "/api-reference/static-ips/lists-all-source-ips-for-check-runs-as-txt-file"
+    },
+    {
+      "source": "/reference/getv1staticipv6s",
+      "destination": "/api-reference/static-ips/lists-all-source-ipv6s-for-check-runs"
+    },
+    {
+      "source": "/reference/getv1staticipv6sbyregion",
+      "destination": "/api-reference/static-ips/lists-all-source-ipv6s-for-check-runs-1"
+    },
+    {
+      "source": "/reference/getv1staticipv6stxt",
+      "destination": "/api-reference/static-ips/lists-all-source-ipv6s-for-check-runs-as-a-txt-file"
+    },
+    {
+      "source": "/reference/getv1statuspages",
+      "destination": "/api-reference/status-pages/retrieve-all-status-pages"
+    },
+    {
+      "source": "/reference/postv1statuspages",
+      "destination": "/api-reference/status-pages/create-a-new-status-page"
+    },
+    {
+      "source": "/reference/getv1statuspagesincidents",
+      "destination": "/api-reference/status-page-incidents/retrieve-the-latest-incidents-with-pagination"
+    },
+    {
+      "source": "/reference/postv1statuspagesincidents",
+      "destination": "/api-reference/status-page-incidents/create-a-new-incident"
+    },
+    {
+      "source": "/reference/deletev1statuspagesincidentsincidentid",
+      "destination": "/api-reference/status-page-incidents/delete-an-incident"
+    },
+    {
+      "source": "/reference/getv1statuspagesincidentsincidentid",
+      "destination": "/api-reference/status-page-incidents/retrieve-an-incident-by-id"
+    },
+    {
+      "source": "/reference/putv1statuspagesincidentsincidentid",
+      "destination": "/api-reference/status-page-incidents/update-an-existing-incident"
+    },
+    {
+      "source": "/reference/getv1statuspagesincidentsincidentidincidentupdates",
+      "destination": "/api-reference/status-page-incidents/retrieve-the-100-latest-incident-updates-of-a-specific-incident"
+    },
+    {
+      "source": "/reference/postv1statuspagesincidentsincidentidincidentupdates",
+      "destination": "/api-reference/status-page-incidents/add-a-new-incident-update-to-a-specific-incident"
+    },
+    {
+      "source": "/reference/deletev1statuspagesincidentsincidentidincidentupdatesincidentupdateid",
+      "destination": "/api-reference/status-page-incidents/delete-an-incident-update"
+    },
+    {
+      "source": "/reference/getv1statuspagesincidentsincidentidincidentupdatesincidentupdateid",
+      "destination": "/api-reference/status-page-incidents/retrieve-an-incident-update-by-id"
+    },
+    {
+      "source": "/reference/putv1statuspagesincidentsincidentidincidentupdatesincidentupdateid",
+      "destination": "/api-reference/status-page-incidents/update-an-existing-incident-update"
+    },
+    {
+      "source": "/reference/getv1statuspagesservices",
+      "destination": "/api-reference/status-page-services/get-all-services"
+    },
+    {
+      "source": "/reference/postv1statuspagesservices",
+      "destination": "/api-reference/status-page-services/create-a-service"
+    },
+    {
+      "source": "/reference/deletev1statuspagesservicesserviceid",
+      "destination": "/api-reference/status-page-services/delete-a-service"
+    },
+    {
+      "source": "/reference/getv1statuspagesservicesserviceid",
+      "destination": "/api-reference/status-page-services/get-a-single-service"
+    },
+    {
+      "source": "/reference/putv1statuspagesservicesserviceid",
+      "destination": "/api-reference/status-page-services/update-a-service"
+    },
+    {
+      "source": "/reference/deletev1statuspagesstatuspageid",
+      "destination": "/api-reference/status-pages/delete-a-status-page"
+    },
+    {
+      "source": "/reference/getv1statuspagesstatuspageid",
+      "destination": "/api-reference/status-pages/retrieve-a-single-status-page-by-id"
+    },
+    {
+      "source": "/reference/putv1statuspagesstatuspageid",
+      "destination": "/api-reference/status-pages/update-an-existing-status-page"
+    },
+    {
+      "source": "/reference/getv1statuspagesstatuspageidsubscriptions",
+      "destination": "/api-reference/status-pages/get-all-subscriptions-for-a-specific-status-page"
+    },
+    {
+      "source": "/reference/postv1statuspagesstatuspageidsubscriptionsbulk",
+      "destination": "/api-reference/status-pages/bulk-create-subscriptions-for-a-specific-status-page"
+    },
+    {
+      "source": "/reference/deletev1statuspagesstatuspageidsubscriptionssubscriptionid",
+      "destination": "/api-reference/status-pages/delete-a-subscription-belonging-to-a-specific-status-page"
+    },
+    {
+      "source": "/reference/getv1testsessionerrorgroups",
+      "destination": "/api-reference/test-session-error-groups/list-all-test-session-error-groups"
+    },
+    {
+      "source": "/reference/getv1testsessionerrorgroupsprojectsprojectid",
+      "destination": "/api-reference/test-session-error-groups/list-all-test-session-error-groups-for-a-project"
+    },
+    {
+      "source": "/reference/getv1testsessionerrorgroupsid",
+      "destination": "/api-reference/test-session-error-groups/retrieve-a-test-session-error-group"
+    },
+    {
+      "source": "/reference/patchv1testsessionerrorgroupsid",
+      "destination": "/api-reference/test-session-error-groups/update-a-test-session-error-group"
+    },
+    {
+      "source": "/reference/getv1testsessions",
+      "destination": "/api-reference/test-sessions/list-test-sessions"
+    },
+    {
+      "source": "/reference/postv1testsessionstrigger",
+      "destination": "/api-reference/test-sessions/trigger-a-new-test-session"
+    },
+    {
+      "source": "/reference/getv1testsessionstestsessionid",
+      "destination": "/api-reference/test-sessions/retrieve-a-test-session"
+    },
+    {
+      "source": "/reference/postv1testsessionstestsessionidcancel",
+      "destination": "/api-reference/test-sessions/cancel-a-test-session"
+    },
+    {
+      "source": "/reference/getv1testsessionstestsessionidcompletion",
+      "destination": "/api-reference/test-sessions/await-the-completion-of-a-test-session"
+    },
+    {
+      "source": "/reference/getv1testsessionstestsessionidresultstestsessionresultid",
+      "destination": "/api-reference/test-sessions/retrieve-a-test-session-result"
+    },
+    {
+      "source": "/reference/getv1testsessionstestsessionidresultstestsessionresultidassets",
+      "destination": "/api-reference/test-sessions/retrieve-a-normalized-asset-manifest-for-a-test-session-result"
+    },
+    {
+      "source": "/reference/deletev1triggerscheckgroupsgroupid",
+      "destination": "/api-reference/triggers/delete-the-check-group-trigger"
+    },
+    {
+      "source": "/reference/getv1triggerscheckgroupsgroupid",
+      "destination": "/api-reference/triggers/get-the-check-group-trigger"
+    },
+    {
+      "source": "/reference/postv1triggerscheckgroupsgroupid",
+      "destination": "/api-reference/triggers/create-the-check-group-trigger"
+    },
+    {
+      "source": "/reference/deletev1triggerscheckscheckid",
+      "destination": "/api-reference/triggers/delete-the-check-trigger"
+    },
+    {
+      "source": "/reference/getv1triggerscheckscheckid",
+      "destination": "/api-reference/triggers/get-the-check-trigger"
+    },
+    {
+      "source": "/reference/postv1triggerscheckscheckid",
+      "destination": "/api-reference/triggers/create-the-check-trigger"
+    },
+    {
+      "source": "/reference/getv1variables",
+      "destination": "/api-reference/environment-variables/list-all-environment-variables"
+    },
+    {
+      "source": "/reference/postv1variables",
+      "destination": "/api-reference/environment-variables/create-an-environment-variable"
+    },
+    {
+      "source": "/reference/deletev1variableskey",
+      "destination": "/api-reference/environment-variables/delete-an-environment-variable"
+    },
+    {
+      "source": "/reference/getv1variableskey",
+      "destination": "/api-reference/environment-variables/retrieve-an-environment-variable"
+    },
+    {
+      "source": "/reference/putv1variableskey",
+      "destination": "/api-reference/environment-variables/update-an-environment-variable"
+    },
+    {
+      "source": "/reference/postv2checkgroups",
+      "destination": "/api-reference/check-groups/create-a-check-group-v2"
+    },
+    {
+      "source": "/reference/putv2checkgroupsid",
+      "destination": "/api-reference/check-groups/update-a-check-group-v2"
+    },
+    {
+      "source": "/reference/getv2checkresultscheckid",
+      "destination": "/api-reference/check-results/lists-all-check-results-1"
+    },
+    {
+      "source": "/reference/postv2checksessionstrigger",
+      "destination": "/api-reference/check-sessions/trigger-a-new-check-session-v2"
+    },
+    {
+      "source": "/reference/getv2checksessionschecksessionid",
+      "destination": "/api-reference/check-sessions/retrieve-a-check-session-v2"
+    },
+    {
+      "source": "/reference/getv2checksessionschecksessionidcompletion",
+      "destination": "/api-reference/check-sessions/await-the-completion-of-a-check-session-v2"
+    },
+    {
+      "source": "/reference/authentication",
+      "destination": "/api-reference/overview#authentication"
+    },
+    {
+      "source": "/reference/:slug*",
+      "destination": "/api-reference/overview"
     }
   ]
 }

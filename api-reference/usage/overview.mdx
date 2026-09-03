@@ -21,11 +21,7 @@ The Usage API shows how an organization is using its contract. Use it to check c
 
 ## Resolve usage terms and dates
 
-Each request selects one contract:
-
-- Pass `usageTermsId` to select a specific contract.
-- Otherwise, pass `to` to select the contract active on that date.
-- If you omit both values, `to` defaults to today.
+The API uses `to` to select the contract active on that date. If you omit `to`, it uses today's date.
 
 Dates use `YYYY-MM-DD` and include both the start and end date. If you omit `from`, the API uses the contract's `usageStartDate`. The API trims dates that fall outside the contract's usage window. Series responses include a `PARTIAL_WINDOW` warning when this happens.
 

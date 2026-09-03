@@ -166,6 +166,20 @@ Google Analytics tag ID (e.g. `G-XXXXXXXXXX`) embedded on the public page.
 Whether search engines may index the public page.
 </ResponseField>
 
+<ResponseField name="isPrivate" type="boolean" default="false">
+Protect the status page with a generated password. This requires the Communicate Team add-on.
+
+When a deployment enables password protection, the Checkly CLI prints the generated password once. Store it securely: Checkly does not retain the plaintext password and it cannot be retrieved later. An unchanged redeployment does not rotate the password.
+
+```ts highlight={4}
+new StatusPageV3("company-status", {
+  name: "Company Status",
+  url: "company-status",
+  isPrivate: true,
+})
+```
+</ResponseField>
+
 ## Referencing an existing page
 
 Use `StatusPageV3.fromId()` to attach components and automation rules declared in code to a page created in the UI, without managing the page itself:

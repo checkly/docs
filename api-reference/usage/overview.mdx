@@ -52,19 +52,8 @@ Summary projections compare four windows: usage since `usageStartDate`, the last
 
 ## Paginate a series
 
-When a series response contains a non-null `nextId`, send it unchanged with the same query parameters to retrieve the next page. `length` is the number of rows in the current page. A changed date range, filter, grouping, interval, or limit invalidates the cursor.
+Send a non-null `nextId` unchanged with the same query parameters to retrieve the next page. Changing a parameter invalidates the cursor.
 
 ## Handle errors
 
-Usage-specific errors include:
-
-| Code | Meaning |
-| --- | --- |
-| `ACCOUNT_NOT_IN_USAGE_TERMS` | A requested account is outside the resolved organization terms. |
-| `INVALID_CURSOR` | The cursor is malformed or does not match the current query. |
-| `INVALID_RANGE` | The requested dates are reversed or do not overlap the usage window. |
-| `NO_USAGE_TERMS` | No usage terms match the requested ID or date. |
-| `USAGE_TERMS_CONFLICT` | More than one set of usage terms matches the requested date. |
-| `USAGE_STORE_UNAVAILABLE` | The usage data store is temporarily unavailable. |
-
-The API can also return standard authentication, authorization, and rate-limit errors.
+The API returns `400` for invalid requests, `401` or `403` for authentication and permission errors, and `404` when no matching usage terms are found.

@@ -1,0 +1,70 @@
+---
+title: 'Usage API'
+sidebarTitle: 'Overview'
+description: 'Query organization usage terms, totals, projections, and time-series data with the Checkly Public API.'
+canonical: 'https://www.checklyhq.com/docs/api-reference/usage/overview/'
+---
+
+The Usage API reports contract usage for the organization associated with the account in your request. Use it to inspect contract terms, track consumed credits, and export usage data to your own reporting systems.
+
+<Accordion title="Before you begin">
+  You need a user or service API key and the ID of an account in the organization. Send the key in the `Authorization: Bearer <api-key>` header and the account ID in the `X-Checkly-Account` header. Your key must have the **Owner** or **Admin** role for that account. Legacy account API keys are not supported. See [Using the Checkly API](../overview) for authentication details.
+</Accordion>
+
+## Choose an endpoint
+
+| Endpoint | Use it to |
+| --- | --- |
+| [`GET /v1/usage/terms`](./get-usage-terms) | Resolve the applicable usage terms and list every account in the organization. |
+| [`GET /v1/usage/summary`](./get-usage-summary) | Return totals and projections for an inclusive date range. |
+| [`GET /v1/usage/series`](./get-usage-series) | Return paginated usage rows grouped by time, account, check type, or both dimensions. |
+
+## Resolve usage terms and dates
+
+Each request resolves one set of usage terms for the organization:
+
+- Pass `usageTermsId` to select a specific contract.
+- Otherwise, pass `to` to select the contract active on that date.
+- If you omit both values, `to` defaults to today.
+
+Dates use `YYYY-MM-DD` and are inclusive. For summary and series requests, `from` defaults to the contract's `usageStartDate`. When a requested range extends beyond the available usage window, the API clamps it to `usageStartDate` and `contractEndDate`. Series responses then include a `PARTIAL_WINDOW` warning.
+
+## Filter and group usage
+
+Summary and series requests accept `accountIds` and `checkTypes`. Repeat a parameter or provide comma-separated values. If you omit `accountIds`, the response covers every account in the resolved usage terms.
+
+The series endpoint also supports:
+
+- `interval`: `day` (default), `week`, `month`, or `total`. Weekly buckets start on Monday. Monthly buckets follow calendar months.
+- `groupBy`: `account`, `checkType`, or `account,checkType` (default).
+- `limit`: 1–500 rows per page; the default is 100.
+- `nextId`: the opaque cursor from the previous response.
+
+Rows are ordered by period, account ID, and check type. The API returns zero-valued rows for requested time and grouping combinations that have no usage, which keeps exported series structurally consistent.
+
+## Interpret metrics and credits
+
+Every `totals` or series row contains `credits` and a `CHECK_RUN` meter. Its `measures` object includes run outcomes, billable units, Multistep request counts, and Playwright billable duration in milliseconds.
+
+`credits.used` is calculated from standard and premium billable units using the rates in the resolved usage terms. It is `null` when a required rate is unavailable. Budget percentages, remaining credits, and exhaustion estimates are `null` when the credit budget is unavailable; projected credit totals remain available when the rates are known. Series responses report missing budgets or rates with `UNKNOWN_BUDGET` or `USAGE_TERMS_FLAGGED` warnings.
+
+Summary projections compare four windows: usage since `usageStartDate`, the last 30 days, the last 7 days, and the last day. Each window reports annualized budget percentage and, where meaningful, projected contract-end consumption and estimated weeks until the budget is exhausted.
+
+## Paginate a series
+
+When a series response contains a non-null `nextId`, send it unchanged with the same query parameters to retrieve the next page. `length` is the number of rows in the current page. A changed date range, filter, grouping, interval, or limit invalidates the cursor.
+
+## Handle errors
+
+Usage-specific errors include:
+
+| Code | Meaning |
+| --- | --- |
+| `ACCOUNT_NOT_IN_USAGE_TERMS` | A requested account is outside the resolved organization terms. |
+| `INVALID_CURSOR` | The cursor is malformed or does not match the current query. |
+| `INVALID_RANGE` | The requested dates are reversed or do not overlap the usage window. |
+| `NO_USAGE_TERMS` | No usage terms match the requested ID or date. |
+| `USAGE_TERMS_CONFLICT` | More than one set of usage terms matches the requested date. |
+| `USAGE_STORE_UNAVAILABLE` | The usage data store is temporarily unavailable. |
+
+The API can also return standard authentication, authorization, and rate-limit errors.

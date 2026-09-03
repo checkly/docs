@@ -1,54 +1,54 @@
 ---
 title: 'Usage API'
 sidebarTitle: 'Overview'
-description: 'Query organization usage terms, totals, projections, and time-series data with the Checkly Public API.'
+description: 'Get usage terms, totals, projections, and time-series data for an organization.'
 canonical: 'https://www.checklyhq.com/docs/api-reference/usage/overview/'
 ---
 
-The Usage API reports contract usage for the organization associated with the account in your request. Use it to inspect contract terms, track consumed credits, and export usage data to your own reporting systems.
+The Usage API shows how an organization is using its contract. Use it to check contract terms and credits or export data for reporting.
 
 <Accordion title="Before you begin">
-  You need a user or service API key and the ID of an account in the organization. Send the key in the `Authorization: Bearer <api-key>` header and the account ID in the `X-Checkly-Account` header. Your key must have the **Owner** or **Admin** role for that account. Legacy account API keys are not supported. See [Using the Checkly API](../overview) for authentication details.
+  You need a user or service API key with the **Owner** or **Admin** role for an account in the organization. Send the key in the `Authorization: Bearer <api-key>` header. Send the account ID in the `X-Checkly-Account` header. Legacy account API keys are not supported. See [Using the Checkly API](../overview) for authentication details.
 </Accordion>
 
 ## Choose an endpoint
 
 | Endpoint | Use it to |
 | --- | --- |
-| [`GET /v1/usage/terms`](./get-usage-terms) | Resolve the applicable usage terms and list every account in the organization. |
-| [`GET /v1/usage/summary`](./get-usage-summary) | Return totals and projections for an inclusive date range. |
-| [`GET /v1/usage/series`](./get-usage-series) | Return paginated usage rows grouped by time, account, check type, or both dimensions. |
+| [`GET /v1/usage/terms`](./get-usage-terms) | Get contract dates, credit rates, and organization accounts. |
+| [`GET /v1/usage/summary`](./get-usage-summary) | Get totals and projections for a date range. |
+| [`GET /v1/usage/series`](./get-usage-series) | Get paginated usage grouped over time. |
 
 ## Resolve usage terms and dates
 
-Each request resolves one set of usage terms for the organization:
+Each request selects one contract:
 
 - Pass `usageTermsId` to select a specific contract.
 - Otherwise, pass `to` to select the contract active on that date.
 - If you omit both values, `to` defaults to today.
 
-Dates use `YYYY-MM-DD` and are inclusive. For summary and series requests, `from` defaults to the contract's `usageStartDate`. When a requested range extends beyond the available usage window, the API clamps it to `usageStartDate` and `contractEndDate`. Series responses then include a `PARTIAL_WINDOW` warning.
+Dates use `YYYY-MM-DD` and include both the start and end date. If you omit `from`, the API uses the contract's `usageStartDate`. The API trims dates that fall outside the contract's usage window. Series responses include a `PARTIAL_WINDOW` warning when this happens.
 
 ## Filter and group usage
 
-Summary and series requests accept `accountIds` and `checkTypes`. Repeat a parameter or provide comma-separated values. If you omit `accountIds`, the response covers every account in the resolved usage terms.
+Summary and series requests accept `accountIds` and `checkTypes`. Repeat a parameter or separate values with commas. Omit `accountIds` to include every account in the selected contract.
 
 The series endpoint also supports:
 
-- `interval`: `day` (default), `week`, `month`, or `total`. Weekly buckets start on Monday. Monthly buckets follow calendar months.
-- `groupBy`: `account`, `checkType`, or `account,checkType` (default).
-- `limit`: 1–500 rows per page; the default is 100.
+- `interval`: `day`, `week`, `month`, or `total`. The default is `day`. Weekly buckets start on Monday. Monthly buckets follow calendar months.
+- `groupBy`: `account`, `checkType`, or `account,checkType`. The default is `account,checkType`.
+- `limit`: From 1 to 500 rows per page. The default is 100.
 - `nextId`: the opaque cursor from the previous response.
 
-Rows are ordered by period, account ID, and check type. The API returns zero-valued rows for requested time and grouping combinations that have no usage, which keeps exported series structurally consistent.
+The API orders rows by period, account ID, and check type. It includes rows with zero usage, so clients do not have to fill gaps before building tables or charts.
 
 ## Interpret metrics and credits
 
-Every `totals` or series row contains `credits` and a `CHECK_RUN` meter. Its `measures` object includes run outcomes, billable units, Multistep request counts, and Playwright billable duration in milliseconds.
+Summary totals and series rows include `credits` and a `CHECK_RUN` meter. The meter reports run outcomes, billable units, Multistep requests, and Playwright billable duration in milliseconds.
 
-`credits.used` is calculated from standard and premium billable units using the rates in the resolved usage terms.
+The API calculates `credits.used` from standard and premium billable units using the contract's rates.
 
-Summary projections compare four windows: usage since `usageStartDate`, the last 30 days, the last 7 days, and the last day. Each window reports annualized budget percentage and, where meaningful, projected contract-end consumption and estimated weeks until the budget is exhausted.
+Summary projections cover usage since `usageStartDate`, the last 30 days, the last 7 days, and the last day. They show annualized budget use, projected usage at the end of the contract, and the estimated time until credits run out.
 
 ## Paginate a series
 

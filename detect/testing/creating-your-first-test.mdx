@@ -54,9 +54,9 @@ my-checkly-project/
 
 Open `checkly.config.ts` to configure your monitoring setup:
 
-```ts Checkly.config.ts
-import { defineConfig } from '@checkly/cli'
-import { Frequency } from '@checkly/cli/constructs'
+```ts checkly.config.ts
+import { defineConfig } from 'checkly'
+import { Frequency } from 'checkly/constructs'
 
 export default defineConfig({
   projectName: 'My First Checkly Project',
@@ -147,9 +147,8 @@ After deployment, you can:
 
 For more control over your browser checks:
 
-```ts Checkly.config.ts
-// __checks__/advanced-browser.check.ts
-import { BrowserCheck, Frequency } from '@checkly/cli/constructs'
+```ts __checks__/advanced-browser.check.ts
+import { BrowserCheck, Frequency } from 'checkly/constructs'
 
 new BrowserCheck('advanced-check', {
   name: 'Advanced Browser Check',
@@ -161,7 +160,7 @@ new BrowserCheck('advanced-check', {
     entrypoint: './advanced-test.spec.ts',
   },
   retryStrategy: {
-    type: 'linear',
+    type: 'LINEAR',
     baseBackoffSeconds: 60,
     maxRetries: 2,
   },

@@ -196,8 +196,8 @@ Next up, we want to create our `checkly.config.ts` file and include the basic Ch
 <Tabs>
 <Tab title="checkly.config.ts">
 ```ts checkly.config.ts
-import { defineConfig } from '@checkly/cli'
-import { Frequency } from '@checkly/cli/constructs'
+import { defineConfig } from 'checkly'
+import { Frequency } from 'checkly/constructs'
 
 export default defineConfig({
  projectName: 'Website Monitoring',
@@ -237,7 +237,7 @@ $ npx checkly login
 ? Do you allow to open the browser to continue with login? Yes
 ? Which account do you want to use? TestCheckly
 Successfully logged in as Hannes Lenke
-Welcome to @checkly/cli 🦝
+Welcome to the Checkly CLI
 ```
 
 Now it's time to test run your browser checks on Checkly:
@@ -286,7 +286,7 @@ Browser Checks are now there to keep us informed on the status of our key websit
 <Tab title="API check resource">
 ```ts api.check.ts
 // __check__/api.check.ts
-import { Frequency, ApiCheck, AssertionBuilder } from '@checkly/cli/constructs'
+import { Frequency, ApiCheck, AssertionBuilder } from 'checkly/constructs'
 
 const api = new ApiCheck('webstore-list-books', {
   name: 'List Books API',
@@ -317,7 +317,7 @@ Now that we have our Checks in place, we want to set up alerting to ensure we ar
 
 ```ts alert-channels.ts
 // alert-channels.ts
-import { EmailAlertChannel } from '@checkly/cli/constructs'
+import { EmailAlertChannel } from 'checkly/constructs'
 
 const sendDefaults = {
   sendFailure: true,
@@ -335,8 +335,8 @@ We are setting up things so that we are alerted when our Check starts failing, a
 
 ```ts api.check.ts
 // __check__/api.check.ts
-import { Frequency, ApiCheck, AssertionBuilder } from '@checkly/cli/constructs'
-import { emailChannel } from './alert-Channels'
+import { Frequency, ApiCheck, AssertionBuilder } from 'checkly/constructs'
+import { emailChannel } from './alert-channels'
 
 const api = new ApiCheck('webstore-list-books', {
   name: 'List Books API',

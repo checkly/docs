@@ -96,7 +96,7 @@ new ApiCheck('books-api-check-1', {
     entrypoint: path.join(__dirname, './utils/setup.ts'),
   },
   request: {
-    url: '{{ENVIRONMENT_URL}}' || 'https://danube-web.shop/api/books',
+    url: '{{ENVIRONMENT_URL}}',
     method: 'GET',
     followRedirects: true,
     skipSSL: false,
@@ -114,8 +114,9 @@ npx checkly test -e ENVIRONMENT_URL="https://staging.checklyhq.com"
 
 - Notice that we pass in the variable using the `-e` flag. This means it will be passed to the cloud environment and made
 available during runtime.
-- After deploying this check, the `ENVIRONMENT_URL` needs to be set at the Account, Group or Check level. If not set, the Check
-will use the fallback URL.
+- After deploying this check, the `ENVIRONMENT_URL` needs to be set at the Account, Group or Check level. Handlebars variables have no
+fallback, so the check will not work until the variable is set. Only script code, like the Playwright example above, can
+provide a fallback value.
 - Prepending the variable like `ENVIRONMENT_URL="https://staging.checklyhq.com" npx checkly test` has no effect as local
 environment variables are not replaced in code dependencies.
 

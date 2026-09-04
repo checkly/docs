@@ -34,20 +34,18 @@ This creates the basic project structure with configuration files and example mo
 <CodeGroup dropdown>
 
 ```ts url-monitor.check.ts
-import { UrlMonitor, UrlAssertionBuilder } from 'checkly/constructs'
+import { Frequency, UrlMonitor, UrlAssertionBuilder } from 'checkly/constructs'
 
 new UrlMonitor('homepage-check', {
   name: 'Homepage Availability',
   activated: true,
   locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
-  frequency: 5, // minutes
+  frequency: Frequency.EVERY_5M,
+  maxResponseTime: 2000, // ms
   request: {
-    method: 'GET',
     url: 'https://www.myapp.com',
     assertions: [
       UrlAssertionBuilder.statusCode().equals(200),
-      UrlAssertionBuilder.responseTime().lessThan(2000),
-      UrlAssertionBuilder.body().contains('Welcome to MyApp'),
     ]
   },
   tags: ['production', 'frontend', 'critical']
@@ -55,20 +53,18 @@ new UrlMonitor('homepage-check', {
 ```
 
 ```js url-monitor.check.js
-const { UrlMonitor, UrlAssertionBuilder } = require('checkly/constructs')
+const { Frequency, UrlMonitor, UrlAssertionBuilder } = require('checkly/constructs')
 
 new UrlMonitor('homepage-check', {
   name: 'Homepage Availability',
   activated: true,
   locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
-  frequency: 5, // minutes
+  frequency: Frequency.EVERY_5M,
+  maxResponseTime: 2000, // ms
   request: {
-    method: 'GET',
     url: 'https://www.myapp.com',
     assertions: [
       UrlAssertionBuilder.statusCode().equals(200),
-      UrlAssertionBuilder.responseTime().lessThan(2000),
-      UrlAssertionBuilder.body().contains('Welcome to MyApp'),
     ]
   },
   tags: ['production', 'frontend', 'critical']
@@ -77,62 +73,66 @@ new UrlMonitor('homepage-check', {
 
 </CodeGroup>
 
-### Advanced URL Monitor with Authentication
+### Advanced URL Monitor with Response Time Limits
+
+URL monitors only assert on the HTTP status code. If you need to send custom headers or assert on the response body, use an [API check](/detect/synthetic-monitoring/api-checks/overview) instead.
+
+The samples on this page define their alert channels inline to stay self-contained. In a real project, define each [alert channel](/constructs/alert-channel) once in a shared file, export it, and import it where needed; a logical ID may only be used once per project.
 
 <CodeGroup dropdown>
 
 ```ts api-monitor.check.ts
-import { UrlMonitor, UrlAssertionBuilder } from 'checkly/constructs'
+import { Frequency, UrlMonitor, UrlAssertionBuilder, EmailAlertChannel, SlackAppAlertChannel } from 'checkly/constructs'
+
+const emailAlerts = new EmailAlertChannel('email-alerts', {
+  address: 'ops@myapp.com'
+})
+const slackAlerts = new SlackAppAlertChannel('slack-alerts', {
+  slackChannels: ['#alerts']
+})
 
 new UrlMonitor('api-health-check', {
   name: 'API Health Check',
   activated: true,
   locations: ['us-east-1', 'eu-west-1'],
-  frequency: 2, // minutes
+  frequency: Frequency.EVERY_2M,
+  degradedResponseTime: 500, // ms
+  maxResponseTime: 1000, // ms
   request: {
-    method: 'GET',
     url: 'https://api.myapp.com/health',
-    headers: {
-      'Authorization': 'Bearer {{API_TOKEN}}',
-      'Content-Type': 'application/json',
-      'User-Agent': 'Checkly Monitor'
-    },
     assertions: [
       UrlAssertionBuilder.statusCode().equals(200),
-      UrlAssertionBuilder.responseTime().lessThan(1000),
-      UrlAssertionBuilder.jsonBody('$.status').equals('healthy'),
-      UrlAssertionBuilder.jsonBody('$.version').exists(),
     ]
   },
-  alertChannels: ['email-alerts', 'slack-alerts'],
+  alertChannels: [emailAlerts, slackAlerts],
   tags: ['production', 'api', 'critical']
 })
 ```
 
 ```js api-monitor.check.js
-const { UrlMonitor, UrlAssertionBuilder } = require('checkly/constructs')
+const { Frequency, UrlMonitor, UrlAssertionBuilder, EmailAlertChannel, SlackAppAlertChannel } = require('checkly/constructs')
+
+const emailAlerts = new EmailAlertChannel('email-alerts', {
+  address: 'ops@myapp.com'
+})
+const slackAlerts = new SlackAppAlertChannel('slack-alerts', {
+  slackChannels: ['#alerts']
+})
 
 new UrlMonitor('api-health-check', {
   name: 'API Health Check',
   activated: true,
   locations: ['us-east-1', 'eu-west-1'],
-  frequency: 2, // minutes
+  frequency: Frequency.EVERY_2M,
+  degradedResponseTime: 500, // ms
+  maxResponseTime: 1000, // ms
   request: {
-    method: 'GET',
     url: 'https://api.myapp.com/health',
-    headers: {
-      'Authorization': 'Bearer {{API_TOKEN}}',
-      'Content-Type': 'application/json',
-      'User-Agent': 'Checkly Monitor'
-    },
     assertions: [
       UrlAssertionBuilder.statusCode().equals(200),
-      UrlAssertionBuilder.responseTime().lessThan(1000),
-      UrlAssertionBuilder.jsonBody('$.status').equals('healthy'),
-      UrlAssertionBuilder.jsonBody('$.version').exists(),
     ]
   },
-  alertChannels: ['email-alerts', 'slack-alerts'],
+  alertChannels: [emailAlerts, slackAlerts],
   tags: ['production', 'api', 'critical']
 })
 ```
@@ -146,84 +146,82 @@ new UrlMonitor('api-health-check', {
 <CodeGroup dropdown>
 
 ```ts database-monitor.check.ts
-import { TcpMonitor } from 'checkly/constructs'
+import { Frequency, TcpMonitor } from 'checkly/constructs'
 
 new TcpMonitor('database-tcp-check', {
   name: 'Production Database Connection',
   activated: true,
   locations: ['us-east-1', 'eu-west-1'],
-  frequency: 5, // minutes
-  target: {
-    host: 'db.myapp.com',
+  frequency: Frequency.EVERY_5M,
+  degradedResponseTime: 3000, // ms
+  request: {
+    hostname: 'db.myapp.com',
     port: 5432
   },
-  timeout: 10, // seconds
   tags: ['production', 'database', 'infrastructure']
 })
 ```
 
 ```js database-monitor.check.js
-const { TcpMonitor } = require('checkly/constructs')
+const { Frequency, TcpMonitor } = require('checkly/constructs')
 
 new TcpMonitor('database-tcp-check', {
   name: 'Production Database Connection',
   activated: true,
   locations: ['us-east-1', 'eu-west-1'],
-  frequency: 5, // minutes
-  target: {
-    host: 'db.myapp.com',
+  frequency: Frequency.EVERY_5M,
+  degradedResponseTime: 3000, // ms
+  request: {
+    hostname: 'db.myapp.com',
     port: 5432
   },
-  timeout: 10, // seconds
   tags: ['production', 'database', 'infrastructure']
 })
 ```
 
 </CodeGroup>
 
-### TCP Monitor with SSL and Response Validation
+### TCP Monitor with Response Validation
 
 <CodeGroup dropdown>
 
 ```ts mail-server-monitor.check.ts
-import { TcpMonitor } from 'checkly/constructs'
+import { Frequency, TcpMonitor, TcpAssertionBuilder } from 'checkly/constructs'
 
 new TcpMonitor('mail-server-check', {
   name: 'SMTP Server Monitoring',
   activated: true,
   locations: ['us-east-1', 'eu-west-1'],
-  frequency: 10, // minutes
-  target: {
-    host: 'mail.myapp.com',
+  frequency: Frequency.EVERY_10M,
+  degradedResponseTime: 3000, // ms
+  request: {
+    hostname: 'mail.myapp.com',
     port: 587,
-    ssl: true
-  },
-  timeout: 15, // seconds
-  responseValidation: {
-    expectedResponse: '220',
-    timeout: 5
+    assertions: [
+      // The SMTP server greets with a "220" banner on connect
+      TcpAssertionBuilder.responseData().contains('220'),
+    ]
   },
   tags: ['production', 'mail', 'infrastructure']
 })
 ```
 
 ```js mail-server-monitor.check.js
-const { TcpMonitor } = require('checkly/constructs')
+const { Frequency, TcpMonitor, TcpAssertionBuilder } = require('checkly/constructs')
 
 new TcpMonitor('mail-server-check', {
   name: 'SMTP Server Monitoring',
   activated: true,
   locations: ['us-east-1', 'eu-west-1'],
-  frequency: 10, // minutes
-  target: {
-    host: 'mail.myapp.com',
+  frequency: Frequency.EVERY_10M,
+  degradedResponseTime: 3000, // ms
+  request: {
+    hostname: 'mail.myapp.com',
     port: 587,
-    ssl: true
-  },
-  timeout: 15, // seconds
-  responseValidation: {
-    expectedResponse: '220',
-    timeout: 5
+    assertions: [
+      // The SMTP server greets with a "220" banner on connect
+      TcpAssertionBuilder.responseData().contains('220'),
+    ]
   },
   tags: ['production', 'mail', 'infrastructure']
 })
@@ -243,8 +241,10 @@ import { HeartbeatMonitor } from 'checkly/constructs'
 new HeartbeatMonitor('daily-backup-heartbeat', {
   name: 'Daily Database Backup',
   activated: true,
-  period: 24 * 60, // 24 hours in minutes
+  period: 24,
+  periodUnit: 'hours',
   grace: 30, // 30 minutes grace period
+  graceUnit: 'minutes',
   tags: ['backup', 'database', 'daily']
 })
 ```
@@ -255,8 +255,10 @@ const { HeartbeatMonitor } = require('checkly/constructs')
 new HeartbeatMonitor('daily-backup-heartbeat', {
   name: 'Daily Database Backup',
   activated: true,
-  period: 24 * 60, // 24 hours in minutes
+  period: 24,
+  periodUnit: 'hours',
   grace: 30, // 30 minutes grace period
+  graceUnit: 'minutes',
   tags: ['backup', 'database', 'daily']
 })
 ```
@@ -268,27 +270,47 @@ new HeartbeatMonitor('daily-backup-heartbeat', {
 <CodeGroup dropdown>
 
 ```ts sync-job-heartbeat.check.ts
-import { HeartbeatMonitor } from 'checkly/constructs'
+import { HeartbeatMonitor, PagerdutyAlertChannel, SlackAppAlertChannel } from 'checkly/constructs'
+
+const pagerdutyCritical = new PagerdutyAlertChannel('pagerduty-critical', {
+  serviceName: 'Data platform',
+  serviceKey: 'your-pagerduty-integration-key'
+})
+const slackOps = new SlackAppAlertChannel('slack-ops', {
+  slackChannels: ['#ops']
+})
 
 new HeartbeatMonitor('hourly-sync-heartbeat', {
   name: 'Hourly Data Sync Job',
   activated: true,
-  period: 60, // 1 hour in minutes
+  period: 1,
+  periodUnit: 'hours',
   grace: 10, // 10 minutes grace period
-  alertChannels: ['pagerduty-critical', 'slack-ops'],
+  graceUnit: 'minutes',
+  alertChannels: [pagerdutyCritical, slackOps],
   tags: ['sync', 'data', 'hourly', 'critical']
 })
 ```
 
 ```js sync-job-heartbeat.check.js
-const { HeartbeatMonitor } = require('checkly/constructs')
+const { HeartbeatMonitor, PagerdutyAlertChannel, SlackAppAlertChannel } = require('checkly/constructs')
+
+const pagerdutyCritical = new PagerdutyAlertChannel('pagerduty-critical', {
+  serviceName: 'Data platform',
+  serviceKey: 'your-pagerduty-integration-key'
+})
+const slackOps = new SlackAppAlertChannel('slack-ops', {
+  slackChannels: ['#ops']
+})
 
 new HeartbeatMonitor('hourly-sync-heartbeat', {
   name: 'Hourly Data Sync Job',
   activated: true,
-  period: 60, // 1 hour in minutes
+  period: 1,
+  periodUnit: 'hours',
   grace: 10, // 10 minutes grace period
-  alertChannels: ['pagerduty-critical', 'slack-ops'],
+  graceUnit: 'minutes',
+  alertChannels: [pagerdutyCritical, slackOps],
   tags: ['sync', 'data', 'hourly', 'critical']
 })
 ```
@@ -303,15 +325,22 @@ Organize related monitors using groups:
 
 <CodeGroup dropdown>
 
-```ts api-monitoring-group.ts
-import { MonitorGroup } from 'checkly/constructs'
+```ts api-monitoring-group.check.ts
+import { Frequency, CheckGroupV2, UrlMonitor, EmailAlertChannel, SlackAppAlertChannel } from 'checkly/constructs'
 
-const apiGroup = new MonitorGroup('api-monitoring', {
+const emailAlerts = new EmailAlertChannel('email-alerts', {
+  address: 'ops@myapp.com'
+})
+const slackApiAlerts = new SlackAppAlertChannel('slack-api-alerts', {
+  slackChannels: ['#api-alerts']
+})
+
+const apiGroup = new CheckGroupV2('api-monitoring', {
   name: 'API Monitoring',
   activated: true,
   locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
-  frequency: 5,
-  alertChannels: ['email-alerts', 'slack-api-alerts'],
+  frequency: Frequency.EVERY_5M,
+  alertChannels: [emailAlerts, slackApiAlerts],
   tags: ['api', 'production']
 })
 
@@ -320,8 +349,7 @@ new UrlMonitor('users-api', {
   name: 'Users API',
   group: apiGroup,
   request: {
-    url: 'https://api.myapp.com/users',
-    method: 'GET'
+    url: 'https://api.myapp.com/users'
   }
 })
 
@@ -329,21 +357,27 @@ new UrlMonitor('orders-api', {
   name: 'Orders API',
   group: apiGroup,
   request: {
-    url: 'https://api.myapp.com/orders',
-    method: 'GET'
+    url: 'https://api.myapp.com/orders'
   }
 })
 ```
 
-```js api-monitoring-group.js
-const { MonitorGroup, UrlMonitor } = require('checkly/constructs')
+```js api-monitoring-group.check.js
+const { Frequency, CheckGroupV2, UrlMonitor, EmailAlertChannel, SlackAppAlertChannel } = require('checkly/constructs')
 
-const apiGroup = new MonitorGroup('api-monitoring', {
+const emailAlerts = new EmailAlertChannel('email-alerts', {
+  address: 'ops@myapp.com'
+})
+const slackApiAlerts = new SlackAppAlertChannel('slack-api-alerts', {
+  slackChannels: ['#api-alerts']
+})
+
+const apiGroup = new CheckGroupV2('api-monitoring', {
   name: 'API Monitoring',
   activated: true,
   locations: ['us-east-1', 'eu-west-1', 'ap-southeast-1'],
-  frequency: 5,
-  alertChannels: ['email-alerts', 'slack-api-alerts'],
+  frequency: Frequency.EVERY_5M,
+  alertChannels: [emailAlerts, slackApiAlerts],
   tags: ['api', 'production']
 })
 
@@ -352,8 +386,7 @@ new UrlMonitor('users-api', {
   name: 'Users API',
   group: apiGroup,
   request: {
-    url: 'https://api.myapp.com/users',
-    method: 'GET'
+    url: 'https://api.myapp.com/users'
   }
 })
 
@@ -361,22 +394,21 @@ new UrlMonitor('orders-api', {
   name: 'Orders API',
   group: apiGroup,
   request: {
-    url: 'https://api.myapp.com/orders',
-    method: 'GET'
+    url: 'https://api.myapp.com/orders'
   }
 })
 ```
 
 </CodeGroup>
 
-### Environment Variables and Secrets
+### Environment Variables
 
-Use environment variables for configuration:
+Use environment variables to vary the configuration per environment:
 
 <CodeGroup dropdown>
 
-```ts environment-config.ts
-import { UrlMonitor, UrlAssertionBuilder } from 'checkly/constructs'
+```ts environment-config.check.ts
+import { Frequency, UrlMonitor, UrlAssertionBuilder } from 'checkly/constructs'
 
 // Environment-specific configuration
 const baseUrl = process.env.BASE_URL || 'https://api.myapp.com'
@@ -388,25 +420,20 @@ new UrlMonitor(`${environment}-api-check`, {
   locations: environment === 'production'
     ? ['us-east-1', 'eu-west-1', 'ap-southeast-1']
     : ['us-east-1'],
-  frequency: environment === 'production' ? 2 : 10,
+  frequency: environment === 'production' ? Frequency.EVERY_2M : Frequency.EVERY_10M,
+  maxResponseTime: environment === 'production' ? 2000 : 5000, // ms
   request: {
-    method: 'GET',
     url: `${baseUrl}/health`,
-    headers: {
-      'Authorization': 'Bearer {{API_TOKEN}}',
-      'X-Environment': environment
-    },
     assertions: [
       UrlAssertionBuilder.statusCode().equals(200),
-      UrlAssertionBuilder.jsonBody('$.environment').equals(environment),
     ]
   },
   tags: [environment, 'api', 'health']
 })
 ```
 
-```js environment-config.js
-const { UrlMonitor, UrlAssertionBuilder } = require('checkly/constructs')
+```js environment-config.check.js
+const { Frequency, UrlMonitor, UrlAssertionBuilder } = require('checkly/constructs')
 
 // Environment-specific configuration
 const baseUrl = process.env.BASE_URL || 'https://api.myapp.com'
@@ -418,17 +445,12 @@ new UrlMonitor(`${environment}-api-check`, {
   locations: environment === 'production'
     ? ['us-east-1', 'eu-west-1', 'ap-southeast-1']
     : ['us-east-1'],
-  frequency: environment === 'production' ? 2 : 10,
+  frequency: environment === 'production' ? Frequency.EVERY_2M : Frequency.EVERY_10M,
+  maxResponseTime: environment === 'production' ? 2000 : 5000, // ms
   request: {
-    method: 'GET',
     url: `${baseUrl}/health`,
-    headers: {
-      'Authorization': 'Bearer {{API_TOKEN}}',
-      'X-Environment': environment
-    },
     assertions: [
       UrlAssertionBuilder.statusCode().equals(200),
-      UrlAssertionBuilder.jsonBody('$.environment').equals(environment),
     ]
   },
   tags: [environment, 'api', 'health']
@@ -478,7 +500,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -507,8 +529,8 @@ Generate monitors programmatically:
 
 <CodeGroup dropdown>
 
-```ts dynamic-monitors.ts
-import { UrlMonitor, UrlAssertionBuilder } from 'checkly/constructs'
+```ts dynamic-monitors.check.ts
+import { Frequency, UrlMonitor, UrlAssertionBuilder } from 'checkly/constructs'
 
 // Monitor multiple API endpoints
 const endpoints = [
@@ -523,15 +545,12 @@ endpoints.forEach((endpoint, index) => {
     name: endpoint.name,
     activated: true,
     locations: ['us-east-1', 'eu-west-1'],
-    frequency: endpoint.path === '/payments' ? 1 : 5, // More frequent for critical endpoints
+    frequency: endpoint.path === '/payments' ? Frequency.EVERY_1M : Frequency.EVERY_5M, // More frequent for critical endpoints
+    maxResponseTime: endpoint.path === '/payments' ? 500 : 1000, // Stricter limit for critical endpoints
     request: {
-      method: 'GET',
       url: `https://api.myapp.com${endpoint.path}`,
       assertions: [
         UrlAssertionBuilder.statusCode().equals(200),
-        UrlAssertionBuilder.responseTime().lessThan(
-          endpoint.path === '/payments' ? 500 : 1000
-        ),
       ]
     },
     tags: ['api', 'production', endpoint.path.replace('/', '')]
@@ -539,8 +558,8 @@ endpoints.forEach((endpoint, index) => {
 })
 ```
 
-```js dynamic-monitors.js
-const { UrlMonitor, UrlAssertionBuilder } = require('checkly/constructs')
+```js dynamic-monitors.check.js
+const { Frequency, UrlMonitor, UrlAssertionBuilder } = require('checkly/constructs')
 
 // Monitor multiple API endpoints
 const endpoints = [
@@ -555,15 +574,12 @@ endpoints.forEach((endpoint, index) => {
     name: endpoint.name,
     activated: true,
     locations: ['us-east-1', 'eu-west-1'],
-    frequency: endpoint.path === '/payments' ? 1 : 5, // More frequent for critical endpoints
+    frequency: endpoint.path === '/payments' ? Frequency.EVERY_1M : Frequency.EVERY_5M, // More frequent for critical endpoints
+    maxResponseTime: endpoint.path === '/payments' ? 500 : 1000, // Stricter limit for critical endpoints
     request: {
-      method: 'GET',
       url: `https://api.myapp.com${endpoint.path}`,
       assertions: [
         UrlAssertionBuilder.statusCode().equals(200),
-        UrlAssertionBuilder.responseTime().lessThan(
-          endpoint.path === '/payments' ? 500 : 1000
-        ),
       ]
     },
     tags: ['api', 'production', endpoint.path.replace('/', '')]
@@ -583,7 +599,6 @@ Centralized configuration management:
 interface MonitoringConfig {
   baseUrl: string
   locations: string[]
-  alertChannels: string[]
   defaultFrequency: number
   environment: string
 }
@@ -593,9 +608,6 @@ export const config: MonitoringConfig = {
   locations: process.env.ENVIRONMENT === 'production'
     ? ['us-east-1', 'eu-west-1', 'ap-southeast-1']
     : ['us-east-1'],
-  alertChannels: process.env.ENVIRONMENT === 'production'
-    ? ['email-alerts', 'slack-alerts', 'pagerduty']
-    : ['email-alerts'],
   defaultFrequency: process.env.ENVIRONMENT === 'production' ? 5 : 15,
   environment: process.env.ENVIRONMENT || 'development'
 }
@@ -607,9 +619,6 @@ const config = {
   locations: process.env.ENVIRONMENT === 'production'
     ? ['us-east-1', 'eu-west-1', 'ap-southeast-1']
     : ['us-east-1'],
-  alertChannels: process.env.ENVIRONMENT === 'production'
-    ? ['email-alerts', 'slack-alerts', 'pagerduty']
-    : ['email-alerts'],
   defaultFrequency: process.env.ENVIRONMENT === 'production' ? 5 : 15,
   environment: process.env.ENVIRONMENT || 'development'
 }
@@ -639,6 +648,7 @@ monitoring/
 ├── groups/
 │   ├── api-group.ts
 │   └── infrastructure-group.ts
+├── alert-channels.ts
 └── checkly.config.ts
 ```
 

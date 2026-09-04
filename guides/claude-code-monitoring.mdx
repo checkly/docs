@@ -162,7 +162,7 @@ Add comments to the check.ts file defining how each line configures the checkly 
 The result is a nicely commented version of and a good tour of this construct:
 ```ts {title="book-detail-visibility.check.ts"}
 // Import Checkly constructs for browser checks, alert escalation, and retry strategies
-import { AlertEscalationBuilder, BrowserCheck, RetryStrategyBuilder } from 'checkly/constructs'
+import { Frequency, AlertEscalationBuilder, BrowserCheck, RetryStrategyBuilder } from 'checkly/constructs'
 
 // Create a new browser check with unique logical ID
 new BrowserCheck('book-detail-visibility-check-v1', {
@@ -184,8 +184,8 @@ new BrowserCheck('book-detail-visibility-check-v1', {
     'us-east-1', // US East (N. Virginia)
     'eu-west-1', // EU West (Ireland)
   ],
-  // How often the check runs in minutes
-  frequency: 30,
+  // How often the check runs
+  frequency: Frequency.EVERY_30M,
   // Alert escalation policy defining when and how alerts are sent
   alertEscalationPolicy: AlertEscalationBuilder.runBasedEscalation(1, {
     // Number of failed runs before sending alert (0 = immediate)

@@ -1,0 +1,55 @@
+---
+title: 'Usage API'
+sidebarTitle: 'Overview'
+description: 'Get usage terms, totals, projections, and time-series data for an organization.'
+canonical: 'https://www.checklyhq.com/docs/api-reference/usage/overview/'
+---
+
+The Usage API shows how an organization is using its contract. Use it to check contract terms and credits or export data for reporting.
+
+<Accordion title="Before you begin">
+  You need a user or service API key with the **Owner** or **Admin** role for an account in the organization. Send the key in the `Authorization: Bearer <api-key>` header. Send the account ID in the `X-Checkly-Account` header. Legacy account API keys are not supported. See [Using the Checkly API](../overview) for authentication details.
+</Accordion>
+
+## Choose an endpoint
+
+| Endpoint | Use it to |
+| --- | --- |
+| [`GET /v1/usage/terms`](./get-usage-terms) | Get contract dates, credit rates, and organization accounts. |
+| [`GET /v1/usage/summary`](./get-usage-summary) | Get totals and projections for a date range. |
+| [`GET /v1/usage/series`](./get-usage-series) | Get paginated usage grouped over time. |
+
+## Resolve usage terms and dates
+
+The API uses `to` to select the contract active on that date. If you omit `to`, it uses today's date.
+
+Dates use `YYYY-MM-DD` and include both the start and end date. If you omit `from`, the API uses the contract's `usageStartDate`. The API trims dates that fall outside the contract's usage window. Series responses include a `PARTIAL_WINDOW` warning when this happens.
+
+## Filter and group usage
+
+Summary and series requests accept `accountIds` and `checkTypes`. Repeat a parameter or separate values with commas. Omit `accountIds` to include every account in the selected contract.
+
+The series endpoint also supports:
+
+- `interval`: `day`, `week`, `month`, or `total`. The default is `day`. Weekly buckets start on Monday. Monthly buckets follow calendar months.
+- `groupBy`: `account`, `checkType`, or `account,checkType`. The default is `account,checkType`.
+- `limit`: From 1 to 500 rows per page. The default is 100.
+- `nextId`: the opaque cursor from the previous response.
+
+The API orders rows by period, account ID, and check type. It includes rows with zero usage, so clients do not have to fill gaps before building tables or charts.
+
+## Interpret metrics and credits
+
+Summary totals and series rows include `credits` and a `CHECK_RUN` meter. The meter reports run outcomes, billable units, Multistep requests, and Playwright billable duration in milliseconds.
+
+The API calculates `credits.used` from standard and premium billable units using the contract's rates.
+
+Summary projections cover usage since `usageStartDate`, the last 30 days, the last 7 days, and the last day. They show annualized budget use, projected usage at the end of the contract, and the estimated time until credits run out.
+
+## Paginate a series
+
+Send a non-null `nextId` unchanged with the same query parameters to retrieve the next page. Changing a parameter invalidates the cursor.
+
+## Handle errors
+
+The API returns `400` for invalid requests, `401` or `403` for authentication and permission errors, and `404` when no matching usage terms are found.

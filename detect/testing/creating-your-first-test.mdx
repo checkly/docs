@@ -148,7 +148,7 @@ After deployment, you can:
 For more control over your browser checks:
 
 ```ts __checks__/advanced-browser.check.ts
-import { BrowserCheck, Frequency } from 'checkly/constructs'
+import { BrowserCheck, Frequency, RetryStrategyBuilder } from 'checkly/constructs'
 
 new BrowserCheck('advanced-check', {
   name: 'Advanced Browser Check',
@@ -159,11 +159,10 @@ new BrowserCheck('advanced-check', {
   code: {
     entrypoint: './advanced-test.spec.ts',
   },
-  retryStrategy: {
-    type: 'LINEAR',
+  retryStrategy: RetryStrategyBuilder.linearStrategy({
     baseBackoffSeconds: 60,
     maxRetries: 2,
-  },
+  }),
 })
 ```
 

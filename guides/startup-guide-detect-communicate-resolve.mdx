@@ -346,22 +346,19 @@ Now that issues have been detected with proactive monitoring, we need to plan ho
 
 ### Configure When Alerts Go Out
 
-By setting up alert rules, you can define conditions—such as consecutive failures or specific error responses—that trigger alerts.  You can also configure how to handle retries before generating an alert, and whether reminder messages go out for an ongoing alert.  This is particularly useful for handling transient network issues or brief API hiccups. Well-tuned alerting policies allow your DevOps or SRE team to quickly identify and investigate issues before they escalate, without burdening the team with many false alarms. All of these settings are covered in the `alertSettings` portion of the construct for any monitor.
+By setting up alert rules, you can define conditions—such as consecutive failures or specific error responses—that trigger alerts.  You can also configure how to handle retries before generating an alert, and whether reminder messages go out for an ongoing alert.  This is particularly useful for handling transient network issues or brief API hiccups. Well-tuned alerting policies allow your DevOps or SRE team to quickly identify and investigate issues before they escalate, without burdening the team with many false alarms. All of these settings are covered by the `alertEscalationPolicy` property of any monitor construct. Build it with [`AlertEscalationBuilder`](/constructs/alert-escalation-policy) rather than writing the object by hand:
 
 ```ts
-alertSettings: {
-  reminders: { // Controls reminder notifications after initial alert
-    amount: 0, // Number of reminder notifications to send (0 = no reminders)
-    interval: 5 // Time interval in minutes between each reminder notification
-  },
-  escalationType: "RUN_BASED", // Sets escalation trigger type (RUN_BASED or TIME_BASED)
-  runBasedEscalation: { // Configuration for run-based escalation triggers
-    failedRunThreshold: 1 // Number of consecutive failed runs before escalating alert
-  },
-  timeBasedEscalation: { // Configuration for time-based escalation triggers
-    minutesFailingThreshold: 5 // Minutes check must be failing before escalating alert
-  }
-}
+import { AlertEscalationBuilder } from 'checkly/constructs'
+
+// Escalate after 1 consecutive failed run; send no reminders
+alertEscalationPolicy: AlertEscalationBuilder.runBasedEscalation(1, {
+  amount: 0, // Number of reminder notifications to send (0 = no reminders)
+  interval: 5, // Minutes between reminder notifications
+})
+
+// Or escalate once the check has been failing for 5 minutes
+alertEscalationPolicy: AlertEscalationBuilder.timeBasedEscalation(5)
 ```
 
 These settings just like all the settings in this section can be managed at the individual check level, [as a group](/platform/groups), or across the whole project in the `checkly.config.ts` file.

@@ -242,7 +242,7 @@ As you handle monitors for multiple sites and environments, inevitably you'll wa
 We can create a group with constructs:
 
 ```ts {title="prod-monitoring-group.ts"}
-import { Frequency, CheckGroupV2 } from 'checkly/constructs'
+import { Frequency, CheckGroupV2, RetryStrategyBuilder } from 'checkly/constructs'
 
 export const prodMonitorGroup = new CheckGroupV2('prod-monitor-group', {
   name: 'Prod Monitor Group',
@@ -251,13 +251,12 @@ export const prodMonitorGroup = new CheckGroupV2('prod-monitor-group', {
   locations: ['us-east-1', 'eu-west-1'],
   tags: ['url-monitoring', 'production'],
   environmentVariables: [],
-  retryStrategy: {
-    type: 'FIXED',
+  retryStrategy: RetryStrategyBuilder.fixedStrategy({
     baseBackoffSeconds: 60,
     maxRetries: 2,
     maxDurationSeconds: 600,
     sameRegion: false
-  }
+  })
 })
 ```
 

@@ -248,7 +248,6 @@ export const prodMonitorGroup = new CheckGroupV2('prod-monitor-group', {
   name: 'Prod Monitor Group',
   activated: true,
   frequency: 5,
-  maxResponseTime: 10000,
   locations: ['us-east-1', 'eu-west-1'],
   tags: ['url-monitoring', 'production'],
   environmentVariables: [],
@@ -272,7 +271,9 @@ import { prodMonitorGroup } from './prod-monitoring-group.ts'
 new UrlMonitor('url-monitor-example', { 
   name: 'Example URL Monitor',
   group: prodMonitorGroup, //add this check to the group
-  //most config can now be handled at the group level
+  //most config can now be handled at the group level;
+  //response time thresholds are always set per monitor
+  maxResponseTime: 10000,
   request: {
     url: 'https://httpbin.org/get', 
     followRedirects: false, 

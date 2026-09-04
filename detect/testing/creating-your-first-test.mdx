@@ -56,6 +56,7 @@ Open `checkly.config.ts` to configure your monitoring setup:
 
 ```ts Checkly.config.ts
 import { defineConfig } from '@checkly/cli'
+import { Frequency } from '@checkly/cli/constructs'
 
 export default defineConfig({
   projectName: 'My First Checkly Project',
@@ -66,13 +67,13 @@ export default defineConfig({
     activated: true,
     muted: false,
     runtimeId: '2025.04',
-    frequency: 5, // Run every 5 minutes
+    frequency: Frequency.EVERY_5M,
     locations: ['us-east-1', 'eu-west-1'], // Global locations
     tags: ['production', 'critical'],
     
     // Browser check specific settings
     browserChecks: {
-      frequency: 10, // Browser checks every 10 minutes
+      frequency: Frequency.EVERY_10M,
       testMatch: '**/__checks__/*.spec.ts',
     },
   },

@@ -88,12 +88,12 @@ With a project set up, we can start writing our first monitors. Monitors come in
 All monitors are created as `.check.ts` files implementing the [Checkly CLI construct](/constructs/overview). Here’s an example URL Monitor:
 
 ```ts
-import { UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs' // Import required constructs from Checkly CLI
+import { Frequency, UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs' // Import required constructs from Checkly CLI
 
 new UrlMonitor('url-monitor-example', { // Create new URL monitor with unique logical ID
   name: 'Example URL Monitor', // Human-readable name for the monitor
   activated: true, // Enable the monitor to run checks
-  frequency: 1, // Run check every 1 minute
+  frequency: Frequency.EVERY_1M,
   maxResponseTime: 10000, // Maximum response time in milliseconds before marking as failed
   degradedResponseTime: 5000, // Response time in milliseconds for degraded performance warning
   request: { // Configure the HTTP request settings (required)
@@ -259,7 +259,7 @@ A Chromium browser and a new "Playwright inspector" window should appear. As you
 Once you’re happy with the scripted test, copy the code into a `.spec.ts` file, and create a construct for your check as a `.check.ts` file, based  on the CLI [constructs; this time for browser checks](/constructs/overview#browsercheck). Here’s an example of a check for the demo site [Danube Web Shop](https://danube-web.shop/):
 
 ```ts {title="homepage-browse.check.ts"}
-import { AlertEscalationBuilder, BrowserCheck, RetryStrategyBuilder } from 'checkly/constructs'
+import { Frequency, AlertEscalationBuilder, BrowserCheck, RetryStrategyBuilder } from 'checkly/constructs'
 
 new BrowserCheck('browse-danube-homepage-v1', {
   name: 'Browse Danube Homepage',
@@ -274,7 +274,7 @@ new BrowserCheck('browse-danube-homepage-v1', {
     'us-east-1',
     'us-west-1',
   ],
-  frequency: 30,
+  frequency: Frequency.EVERY_30M,
   // what must happen to generate an alert
   alertEscalationPolicy: AlertEscalationBuilder.runBasedEscalation(1, {
     amount: 0,
@@ -397,7 +397,7 @@ export const slackChannel = new SlackAppAlertChannel('slack-channel-1', {
 Now we can go back to our URL monitor from part 1 and update it to include multiple alert channels:
 
 ```ts {tile="url-monitor.check.ts"}
-import { UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs'
+import { Frequency, UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs'
 import { emailChannel } from './email-alert-channel'
 import { slackChannel } from './slack-alert-channel'
 import { webhookChannel } from './webhook-alert-channel'
@@ -405,7 +405,7 @@ import { webhookChannel } from './webhook-alert-channel'
 new UrlMonitor('url-monitor-example', {
   name: 'Example URL Monitor',
   activated: true,
-  frequency: 1,
+  frequency: Frequency.EVERY_1M,
   maxResponseTime: 10000,
   degradedResponseTime: 5000,
   alertChannels: [emailChannel, slackChannel, webhookChannel], // Array of alert channels to notify when check fails or recovers

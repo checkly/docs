@@ -19,9 +19,9 @@ Define heartbeat monitors as code alongside your other monitoring using the Chec
 ### TypeScript Example
 
 ```typescript
-import { HeartbeatCheck } from 'checkly/constructs'
+import { HeartbeatMonitor } from 'checkly/constructs'
 
-new HeartbeatCheck('weekly-newsletter', {
+new HeartbeatMonitor('weekly-newsletter', {
   name: 'Weekly Newsletter Campaign',
   period: 7,
   periodUnit: 'days',
@@ -30,7 +30,7 @@ new HeartbeatCheck('weekly-newsletter', {
   tags: ['newsletter', 'marketing', 'weekly']
 })
 
-new HeartbeatCheck('database-backup', {
+new HeartbeatMonitor('database-backup', {
   name: 'Nightly Database Backup',
   period: 1,
   periodUnit: 'days', 
@@ -43,9 +43,9 @@ new HeartbeatCheck('database-backup', {
 ### JavaScript Example
 
 ```javascript
-const { HeartbeatCheck } = require('checkly/constructs')
+const { HeartbeatMonitor } = require('checkly/constructs')
 
-new HeartbeatCheck('data-sync', {
+new HeartbeatMonitor('data-sync', {
   name: 'Hourly Data Sync',
   period: 1,
   periodUnit: 'hours',
@@ -58,16 +58,24 @@ new HeartbeatCheck('data-sync', {
 ### Advanced CLI Configuration
 
 ```typescript
-import { HeartbeatCheck } from 'checkly/constructs'
+import { HeartbeatMonitor, EmailAlertChannel, SlackAlertChannel } from 'checkly/constructs'
 
-new HeartbeatCheck('production-backup', {
+const email = new EmailAlertChannel('email', {
+  address: 'ops@example.com'
+})
+const slackCritical = new SlackAlertChannel('slack-critical', {
+  url: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL',
+  channel: '#critical'
+})
+
+new HeartbeatMonitor('production-backup', {
   name: 'Production Database Backup',
   period: 24,
   periodUnit: 'hours',
   grace: 60,
   graceUnit: 'minutes',
   tags: ['production', 'backup', 'critical'],
-  alertChannels: ['email', 'slack-critical'],
+  alertChannels: [email, slackCritical],
   activated: true,
   muted: false
 })

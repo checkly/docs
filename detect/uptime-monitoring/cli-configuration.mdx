@@ -82,14 +82,13 @@ The samples on this page define their alert channels inline to stay self-contain
 <CodeGroup dropdown>
 
 ```ts api-monitor.check.ts
-import { UrlMonitor, UrlAssertionBuilder, EmailAlertChannel, SlackAlertChannel } from 'checkly/constructs'
+import { UrlMonitor, UrlAssertionBuilder, EmailAlertChannel, SlackAppAlertChannel } from 'checkly/constructs'
 
 const emailAlerts = new EmailAlertChannel('email-alerts', {
   address: 'ops@myapp.com'
 })
-const slackAlerts = new SlackAlertChannel('slack-alerts', {
-  url: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL',
-  channel: '#alerts'
+const slackAlerts = new SlackAppAlertChannel('slack-alerts', {
+  slackChannels: ['#alerts']
 })
 
 new UrlMonitor('api-health-check', {
@@ -111,14 +110,13 @@ new UrlMonitor('api-health-check', {
 ```
 
 ```js api-monitor.check.js
-const { UrlMonitor, UrlAssertionBuilder, EmailAlertChannel, SlackAlertChannel } = require('checkly/constructs')
+const { UrlMonitor, UrlAssertionBuilder, EmailAlertChannel, SlackAppAlertChannel } = require('checkly/constructs')
 
 const emailAlerts = new EmailAlertChannel('email-alerts', {
   address: 'ops@myapp.com'
 })
-const slackAlerts = new SlackAlertChannel('slack-alerts', {
-  url: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL',
-  channel: '#alerts'
+const slackAlerts = new SlackAppAlertChannel('slack-alerts', {
+  slackChannels: ['#alerts']
 })
 
 new UrlMonitor('api-health-check', {
@@ -272,15 +270,14 @@ new HeartbeatMonitor('daily-backup-heartbeat', {
 <CodeGroup dropdown>
 
 ```ts sync-job-heartbeat.check.ts
-import { HeartbeatMonitor, PagerdutyAlertChannel, SlackAlertChannel } from 'checkly/constructs'
+import { HeartbeatMonitor, PagerdutyAlertChannel, SlackAppAlertChannel } from 'checkly/constructs'
 
 const pagerdutyCritical = new PagerdutyAlertChannel('pagerduty-critical', {
   serviceName: 'Data platform',
   serviceKey: 'your-pagerduty-integration-key'
 })
-const slackOps = new SlackAlertChannel('slack-ops', {
-  url: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL',
-  channel: '#ops'
+const slackOps = new SlackAppAlertChannel('slack-ops', {
+  slackChannels: ['#ops']
 })
 
 new HeartbeatMonitor('hourly-sync-heartbeat', {
@@ -296,15 +293,14 @@ new HeartbeatMonitor('hourly-sync-heartbeat', {
 ```
 
 ```js sync-job-heartbeat.check.js
-const { HeartbeatMonitor, PagerdutyAlertChannel, SlackAlertChannel } = require('checkly/constructs')
+const { HeartbeatMonitor, PagerdutyAlertChannel, SlackAppAlertChannel } = require('checkly/constructs')
 
 const pagerdutyCritical = new PagerdutyAlertChannel('pagerduty-critical', {
   serviceName: 'Data platform',
   serviceKey: 'your-pagerduty-integration-key'
 })
-const slackOps = new SlackAlertChannel('slack-ops', {
-  url: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL',
-  channel: '#ops'
+const slackOps = new SlackAppAlertChannel('slack-ops', {
+  slackChannels: ['#ops']
 })
 
 new HeartbeatMonitor('hourly-sync-heartbeat', {
@@ -330,14 +326,13 @@ Organize related monitors using groups:
 <CodeGroup dropdown>
 
 ```ts api-monitoring-group.check.ts
-import { CheckGroupV2, UrlMonitor, EmailAlertChannel, SlackAlertChannel } from 'checkly/constructs'
+import { CheckGroupV2, UrlMonitor, EmailAlertChannel, SlackAppAlertChannel } from 'checkly/constructs'
 
 const emailAlerts = new EmailAlertChannel('email-alerts', {
   address: 'ops@myapp.com'
 })
-const slackApiAlerts = new SlackAlertChannel('slack-api-alerts', {
-  url: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL',
-  channel: '#api-alerts'
+const slackApiAlerts = new SlackAppAlertChannel('slack-api-alerts', {
+  slackChannels: ['#api-alerts']
 })
 
 const apiGroup = new CheckGroupV2('api-monitoring', {
@@ -368,14 +363,13 @@ new UrlMonitor('orders-api', {
 ```
 
 ```js api-monitoring-group.check.js
-const { CheckGroupV2, UrlMonitor, EmailAlertChannel, SlackAlertChannel } = require('checkly/constructs')
+const { CheckGroupV2, UrlMonitor, EmailAlertChannel, SlackAppAlertChannel } = require('checkly/constructs')
 
 const emailAlerts = new EmailAlertChannel('email-alerts', {
   address: 'ops@myapp.com'
 })
-const slackApiAlerts = new SlackAlertChannel('slack-api-alerts', {
-  url: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL',
-  channel: '#api-alerts'
+const slackApiAlerts = new SlackAppAlertChannel('slack-api-alerts', {
+  slackChannels: ['#api-alerts']
 })
 
 const apiGroup = new CheckGroupV2('api-monitoring', {

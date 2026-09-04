@@ -38,15 +38,14 @@ new HeartbeatMonitor("daily-backup-heartbeat", {
 ```
 
 ```ts Advanced Example
-import { HeartbeatMonitor, EmailAlertChannel, SlackAlertChannel } from "checkly/constructs"
+import { HeartbeatMonitor, EmailAlertChannel, SlackAppAlertChannel } from "checkly/constructs"
 
 const emailChannel = new EmailAlertChannel("team-email", {
   address: "team@example.com",
 })
 
-const slackChannel = new SlackAlertChannel("team-slack", {
-  url: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL",
-  channel: "#ops",
+const slackChannel = new SlackAppAlertChannel("team-slack", {
+  slackChannels: ["#ops"]
 })
 
 new HeartbeatMonitor("newsletter-heartbeat", {

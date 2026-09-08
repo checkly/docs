@@ -63,6 +63,7 @@ const TAG_MAP = {
   'Subscriptions':         { dir: 'status-pages',        group: 'Status Page Subscribers' },
   'Test sessions':         { dir: 'test-sessions',       group: 'Test Sessions' },
   'Triggers':              { dir: 'triggers',            group: 'Check Triggers' },
+  'Usage':                 { dir: 'usage',               group: 'Usage' },
 };
 
 // Monitor-type endpoints under the "Checks" or "Monitors" tag go into

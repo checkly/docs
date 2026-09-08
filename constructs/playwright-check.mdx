@@ -266,11 +266,13 @@ new PlaywrightCheck("critical-e2e-monitor", {
 
 </CodeGroup>
 
-If you omit `engine`, the Checkly CLI tries to detect it from project version files. It checks `.node-version`, `.nvmrc`, `.tool-versions` (`nodejs` or `bun`), `.bun-version`, and `package.json` `engines.node` or `engines.bun`.
+If you omit `engine`, the Checkly CLI tries to detect it from project version files. It checks `.node-version`, `.nvmrc`, `.tool-versions` (`nodejs` or `bun`), `.bun-version`, the [Volta](https://volta.sh) pin in `package.json` (`volta.node`), and `package.json` `engines.node` or `engines.bun`, in that order. The files are read from the project root: the workspace root when your Checkly config is part of a pnpm, npm, or Yarn workspace, otherwise the directory of the nearest `package.json`.
 
 When both Node.js and Bun candidates are found, Node.js takes precedence. `.nvmrc` aliases such as `lts`, `lts/*`, `node`, `stable`, and `latest` are skipped.
 
-For `package.json` engine ranges, the CLI uses the minimum version from the semver range. For example, `>=22` resolves to Node.js `22`, and `>=1.3` resolves to Bun `1.3`.
+The Volta pin is the one source that is also looked up below the project root. Like Volta itself, the CLI starts from the package that contains your Checkly config, walks up to the project root, and uses the nearest `package.json` that has a `volta` key, following `volta.extends` when that manifest delegates to another file. Volta does not manage Bun, so only `volta.node` is considered.
+
+For `package.json` engine ranges (and Volta pins that use a range), the CLI uses the minimum version from the semver range. For example, `>=22` resolves to Node.js `22`, and `>=1.3` resolves to Bun `1.3`.
 
 Detected and explicit versions are checked against Checkly's engine rules:
 

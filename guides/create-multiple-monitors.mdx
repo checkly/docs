@@ -20,12 +20,12 @@ Checkly's Monitoring as Code workflow starts with creating a [project](/construc
 If you haven't worked with Checkly at all, or have only created new monitors from our web UI, [install the Checkly CLI and create a new project for our checks with our getting started guide here](/cli/overview). A basic URL monitor with minimal configuration looks like this:
 
 ```ts {title="first-url-monitor.check.ts"}
-import { UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs' 
+import { Frequency, UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs' 
 
 new UrlMonitor('url-monitor-001', { // the monitor's unique logical ID
   name: 'Example URL Monitor', // display name to show in the Checkly UI
   activated: true, 
-  frequency: 1, // frequency in minutes 
+  frequency: Frequency.EVERY_1M,
   maxResponseTime: 10000, // milliseconds
   request: {
     url: 'https://www.checklyhq.com/learn/', // target URL
@@ -89,7 +89,7 @@ sitemapUrls.forEach((url, index) => {
   new UrlMonitor(logicalId, {
     name: `URL Monitor - ${url}`,
     activated: true,
-    frequency: 5, // Check every 5 minutes
+    frequency: Frequency.EVERY_5M,
     maxResponseTime: 10000,
     degradedResponseTime: 5000,
     request: {
@@ -175,7 +175,7 @@ Let’s continue to increase the sophistication of our group of monitors. Right 
 And this version of the URL monitor fetches the CSV and parses the three values for each check from the row before creating a monitor.
 
 ```ts {title="csv-import-url-monitors.check.ts"}
-import { UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs'
+import { Frequency, UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs'
 const csvUrl = 'https://raw.githubusercontent.com/serverless-mom/claudeExperiments/refs/heads/main/urlsWithIds.csv'
 
 interface CsvRow {
@@ -217,7 +217,7 @@ urlsToMonitor.forEach((row) => {
   new UrlMonitor(row.logicalId, {
     name: row.name,
     activated: true,
-    frequency: 5,
+    frequency: Frequency.EVERY_5M,
     maxResponseTime: 10000,
     request: {
       url: row.url,
@@ -242,23 +242,21 @@ As you handle monitors for multiple sites and environments, inevitably you'll wa
 We can create a group with constructs:
 
 ```ts {title="prod-monitoring-group.ts"}
-import { CheckGroupV2 } from 'checkly/constructs'
+import { Frequency, CheckGroupV2, RetryStrategyBuilder } from 'checkly/constructs'
 
 export const prodMonitorGroup = new CheckGroupV2('prod-monitor-group', {
   name: 'Prod Monitor Group',
   activated: true,
-  frequency: 5,
-  maxResponseTime: 10000,
+  frequency: Frequency.EVERY_5M,
   locations: ['us-east-1', 'eu-west-1'],
   tags: ['url-monitoring', 'production'],
   environmentVariables: [],
-  retryStrategy: {
-    type: 'FIXED',
+  retryStrategy: RetryStrategyBuilder.fixedStrategy({
     baseBackoffSeconds: 60,
     maxRetries: 2,
     maxDurationSeconds: 600,
     sameRegion: false
-  }
+  })
 })
 ```
 
@@ -272,7 +270,9 @@ import { prodMonitorGroup } from './prod-monitoring-group.ts'
 new UrlMonitor('url-monitor-example', { 
   name: 'Example URL Monitor',
   group: prodMonitorGroup, //add this check to the group
-  //most config can now be handled at the group level
+  //most config can now be handled at the group level;
+  //response time thresholds are always set per monitor
+  maxResponseTime: 10000,
   request: {
     url: 'https://httpbin.org/get', 
     followRedirects: false, 

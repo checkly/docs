@@ -54,7 +54,7 @@ The following example deploys one shared API check to development, staging, and 
     Read the target environment from your CI pipeline and map it to a unique project `logicalId`.
 
     ```typescript checkly.config.ts
-    import { defineConfig } from "checkly"
+    import { defineConfig, type Region } from "checkly"
     import { Frequency } from "checkly/constructs"
 
     type Environment = "development" | "staging" | "production"
@@ -63,7 +63,7 @@ The following example deploys one shared API check to development, staging, and 
       projectName: string
       logicalId: string
       frequency: Frequency
-      locations: string[]
+      locations: (keyof Region)[]
     }> = {
       development: {
         projectName: "My app - Development",

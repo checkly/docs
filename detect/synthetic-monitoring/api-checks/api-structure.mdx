@@ -20,9 +20,9 @@ new ApiCheck('user-api-health', {
   request: {
     method: 'GET',
     url: 'https://api.example.com/v1/users/health',
-    headers: {
-      'Authorization': 'Bearer {{API_TOKEN}}'
-    },
+    headers: [
+      { key: 'Authorization', value: 'Bearer {{API_TOKEN}}' }
+    ],
     assertions: [
       AssertionBuilder.statusCode().equals(200),
       AssertionBuilder.responseTime().lessThan(2000),

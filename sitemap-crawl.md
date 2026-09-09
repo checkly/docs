@@ -3,9 +3,11 @@
 This file contains all valid URLs extracted from docs.json organized by directory structure.
 
 ## Root Pages
+
 - /what-is-checkly
 
 ## Quickstarts
+
 - /quickstarts/url-monitor
 - /quickstarts/browser-check
 - /quickstarts/api-check
@@ -14,6 +16,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /quickstarts/tcp-monitor
 
 ## Concepts
+
 - /concepts/checks
 - /concepts/monitoring-as-code
 - /concepts/locations
@@ -22,6 +25,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /concepts/metrics
 
 ## Platform
+
 - /platform/groups
 - /platform/secrets
 - /platform/variables
@@ -30,6 +34,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /platform/managing-false-positives
 
 ### Platform - Private Locations
+
 - /platform/private-locations/overview
 - /platform/private-locations/quick-start
 - /platform/private-locations/use-cases
@@ -40,21 +45,25 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /platform/private-locations/scaling-redundancy
 
 ### Platform - Reporting
+
 - /platform/reporting/overview
 - /platform/reporting/analytics-api
 
 ### Platform - Runtimes
+
 - /platform/runtimes/overview
 - /platform/runtimes/runtime-specification
 - /platform/runtimes/dependencies
 
 ## Admin
+
 - /admin/creating-api-key
 - /admin/changing-your-email-password
 - /admin/data-storage
 - /admin/ip-information
 
 ### Admin - Team Management
+
 - /admin/team-management/overview
 - /admin/team-management/adding-team-members
 - /admin/team-management/microsoft-azure-ad
@@ -63,30 +72,37 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /admin/team-management/single-sign-on
 
 ## Detect
+
 - /detect/overview
 
 ### Detect - Uptime Monitoring
+
 - /detect/uptime-monitoring/overview
 
 #### Detect - URL Monitors
+
 - /detect/uptime-monitoring/url-monitors/overview
 - /detect/uptime-monitoring/url-monitors/configuration
 - /detect/uptime-monitoring/url-monitors/creating-your-first-url-monitor
 
 #### Detect - Heartbeat Monitors
+
 - /detect/uptime-monitoring/heartbeat-monitors/overview
 - /detect/uptime-monitoring/heartbeat-monitors/creating-your-first-heartbeat-monitor
 - /detect/uptime-monitoring/heartbeat-monitors/examples
 
 #### Detect - TCP Monitors
+
 - /detect/uptime-monitoring/tcp-monitors/overview
 - /detect/uptime-monitoring/tcp-monitors/configuration
 - /detect/uptime-monitoring/tcp-monitors/creating-your-first-tcp-monitor
 
 ### Detect - Synthetic Monitoring
+
 - /detect/synthetic-monitoring/overview
 
 #### Detect - API Checks
+
 - /detect/synthetic-monitoring/api-checks/overview
 - /detect/synthetic-monitoring/api-checks/creating-your-first-api-check
 - /detect/synthetic-monitoring/api-checks/api-structure
@@ -97,6 +113,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /detect/synthetic-monitoring/api-checks/troubleshooting
 
 #### Detect - Multistep Checks
+
 - /detect/synthetic-monitoring/multistep-checks/overview
 - /detect/synthetic-monitoring/multistep-checks/creating-your-first-multistep-check
 - /detect/synthetic-monitoring/multistep-checks/multistep-structure
@@ -106,6 +123,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /detect/synthetic-monitoring/multistep-checks/examples
 
 #### Detect - Browser Checks
+
 - /detect/synthetic-monitoring/browser-checks/overview
 - /detect/synthetic-monitoring/browser-checks/creating-a-browser-check
 - /detect/synthetic-monitoring/browser-checks/mac-structure
@@ -118,6 +136,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /detect/synthetic-monitoring/browser-checks/troubleshooting
 
 #### Detect - Playwright Checks Suite
+
 - /detect/synthetic-monitoring/playwright-checks/overview
 - /detect/synthetic-monitoring/playwright-checks/quickstart
 - /detect/synthetic-monitoring/playwright-checks/reference
@@ -125,14 +144,17 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /detect/synthetic-monitoring/playwright-checks/custom-dependencies
 
 ### Detect - Testing
+
 - /detect/testing/overview
 - /detect/testing/creating-your-first-test
 - /detect/testing/using-env-variables
 
 ## Communicate
+
 - /communicate/overview
 
 ### Communicate - Alerts
+
 - /communicate/alerts/overview
 - /communicate/alerts/configuration
 - /communicate/alerts/channels
@@ -141,41 +163,49 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /communicate/alerts/notification-log
 
 ### Communicate - Status Pages
+
 - /communicate/status-pages/overview
 - /communicate/status-pages/creating-a-status-page
 - /communicate/status-pages/customization
 - /communicate/status-pages/incidents
 
 ### Communicate - Dashboards
+
 - /communicate/dashboards/overview
 - /communicate/dashboards/configuration
 - /communicate/dashboards/custom-css
 - /communicate/dashboards/incidents
 
 ### Communicate - Maintenance Windows
+
 - /communicate/maintenance-windows/overview
 
 ## Resolve
+
 - /resolve/overview
 - /resolve/rocky-ai/overview
 
 ### Resolve - Traces
+
 - /resolve/traces/overview
 - /resolve/traces/how-it-works
 
 #### Resolve - Traces - Importing
+
 - /resolve/traces/import/overview
 - /resolve/traces/import/open-telemetry
 - /resolve/traces/import/missing-spans
 - /resolve/traces/import/https-grpc
 
 #### Resolve - Traces - Exporting
+
 - /resolve/traces/export/grafana-tempo
 - /resolve/traces/export/honeycomb
 - /resolve/traces/export/new-relic
 - /resolve/traces/export/dash0
 
 #### Resolve - Traces - Instrumentation
+
 - /resolve/traces/instrumentation/nextjs
 - /resolve/traces/instrumentation/nodejs
 - /resolve/traces/instrumentation/express
@@ -198,6 +228,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 ## Integrations
 
 ### Integrations - Alerts & Notifications
+
 - /integrations/alerts/discord
 - /integrations/alerts/email
 - /integrations/alerts/gitlab_alerts
@@ -211,6 +242,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /integrations/alerts/webhooks
 
 ### Integrations - Incident Management
+
 - /integrations/incident-management/firehydrant
 - /integrations/incident-management/pagerduty
 - /integrations/incident-management/opsgenie
@@ -220,20 +252,24 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /integrations/incident-management/splunk-on-call
 
 ### Integrations - CI/CD
+
 - /integrations/ci-cd/overview
 - /integrations/ci-cd/gitlab/overview
 - /integrations/ci-cd/jenkins/overview
 
 #### Integrations - GitHub
+
 - /integrations/ci-cd/github/actions
 - /integrations/ci-cd/github/deployments
 
 #### Integrations - Vercel
+
 - /integrations/ci-cd/vercel/overview
 - /integrations/ci-cd/vercel/deployment-protection
 - /integrations/ci-cd/vercel/managing-plan
 
 ### Integrations - Observability
+
 - /integrations/observability/prometheus
 - /integrations/observability/prometheus-v2
 - /integrations/observability/coralogix
@@ -241,6 +277,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 ### Integrations - Infrastructure as Code
 
 #### Integrations - Terraform
+
 - /integrations/iac/terraform/overview
 - /integrations/iac/terraform/alerting
 - /integrations/iac/terraform/maintenance-windows
@@ -252,17 +289,20 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /integrations/iac/terraform/troubleshooting
 
 #### Integrations - Pulumi
+
 - /integrations/iac/pulumi/overview
 - /integrations/iac/pulumi/best-practices
 - /integrations/iac/pulumi/setup
 - /integrations/iac/pulumi/ci-cd
 
 ## Constructs
+
 - /constructs/overview
 - /constructs/quickstart
 - /constructs/including-checks
 
 ### Constructs - DETECT
+
 - /constructs/url-monitor
 - /constructs/tcp-monitor
 - /constructs/heartbeat-monitor
@@ -272,12 +312,14 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /constructs/playwright-check
 
 ### Constructs - COMMUNICATE
+
 - /constructs/alert-escalation-policy
 - /constructs/retry-strategy
 - /constructs/dashboard
 - /constructs/maintenance-window
 
 #### Constructs - Alert Channels
+
 - /constructs/email-alert-channel
 - /constructs/sms-alert-channel
 - /constructs/phone-call-alert-channel
@@ -286,15 +328,18 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /constructs/webhook-alert-channel
 
 #### Constructs - Status Pages
+
 - /constructs/status-page
 - /constructs/status-page-service
 
 ### Constructs - Project & Configuration
+
 - /constructs/project
 - /constructs/check-group-v2
 - /constructs/check-group
 
 ## CLI
+
 - /cli/overview
 - /cli/authentication
 - /cli/basic-workflow
@@ -302,6 +347,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /cli/importing
 
 ### CLI Commands
+
 - /cli/checkly-deploy
 - /cli/checkly-destroy
 - /cli/checkly-env
@@ -319,14 +365,17 @@ This file contains all valid URLs extracted from docs.json organized by director
 ## API Reference
 
 ### API - Platform
+
 - /api-reference/authentication
 
 #### API - Accounts
+
 - /api-reference/accounts/list
 - /api-reference/accounts/get
 - /api-reference/accounts/me
 
 #### API - Analytics
+
 - /api-reference/analytics/metrics
 - /api-reference/analytics/api-checks
 - /api-reference/analytics/browser-checks
@@ -336,6 +385,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /api-reference/analytics/url-monitors
 
 #### API - Environment Variables
+
 - /api-reference/environment-variables/list
 - /api-reference/environment-variables/get
 - /api-reference/environment-variables/create
@@ -343,13 +393,16 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /api-reference/environment-variables/delete
 
 #### API - Locations
+
 - /api-reference/locations/list
 
 #### API - Runtimes
+
 - /api-reference/runtimes/list
 - /api-reference/runtimes/get
 
 #### API - Static IPs
+
 - /api-reference/static-ips/list
 - /api-reference/static-ips/by-region
 - /api-reference/static-ips/text-format
@@ -358,9 +411,11 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /api-reference/static-ips/ipv6-text-format
 
 #### API - Reporting
+
 - /api-reference/reporting/generate
 
 #### API - Snippets
+
 - /api-reference/snippets/list
 - /api-reference/snippets/get
 - /api-reference/snippets/create
@@ -370,6 +425,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 ### API - Detect
 
 #### API - Checks
+
 - /api-reference/checks/list
 - /api-reference/checks/get
 - /api-reference/checks/update
@@ -400,6 +456,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /api-reference/checks/heartbeat-delete
 
 #### API - Check Groups
+
 - /api-reference/check-groups/list
 - /api-reference/check-groups/create
 - /api-reference/check-groups/get
@@ -407,22 +464,27 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /api-reference/check-groups/delete
 
 #### API - Check Results
+
 - /api-reference/check-results/list
 - /api-reference/check-results/get
 
 #### API - Check Status
+
 - /api-reference/check-status/list
 - /api-reference/check-status/get
 
 #### API - Check Alerts
+
 - /api-reference/check-alerts/list
 - /api-reference/check-alerts/get
 
 #### API - Heartbeats
+
 - /api-reference/heartbeats/list
 - /api-reference/heartbeats/create
 
 #### API - Private Locations
+
 - /api-reference/private-locations/list
 - /api-reference/private-locations/create
 - /api-reference/private-locations/get
@@ -434,19 +496,23 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /api-reference/private-locations/metrics
 
 #### API - Badges
+
 - /api-reference/badges/check-badge
 - /api-reference/badges/group-badge
 
 #### API - Triggers
+
 - /api-reference/triggers/trigger-check
 - /api-reference/triggers/trigger-group
 
 #### API - Heartbeat Events
+
 - /api-reference/heartbeat-events/list
 - /api-reference/heartbeat-events/get
 - /api-reference/heartbeat-events/availability
 
 #### API - Client Certificates
+
 - /api-reference/client-certificates/list
 - /api-reference/client-certificates/get
 - /api-reference/client-certificates/create
@@ -454,6 +520,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /api-reference/client-certificates/delete
 
 #### API - V2 API
+
 - /api-reference/v2/check-groups-list
 - /api-reference/v2/check-groups-get
 - /api-reference/v2/check-results-get
@@ -461,6 +528,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 ### API - Communicate
 
 #### API - Alert Channels
+
 - /api-reference/alert-channels/list
 - /api-reference/alert-channels/create
 - /api-reference/alert-channels/get
@@ -469,25 +537,30 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /api-reference/alert-channels/subscriptions
 
 #### API - Alert Notifications
+
 - /api-reference/alert-notifications/list
 
 #### API - Dashboards
+
 - /api-reference/dashboards/list
 - /api-reference/dashboards/get
 - /api-reference/dashboards/create
 
 #### API - Status Pages
+
 - /api-reference/status-pages/list
 - /api-reference/status-pages/create
 - /api-reference/status-pages/get
 - /api-reference/status-pages/update
 
 #### API - Incidents
+
 - /api-reference/incidents/list
 
 ### API - Resolve
 
 #### API - Maintenance Windows
+
 - /api-reference/maintenance-windows/list
 - /api-reference/maintenance-windows/create
 - /api-reference/maintenance-windows/get
@@ -495,9 +568,11 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /api-reference/maintenance-windows/delete
 
 ## Guides
+
 - /guides/overview
 
 ### Guides - Monitoring Guides
+
 - /guides/end-to-end-monitoring
 - /guides/startup-guide-detect-communicate-resolve
 - /guides/getting-started-with-monitoring-as-code
@@ -509,27 +584,32 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /guides/create-multiple-monitors
 
 ### Guides - API Monitoring
+
 - /guides/monitoring-an-openapi-spec
 - /guides/monitoring-the-stripe-api
 - /guides/setup-scripts-for-apis
 
 ### Guides - E-commerce Monitoring
+
 - /guides/monitoring-ecommerce-apps-using-playwright
 - /guides/monitoring-ecommerce-apps-using-terraform
 
 ### Guides - Playwright Guides
+
 - /guides/moving-from-puppeteer-to-playwright
 - /guides/developer-fixtures
 - /guides/auto-waiting-methods
 - /guides/reading-traces
 
 ### Guides - Advanced Topics
+
 - /guides/claude-code-monitoring
 - /guides/how-to-monitor-broken-links
 
 ## Learn
 
 ### Learn - Playwright
+
 - /learn/playwright/overview
 - /learn/playwright/what-is-playwright
 - /learn/playwright/how-to-set-up-locally
@@ -580,6 +660,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /learn/playwright/error-wait-not-respected
 
 ### Learn - Incidents
+
 - /learn/incidents/overview
 - /learn/incidents/detection-best-practices
 - /learn/incidents/incident-management-challenges
@@ -600,6 +681,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /learn/incidents/postmortems
 
 ### Learn - Kubernetes
+
 - /learn/kubernetes/overview
 - /learn/kubernetes/centralized-logging
 - /learn/kubernetes/events
@@ -611,6 +693,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /learn/kubernetes/structured-logging
 
 ### Learn - Monitoring
+
 - /learn/monitoring/overview
 - /learn/monitoring/intro-to-sdlc
 - /learn/monitoring/metrics-every-team-needs
@@ -626,6 +709,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /learn/monitoring/what-is-tcp
 
 ### Learn - OpenTelemetry
+
 - /learn/opentelemetry/overview
 - /learn/opentelemetry/getting-started-with-observability
 - /learn/opentelemetry/how-to-instrument
@@ -641,6 +725,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 ## Comparisons
 
 ### Comparisons - Frameworks
+
 - /comparisons/frameworks/playwright-vs-cypress
 - /comparisons/frameworks/playwright-vs-selenium
 - /comparisons/frameworks/playwright-vs-others
@@ -650,26 +735,22 @@ This file contains all valid URLs extracted from docs.json organized by director
 ## Common URL Patterns for Link Fixing:
 
 ### BROKEN → CORRECT MAPPINGS:
+
 - `/alerting/` → `/communicate/alerts/`
 - `/alerting-and-retries/` → `/communicate/alerts/`
 - `/alerting-and-retries/retries/` → `/communicate/alerts/retries`
 - `/alerting-and-retries/alert-channels/` → `/communicate/alerts/channels`
 - `/alerting-and-retries/webhooks/` → `/communicate/alerts/webhooks`
 - `/alerting-and-retries/alert-settings/` → `/communicate/alerts/configuration`
-
 - `/api-checks/` → `/detect/synthetic-monitoring/api-checks/`
 - `/api-checks/setup-teardown-scripts/` → `/detect/synthetic-monitoring/api-checks/set-up-and-tear-down`
 - `/api-checks/setup-script-examples/` → `/detect/synthetic-monitoring/api-checks/examples`
 - `/api-checks/limits/` → `/detect/synthetic-monitoring/api-checks/response-limits`
-
 - `/browser-checks/` → `/detect/synthetic-monitoring/browser-checks/`
 - `/browser-checks/partials-code-snippets/` → `/detect/synthetic-monitoring/browser-checks/snippets`
 - `/browser-checks/degraded-state/` → `/detect/synthetic-monitoring/multistep-checks/degraded-states`
 - `/browser-checks/login-scenarios/` → `/detect/synthetic-monitoring/browser-checks/examples`
-
 - `/private-locations/` → `/platform/private-locations/overview`
-
 - `/status-pages/` → `/communicate/status-pages/`
-
 - `/monitoring/global-locations/` → `/concepts/locations` (likely)
 - `/maintenance-windows/` → `/communicate/maintenance-windows/overview`

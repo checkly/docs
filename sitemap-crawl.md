@@ -93,7 +93,6 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /detect/synthetic-monitoring/api-checks/configuration
 - /detect/assertions
 - /detect/synthetic-monitoring/api-checks/set-up-and-tear-down
-- /detect/synthetic-monitoring/api-checks/snippets
 - /detect/synthetic-monitoring/api-checks/troubleshooting
 
 #### Detect - Multistep Checks
@@ -113,7 +112,6 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /detect/synthetic-monitoring/browser-checks/performance-metrics
 - /detect/synthetic-monitoring/browser-checks/visual-regressions
 - /detect/synthetic-monitoring/browser-checks/playwright-support
-- /detect/synthetic-monitoring/browser-checks/snippets
 - /detect/synthetic-monitoring/browser-checks/timeouts
 - /detect/synthetic-monitoring/browser-checks/troubleshooting
 
@@ -248,7 +246,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /integrations/iac/terraform/ci-cd
 - /integrations/iac/terraform/command-line-triggers
 - /integrations/iac/terraform/testing-scripts-locally
-- /integrations/iac/terraform/snippets-variables
+- /integrations/iac/terraform/environment-variables
 - /integrations/iac/terraform/troubleshooting
 
 #### Integrations - Pulumi
@@ -360,12 +358,6 @@ This file contains all valid URLs extracted from docs.json organized by director
 #### API - Reporting
 - /api-reference/reporting/generate
 
-#### API - Snippets
-- /api-reference/snippets/list
-- /api-reference/snippets/get
-- /api-reference/snippets/create
-- /api-reference/snippets/update
-- /api-reference/snippets/delete
 
 ### API - Detect
 
@@ -663,7 +655,6 @@ This file contains all valid URLs extracted from docs.json organized by director
 - `/api-checks/limits/` → `/detect/synthetic-monitoring/api-checks/response-limits`
 
 - `/browser-checks/` → `/detect/synthetic-monitoring/browser-checks/`
-- `/browser-checks/partials-code-snippets/` → `/detect/synthetic-monitoring/browser-checks/snippets`
 - `/browser-checks/degraded-state/` → `/detect/synthetic-monitoring/multistep-checks/degraded-states`
 - `/browser-checks/login-scenarios/` → `/detect/synthetic-monitoring/browser-checks/examples`
 

@@ -30,13 +30,13 @@ Components belong to one status page. You manage them in the page's settings, wh
 
 Each component has one of five statuses:
 
-| Status | Meaning |
-|--------|---------|
-| Operational | Everything works |
-| Under maintenance | Planned maintenance is running |
-| Degraded performance | Slow, but working |
-| Partial outage | Some functionality is unavailable |
-| Major outage | The component is down |
+| Status | Meaning | Uptime calculation |
+|--------|---------|--------------------|
+| Operational | Everything works | N/A |
+| Under maintenance | Planned maintenance is running | 0% |
+| Degraded performance | Slow, but working | 0% |
+| Partial outage | Some functionality is unavailable | 30% |
+| Major outage | The component is down | 100% |
 
 A component's status is set by open [incidents](/communicate/status-pages/incidents): each incident declares an impact per affected component. The page header shows the worst status across all components.
 
@@ -54,10 +54,10 @@ Incident automation is available on Communicate Team and Enterprise plans. [View
 
 Uptime is calculated over the **last 90 days**, per component, from incident impacts:
 
-- **Major outage** time counts as full downtime.
-- **Partial outage** time counts as 30% downtime.
-- **Degraded performance** and **under maintenance** do not lower uptime.
-
+- **Major outage** counts as 100% downtime.
+- **Partial outage** counts as 30% downtime.
+- **Degraded performance** counts as 0% downtime as the service is still usable.
+- **Under maintenance** counts as 0% downtime as it is an intentional pause of service.
 ```
 Uptime = ((Total time - Weighted downtime) / Total time) × 100
 ```

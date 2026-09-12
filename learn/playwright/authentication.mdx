@@ -138,6 +138,19 @@ Notice the following in this code example:
 
 As mentioned, there is some prep you need to do. Refer to our full [article on 2FA login](https://www.checklyhq.com/learn/playwright/bypass-totp/) for all instructions.
 
+### SMS and email one-time passcodes
+
+Unlike TOTP, one-time passcodes sent via SMS or email cannot be generated inside your test — the code is only known after the provider sends it. Playwright cannot read a text message or open a mailbox on its own, so you need a way to fetch the code from outside the browser and then type it into the login form.
+
+You have a few practical options:
+
+- **Use a test-only bypass.** The most reliable approach is to work with your application team to add a test-mode account, a shared static code, or a header/query flag that skips the SMS/email step in a non-production environment. This keeps the test deterministic and avoids depending on third-party delivery.
+- **Poll a programmable inbox.** For email OTP, sign up your test user with a mailbox that exposes an API (for example, Mailosaur, Mailslurp, or a Gmail account you can query via the Gmail API). In your Playwright test, poll the API for the most recent message, extract the code with a regex, and `fill()` it into the OTP input.
+- **Poll a programmable phone number.** For SMS OTP, use a provider that lets you receive SMS via API (for example, Twilio or a similar service) against a dedicated test number, then poll for the latest message body and extract the code.
+- **Read the code from your own backend.** If your app stores the last issued OTP in a database or exposes it on an internal endpoint in staging, query that from the test instead of the delivery channel.
+
+Whichever path you pick, wrap the fetch step in a short polling loop with a timeout so the test fails clearly if the code never arrives, and store any credentials or API keys for the inbox provider as [environment variables](/platform/variables) rather than committing them to the repo.
+
 ## Passkey & **WebAuthn**
 
 Passkeys are a fairly recent authentication scheme. Passkeys are passwordless, so passwords can’t be stolen or phished. There is also no need to memorize a passkey. Often, a passkey is tied to biometric data: every time you authenticate on some app or service with Face ID or Touch ID or using [YubiKey](https://www.yubico.com/) you are using a passkey.

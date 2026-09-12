@@ -34,6 +34,10 @@ URL monitors track the availability of your HTTP-based services by sending reque
 * Checking that your SSL certificate is still valid
 * Confirming that a public pricing endpoint is reachable for customers
 
+<Note>
+URL monitors always send a plain `GET` request. They do not support custom request headers, cookies, request bodies, authentication, or [dynamic variables](/detect/synthetic-monitoring/api-checks/configuration) such as `{{moment}}`. If you need any of those, use an [API check](/detect/synthetic-monitoring/api-checks/overview) instead — API checks support all HTTP methods, custom headers (including `Cookie`), request bodies, and body/header assertions.
+</Note>
+
 ## How URL Monitors Work
 
 URL monitors send HTTP requests to specified URLs and validate availability and performance. They can be configured to check for specific status codes and response times while running from multiple global locations.

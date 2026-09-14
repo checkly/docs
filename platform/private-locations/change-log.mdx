@@ -147,6 +147,11 @@ Updated packages:
     - Sensitive data such as API keys, environment variables, check configuration, URLs, headers, and response bodies is never sent
     - Enabled by default, can be disabled with `EXTERNAL_OBSERVABILITY=off`
   - Support for runtimes `2026.04` and `2025.04`
+
+  **Breaking changes**
+
+  - API checks and URL monitors migrated to the Go runner now percent-encode reserved characters in query parameter data, following [RFC 3986, Section 2.2](https://datatracker.ietf.org/doc/html/rfc3986#section-2.2). For example, `(` and `)` are sent as `%28` and `%29`. Target servers that treat the encoded and unencoded forms differently may require changes.
+  - TLS certificate validation for an IP-address target now requires the certificate to contain that IP address in its Subject Alternative Name as an `iPAddress`, following [RFC 5280, Section 4.2.1.6](https://datatracker.ietf.org/doc/html/rfc5280#section-4.2.1.6). Checks targeting an IP address fail TLS validation when the certificate does not contain a matching IP address SAN.
 </Update>
 
 <Update label="v6.3.2" tags={["March 2026"]}>

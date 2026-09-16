@@ -48,6 +48,19 @@ const statusPage = new StatusPageV3("acme-status", {
   footerText: "A.C.M.E Inc.",
   privacyPolicyLink: "https://acme.com/privacy",
   termsOfServiceLink: "https://acme.com/terms",
+  supportLink: "https://acme.com/support",
+  themeColors: {
+    light: {
+      headerBackgroundColor: "#0075FF",
+      headerFontColor: "#FFFFFF",
+      primaryButtonBackgroundColor: "#0075FF",
+    },
+    dark: {
+      bodyBackgroundColor: "#0B0F19",
+      cardBackgroundColor: "#151B2B",
+      linkFontColor: "#7AB8FF",
+    },
+  },
 })
 
 // A group with one component nested under it.
@@ -154,6 +167,10 @@ Link to your privacy policy, shown in the page footer.
 Link to your terms of service, shown in the page footer.
 </ResponseField>
 
+<ResponseField name="supportLink" type="string">
+Link to your support channel, shown in the page footer.
+</ResponseField>
+
 <ResponseField name="footerText" type="string">
 Free-form text shown in the page footer.
 </ResponseField>
@@ -164,6 +181,49 @@ Google Analytics tag ID (e.g. `G-XXXXXXXXXX`) embedded on the public page.
 
 <ResponseField name="allowIndexing" type="boolean" default="true">
 Whether search engines may index the public page.
+</ResponseField>
+
+<ResponseField name="themeColors" type="object">
+Custom colors for the light and dark theme of the page. Set only the colors you want to change; every other color keeps Checkly's default for that theme. Either theme can be left out entirely.
+
+Each color is a hex string in `#RGB` or `#RRGGBB` format, such as `"#F00"` or `"#FF0000"`. Unknown color names and non-hex values fail validation at deploy time. See [Custom theme colors](/communicate/status-pages/customization#custom-theme-colors) for where each color appears on the page.
+
+<Note>
+Custom theme colors must be part of your plan.
+</Note>
+
+**Usage:**
+
+```ts
+themeColors: {
+  light: {
+    headerBackgroundColor: "#0075FF",
+    headerFontColor: "#FFFFFF",
+  },
+  dark: {
+    bodyBackgroundColor: "#0B0F19",
+  },
+}
+```
+
+**Parameters:**
+
+Both `light` and `dark` accept the same set of optional color properties:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `bodyBackgroundColor` | `string` | Background of the page |
+| `headerBackgroundColor` | `string` | Background of the page header |
+| `headerFontColor` | `string` | Text in the page header |
+| `titleFontColor` | `string` | Titles and headings |
+| `bodyFontColor` | `string` | Regular body text |
+| `bodyFontColorMuted` | `string` | De-emphasized body text, such as timestamps |
+| `navigationFontColor` | `string` | Navigation links |
+| `linkFontColor` | `string` | Links in the page content |
+| `cardBackgroundColor` | `string` | Background of component and incident cards |
+| `borderColor` | `string` | Borders and dividers |
+| `primaryButtonBackgroundColor` | `string` | Background of primary buttons, such as "Get updates" |
+| `primaryButtonFontColor` | `string` | Text of primary buttons |
 </ResponseField>
 
 ## Referencing an existing page

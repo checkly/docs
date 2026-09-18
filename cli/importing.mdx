@@ -44,14 +44,6 @@ There are two ways to import individual resources:
 - Run `npx checkly import` and in the first step select `Let me choose resources manually`. In the following menu use `space` to select/deselect resources for import and `return` to finalize your selection. From there, follow steps 3 - 5 in the [Importing step-by-step guide](#importing-step-by-step).
 - Specify a single resource as part of the `import` command with the following syntax: `npx checkly import resource-type:resource-id`.
 
-### Troubleshoot "No importable resources were found"
-
-Only resources that are not already managed by a Checkly CLI project can be imported. Specifying a resource ID does not override its project association.
-
-If no resources are importable, check whether the resource already belongs to this or another CLI project. A resource in the current project is already managed and does not need to be imported. Also check for an applied but uncommitted import: finish it with `npx checkly import commit`, or cancel it with `npx checkly import cancel` before trying again.
-
-The `Found ... exported resources` message counts constructs exported by your local project. It does not count account resources available to import.
-
 ## Using `export` when creating CLI resources
 
 The import process will automatically `export` resouces to make them available in other constructs. It is recommended to also export manually created resources so that future import processes can take advantage of the same process.

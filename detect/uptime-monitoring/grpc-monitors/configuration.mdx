@@ -28,11 +28,15 @@ Choose between two monitoring modes:
 Invokes a unary gRPC method and asserts on the response. Requires:
 
 * **Method**: The fully-qualified method name in `package.Service/Method` format (e.g. `mypackage.MyService/GetUser`)
-* **Service definition**: How the method schema is resolved:
-  * **Reflection** (default): The runner discovers the method using gRPC server reflection. Requires reflection to be enabled on the server.
-  * **Proto file**: Provide the `.proto` file content inline. The runner compiles it locally — no server reflection required.
+* **Encoding and service definition**: How the request is encoded and the method schema is resolved:
+  * **Protobuf** (default): Use server reflection or provide the `.proto` file content inline.
+  * **FlatBuffers**: Provide a compiled binary FlatBuffers schema (`.bfbs`). Compile the `.fbs` source locally with `flatc -b --schema --bfbs-builtins schema.fbs`; Checkly consumes the generated `.bfbs` file, not the `.fbs` source. The `--bfbs-builtins` flag preserves attributes used for streaming and nested FlatBuffers fields.
 * **Request message**: Optional JSON-encoded payload sent as the gRPC request body
 * **Metadata**: Optional key/value pairs sent as gRPC request headers (e.g. `authorization: Bearer {{MY_TOKEN}}`)
+
+<Note>
+For a Checkly CLI example that compiles and loads a FlatBuffers schema, see the [`GrpcMonitor` construct documentation](/constructs/grpc-monitor#use-a-flatbuffers-schema).
+</Note>
 
 #### HEALTH Mode
 

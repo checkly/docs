@@ -90,10 +90,10 @@ new GrpcMonitor('grpc-behavior-1', {
 Checkly consumes a compiled binary FlatBuffers schema (`.bfbs`), not the source `.fbs` file. Compile your schema locally:
 
 ```bash Terminal
-flatc -b --schema schema.fbs
+flatc -b --schema --bfbs-builtins schema.fbs
 ```
 
-The command creates `schema.bfbs`. Load that binary file as base64 in your monitor:
+The command creates `schema.bfbs`. The `--bfbs-builtins` flag preserves attributes used for streaming and nested FlatBuffers fields. Load that binary file as base64 in your monitor:
 
 ```ts grpc-flatbuffers.check.ts
 import { readFileSync } from 'node:fs'

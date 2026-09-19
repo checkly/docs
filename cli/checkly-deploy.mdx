@@ -45,7 +45,7 @@ The plan compares your code against what the project last deployed, so it can al
 Under an updated resource, `--preview` and `--output` print a diff of the construct as it is in your account against the construct in your code. You may also see:
 
 - A diff of two texts rather than of the construct, for a change that lives outside it: a browser or multi-step check's script, an API check's setup or teardown script.
-- `secret changed: <property>` for a property Checkly stores encrypted. Its values are never printed.
+- A property Checkly stores encrypted, such as a locked environment variable, is shown inline with its value masked as `'********'`. The side that changed reads `'******** (changed)'`, or `'******** (changed in Checkly)'` on the deployed side. When the change cannot be shown inline, for example a secret that was renamed, the line `secret changed: <property>` names the property holding it instead.
 - `changed: code bundle` or `changed: dependency cache`, or one line naming both, for a resource whose only change is what it bundles.
 - `payload format changed (CLI upgrade)` when the only differences come from a newer CLI describing the same construct differently, such as a private location list or retry strategy being sent in a new form. The deploy rewrites the stored form and nothing about the resource changes.
 - A plain list of the changed properties when the CLI cannot render the resource as a construct.
@@ -89,7 +89,7 @@ npx checkly deploy -c="./checkly.staging.config.ts"
 
 <ResponseField name="--dry-run" type="boolean">
 
-Print the plan as a JSON envelope and exit without deploying. The envelope carries every resource the deploy would touch and, for each updated one, the changed properties with their values before and after, together with the plan token. A value longer than 256 characters (a script, a request body) is replaced by an `$omitted` marker carrying its length, a changed secret is marked `secret: true` without values, and the deployed state itself is not included. Useful for scripts and agents that want to inspect a deploy before running it with `--plan-token`.
+Print the plan as a JSON envelope and exit without deploying. The envelope carries every resource the deploy would touch and, for each updated one, the changed properties with their values before and after, together with the plan token. A value longer than 256 characters (a script, a request body) is replaced by an `$omitted` marker carrying its length. A sensitive value is a `{ "$masked": "same" | "changed" }` marker, `changed` on the element whose secret moved. A change is flagged `secret: true` when a secret moved or when a sensitive list element has no counterpart on the other side (added, removed or renamed), in which case no marker reads `changed` and the list itself shows the difference. The deployed state itself is not included. Useful for scripts and agents that want to inspect a deploy before running it with `--plan-token`.
 
 **Usage:**
 

@@ -42,15 +42,23 @@ Before it writes anything, `checkly deploy` asks Checkly what the deploy would c
 
 The plan compares your code against what the project last deployed, so it can also tell you when a resource was edited in the Checkly web app or through the API since then. Such an edit is overwritten by the deploy, because your code is the source of truth for the resources it declares; the property listing and the `--dry-run` envelope mark it as changed in Checkly, while the construct diff simply shows your account's current value on the deployed side.
 
-Under an updated resource, `--preview` and `--output` print a diff of the construct as it is in your account against the construct in your code. You may also see:
+`--preview` and `--output` print the plan as an overview of every resource the deploy touches, followed by a diff per updated resource. Each row in the overview carries a marker, the construct type, the logical ID and either the source file or a note saying what happens to the resource:
 
-- A diff of two texts rather than of the construct, for a change that lives outside it: a browser or multi-step check's script, an API check's setup or teardown script.
-- A property Checkly stores encrypted, such as a locked environment variable, is shown inline with its value masked as `'********'`. The side that changed reads `'******** (changed)'`, or `'******** (changed in Checkly)'` on the deployed side. When the change cannot be shown inline, for example a secret that was renamed, the line `secret changed: <property>` names the property holding it instead.
-- `changed: code bundle` or `changed: dependency cache`, or one line naming both, for a resource whose only change is what it bundles.
+- `+` create, `~` update, `-` delete. A deleted resource is noted `permanently deleted, run history lost`.
+- `-` with `kept in your Checkly account, now managed from the Checkly web app` for a resource removed from code that [`--preserve-resources`](#command-options) detaches instead of deleting.
+- `-` on a relation with `relation not managed by this project, deleted by --prune-relations`, and `!` on a check or group that has such relations when [`--prune-relations`](#command-options) is not passed.
+- `·` with `skipped (testOnly)` for checks marked `testOnly: true`, which are never deployed.
+- A closing `N unchanged` row counting the resources the deploy leaves alone.
+
+Under the overview, every updated resource gets a header line with its type, logical ID and source file, followed by a diff of the construct as it is in your account against the construct in your code: `+` lines are added, `-` lines removed, everything else is context, and `⋯` marks skipped lines. Facts a diff cannot show are printed as `~` notes:
+
+- The property's path, such as `/script:`, followed by a diff of two texts rather than of the construct, for a change that lives outside it: a browser or multi-step check's script, an API check's setup or teardown script.
+- A property Checkly stores encrypted, such as a locked environment variable, is shown inline with its value masked as `'********'`. The side that changed reads `'******** (changed)'`, or `'******** (changed in Checkly)'` on the deployed side. When the change cannot be shown inline, for example a secret that was renamed, the note `secret changed: <property>` names the property holding it instead.
+- `changed: code bundle` or `changed: dependency cache`, or one note naming both, for a resource whose only change is what it bundles.
 - `payload format changed (CLI upgrade)` when the only differences come from a newer CLI describing the same construct differently, such as a private location list or retry strategy being sent in a new form. The deploy rewrites the stored form and nothing about the resource changes.
 - A plain list of the changed properties when the CLI cannot render the resource as a construct.
 
-Checks marked `testOnly: true` are not deployed and are listed under `Skip (testOnly):`.
+The last line totals the plan: how many resources are to be created, updated and deleted, and how many are unchanged.
 
 Every plan comes with a **plan token** that pins the account state it was computed against, so a deploy cannot silently apply to an account that changed in the meantime. See [`--plan-token`](#command-options).
 
@@ -150,23 +158,20 @@ Bundling project resources... ✅
 Checking what would change... ✅
 Deploying project... ✅
 
-Update:
-    ApiCheck: homepage-api
-      file: __checks__/homepage.check.ts
-      --- deployed
-      +++ local
-      @@ -1,7 +1,7 @@
-       new ApiCheck('homepage-api', {
-         name: 'Homepage API',
-         request: {
-      -    url: 'https://example.com/health',
-      +    url: 'https://example.com/v2/health',
-           method: 'GET',
-         },
-       })
+  ~ ApiCheck  homepage-api  __checks__/homepage.check.ts
+    12 unchanged
 
-Unchanged: 12
+~ ApiCheck homepage-api  __checks__/homepage.check.ts
+    new ApiCheck('homepage-api', {
+      name: 'Homepage API',
+      request: {
+  -     url: 'https://example.com/health',
+  +     url: 'https://example.com/v2/health',
+        method: 'GET',
+      },
+    })
 
+1 to update, 12 unchanged
 Successfully deployed project "Website Monitoring" to account "Monitoring as Code".
 ```
 
@@ -205,29 +210,23 @@ Validating project resources... ✅
 Bundling project resources... ✅
 Checking what would change... ✅
 
-Create:
-    UrlMonitor: homepage-uptime
-    MultiStepCheck: auth-api-flow
+Deploy preview · Website Monitoring → account Monitoring as Code
 
-Delete:
-    Check: legacy-api-check
+  + MultiStepCheck   auth-api-flow     __checks__/auth-api-flow.check.ts
+  + UrlMonitor       homepage-uptime   __checks__/homepage-uptime.check.ts
+  ~ SmsAlertChannel  sms-channel-1     __checks__/alert-channels.ts
+  - Check            legacy-api-check  permanently deleted, run history lost
+    12 unchanged
 
-Update:
-    SmsAlertChannel: sms-channel-1
-      file: __checks__/alert-channels.ts
-      --- deployed
-      +++ local
-      @@ -1,4 +1,4 @@
-       export const smsChannel1Alert = new SmsAlertChannel('sms-channel-1', {
-         name: 'On-call phone',
-      -  phoneNumber: '+31612345678',
-      +  phoneNumber: '+31687654321',
-       })
+~ SmsAlertChannel sms-channel-1  __checks__/alert-channels.ts
+    export const smsChannel1Alert = new SmsAlertChannel('sms-channel-1', {
+      name: 'On-call phone',
+  -   phoneNumber: '+31612345678',
+  +   phoneNumber: '+31687654321',
+    })
 
-Unchanged: 12
-
-Plan token: v1.Yq2PnD7Kzx0m8sVxLh4cQw
-Deploy this exact plan with `checkly deploy --plan-token v1.Yq2PnD7Kzx0m8sVxLh4cQw`.
+2 to create, 1 to update, 1 to delete, 12 unchanged
+Deploy exactly this plan: checkly deploy --plan-token v1.Yq2PnD7Kzx0m8sVxLh4cQw
 ```
 
 The lines printed under an updated resource are described in [How a deploy previews its changes](#how-a-deploy-previews-its-changes).
@@ -246,7 +245,7 @@ This mirrors [`checkly destroy --preserve-resources`](/cli/checkly-destroy), but
 npx checkly deploy --preserve-resources
 ```
 
-In the deploy output, detached resources are listed in their own section instead of under `Delete:`; see [Deleting vs. detaching removed resources](#deleting-vs-detaching-removed-resources).
+In the deploy output, a detached resource keeps its `-` marker but is noted `kept in your Checkly account, now managed from the Checkly web app` instead of being reported as deleted; see [Deleting vs. detaching removed resources](#deleting-vs-detaching-removed-resources).
 
 </ResponseField>
 
@@ -254,7 +253,7 @@ In the deploy output, detached resources are listed in their own section instead
 
 Alert channel subscriptions and private location assignments can be added to a check or group from the Checkly web app, outside your code. A deploy leaves those alone and reports them as relations the project does not manage. Pass `--prune-relations` to delete them, so the check or group ends up with exactly the alert channels and private locations your code declares.
 
-Without the flag, a check or group whose only reported change is such a relation is listed under `Has alert channels or private locations this project does not manage (pass --prune-relations to delete them):`. With it, the relations to be deleted are listed under `Prune (relations not managed by this project):` and named in the confirmation, so you can see what goes before it does.
+Without the flag, a check or group whose only reported change is such a relation gets a `!` row noted `has alert channels or private locations this project does not manage (pass --prune-relations to delete them)`. With it, every relation to be deleted gets its own `-` row noted `relation not managed by this project, deleted by --prune-relations`, and is named in the confirmation, so you can see what goes before it does.
 
 **Usage:**
 
@@ -337,14 +336,15 @@ To keep removed resources and their run history, deploy with [`--preserve-resour
 ```bash Terminal
 $ npx checkly deploy --preserve-resources --output
 
-Kept in your Checkly account (removed from code, now managed from the Checkly web app):
-    Check: legacy-api-check
+  - Check  legacy-api-check  kept in your Checkly account, now managed from the Checkly web app
+    12 unchanged
 
+1 kept in your account, 12 unchanged
 Successfully deployed project "Website Monitoring" to account "Monitoring as Code".
 ```
 
 <Note>
-Detach-on-deploy requires a recent Checkly backend. Against older backends, `--preserve-resources` still keeps your resources, but they may be reported under `Delete:` rather than under the kept-in-account section in the deploy output.
+Detach-on-deploy requires a recent Checkly backend. Against older backends, `--preserve-resources` still keeps your resources, but the deploy output may report them as permanently deleted rather than as kept in your account.
 </Note>
 
 ## Git Integration

@@ -341,29 +341,27 @@ This command won't deploy anything, just parse our project and show us what will
 Bundling project resources... ✅
 Checking what would change... ✅
 
-Create:
-    BrowserCheck: __checks__/crime-category.spec.ts
-    BrowserCheck: __checks__/fantasy-category.spec.ts
-    BrowserCheck: __checks__/homepage-elements.spec.ts
-    BrowserCheck: __checks__/navigation-menu.spec.ts
-    BrowserCheck: __checks__/search-functionality.spec.ts
-    BrowserCheck: book-detail-visibility-check-v1
-    BrowserCheck: signup-form-elements-check-v1
+Deploy preview · Danube Web Shop → account Monitoring as Code
 
-Delete:
-    Check: danube-web-shop-monitor
+  + BrowserCheck  __checks__/crime-category.spec.ts        __checks__/crime-category.spec.ts
+  + BrowserCheck  __checks__/fantasy-category.spec.ts      __checks__/fantasy-category.spec.ts
+  + BrowserCheck  __checks__/homepage-elements.spec.ts     __checks__/homepage-elements.spec.ts
+  + BrowserCheck  __checks__/navigation-menu.spec.ts       __checks__/navigation-menu.spec.ts
+  + BrowserCheck  __checks__/search-functionality.spec.ts  __checks__/search-functionality.spec.ts
+  + BrowserCheck  book-detail-visibility-check-v1          __checks__/book-detail.check.ts
+  + BrowserCheck  signup-form-elements-check-v1            __checks__/signup-form.check.ts
+  - Check         danube-web-shop-monitor                  permanently deleted, run history lost
+    1 unchanged
 
-Unchanged: 1
-
-Plan token: v1.Yq2PnD7Kzx0m8sVxLh4cQw
-Deploy this exact plan with `checkly deploy --plan-token v1.Yq2PnD7Kzx0m8sVxLh4cQw`.
+7 to create, 1 to delete, 1 unchanged
+Deploy exactly this plan: checkly deploy --plan-token v1.Yq2PnD7Kzx0m8sVxLh4cQw
 ```
 
 Let's discuss the output of this preview command in detail, as it's critical to understand how Checkly handles deployments from your project:
 * Checks that have no `.check.ts` config file are listed by their filename and will be named for their file name in the Checkly web UI. In general, it's better to include a config file for every check since it gives you explicit control of the check's logical ID. We've left out the config for five checks for demonstration purposes.
 * Checks with a config file are shown by their logical ID. 
 * Checks previously deployed from this project that are not present in this deployment will be deleted.
-* Checks with a matching logical ID from a previous deployment are listed under "Update", with a diff of what changed, or only counted under "Unchanged" when nothing did.
+* Checks with a matching logical ID from a previous deployment are marked `~`, with a diff of what changed below the overview, or only counted in the `N unchanged` row when nothing did.
 
 If you're getting strange results from a preview of `deploy` and you're not sure why, it might be time to get in touch with the Checkly team. [Join our Slack](https://checklyhq.com/slack) for deployment advice! 
 

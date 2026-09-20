@@ -58,7 +58,7 @@ Under the overview, every updated resource gets a header line with its type, log
 - `payload format changed (CLI upgrade)` when the only differences come from a newer CLI describing the same construct differently, such as a private location list or retry strategy being sent in a new form. The deploy rewrites the stored form and nothing about the resource changes.
 - A plain list of the changed properties when the CLI cannot render the resource as a construct.
 
-The last line totals the plan: how many resources are to be created, updated and deleted, and how many are unchanged.
+The last line totals the plan: how many resources are to be created, updated and deleted, and how many are unchanged. After a deploy, `--output` prints the same overview and diffs for what was done, with the totals in the past tense.
 
 Every plan comes with a **plan token** that pins the account state it was computed against, so a deploy cannot silently apply to an account that changed in the meantime. See [`--plan-token`](#command-options).
 
@@ -171,7 +171,8 @@ Deploying project... ✅
       },
     })
 
-1 to update, 12 unchanged
+1 updated, 12 unchanged
+
 Successfully deployed project "Website Monitoring" to account "Monitoring as Code".
 ```
 
@@ -340,6 +341,7 @@ $ npx checkly deploy --preserve-resources --output
     12 unchanged
 
 1 kept in your account, 12 unchanged
+
 Successfully deployed project "Website Monitoring" to account "Monitoring as Code".
 ```
 

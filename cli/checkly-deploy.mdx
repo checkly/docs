@@ -33,12 +33,13 @@ npx checkly deploy [options]
 | `--preserve-resources` | - | Detach resources removed from code (keeping them and their run history) instead of deleting them. |
 | `--prune-relations` | - | Delete the alert channel subscriptions and private location assignments on this project's checks and groups that the project does not manage. |
 | `--[no-]schedule-on-deploy` | - | Enables automatic check scheduling after a deploy. |
+| `--skip-plan` | - | Deploy without asking Checkly for a plan first. Nothing is previewed and no plan token is used; a deploy that deletes resources still lists them before you confirm. |
 | `--[no-]verify-runtime-dependencies` | - | Return an error if checks import dependencies that are not supported by the selected runtime. |
 | `--verbose, -v` | - | Show resource names and IDs in the deploy output. Implies `--output`. |
 
 ## How a deploy previews its changes
 
-Before it writes anything, `checkly deploy` asks Checkly what the deploy would change and shows you the plan. A plain `checkly deploy` lists the resources it would create, update or delete and asks you to confirm: deletions are always listed in full, created and updated resources up to 20, with the rest counted and `--preview` suggested for the full list. While the plan is being checked nothing is uploaded, so cancelling at the prompt leaves your account untouched.
+Before it writes anything, `checkly deploy` asks Checkly what the deploy would change and shows you the plan. A plain `checkly deploy` prints the full preview (the overview of every resource it would create, update or delete, with the unchanged ones counted, and a diff of every updated resource) and then asks whether to apply the changes or cancel. While the plan is being checked nothing is uploaded, so cancelling at the prompt leaves your account untouched. In agent or CI environments the plan is returned as a `confirmation_required` envelope instead (see [Deleting vs. detaching removed resources](#deleting-vs-detaching-removed-resources)).
 
 The plan compares your code against what the project last deployed, so it can also tell you when a resource was edited in the Checkly web app or through the API since then. Such an edit is overwritten by the deploy, because your code is the source of truth for the resources it declares; the property listing and the `--dry-run` envelope mark it as changed in Checkly, while the construct diff simply shows your account's current value on the deployed side.
 
@@ -65,7 +66,7 @@ Every plan comes with a **plan token** that pins the account state it was comput
 Resources that did not change are not written at all. Deploying the same code twice reports every resource as unchanged the second time.
 
 <Note>
-When the plan cannot be computed, the CLI warns `Could not check what this deploy would change` and falls back to listing the resources a deploy would touch, without property-level detail and with the code bundle uploaded before the confirmation; `--plan-token` and `--prune-relations` are unavailable on that path.
+When the plan cannot be computed, the CLI warns `Could not check what this deploy would change` and deploys without one; `--skip-plan` takes the same path on purpose. Without a plan nothing is previewed. A deploy that deletes removed resources finds them with a dry run, for which the code bundle is uploaded before the confirmation, and the confirmation lists those deletions; with `--preserve-resources` nothing is listed and the upload happens after you confirm. `--plan-token` and `--prune-relations` are unavailable on that path.
 </Note>
 
 ## Command Options
@@ -111,7 +112,7 @@ npx checkly deploy --dry-run
 
 Skip the interactive confirmation dialog and proceed with the operation.
 
-Use `--force` to set up automated CI/CD pipelines testing preview environments and deploying monitoring changes automatically. A forced deploy still computes the plan; if the account changes while the code bundle is uploading, it plans again and deploys the current plan rather than failing the pipeline. A run pinned with `--plan-token` is refused instead, even with `--force`.
+Use `--force` to set up automated CI/CD pipelines testing preview environments and deploying monitoring changes automatically. A forced deploy still computes the plan unless `--skip-plan` is passed; if the account changes while the code bundle is uploading, it plans again and deploys the current plan rather than failing the pipeline. A run pinned with `--plan-token` is refused instead, even with `--force`.
 
 **Usage:**
 
@@ -276,6 +277,21 @@ npx checkly deploy --no-schedule-on-deploy
 
 </ResponseField>
 
+<ResponseField name="--skip-plan" type="boolean">
+
+Deploy without asking Checkly for a plan first. Nothing is previewed, no plan token is used, and the deploy applies whatever your account looks like when it runs. What the confirmation shows instead is described in the note under [How a deploy previews its changes](#how-a-deploy-previews-its-changes); `--force` skips the confirmation as usual, and `--output` prints the overview and totals only, since there is no plan to diff against. `--skip-preview` is accepted as an alias.
+
+Cannot be combined with `--preview`, `--dry-run`, `--plan-token` or `--prune-relations`, which all need a plan.
+
+**Usage:**
+
+```bash Terminal
+npx checkly deploy --skip-plan
+npx checkly deploy --skip-plan --force
+```
+
+</ResponseField>
+
 <ResponseField name="--[no-]verify-runtime-dependencies" type="boolean" default="true">
 
 Return an error if checks import dependencies that are not supported by the selected runtime.
@@ -310,7 +326,7 @@ npx checkly deploy -v
 
 When you remove a resource from your code and deploy, the CLI reconciles your account with your local configuration. By default, resources that no longer exist in code are **deleted** from your account, which also **permanently deletes their run history**.
 
-A non-forced `checkly deploy` shows you the plan and asks you to confirm it:
+A non-forced `checkly deploy` shows you the plan, with the same overview and diffs as [`--preview`](#command-options) but without the `Deploy exactly this plan` line since this run already pins the token, and asks you to apply it:
 
 ```bash Terminal
 $ npx checkly deploy
@@ -320,17 +336,30 @@ Validating project resources... ✅
 Bundling project resources... ✅
 Checking what would change... ✅
 
+Deploy preview · Website Monitoring → account Monitoring as Code
+
+  ~ ApiCheck  homepage-api      __checks__/homepage-api.check.ts
+  - Check     legacy-api-check  permanently deleted, run history lost
+    12 unchanged
+
+~ ApiCheck homepage-api  __checks__/homepage-api.check.ts
+    export const homepageApi = new ApiCheck('homepage-api', {
+      name: 'Homepage API',
+  -   frequency: Frequency.EVERY_10M,
+  +   frequency: Frequency.EVERY_5M,
+    })
+
+1 to update, 1 to delete, 12 unchanged
+
 This will:
   - Deploy project "Website Monitoring" to account "Monitoring as Code"
   - Schedule checks after deploy
   - Delete any resources removed from code, losing their run history. Pass --preserve-resources to keep them in your Checkly account instead
-  - Permanently delete Check: legacy-api-check, losing its run history
-  - Update Check: homepage-api
 
-? Proceed? › (y/N)
+? Apply these changes? › (y/N)
 ```
 
-This confirmation is skipped when you pass `--force` (for CI/CD). In agent or CI environments the CLI instead returns a `confirmation_required` JSON envelope carrying the plan and its token, and exits with code `2` rather than prompting; the envelope names the command that deploys that exact plan.
+This confirmation is skipped when you pass `--force` (for CI/CD). In agent or CI environments the CLI instead returns a `confirmation_required` JSON envelope carrying the plan and its token, and exits with code `2` rather than prompting; the envelope names the command that deploys that exact plan. Its `changes` list deletions and detachments in full and created and updated resources up to 20, with the rest counted; the `--dry-run` envelope is capped the same way, while the `preview.diff` both carry is not. Without a plan, the prompt lists deletions instead of the preview, as described in the note under [How a deploy previews its changes](#how-a-deploy-previews-its-changes).
 
 To keep removed resources and their run history, deploy with [`--preserve-resources`](#command-options). Instead of deleting them, the CLI **detaches** them — they remain in your Checkly account as regular account-level resources, managed from the UI, and can be re-attached later by adding them back to your code:
 

@@ -41,7 +41,7 @@ npx checkly deploy [options]
 
 Before it writes anything, `checkly deploy` asks Checkly what the deploy would change and shows you the plan. A plain `checkly deploy` prints the full preview (the overview of every resource it would create, update or delete, with the unchanged ones counted, and a diff of every updated resource) and then asks whether to apply the changes or cancel. While the plan is being checked nothing is uploaded, so cancelling at the prompt leaves your account untouched. In agent or CI environments the plan is returned as a `confirmation_required` envelope instead (see [Deleting vs. detaching removed resources](#deleting-vs-detaching-removed-resources)).
 
-The plan compares your code against what the project last deployed, so it can also tell you when a resource was edited in the Checkly web app or through the API since then. Such an edit is overwritten by the deploy, because your code is the source of truth for the resources it declares; the property listing and the `--dry-run` envelope mark it as changed in Checkly, while the construct diff simply shows your account's current value on the deployed side.
+The plan compares your code against what the project last deployed, so it can also tell you when a resource was edited in the Checkly web app or through the API since then. Such an edit is overwritten by the deploy, because your code is the source of truth for the resources it declares; the property listing and the `--dry-run` envelope mark it as changed in Checkly, while the construct diff simply shows your account's current value on the deployed side. In a terminal you can instead have the CLI [update your code with that edit](#updating-your-code-with-changes-made-in-checkly).
 
 `--preview` and `--output` print the plan as an overview of every resource the deploy touches, followed by a diff per updated resource. Each row in the overview carries a marker, the construct type, the logical ID and either the source file or a note saying what happens to the resource:
 
@@ -64,6 +64,27 @@ The last line totals the plan: how many resources are to be created, updated and
 Every plan comes with a **plan token** that pins the account state it was computed against, so a deploy cannot silently apply to an account that changed in the meantime. See [`--plan-token`](#command-options).
 
 Resources that did not change are not written at all. Deploying the same code twice reports every resource as unchanged the second time.
+
+### Updating your code with changes made in Checkly
+
+When the plan shows a check or check group that was edited in the Checkly web app or through the API, and the edit is on a property the CLI can write into your code, the prompt gets a third choice next to applying and cancelling:
+
+```text Terminal
+? Apply these changes? ›
+    Yes, apply these changes
+    Update my code with the changes made in Checkly (deploys nothing)
+  ❯ Cancel
+```
+
+Choosing it writes your account's current values into the construct files and ends the run without deploying, so you can review the result with `git diff` and deploy again. Only what can be written without guessing is written, so a reason found once the file is read (listed below) can still leave nothing to write:
+
+- On every check: `name`, `description`, `activated`, `muted`, `shouldFail`, `tags`, `locations`, and a `frequency` in whole minutes. Also `degradedResponseTime` and `maxResponseTime` on API checks and URL, TCP, DNS, gRPC, SSL and traceroute monitors; the packet-loss thresholds on ICMP monitors; `period` and `grace` on heartbeat monitors, each written together with its unit; `environmentVariables` on API, browser, multistep and Playwright checks; and the `request` of an API check (`url`, `method`, `headers`, `queryParameters`, `body`, `bodyType`, `basicAuth`, `followRedirects`, `skipSSL`, `ipFamily`) or URL monitor (`url`, `followRedirects`, `skipSSL`, `ipFamily`). Agentic checks take neither `shouldFail` nor `frequency`.
+- On a check group: `name`, `activated`, `muted`, `tags`, `locations`, `concurrency`, `environmentVariables`, and `apiCheckDefaults` (`url`, `headers`, `queryParameters`, `basicAuth`).
+- The construct has to be declared as `new ApiCheck('logical-id', { … })` in a JavaScript or TypeScript file, with the class imported by name from `checkly` or `checkly/constructs` or destructured from a top-level `require` of it (a namespace import or a re-export from your own module is not recognised) and its options written out as an object literal. An existing value is replaced only when it is itself a literal (a string, number or boolean, or an array or object of those); a property the code does not set is added after the last one of the object that holds it (`request` itself has to exist for `request.body` to be added), in the file's own quoting and indentation. Nothing else in the file is touched.
+
+A change that was also made in your code since the last deploy is written over it, and the output marks it `(replacing a local edit)`; a list such as `tags` that your code changed too is left alone instead, since the CLI cannot merge the two. Every change that cannot be written is listed under `Not updated (edit these by hand)` with its reason: a value written with a helper such as `Frequency.EVERY_5M` or `RetryStrategyBuilder`, `assertions` (write them with `AssertionBuilder`), a reference to another resource (alert channels, private locations, a group), a secret or a locked variable that Checkly does not return, a script or code bundle, a sub-minute frequency, a list your code also changed, options built from a variable or a spread, or a construct the CLI cannot locate in the file (its id is computed, or two constructs share it). TypeScript and JSX files need `typescript` installed in the project, as TypeScript check files already do.
+
+The CLI prints each property it updated with its old and new value. There is no flag for the choice, and the `confirmation_required` envelope does not change.
 
 <Note>
 When the plan cannot be computed, the CLI warns `Could not check what this deploy would change` and deploys without one; `--skip-plan` takes the same path on purpose. Without a plan nothing is previewed. A deploy that deletes removed resources finds them with a dry run, for which the code bundle is uploaded before the confirmation, and the confirmation lists those deletions; with `--preserve-resources` nothing is listed and the upload happens after you confirm. `--plan-token` and `--prune-relations` are unavailable on that path.

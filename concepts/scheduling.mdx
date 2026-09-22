@@ -5,6 +5,14 @@ sidebarTitle: 'Scheduling'
 canonical: 'https://www.checklyhq.com/docs/concepts/scheduling/'
 ---
 
+## How scheduling works
+
+Checkly runs checks on a **fixed interval** (the check's frequency), not at specific clock times. Frequencies range from every 10 seconds up to every 24 hours, depending on the check type. Cron expressions and "run at exactly 1:00 AM every day" schedules are not supported by the built-in scheduler.
+
+The first run happens shortly after you activate or deploy a check. Every subsequent run is scheduled one interval later, so run times are not aligned to the top of the hour or to a specific time zone. See the **Available frequencies** list on each construct reference (for example, [ApiCheck](/constructs/api-check) or [BrowserCheck](/constructs/browser-check)) for the exact values you can pick.
+
+If you need a check to run at a specific time of day, trigger it externally on your own schedule (for example, from a cron job or CI workflow) using [`checkly trigger`](/cli/checkly-trigger) or the Checkly [API](/api-reference). Keep the check's own frequency at a value that fits your monitoring needs, or set `activated: false` on the check if it should only run when triggered.
+
 ## Scheduling Strategies
 
 Checkly provides two scheduling strategies for running checks: **Round-robin** or **Parallel scheduling**. To select a scheduling strategy go to ‘Scheduling and locations’ when creating or editing a check.

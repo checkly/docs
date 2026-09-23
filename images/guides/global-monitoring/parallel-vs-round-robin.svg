@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1f2937">
+  <text x="40" y="40" font-size="22" font-weight="600">Round-robin spreads load. Parallel finds the region that is down.</text>
+  <text x="40" y="66" fill="#6b7280">Four locations, a check every 5 minutes, and Sydney goes dark at 00:02. Each cell is one run.</text>
+
+  <!-- Column headers (time) -->
+  <g font-size="13" fill="#6b7280" text-anchor="middle">
+    <text x="340" y="112">00:00</text><text x="470" y="112">00:05</text><text x="600" y="112">00:10</text><text x="730" y="112">00:15</text><text x="860" y="112">00:20</text><text x="990" y="112">00:25</text>
+  </g>
+  <!-- outage marker -->
+  <line x1="392" y1="120" x2="392" y2="470" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 4"/>
+  <text x="398" y="134" font-size="12" fill="#dc2626">Sydney PoP fails 00:02</text>
+
+  <!-- Round-robin block -->
+  <text x="40" y="160" font-weight="600">Round-robin</text>
+  <text x="40" y="180" font-size="12" fill="#6b7280">one location per interval</text>
+  <g font-size="13" fill="#374151">
+    <text x="190" y="216">Virginia</text><text x="190" y="248">Frankfurt</text><text x="190" y="280">Singapore</text><text x="190" y="312">Sydney</text>
+  </g>
+  <!-- grid rows y: 200,232,264,296 ; cols x: 320,450,580,710,840,970 (w 40 h 24) -->
+  <g>
+    <rect x="320" y="200" width="40" height="24" rx="4" fill="#16a34a"/>
+    <rect x="450" y="232" width="40" height="24" rx="4" fill="#16a34a"/>
+    <rect x="580" y="264" width="40" height="24" rx="4" fill="#16a34a"/>
+    <rect x="710" y="296" width="40" height="24" rx="4" fill="#dc2626"/>
+    <rect x="840" y="200" width="40" height="24" rx="4" fill="#16a34a"/>
+    <rect x="970" y="232" width="40" height="24" rx="4" fill="#16a34a"/>
+  </g>
+  <g fill="#e5e7eb">
+    <rect x="450" y="200" width="40" height="24" rx="4"/><rect x="580" y="200" width="40" height="24" rx="4"/><rect x="710" y="200" width="40" height="24" rx="4"/><rect x="970" y="200" width="40" height="24" rx="4"/>
+    <rect x="320" y="232" width="40" height="24" rx="4"/><rect x="580" y="232" width="40" height="24" rx="4"/><rect x="710" y="232" width="40" height="24" rx="4"/><rect x="840" y="232" width="40" height="24" rx="4"/>
+    <rect x="320" y="264" width="40" height="24" rx="4"/><rect x="450" y="264" width="40" height="24" rx="4"/><rect x="710" y="264" width="40" height="24" rx="4"/><rect x="840" y="264" width="40" height="24" rx="4"/><rect x="970" y="264" width="40" height="24" rx="4"/>
+    <rect x="320" y="296" width="40" height="24" rx="4"/><rect x="450" y="296" width="40" height="24" rx="4"/><rect x="580" y="296" width="40" height="24" rx="4"/><rect x="840" y="296" width="40" height="24" rx="4"/><rect x="970" y="296" width="40" height="24" rx="4"/>
+  </g>
+  <text x="1030" y="316" font-size="13" fill="#dc2626" font-weight="600">first failure at 00:15</text>
+  <text x="1030" y="334" font-size="12" fill="#6b7280">13 min after the outage.</text>
+  <text x="1030" y="350" font-size="12" fill="#6b7280">A retry from another</text>
+  <text x="1030" y="366" font-size="12" fill="#6b7280">location passes, and it</text>
+  <text x="1030" y="382" font-size="12" fill="#6b7280">is filed as a blip.</text>
+
+  <!-- Parallel block -->
+  <line x1="40" y1="392" x2="1010" y2="392" stroke="#e5e7eb"/>
+  <text x="40" y="420" font-weight="600">Parallel</text>
+  <text x="40" y="440" font-size="12" fill="#6b7280">all locations, each interval</text>
+  <!-- compact: 4 stacked small cells per column at y 404..476 -->
+  <g font-size="11" fill="#374151">
+    <text x="236" y="414">Virginia</text><text x="236" y="432">Frankfurt</text><text x="236" y="450">Singapore</text><text x="236" y="468">Sydney</text>
+  </g>
+  <g fill="#16a34a">
+    <rect x="320" y="404" width="40" height="14" rx="3"/><rect x="320" y="422" width="40" height="14" rx="3"/><rect x="320" y="440" width="40" height="14" rx="3"/><rect x="320" y="458" width="40" height="14" rx="3"/>
+    <rect x="450" y="404" width="40" height="14" rx="3"/><rect x="450" y="422" width="40" height="14" rx="3"/><rect x="450" y="440" width="40" height="14" rx="3"/>
+    <rect x="580" y="404" width="40" height="14" rx="3"/><rect x="580" y="422" width="40" height="14" rx="3"/><rect x="580" y="440" width="40" height="14" rx="3"/>
+    <rect x="710" y="404" width="40" height="14" rx="3"/><rect x="710" y="422" width="40" height="14" rx="3"/><rect x="710" y="440" width="40" height="14" rx="3"/>
+    <rect x="840" y="404" width="40" height="14" rx="3"/><rect x="840" y="422" width="40" height="14" rx="3"/><rect x="840" y="440" width="40" height="14" rx="3"/>
+    <rect x="970" y="404" width="40" height="14" rx="3"/><rect x="970" y="422" width="40" height="14" rx="3"/><rect x="970" y="440" width="40" height="14" rx="3"/>
+  </g>
+  <g fill="#dc2626">
+    <rect x="450" y="458" width="40" height="14" rx="3"/><rect x="580" y="458" width="40" height="14" rx="3"/><rect x="710" y="458" width="40" height="14" rx="3"/><rect x="840" y="458" width="40" height="14" rx="3"/><rect x="970" y="458" width="40" height="14" rx="3"/>
+  </g>
+  <text x="1030" y="426" font-size="13" fill="#dc2626" font-weight="600">first failure at 00:05</text>
+  <text x="1030" y="444" font-size="12" fill="#6b7280">3 min after the outage,</text>
+  <text x="1030" y="460" font-size="12" fill="#6b7280">and 3 green rows say</text>
+  <text x="1030" y="476" font-size="12" fill="#6b7280">where the problem is.</text>
+
+  <text x="40" y="505" font-size="13" fill="#9ca3af">Round-robin is right for load-sensitive endpoints where "up somewhere" is good enough. Parallel is right when a region being down is an incident.</text>
+</svg>

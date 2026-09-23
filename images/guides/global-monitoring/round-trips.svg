@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" fill="#1f2937">
+  <text x="40" y="40" font-size="22" font-weight="600">Latency is distance, and a page load pays it four times</text>
+  <text x="40" y="66" fill="#6b7280">Light in fibre covers roughly 200 km per millisecond. Before the first byte of HTML arrives, a browser has already made about four round trips.</text>
+
+  <!-- Legend -->
+  <g font-size="13">
+    <rect x="40" y="90" width="14" height="14" rx="3" fill="#a5b4fc"/><text x="60" y="102">DNS lookup</text>
+    <rect x="160" y="90" width="14" height="14" rx="3" fill="#818cf8"/><text x="180" y="102">TCP handshake</text>
+    <rect x="300" y="90" width="14" height="14" rx="3" fill="#6366f1"/><text x="320" y="102">TLS handshake</text>
+    <rect x="440" y="90" width="14" height="14" rx="3" fill="#4338ca"/><text x="460" y="102">HTTP request → first byte</text>
+    <text x="1160" y="102" text-anchor="end" fill="#6b7280">Origin in us-east-1 (Virginia). One round trip ≈ 2 × distance ÷ 200 km/ms, plus routing.</text>
+  </g>
+
+  <!-- Scale: 0..800 ms across x=300..1140 (1.05 px per ms) -->
+  <g stroke="#e5e7eb">
+    <line x1="300" y1="130" x2="300" y2="470"/><line x1="510" y1="130" x2="510" y2="470"/><line x1="720" y1="130" x2="720" y2="470"/><line x1="930" y1="130" x2="930" y2="470"/><line x1="1140" y1="130" x2="1140" y2="470"/>
+  </g>
+  <g font-size="12" fill="#9ca3af" text-anchor="middle">
+    <text x="300" y="488">0 ms</text><text x="510" y="488">200 ms</text><text x="720" y="488">400 ms</text><text x="930" y="488">600 ms</text><text x="1140" y="488">800 ms</text>
+  </g>
+
+  <!-- Rows: name, distance, rtt -> 4 segments each rtt wide -->
+  <!-- Ohio: 700 km, ~15 ms RTT -->
+  <g>
+    <text x="40" y="164" font-weight="600">Ohio</text><text x="40" y="182" font-size="12" fill="#6b7280">≈ 700 km · 15 ms RTT</text>
+    <rect x="300" y="150" width="16" height="30" fill="#a5b4fc"/><rect x="316" y="150" width="16" height="30" fill="#818cf8"/><rect x="332" y="150" width="16" height="30" fill="#6366f1"/><rect x="348" y="150" width="16" height="30" fill="#4338ca"/>
+    <text x="372" y="171" font-size="13" fill="#4338ca" font-weight="600">≈ 60 ms to first byte</text>
+  </g>
+  <!-- Frankfurt: 6,600 km, ~90 ms -->
+  <g>
+    <text x="40" y="234" font-weight="600">Frankfurt</text><text x="40" y="252" font-size="12" fill="#6b7280">≈ 6,600 km · 90 ms RTT</text>
+    <rect x="300" y="220" width="94" height="30" fill="#a5b4fc"/><rect x="394" y="220" width="94" height="30" fill="#818cf8"/><rect x="488" y="220" width="94" height="30" fill="#6366f1"/><rect x="582" y="220" width="94" height="30" fill="#4338ca"/>
+    <text x="684" y="241" font-size="13" fill="#4338ca" font-weight="600">≈ 360 ms</text>
+  </g>
+  <!-- São Paulo: 7,600 km, ~120 ms -->
+  <g>
+    <text x="40" y="304" font-weight="600">São Paulo</text><text x="40" y="322" font-size="12" fill="#6b7280">≈ 7,600 km · 120 ms RTT</text>
+    <rect x="300" y="290" width="126" height="30" fill="#a5b4fc"/><rect x="426" y="290" width="126" height="30" fill="#818cf8"/><rect x="552" y="290" width="126" height="30" fill="#6366f1"/><rect x="678" y="290" width="126" height="30" fill="#4338ca"/>
+    <text x="812" y="311" font-size="13" fill="#4338ca" font-weight="600">≈ 480 ms</text>
+  </g>
+  <!-- Mumbai: 13,000 km, ~190 ms -->
+  <g>
+    <text x="40" y="374" font-weight="600">Mumbai</text><text x="40" y="392" font-size="12" fill="#6b7280">≈ 13,000 km · 190 ms RTT</text>
+    <rect x="300" y="360" width="199" height="30" fill="#a5b4fc"/><rect x="499" y="360" width="199" height="30" fill="#818cf8"/><rect x="698" y="360" width="199" height="30" fill="#6366f1"/><rect x="897" y="360" width="199" height="30" fill="#4338ca"/>
+    <text x="1104" y="381" font-size="13" fill="#4338ca" font-weight="600">≈ 760 ms</text>
+  </g>
+  <!-- Sydney: 16,000 km, ~200 ms -->
+  <g>
+    <text x="40" y="444" font-weight="600">Sydney</text><text x="40" y="462" font-size="12" fill="#6b7280">≈ 16,000 km · 200 ms RTT</text>
+    <rect x="300" y="430" width="210" height="30" fill="#a5b4fc"/><rect x="510" y="430" width="210" height="30" fill="#818cf8"/><rect x="720" y="430" width="210" height="30" fill="#6366f1"/><rect x="930" y="430" width="210" height="30" fill="#4338ca"/>
+    <text x="1136" y="451" font-size="13" fill="#fff" font-weight="600" text-anchor="end">≈ 800 ms</text>
+  </g>
+
+  <rect x="40" y="508" width="1120" height="40" rx="8" fill="#f9fafb" stroke="#e5e7eb"/>
+  <text x="600" y="533" text-anchor="middle" font-size="14">Nothing in your code is slow. Sydney is simply 13× further away than Ohio, and every handshake pays for it. A monitor in Virginia will never measure this.</text>
+</svg>

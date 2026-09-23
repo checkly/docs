@@ -186,7 +186,7 @@ playwright.config.ts
 Both variants from step 2 ran because the sample contains both. Open the session link. Each test in the suite shows its steps, timing, a trace, and a video, the same artifacts you get from a local run.
 
 <Frame>
-  <img src="/images/guides/playwright-to-monitoring/test-session-passing.png" alt="A recorded test session in Checkly showing the search and checkout tests passing with their Playwright report" />
+  <img src="/images/guides/playwright-to-monitoring/result-passing.png" alt="A passing Shop critical flows result in Checkly listing the checkout and search test cases with trace and video attachments" />
 </Frame>
 
 ## Step 4: Deploy
@@ -244,7 +244,7 @@ playwright.config.ts
 Playwright retried the test twice, the search test still passed, and `maxFailures` stopped the run. The result page shows the failing step, the error, a screenshot at the moment of failure, and the trace. This is the page an alert links to.
 
 <Frame>
-  <img src="/images/guides/playwright-to-monitoring/result-failing.png" alt="A failed Playwright Check Suite result in Checkly with the checkout test error, screenshot, and trace" />
+  <img src="/images/guides/playwright-to-monitoring/result-failing.png" alt="The failed checkout test case in Checkly showing three failed attempts, the Playwright error with the failing line highlighted, and View Trace and Analyze root cause buttons" />
 </Frame>
 
 Put `Buy` back. The deployed monitor never saw the broken version, because `npx checkly test` runs the code in your working tree and `npx checkly deploy` is what changes the monitor.

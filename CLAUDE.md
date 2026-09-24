@@ -54,7 +54,6 @@
 
 ## Writing standards
 - Second-person voice ("you")
-- Prerequisites at start of procedural content - ALWAYS wrap prerequisites in an Accordion component
 - Test all code examples before publishing
 - Match style and formatting of existing pages
 - Include both basic and advanced use cases
@@ -63,7 +62,6 @@
 - Relative paths for internal links
 
 ## Component usage rules
-- Prerequisites Should Always be wrapped in an Accordion component with title "Prerequisites" or "Before you begin"
 - Use Steps component for sequential procedures sparingly.
 - Don't use Cards to display information. Only for navigation on Overview type pages
 - Use CodeGroups and Dropdowns for code examples that show the same example in different languages

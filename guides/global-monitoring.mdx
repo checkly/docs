@@ -29,7 +29,7 @@ Most monitoring starts as a single check from a single place, usually the cloud 
 Between a browser and your code sit DNS, a CDN edge, transit networks, and a cloud region. Only the first hop is the same for everyone. The DNS answer, the edge that serves the request, the route it takes, and the region it lands in all depend on where the user is. Each of those hops can fail for one region and nobody else.
 
 <Frame>
-  <img src="/images/guides/global-monitoring/where-requests-break.svg" alt="Diagram of the six hops from a user's device to application code, with examples of failures that affect only one region at each hop, and who notices them first" />
+  <img src="/images/guides/global-monitoring/where-requests-break.png" alt="The six hops from a user's device to application code, one regional failure per hop, and two coverage bars: origin telemetry sees the last two hops, a monitor in the user's region sees all six" />
 </Frame>
 
 Origin-side telemetry, such as CPU, error rates, and traces, covers the last two hops. It cannot see a PoP returning 503s in Sydney, a WAF rule that blocks a country, or a submarine cable cut, because those requests never arrive. The only way to observe a path is to send a request down it.

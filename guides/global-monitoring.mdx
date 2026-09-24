@@ -5,6 +5,9 @@ description: A monitor next to your servers sees your servers. Your users see DN
 canonical: 'https://www.checklyhq.com/docs/guides/global-monitoring/'
 ---
 
+import GuideAgentIntro from '/snippets/guide-agent-intro.mdx'
+import { CopyPromptButton } from '/snippets/copy-prompt-button.jsx'
+
 By the end of this guide, you have a per-location latency profile of your site from thirteen locations, a default set of monitoring locations chosen from your users and your infrastructure, and a browser flow that retries in the region that failed and pages only when enough regions agree.
 
 <Frame>
@@ -17,6 +20,34 @@ By the end of this guide, you have a per-location latency profile of your site f
 
 To follow along without your own app, clone the [sample project](https://github.com/checkly/docs/tree/main/samples/guides/global-monitoring). It monitors the [Danube demo shop](https://danube-web.shop), which is hosted in AWS `us-east-1`. Every number in this guide was measured against it.
 </Accordion>
+
+## Let your agent do it
+
+<GuideAgentIntro />
+
+<div id="ai-setup-prompt">
+
+```txt Prompt
+Set up global monitoring for this project with Checkly. Read `npx checkly skills manage` to see which locations my plan allows, then `npx checkly skills configure url-monitors` and `npx checkly skills configure browser-checks`.
+
+Goal: measure the site from every region my users are in and alert only when regions agree.
+
+Success criteria:
+1. Create `__checks__/locations.ts` exporting the available public locations grouped by continent.
+2. Create a `UrlMonitor` for the homepage that runs every 5 minutes from every location in that file with `runParallel: true`, `degradedResponseTime: 1500`, and a 200 status assertion.
+3. Create a `BrowserCheck` for my most important user flow that runs every 10 minutes from one location per continent, with a same-region fixed retry strategy (2 retries, 30 seconds) and a run-based alert escalation that only fires when 50% of locations fail.
+4. Run `npx checkly test --record` and show me the session link.
+5. Show me `npx checkly deploy --preview` and wait for my confirmation before deploying.
+6. After the deploy has run for 15 minutes, use `npx checkly checks` or the Checkly MCP server to list the latest results per location, sorted by response time, and tell me the three slowest regions and the spread between fastest and slowest.
+
+Explain each file you changed and why.
+```
+
+</div>
+
+<CopyPromptButton />
+
+What follows is the reasoning behind that prompt and the same setup built step by step.
 
 ## Why one location is not enough
 
@@ -48,8 +79,6 @@ None of that shows up in your code's timing, because the code runs after the han
 
 ## Build it in three steps
 
-The three steps below take you from one check in one region to monitoring that sees every market, names the region that broke, and pages only when enough regions agree. Each step feeds the next: the measurement tells you which locations matter, and the locations you choose are what the alert votes with.
-
 ### Step 1: Measure from everywhere
 
 Before you can choose locations, you need to know how your site behaves from each one. Put the locations in one file and treat it as configuration, not as a per-check afterthought.
@@ -64,7 +93,7 @@ export const ASIA_PACIFIC = ['ap-south-1', 'ap-southeast-1', 'ap-northeast-1', '
 export const WORLD = [...AMERICAS, ...EUROPE, ...MIDDLE_EAST_AFRICA, ...ASIA_PACIFIC]
 ```
 
-A URL monitor is cheap enough to run from all of them, which makes it the right instrument for measuring.
+A URL monitor is cheap enough to run from all of them.
 
 ```ts __checks__/homepage-world.check.ts highlight={9-10}
 import { Frequency, UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs'
@@ -240,6 +269,12 @@ npx checkly deploy
 
 ## Verify it works
 
+With the [Checkly MCP server](/ai/mcp-server) connected, the same read is one prompt away, and it is the kind of question you will ask again after every deploy:
+
+```text Prompt
+Using Checkly, show the latest results of "Homepage from around the world" grouped by location, sorted by response time. Which three locations are slowest, and is any location above the degraded threshold?
+```
+
 Open the world monitor and sort its run results by location. The order should match the chart above within a few positions, and every location should be under the `degradedResponseTime` you set. If one is not, that is the number to design around, because it is what a real user there is waiting. Then open the checkout check: three rows, one per continent, each with its own screenshots and trace, so a failure in one is already localised before anyone looks at a log.
 
 ## Next
@@ -253,3 +288,4 @@ Open the world monitor and sort its run results by location. The order should ma
 - [`RetryStrategyBuilder`](/constructs/retry-strategy) and [`AlertEscalationBuilder`](/constructs/alert-escalation-policy)
 - [`UrlMonitor`](/constructs/url-monitor) and [`BrowserCheck`](/constructs/browser-check)
 - [Private locations](/platform/private-locations/overview)
+- [Checkly Skills](/ai/skills), [`npx checkly skills`](/cli/checkly-skills), and the [MCP server tools](/ai/mcp-server/tools)

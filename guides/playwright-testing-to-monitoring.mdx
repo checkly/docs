@@ -5,6 +5,9 @@ description: Run the Playwright tests you already have as scheduled production m
 canonical: 'https://www.checklyhq.com/docs/guides/playwright-testing-to-monitoring/'
 ---
 
+import GuideAgentIntro from '/snippets/guide-agent-intro.mdx'
+import { CopyPromptButton } from '/snippets/copy-prompt-button.jsx'
+
 By the end of this guide, two of your existing Playwright tests run against production every ten minutes from two regions, and you have seen what a failure looks like before a real one happens.
 
 <Frame>
@@ -18,6 +21,34 @@ By the end of this guide, two of your existing Playwright tests run against prod
 
 No Playwright project handy? Clone the [sample project](https://github.com/checkly/docs/tree/main/samples/guides/playwright-to-monitoring) this guide is built on. It runs against the [Danube demo shop](https://danube-web.shop).
 </Accordion>
+
+## Let your agent do it
+
+<GuideAgentIntro />
+
+<div id="ai-setup-prompt">
+
+```txt Prompt
+Turn the Playwright tests in this repository into Checkly production monitors. Read `npx checkly skills configure playwright-check-suites` first.
+
+Goal: a Playwright Check Suite that runs only the tests worth alerting on, every 10 minutes, from us-east-1 and eu-west-1.
+
+Success criteria:
+1. Add a `monitoring` project to my existing `playwright.config.ts` that selects tests tagged `@monitor`. Do not change the other projects.
+2. Use `process.env.CHECKLY === '1'` to point `baseURL` at production on Checkly and keep local runs on my dev server. Set `maxFailures: 1` and `retries: 2` for Checkly runs only.
+3. Tag at most two critical user-flow tests with `@monitor`. Ask me which ones if it is not obvious. Never tag tests that create accounts or mutate data.
+4. Create `checkly.config.ts` with one entry in `playwrightChecks` that selects the `monitoring` project.
+5. Run `npx checkly test --record` and show me the session link.
+6. Stop. Show me `npx checkly deploy --preview` and wait for my confirmation before `npx checkly deploy`.
+
+Explain each file you changed and why.
+```
+
+</div>
+
+<CopyPromptButton />
+
+Every step below is what the agent just did, in the open, so you can read the result or do it by hand.
 
 ## Step 1: Pick the tests that become monitors
 
@@ -266,3 +297,4 @@ Put `Buy` back. The deployed monitor never saw the broken version, because `npx 
 - [`PlaywrightCheck` construct](/constructs/playwright-check)
 - [`BrowserCheck` construct](/constructs/browser-check)
 - [`npx checkly test`](/cli/checkly-test) and [`npx checkly deploy`](/cli/checkly-deploy)
+- [Checkly Skills](/ai/skills) and [`npx checkly skills`](/cli/checkly-skills)

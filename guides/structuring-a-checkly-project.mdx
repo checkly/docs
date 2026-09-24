@@ -5,6 +5,9 @@ description: Organize checks by service with groups, keep shared settings in one
 canonical: 'https://www.checklyhq.com/docs/guides/structuring-a-checkly-project/'
 ---
 
+import GuideAgentIntro from '/snippets/guide-agent-intro.mdx'
+import { CopyPromptButton } from '/snippets/copy-prompt-button.jsx'
+
 By the end of this guide, your monitoring repository has one folder per service, shared defaults in a single config, a group per service with its own locations and variables, and a workflow that redeploys monitoring on every merge to `main`.
 
 <Frame>
@@ -18,6 +21,34 @@ By the end of this guide, your monitoring repository has one folder per service,
 
 To follow along without your own app, clone the [sample project](https://github.com/checkly/docs/tree/main/samples/guides/structure-a-project). It monitors the [Danube demo shop](https://danube-web.shop) and its API.
 </Accordion>
+
+## Let your agent do it
+
+<GuideAgentIntro />
+
+<div id="ai-setup-prompt">
+
+```txt Prompt
+Restructure the Checkly project in this repository so it scales with the codebase. Read `npx checkly skills configure` and `npx checkly skills configure check-groups` first.
+
+Goal: one folder per service under `__checks__`, shared defaults in `checkly.config.ts`, a `CheckGroupV2` per service, and a GitHub Actions workflow that deploys on merge to `main`.
+
+Success criteria:
+1. Look at the services this repository contains and propose the service folders. Ask me to confirm before moving files.
+2. Move shared settings (frequency, locations, tags, alert channels) into the `checks` defaults of `checkly.config.ts`. Keep `logicalId` unchanged.
+3. Put one `group.ts` in each service folder with a `CheckGroupV2`. Give the API group an `API_BASE_URL` environment variable and make its checks use `{{API_BASE_URL}}`.
+4. Put credentials in secrets with `npx checkly env add <KEY> <value> --secret`, never in code.
+5. Add `.github/workflows/checkly-deploy.yml` that runs `npx checkly deploy --force` on pushes to `main` that touch `__checks__/**` or `checkly.config.ts`, reading `CHECKLY_API_KEY` from secrets and `CHECKLY_ACCOUNT_ID` from variables.
+6. Run `npx checkly test --record`, then show me `npx checkly deploy --preview` and wait for my confirmation before deploying.
+
+Explain each file you changed and why.
+```
+
+</div>
+
+<CopyPromptButton />
+
+The steps below are the same work done by hand, so you can see what the agent built and why each piece is there.
 
 ## Step 1: One folder per service
 
@@ -307,3 +338,4 @@ Commit the file and merge. The workflow deploys it, and the new check appears un
 - [Environment variables and secrets](/platform/variables)
 - [Run Checkly from GitHub Actions](/integrations/ci-cd/github/actions) and [CLI authentication](/cli/authentication)
 - [`npx checkly test`](/cli/checkly-test) and [`npx checkly deploy`](/cli/checkly-deploy)
+- [Checkly Skills](/ai/skills) and [`npx checkly skills`](/cli/checkly-skills)

@@ -86,6 +86,9 @@
 
 - This replaces the older `<Tabs>` pattern for language-specific code examples
 
+## Guides
+- Any change under `guides/`, `samples/guides/`, or `images/guides/` follows the `guide-authoring` skill in `.claude/skills/guide-authoring/SKILL.md`: agent path first, tested samples, real screenshots, brand diagrams.
+
 ## Git workflow
 - NEVER use --no-verify when committing
 - Ask how to handle uncommitted changes before starting

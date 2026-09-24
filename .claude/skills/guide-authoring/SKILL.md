@@ -1,6 +1,6 @@
 ---
 name: guide-authoring
-description: Write or rewrite a page in the Guides tab. Use whenever a task touches guides/*.mdx, samples/guides/, or images/guides/. Covers the onboarding-journey map, the fixed page template (agent path first, then CLI steps), the tested-sample and screenshot pipeline, brand diagram rules, and the verification checklist.
+description: Write or rewrite a page in the Guides tab. Use whenever a task touches guides/*.mdx, samples/guides/, or images/guides/. Covers the fixed page template (collapsed agent prompt, then CLI steps), the tested-sample and screenshot pipeline, brand diagram rules, and the verification checklist.
 metadata:
   author: checkly docs
   established: 2026-09-23
@@ -18,39 +18,18 @@ A guide is a tutorial that ends with something deployed. It has one job, takes 1
 4. **Diagrams follow the brand system** (see "Diagrams"). If a diagram is mostly text in boxes, it is page content, not an image.
 5. **Under 2,000 words.** Split rather than exceed.
 
-## The journey
-
-Guides are sequenced. Each ends with a "Next" link to the following one.
-
-| Group | Guide | Slug |
-|---|---|---|
-| Start | Structure a Checkly project for a real codebase | `structuring-a-checkly-project` |
-| Detect | Turn your Playwright tests into monitors | `playwright-testing-to-monitoring` |
-| Detect | Why monitoring from around the globe is critical | `global-monitoring` |
-| Detect | Cover every endpoint with uptime monitors | `uptime-monitoring` |
-| Detect | Monitor an API end to end | `api-monitoring` |
-| Detect | Monitor a checkout flow | `monitoring-ecommerce-apps-using-playwright` |
-| Detect | Run checks on every deploy | `sdlc-monitoring` |
-| Communicate | Alerting that doesn't wake you up for nothing | `alerting` |
-| Communicate | A status page backed by real monitors | `communicate-availability` |
-| Resolve | Debug a failed check | `reading-traces` |
-| AI | Set up monitoring with an AI coding agent | `agentic-workflows` |
-| AI | Claude Code walkthrough | `claude-code-monitoring` |
-
-Retired pages get a `docs.json` redirect and every inbound link repointed in the same PR.
-
 ## Page template
 
 Fixed order. Do not add sections; fold extra material into a step or cut it.
 
 1. **Frontmatter**: `title`, `sidebarTitle`, `description`, `canonical`. Nothing else.
 2. **Outcome**: one sentence starting "By the end of this guide", then a `<Frame>` with the end-state screenshot.
-3. **Prerequisites** accordion: quickstart done, Node `20.19+` or `22.12+`, guide-specific items, and a link to the sample under `samples/guides/<slug>/`.
-4. **Let your agent do it**, collapsed in `<Accordion title="Let your agent do it" icon="sparkles">` right after Prerequisites, with no `##` heading: `import GuideAgentIntro from '/snippets/guide-agent-intro.mdx'` and `import { CopyPromptButton } from '/snippets/copy-prompt-button.jsx'`. Render `<GuideAgentIntro />`, then the prompt inside `<div id="ai-setup-prompt">` as a ` ```txt ` block, then `<CopyPromptButton />`, then one sentence: the steps below are what the agent does, in the open. The prompt states the goal, the success criteria, and that the agent must run `npx checkly test --record` and stop for confirmation before `npx checkly deploy`. The prompt carries the gist of the guide and nothing about skills. The snippet links to [Checkly Skills](/ai/skills); never add install or `npx checkly skills` instructions to the page.
+3. **Sample**: one plain sentence linking the sample under `samples/guides/<slug>/` and what it monitors. No Prerequisites accordion.
+4. **Let your agent do it**, collapsed in `<Accordion title="Let your agent do it" icon="sparkles">` right after the sample sentence, with no `##` heading: `import GuideAgentIntro from '/snippets/guide-agent-intro.mdx'` and `import { CopyPromptButton } from '/snippets/copy-prompt-button.jsx'`. Render `<GuideAgentIntro />`, then the prompt inside `<div id="ai-setup-prompt">` as a ` ```txt ` block, then `<CopyPromptButton />`, then one sentence: the steps below are what the agent does, in the open. The prompt states the goal, the success criteria, and that the agent must run `npx checkly test --record` and stop for confirmation before `npx checkly deploy`. The prompt carries the gist of the guide and nothing about skills. The snippet links to [Checkly Skills](/ai/skills); never add install or `npx checkly skills` instructions to the page.
 5. **Steps**, three to five `##` headings, each "do this, code block, what you see". Code fences carry the filename. CLI steps show real captured output in a ` ```text Terminal ` fence. Where the app changes, a `<Frame>` screenshot. Browser monitoring shows Playwright Check Suites and Browser Checks as equal paths in a `<CodeGroup>`.
 6. **Verify it works**: force a failure or run `npx checkly trigger`, show the result. In Resolve and Communicate guides, also show the same check through the MCP server with a ` ```text Prompt ` example.
-7. **Next**: one link to the following guide with a sentence on why.
-8. **Reference**: bullet list of the product pages touched. Always include the relevant `npx checkly skills` action and the MCP tools page when MCP appears.
+7. **Next**: one link to the guide that follows this one in the sidebar order, with a sentence on why.
+8. **Reference**: bullet list of the product pages touched. Link [Checkly Skills](/ai/skills) once; add the MCP tools page when MCP appears. No `npx checkly skills` instructions anywhere on the page.
 
 Voice: second person, plain sentences, no em dashes, no parentheticals. Tips and Notes sparingly, one each at most per step.
 
@@ -97,7 +76,7 @@ Only draw what has a spatial or quantitative idea: maps, timelines, bars, covera
 
 ## PR conventions
 
-One PR per guide, or a series on one branch. Each commit: the MDX, its sample, its images, its redirects, its overview card, and repointed inbound links. Update the PR body with `gh api -X PATCH repos/checkly/docs/pulls/<n>`; `gh pr edit` fails on this repo. Leave the marketing repo's `scenes.ts` change for Dan to commit.
+One PR per guide, or a series on one branch. Each commit: the MDX, its sample, its images, its redirects, its overview card, and repointed inbound links. A retired page gets a `docs.json` redirect and every inbound link repointed in the same commit. Update the PR body with `gh api -X PATCH repos/checkly/docs/pulls/<n>`; `gh pr edit` fails on this repo. Leave the marketing repo's `scenes.ts` change for Dan to commit.
 
 ## Decisions on record
 

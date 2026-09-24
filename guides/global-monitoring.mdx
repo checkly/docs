@@ -21,24 +21,25 @@ By the end of this guide, you have a per-location latency profile of your site f
 To follow along without your own app, clone the [sample project](https://github.com/checkly/docs/tree/main/samples/guides/global-monitoring). It monitors the [Danube demo shop](https://danube-web.shop), which is hosted in AWS `us-east-1`. Every number in this guide was measured against it.
 </Accordion>
 
-## Let your agent do it
+<Accordion title="Let your agent do it" icon="sparkles">
 
 <GuideAgentIntro />
 
 <div id="ai-setup-prompt">
 
 ```txt Prompt
-Set up global monitoring for this project with Checkly. Read `npx checkly skills manage` to see which locations my plan allows, then `npx checkly skills configure url-monitors` and `npx checkly skills configure browser-checks`.
+Set up global monitoring for this project with Checkly.
 
 Goal: measure the site from every region my users are in and alert only when regions agree.
 
 Success criteria:
 1. Create `__checks__/locations.ts` exporting the available public locations grouped by continent.
 2. Create a `UrlMonitor` for the homepage that runs every 5 minutes from every location in that file with `runParallel: true`, `degradedResponseTime: 1500`, and a 200 status assertion.
-3. Create a `BrowserCheck` for my most important user flow that runs every 10 minutes from one location per continent, with a same-region fixed retry strategy (2 retries, 30 seconds) and a run-based alert escalation that only fires when 50% of locations fail.
-4. Run `npx checkly test --record` and show me the session link.
-5. Show me `npx checkly deploy --preview` and wait for my confirmation before deploying.
-6. After the deploy has run for 15 minutes, use `npx checkly checks` or the Checkly MCP server to list the latest results per location, sorted by response time, and tell me the three slowest regions and the spread between fastest and slowest.
+3. Ask me which markets my users are in and which cloud regions I deploy to. Export `USERS`, `INFRA`, and one far-away `CONTROL` location from `locations.ts`, and set their combined set as `checks.locations` in `checkly.config.ts`.
+4. Create a `BrowserCheck` for my most important user flow that runs every 10 minutes from one location per continent in that set, with a same-region fixed retry strategy (2 retries, 30 seconds) and a run-based alert escalation that only fires when 50% of locations fail.
+5. Run `npx checkly test --record` and show me the session link.
+6. Show me `npx checkly deploy --preview` and wait for my confirmation before deploying.
+7. After the deploy has run for 15 minutes, use `npx checkly checks` or the Checkly MCP server to list the latest results per location, sorted by response time, and tell me the three slowest regions and the spread between fastest and slowest.
 
 Explain each file you changed and why.
 ```
@@ -48,6 +49,8 @@ Explain each file you changed and why.
 <CopyPromptButton />
 
 What follows is the reasoning behind that prompt and the same setup built step by step.
+
+</Accordion>
 
 ## Why one location is not enough
 

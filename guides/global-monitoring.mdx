@@ -167,11 +167,13 @@ npx checkly deploy
 
 Twenty-two locations is a menu, not a target. Three questions pick the right handful.
 
-<Frame>
-  <img src="/images/guides/global-monitoring/choosing-locations.png" alt="Three panels: pick locations where your users are, where your infrastructure runs, and one control location far from both; plus a strip on private locations for networks the internet cannot reach" />
-</Frame>
+**Where are your users?** Take the top regions from your analytics and monitor from one location in each. One per region that matters to revenue, not one per country. For a shop that is 60% US, 25% EU, and 10% India, that is `us-east-1`, `eu-central-1`, and `ap-south-1`.
 
-Take the top regions from your analytics and monitor from one location in each. Add one location in every cloud region you deploy to, so a bad regional deploy shows up on its own row. Add one control far from both, with no users and no infrastructure. If only the control fails, the problem is the path, and it also gives you the worst-case latency you should design for. For anything the public internet cannot reach, an office, a VPC, or a customer's network, a [private location](/platform/private-locations/overview) runs the same checks from inside.
+**Where does it run?** Add one location in every cloud region you deploy to, so a bad regional deploy shows up on its own row. Active in Oregon with failover in Ireland means `us-west-2` and `eu-west-1`.
+
+**One control, far from both.** Pick a location with no users and no infrastructure, such as `ap-southeast-2`. If only the control fails, the problem is the path, not the service. It also gives you the worst-case latency you should design for.
+
+For anything the public internet cannot reach, an office, a VPC, or a customer's network, a [private location](/platform/private-locations/overview) runs the same checks from inside.
 
 Start with five or six. Add a location when a real incident would have been caught sooner by it, not before.
 

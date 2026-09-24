@@ -84,7 +84,7 @@ new UrlMonitor('shop-homepage-world', {
 Deploy it and give it fifteen minutes. Then read the run results by location. This is what three parallel runs against the demo shop produced:
 
 <Frame>
-  <img src="/images/guides/global-monitoring/measured-latency.svg" alt="Bar chart of median response time by Checkly location for the demo shop: 22 milliseconds from N. Virginia rising to 1,079 milliseconds from Cape Town, with Oregon slower than Ireland" />
+  <img src="/images/guides/global-monitoring/measured-latency.png" alt="Bar chart of median response time by Checkly location for the demo shop: 22 milliseconds from N. Virginia rising to 1,079 milliseconds from Cape Town, with Oregon slower than Ireland" />
 </Frame>
 
 Two things in that chart matter more than the numbers. The spread is 49× for one static page, so a single "response time" for your site is not a real quantity. And Oregon is slower than Ireland despite sharing a continent with the origin, because routing decides the tail, not the map. You cannot reason your way to either fact. You have to measure from there.
@@ -98,7 +98,7 @@ Bahrain shows 0 ms with a skipped marker in the same runs: the check did not exe
 Checkly schedules multi-location checks two ways. Round-robin runs one location per interval and rotates. Parallel runs every location every interval.
 
 <Frame>
-  <img src="/images/guides/global-monitoring/parallel-vs-round-robin.svg" alt="Timeline comparing round-robin and parallel scheduling over 25 minutes when Sydney fails at 00:02: round-robin first fails at 00:15 and the retry elsewhere passes, parallel fails at 00:05 and the other three rows stay green" />
+  <img src="/images/guides/global-monitoring/parallel-vs-round-robin.png" alt="Timeline comparing round-robin and parallel scheduling over 25 minutes when Sydney fails at 00:02: round-robin first fails at 00:15 and the retry elsewhere passes, parallel fails at 00:05 and the other three rows stay green" />
 </Frame>
 
 With four locations on a five-minute interval, round-robin takes up to fifteen minutes to run from the region that broke, and a retry from a different location then passes and hides it. Parallel catches it on the next tick and, because the other rows stay green, tells you it is regional. Round-robin still has a place: endpoints where the load of every location every minute is unwelcome and "up from somewhere" is the real requirement.
@@ -137,7 +137,7 @@ new BrowserCheck('shop-checkout-regions', {
 ```
 
 <Frame>
-  <img src="/images/guides/global-monitoring/location-consensus.svg" alt="Two scenarios with four locations and a 50% threshold: one failing region retries in place and does not page; three failing regions retry in place and page, with the one passing region pointing at CDN or routing" />
+  <img src="/images/guides/global-monitoring/location-consensus.png" alt="Two scenarios with four locations and a 50% threshold: one failing region retries in place and does not page; three failing regions retry in place and page, with the one passing region pointing at CDN or routing" />
 </Frame>
 
 In scenario A one region fails, retries in place, and stays failed. That is real, it is recorded per location, and it is not a page, because 25% is under the threshold. In scenario B three regions fail and the alert fires. The region that still passes is the first clue about where to look. Retrying from a different region would have hidden scenario A entirely, which is the opposite of what you want from monitoring.
@@ -168,7 +168,7 @@ npx checkly deploy
 Twenty-two locations is a menu, not a target. Three questions pick the right handful.
 
 <Frame>
-  <img src="/images/guides/global-monitoring/choosing-locations.svg" alt="Three panels: pick locations where your users are, where your infrastructure runs, and one control location far from both; plus a strip on private locations for networks the internet cannot reach" />
+  <img src="/images/guides/global-monitoring/choosing-locations.png" alt="Three panels: pick locations where your users are, where your infrastructure runs, and one control location far from both; plus a strip on private locations for networks the internet cannot reach" />
 </Frame>
 
 Take the top regions from your analytics and monitor from one location in each. Add one location in every cloud region you deploy to, so a bad regional deploy shows up on its own row. Add one control far from both, with no users and no infrastructure. If only the control fails, the problem is the path, and it also gives you the worst-case latency you should design for. For anything the public internet cannot reach, an office, a VPC, or a customer's network, a [private location](/platform/private-locations/overview) runs the same checks from inside.

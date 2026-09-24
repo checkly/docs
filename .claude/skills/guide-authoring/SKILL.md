@@ -25,7 +25,7 @@ Fixed order. Do not add sections; fold extra material into a step or cut it.
 1. **Frontmatter**: `title`, `sidebarTitle`, `description`, `canonical`. Nothing else.
 2. **Outcome**: one sentence starting "By the end of this guide", then a `<Frame>` with the end-state screenshot.
 3. **Sample**: one plain sentence linking the sample under `samples/guides/<slug>/` and what it monitors. No Prerequisites accordion.
-4. **Let your agent do it**, collapsed in `<Accordion title="Let your agent do it" icon="sparkles">` right after the sample sentence, with no `##` heading: `import GuideAgentIntro from '/snippets/guide-agent-intro.mdx'` and `import { CopyPromptButton } from '/snippets/copy-prompt-button.jsx'`. Render `<GuideAgentIntro />`, then the prompt inside `<div id="ai-setup-prompt">` as a ` ```txt ` block, then `<CopyPromptButton />`, then one sentence: the steps below are what the agent does, in the open. The prompt states the goal, the success criteria, and that the agent must run `npx checkly test --record` and stop for confirmation before `npx checkly deploy`. The prompt carries the gist of the guide and nothing about skills. The snippet links to [Checkly Skills](/ai/skills); never add install or `npx checkly skills` instructions to the page.
+4. **Let your agent do it**, collapsed in `<Accordion title="Let your agent do it" icon="sparkles">` right after the sample sentence, with no `##` heading: `import GuideAgentIntro from '/snippets/guide-agent-intro.mdx'` and `import { CopyPromptButton } from '/snippets/copy-prompt-button.jsx'`. Render `<GuideAgentIntro />`, then the prompt inside `<div id="ai-setup-prompt">` as a ` ```txt ` block, then `<CopyPromptButton />`, then one sentence: the steps below are what the agent does, in the open. The prompt states the goal, the success criteria, and that the agent must run `npx checkly test --record` and stop for confirmation before `npx checkly deploy`. The prompt carries the gist of the guide and nothing about skills. The snippet links to [Checkly Skills](/ai/skills); never add install or `npx checkly skills` instructions to the page. `npx checkly init` in the quickstart already installs the skill, so every reader has it.
 5. **Steps**, three to five `##` headings, each "do this, code block, what you see". Code fences carry the filename. CLI steps show real captured output in a ` ```text Terminal ` fence. Where the app changes, a `<Frame>` screenshot. Browser monitoring shows Playwright Check Suites and Browser Checks as equal paths in a `<CodeGroup>`.
 6. **Verify it works**: force a failure or run `npx checkly trigger`, show the result. In Resolve and Communicate guides, also show the same check through the MCP server with a ` ```text Prompt ` example.
 7. **Next**: one link to the guide that follows this one in the sidebar order, with a sentence on why.
@@ -69,8 +69,7 @@ Only draw what has a spatial or quantitative idea: maps, timelines, bars, covera
 ## Verification before commit
 
 - `npx checkly test` passes from the sample; `npx checkly deploy --force` done; root `npx checkly deploy --preview` still lists only the docs-site resources.
-- `./node_modules/.bin/mint broken-links` clean. Move `.context/attachments` aside first; the Conductor comment files there break the MDX parser. Same for `mint dev`.
-- Page renders in `mint dev` and every image URL returns 200.
+- `./node_modules/.bin/mint broken-links` clean. Move `.context/attachments` aside first; the Conductor comment files there break the MDX parser. Do not start `mint dev` or open a browser to eyeball pages; the link check and reading the MDX are enough.
 - `wc -w` under 2,000.
 - A cold read from the quickstart completes the guide without opening another guide first.
 

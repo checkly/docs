@@ -49,7 +49,7 @@ None of that shows up in your code's timing, because the code runs after the han
 Put the locations you care about in one file and treat it as configuration, not as a per-check afterthought.
 
 ```ts __checks__/locations.ts
-// Every public Checkly location, grouped by continent. Pick from here.
+// Thirteen of the public Checkly locations, grouped by continent. Pick from here.
 export const AMERICAS = ['us-east-1', 'us-west-2', 'ca-central-1', 'sa-east-1'] as const
 export const EUROPE = ['eu-west-1', 'eu-central-1', 'eu-north-1'] as const
 export const MIDDLE_EAST_AFRICA = ['me-south-1', 'af-south-1'] as const
@@ -165,17 +165,92 @@ npx checkly deploy
 
 ## Choosing locations
 
-Twenty-two locations is a menu, not a target. Three questions pick the right handful.
+Locations decide what this whole setup can see. A region you do not monitor from is a region whose outages you hear about from customers. Twenty-two [public locations](/concepts/locations) is a menu, not a target: build a default set from three sources, then widen or narrow it per check.
 
-**Where are your users?** Take the top regions from your analytics and monitor from one location in each. One per region that matters to revenue, not one per country. For a shop that is 60% US, 25% EU, and 10% India, that is `us-east-1`, `eu-central-1`, and `ap-south-1`.
+### Start where your users are
 
-**Where does it run?** Add one location in every cloud region you deploy to, so a bad regional deploy shows up on its own row. Active in Oregon with failover in Ireland means `us-west-2` and `eu-west-1`.
+Export sessions or revenue by country from your analytics, group the countries into markets, and keep the markets that matter to revenue. Monitor from one location per market, not one per country. Users in the same market mostly share DNS resolvers, CDN edges, and transit, so one location sees the path they take.
 
-**One control, far from both.** Pick a location with no users and no infrastructure, such as `ap-southeast-2`. If only the control fails, the problem is the path, not the service. It also gives you the worst-case latency you should design for.
+| If your users are in | Monitor from |
+|---|---|
+| US East and Canada | `us-east-1`, `ca-central-1` |
+| US West | `us-west-2` |
+| Latin America | `sa-east-1` |
+| UK and Western Europe | `eu-west-2`, `eu-central-1` |
+| Nordics | `eu-north-1` |
+| Middle East | `me-south-1` |
+| Africa | `af-south-1` |
+| India | `ap-south-1` |
+| Southeast Asia | `ap-southeast-1`, `ap-southeast-3` |
+| Japan and Korea | `ap-northeast-1`, `ap-northeast-2` |
+| Australia and New Zealand | `ap-southeast-2` |
+
+For a shop that is 60% US, 25% EU, and 10% India, that is `us-east-1`, `eu-central-1`, and `ap-south-1`.
+
+### Add every region you run in
+
+Add one location in or next to every cloud region you deploy to, so a bad regional deploy shows up on its own row. Include standby regions: a failover region that serves no traffic until the day you need it is the one most likely to be broken on that day. The same shop runs in Virginia with failover in Ireland, which adds `eu-west-1` (`us-east-1` is already on the list).
+
+This only isolates a region if your routing sends the monitor to its nearest region. With latency- or geo-based routing it does. If it does not, or you want to test a standby directly, point a separate check at the region's own hostname.
+
+### Keep one control far from both
+
+Pick a location with no users and no infrastructure, such as `ap-southeast-2` for this shop. If only the control fails, the problem is the path, not the service. It also gives you the worst-case latency you should design for.
+
+### Put the set in code
+
+Name each source in `locations.ts` and make the combined set the project default, so a new check picks it up without anyone choosing locations again.
+
+```ts __checks__/locations.ts
+// The default set: where users are, where the app runs, and one control.
+export const USERS = ['us-east-1', 'eu-central-1', 'ap-south-1'] as const
+export const INFRA = ['us-east-1', 'eu-west-1'] as const
+export const CONTROL = ['ap-southeast-2'] as const
+
+export const CORE = [...new Set([...USERS, ...INFRA, ...CONTROL])]
+```
+
+```ts checkly.config.ts highlight={3,10}
+import { defineConfig } from 'checkly'
+import { Frequency } from 'checkly/constructs'
+import { CORE } from './__checks__/locations'
+
+export default defineConfig({
+  projectName: 'Docs guide: Global monitoring',
+  logicalId: 'docs-guide-global-monitoring',
+  checks: {
+    frequency: Frequency.EVERY_10M,
+    locations: CORE,
+    tags: ['global'],
+    checkMatch: '**/__checks__/**/*.check.ts',
+  },
+})
+```
+
+Checks that set their own `locations`, like the two above, keep them. Everything else runs from the five core locations.
+
+### Size the set per check type
+
+In a parallel check, every location runs at every interval, and each one is a check run. Width multiplies:
+
+| Check | Locations | Frequency | Runs per hour |
+|---|---|---|---|
+| Homepage from around the world | 13 | 5 minutes | 156 |
+| Checkout from three continents | 3 | 10 minutes | 18 |
+
+Spend the width where it is cheap:
+
+- **URL, TCP, DNS, and ICMP monitors** run in milliseconds. Run them from the core set or wider. They are what finds a regional path problem.
+- **API checks** follow the core set: users, infrastructure, and the control.
+- **Browser checks and Playwright check suites** take seconds to minutes per run. One location per continent with meaningful revenue is enough to prove the flow works there. Let the wide monitors do the regional detection.
+
+Use an odd number of locations on any check with a location-based threshold, so a 50% threshold never lands on a tie. With five, three agreeing regions page and two do not.
+
+### Revisit it
+
+Start with five or six. Add a location when a real incident would have been caught sooner by it, not before. Review the set when your analytics show a new market, when you add or retire a region, and when you change CDN or DNS provider, because each of those changes which paths your users take.
 
 For anything the public internet cannot reach, an office, a VPC, or a customer's network, a [private location](/platform/private-locations/overview) runs the same checks from inside.
-
-Start with five or six. Add a location when a real incident would have been caught sooner by it, not before.
 
 ## Verify it works
 

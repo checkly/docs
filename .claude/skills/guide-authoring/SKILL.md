@@ -8,15 +8,15 @@ metadata:
 
 # Guide authoring
 
-A guide is a tutorial that ends with something deployed. It has one job, takes 15 to 30 minutes, and every reader arrives having finished the [quickstart](/quickstart). Anything conceptual that would still be true without Checkly belongs in Learn. Anything that documents one feature belongs in product docs; guides link to it and never restate it.
+A guide is a tutorial that uses Checkly in a real-world scenario that ends with something being deployed. It has one job, takes 15 to 30 minutes, walks the reader through the scenario, holding their hand from start to finish. Where Docs are atomic details of each feature, and Learn teaches users about best practices and product-agnostic processes, Guides brings them all together to "get real jobs done".
 
 ## Non-negotiables
 
-1. **Skills, MCP, and the CLI lead.** Every guide offers a collapsed prompt the reader can hand to their coding agent with Checkly Skills installed. The manual steps that follow use `npx checkly` for every action. Guides in Resolve and Communicate also show the MCP server doing the reading (results, RCA, incidents). The web app is a place to look, never the place to configure.
+1. **MCP and the CLI lead.** Every guide offers a collapsed prompt the reader can hand to their coding agent with Checkly Skills installed. The manual steps that follow use `npx checkly` for every action. Guides in Resolve and Communicate also show the MCP server doing the reading (results, RCA, incidents). The web app is a place to look, never the place to configure.
 2. **Every code block is copied verbatim from a sample that passed on Checkly.** No untested code, no placeholder URLs, no `runtimeId` pins.
-3. **Every screenshot is of the guide's own deployed checks.** No stock captures, no skeleton states, no account or user chrome.
-4. **Diagrams follow the brand system** (see "Diagrams"). If a diagram is mostly text in boxes, it is page content, not an image.
-5. **Under 2,000 words.** Split rather than exceed.
+3. **Screenshots start as the guide's own deployed checks.** Recreate the screenshot as a PNG or piece of code to get it into the perfect state for the guide, but do not "invent" any features, buttons, or capabailities. Remove account and user chrome, while
+4. **Diagrams follow the brand system** (see "Diagrams"). Diagrams should be used to distill and visualize information that would otherwise be unparseable in text, or too much text. 
+5. **Be Concise** If the tutorial is approaching 3000+ words, think about splitting rather than exceeding.
 
 ## Page template
 
@@ -26,12 +26,12 @@ Fixed order. Do not add sections; fold extra material into a step or cut it.
 2. **Outcome**: one sentence starting "By the end of this guide", then a `<Frame>` with the end-state screenshot.
 3. **Sample**: one plain sentence linking the sample under `samples/guides/<slug>/` and what it monitors. No Prerequisites accordion.
 4. **Let your agent do it**, collapsed in `<Accordion title="Let your agent do it" icon="sparkles">` right after the sample sentence, with no `##` heading: `import GuideAgentIntro from '/snippets/guide-agent-intro.mdx'` and `import { CopyPromptButton } from '/snippets/copy-prompt-button.jsx'`. Render `<GuideAgentIntro />`, then the prompt inside `<div id="ai-setup-prompt">` as a ` ```txt ` block, then `<CopyPromptButton />`, then one sentence: the steps below are what the agent does, in the open. The prompt states the goal, the success criteria, and that the agent must run `npx checkly test --record` and stop for confirmation before `npx checkly deploy`. The prompt carries the gist of the guide and nothing about skills. The snippet links to [Checkly Skills](/ai/skills); never add install or `npx checkly skills` instructions to the page. `npx checkly init` in the quickstart already installs the skill, so every reader has it.
-5. **Steps**, three to five `##` headings, each "do this, code block, what you see". Code fences carry the filename. CLI steps show real captured output in a ` ```text Terminal ` fence. Where the app changes, a `<Frame>` screenshot. Browser monitoring shows Playwright Check Suites and Browser Checks as equal paths in a `<CodeGroup>`.
+5. **Use Realistic Code** Each "do this, code block, what you see". Code fences carry the filename. CLI steps show real captured output in a ` ```text Terminal ` fence. Where the app changes, a `<Frame>` screenshot. Browser monitoring shows Playwright Check Suites and Browser Checks as equal paths in a `<CodeGroup>`.
 6. **Verify it works**: force a failure or run `npx checkly trigger`, show the result. In Resolve and Communicate guides, also show the same check through the MCP server with a ` ```text Prompt ` example.
 7. **Next**: one link to the guide that follows this one in the sidebar order, with a sentence on why.
 8. **Reference**: bullet list of the product pages touched. Link [Checkly Skills](/ai/skills) once; add the MCP tools page when MCP appears. No `npx checkly skills` instructions anywhere on the page.
 
-Voice: second person, plain sentences, no em dashes, no parentheticals. Tips and Notes sparingly, one each at most per step.
+Voice: second person, plain sentences, no em dashes, no parentheticals. Tips and Notes sparingly, one each at most per step. Avoid any AI-slop.
 
 ## Sample pipeline
 
@@ -76,11 +76,3 @@ Only draw what has a spatial or quantitative idea: maps, timelines, bars, covera
 ## PR conventions
 
 One PR per guide, or a series on one branch. Each commit: the MDX, its sample, its images, its redirects, its overview card, and repointed inbound links. A retired page gets a `docs.json` redirect and every inbound link repointed in the same commit. Update the PR body with `gh api -X PATCH repos/checkly/docs/pulls/<n>`; `gh pr edit` fails on this repo. Leave the marketing repo's `scenes.ts` change for Dan to commit.
-
-## Decisions on record
-
-- Browser Checks and Playwright Check Suites are shown equally, not Check Suites by default.
-- "Run checks on every deploy" is its own guide, not a section.
-- Terraform e-commerce content becomes a section of the checkout guide; keyword monitoring likewise.
-- Light theme screenshots only, clean crops, no drawn annotations.
-- Samples and screenshots live in the Checkly Marketing account.

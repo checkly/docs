@@ -21,12 +21,12 @@ Status values: `Done` (committed on the branch), `In progress` (edited, not comm
 | 11 | Set up monitoring with an AI coding agent | `guides/agentic-workflows` | In progress | Edited by another session, committed with the Learn moves. Confirm it is on the template |
 | 12 | Claude Code walkthrough | `guides/claude-code-monitoring` | In progress | Same as 11 |
 
-## Pages that stay as they are
+## Kept pages, rewritten on the template
 
 | Page | Status | Notes |
 |---|---|---|
-| `guides/keyword-monitoring` | In progress | Kept by decision. File restored from history on 2026-09-25; needs a sidebar entry and commit |
-| `guides/monitoring-ecommerce-apps-using-terraform` | In progress | Same as above |
+| `guides/keyword-monitoring` | Done | Rewritten on the template as "Monitor the content your customers need to see"; sample `keyword-monitoring` deployed; in Detect after uptime |
+| `guides/monitoring-ecommerce-apps-using-terraform` | Done | Rewritten on the template as "Monitor a shop with Terraform"; sample `terraform-shop` validated with `terraform plan` only, never applied, so no app screenshots; in Examples after the checkout guide |
 
 ## Moves to Learn
 
@@ -42,7 +42,7 @@ Status values: `Done` (committed on the branch), `In progress` (edited, not comm
 
 | Task | Status | Notes |
 |---|---|---|
-| Regroup Guides sidebar into Getting Started, Detect, Communicate, Resolve, Examples | In progress | Committed. Still lacks the two kept pages |
+| Regroup Guides sidebar into Getting Started, Detect, Communicate, Resolve, Examples | Done | Includes the two kept pages |
 | Every guide's "Next" link matches sidebar order | Not started | Do after the sidebar is final |
 | Rewrite `guides/overview.mdx` | In progress | Cards updated piecemeal; needs one pass once the sidebar is final |
 | Quickstart "Go deeper" cards point at guides 1 and 2 | Not started | |

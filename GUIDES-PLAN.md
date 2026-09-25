@@ -14,11 +14,11 @@ Status values: `Done` (committed on the branch), `In progress` (edited, not comm
 | 4 | Alerting that doesn't wake you up for nothing | `guides/alerting` | Done | |
 | 5 | Run checks on every deploy | `guides/sdlc-monitoring` | Done | Workflows validated, not executed in CI |
 | 6 | Monitor a checkout flow | `guides/monitoring-ecommerce-apps-using-playwright` | Done | |
-| 7 | Cover every endpoint with uptime monitors | `guides/uptime-monitoring` | In progress | `create-multiple-monitors` deleted, redirect added, sample and images present. Needs commit |
+| 7 | Cover every endpoint with uptime monitors | `guides/uptime-monitoring` | In progress | `create-multiple-monitors` deleted, redirect added, sample and images present. Committed with the Learn moves; not yet reviewed against the template |
 | 8 | Monitor an API end to end | `guides/api-monitoring` (new) | Not started | Absorbs `monitoring-an-openapi-spec`, `setup-scripts-for-apis`, `monitoring-the-stripe-api`; three redirects |
 | 9 | Debug a failed check | `guides/reading-traces` | Not started | Resolve guide: verify step must include an MCP prompt |
 | 10 | A status page backed by real monitors | `guides/communicate-availability` | Not started | Communicate guide: verify step must include an MCP prompt |
-| 11 | Set up monitoring with an AI coding agent | `guides/agentic-workflows` | In progress | Edited by another session, not committed. Confirm it is on the template |
+| 11 | Set up monitoring with an AI coding agent | `guides/agentic-workflows` | In progress | Edited by another session, committed with the Learn moves. Confirm it is on the template |
 | 12 | Claude Code walkthrough | `guides/claude-code-monitoring` | In progress | Same as 11 |
 
 ## Pages that stay as they are
@@ -32,22 +32,22 @@ Status values: `Done` (committed on the branch), `In progress` (edited, not comm
 
 | Task | Status | Notes |
 |---|---|---|
-| `end-to-end-monitoring` to `learn/monitoring/end-to-end-monitoring` | In progress | File moved, redirect added. Needs a Learn Monitoring nav entry and commit |
-| `auto-waiting-methods` merged into `learn/playwright/waits-and-timeouts` | Not started | Redirect required |
-| `developer-fixtures` merged into `learn/playwright/test-fixtures` | Not started | Only the Playwright half; redirect required |
-| `moving-from-puppeteer-to-playwright` to `learn/playwright/` | Not started | Redirect required. A `comparisons/frameworks/playwright-vs-puppeteer` page appeared uncommitted; decide whether it replaces this |
-| `how-to-monitor-broken-links` retired to `learn/playwright/how-to-detect-broken-links` | Not started | Redirect required |
+| `end-to-end-monitoring` to `learn/monitoring/end-to-end-monitoring` | Done | In Learn > Monitoring Concepts; inbound links updated |
+| `auto-waiting-methods` merged into `learn/playwright/waits-and-timeouts` | Done | New "When auto-waiting isn't enough" section; `toPass` example fixed and tested |
+| `developer-fixtures` merged into `learn/playwright/test-fixtures` | Done | Playwright half was already covered; added the two fixture videos |
+| `moving-from-puppeteer-to-playwright` to `comparisons/frameworks/` | Done | Decided: Comparisons, not Learn. Nested under Frameworks > Puppeteer next to `playwright-vs-puppeteer`, which links to it |
+| `how-to-monitor-broken-links` retired to `learn/playwright/how-to-detect-broken-links` | Done | Deleted, redirected |
 
 ## Navigation and entry points
 
 | Task | Status | Notes |
 |---|---|---|
-| Regroup Guides sidebar into Getting Started, Detect, Communicate, Resolve, Examples | In progress | Done in `docs.json`, not committed. Still lists `developer-fixtures` and `auto-waiting-methods`, which move to Learn, and lacks the two kept pages |
+| Regroup Guides sidebar into Getting Started, Detect, Communicate, Resolve, Examples | In progress | Committed. Still lacks the two kept pages |
 | Every guide's "Next" link matches sidebar order | Not started | Do after the sidebar is final |
 | Rewrite `guides/overview.mdx` | In progress | Cards updated piecemeal; needs one pass once the sidebar is final |
 | Quickstart "Go deeper" cards point at guides 1 and 2 | Not started | |
 | `index.mdx` and `what-is-checkly.mdx` link to rewritten guides | Not started | `what-is-checkly` still links `sdlc-monitoring` and the checkout guide by old titles |
-| Regenerate sitemap | In progress | `sitemap.xml` modified, not committed |
+| Regenerate sitemap | Done | `npm run generate-sitemap`; rerun after the remaining guide moves |
 | Update PR #522 body | Not started | Use `gh api -X PATCH repos/checkly/docs/pulls/522` |
 
 ## Outside this repo

@@ -1,86 +1,93 @@
 ---
-title: Guides to Using Checkly
-description: 'Comprehensive collection of practical guides for monitoring, testing, and automation with Checkly'
-sidebarTitle: 'Overview'
+title: Checkly guides
+sidebarTitle: Overview
+description: Hands-on guides that take you from a first Checkly project to monitoring that detects failures, tells the right people, and helps you fix them.
 mode: 'wide'
 canonical: 'https://www.checklyhq.com/docs/guides/overview/'
 ---
 
-Welcome to the Checkly Guides section! Here you'll find practical, hands-on guides that help you implement monitoring solutions, automate testing workflows, and optimize your applications for reliability and performance.
+Each guide does one real job from start to finish, with a sample project you can clone and a prompt you can hand to your coding agent. If you haven't set up a project yet, start with the [quickstart](/quickstart), then work through the guides in order or jump to the one you need.
 
+## Getting started
 
-## Getting Started Guides
-
-Start your journey with Checkly using these foundational guides that cover the essential concepts and workflows.
-
-
-<Columns cols={3}>
+<Columns cols={2}>
 <Card title="Structure a project" icon="folder-tree" href="/guides/structuring-a-checkly-project">
-Organize checks by service with groups, share settings in one config, and deploy from CI on every merge
+Organize checks by service with groups, keep shared settings in one config, and deploy from CI on every merge
 </Card>
 
-<Card title="Playwright tests to monitors" icon="theater-masks" href="/guides/playwright-testing-to-monitoring">
-Run the Playwright tests you already have as scheduled production monitors, and see what a failure looks like
+<Card title="Turn Playwright tests into monitors" icon="masks-theater" href="/guides/playwright-testing-to-monitoring">
+Run the Playwright tests you already have as scheduled production monitors, without rewriting them
 </Card>
 </Columns>
 
-## Monitoring Guides
+## Detect
 
-Comprehensive guides for different types of monitoring scenarios to ensure complete coverage of your applications.
-
-
-<Columns cols={2}>
-<Card title="End-to-End Monitoring" icon="route" href="/learn/monitoring/end-to-end-monitoring">
-Learn how to monitor complete user journeys and critical business flows
-</Card>
-
-<Card title="Monitor from around the globe" icon="globe" href="/guides/global-monitoring">
-Why one vantage point is not monitoring, with real per-location latency data, parallel scheduling, and region-consensus alerts
-</Card>
-
-<Card title="Alert without the noise" icon="bell" href="/guides/alerting">
-Route alerts by urgency, retry blips in place, escalate on consecutive runs, and mute planned deploys
-</Card>
-
+<Columns cols={3}>
 <Card title="Cover every endpoint" icon="arrow-up" href="/guides/uptime-monitoring">
 Turn a list of pages into URL monitors, tell slow from down, and watch the certificate under all of them
 </Card>
 
-<Card title="Monitor a checkout flow" icon="shopping-cart" href="/guides/monitoring-ecommerce-apps-using-playwright">
-Browse, search, add to cart, and checkout as one Playwright Check Suite, with a confirmation-text assertion and a Terraform equivalent
+<Card title="Monitor the content customers see" icon="magnifying-glass" href="/guides/keyword-monitoring">
+Assert that the text that sells is on the page, in the right place, exactly once, and that error copy never is
+</Card>
+
+<Card title="Monitor from around the globe" icon="globe" href="/guides/global-monitoring">
+Run checks from where your users are, in parallel, and let the regions vote before you get paged
 </Card>
 
 <Card title="Run checks on every deploy" icon="diagram-project" href="/guides/sdlc-monitoring">
-Test pull request previews and validate production deployments with recorded Checkly sessions
+Test pull request previews before merging and validate production deployments after they ship
+</Card>
+
+<Card title="Setup and teardown scripts" icon="gear" href="/guides/setup-scripts-for-apis">
+Create test data before an API check runs, clean it up afterward, and scrub sensitive values from results
+</Card>
+
+<Card title="Control monitoring with agents" icon="robot" href="/guides/agentic-workflows">
+Create, configure, and update your monitoring through prompts to your coding agent
+</Card>
+
+<Card title="Checkly and Claude Code" icon="terminal" href="/guides/claude-code-monitoring">
+Set up Claude Code to generate and deploy URL monitors and browser checks for your services
 </Card>
 </Columns>
 
-## API Monitoring Guides
-
-Specialized guides for monitoring APIs and web services with advanced techniques and integrations.
-
-
-<Columns cols={3}>
-<Card title="OpenAPI Monitoring" icon="file-code" href="/guides/monitoring-an-openapi-spec">
-Automatically generate monitoring checks from your OpenAPI specifications
-</Card>
-
-<Card title="Stripe API Monitoring" icon="credit-card" href="/guides/monitoring-the-stripe-api">
-Set up comprehensive monitoring for Stripe API endpoints and webhooks
-</Card>
-
-<Card title="API Setup Scripts" icon="gear" href="/guides/setup-scripts-for-apis">
-Create setup scripts to prepare your API environment for testing
-</Card>
-</Columns>
-
-## Advanced Topics
-
-Specialized guides for advanced monitoring scenarios that require deeper technical knowledge.
-
+## Communicate
 
 <Columns cols={2}>
-<Card title="Reading Traces" icon="chart-line" href="/guides/reading-traces">
-Understand and analyze distributed tracing data for debugging
+<Card title="Alert without the noise" icon="bell" href="/guides/alerting">
+Route alerts by urgency, retry blips in place, escalate on consecutive runs, and mute planned deploys
+</Card>
+
+<Card title="Status pages backed by monitors" icon="signal" href="/guides/communicate-availability">
+Show users whether they can complete their workflows, based on the checks that test them
+</Card>
+</Columns>
+
+## Resolve
+
+<Columns cols={2}>
+<Card title="Diagnose failures with traces" icon="chart-line" href="/guides/reading-traces">
+Go from a failed check alert to the error, using the dashboard, screenshots, and Playwright traces
+</Card>
+</Columns>
+
+## Examples
+
+<Columns cols={2}>
+<Card title="Monitor a checkout flow" icon="cart-shopping" href="/guides/monitoring-ecommerce-apps-using-playwright">
+Browse, search, add to cart, and checkout as one Playwright Check Suite with safe test data
+</Card>
+
+<Card title="Monitor a shop with Terraform" icon="cubes" href="/guides/monitoring-ecommerce-apps-using-terraform">
+Declare the alert channel, group, browser checks, and API check for a shop in Terraform
+</Card>
+
+<Card title="Monitor the Stripe API" icon="credit-card" href="/guides/monitoring-the-stripe-api">
+Check a third-party API your product depends on with API check assertions and response time limits
+</Card>
+
+<Card title="Monitor an OpenAPI spec" icon="file-code" href="/guides/monitoring-an-openapi-spec">
+Generate API checks from an OpenAPI or Swagger specification
 </Card>
 </Columns>

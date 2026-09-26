@@ -43,12 +43,12 @@ Status values: `Done` (committed on the branch), `In progress` (edited, not comm
 | Task | Status | Notes |
 |---|---|---|
 | Regroup Guides sidebar into Getting Started, Detect, Communicate, Resolve, Examples | Done | Includes the two kept pages |
-| Every guide's "Next" link matches sidebar order | Not started | Do after the sidebar is final |
-| Rewrite `guides/overview.mdx` | In progress | Cards updated piecemeal; needs one pass once the sidebar is final |
+| Every guide's "Next" link matches sidebar order | Done | Sidebar reordered: Playwright-to-monitors in Getting Started, AI guides last in Detect. Pages pending a merge or template rewrite (setup scripts, Stripe, OpenAPI, AI guides, status pages, traces) still need Next links when they are rewritten. `sdlc-monitoring` points to alerting; Terraform, last in Examples, points to `sdlc-monitoring` |
+| Rewrite `guides/overview.mdx` | Done | One card per sidebar entry, grouped like the sidebar. Update cards when guides 8 to 10 land |
 | Quickstart "Go deeper" cards point at guides 1 and 2 | Not started | |
 | `index.mdx` and `what-is-checkly.mdx` link to rewritten guides | Not started | `what-is-checkly` still links `sdlc-monitoring` and the checkout guide by old titles |
 | Regenerate sitemap | Done | `npm run generate-sitemap`; rerun after the remaining guide moves |
-| Update PR #522 body | Not started | Use `gh api -X PATCH repos/checkly/docs/pulls/522` |
+| Update PR #522 body | Blocked | PR #522 is closed, not merged. Draft body in `.context/pr-body.md`; decide whether to reopen #522 or open a new PR |
 
 ## Outside this repo
 

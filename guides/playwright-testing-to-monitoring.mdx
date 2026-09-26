@@ -50,6 +50,10 @@ Every step below is what the agent just did, in the open, so you can read the re
 
 Not every test belongs in production monitoring. The sample has three: a search, a checkout, and a signup. Signup creates accounts, so it stays in CI. Search and checkout are what you want to know about within minutes, so they get a `@monitor` tag.
 
+<Frame>
+  <img src="/images/guides/playwright-to-monitoring/test-to-monitor-journey.png" alt="Diagram: three panels of dots, one per Playwright test. Local runs 40 tests, CI on staging runs all 60 after a pull request, and 12 tagged @monitor become production monitors after merge and deploy" />
+</Frame>
+
 ```ts tests/checkout.spec.ts highlight={3}
 import { test, expect } from '@playwright/test'
 

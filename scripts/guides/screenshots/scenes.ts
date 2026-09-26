@@ -59,6 +59,11 @@ const GUIDE_STATUS_PAGE = {
   publicUrl: 'https://danube-shop-status.checkly-status-page.com',
   incidentId: 'a2f35110-171e-4f7f-a0c4-97b6d904243e',
 }
+const GUIDE_DEBUG = {
+  checkId: '8c688bf9-2c0a-4614-be7b-e66008b1093a',
+  failedResultId: '01a0df0e-99a6-7379-aab4-9e3f0bfcf420',
+  failedSessionId: '01a0df0e-997b-74a3-ab2a-e31178ef1a07',
+}
 const GUIDE_UPTIME = {
   group: 6887126,
   ssl: '66c3df01-432a-4baa-a7ab-e296fc4be8a1',
@@ -357,5 +362,35 @@ export const scenes: Scene[] = [
     colorScheme: 'light',
     delay: 2000,
     clip: { x: 240, y: 235, width: 800, height: 625 },
+  },
+
+  // Guide: Debug a failed check
+  {
+    id: 'guide-debug-check-detail',
+    name: 'Docs guide (Debug a failed check) — check detail after the fix',
+    tags: ['guide-debug-failed-check', 'docs', 'playwright', 'detail'],
+    url: `/checks/${GUIDE_DEBUG.checkId}`,
+    viewport: { width: 1440, height: 1100 },
+    delay: 2500,
+    setup: waitForCheckDetail,
+    clip: { x: 240, y: 58, width: 1200, height: 900 },
+  },
+  {
+    id: 'guide-debug-result-session',
+    name: 'Docs guide (Debug a failed check) — failed check session',
+    tags: ['guide-debug-failed-check', 'docs', 'playwright', 'check-result'],
+    url: `/checks/${GUIDE_DEBUG.checkId}/check-sessions/${GUIDE_DEBUG.failedSessionId}`,
+    viewport: { width: 1440, height: 1500 },
+    delay: 4000,
+    clip: { x: 240, y: 58, width: 1200, height: 1300 },
+  },
+  {
+    id: 'guide-debug-result-failed',
+    name: 'Docs guide (Debug a failed check) — failed check result with error, screenshot, and trace',
+    tags: ['guide-debug-failed-check', 'docs', 'playwright', 'check-result'],
+    url: `/checks/${GUIDE_DEBUG.checkId}/results/${GUIDE_DEBUG.failedResultId}`,
+    viewport: { width: 1440, height: 1500 },
+    delay: 4000,
+    clip: { x: 240, y: 58, width: 1200, height: 1300 },
   },
 ]

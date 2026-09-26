@@ -54,7 +54,6 @@ Status values: `Done` (committed on the branch), `In progress` (edited, not comm
 
 | Task | Owner | Status |
 |---|---|---|
-| Commit guide scenes in `checkly-marketing-website/scripts/screenshots/scenes.ts` | Dan | Not started |
 | Named reviewer per area: Detect, Communicate, Resolve, AI | Dan | Not started |
 | Product: link post-init and empty-state app screens to guide 1 | Product | Not started |
 | Re-check success measures 90 days after merge | Dan | Blocked until merge |

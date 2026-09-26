@@ -43,17 +43,17 @@ Voice: second person, plain sentences, no em dashes, no parentheticals. Tips and
 
 ## Screenshot pipeline
 
-Uses the marketing site harness at `checkly-marketing-website/scripts/screenshots` (skill `screenshot-harness` there).
+Uses the harness in `scripts/guides/screenshots/`. It defaults to the Checkly Marketing account at 2x.
 
-1. Add scenes tagged `guide-<slug>` to `scenes.ts`; keep IDs in a `GUIDE_<NAME>` const. Test-session and result IDs age out of retention; re-record and update when a capture comes back empty.
-2. `npm run screenshots:capture -- --tags=guide-<slug> --account=5d536cc1-f076-446e-a142-21e48dd31986 --scale=2`. Light theme only.
+1. Add scenes tagged `guide-<slug>` to `scripts/guides/screenshots/scenes.ts`; keep IDs in a `GUIDE_<NAME>` const. Test-session and result IDs age out of retention; re-record and update when a capture comes back empty.
+2. `npm run guides:screenshots -- --tags=guide-<slug>`. Light theme only. Captures land in `scripts/guides/screenshots/output/images/` (gitignored).
 3. Clip to the app content: `clip: { x: 240, y: 58, width: 1200, height: <n> }` drops the sidebar and top bar, which carry the account and user name. Use a tall viewport instead of `fullPage` on scrolling panes.
 4. Open every PNG before use. Reject skeleton states, empty states, and any user name, email, or other customers' resources. The Projects page shows other people's repositories; never capture it.
 5. Copy to `images/guides/<slug>/<step>.png`. Embed in `<Frame><img src alt /></Frame>` with alt text describing the state.
 
 Known routes: check detail `/checks/<id>`, group `/groups/<id>`, test session `/test-sessions/<id>`, home list search `/?search=<text>`. Expanding group rows on the home list by click does not work; capture the group page.
 
-If the saved session has expired the capture lands on a login page. Ask Dan to run `npm run screenshots:auth` in the marketing repo; it cannot be done non-interactively.
+If the saved session has expired the capture lands on a login page. Ask Dan to run `npm run guides:screenshots:auth`; it cannot be done non-interactively.
 
 ## Diagrams
 
@@ -63,7 +63,7 @@ Only draw what has a spatial or quantitative idea: maps, timelines, bars, covera
 - Colors: green `#20DF66`, yellow `#FFBD00`, red `#FF5C5C`, brand blue `#0075FF`. Region IDs in JetBrains Mono.
 - World maps: dot matrix from Natural Earth land polygons (world-atlas plus d3-geo), equirectangular, latitude 72 to -58, dots `rgba(139,163,199,0.30)`.
 - Ship PNG at 2x rendered with Playwright and Google Fonts Inter. An SVG in an `img` tag cannot use the page's web font.
-- Generators live in the worktree's `.context/<slug>-images/` (gitignored): `lib.mjs`, one `build-*.mjs` per image, `render.mjs`.
+- Generators live in `scripts/guides/diagrams/<slug>/`, one script per image, named after the PNG. Import the brand helpers from `scripts/guides/diagrams/lib.mjs`; its `write()` renders straight to `images/guides/<slug>/`. Commit the generator with the image.
 - Real data beats illustration. Pull per-location results from `GET /v1/check-results/<checkId>` and chart the medians.
 
 ## Verification before commit
@@ -75,4 +75,4 @@ Only draw what has a spatial or quantitative idea: maps, timelines, bars, covera
 
 ## PR conventions
 
-One PR per guide, or a series on one branch. Each commit: the MDX, its sample, its images, its redirects, its overview card, and repointed inbound links. A retired page gets a `docs.json` redirect and every inbound link repointed in the same commit. Update the PR body with `gh api -X PATCH repos/checkly/docs/pulls/<n>`; `gh pr edit` fails on this repo. Leave the marketing repo's `scenes.ts` change for Dan to commit.
+One PR per guide, or a series on one branch. Each commit: the MDX, its sample, its images, its redirects, its overview card, and repointed inbound links. A retired page gets a `docs.json` redirect and every inbound link repointed in the same commit. Update the PR body with `gh api -X PATCH repos/checkly/docs/pulls/<n>`; `gh pr edit` fails on this repo.

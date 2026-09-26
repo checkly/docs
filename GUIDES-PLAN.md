@@ -1,6 +1,6 @@
 # Guides overhaul plan
 
-Branch `onboarding-guides-plan`, PR #522. How to write a guide: `.claude/skills/guide-authoring/SKILL.md`. Update the status column when you start or finish a task. Last updated 2026-09-25.
+Branch `guides-overhaul`, no PR yet. How to write a guide: `.claude/skills/guide-authoring/SKILL.md`. Update the status column when you start or finish a task. Last updated 2026-09-25.
 
 Status values: `Done` (committed on the branch), `In progress` (edited, not committed), `Not started`, `Blocked`.
 
@@ -48,7 +48,7 @@ Status values: `Done` (committed on the branch), `In progress` (edited, not comm
 | Quickstart "Go deeper" cards point at guides 1 and 2 | Not started | |
 | `index.mdx` and `what-is-checkly.mdx` link to rewritten guides | Not started | `what-is-checkly` still links `sdlc-monitoring` and the checkout guide by old titles |
 | Regenerate sitemap | Done | `npm run generate-sitemap`; rerun after the remaining guide moves |
-| Update PR #522 body | Blocked | PR #522 is closed, not merged. Draft body in `.context/pr-body.md`; decide whether to reopen #522 or open a new PR |
+| Open the PR for `guides-overhaul` | Not started | PR #522 was closed and will not be reopened. Draft body in `.context/pr-body.md` needs a review first |
 
 ## Outside this repo
 

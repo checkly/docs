@@ -53,6 +53,12 @@ const GUIDE_PW2M = {
   passingSession: '01a0ce89-ce0c-74e1-8ee7-e95a2430af87',
   failingSession: '01a0ce8a-ea5e-700b-b41f-3d5b62e518d0',
 }
+const GUIDE_STATUS_PAGE = {
+  // Public page deployed by samples/guides/communicate-availability. It needs
+  // no login, and the incident IDs change every time the sample is broken.
+  publicUrl: 'https://danube-shop-status.checkly-status-page.com',
+  incidentId: 'a2f35110-171e-4f7f-a0c4-97b6d904243e',
+}
 const GUIDE_UPTIME = {
   group: 6887126,
   ssl: '66c3df01-432a-4baa-a7ab-e296fc4be8a1',
@@ -324,5 +330,32 @@ export const scenes: Scene[] = [
     colorScheme: 'light',
     delay: 3000,
     clip: { x: 240, y: 58, width: 1200, height: 800 },
+  },
+
+  // Guide: A status page backed by real monitors
+  {
+    id: 'guide-status-page-incident',
+    name: 'Docs guide (Status page) — public page with an automated incident open',
+    tags: ['guide-communicate-availability', 'docs', 'status-pages'],
+    url: GUIDE_STATUS_PAGE.publicUrl,
+    viewport: { width: 1280, height: 800 },
+    colorScheme: 'light',
+    delay: 1500,
+    setup: async (page) => {
+      // The component group is collapsed by default; open it to show both components.
+      await page.getByText('Danube shop', { exact: true }).click()
+      await page.waitForTimeout(1000)
+    },
+    clip: { x: 240, y: 0, width: 800, height: 740 },
+  },
+  {
+    id: 'guide-status-page-incident-resolved',
+    name: 'Docs guide (Status page) — resolved automated incident timeline',
+    tags: ['guide-communicate-availability-resolved', 'docs', 'status-pages'],
+    url: `${GUIDE_STATUS_PAGE.publicUrl}/incident/${GUIDE_STATUS_PAGE.incidentId}`,
+    viewport: { width: 1280, height: 900 },
+    colorScheme: 'light',
+    delay: 2000,
+    clip: { x: 240, y: 235, width: 800, height: 625 },
   },
 ]

@@ -17,7 +17,7 @@ Status values: `Done` (committed on the branch), `In progress` (edited, not comm
 | 7 | Cover every endpoint with uptime monitors | `guides/uptime-monitoring` | In progress | `create-multiple-monitors` deleted, redirect added, sample and images present. Committed with the Learn moves; not yet reviewed against the template |
 | 8 | Monitor an API end to end | `guides/api-monitoring` (new) | Not started | Absorbs `monitoring-an-openapi-spec`, `setup-scripts-for-apis`, `monitoring-the-stripe-api`; three redirects |
 | 9 | Debug a failed check | `guides/reading-traces` | Not started | Resolve guide: verify step must include an MCP prompt |
-| 10 | A status page backed by real monitors | `guides/communicate-availability` | Not started | Communicate guide: verify step must include an MCP prompt |
+| 10 | A status page backed by real monitors | `guides/communicate-availability` | Done | Rebuilt on v3 status pages (components + automation rules). Sample `communicate-availability` deployed; public page `danube-shop-status.checkly-status-page.com`. Verify step reads the incident and posts an update through MCP, both tested against the MCP endpoint |
 | 11 | Set up monitoring with an AI coding agent | `guides/agentic-workflows` | In progress | Edited by another session, committed with the Learn moves. Confirm it is on the template |
 | 12 | Claude Code walkthrough | `guides/claude-code-monitoring` | In progress | Same as 11 |
 

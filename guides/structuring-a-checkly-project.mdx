@@ -42,11 +42,13 @@ Explain each file you changed and why.
 
 <CopyPromptButton />
 
-The steps below are the same work done by hand, so you can see what the agent built and why each piece is there.
+The sections below are the same work done by hand, so you can see what the agent built and why each piece is there.
 
 </Accordion>
 
-## Step 1: One folder per service
+A project that scales has four parts: a folder layout that mirrors your services, defaults in one config, a group per service, and a CI workflow that deploys it.
+
+## One folder per service
 
 The quickstart scaffold puts every check in a flat `__checks__` folder. That works for four files and stops working at forty. Split it by the services in your system, so the folder tells you who owns a check and what it covers.
 
@@ -66,7 +68,7 @@ __checks__/
 
 Each service folder gets a `group.ts` and its checks. The config's `checkMatch` glob finds check files at any depth, so nothing else changes when you add a folder.
 
-## Step 2: Shared settings in one config
+## Project defaults in one config
 
 Put the defaults every check should inherit in `checkly.config.ts`, and the alert channel they share next to the checks.
 
@@ -109,7 +111,7 @@ export const opsEmail = new EmailAlertChannel('ops-email', {
 
 Settings resolve from the most specific level: a value on the check wins over the group, which wins over the project. Keep `logicalId` stable. Changing it makes Checkly treat the project as new and drops its history.
 
-## Step 3: A group per service
+## A group per service
 
 A group holds the settings that are true for a whole service and lets you run or mute that service as a unit. The storefront runs from three regions so a regional CDN problem shows up as a single-location failure.
 
@@ -213,13 +215,13 @@ __checks__/web/uptime.check.ts
 3 passed, 3 total
 ```
 
-After you deploy in the next step, each group gets its own page with the checks it owns, their combined availability, and a button to run them all at once.
+Once deployed, each group gets its own page with the checks it owns, their combined availability, and a button to run them all at once.
 
 <Frame>
   <img src="/images/guides/structure-a-project/group-web.png" alt="The Shop web group page in Checkly showing two passing checks, availability and response time stats, and recent run results from three locations" />
 </Frame>
 
-## Step 4: Deploy from CI on every merge
+## Deploy from CI on every merge
 
 Preview what the first deploy creates, then deploy once from your machine.
 

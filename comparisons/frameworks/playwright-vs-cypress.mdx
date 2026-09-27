@@ -1,8 +1,8 @@
 ---
-title: Playwright vs Cypress - Detailed comparison [2024]
-description: Discover the differences between Playwright and Cypress. Explore key features, pros and cons, and how to pick the right framework.
+title: Playwright vs Cypress - Detailed comparison [2026]
+description: Compare Playwright and Cypress in 2026. Architecture, browser support, parallelization, AI tooling, pros and cons, and how to pick the right framework.
 subTitle: Key features, and pros & cons of each framework
-date: 2024-10-17
+date: 2026-09-27
 author: Nocnica Mellifera
 githubUser: serverless-mom
 tags:
@@ -14,125 +14,129 @@ learn_playwright:
   parent: "Getting started"
 canonical: 'https://www.checklyhq.com/docs/comparisons/frameworks/playwright-vs-cypress/'
 ---
-Playwright and Cypress are two frameworks both closely associated with end-to-end testing of production websites. Both frameworks can do quite a bit more than 'making sure nothing on your site is broken' and their design philosophies, architectures, and use cases are different.
+Playwright and Cypress are two frameworks closely associated with end-to-end testing of web applications. Both can do more than make sure nothing on your site is broken, but their design philosophies, architectures, and use cases differ.
 
-Starting in mid-2024, Playwright surpassed Cypress in npm downloads, indicating that more projects are starting with Playwright as their preferred automation framework. Playwright is the framework supported by Checkly in our current runtimes.
+Playwright passed Cypress in weekly npm downloads in mid-2024 and has widened the gap since, so most new projects now start with Playwright. Playwright is the framework Checkly runs in its browser checks and Playwright Check Suites.
+
+This comparison reflects Playwright 1.63 and Cypress 16.1.
 
 ## Playwright overview
-While Cypress is a testing tool, [Playwright](https://www.checklyhq.com/learn/playwright/what-is-playwright/) is an automation solution.
 
-This distinction is important when you compare these solutions, with Playwright supporting more features to allow for repetetive scripted actions and automations.
+While Cypress is a testing tool, [Playwright](https://www.checklyhq.com/learn/playwright/what-is-playwright/) is a browser automation library with a full test runner, Playwright Test, built on top.
 
-Playwright is a tool focused on developer productivity with more robust built-in features, the ability to use async/await, built in parallelization, a much lighter weight in CI. Playwright is also less opinionated because it doesn’t have to be, you can use it however you want. Playwright can [monitor your APIs](https://www.checklyhq.com/learn/playwright/testing-apis/) just as well as it can your frontend web pages. Scraping content for a LLM model? Check! Have a nested app in an iframe you want to test? Go wild! *Three different browser sessions in the same chat instance? Sounds cool! Re-use your tests to monitor production? Absolutely.*
+That distinction matters. Because Playwright controls browsers from the outside, you can use it for anything a browser can do: test your frontend, [test your APIs](https://www.checklyhq.com/learn/playwright/testing-apis/), drive several browser sessions in one test, test apps nested in cross-origin iframes, scrape content, or reuse your tests to monitor production.
 
-## Playwright Key Features
-- Supports multiple languages: JavaScript, TypeScript, Python, Java, C#
-- Create tests without writing any code with their test generator 
-- Cross-platform testing (Windows, macOS, Linux)  
-- Native support for multiple browsers (Chromium, Firefox, WebKit)  
-- API testing, visual regression, and component testing support  
-- Test parallelism and isolated browser contexts  
-- Headless and headed modes for fast execution  
-- Advanced debugging tools like Trace Viewer  
-- Network-level testing: intercepts requests and manipulates responses  
-- Integrates easily with CI/CD pipelines  
+Playwright uses standard `async`/`await`, runs tests in parallel by default, and ships its debugging and reporting tools (UI Mode, Trace Viewer, HTML reporter) as part of the open source package.
+
+## Playwright key features
+
+- Supports JavaScript, TypeScript, Python, Java, and .NET
+- Chromium, Firefox, and WebKit (Safari's engine) on Windows, macOS, and Linux, plus branded Chrome and Edge
+- Built-in parallelism across and within test files, and sharding across CI machines, with no paid service required
+- Multiple tabs, browser windows, browser contexts, and origins in a single test
+- Full iframe support, including cross-origin iframes
+- API testing, screenshot and visual comparisons, ARIA snapshots, and component testing
+- Network interception and mocking for HTTP and WebSocket traffic
+- Clock API to control time in tests
+- Codegen to record tests, UI Mode for local development, and Trace Viewer for debugging failures
+- AI tooling: a bundled MCP server and CLI for coding agents, plus planner, generator, and healer test agents
+- Mobile device emulation
 
 ## Cypress overview
 
-With Cypress, E2E went from the painful world of hard-coded waits and heavy-handed POM approaches to built in actionability and visibility checks with a focus on community building and developer experience. What we’ve seen over the course of the last five years or so is a cultural shift in the testing world from a heavy reliance on Manual QA and non-developer owned testing responsibilities to testing as a more fully incorporated practice. We’ve shifted left.
+Cypress changed end-to-end testing for frontend developers. It replaced hard-coded waits and heavy page object models with built-in actionability checks and automatic retries, and paired them with an interactive runner that shows every command as it executes. That developer experience helped move testing from dedicated QA teams to the developers who write the code.
 
-We’ve also seen testing become the battleground of where your developer velocity goes to die. Since the inception of playwright more and more teams contain dedicated roles for platform engineering, with a focus on making development, testing, and the [deployment process](https://www.checklyhq.com/guides/empowering-developers-with-checkly/) easier for everyone.
+Cypress is deliberately focused. By its own documentation, it is not a general automation tool: it's built to test applications you own, it only supports JavaScript and TypeScript, and it controls a single browser at a time.
 
-Titles have changed, entire departments have been lost to restructures, responsibilities have adjusted and solutions that were groundbreaking less than a decade ago are now no longer cutting edge.
+Cypress's commercial product, Cypress Cloud, adds parallelization and load balancing, Test Replay, and paid add-ons for UI coverage and accessibility. Cypress also offers AI-assisted test authoring through `cy.prompt()`, which turns plain-English steps into test code, and Cypress Studio for recording and editing tests in the browser.
 
-The main areas where Cypress loses now used to be where they won; community trust, focus on developer productivity and rapid feature development. It’s not that those things don’t matter to Cypress any longer, but their attention has clearly shifted to solving enterprise problems. We can talk about [blocking npm packages](https://currents.dev/posts/v13-blocking), or [paywalling features](https://docs.cypress.io/guides/cloud/test-replay) that create parity with Playwright, but that would be a distraction. What really matters is velocity and practicality. A solution without parity to its top competitor, that requires the largest machines in CI and is still slower to run; is neither efficient nor practical unless you’re already using it.
+## Cypress key features
 
-## Cypress Key Features
-- JavaScript and TypeScript support (limited to web apps)  
-- Native test runner with interactive GUI  
-- Provides automatic waits, retry logic, and time travel debugging  
-- Rich network mocking and stubbing tools  
-- Custom dot-notation language for async
-- Supports browser automation for Chromium-based browsers  
-- Focuses on frontend testing but supports API testing  
-- Strong documentation
-- Direct access to browser internals, enabling state manipulation  
+- JavaScript and TypeScript
+- Chrome, Chromium, Edge, and Firefox, with experimental WebKit support
+- Interactive runner with time-travel debugging through command snapshots
+- Automatic waiting and retries built into queries and assertions
+- Network stubbing and spying with `cy.intercept()`
+- Component testing with official support for React, Angular, Vue, and Svelte
+- Cross-origin navigation within a test using `cy.origin()`
+- Session caching with `cy.session()`
+- AI-assisted authoring with `cy.prompt()` and Cypress Studio
+- Large plugin ecosystem and strong documentation
 
-## **Playwright vs Cypress: Architectural Differences**  
+## Playwright vs Cypress: architectural differences
 
-### **Overview of Architectures**  
-The architectural differences between Playwright and Cypress reflect distinct design philosophies and impact how each tool interacts with browsers and testing workflows. Playwright leverages the **Chrome DevTools Protocol (CDP)** to automate browsers directly, while Cypress runs within the browser’s execution loop via a custom Electron-based app. These design choices affect browser support, performance, parallelization, and test writing practices.
+### Overview of architectures
 
+The architectural differences between Playwright and Cypress drive most of the practical differences between them. Playwright controls browsers from an external process over browser automation protocols. Cypress runs your test code inside the browser, alongside your application. These choices affect browser support, parallelization, multi-tab and multi-origin testing, and how you write tests.
 
+### Playwright architecture
 
-### **Playwright Architecture**  
-- **CDP-based**: Playwright interacts with browsers using the Chrome DevTools Protocol, which is natively supported by major browsers (Chromium, Firefox, WebKit). This allows it to control the browser externally without modifying the browser’s native execution loop.
-- **Separate Node Process**: Since Playwright runs outside the browser’s execution loop, it requires an external process (Node.js) to orchestrate tests. This design is more similar to Selenium’s WebDriver model, although Selenium 4 now also supports CDP.
-- **Language Flexibility**: Playwright’s architecture allows multi-language support, including JavaScript, TypeScript, Python, Java, and C#. It can also integrate with other frameworks like RobotFramework.
-- **Parallel Testing**: Playwright offers built-in parallelism without additional configuration, enabling faster test execution out of the box.
-- **Browser & Tab Support**: Playwright supports all major browsers and multiple tabs, giving it flexibility for complex test scenarios. It also has experimental support for mobile testing.
-- **Standardized Integration**: Playwright integrates smoothly with high-level testing frameworks (e.g., CucumberJS, CodeceptJS) without custom runners, as the browser behaviors remain unmodified.
+- **External control**: Playwright drives Chromium over the Chrome DevTools Protocol (CDP). For Firefox and WebKit, it ships patched browser builds that expose equivalent automation protocols. Because of this, Playwright runs its own Firefox and WebKit builds rather than branded Firefox or Safari.
+- **Driver process**: A Node.js driver talks to the browsers. The Python, Java, and .NET libraries use the same driver, which is how Playwright offers the same capabilities across languages.
+- **Browser contexts**: Each test gets a fresh browser context, a lightweight isolated profile with its own cookies and storage. Contexts are fast to create, which makes per-test isolation and parallelism cheap.
+- **Unmodified browser behavior**: Playwright doesn't inject a test runner into the page, so the application runs as it would for a real user.
 
+### Cypress architecture
 
+- **In-browser execution**: The Cypress app launches a browser and runs your test code inside it, in the same run loop as your application. A Node.js server process runs alongside it to proxy network traffic and handle tasks the browser can't, like file system access.
+- **Tight browser integration**: Running inside the browser gives Cypress direct access to the DOM, `window`, and your app's objects, which powers automatic waiting, time-travel snapshots, and fast component testing. It's also why Cypress only supports JavaScript and TypeScript.
+- **Single browser, single tab**: Cypress controls one browser and one tab at a time. Extra tabs are closed between tests, and the Cypress docs point to the `@cypress/puppeteer` plugin as a workaround for multi-tab flows.
+- **Origin and iframe limits**: Each test is bound to one superdomain unless you wrap steps in `cy.origin()`. You can query same-origin iframes, but there's no built-in command to switch into an iframe.
+- **Parallelization through Cypress Cloud**: Cypress parallelization requires recording to Cypress Cloud with `--record`. Third-party orchestration services exist as alternatives.
 
-### **Cypress Architecture**  
-- **Electron-based App**: Cypress runs as a native JavaScript app embedded within an Electron browser. This architecture means tests and Cypress’s custom library run **within the browser’s execution loop**, directly injecting code into the test browser.
-- **Tight Browser Integration**: This direct integration allows Cypress to manipulate browser behavior (e.g., automatic waits and retries) but limits support to JavaScript and transpiled languages. It also complicates browser support—Safari, for instance, is not currently supported.
-- **Single Process Control**: Cypress uses a combination of Node.js and its custom library for test execution, but the bulk of the test control happens in the browser, limiting flexibility compared to Playwright’s external Node process.
-- **Component Testing Support**: Because Cypress runs directly within the browser, it enables component and unit testing as well as E2E tests in the same framework. However, this approach changes the browser’s behavior, creating potential differences from real-world user scenarios.
-- **Limited Parallelism**: Parallelization is not available out of the box and requires a **SaaS subscription** to Cypress Cloud for optimal parallel test execution.
-- **Limited Tab and iFrame Support**: Cypress does not support multiple tabs and has limited and sometimes inconsistent iFrame handling, making it less effective for complex web applications.
+### Impact of architectural differences
 
+1. **Browser and platform support**
+   - Playwright supports Chromium, Firefox, and WebKit on all major operating systems, so you can check Safari-engine behavior from Windows or Linux CI.
+   - Cypress supports Chromium-based browsers and Firefox. WebKit support is experimental and requires installing the `playwright-webkit` package.
 
+2. **Testing flexibility**
+   - Playwright's external control lets you automate multiple tabs, windows, users, and origins in one test, and use it outside of testing.
+   - Cypress's in-browser model makes component testing and app-state manipulation easy, but multi-tab, multi-browser, and cross-origin flows need workarounds.
 
-### **Impact of Architectural Differences**
+3. **Parallelization and CI**
+   - Playwright parallelizes by default and shards across machines with `--shard`, with no subscription required.
+   - Cypress needs Cypress Cloud or a third-party service to parallelize across machines.
 
-1. **Browser and Platform Support**  
-   - Playwright supports all modern browsers (Chromium, Firefox, WebKit) and can run on multiple operating systems with little configuration (sidenote: Checkly currently supports using Chromium or Chrome with Playwright Test and Playwright library, with Chromium being the default browser for all checks. [Read more about using Chrome](/detect/synthetic-monitoring/browser-checks/overview#using-other-browsers)).
-   - Cypress, with its Electron-based architecture, requires adaptation for each browser and does not support Safari or tabs.
+4. **Realism and developer feedback**
+   - Playwright's external control reflects real user behavior without modifying the page.
+   - Cypress's in-browser runner gives a fast, visual feedback loop during development.
 
-2. **Testing Flexibility**  
-   - Playwright’s language-agnostic design supports a wide range of frameworks and languages beyond JavaScript. Cypress is restricted to JavaScript and TypeScript.  
-   - Playwright focuses on E2E and system testing, while Cypress can handle both component and E2E testing within the same framework, though it changes browser behavior in the process.
+5. **Asynchronous code**
+   - Playwright uses standard `async`/`await`, so tests read like any other modern JavaScript or Python code.
+   - Cypress uses chained commands that it queues and runs in order. The syntax is compact, but you can't `await` Cypress commands, which trips up developers used to native promises.
 
-3. **Parallelization and CI Integration**  
-   - Playwright offers **free built-in parallel testing** and easily integrates with CI pipelines using only `npm install`. Cypress requires either SaaS subscriptions or workarounds for parallelism, increasing costs and complexity.  
-   - For remote testing, Playwright integrates seamlessly with Selenium Grid and SaaS solutions (e.g., BrowserStack), while Cypress relies on its own cloud service.
+### Which architecture fits your needs?
 
-4. **Performance and Practicality**  
-   - Playwright’s external control through CDP offers **more realistic testing**, reflecting real user behavior without modifying browser internals.  
-   - Cypress’s tight browser integration provides fast feedback loops for developers but can lead to discrepancies between test environments and real-world scenarios.
+- **Choose Playwright** if you need cross-browser coverage including WebKit, free parallelism, multiple languages, or tests that span tabs, users, and origins.
+- **Choose Cypress** if your focus is fast, visual feedback during frontend development, you want mature component testing, and your team works in JavaScript or TypeScript with limited browser requirements.
 
-5. **Asynchronous Code Handling**  
-   - Playwright uses standard **async/await** syntax, providing a clear, modern JavaScript interface. Cypress uses a custom dot notation that simplifies code but is not fully asynchronous, limiting flexibility.
+## Playwright vs Cypress: key differences comparison
 
+| Feature | Playwright | Cypress |
+|---|---|---|
+| Languages | JavaScript, TypeScript, Python, Java, .NET | JavaScript, TypeScript |
+| Test runner | Playwright Test for JS/TS; pytest, JUnit, TestNG, NUnit, MSTest, or xUnit in other languages | Built-in runner (Mocha-based) |
+| Operating systems | Windows, macOS, Linux | Windows, macOS, Linux |
+| Open source | Yes (Apache 2.0) | App is open source (MIT); Cypress Cloud is commercial |
+| Browsers | Chromium, Chrome, Edge, Firefox, WebKit | Chrome, Chromium, Edge, Firefox; WebKit experimental |
+| Architecture | Controls browsers externally, isolates tests with browser contexts | Runs tests inside the browser |
+| Parallel testing | Built in, within and across files; free sharding | Across spec files, through Cypress Cloud |
+| Multiple tabs and windows | Yes | No |
+| Cross-origin testing | Yes | With `cy.origin()` |
+| Iframes | Full support, including cross-origin | Same-origin, no built-in switch command |
+| Component testing | React, Vue, and any framework your dev server renders | React, Angular, Vue, Svelte |
+| Debugging | UI Mode, Trace Viewer, HTML reporter | Interactive runner with time travel; Test Replay in Cypress Cloud |
+| AI tooling | MCP server, CLI, and test agents | `cy.prompt()` and Cypress Studio |
+| Mobile | Device emulation | Viewport resizing |
+| Community | Microsoft-maintained, GitHub and Discord | Cypress-maintained, GitHub and Discord, large plugin ecosystem |
 
+## Playwright vs Cypress examples
 
-### **Which Architecture Fits Your Needs?**  
-- **Choose Playwright** if you need cross-browser support, parallelism, and multi-language flexibility. Its architecture is more scalable for complex, multi-layered applications that demand realistic, real-world testing.  
-- **Choose Cypress** if your focus is on quick feedback during frontend development, and you prefer a highly interactive testing experience embedded within the browser. Cypress is ideal for teams already working in a JavaScript/TypeScript environment with limited browser requirements.
+At a basic level, Playwright and Cypress tests look similar. The differences become visible when you make two asynchronous requests with assertions.
 
-## Playwright vs Cypress: Key Differences Comparison
+### Playwright example
 
-| Feature                | Playwright                                | Cypress                              |
-|------------------------|--------------------------------------------|--------------------------------------|
-| Language           | JavaScript, TypeScript, Python, Java, C#  | JavaScript, TypeScript               |
-| Test Runner        | Works with Jest, Mocha, and others        | Built-in test runner                 |
-| Operating Systems  | Windows, macOS, Linux                     | Windows, macOS, Linux                |
-| Open Source        | Yes                                        | Yes                                  |
-| Parallel Testing   | Full parallelism, even within specs       | Parallel at spec level only          |
-| Architecture       | Uses browser contexts for isolation       | Runs within the browser itself       |
-| Browsers Supported | Chromium, Firefox, WebKit                 | Chrome, Edge (Chromium-based)        |
-| Documentation      | Strong Microsoft support, Discord channel | Strong community, Slack support      |
-| Real Devices Support | Limited                                 | No                                   |
-| Plugins            | Relies on custom setup                    | Ecosystem of plugins                 |
-
-
-
-## Playwright vs Cypress Examples
-At the highest level, Playwright and Cypress tests look very similar when writing a basic tests. Differences only really become visible when you make two asynchronous requests with assertions.
-
-### Playwright Example
 ```ts
 import { test, expect } from '@playwright/test'
 
@@ -147,9 +151,10 @@ test('Multiple API Requests Test', async ({ request }) => {
 })
 ```
 
-Playwright uses the standard `await` syntax used in the rest of Node.js. 
+Playwright uses the standard `await` syntax used in the rest of Node.js.
 
-### Cypress Example
+### Cypress example
+
 ```js
 describe('Multiple API Requests Test', () => {
   it('should return valid status codes for two API requests', () => {
@@ -162,48 +167,50 @@ describe('Multiple API Requests Test', () => {
     cy.request('https://jsonplaceholder.typicode.com/users/1')
       .its('status')
       .should('eq', 200)
-  });
+  })
 })
 ```
-With Cypress, we're using their custom syntax, which is a bit more compact but still has its own specialized field of knowledge. If you're pursuing a [monitoring as code](https://www.checklyhq.com/guides/monitoring-as-code/) strategy and getting everyone involved in testing and monitoring, this domain-specific syntax may be a barrier to entry.
 
-Further, Cypress asynchrony may not act as expected if we're used to asynchrony from Node.js. In Cypress, each `cy.request()` runs asynchronously, but Cypress queues them sequentially. This ensures that the second request only executes after the first one completes, making this pattern simple and effective for making multiple assertions across async requests.
+Cypress uses its own chained command syntax, which is compact but is its own body of knowledge. If you're pursuing a [monitoring as code](/concepts/monitoring-as-code) strategy and getting everyone involved in testing and monitoring, this domain-specific syntax can be a barrier to entry.
 
+Cypress asynchrony may also not behave the way you expect from Node.js. Each `cy.request()` is asynchronous, but Cypress queues commands and runs them one after another. The second request only runs after the first completes, which keeps this pattern simple, but you can't store a command's result in a variable or `await` it.
 
+## Playwright vs Cypress: pros & cons
 
-## Playwright vs Cypress: Pros & Cons
+### Playwright pros
 
-### Playwright Pros  
-- Supports more browsers, including Firefox and Safari/WebKit  
-- Suitable for complex web apps with [API](https://www.checklyhq.com/learn/playwright/testing-apis/), UI, and [visual testing](/detect/synthetic-monitoring/browser-checks/visual-regressions) combined  
-- Superior parallelism and scalability for larger test suites  
-- Works on multiple platforms  
+- Supports all three major browser engines, including WebKit
+- Handles multiple tabs, users, origins, and iframes in one test
+- Free built-in parallelism and sharding for large suites
+- Combines [API](https://www.checklyhq.com/learn/playwright/testing-apis/), UI, and [visual testing](/detect/synthetic-monitoring/browser-checks/visual-regressions) in one framework
+- Works in JavaScript, TypeScript, Python, Java, and .NET
+- Debugging and reporting tools are included in the open source package
 
-### Playwright Cons  
-- More complex setup for beginners  
-- Larger learning curve compared to Cypress  
-- Requires deeper configuration to utilize full power  
+### Playwright cons
 
-### Cypress Pros
-- User-friendly interface, easy for beginners  
-- GUI with real-time updates during tests  
-- Great for frontend testing  
+- More configuration options to learn to use it fully
+- `async`/`await` is required everywhere, which can trip up newer JavaScript developers
+- Runs its own Firefox and WebKit builds, not branded Firefox or Safari
 
-### Cypress Cons  
-- Limited to Chromium-based browsers  
-- Struggles with large-scale parallelism  
-- No native support for multi-language tests  
+### Cypress pros
 
+- Interactive runner with real-time updates and time-travel debugging
+- Easy to get started for frontend developers
+- Mature component testing for popular frameworks
+- Large plugin ecosystem
 
-## Playwright vs Cypress: Which Solution is Better for You?
+### Cypress cons
 
-- Choose Playwright if you need to test across multiple browsers, require advanced parallelism, or need to include API and component testing in your workflow. It’s better suited for complex, large-scale projects with multiple stakeholders.  If you've been told 'that's hard to test with Cypress' there's no doubt you can do it in Playwright.
-- Choose Cypress if your focus is frontend testing, or you are working on web apps that run primarily in Chrome/Edge. Cypress is more user-friendly for teams without extensive testing experience and offers quick startup time with fewer configurations.  
+- No support for multiple tabs or multiple browsers in one test
+- WebKit support is experimental
+- Parallelization across machines requires Cypress Cloud or a third-party service
+- JavaScript and TypeScript only
 
+## Playwright vs Cypress: which solution is better for you?
 
+- **Choose Playwright** if you need to test across browsers, require parallelism at scale, or want API, UI, and component testing in one workflow. It suits complex projects with multiple stakeholders and languages. If you've been told "that's hard to test with Cypress," you can likely do it in Playwright.
+- **Choose Cypress** if your focus is frontend and component testing for web apps that run primarily in Chromium-based browsers or Firefox, and your team values Cypress's interactive runner. Cypress is approachable for teams new to testing.
 
 ## Conclusion
 
-Both Playwright and Cypress are powerful tools, but each shines in different areas. Playwright’s versatility makes it the better choice for complex, multi-layered applications requiring scalability, while Cypress excels in simplicity and frontend testing. Now that you've chosen a framework, what's next?
-
-
+Both Playwright and Cypress are capable tools that shine in different areas. Playwright's versatility makes it the better choice for complex applications that need cross-browser coverage and scale, while Cypress excels at interactive frontend and component testing. If you choose Playwright, you can reuse your tests to monitor production with [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview).

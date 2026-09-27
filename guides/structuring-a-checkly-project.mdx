@@ -1,6 +1,6 @@
 ---
 title: Structure a Checkly project for a real codebase
-sidebarTitle: Structure a Project
+sidebarTitle: Structuring a Project
 description: Organize checks by service with groups, keep shared settings in one config, and deploy monitoring from CI on every merge to main.
 canonical: 'https://www.checklyhq.com/docs/guides/structuring-a-checkly-project/'
 ---
@@ -46,11 +46,19 @@ The sections below are the same work done by hand, so you can see what the agent
 
 </Accordion>
 
-A project that scales has four parts: a folder layout that mirrors your services, defaults in one config, a group per service, and a CI workflow that deploys it.
+## How a project is organized
 
-## One folder per service
+Every Checkly project has three levels of configuration, and settings inherit downward. A value set on a check wins over the group, which wins over the project.
 
-The quickstart scaffold puts every check in a flat `__checks__` folder. That works for four files and stops working at forty. Split it by the services in your system, so the folder tells you who owns a check and what it covers.
+| Level | Where it lives | What belongs there |
+|---|---|---|
+| Project | `checkly.config.ts` | Anything true for every check in the account: frequency, default locations, tags, alert channels, and where to find check files |
+| Group | `group.ts` in a service folder | Anything true for one service: its locations, environment variables, tags, and how its checks run |
+| Check | `*.check.ts` | Only what is specific to that check: the request or script, assertions, and response time thresholds |
+
+Groups are optional. A project with a handful of checks does fine with project defaults alone. Once several people own different parts of the system, a group per service gives each part its own settings and its own page in Checkly, and lets you run or mute that service as a unit.
+
+The folder layout is a convention, not a rule. Checkly finds check files with the `checkMatch` glob and does not care where they sit. Mirror the groups anyway, one folder per service, so the path tells you who owns a check and what it covers. Splitting by check type or by team works too, but service folders are the ones that survive a reorg.
 
 ```text Project layout
 checkly.config.ts
@@ -66,11 +74,11 @@ __checks__/
     books.check.ts
 ```
 
-Each service folder gets a `group.ts` and its checks. The config's `checkMatch` glob finds check files at any depth, so nothing else changes when you add a folder.
+The rest of this guide sets up each level in turn, then wires up a deploy from CI.
 
-## Project defaults in one config
+## Project defaults
 
-Put the defaults every check should inherit in `checkly.config.ts`, and the alert channel they share next to the checks.
+Put the settings every check should inherit in `checkly.config.ts`, and the alert channel they share next to the checks.
 
 ```ts checkly.config.ts highlight={10-16}
 import { defineConfig } from 'checkly'
@@ -109,11 +117,13 @@ export const opsEmail = new EmailAlertChannel('ops-email', {
 })
 ```
 
-Settings resolve from the most specific level: a value on the check wins over the group, which wins over the project. Keep `logicalId` stable. Changing it makes Checkly treat the project as new and drops its history.
+The `checkMatch` glob finds check files at any depth, so adding a service folder needs no config change. Keep `logicalId` stable. Changing it makes Checkly treat the project as new and drops its history.
 
 ## A group per service
 
-A group holds the settings that are true for a whole service and lets you run or mute that service as a unit. The storefront runs from three regions so a regional CDN problem shows up as a single-location failure.
+Each service folder gets a `group.ts` with a `CheckGroupV2`. The two groups here carry different things, which is the point: a group holds whatever is true for that service and nothing else.
+
+The storefront group sets locations. It runs from three regions so a regional CDN problem shows up as a single-location failure.
 
 ```ts __checks__/web/group.ts
 import { CheckGroupV2 } from 'checkly/constructs'
@@ -128,7 +138,31 @@ export const webGroup = new CheckGroupV2('shop-web', {
 })
 ```
 
-A check joins the group through its `group` property. The uptime monitor also overrides the project's ten-minute default, because a URL monitor is cheap enough to run every minute.
+The API group sets a variable instead. Every API check in the folder reads `{{API_BASE_URL}}`, so moving the API to a new host is a one-line change.
+
+```ts __checks__/api/group.ts highlight={8-10}
+import { CheckGroupV2 } from 'checkly/constructs'
+
+// The backend API. The base URL lives on the group, so every API check
+// in this folder reads {{API_BASE_URL}} instead of repeating the host.
+export const apiGroup = new CheckGroupV2('shop-api', {
+  name: 'Shop API',
+  tags: ['api'],
+  environmentVariables: [
+    { key: 'API_BASE_URL', value: 'https://danube-web.shop/api' },
+  ],
+})
+```
+
+Once deployed, each group gets its own page with the checks it owns, their combined availability, and a button to run them all at once.
+
+<Frame>
+  <img src="/images/guides/structure-a-project/group-web.png" alt="The Shop web group page in Checkly showing two passing checks, availability and response time stats, and recent run results from three locations" />
+</Frame>
+
+## Checks
+
+A check joins its group through the `group` property and inherits everything above it. The file itself holds only what is specific to this check. The uptime monitor below overrides one inherited value, because a URL monitor is cheap enough to run every minute.
 
 ```ts __checks__/web/uptime.check.ts highlight={6,8}
 import { Frequency, UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs'
@@ -149,21 +183,7 @@ new UrlMonitor('shop-homepage-uptime', {
 })
 ```
 
-The API group carries a variable instead of locations. Every API check in the folder reads `{{API_BASE_URL}}`, so moving the API to a new host is a one-line change.
-
-```ts __checks__/api/group.ts highlight={8-10}
-import { CheckGroupV2 } from 'checkly/constructs'
-
-// The backend API. The base URL lives on the group, so every API check
-// in this folder reads {{API_BASE_URL}} instead of repeating the host.
-export const apiGroup = new CheckGroupV2('shop-api', {
-  name: 'Shop API',
-  tags: ['api'],
-  environmentVariables: [
-    { key: 'API_BASE_URL', value: 'https://danube-web.shop/api' },
-  ],
-})
-```
+The API check reads the group's variable in its URL and adds nothing but its own assertions.
 
 ```ts __checks__/api/books.check.ts highlight={11}
 import { ApiCheck, AssertionBuilder } from 'checkly/constructs'
@@ -215,15 +235,9 @@ __checks__/web/uptime.check.ts
 3 passed, 3 total
 ```
 
-Once deployed, each group gets its own page with the checks it owns, their combined availability, and a button to run them all at once.
-
-<Frame>
-  <img src="/images/guides/structure-a-project/group-web.png" alt="The Shop web group page in Checkly showing two passing checks, availability and response time stats, and recent run results from three locations" />
-</Frame>
-
 ## Deploy from CI on every merge
 
-Preview what the first deploy creates, then deploy once from your machine.
+The structure above is code, so it ships like code. Preview what the first deploy creates, then deploy once from your machine.
 
 ```bash Terminal
 npx checkly deploy --preview

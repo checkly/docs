@@ -62,7 +62,6 @@ const GUIDE_STATUS_PAGE = {
 const GUIDE_DEBUG = {
   checkId: '8c688bf9-2c0a-4614-be7b-e66008b1093a',
   failedResultId: '01a0df0e-99a6-7379-aab4-9e3f0bfcf420',
-  failedSessionId: '01a0df0e-997b-74a3-ab2a-e31178ef1a07',
 }
 const GUIDE_UPTIME = {
   group: 6887126,
@@ -376,21 +375,17 @@ export const scenes: Scene[] = [
     clip: { x: 240, y: 58, width: 1200, height: 900 },
   },
   {
-    id: 'guide-debug-result-session',
-    name: 'Docs guide (Debug a failed check) — failed check session',
-    tags: ['guide-debug-failed-check', 'docs', 'playwright', 'check-result'],
-    url: `/checks/${GUIDE_DEBUG.checkId}/check-sessions/${GUIDE_DEBUG.failedSessionId}`,
-    viewport: { width: 1440, height: 1500 },
-    delay: 4000,
-    clip: { x: 240, y: 58, width: 1200, height: 1300 },
-  },
-  {
     id: 'guide-debug-result-failed',
     name: 'Docs guide (Debug a failed check) — failed check result with error, screenshot, and trace',
     tags: ['guide-debug-failed-check', 'docs', 'playwright', 'check-result'],
     url: `/checks/${GUIDE_DEBUG.checkId}/results/${GUIDE_DEBUG.failedResultId}`,
     viewport: { width: 1440, height: 1500 },
     delay: 4000,
-    clip: { x: 240, y: 58, width: 1200, height: 1300 },
+    setup: async (page) => {
+      // Open the failed test case to show the error, screenshot, and trace.
+      await page.getByText('checkout completes').first().click({ timeout: 10000 }).catch(() => {})
+      await page.waitForTimeout(4000)
+    },
+    clip: { x: 240, y: 58, width: 1200, height: 830 },
   },
 ]

@@ -20,6 +20,9 @@ const AUTH_DIR = path.join(__dirname, '.auth')
 const AUTH_FILE = path.join(AUTH_DIR, 'session.json')
 const CONTEXT_FILE = path.join(AUTH_DIR, 'context.json')
 const LOGIN_URL = 'https://app.checklyhq.com/'
+// The account the guide samples deploy to (Checkly Marketing). Used when the
+// post-login URL does not carry an account ID.
+const DEFAULT_ACCOUNT_ID = '5d536cc1-f076-446e-a142-21e48dd31986'
 
 async function setupAuth() {
   // Ensure .auth directory exists
@@ -30,8 +33,11 @@ async function setupAuth() {
   console.log('🔐 Opening browser for Checkly login...')
   console.log('   Log in to your account, then come back here.\n')
 
+  // Use the installed Chrome: Google sign-in and the human check on the
+  // login page reject the bundled Chromium.
   const browser = await chromium.launch({
     headless: false, // Must be visible for manual login
+    channel: 'chrome',
     args: ['--start-maximized'],
   })
 
@@ -63,13 +69,10 @@ async function setupAuth() {
   // Extract account ID from the URL (e.g. /accounts/abc123/...)
   const currentUrl = page.url()
   const accountMatch = currentUrl.match(/\/accounts\/([^/]+)/)
-  const accountId = accountMatch?.[1]
+  const accountId = accountMatch?.[1] ?? DEFAULT_ACCOUNT_ID
 
-  if (!accountId) {
-    console.error('❌ Could not extract account ID from URL:', currentUrl)
-    console.error('   Expected URL pattern: /accounts/{accountId}')
-    await browser.close()
-    process.exit(1)
+  if (!accountMatch) {
+    console.log(`ℹ️  No account ID in ${currentUrl}; using the default account ${DEFAULT_ACCOUNT_ID}`)
   }
 
   // Save the authenticated session

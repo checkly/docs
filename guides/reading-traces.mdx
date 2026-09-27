@@ -125,10 +125,16 @@ Rocky analyzes every new error group automatically. To rerun it with what you kn
 The result page has the failure screenshot, the video, and the trace viewer. It is the quickest way to see what the browser saw, and it is what the alert links to.
 
 <Frame>
-  <img src="/images/guides/debug-failed-check/result-failed.png" alt="The failed Shop checkout result in Checkly showing the Playwright error, the screenshot of the checkout form at the moment of failure, and the View trace and Analyze root cause buttons" />
+  <img src="/images/guides/debug-failed-check/result-failed.png" alt="The failed Shop checkout result in Checkly with the Run, Retry 1, and Retry 2 tabs, the View Trace, Screenshots, Video, and Analyze root cause buttons, and the Playwright error with line 21 highlighted" />
 </Frame>
 
-The screenshot shows the checkout form still on screen with a validation message under it. To find out which field the form is complaining about, you need the trace.
+Open the screenshot. The checkout form is still on screen, five fields are filled, the company field is empty, and the form says `Please fill in all fields.`.
+
+<Frame>
+  <img src="/images/guides/debug-failed-check/failure-screenshot.png" alt="The Danube shop checkout form at the moment of failure: name, surname, address, zipcode, and city filled in, the Company (optional) field empty, and the message Please fill in all fields above the Buy button" />
+</Frame>
+
+That is a strong lead, and a screenshot is one frame. The trace tells you what the click did and what the page looked like as text you can search.
 
 ## Step 4: Read the trace in the terminal
 

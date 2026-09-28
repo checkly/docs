@@ -81,7 +81,7 @@ When updating, `update-check` accepts either shared top-level properties (`name`
 `delete-check` permanently removes the check and its result history. The tool first returns a confirmation handle, and the deletion only proceeds when your client passes that handle back after you explicitly agree. To stop a check from running while keeping it, use `update-check` with `activated: false` instead.
 </Warning>
 
-Playwright Check Suites, agentic checks, and checks whose code lives in a repository are managed as Monitoring as Code with the Checkly CLI. Use `prepare-local-check-authoring` for a CLI handoff. Changes made through MCP to a check that a CLI project manages are overwritten by that project's next deploy.
+Playwright Check Suites are managed as Monitoring as Code with the Checkly CLI. Use `prepare-local-check-authoring` for a CLI handoff. Changes made through MCP to a check that a CLI project manages are overwritten by that project's next deploy.
 
 Example prompts:
 
@@ -113,15 +113,8 @@ Trigger the checks tagged production-smoke, then poll the test session until res
 
 Group settings such as locations, alerting, retries, API check defaults, and environment variables apply to every check in the group. To put a check in a group, set `groupId` on the check with `create-check` or `update-check`.
 
-<Warning>
-`delete-check-group` deletes the group and all checks in it, including their result history, like deleting a group in the Checkly web app. To keep the checks, first move them out of the group with `update-check` and `groupId: null`. To pause the group instead, use `update-check-group` with `activated: false`.
-</Warning>
 
 Example prompts:
-
-```text title="Prompt" wrap
-List my check groups and show how many checks each one contains.
-```
 
 ```text title="Prompt" wrap
 Create a check group named "Payments API" that runs from eu-central-1 and us-west-2 with a base URL of https://api.example.com, then move all checks tagged payments into it.

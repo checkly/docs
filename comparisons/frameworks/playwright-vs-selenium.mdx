@@ -1,277 +1,258 @@
 ---
-title: Playwright vs Selenium - Detailed Comparison for 2024
+title: Playwright vs Selenium - Detailed Comparison for 2026
 subTitle: Key features, and pros & cons of each framework
-description: Explore the key differences between Playwright and Selenium in web testing. Discover the examples, pros and cons, and learn how to run the tests.
-date: 2024-10-17
+description: Compare Playwright and Selenium by language and browser support, waiting, test tooling, debugging, and mobile testing, with side-by-side examples.
+date: 2026-09-27
 author: Nocnica Mellifera
 githubUser: serverless-mom
 tags:
   - basics
 weight: 20
 displayTitle: Playwright vs Selenium
-sidebarTitle: Playwright vs Selenium
+sidebarTitle: vs Selenium
 learn_playwright:
   parent: "Getting started"
 canonical: 'https://www.checklyhq.com/docs/comparisons/frameworks/playwright-vs-selenium/'
 ---
 
-When considering automated testing tools for web applications, the choice between Playwright and Selenium is common. Both tools offer robust capabilities, but they cater to different needs and expertise levels. This article provides a detailed comparison to help you decide which solution is best for your project or organization.
+Playwright and Selenium are the two most widely used open-source frameworks for browser automation. Both drive real browsers and support multiple languages, but they take different approaches: Playwright ships a complete testing toolkit, while Selenium provides a standards-based automation layer that you combine with the test framework of your choice. This article compares the two to help you decide which fits your project.
 
-## Playwright Overview
+## Playwright overview
 
-Playwright is a relatively new browser automation framework that has gained popularity due to its modern approach to web testing. It supports multiple programming languages, but it is particularly well-suited for JavaScript and TypeScript users.
+Playwright is a browser automation framework maintained by Microsoft. It supports JavaScript/TypeScript, Python, Java, and .NET. The Node.js version includes Playwright Test, a full test runner. Other languages integrate with their standard test frameworks, such as pytest, JUnit, TestNG, NUnit, MSTest, and xUnit.
 
-### Playwright Key Features
+### Playwright key features
 
-- **Out-of-the-box Test Framework**: Playwright comes bundled with Playwright Test, providing a comprehensive test automation framework that handles test execution, reporting, assertions, and more.
-- **Auto-Wait Mechanism**: Playwright intelligently waits for elements to be ready before interacting with them, reducing the need for manual wait statements.
-- **Cross-Browser Testing**: It supports Chromium, Firefox, and WebKit, making it useful for testing across different browsers.
-- **Parallel Execution**: Built-in support for running tests in parallel to speed up execution time.
-- **Trace Viewer**: A powerful debugging tool that records test execution, allowing you to inspect the behavior and identify issues.
-- **Headless Mode**: Ability to run tests in headless mode for faster execution and CI/CD pipelines.
+- **Built-in test runner**: Playwright Test handles test execution, parallelism, retries, fixtures, assertions, and reporting.
+- **Auto-waiting**: Locators wait for elements to be actionable before interacting, and web-first assertions retry until they pass or time out.
+- **User-facing locators**: Locators such as `getByRole`, `getByLabel`, and `getByText` find elements the way users and assistive technology see them.
+- **Cross-browser testing**: Runs Chromium, Firefox, and WebKit, plus branded Google Chrome and Microsoft Edge.
+- **Isolation**: Each test runs in its own lightweight browser context, so tests don't share cookies or storage.
+- **Debugging tools**: Trace Viewer, UI Mode, and the HTML reporter show every action, DOM snapshot, network request, and console message from a run.
+- **Beyond UI testing**: Built-in API testing, network interception and mocking, screenshot and ARIA snapshot assertions, and device emulation.
+- **AI tooling**: The Playwright MCP server lets AI agents drive a browser, and Playwright Test Agents plan, generate, and repair tests.
 
-### How to Run Playwright Tests
+### Run a Playwright test
 
-1. Install Playwright using npm:
-    
+1. Set up Playwright Test in your project. The installer adds the dependencies, a config file, and the browsers:
+
     ```bash
-    npm install --save-dev playwright
+    npm init playwright@latest
     ```
-    
-2. Set up a test script using `@playwright/test`:
-    
-    ```ts
+
+2. Write a test in the `tests` folder:
+
+    ```ts tests/example.spec.ts
     import { test, expect } from '@playwright/test'
-    
+
     test('example test', async ({ page }) => {
-      await page.goto('<https://example.com>')
-      const title = await page.title()
-      expect(title).toBe('Example Domain')
+      await page.goto('https://example.com')
+      await expect(page).toHaveTitle('Example Domain')
     })
     ```
-    
+
 3. Run the test with the Playwright CLI:
-    
+
     ```bash
     npx playwright test
     ```
-    
 
-## Selenium Overview
+## Selenium overview
 
-Selenium has been a mainstay in browser automation for over a decade. It is widely used across the industry and supports multiple languages, including Java, Python, C#, and JavaScript. Selenium is a browser automation tool rather than a full-fledged testing framework, which means you’ll need to add additional libraries for assertions, reporting, and parallel test execution.
+Selenium has been a mainstay of browser automation for more than two decades. Its WebDriver protocol became a W3C standard, and browser vendors ship their own drivers for it. Selenium supports Java, Python, C#, Ruby, and JavaScript.
 
-### Selenium Key Features
+Selenium is a browser automation library rather than a test framework. You pair it with a test runner such as JUnit, TestNG, pytest, NUnit, or Mocha for assertions, reporting, and parallel execution.
 
-- **Multi-Language Support**: Selenium supports many programming languages, making it flexible for teams with diverse tech stacks.
-- **Cross-Browser Testing**: It works with all major browsers, including Chrome, Firefox, Safari, and Edge.
-- **WebDriver Protocol**: Selenium uses the WebDriver protocol, which is a standard for browser automation.
-- **Support for Real Devices**: It integrates well with cloud services for testing on real devices.
-- **Large Ecosystem**: There are many plugins, libraries, and resources available for Selenium.
+### Selenium key features
 
-### Setting up and running Selenium tests
+- **Multi-language support**: Official bindings for Java, Python, C#, Ruby, and JavaScript.
+- **Cross-browser testing**: Works with Chrome, Firefox, Edge, and Safari through vendor-maintained drivers.
+- **Automatic driver management**: Selenium Manager, included with Selenium, downloads the right driver, and the browser if needed, so there's no manual driver setup.
+- **W3C standards**: Built on the WebDriver standard. Selenium also supports WebDriver BiDi, the bidirectional successor standard, for features such as console logs and network interception.
+- **Selenium Grid**: Runs tests in parallel across many machines, browsers, and operating systems.
+- **Mobile and real devices**: Appium extends the WebDriver protocol to native and mobile web testing on real iOS and Android devices, and cloud testing providers run Selenium tests on real browsers and devices.
+- **Selenium IDE**: A browser extension for Chrome and Firefox that records and plays back tests.
+- **Large ecosystem**: Many plugins, integrations, and learning resources built over the project's history.
 
-Here’s how to run a Selenium test in NodeJS
+### Run a Selenium test
 
-1. **Install Selenium WebDriver**
-    
-    You can add Selenium WebDriver to your project using NPM:
-    
+Here's how to run a Selenium test in Node.js:
+
+1. Install Selenium WebDriver:
+
     ```bash
     npm install selenium-webdriver
     ```
-    
-    Selenium WebDriver is the library that allows your tests to interact with browsers.
-    
 
-### Writing a Basic Selenium Test
+2. Write a script that opens a browser, checks the page title, and closes the browser:
 
-1. **Import the Selenium WebDriver Module**
-    
-    In your test file (e.g., `test.js`), import the `selenium-webdriver` package:
-    
-    ```js
-    const { Builder, By, until } = require('selenium-webdriver');
-    ```
-    
-2. **Set Up the Browser Driver**
-    
-    Use the `Builder` to configure your test environment. Here is a simple example:
-    
-    ```ts
+    ```js test.js
+    const { Builder } = require('selenium-webdriver')
+    const assert = require('node:assert')
+
     async function exampleTest() {
-      // Initialize a new browser instance
-      const driver = await new Builder().forBrowser('chrome').build();
-    
+      // Selenium Manager finds or downloads the matching driver
+      const driver = await new Builder().forBrowser('chrome').build()
+
       try {
-        // Navigate to a website
-        await driver.get('https://www.example.com');
-    
-        // Perform actions or assertions
-        const title = await driver.getTitle();
-        console.log('Page Title:', title);
-    
-        // Find an element and interact with it
-        const element = await driver.findElement(By.name('exampleInput'));
-        await element.sendKeys('Test Input');
-    
-        // Wait for some condition, if necessary
-        await driver.wait(until.titleIs('Expected Title'), 5000);
+        await driver.get('https://example.com')
+        const title = await driver.getTitle()
+        assert.strictEqual(title, 'Example Domain')
       } finally {
-        // Clean up and close the browser
-        await driver.quit();
+        await driver.quit()
       }
     }
-    
-    // Run the test
-    exampleTest();
+
+    exampleTest()
     ```
-    
 
-### Running the Test
+3. Run the script:
 
-To run your test, execute `node test.js` in your terminal
+    ```bash
+    node test.js
+    ```
 
-This command launches a browser, performs the specified actions, and then closes the browser. You should see any console output you added, such as the page title.
+For larger suites, run Selenium from a test framework such as Mocha to get test organization, reporting, and retries.
 
-## Playwright vs Selenium: Key Differences
+## Playwright vs Selenium: key differences
 
-While Playwright and Selenium are both used for similar roles as test automation. And both are focused on operating a browser automatically, the difference in their backgrounds, core userbase, and ages show up in a number of implementation details.
+Both tools automate real browsers, but their architecture and scope differ.
 
 | **Feature** | **Playwright** | **Selenium** |
 | --- | --- | --- |
-| **Language** | Primarily used with JavaScript/TypeScript; also supports Python, Java, and .NET. | Supports a wider range of languages, suitable for diverse tech stacks. |
-| **Test Runner Frameworks** | Comes with Playwright Test, a built-in test runner. | Does not include a test runner; requires integration with frameworks like JUnit, TestNG, or PyTest. |
-| **Element Locators** | Uses modern CSS selectors and locators like `getByRole`, `getByText`, `getByTestId`. | Uses traditional locators such as `id`, `class`, `xpath`, `cssSelector`. |
-| **Waits** | Automatic waiting for elements, reducing the need for manual `sleep` statements. | Requires explicit or implicit waits, leading to more complex synchronization issues. |
-| **Ease of Installation** | Easy to install with a single npm command. | Requires installing browser drivers and additional setup components. |
-| **Trace Viewer** | Includes a built-in trace viewer for debugging. | No built-in trace viewer; debugging requires additional tools. |
-| **Prerequisites** | Basic knowledge of JavaScript or TypeScript. | More flexibility with languages but requires additional setup. |
-| **Operating Systems** | Supports Windows, macOS, and Linux. | Supports Windows, macOS, and Linux. |
-| **Open Source** | Actively gaining traction and evolving rapidly. | Established community, but some resources may be outdated. |
-| **Parallel Testing** | Built-in support for parallel test execution. | Requires a third-party framework for parallel runs. |
-| **Architecture** | Modern architecture optimized for speed and reliability. | Based on the WebDriver protocol, which is older. |
-| **Browsers Supported** | Chromium, Firefox, WebKit. | Chrome, Firefox, Safari, Edge, and more. |
-| **Documentation & Community** | Well-documented; community support is growing. | Established community with extensive resources. |
-| **Real Devices Support** | Limited real device testing options. | Better integration with cloud-based real device testing services. |
-| **Plugins** | Fewer plugins but growing support. | Rich ecosystem of plugins for various purposes. |
-| **Visual Testing** | Native support for visual regression testing. | Requires third-party libraries for visual testing. |
-| **Test Recording & Screenshots** | Built-in support for test recording and screenshots. | Screenshots supported; test recording needs external tools. |
-| **Assertions** | Comes with built-in assertions. | Needs an external assertion library. |
-| **Test Reporting** | Built-in test reporting features. | Needs external reporting libraries. |
-| **API Automation** | Supports API testing natively. | Focused on browser automation only. |
-| **Performance** | Generally faster, especially in headless mode. | Slower due to the WebDriver protocol overhead. |
+| **Languages** | JavaScript/TypeScript, Python, Java, and .NET. | Java, Python, C#, Ruby, and JavaScript. |
+| **Test runner** | Playwright Test for Node.js. Other languages use pytest, JUnit, TestNG, NUnit, MSTest, or xUnit. | None included. Use JUnit, TestNG, pytest, NUnit, Mocha, or similar. |
+| **Browsers** | Chromium, Firefox, and WebKit, plus branded Chrome and Edge. | Chrome, Firefox, Edge, and Safari. |
+| **Architecture** | Communicates with browsers over a persistent connection. | Uses the W3C WebDriver standard through browser drivers, with WebDriver BiDi for bidirectional features. |
+| **Setup** | One command installs the test runner, config, and browsers. | One package install. Selenium Manager handles drivers and browsers. |
+| **Element locators** | User-facing locators such as `getByRole`, `getByLabel`, and `getByTestId`, plus CSS and XPath. | `id`, `name`, `className`, `cssSelector`, `xpath`, link text, and relative locators. |
+| **Waits** | Auto-waits for actionability, and assertions retry automatically. | Explicit or implicit waits that you add to your code. |
+| **Test isolation** | A new browser context for each test by default. | Managed by your test code, typically a new driver session per test. |
+| **Assertions** | Built-in web-first assertions. | Use your test framework's assertion library. |
+| **Parallel execution** | Built into Playwright Test, with sharding across machines. | Through your test framework, or across machines with Selenium Grid. |
+| **Debugging** | Trace Viewer, UI Mode, and the HTML reporter. | Framework reports, logs, and screenshots. No built-in trace viewer. |
+| **Test recording** | Codegen generates tests from your browser actions. | Selenium IDE records and plays back tests. |
+| **Screenshots and video** | Built-in screenshots and video recording. | Built-in screenshots. Video needs Selenium Grid or external tools. |
+| **Visual testing** | Built-in screenshot comparison with `toHaveScreenshot`. | Requires third-party libraries or services. |
+| **Network interception** | Built-in request routing and mocking. | Through WebDriver BiDi or the Chrome DevTools Protocol. |
+| **API testing** | Built-in API testing through `request`. | Browser automation only. |
+| **Mobile testing** | Device emulation, plus experimental support for Chrome on Android and Android WebView. No real iOS devices. | Real iOS and Android devices through Appium and cloud device providers. |
+| **AI tooling** | Playwright MCP server and Playwright Test Agents. | No built-in AI tooling. |
+| **Operating systems** | Windows, macOS, and Linux. | Windows, macOS, and Linux. |
+| **Ecosystem** | Large and active community with frequent releases. | Mature community with a long history of plugins, integrations, and resources. |
 
-## 
+## Side-by-side example
 
-## Selenium Example
-
-Here’s a test that simulates a user logging in and loading recent transactions. The automation then takes a screenshot.
-
-```js
-const { Builder, By, until } = require('selenium-webdriver');
-const fs = require('fs');
-
-async function loginAndCaptureScreenshot() {
-  // Initialize the browser driver
-  const driver = await new Builder().forBrowser('chrome').build();
-
-  try {
-    // Step 1: Navigate to the login page
-    await driver.get('https://www.example-service.com/login');
-
-    // Step 2: Enter login credentials
-    await driver.findElement(By.id('username')).sendKeys('your-username');
-    await driver.findElement(By.id('password')).sendKeys('your-password');
-
-    // Step 3: Click the login button
-    await driver.findElement(By.id('login-button')).click();
-
-    // Step 4: Wait until the recent transactions button is loaded
-    await driver.wait(until.elementLocated(By.id('recent-transactions-button')), 10000);
-    
-    // Step 5: Click recent transactions
-    await driver.findElement(By.id('recent-transactions-button')).click();
-
-    // Step 6: Wait until the recent transactions are loaded
-    await driver.wait(until.elementLocated(By.id('recent-transactions')), 10000);
-
-    // Step 7: Take a screenshot
-    const screenshot = await driver.takeScreenshot();
-    fs.writeFileSync('screenshot.png', screenshot, 'base64');
-
-  } catch (error) {
-    console.error('An error occurred:', error);
-  } finally {
-    // Step 8: Close the browser
-    await driver.quit();
-  }
-}
-
-// Run the test
-loginAndCaptureScreenshot()
-```
-
-## Playwright Example
-
-Here’s the same test in Playwright:
-
-```js
-import { test, expect } from '@playwright/test'
-
-test('login and capture screenshot', async ({ page }) => {
-    // Step 1: Navigate to the login page
-    await page.goto('https://www.example-service.com/login');
-    
-    // Step 2: Enter login credentials
-    await page.getByLabel('Username or email address').fill('username');
-    await page.getByLabel('Password').fill('password');
-    
-    // Step 3: Click the login button
-    await page.getByRole('button', { name: 'Sign in' }).click();
-    
-    // Step 4: Click recent transactions
-    await page.getByLabel('Transactions').click()
-    
-    // Step 5: Take a screenshot
-    await page.screenshot({ path: 'screenshot.png', fullPage: true });
-})
-```
-
-Some key differences in the two examples:
-
-- Playwright uses modern css locators rather than finding by ID or class. ID and class can shift on an element when all that’s happening is a visual refresh of the site. We don’t want our tests to break in this situation!
-- Playwright includes auto-waiting, so there’s no need to add manual timeouts to our code.
-
-## Playwright vs Selenium: Pros & Cons
-
-### Playwright
-
-**Pros**: Easy to get started, built-in test framework, faster execution, modern architecture, better support for JavaScript/TypeScript.
-**Cons**: Fewer legacy languages supported (e.g. C), limited real device testing.
+The following tests log in to a service, open recent transactions, and take a screenshot.
 
 ### Selenium
 
-**Pros**: Established tool with a large community, supports many languages, better integration with real device testing.
-**Cons**: More setup required, slower execution, higher learning curve for productivity.
+```js
+const { Builder, By, until } = require('selenium-webdriver')
+const fs = require('node:fs')
 
-## Playwright vs Selenium: Which Solution to Choose?
+async function loginAndCaptureScreenshot() {
+  const driver = await new Builder().forBrowser('chrome').build()
 
-### When to Use Playwright
+  try {
+    // Step 1: Navigate to the login page
+    await driver.get('https://www.example-service.com/login')
 
-- If you’re starting a new project and want fast productivity.
-- If your team is experienced with JavaScript or TypeScript.
-- If you need built-in features like auto-waiting, test recording, and API testing.
+    // Step 2: Enter login credentials
+    await driver.findElement(By.id('username')).sendKeys('your-username')
+    await driver.findElement(By.id('password')).sendKeys('your-password')
 
-### When to Use Selenium
+    // Step 3: Click the login button
+    await driver.findElement(By.id('login-button')).click()
 
-- If you’re joining an established project that already uses Selenium.
-- If you require deep device simulation
+    // Step 4: Wait for the recent transactions button, then click it
+    const button = await driver.wait(until.elementLocated(By.id('recent-transactions-button')), 10000)
+    await driver.wait(until.elementIsVisible(button), 10000)
+    await button.click()
+
+    // Step 5: Wait until the recent transactions are visible
+    const transactions = await driver.wait(until.elementLocated(By.id('recent-transactions')), 10000)
+    await driver.wait(until.elementIsVisible(transactions), 10000)
+
+    // Step 6: Take a screenshot
+    const screenshot = await driver.takeScreenshot()
+    fs.writeFileSync('screenshot.png', screenshot, 'base64')
+  } finally {
+    // Step 7: Close the browser
+    await driver.quit()
+  }
+}
+
+loginAndCaptureScreenshot()
+```
+
+### Playwright
+
+```ts
+import { test, expect } from '@playwright/test'
+
+test('login and capture screenshot', async ({ page }) => {
+  // Step 1: Navigate to the login page
+  await page.goto('https://www.example-service.com/login')
+
+  // Step 2: Enter login credentials
+  await page.getByLabel('Username').fill('your-username')
+  await page.getByLabel('Password').fill('your-password')
+
+  // Step 3: Click the login button
+  await page.getByRole('button', { name: 'Sign in' }).click()
+
+  // Step 4: Click recent transactions
+  await page.getByRole('button', { name: 'Recent transactions' }).click()
+
+  // Step 5: Wait until the recent transactions are visible
+  await expect(page.getByRole('table', { name: 'Recent transactions' })).toBeVisible()
+
+  // Step 6: Take a screenshot
+  await page.screenshot({ path: 'screenshot.png', fullPage: true })
+})
+```
+
+Key differences between the two examples:
+
+- **Locators**: Playwright finds elements by role and label, the way users see them. IDs and classes can change during a visual redesign even when the page works the same, which breaks tests that depend on them.
+- **Waiting**: Playwright waits for the button to be actionable before clicking, and the `toBeVisible` assertion retries until the transactions appear. In Selenium, you add explicit waits for each element that loads asynchronously.
+- **Lifecycle**: Playwright Test launches and closes the browser for you and reports failures. The Selenium script manages the driver itself.
+
+## Playwright vs Selenium: pros and cons
+
+### Playwright
+
+**Pros**: Quick setup, complete built-in test tooling, auto-waiting, strong debugging with Trace Viewer, built-in API testing and network mocking, and fast, isolated parallel execution.
+
+**Cons**: No official Ruby bindings, the full Playwright Test runner is Node.js only, WebKit approximates Safari rather than running it, and no real iOS device testing.
+
+### Selenium
+
+**Pros**: W3C standard protocol, runs the browsers your users have including Safari, supports more languages, scales across machines with Selenium Grid, and connects to real devices through Appium.
+
+**Cons**: Requires assembling a test framework, assertions, and reporting yourself, explicit waits add code and a source of flakiness, and debugging tools are more limited.
+
+## Playwright vs Selenium: which to choose?
+
+### When to use Playwright
+
+- You're starting a new project and want to be productive quickly.
+- Your team works in JavaScript/TypeScript, Python, Java, or .NET.
+- You want built-in auto-waiting, tracing, visual comparisons, API testing, and network mocking.
+- You plan to use AI agents to write, run, or fix tests.
+
+### When to use Selenium
+
+- You have an established Selenium suite and the infrastructure around it.
+- Your team works in Ruby, or already uses a Selenium-based framework.
+- You need to test on real iOS or Android devices, or in Safari itself.
+- You run large, distributed suites on Selenium Grid or a Selenium-based cloud provider.
 
 ## Conclusion
 
-**If you’re starting a new project, you want to use Playwright.** You’ll get exposure to JS or Typescript, plug in to a great existing community, write tests and other automations faster, and your tests will be more consistent and reliable. You can adopt Playwright without needing to become a “Playwright specialist” and the skills you learn will encourage solid front-end engineering and language skills in other areas.
+**If you're starting a new project, choose Playwright.** You get a complete testing toolkit from a single install, and auto-waiting, user-facing locators, and Trace Viewer make tests more reliable and easier to debug.
 
-If you’re already using Selenium, it’s a framework with a lot of strengths! All other factors being equal, you don’t need to rip out your Selenium workflow just to adopt Playwright.
+If you already use Selenium, it remains a capable, standards-based framework. You don't need to rewrite a working Selenium suite just to adopt Playwright. You can write new tests in Playwright and migrate existing ones gradually.
 
-Engineers building testing and automation have more options than ever, and they can simulate a broader range of user actions with great tool suites. For now, our pick for new projects is Playwright, and we’re excited to see what new features are added to the project in the coming years.
+Checkly runs Playwright tests as monitors, so the same tests you write for CI can check production around the clock. See [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview) to get started.

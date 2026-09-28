@@ -1,0 +1,55 @@
+name: Checkly preview
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  deployments: read
+
+jobs:
+  preview:
+    name: Checkly preview job
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Wait for this commit's preview deployment
+        id: preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          for attempt in $(seq 1 60); do
+            deployment_id=$(gh api "repos/$REPOSITORY/deployments?sha=$HEAD_SHA&per_page=100" \
+              --jq '[.[] | select(.environment == "Preview" and .production_environment == false)][0].id // empty')
+            if [ -n "$deployment_id" ]; then
+              url=$(gh api "repos/$REPOSITORY/deployments/$deployment_id/statuses" \
+                --jq '.[0] | select(.state == "success") | .environment_url // empty')
+              if [ -n "$url" ]; then
+                echo "url=$url" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+            fi
+            sleep 10
+          done
+          echo "No successful Preview deployment for $HEAD_SHA" >&2
+          exit 1
+
+      - uses: checkly/checkly-action@v1
+        with:
+          command: test
+          working-directory: samples/guides/checks-on-deploy
+          install-command: npm ci
+          reporting: auto
+          github-check-name: Checkly preview results
+          test-session-name: "Deploy checks | Preview | ${{ steps.preview.outputs.url }}"
+          env: ENVIRONMENT_URL=${{ steps.preview.outputs.url }}
+        env:
+          CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
+          CHECKLY_TEST_ENVIRONMENT: Preview
+          ENVIRONMENT_URL: ${{ steps.preview.outputs.url }}

@@ -490,7 +490,6 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /guides/overview
 
 ### Guides - Monitoring Guides
-- /guides/end-to-end-monitoring
 - /guides/startup-guide-detect-communicate-resolve
 - /guides/getting-started-with-monitoring-as-code
 - /guides/empowering-developers-with-checkly
@@ -498,7 +497,6 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /guides/uptime-monitoring
 - /guides/keyword-monitoring
 - /guides/sdlc-monitoring
-- /guides/create-multiple-monitors
 
 ### Guides - API Monitoring
 - /guides/monitoring-an-openapi-spec
@@ -510,14 +508,10 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /guides/monitoring-ecommerce-apps-using-terraform
 
 ### Guides - Playwright Guides
-- /guides/moving-from-puppeteer-to-playwright
-- /guides/developer-fixtures
-- /guides/auto-waiting-methods
 - /guides/reading-traces
 
 ### Guides - Advanced Topics
 - /guides/claude-code-monitoring
-- /guides/how-to-monitor-broken-links
 
 ## Learn
 
@@ -607,6 +601,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /learn/monitoring/intro-to-sdlc
 - /learn/monitoring/metrics-every-team-needs
 - /learn/monitoring/api-monitoring
+- /learn/monitoring/end-to-end-monitoring
 - /learn/monitoring/frontend-monitoring
 - /learn/monitoring/monitoring-as-code
 - /learn/monitoring/real-user-monitoring
@@ -635,7 +630,8 @@ This file contains all valid URLs extracted from docs.json organized by director
 ### Comparisons - Frameworks
 - /comparisons/frameworks/playwright-vs-cypress
 - /comparisons/frameworks/playwright-vs-selenium
-- /comparisons/frameworks/playwright-vs-others
+- /comparisons/frameworks/playwright-vs-puppeteer
+- /comparisons/frameworks/moving-from-puppeteer-to-playwright
 
 ---
 

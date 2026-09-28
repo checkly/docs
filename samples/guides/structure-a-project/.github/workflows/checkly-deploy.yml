@@ -1,0 +1,26 @@
+name: Deploy Checkly monitoring
+
+# Every merge to main that touches monitoring code redeploys the project.
+# Checkly diffs the project against what is deployed and applies the change.
+on:
+  push:
+    branches: [main]
+    paths:
+      - '__checks__/**'
+      - 'checkly.config.ts'
+      - 'package-lock.json'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx checkly deploy --force
+        env:
+          CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}

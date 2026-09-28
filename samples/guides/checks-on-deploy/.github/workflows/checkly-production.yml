@@ -1,0 +1,34 @@
+name: Checkly production
+
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+jobs:
+  production:
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment.production_environment == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment.sha }}
+
+      - uses: checkly/checkly-action@v1
+        with:
+          command: trigger
+          working-directory: samples/guides/checks-on-deploy
+          install-command: npm ci
+          reporting: github-actions
+          tags: guide-checks-on-deploy
+          github-sha: ${{ github.event.deployment.sha }}
+          test-session-name: "Deploy checks | ${{ github.event.deployment.environment }} | ${{ github.event.deployment_status.environment_url }}"
+          env: ENVIRONMENT_URL=${{ github.event.deployment_status.environment_url }}
+        env:
+          CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
+          CHECKLY_ACCOUNT_ID: ${{ vars.CHECKLY_ACCOUNT_ID }}
+          CHECKLY_TEST_ENVIRONMENT: ${{ github.event.deployment.environment }}
+          CHECKLY_REPO_BRANCH: ${{ github.event.deployment.ref }}

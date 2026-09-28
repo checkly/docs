@@ -1,0 +1,40 @@
+---
+title: 'Migrate from Agentic Checks'
+sidebarTitle: 'Migrate Agentic Checks'
+description: 'Replace Agentic Checks with Browser or Multistep Checks and enable automatic repair before December 1, 2026.'
+---
+
+<Warning>
+Agentic Checks are deprecated and will stop running on **December 1, 2026**. Replace each active Agentic Check before that date to keep monitoring its journey.
+</Warning>
+
+Create a Browser or Multistep Check for the same journey, verify the replacement, then deactivate the Agentic Check. The replacement has its own results and history.
+
+<Accordion title="Prerequisites">
+
+- A Trial, Starter, Team, or Enterprise account with access to the [AI Assistant](../../../ai/ai-assistant)
+- Permission to create and edit checks
+- Access to each Agentic Check's prompt, schedule, locations, alert settings, and any variables or secrets it uses
+
+</Accordion>
+
+## Replace an Agentic Check
+
+1. Open the Agentic Check and copy its prompt. Note its frequency, locations, alert channels, and referenced variables or secrets.
+2. Open **AI Assistant**, select **New**, and ask it to create a check for the same journey. Give it the original prompt and the pass and fail criteria. Choose a **Browser Check** for a web journey or a **Multistep Check** for an API workflow.
+3. Review the proposed plan and select **Create checks**. Inspect the generated script, assertions, settings, and check intent. Confirm that important outcomes and guardrails from the original prompt are present.
+4. Run the replacement check and confirm it reports the expected result. Correct the script or settings if needed. Match the original check's frequency, locations, and alerting before relying on the replacement.
+5. In the replacement check's **Automatic Repair** settings, review its intent, select **On** under **Automatic repair behavior**, and save. [Learn how automatic repair works](../../../resolve/automatic-check-repair).
+6. Once the replacement is running as expected, deactivate the Agentic Check. Keep it for its existing configuration and history, or remove it later according to your retention needs.
+
+<Tip>
+Migrate one journey at a time. If the original prompt covered several unrelated flows, create a separate replacement check for each flow and verify each one before deactivating the Agentic Check.
+</Tip>
+
+## Add automatic repair to other checks
+
+You can enable automatic repair on Browser and Multistep Checks you already use. Open a check's **Automatic Repair** settings and select **Initialize from saved check** to get an editable intent suggestion, or enter the intent manually. Review and save the intent, then set **Automatic repair behavior** to **On** and save the check. See [Add intent to an existing check](../../../resolve/automatic-check-repair#add-intent-to-an-existing-check).
+
+## AI invocation usage
+
+AI Assistant conversations and **Initialize from saved check** currently do not consume your Resolve AI invocation allowance. Root cause analysis and a subsequent automatic repair each consume an invocation. See [AI invocation usage](../../../resolve/automatic-check-repair#ai-invocation-usage).

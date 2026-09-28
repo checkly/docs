@@ -13,21 +13,23 @@ Use the production MCP endpoint in your client:
 https://api.checklyhq.com/mcp
 ```
 
-<Warning>
-OAuth is the recommended way to connect. The OAuth flow only supports Checkly-approved clients listed in setup. User and service API keys are available for clients that can send custom headers when OAuth is unavailable or a workflow needs a stable service identity.
-</Warning>
+Use it when your agent needs live Checkly account context, check status, check results, test sessions, root cause analyses,
+result assets, status pages, incidents, account environment variables, or when it needs to trigger existing checks.
 
-Use it when your agent needs live Checkly account context, check status, check results, test sessions, root cause analyses, result assets, status pages, incidents, account environment variables, or when it needs to trigger existing checks.
+Use [Checkly Skills](/ai/skills) and the [Checkly CLI](/cli/overview) when your agent needs to create, edit, test, bundle,
+or deploy check code. The MCP server runs remotely and cannot access your local filesystem.
 
 <Note>
-Use [Checkly Skills](/ai/skills) and the [Checkly CLI](/cli/overview) when your agent needs to create, edit, test, bundle, or deploy check code. The MCP server runs remotely and cannot access your local filesystem.
+  OAuth is the recommended way to connect. The OAuth flow only supports Checkly-approved clients listed in setup. User and service API keys are available for clients that can send custom headers when OAuth is unavailable or a workflow needs a stable service identity.
 </Note>
+
 
 ## What you can do
 
 - Inspect account membership, plan, and feature entitlements.
+- Create,read update and delete synthetic & uptime monitors and groups.
 - Check which checks are passing, failing, muted, or deactivated.
-- Read compact check results and test-session results.
+- Read compact check results and test session results.
 - Fetch normalized result asset manifests and bounded text assets.
 - Start or read Rocky AI root cause analyses.
 - Trigger existing deployed checks on demand.
@@ -73,20 +75,26 @@ What features are available on my current Checkly plan?
 Advanced prompts:
 
 ```text title="Prompt" wrap
+Create a new group called Acme website. Add an SSL check that pings acme.com and a browser check that visits https://acme.com and validates the basic features of that page. Both should run every 30 minutes from the US and Europe. Alert me my ops@acme.com address when they fail.
+```
+
+```text title="Prompt" wrap
 Investigate the latest failed result for the checkout API check. If there is an error group, check whether an RCA already exists before triggering a new one.
 ```
 
 ```text title="Prompt" wrap
-Trigger the checks tagged production-smoke, then follow the test session until results are available.
+Trigger the checks tagged "production", then follow the test session until results are available.
 ```
 
 ```text title="Prompt" wrap
-Create a major status page incident for the API outage, but do not notify subscribers until I confirm the message.
+Create a status page incident for the "Backend API" component, but do not notify subscribers until I confirm the message.
 ```
 
 ## MCP, Skills, and CLI
 
-MCP, Checkly Skills, and the Checkly CLI are complementary. Use the MCP Server for quick access to live Checkly data and account actions. OAuth is the recommended connection method; use an API key when OAuth is unavailable or when automation needs an account-scoped service identity. Use Checkly Skills with the CLI when your agent needs to create, edit, test, or deploy code from your local project.
+MCP, Checkly Skills, and the Checkly CLI are complementary. Use the MCP Server for quick access to live Checkly data and
+account actions. OAuth is the recommended connection method; use an API key when OAuth is unavailable or when automation
+needs an account-scoped service identity. Use Checkly Skills with the CLI when your agent needs to create, edit, test, or deploy code from your local project.
 
 See [Skills, MCP, and the CLI](/ai/overview#skills-mcp-and-the-cli) for a full comparison of when to use each.
 

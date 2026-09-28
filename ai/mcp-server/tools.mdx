@@ -34,10 +34,17 @@ Prepare the local Checkly CLI steps to create a browser check for checkout.
 | Tool | Type | Description |
 | --- | --- | --- |
 | `list-check-stats` | Read | Return a paginated, filterable list of checks with current pass, fail, and degraded status. Set `includeReliability` to also return availability, response-time percentiles, and ICMP latency or packet loss over a quick range. |
+| `get-check` | Read | Return the full configuration of one check: schedule, locations, alert settings, and the type-specific configuration such as `request`, `script`, or `heartbeat`. |
+| `get-check-type-schema` | Read | Return the JSON Schema of the `check` payload for one check type, for either the create or the update operation. |
+| `create-check` | Write | Create a check of any supported type from a JSON configuration. The check is created standalone, outside any Checkly CLI project. |
+| `update-check` | Write | Update shared check properties such as name, tags, activation, or mute state, or pass a partial type-specific configuration. Does not trigger a check run. |
+| `delete-check` | Write | Permanently delete a check, including its configuration and result history. Cannot be undone and requires confirmation. |
 | `list-check-results` | Read | List recent compact results for one check, including HTTP response status and assertion counts when available. Raw logs, traces, screenshots, videos, and download URLs are omitted. |
 | `get-check-result` | Read | Return compact detail for one check result. |
 | `get-check-performance-summary` | Read | Return average, P50, P95, and P99 response-time metrics for one check over a date range when data is available. |
 | `trigger-checks` | Write | Run existing deployed checks on demand and record the run as a test session. Consumes check-run execution quota. |
+
+### List and filter checks
 
 For large accounts, start with `list-check-stats` filters instead of asking for every check at once. The default response is status-only. The tool supports:
 
@@ -53,7 +60,28 @@ The response includes pagination metadata (`length`, `total`, `page`, `limit`, a
 
 `list-check-results` stays compact for fast triage. Result rows include `responseStatusCode`, `responseStatusText`, `totalAssertions`, and `failingAssertions` when available, so your client can inspect common URL and API failure signals before fetching full result details or assets.
 
-`trigger-checks` only runs checks that already exist on the account. Use `prepare-local-check-authoring` and the Checkly CLI when you need to create, test, or deploy local check code.
+### Create, update, and delete checks
+
+The check write tools manage checks from a JSON configuration, without a local project or a CLI deploy. They support these check types:
+
+- API checks
+- Browser checks and Multistep checks with a single inline script
+- Heartbeat monitors
+- URL, TCP, DNS, ICMP, traceroute, gRPC, and SSL monitors
+
+A typical create flow:
+
+1. Call `get-check-type-schema` with the `checkType` to learn the `check` payload. Every check type takes different configuration, for example `request` for API checks and uptime monitors, `script` for browser checks, and `heartbeat` for heartbeat monitors.
+2. Optionally call `list-alert-channels` to pick specific alert channels, and `list-check-groups` to find a `groupId`.
+3. Call `create-check` with `checkType` and the `check` payload. By default the new check is subscribed to all of the account's alert channels. Set `autoAssignAlerts` to `false` or pass `check.alertChannelSubscriptions` to change this.
+
+When updating, `update-check` accepts either shared top-level properties (`name`, `activated`, `muted`, `tags`, `useGlobalAlertSettings`, `runParallel`, `description`, `intent`, `aiAutoRepairEnabled`) or a partial `check` object validated against the update schema for the check's type. The two cannot be combined in one call. Array fields such as `locations` and `tags` replace the check's current values.
+
+<Warning>
+`delete-check` permanently removes the check and its result history. The tool first returns a confirmation handle, and the deletion only proceeds when your client passes that handle back after you explicitly agree. To stop a check from running while keeping it, use `update-check` with `activated: false` instead.
+</Warning>
+
+Playwright Check Suites, agentic checks, and checks whose code lives in a repository are managed as Monitoring as Code with the Checkly CLI. Use `prepare-local-check-authoring` for a CLI handoff. Changes made through MCP to a check that a CLI project manages are overwritten by that project's next deploy.
 
 Example prompts:
 
@@ -62,7 +90,55 @@ Show me the first page of failing API checks tagged production, then summarize w
 ```
 
 ```text title="Prompt" wrap
+Create a URL monitor for https://www.example.com that runs every 5 minutes from eu-west-1 and us-east-1, tagged production.
+```
+
+```text title="Prompt" wrap
+Update the "Checkout API" check to run every 10 minutes and add the tag critical. Keep all other settings.
+```
+
+```text title="Prompt" wrap
 Trigger the checks tagged production-smoke, then poll the test session until results are available.
+```
+
+## Check group tools
+
+| Tool | Type | Description |
+| --- | --- | --- |
+| `list-check-groups` | Read | List check groups with their check counts. Supports `search`, `tag`, `limit`, and `page` filters. |
+| `get-check-group` | Read | Return the full configuration of one check group and the checks in it. |
+| `create-check-group` | Write | Create a check group. Only `name` is required. By default the group is subscribed to all of the account's alert channels. |
+| `update-check-group` | Write | Change the settings of a check group. Fields left out keep their current values. List fields such as `tags`, `locations`, `alertChannelSubscriptions`, and `environmentVariables` are replaced as a whole. |
+| `delete-check-group` | Write | Permanently delete a check group and every check in it. Cannot be undone and requires confirmation. |
+
+Group settings such as locations, alerting, retries, API check defaults, and environment variables apply to every check in the group. To put a check in a group, set `groupId` on the check with `create-check` or `update-check`.
+
+<Warning>
+`delete-check-group` deletes the group and all checks in it, including their result history, like deleting a group in the Checkly web app. To keep the checks, first move them out of the group with `update-check` and `groupId: null`. To pause the group instead, use `update-check-group` with `activated: false`.
+</Warning>
+
+Example prompts:
+
+```text title="Prompt" wrap
+List my check groups and show how many checks each one contains.
+```
+
+```text title="Prompt" wrap
+Create a check group named "Payments API" that runs from eu-central-1 and us-west-2 with a base URL of https://api.example.com, then move all checks tagged payments into it.
+```
+
+## Alert channel tools
+
+| Tool | Type | Description |
+| --- | --- | --- |
+| `list-alert-channels` | Read | List the account's alert channels with the non-secret details that identify each one. Supports a `type` filter for `EMAIL`, `SLACK`, `SLACK_APP`, `WEBHOOK`, `SMS`, `PAGERDUTY`, `OPSGENIE`, and `CALL`. |
+
+Use the returned IDs to set `alertChannelSubscriptions` when creating or updating a check or check group.
+
+Example prompt:
+
+```text title="Prompt" wrap
+List my Slack alert channels, then subscribe the "Checkout API" check to the #incidents channel only.
 ```
 
 ## Test session tools
@@ -157,4 +233,20 @@ Show open status page incidents and summarize their latest updates.
 
 ```text title="Prompt" wrap
 Draft a major status page incident for the API outage and wait for confirmation before notifying subscribers.
+```
+
+## Usage tools
+
+| Tool | Type | Description |
+| --- | --- | --- |
+| `get-usage-terms` | Read | Return the organization usage terms: contract dates, credit budget, per-unit credit rates, pricing rules, and the accounts covered. Call this first to learn the contract window and the account IDs accepted by the other usage tools. |
+| `get-usage-summary` | Read | Return organization usage totals for a date range plus credit projections, including the `CHECK_RUN` and `AI_INVOCATION` meters. |
+| `list-usage-series` | Read | Return organization usage per period, grouped by account and/or check type, as a zero-filled, cursor-paginated series. Supports `day`, `week`, `month`, and `total` intervals. |
+
+Usage tools report on the whole organization the account belongs to. Use `accountIds` and `checkTypes` to narrow a report. These tools require an organization usage contract and Owner or Admin access.
+
+Example prompt:
+
+```text title="Prompt" wrap
+Show my organization's credit usage this month, broken down by check type, and how it projects against the budget.
 ```

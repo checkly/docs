@@ -50,6 +50,12 @@ The sections below are the same work done by hand, so you can see what the agent
 
 Every Checkly project has three levels of configuration, and settings inherit downward. A value set on a check wins over the group, which wins over the project.
 
+<Frame>
+  <img src="/images/guides/structure-a-project/settings-inheritance.png" alt="Tree of the sample project: the project sets frequency, two locations, a tag, and an alert channel. The Shop web group below it sets three locations and the Shop API group sets an API_BASE_URL variable. Of the three checks at the bottom, only Homepage uptime overrides a value, running every minute instead of the project's ten." />
+</Frame>
+
+This is the sample project from this guide. Each box lists only what that level sets, and everything else comes from the level above.
+
 | Level | Where it lives | What belongs there |
 |---|---|---|
 | Project | `checkly.config.ts` | Anything true for every check in the account: frequency, default locations, tags, alert channels, and where to find check files |

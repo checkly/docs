@@ -31,6 +31,8 @@ Fixed order. Do not add sections; fold extra material into a step or cut it.
 7. **Next**: one link to the guide that follows this one in the sidebar order, with a sentence on why.
 8. **Reference**: bullet list of the product pages touched. Link [Checkly Skills](/ai/skills) once; add the MCP tools page when MCP appears. No `npx checkly skills` instructions anywhere on the page.
 
+Headings: the `##` sections between the accordion and "Verify it works" are named for what the reader does, never numbered. No "Step N:" prefixes anywhere in a heading.
+
 Voice: second person, plain sentences, no em dashes, no parentheticals. Tips and Notes sparingly, one each at most per step. Avoid any AI-slop.
 
 ## Sample pipeline

@@ -44,7 +44,7 @@ The steps below are what the agent does, in the open.
 
 </Accordion>
 
-## Step 1: Write down every endpoint
+## Write down every endpoint
 
 Before writing a check, list what to cover. Different methods on the same path count separately: `GET /orders/{id}` and `DELETE /orders/{id}` are two endpoints and two checks.
 
@@ -95,7 +95,7 @@ Each operation becomes a check, and each `required` property becomes an assertio
 For a large spec, the web app can [import it](/detect/synthetic-monitoring/api-checks/openapi-spec) in bulk. This guide writes the checks as code so they deploy with the API.
 </Note>
 
-## Step 2: Share what every check needs
+## Share what every check needs
 
 Every check shares locations, an alert rule, a base URL, and one idea of what "slow" means. Put those in a group so the tenth check costs the same as the first.
 
@@ -143,7 +143,7 @@ export default defineConfig({
 })
 ```
 
-## Step 3: Assert on status, headers, and body
+## Assert on status, headers, and body
 
 A 200 with an empty array is a broken catalog that a status-code check calls healthy. Assert on the three things the response carries: status, headers, and body. A GraphQL endpoint answers 200 even when the query fails, so also assert that `$.errors` is empty.
 
@@ -199,9 +199,9 @@ Each assertion maps to a way the endpoint breaks:
 
 Body assertions use JSONPath: `$.length` is the array length and `$[0].title` the first element's title. Header names match case-insensitively.
 
-## Step 4: Tell slow from down
+## Tell slow from down
 
-Every check above spreads `responseTimes`, so each one already separates slow from down. To see where the lines sit, add an endpoint that is always slow. httpbin.org waits two seconds before answering.
+Every check so far spreads `responseTimes`, so each one already separates slow from down. To see where the lines sit, add an endpoint that is always slow. httpbin.org waits two seconds before answering.
 
 ```ts __checks__/slow.check.ts
 import { ApiCheck, AssertionBuilder } from 'checkly/constructs'
@@ -223,7 +223,7 @@ new ApiCheck('shop-api-slow', {
 
 Past one second the run is degraded, which is a warning, not downtime. Past five seconds it fails. The catalog endpoints answer in under 50 milliseconds, so the same thresholds let them slow down twentyfold before anyone hears about it. Set thresholds from what you measure, then tighten them where latency is the product.
 
-## Step 5: Authenticate, create, and clean up
+## Authenticate, create, and clean up
 
 A write endpoint needs a token, a request body no previous run has sent, and something to delete afterward. Setup and teardown scripts wrap the request with that work, so the check stays self-contained.
 

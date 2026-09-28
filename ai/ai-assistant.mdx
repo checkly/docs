@@ -1,11 +1,13 @@
 ---
 title: 'Create checks with the AI Assistant'
 sidebarTitle: 'AI Assistant'
-description: 'Plan monitoring and create Browser and Multistep Checks with the Checkly AI Assistant.'
+description: 'Plan monitoring and create checks and monitors with the Checkly AI Assistant.'
 canonical: 'https://www.checklyhq.com/docs/ai/ai-assistant/'
 ---
 
-The AI Assistant helps you turn a monitoring goal into a plan and create the checks you approve. Generated Browser and Multistep Checks include a check intent: the goal and required outcomes that [automatic repair](../resolve/automatic-check-repair) must preserve.
+The AI Assistant helps you turn a monitoring goal into a plan and create the checks you approve. It can create Browser, Multistep, and API Checks, as well as uptime and Heartbeat Monitors. It does not create Playwright Check Suites or deprecated Agentic Checks.
+
+Every check it creates includes an intent: the goal and required outcomes the check should prove. For Browser and Multistep Checks created in Checkly, [automatic repair](../resolve/automatic-check-repair) can use that intent when repairing the check's script. Creating an intent does not mean that every check type can be repaired in Checkly.
 
 <Accordion title="Prerequisites">
 
@@ -21,10 +23,10 @@ The AI Assistant helps you turn a monitoring goal into a plan and create the che
 2. Describe the site, app, or API you want to monitor. Include the starting point, the journey, and the observable outcome that should pass.
 3. Review the proposed monitoring plan. Ask the assistant to adjust the flow, assertions, frequency, locations, or alerting before you approve it.
 4. Select the checks you want and choose **Create checks**.
-5. Open each new check, run it, and review its script, assertions, and **Check intent** under **Automatic Repair**.
+5. Open each new check, run it, and review its behavior and settings. For Browser and Multistep Checks, also review **Check intent** under **Automatic Repair**.
 
-For a browser journey, ask for a Browser Check. For an API workflow with several requests, ask for a Multistep Check. If a journey has important negative cases or guardrails, describe them in your request and confirm they appear in the generated intent.
+For a browser journey, ask for a Browser Check. For an API endpoint, ask for an API Check; for several related requests, ask for a Multistep Check. Use a URL Monitor for site availability or a Heartbeat Monitor for a scheduled job. If a journey has important negative cases or guardrails, describe them in your request and confirm they appear in the generated intent.
 
-The generated intent does not turn on automatic repair by itself. [Set automatic repair for each check](../resolve/automatic-check-repair#enable-automatic-repair) after you have reviewed the check.
+The AI Assistant does not change a check's automatic repair setting when it creates the check. A Browser or Multistep Check inherits the account default until you [set automatic repair for that check](../resolve/automatic-check-repair#enable-automatic-repair). Review its intent and choose **On** if you want to enable repair explicitly.
 
 To replace a deprecated Agentic Check, follow the [Agentic Check migration guide](../detect/synthetic-monitoring/agentic-checks/migrate).

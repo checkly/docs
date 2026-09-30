@@ -102,7 +102,7 @@ A change that was also made in your code since the last deploy is written over i
 The CLI prints each property it updated with its old and new value, and each helper it imported. There is no flag for the choice, and the `confirmation_required` envelope does not change.
 
 <Note>
-When Checkly cannot provide a plan, the CLI warns that it could not get one, for example `Could not check what this deploy would change` or `Checkly has deploy plans switched off at the moment`, and deploys without one, which is what a deploy without `--plan` does on purpose. Without a plan, a deploy that deletes removed resources finds them with a dry run, for which the code bundle is uploaded before the confirmation, and the confirmation lists those deletions; with `--preserve-resources` nothing is listed and the upload happens after you confirm. `--plan-token` and `--prune-relations` need a plan and are refused without one.
+When Checkly cannot provide a plan, the CLI warns that it could not get one, for example `Could not check what this deploy would change` or `Checkly has deploy plans switched off at the moment`, and deploys without one, which is what a deploy without `--plan` does on purpose. Without a plan, a deploy that deletes removed resources finds them with a dry run and lists them in the confirmation; with `--preserve-resources` nothing is listed. Either way the code bundle is uploaded only after you confirm. `--plan-token` and `--prune-relations` need a plan and are refused without one.
 </Note>
 
 ## Command Options

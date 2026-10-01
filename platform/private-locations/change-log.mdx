@@ -17,6 +17,21 @@ Learn more about:
 
 ## Full release history
 
+<Update label="v8.10.1" tags={["September 2026"]}>
+- Fixed SSL checks that could report success when a server rejected the supplied client certificate.
+- Removed unnecessary live updates for scheduled checks.
+</Update>
+
+<Update label="v8.10.0" tags={["September 2026"]}>
+- Expanded the APIs available to check scripts with support for AbortController, AbortSignal, and Node.js stream/promises, enabling cancellable operations and promise-based stream handling.
+- Reduced memory use when processing large error messages.
+</Update>
+
+<Update label="v8.9.0" tags={["September 2026"]}>
+- Added support for the Coralogix US3 region.
+- Updated bundled runtime dependencies to fix vulnerabilities.
+</Update>
+
 <Update label="v8.8.1" tags={["September 2026"]}>
 - Improved private location agent image builds to avoid inclusion of unneeded runtimes in intermediate layers.
 - Updated the bundled 2026-04 runtime dependencies to remove vulnerabilities, including updates to @faker-js/faker, @xmldom/xmldom, csv-parse, imapflow, mysql2, prisma, and nodemailer.
@@ -47,6 +62,23 @@ Learn more about:
 - Playwright Check Suites: network and console entries are extracted from traces, and trace retention now follows your account setting
 - Fixes: pnpm workspace caching on repeated runs, empty Playwright video assets, artifact upload reliability, multi-step method timeouts, and SSL hostname handling
 - Update various dependencies to fix vulnerabilities
+</Update>
+
+<Update label="v8.4.2" tags={["July 2026"]}>
+- Added automatic Web Vitals collection for Playwright Check Suites on Chromium.
+- Playwright Check Suites now respect your trace settings, with tracing enabled on the first retry by default.
+- Improved reporting of internal errors so affected Playwright Check Suites return a result instead of leaving the run incomplete.
+- Added SSL assertions for individual certificate properties.
+- gRPC checks now always store response bodies.
+- Corrected the default UDP traceroute probe port to 33434.
+</Update>
+
+<Update label="v8.4.1" tags={["July 2026"]}>
+- Improved SSL certificate diagnostics, including detection of incomplete certificate chains and stapled certificate revocation status.
+- Fixed SSL hostname validation when an SNI override is configured.
+- Fixed API checks with text-body assertions on binary responses.
+- Improved Playwright Check Suite configuration handling.
+- Pinned npm to a version compatible with the bundled Node.js runtimes.
 </Update>
 
 <Update label="v8.4.0" tags={["July 2026"]}>
@@ -107,6 +139,11 @@ Latest agent image with [runtime 2026.04](/platform/runtimes/runtime-specificati
 - On older runtimes: use the [migration image](#v7-0-2) (`7.0.2-migrate-202409-202604`) to move to `2026-04`, then upgrade to v8
 </Update>
 
+<Update label="v7.1.0" tags={["May 2026"]}>
+- Improved scheduling for long-running Playwright Check Suites to prevent duplicate execution.
+- Fixed reporting of Playwright runs that reach the global timeout or are interrupted.
+- Added test errors to check logs for easier diagnosis.
+</Update>
 
 <Update label="v7.0.3" tags={["April 2026"]}>
 Patches vulnerabilities in dependencies bundled with the [2026.04 runtime](/platform/runtimes/runtime-specification/#2026-04). Fix-forward updates only.

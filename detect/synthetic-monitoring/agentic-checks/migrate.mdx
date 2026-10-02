@@ -12,29 +12,23 @@ Agentic Checks are deprecated and will stop running on **December 1, 2026**. Rep
 
 Create a Browser or Multistep Check for the same journey, verify the replacement, then deactivate the Agentic Check. This guide uses Browser and Multistep Checks because automatic repair can edit their scripts in Checkly. The replacement has its own results and history.
 
-How you create the replacement depends on your plan:
+You can create the replacement in two ways:
 
-- **Trial, Starter, Team, and Enterprise:** use the [AI Assistant](../../../ai/ai-assistant) in Checkly.
-- **Hobby:** use your own AI agent connected to the [Checkly MCP Server](../../../ai/mcp-server).
+- **On every plan:** use your own AI agent connected to the [Checkly MCP Server](../../../ai/mcp-server).
+- **On Trial, Starter, Team, and Enterprise plans:** you can also use the [AI Assistant](../../../ai/ai-assistant) in Checkly.
 
 <Accordion title="Prerequisites">
 
 - Permission to create and edit checks
 - Access to each Agentic Check's prompt, schedule, locations, alert settings, and any variables or secrets it uses
-- For the AI Assistant: Rocky AI enabled for the account. An account owner can enable it in the [AI settings](https://app.checklyhq.com/accounts/rocky-ai).
 - For your own agent: an MCP client connected to the Checkly MCP Server. See [Set up the MCP server](../../../ai/mcp-server/setup).
+- For the AI Assistant: a Trial, Starter, Team, or Enterprise plan, with Rocky AI enabled for the account. An account owner can enable it in the [AI settings](https://app.checklyhq.com/accounts/rocky-ai).
 
 </Accordion>
 
 <Note>
 If a Checkly CLI project manages the Agentic Check, create the replacement in that project instead: replace the `AgenticCheck` construct with a `BrowserCheck` or `MultiStepCheck` construct and deploy. [Checkly Skills](../../../ai/skills) help your agent write and test the check. Changes made in the Checkly app or through the MCP Server to a check that a CLI project manages are overwritten by its next deploy.
 </Note>
-
-## Create the replacement with the AI Assistant
-
-1. Open the Agentic Check and select **Copy prompt**. Note its frequency, locations, alert channels, referenced variables or secrets, and any custom skills.
-2. Select **Open AI assistant**, paste the prompt, and ask for a check for the same journey. Include the pass and fail criteria. Choose a **Browser Check** for a web journey or a **Multistep Check** for an API workflow.
-3. Review the proposed plan and select **Create checks**. Inspect the generated script, assertions, settings, and check intent. Confirm that important outcomes and guardrails from the original prompt are present. If the Agentic Check used custom skills, verify that the replacement script covers the behavior you still need.
 
 ## Create the replacement with your own AI agent
 
@@ -48,6 +42,14 @@ Use Checkly to create a Browser Check named "Checkout flow" that monitors the jo
 ```
 
 3. Open the new check in Checkly and inspect its script, assertions, and settings. Confirm that important outcomes and guardrails from the original prompt are present. If the Agentic Check used custom skills, verify that the replacement script covers the behavior you still need.
+
+## Create the replacement with the AI Assistant
+
+Available on Trial, Starter, Team, and Enterprise plans.
+
+1. Open the Agentic Check and select **Copy prompt**. Note its frequency, locations, alert channels, referenced variables or secrets, and any custom skills.
+2. Select **Open AI assistant**, paste the prompt, and ask for a check for the same journey. Include the pass and fail criteria. Choose a **Browser Check** for a web journey or a **Multistep Check** for an API workflow.
+3. Review the proposed plan and select **Create checks**. Inspect the generated script, assertions, settings, and check intent. Confirm that important outcomes and guardrails from the original prompt are present. If the Agentic Check used custom skills, verify that the replacement script covers the behavior you still need.
 
 ## Verify and switch over
 

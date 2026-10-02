@@ -71,7 +71,26 @@ The last line totals the plan: how many resources are to be created, updated and
 
 Every plan comes with a **plan token** that pins the account state it was computed against, so a deploy cannot silently apply to an account that changed in the meantime. See [`--plan-token`](#command-options).
 
-With a plan, resources that did not change are not written at all. Deploying the same code twice with `--plan` reports every resource as unchanged the second time.
+With a plan, resources that did not change are not written at all. Deploying the same code twice with `--plan` finds nothing to apply the second time.
+
+When a plan has nothing to create, update, delete or detach and no relation to prune, there is nothing to review, so the deploy asks for no confirmation, in a terminal and in agent or CI environments alike. It prints `No changes.` with the number of resources that match your code in place of the overview, and completes:
+
+```text Terminal
+$ npx checkly deploy --plan
+
+Parsing your project... ✅
+Validating project resources... ✅
+Bundling project resources... ✅
+Checking what would change... ✅
+
+No changes. All 13 resources in account "Monitoring as Code" match your code.
+
+Recording the deployment... ✅
+
+Project "Website Monitoring" is up to date. Checks were scheduled to run.
+```
+
+Such a deploy writes no resource. It still records the deployment with its Git information, schedules your checks unless you pass `--no-schedule-on-deploy`, and clears the mark the Checkly web app puts on a resource that was edited outside your code once your code agrees with that edit. Rows that announce no write are still listed above the sentence: a `!` row for a check or group with relations the project does not manage, and a `·` row for a `testOnly` check. `--plan --preview` prints the same sentence without a plan token, since there is no plan to pin, and `--dry-run` prints its envelope as usual.
 
 ### Updating your code with changes made in Checkly
 
@@ -401,7 +420,7 @@ This will:
 ? Apply these changes? › (y/N)
 ```
 
-This confirmation is skipped when you pass `--force` (for CI/CD). In agent or CI environments the CLI instead returns a `confirmation_required` JSON envelope and exits with code `2` rather than prompting. With `--plan` the envelope carries the plan and its token, and names the command that deploys that exact plan. Its `changes` list deletions and detachments in full and created and updated resources up to 20, with the rest counted; the `--dry-run` envelope is capped the same way, while the `preview.diff` both carry is not.
+This confirmation is skipped when you pass `--force` (for CI/CD), and when a plan has [nothing to apply](#how-a-deploy-previews-its-changes). In agent or CI environments the CLI instead returns a `confirmation_required` JSON envelope and exits with code `2` rather than prompting. With `--plan` the envelope carries the plan and its token, and names the command that deploys that exact plan. Its `changes` list deletions and detachments in full and created and updated resources up to 20, with the rest counted; the `--dry-run` envelope is capped the same way, while the `preview.diff` both carry is not.
 
 To keep removed resources and their run history, deploy with [`--preserve-resources`](#command-options). Instead of deleting them, the CLI **detaches** them — they remain in your Checkly account as regular account-level resources, managed from the UI, and can be re-attached later by adding them back to your code:
 

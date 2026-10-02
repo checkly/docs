@@ -116,9 +116,36 @@ Choosing it writes your account's current values into the construct files and en
 - The construct has to be declared as `new ApiCheck('logical-id', { … })` in a JavaScript or TypeScript file, with the class imported by name from `checkly/constructs` or destructured from a top-level `require` of it (a namespace import or a re-export from your own module is not recognised) and its options written out as an object literal. An existing value is replaced only when it is itself a literal (a string, number or boolean, or an array or object of those) or, for the properties below, an expression on the same helper whose arguments are literals; a property the code does not set is added after the last one of the object that holds it (`request` itself has to exist for `request.body` to be added), in the file's own quoting and indentation. Nothing else in the file is touched. The file searched is the one the CLI was loading when the construct was created, so a construct declared in a module that several files import (a common layout for alert channels and status pages) is looked for in the first file that imported it, where the lookup fails and the construct is listed as not updated.
 - `frequency`, `retryStrategy`, `alertEscalationPolicy` and `assertions` are written the way `checkly import` spells them: `Frequency.EVERY_30S` (a whole-minute schedule stays a number where your code uses one), `RetryStrategyBuilder.fixedStrategy({ maxRetries: 3 })`, `AlertEscalationBuilder.runBasedEscalation(3, …)`, `AssertionBuilder.statusCode().equals(200)` and the corresponding builder of each monitor type. A helper the file does not import yet is added to its `import { … } from 'checkly/constructs'` (or to its `const { … } = require('checkly/constructs')`), which the output reports as well. A check group of the `CheckGroupV2` class moved to the global alert policy gets `alertEscalationPolicy: 'global'`.
 
-A change that was also made in your code since the last deploy is written over it, and the output marks it `(replacing a local edit)`; a list such as `tags` or `assertions` that your code changed too is left alone instead, since the CLI cannot merge the two. Every change that cannot be written is listed under `Not updated (edit these by hand)` with its reason; the usual ones are a reference to another resource (alert channels, private locations, a group, a status page's services, components or parent), an incident trigger (Checkly does not report its settings), a secret or a locked variable that Checkly does not return, a script or code bundle, `doubleCheck` (replaced by `retryStrategy`, whether or not a retry strategy sits beside it) and `runParallel`, the offset of a whole-minute schedule (Checkly assigns it), a property your code also changed, a helper call holding a variable, a check or a `CheckGroup` on the global alert policy or a group without a policy of its own (remove `alertEscalationPolicy` by hand; nothing is ever removed from your code), a retry strategy, alert policy or assertion this CLI version cannot spell, a helper name your file already uses for something else, a file with no `checkly/constructs` import to add a helper to, options built from a variable or a spread, or a construct the CLI cannot locate in the file (its id is computed, two constructs share it, or it is declared in a module several files import). TypeScript and JSX files need `typescript` installed in the project, as TypeScript check files already do.
+A change that was also made in your code since the last deploy is written over it, and the output notes it as `replaced a local edit`; a list such as `tags` or `assertions` that your code changed too is left alone instead, since the CLI cannot merge the two. Every change that cannot be written is listed under `Not updated · edit these by hand`, per resource, with its reason; the usual ones are a reference to another resource (alert channels, private locations, a group, a status page's services, components or parent), an incident trigger (Checkly does not report its settings), a secret or a locked variable that Checkly does not return, a script or code bundle, `doubleCheck` (replaced by `retryStrategy`, whether or not a retry strategy sits beside it) and `runParallel`, the offset of a whole-minute schedule (Checkly assigns it), a property your code also changed, a helper call holding a variable, a check or a `CheckGroup` on the global alert policy or a group without a policy of its own (remove `alertEscalationPolicy` by hand; nothing is ever removed from your code), a retry strategy, alert policy or assertion this CLI version cannot spell, a helper name your file already uses for something else, a file with no `checkly/constructs` import to add a helper to, options built from a variable or a spread, or a construct the CLI cannot locate in the file (its id is computed, two constructs share it, or it is declared in a module several files import). TypeScript and JSX files need `typescript` installed in the project, as TypeScript check files already do.
 
-The CLI prints each property it updated with its old and new value, and each helper it imported. There is no flag for the choice, and the `confirmation_required` envelope does not change.
+The CLI then prints what it wrote in the layout of the plan: a header per resource with its construct, logical ID and file, and under it a diff of the construct's source as it was against as it is now, followed by `~` notes for each helper it imported and each local edit it replaced.
+
+```text Terminal
+Updated your code · 2 properties in 1 file
+
+~ ApiCheck homepage-api  __checks__/homepage-api.check.ts
+    export const homepageApi = new ApiCheck('homepage-api', {
+      name: 'Homepage API',
+  -   frequency: Frequency.EVERY_5M,
+  +   frequency: Frequency.EVERY_10M,
+      retryStrategy: RetryStrategyBuilder.fixedStrategy({
+        baseBackoffSeconds: 60,
+  -     maxRetries: 2,
+  +     maxRetries: 3,
+      }),
+    })
+
+Not updated · edit these by hand
+
+! ApiCheck homepage-api  __checks__/homepage-api.check.ts
+    groupId  references another resource
+
+Nothing was deployed. Review with `git diff`, then run `npx checkly deploy --plan` again.
+```
+
+A helper-spelled property is written as the whole expression, in the spelling `checkly import` uses, so the diff can show more lines than the one value that changed when your formatting differs from it.
+
+There is no flag for the choice, and the `confirmation_required` envelope does not change.
 
 <Note>
 When Checkly cannot provide a plan, the CLI warns that it could not get one, for example `Could not check what this deploy would change` or `Checkly has deploy plans switched off at the moment`, and deploys without one, which is what a deploy without `--plan` does on purpose. Without a plan, a deploy that deletes removed resources finds them with a dry run and lists them in the confirmation; with `--preserve-resources` nothing is listed. Either way the code bundle is uploaded only after you confirm. `--plan-token` and `--prune-relations` need a plan and are refused without one.

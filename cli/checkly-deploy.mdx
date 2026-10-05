@@ -47,7 +47,7 @@ With `--plan`, the deploy works from a plan instead. Before it writes anything, 
 `--plan` is a preview feature that you opt in to per deploy; see [`--[no-]plan`](#command-options). The rest of this section describes a deploy run with `--plan`.
 </Note>
 
-The plan compares your code against what the project last deployed, so it can also tell you when a resource was edited in the Checkly web app or through the API since then. Such an edit is overwritten by the deploy, because your code is the source of truth for the resources it declares; the property listing and the `--dry-run` envelope mark it as changed in Checkly, while the construct diff simply shows your account's current value on the deployed side. In a terminal you can instead have the CLI [update your code with that edit](#updating-your-code-with-changes-made-in-checkly).
+The plan compares your code against what the project last deployed with a plan (see [the first plan of a project](#the-first-plan-of-a-project) for when there is no such deploy), so it can also tell you when a resource was edited in the Checkly web app or through the API since then. Such an edit is overwritten by the deploy, because your code is the source of truth for the resources it declares; the property listing and the `--dry-run` envelope mark it as changed in Checkly, while the construct diff simply shows your account's current value on the deployed side. In a terminal you can instead have the CLI [update your code with that edit](#updating-your-code-with-changes-made-in-checkly).
 
 With `--plan`, `--preview` and `--output` print the plan as an overview of every resource the deploy touches, followed by a diff per updated resource. Each row in the overview carries a marker, the construct type, the logical ID and either the source file or a note saying what happens to the resource:
 
@@ -55,6 +55,7 @@ With `--plan`, `--preview` and `--output` print the plan as an overview of every
 - `-` with `kept in your Checkly account, now managed from the Checkly web app` for a resource removed from code that [`--preserve-resources`](#command-options) detaches instead of deleting.
 - `-` on a relation with `relation not managed by this project, deleted by --prune-relations`, and `!` on a check or group that has such relations when [`--prune-relations`](#command-options) is not passed.
 - `·` with `skipped (testOnly)` for checks marked `testOnly: true`, which are never deployed.
+- A closing `N to write again with no difference found` row, on [the first plan of a project](#the-first-plan-of-a-project), counting the resources the deploy writes once more although nothing was found to differ.
 - A closing `N unchanged` row counting the resources the deploy leaves alone.
 
 Without `--plan` the overview has the same markers, but no source file column, no unchanged row and no diffs: every resource that exists is listed as an update, and the totals line always reads `0 unchanged`.
@@ -91,6 +92,40 @@ Project "Website Monitoring" is up to date. Checks were scheduled to run.
 ```
 
 Such a deploy writes no resource. It still records the deployment with its Git information, schedules your checks unless you pass `--no-schedule-on-deploy`, and clears the mark the Checkly web app puts on a resource that was edited outside your code once your code agrees with that edit. Rows that announce no write are still listed above the sentence: a `!` row for a check or group with relations the project does not manage, and a `·` row for a `testOnly` check. `--plan --preview` prints the same sentence without a plan token, since there is no plan to pin, and `--dry-run` prints its envelope as usual.
+
+### The first plan of a project
+
+The first `checkly deploy --plan` of a project has no earlier planned deploy to compare with, and neither has the first one after any deploy without `--plan`, which writes every resource and records nothing to compare against. For those resources the plan compares your code with what is live in Checkly instead, and the deploy writes each of them once, whatever the comparison found:
+
+- A resource that differs from what is live is listed as an update, with its diff. A line under the diff's header says it was `compared with what is live in Checkly, not with an earlier plan`.
+- A resource in which no difference was found gets no row. It is counted as `to write again with no difference found`, under the overview and in the totals.
+- A note under the overview says how many resources this applies to.
+
+```text Terminal
+$ npx checkly deploy --plan --preview
+
+Deploy preview · Website Monitoring → account Monitoring as Code
+
+    13 to write again with no difference found
+
+13 resources have no earlier planned deploy to compare with (none yet, or a deploy without --plan ran since).
+They are compared with what is live in Checkly, and this deploy writes each of them once.
+A value set only in Checkly, on a property your code does not set, may be reset.
+From the next deploy with --plan on, a plan shows only what changed.
+
+13 to write again with no difference found, 0 unchanged
+Deploy exactly this plan: checkly deploy --plan --plan-token v1.Q1uXFJQ9iWX5AGK5-VALMA
+```
+
+Such a plan is applied like any other: it has resources to write, so the deploy asks for confirmation, and in agent or CI environments the `confirmation_required` envelope lists them in one line.
+
+<Warning>
+On these resources the plan shows the properties your code sets. A value that was set only in Checkly, on a property your code does not set, is not part of the comparison, and the deploy may reset it without the plan showing it. A deploy without `--plan` has always done the same. From the second planned deploy on, such an edit is reported as changed in Checkly before it is overwritten.
+</Warning>
+
+A deploy without `--plan` in between starts this over for the resources it wrote, so a project gets the most out of plans when every deploy uses `--plan`.
+
+The machine-readable plan marks each of these entries with `"basis": "live"`, so a script reading the `--dry-run` or `confirmation_required` envelope can tell them apart.
 
 ### Updating your code with changes made in Checkly
 

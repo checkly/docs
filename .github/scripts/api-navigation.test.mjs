@@ -16,7 +16,7 @@ function fixture(t) {
   mkdirSync(join(root, '.github/scripts'), { recursive: true });
   mkdirSync(join(root, 'api-reference'));
   mkdirSync(join(root, 'guides'));
-  for (const file of ['api-navigation.mjs', 'generate-sitemap.mjs', 'check-redirect-destinations.mjs', 'detect-new-endpoints.mjs', 'yaml-lite.mjs', 'clean-openapi.mjs']) {
+  for (const file of ['api-navigation.mjs', 'generate-sitemap.mjs', 'check-redirect-destinations.mjs', 'detect-new-endpoints.mjs', 'yaml-lite.mjs', 'clean-openapi.mjs', 'sync-api-group-tags.mjs']) {
     copyFileSync(join(scripts, file), join(root, '.github/scripts', file));
   }
   const spec = {
@@ -125,4 +125,56 @@ test('HTML cleanup preserves valid JSON and Markdown line breaks', (t) => {
   delete cleaned.paths['/probe'].get.description;
   delete spec.paths['/probe'].get.description;
   assert.deepEqual(cleaned, spec);
+});
+
+test('group badges follow all child operations and stale badges fail validation without rewriting navigation', (t) => {
+  const { root, spec, docs, run } = fixture(t);
+  const group = docs.navigation.tabs[0].pages[0].pages[0];
+  group.pages = ['api-reference/openapi.json GET /probe'];
+  docs.navigation.tabs.push({ tab: 'Docs', pages: [{ group: 'Legacy guides', tag: 'Deprecated', pages: ['guides/example'] }] });
+  spec.paths['/probe'].get.deprecated = true;
+  const save = () => {
+    writeFileSync(join(root, 'docs.json'), JSON.stringify(docs));
+    writeFileSync(join(root, 'api-reference/openapi.json'), JSON.stringify(spec));
+  };
+  const readGroup = () => JSON.parse(readFileSync(join(root, 'docs.json'), 'utf8')).navigation.tabs[0].pages[0].pages[0];
+  save();
+  const stale = run('sync-api-group-tags.mjs', '--check');
+  assert.equal(stale.status, 1);
+  assert.match(stale.stderr, /API group tags are stale: Usage/);
+  assert.deepEqual(JSON.parse(readFileSync(join(root, 'docs.json'), 'utf8')), docs);
+  const synced = run('sync-api-group-tags.mjs');
+  assert.equal(synced.status, 0, synced.stderr);
+  assert.deepEqual(readGroup(), { ...group, tag: 'Deprecated' });
+  assert.deepEqual(JSON.parse(readFileSync(join(root, 'docs.json'), 'utf8')).navigation.tabs[1], docs.navigation.tabs[1]);
+  const first = readFileSync(join(root, 'docs.json'), 'utf8');
+  assert.equal(run('sync-api-group-tags.mjs').status, 0);
+  assert.equal(readFileSync(join(root, 'docs.json'), 'utf8'), first);
+  assert.equal(run('sync-api-group-tags.mjs', '--check').status, 0);
+
+  group.tag = 'Deprecated';
+  spec.paths['/active'] = { get: { responses: { 200: { description: 'OK' } } } };
+  group.pages.push('api-reference/openapi.json GET /active');
+  save();
+  assert.equal(run('sync-api-group-tags.mjs', '--check').status, 1);
+  assert.equal(run('sync-api-group-tags.mjs').status, 0);
+  const { tag, ...withoutTag } = group;
+  assert.deepEqual(readGroup(), withoutTag);
+
+  spec.paths['/active'].get.deprecated = true;
+  group.pages.push('guides/example');
+  save();
+  assert.equal(run('sync-api-group-tags.mjs').status, 0);
+  assert.deepEqual(readGroup(), withoutTag);
+  group.tag = 'New';
+  save();
+  assert.equal(run('sync-api-group-tags.mjs').status, 0);
+  assert.deepEqual(readGroup(), group);
+
+  delete spec.paths['/probe'];
+  save();
+  const missing = run('sync-api-group-tags.mjs');
+  assert.notEqual(missing.status, 0);
+  assert.match(missing.stderr, /operation missing from schema/);
+  assert.deepEqual(JSON.parse(readFileSync(join(root, 'docs.json'), 'utf8')), docs);
 });

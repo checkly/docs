@@ -70,6 +70,9 @@ jobs:
       - name: Test API navigation tooling
         run: npm run test:api-docs
 
+      - name: Check API group badges match the schema
+        run: npm run sync:api-group-tags -- --check
+
       # Legacy /reference/* redirects are inbound-only, so `mint broken-links`
       # never validates their destinations. Runs on any docs change (.mdx or
       # docs.json) because a page rename/delete is exactly what breaks them.

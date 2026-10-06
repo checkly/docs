@@ -54,6 +54,15 @@ test('native endpoint URLs stay in the sitemap and redirects without regeneratin
   assert.deepEqual(JSON.parse(readFileSync(join(root, 'docs.json'), 'utf8')), docs);
   assert.ok(!existsSync(join(root, 'api-reference/usage')));
 
+  docs.redirects[0].destination = '/guides/example';
+  writeFileSync(join(root, 'docs.json'), JSON.stringify(docs));
+  const authored = run('check-redirect-destinations.mjs');
+  assert.equal(authored.status, 0, authored.stderr);
+  rmSync(join(root, 'guides/example.mdx'));
+  const stale = run('check-redirect-destinations.mjs');
+  assert.equal(stale.status, 1);
+  assert.match(stale.stderr, /\/reference\/getprobe -> \/guides\/example/);
+
   docs.redirects[0].destination = '/removed-page';
   writeFileSync(join(root, 'docs.json'), JSON.stringify(docs));
   const broken = run('check-redirect-destinations.mjs');

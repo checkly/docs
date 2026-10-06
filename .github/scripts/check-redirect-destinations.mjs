@@ -7,7 +7,9 @@ import { getNavigationPages } from './api-navigation.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const docs = JSON.parse(readFileSync(join(root, 'docs.json'), 'utf8'));
-const pages = new Set(getNavigationPages(root).map((page) => `/${page.slug}`));
+const pages = new Set(getNavigationPages(root)
+  .filter((page) => page.operation)
+  .map((page) => `/${page.slug}`));
 function walk(directory) {
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     if (entry.name === 'node_modules' || entry.name === '.git') continue;

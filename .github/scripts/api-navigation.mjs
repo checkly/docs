@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const BASE = 'https://www.checklyhq.com/docs/';
-const ENDPOINT = /^(\S+\.json)\s+(get|post|put|patch|delete|head|options)\s+(\/\S+)$/i;
+export const OPENAPI_ENDPOINT = /^(\S+\.json)\s+(get|post|put|patch|delete|head|options)\s+(\/\S+)$/i;
 
 export function readOpenApiSpec(filename) {
   return JSON.parse(readFileSync(filename, 'utf8'));
@@ -14,7 +14,7 @@ export function getNavigationPages(root) {
   const pages = [];
 
   function addPage(page) {
-    const endpoint = page.match(ENDPOINT);
+    const endpoint = page.match(OPENAPI_ENDPOINT);
     if (!endpoint) {
       pages.push({ slug: page.replace(/^\/+|\/+$/g, '') });
       return;

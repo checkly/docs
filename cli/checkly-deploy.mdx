@@ -55,7 +55,6 @@ With `--plan`, `--preview` and `--output` print the plan as an overview of every
 - `-` with `kept in your Checkly account, now managed from the Checkly web app` for a resource removed from code that [`--preserve-resources`](#command-options) detaches instead of deleting.
 - `-` on a relation with `relation not managed by this project, deleted by --prune-relations`, and `!` on a check or group that has such relations when [`--prune-relations`](#command-options) is not passed.
 - `·` with `skipped (testOnly)` for checks marked `testOnly: true`, which are never deployed.
-- A closing `N to write again with no difference found` row, on [the first plan of a project](#the-first-plan-of-a-project), counting the resources the deploy writes once more although nothing was found to differ.
 - A closing `N unchanged` row counting the resources the deploy leaves alone.
 
 Without `--plan` the overview has the same markers, but no source file column, no unchanged row and no diffs: every resource that exists is listed as an update, and the totals line always reads `0 unchanged`.
@@ -95,29 +94,27 @@ Such a deploy writes no resource. It still records the deployment with its Git i
 
 ### The first plan of a project
 
-The first `checkly deploy --plan` of a project has no earlier planned deploy to compare with, and neither has the first one after any deploy without `--plan`, which writes every resource and records nothing to compare against. For those resources the plan compares your code with what is live in Checkly instead, and the deploy writes each of them once, whatever the comparison found:
-
-- A resource that differs from what is live is listed as an update, with its diff. A line under the diff's header says it was `compared with what is live in Checkly, not with an earlier plan`.
-- A resource in which no difference was found gets no row. It is counted as `to write again with no difference found`, under the overview and in the totals.
-- A note under the overview says how many resources this applies to.
+The first `checkly deploy --plan` of an existing project has no earlier planned deploy to compare with, and neither has the first one after any deploy without `--plan`, which writes every resource and records nothing to compare against. Such a deploy updates every resource it already deployed once to set a baseline: the plan compares your code with what is live in Checkly, lists each of those resources as an update whether or not anything differs, and counts them in a note under the overview.
 
 ```text Terminal
 $ npx checkly deploy --plan --preview
 
 Deploy preview · Website Monitoring → account Monitoring as Code
 
-    13 to write again with no difference found
+  ~ EmailAlertChannel  on-call-email     __checks__/alert-channels.ts
+  ~ ApiCheck           books-api         __checks__/api/books-api.check.ts
+  ~ BrowserCheck       homepage-browser  __checks__/browser/homepage.check.ts
+  ~ CheckGroupV2       storefront        __checks__/groups.ts
 
-13 resources have no earlier planned deploy to compare with (none yet, or a deploy without --plan ran since).
-They are compared with what is live in Checkly, and this deploy writes each of them once.
-A value set only in Checkly, on a property your code does not set, may be reset.
-From the next deploy with --plan on, a plan shows only what changed.
+4 resources are updated to set a baseline for --plan. Later deploys with --plan show only what changed.
 
-13 to write again with no difference found, 0 unchanged
+4 to update, 0 unchanged
 Deploy exactly this plan: checkly deploy --plan --plan-token v1.Q1uXFJQ9iWX5AGK5-VALMA
 ```
 
-Such a plan is applied like any other: it has resources to write, so the deploy asks for confirmation, and in agent or CI environments the `confirmation_required` envelope lists them in one line.
+A resource that differs from what is live shows its diff under the overview as usual. The note counts the resources with no baseline, whatever the reason. Besides a project's very first plan and the first plan after a deploy without `--plan`, that is a resource added to the project with `checkly import`, which has no earlier plan to compare with either, and a baseline that a Checkly update made unusable.
+
+Such a plan is applied like any other: it has resources to write, so the deploy asks for confirmation, and in agent or CI environments the `confirmation_required` envelope lists them as updates, summing up the rest of a long plan as usual.
 
 <Warning>
 On these resources the plan shows the properties your code sets. A value that was set only in Checkly, on a property your code does not set, is not part of the comparison, and the deploy may reset it without the plan showing it. A deploy without `--plan` has always done the same. From the second planned deploy on, such an edit is reported as changed in Checkly before it is overwritten.

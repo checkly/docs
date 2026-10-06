@@ -41,6 +41,14 @@ Each page has an `openapi` attribute that points to an endpoint listed in `api-r
 
 Contains a copy of the OpenAPI spec that all our API reference pages pull from. It's automatically updated every 48 hours by our [Github Actions](https://github.com/checkly/docs/actions/workflows/update-api-spec.yml) workflow.
 
+### Endpoint status badges and warnings
+
+Usage and legacy Status Pages pages derive their lifecycle status from the OpenAPI operation: `x-beta: true` produces a Beta badge and warning, and `deprecated: true` produces a Deprecated badge and migration warning. Deprecation takes precedence if both flags are present.
+
+Set these flags in the backend route metadata. Do not edit lifecycle tags or warning imports in individual MDX pages. `.github/scripts/sync_endpoint_status.py` generates them when you run `./update-api-spec.sh` or `npm run dev`. Removing a flag removes its generated badge and warning while preserving authored page content.
+
+After editing the local schema, run `python3 .github/scripts/sync_endpoint_status.py`. CI runs the script with `--check` to catch pages that no longer match the schema.
+
 ## Updating `api-reference/openapi.json` via Github Actions
 
 Checkly's public OpenAPI spec can be found here: https://api.checklyhq.com/openapi.json. We have a copy saved to `api-reference/openapi.json` that we update every 48 hours. This copy is formatted to play nicely with how Mintlify renders pages, and all our API reference pages use this file to auto-generate the API reference documentation.

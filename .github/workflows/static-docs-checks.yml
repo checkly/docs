@@ -53,6 +53,12 @@ jobs:
             echo "docs_changed=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Test endpoint status generation
+        run: python3 -m unittest discover -s .github/scripts -p 'test_sync_endpoint_status.py'
+
+      - name: Check endpoint status metadata
+        run: python3 .github/scripts/sync_endpoint_status.py --check
+
       - name: Set up Node
         if: steps.detect.outputs.openapi_changed == 'true' || steps.detect.outputs.docs_changed == 'true'
         uses: actions/setup-node@v4

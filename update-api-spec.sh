@@ -53,6 +53,7 @@ npm exec mintlify openapi-check "$TEMP_FILE"
 
 echo "🔄 Updating API specification..."
 cp "$TEMP_FILE" "$API_SPEC_PATH"
+python3 .github/scripts/sync_endpoint_status.py
 
 echo "🧹 Cleaning up temporary files..."
 rm -f "$TEMP_FILE"

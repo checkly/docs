@@ -16,7 +16,7 @@ function fixture(t) {
   mkdirSync(join(root, '.github/scripts'), { recursive: true });
   mkdirSync(join(root, 'api-reference'));
   mkdirSync(join(root, 'guides'));
-  for (const file of ['api-navigation.mjs', 'generate-sitemap.mjs', 'check-redirect-destinations.mjs', 'detect-new-endpoints.mjs', 'yaml-lite.mjs']) {
+  for (const file of ['api-navigation.mjs', 'generate-sitemap.mjs', 'check-redirect-destinations.mjs', 'detect-new-endpoints.mjs', 'yaml-lite.mjs', 'clean-openapi.mjs']) {
     copyFileSync(join(scripts, file), join(root, '.github/scripts', file));
   }
   const spec = {
@@ -35,7 +35,7 @@ function fixture(t) {
   writeFileSync(join(root, 'docs.json'), JSON.stringify(docs));
   writeFileSync(join(root, 'api-reference/openapi.json'), JSON.stringify(spec, null, 2));
   writeFileSync(join(root, 'guides/example.mdx'), '---\ntitle: Example\n---\n');
-  const run = (file) => spawnSync(process.execPath, [join(root, '.github/scripts', file)], { cwd: root, encoding: 'utf8' });
+  const run = (file, ...args) => spawnSync(process.execPath, [join(root, '.github/scripts', file), ...args], { cwd: root, encoding: 'utf8' });
   return { root, spec, docs, run };
 }
 
@@ -98,16 +98,31 @@ test('new endpoints with x-mint URLs use native navigation instead of MDX files'
   assert.deepEqual(JSON.parse(readFileSync(join(root, 'docs.json'), 'utf8')), updated);
 });
 
-test('native pages retain their trailing-slash canonical with the legacy schema format', (t) => {
+test('navigation rejects invalid JSON and noncanonical generated URLs', (t) => {
   const { root, spec, run } = fixture(t);
   spec.paths['/probe'].get.description = 'First line\nSecond line';
   const legacy = JSON.stringify(spec).replace('First line\\nSecond line', 'First line\nSecond line');
   writeFileSync(join(root, 'api-reference/openapi.json'), legacy);
-  const valid = run('generate-sitemap.mjs');
-  assert.equal(valid.status, 0, valid.stderr);
+  const malformed = run('generate-sitemap.mjs');
+  assert.notEqual(malformed.status, 0);
+  assert.match(malformed.stderr, /JSON/);
   spec.paths['/probe'].get['x-mint'].metadata.canonical = canonical.slice(0, -1);
   writeFileSync(join(root, 'api-reference/openapi.json'), JSON.stringify(spec));
   const invalid = run('generate-sitemap.mjs');
   assert.notEqual(invalid.status, 0);
   assert.match(invalid.stderr, /generated endpoint canonical must be/);
+});
+
+test('HTML cleanup preserves valid JSON and Markdown line breaks', (t) => {
+  const { root, spec, run } = fixture(t);
+  const filename = join(root, 'api-reference/openapi.json');
+  spec.paths['/probe'].get.description = '<a href="https://example.com/docs">Docs</a><br><code>x</code><br /><b>bold</b></br><b>legacy<b>';
+  writeFileSync(filename, JSON.stringify(spec));
+  const result = run('clean-openapi.mjs', filename);
+  assert.equal(result.status, 0, result.stderr);
+  const cleaned = JSON.parse(readFileSync(filename, 'utf8'));
+  assert.equal(cleaned.paths['/probe'].get.description, '[Docs](https://example.com/docs)\n`x`\n**bold**\n**legacy**');
+  delete cleaned.paths['/probe'].get.description;
+  delete spec.paths['/probe'].get.description;
+  assert.deepEqual(cleaned, spec);
 });

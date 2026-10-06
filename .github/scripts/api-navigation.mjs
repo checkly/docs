@@ -5,15 +5,7 @@ const BASE = 'https://www.checklyhq.com/docs/';
 const ENDPOINT = /^(\S+\.json)\s+(get|post|put|patch|delete|head|options)\s+(\/\S+)$/i;
 
 export function readOpenApiSpec(filename) {
-  const raw = readFileSync(filename, 'utf8');
-  try {
-    return JSON.parse(raw);
-  } catch {
-    // The existing HTML cleanup can leave literal newlines inside JSON strings.
-    return JSON.parse(raw.replace(/"(?:\\[\s\S]|[^"\\])*"/g, (quoted) =>
-      quoted.replace(/[\x00-\x1f]/g, (character) => JSON.stringify(character).slice(1, -1))
-    ));
-  }
+  return JSON.parse(readFileSync(filename, 'utf8'));
 }
 
 export function getNavigationPages(root) {

@@ -54,7 +54,6 @@ jobs:
           fi
 
       - name: Set up Node
-        if: steps.detect.outputs.openapi_changed == 'true' || steps.detect.outputs.docs_changed == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -68,12 +67,18 @@ jobs:
         if: steps.detect.outputs.openapi_changed == 'true'
         run: npx mint openapi-check api-reference/openapi.json
 
+      - name: Test API navigation tooling
+        run: npm run test:api-docs
+
+      - name: Check API group badges match the schema
+        run: npm run sync:api-group-tags -- --check
+
       # Legacy /reference/* redirects are inbound-only, so `mint broken-links`
       # never validates their destinations. Runs on any docs change (.mdx or
       # docs.json) because a page rename/delete is exactly what breaks them.
       - name: Check legacy redirect destinations
         if: steps.detect.outputs.docs_changed == 'true'
-        run: python3 .github/scripts/check_redirect_destinations.py
+        run: node .github/scripts/check-redirect-destinations.mjs
 
       # Guards the SEO frontmatter bug class: a malformed opening `---` fence
       # (e.g. a trailing space) makes Mintlify drop a page's title/description/

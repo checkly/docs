@@ -3,8 +3,8 @@
 /**
  * detect-new-endpoints.mjs
  *
- * For every endpoint that exists in api-reference/openapi.json but has no
- * MDX page yet, generate an MDX stub and add it to docs.json navigation.
+ * Add undocumented OpenAPI endpoints to docs.json navigation. Operations with
+ * x-mint.href use native pages; other operations receive an MDX stub.
  * Writes changes directly to the working tree — the caller (CI workflow)
  * is responsible for committing/pushing.
  *
@@ -15,6 +15,7 @@
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse as yamlParse } from './yaml-lite.mjs';
+import { getNavigationPages, readOpenApiSpec } from './api-navigation.mjs';
 
 const DRY_RUN = process.env.DRY_RUN === '1';
 const ROOT = process.cwd();
@@ -88,14 +89,7 @@ function slugify(text) {
 }
 
 function loadSpec() {
-  const raw = readFileSync(SPEC_PATH, 'utf-8');
-  // OpenAPI descriptions may contain literal control chars (newlines in JSON strings)
-  return JSON.parse(raw.replace(/[\x00-\x1f]/g, (ch) => {
-    if (ch === '\n') return '\\n';
-    if (ch === '\r') return '\\r';
-    if (ch === '\t') return '\\t';
-    return '';
-  }));
+  return readOpenApiSpec(SPEC_PATH);
 }
 
 function loadExclusions() {
@@ -117,8 +111,11 @@ function normalisePath(p) {
   return p.length > 1 ? p.replace(/\/+$/, '') : p;
 }
 
-function scanExistingMdx() {
+function scanDocumentedEndpoints() {
   const documented = new Set();
+  for (const page of getNavigationPages(ROOT)) {
+    if (page.operation) documented.add(`${page.method.toUpperCase()} ${normalisePath(page.path)}`);
+  }
   const apiRefDir = join(ROOT, 'api-reference');
 
   function walk(dir) {
@@ -279,7 +276,7 @@ function main() {
 
   const spec = loadSpec();
   const exclusions = loadExclusions();
-  const documented = scanExistingMdx();
+  const documented = scanDocumentedEndpoints();
 
   console.log(`📋 Spec paths: ${Object.keys(spec.paths).length}`);
   console.log(`📄 Already documented: ${documented.size}`);
@@ -303,7 +300,10 @@ function main() {
       const summary = details.summary ?? '';
       const { dir, group, subgroup } = resolveMapping(tag, summary);
 
-      const ep = { key, method: method.toUpperCase(), path, tag, summary, dir, group, subgroup };
+      const ep = {
+        key, method: method.toUpperCase(), path, schemaPath: rawPath,
+        tag, summary, dir, group, subgroup, href: details['x-mint']?.href,
+      };
       undocumented.push({ ...ep, filename: getUniqueFilename(ep) });
     }
   }
@@ -315,13 +315,26 @@ function main() {
 
   console.log(`\n🆕 Found ${undocumented.length} undocumented endpoint(s):\n`);
   for (const ep of undocumented) {
-    console.log(`  ${ep.key}  →  ${ep.dir}/${ep.filename}.mdx  [${ep.group}${ep.subgroup ? ' > ' + ep.subgroup : ''}]`);
+    const target = ep.href ?? `${ep.dir}/${ep.filename}.mdx`;
+    console.log(`  ${ep.key}  →  ${target}  [${ep.group}${ep.subgroup ? ' > ' + ep.subgroup : ''}]`);
   }
 
   // Mutate docs.json in memory; write once at the end.
   const docsJson = JSON.parse(readFileSync(DOCS_JSON_PATH, 'utf-8'));
 
   for (const ep of undocumented) {
+    if (ep.href) {
+      const slug = ep.href.replace(/^\/+|\/+$/g, '');
+      if (existsSync(join(ROOT, `${slug}.mdx`))) {
+        throw new Error(`${slug}.mdx would overwrite the schema-generated page`);
+      }
+      const reference = `api-reference/openapi.json ${ep.method} ${ep.schemaPath}`;
+      if (!addToDocsJson(docsJson, reference, ep.group, ep.subgroup)) {
+        throw new Error(`Could not add ${reference} to docs.json`);
+      }
+      console.log(`  + Added native endpoint ${reference} → ${ep.href}`);
+      continue;
+    }
     const mdxRelPath = `api-reference/${ep.dir}/${ep.filename}.mdx`;
     const docsJsonPagePath = `api-reference/${ep.dir}/${ep.filename}`;
 

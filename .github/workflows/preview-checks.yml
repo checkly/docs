@@ -126,6 +126,12 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Verify schema-generated API pages on preview
+        if: steps.detect.outputs.docs_changed == 'true' && steps.preview.outputs.skipped != 'true'
+        env:
+          DOCS_PREVIEW_URL: ${{ steps.preview.outputs.url }}
+        run: node .github/scripts/check-api-preview.mjs "$DOCS_PREVIEW_URL"
+
       - name: Install dependencies
         if: steps.detect.outputs.docs_changed == 'true' && steps.preview.outputs.skipped != 'true'
         run: npm ci

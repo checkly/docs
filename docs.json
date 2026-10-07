@@ -764,7 +764,9 @@
                   "api-reference/monitors/create-an-ssl-monitor",
                   "api-reference/monitors/update-an-ssl-monitor",
                   "api-reference/monitors/create-a-traceroute-monitor",
-                  "api-reference/monitors/update-a-traceroute-monitor"
+                  "api-reference/monitors/update-a-traceroute-monitor",
+                  "api-reference/monitors/create-a-grpc-monitor",
+                  "api-reference/monitors/update-a-grpc-monitor"
                 ]
               },
               {
@@ -948,7 +950,11 @@
                   "api-reference/usage/get-usage-terms",
                   "api-reference/usage/get-usage-summary",
                   "api-reference/usage/get-usage-series",
-                  "api-reference/usage/get-usage-terms-and-accounts-for-the-current-organization"
+                  "api-reference/openapi.json GET /v2/usage/terms",
+                  "api-reference/openapi.json GET /v2/usage/series",
+                  "api-reference/openapi.json GET /v2/usage/summary",
+                  "api-reference/openapi.json GET /v2/usage/terms/{id}",
+                  "api-reference/openapi.json GET /v2/usage/terms/{id}/projections"
                 ]
               },
               {
@@ -1024,52 +1030,57 @@
                 ]
               },
               {
-                "group": "Status Pages v1 (deprecated)",
+                "group": "Status Pages v1",
                 "pages": [
-                  "api-reference/status-pages/retrieve-all-status-pages",
-                  "api-reference/status-pages/create-a-new-status-page",
-                  "api-reference/status-pages/retrieve-a-single-status-page-by-id",
-                  "api-reference/status-pages/update-an-existing-status-page",
-                  "api-reference/status-pages/delete-a-status-page"
-                ]
+                  "api-reference/openapi.json GET /v1/status-pages",
+                  "api-reference/openapi.json POST /v1/status-pages",
+                  "api-reference/openapi.json GET /v1/status-pages/{statusPageId}",
+                  "api-reference/openapi.json PUT /v1/status-pages/{statusPageId}",
+                  "api-reference/openapi.json DELETE /v1/status-pages/{statusPageId}"
+                ],
+                "tag": "Deprecated"
               },
               {
-                "group": "Status Page Incidents v1 (deprecated)",
+                "group": "Status Page Incidents v1",
                 "pages": [
-                  "api-reference/status-page-incidents/retrieve-the-latest-incidents-with-pagination",
-                  "api-reference/status-page-incidents/create-a-new-incident",
-                  "api-reference/status-page-incidents/retrieve-an-incident-by-id",
-                  "api-reference/status-page-incidents/update-an-existing-incident",
-                  "api-reference/status-page-incidents/delete-an-incident"
-                ]
+                  "api-reference/openapi.json GET /v1/status-pages/incidents",
+                  "api-reference/openapi.json POST /v1/status-pages/incidents",
+                  "api-reference/openapi.json GET /v1/status-pages/incidents/{incidentId}",
+                  "api-reference/openapi.json PUT /v1/status-pages/incidents/{incidentId}",
+                  "api-reference/openapi.json DELETE /v1/status-pages/incidents/{incidentId}"
+                ],
+                "tag": "Deprecated"
               },
               {
-                "group": "Status Page Incident Updates v1 (deprecated)",
+                "group": "Status Page Incident Updates v1",
                 "pages": [
-                  "api-reference/status-page-incidents/retrieve-the-100-latest-incident-updates-of-a-specific-incident",
-                  "api-reference/status-page-incidents/add-a-new-incident-update-to-a-specific-incident",
-                  "api-reference/status-page-incidents/retrieve-an-incident-update-by-id",
-                  "api-reference/status-page-incidents/update-an-existing-incident-update",
-                  "api-reference/status-page-incidents/delete-an-incident-update"
-                ]
+                  "api-reference/openapi.json GET /v1/status-pages/incidents/{incidentId}/incident-updates",
+                  "api-reference/openapi.json POST /v1/status-pages/incidents/{incidentId}/incident-updates",
+                  "api-reference/openapi.json GET /v1/status-pages/incidents/{incidentId}/incident-updates/{incidentUpdateId}",
+                  "api-reference/openapi.json PUT /v1/status-pages/incidents/{incidentId}/incident-updates/{incidentUpdateId}",
+                  "api-reference/openapi.json DELETE /v1/status-pages/incidents/{incidentId}/incident-updates/{incidentUpdateId}"
+                ],
+                "tag": "Deprecated"
               },
               {
-                "group": "Status Page Services v1 (deprecated)",
+                "group": "Status Page Services v1",
                 "pages": [
-                  "api-reference/status-page-services/get-all-services",
-                  "api-reference/status-page-services/create-a-service",
-                  "api-reference/status-page-services/get-a-single-service",
-                  "api-reference/status-page-services/update-a-service",
-                  "api-reference/status-page-services/delete-a-service"
-                ]
+                  "api-reference/openapi.json GET /v1/status-pages/services",
+                  "api-reference/openapi.json POST /v1/status-pages/services",
+                  "api-reference/openapi.json GET /v1/status-pages/services/{serviceId}",
+                  "api-reference/openapi.json PUT /v1/status-pages/services/{serviceId}",
+                  "api-reference/openapi.json DELETE /v1/status-pages/services/{serviceId}"
+                ],
+                "tag": "Deprecated"
               },
               {
-                "group": "Status Page Subscribers v1 (deprecated)",
+                "group": "Status Page Subscribers v1",
                 "pages": [
-                  "api-reference/status-pages/get-all-subscriptions-for-a-specific-status-page",
-                  "api-reference/status-pages/bulk-create-subscriptions-for-a-specific-status-page",
-                  "api-reference/status-pages/delete-a-subscription-belonging-to-a-specific-status-page"
-                ]
+                  "api-reference/openapi.json GET /v1/status-pages/{statusPageId}/subscriptions",
+                  "api-reference/openapi.json POST /v1/status-pages/{statusPageId}/subscriptions/bulk",
+                  "api-reference/openapi.json DELETE /v1/status-pages/{statusPageId}/subscriptions/{subscriptionId}"
+                ],
+                "tag": "Deprecated"
               },
               {
                 "group": "Test Sessions",
@@ -1118,15 +1129,16 @@
               "guides/overview",
               "guides/structuring-a-checkly-project",
               "guides/playwright-testing-to-monitoring",
-              "guides/agentic-workflows"
+              "guides/agentic-workflows",
+              "guides/global-monitoring"
             ]
           },
           {
             "group": "Detect",
             "pages": [
               "guides/uptime-monitoring",
+              "guides/api-monitoring",
               "guides/keyword-monitoring",
-              "guides/global-monitoring",
               "guides/sdlc-monitoring",
               "guides/setup-scripts-for-apis"
             ]
@@ -1147,7 +1159,7 @@
           {
             "group": "Examples",
             "pages": [
-            "guides/claude-code-monitoring",
+              "guides/claude-code-monitoring",
               "guides/monitoring-ecommerce-apps-using-playwright",
               "guides/monitoring-ecommerce-apps-using-terraform",
               "guides/monitoring-the-stripe-api",

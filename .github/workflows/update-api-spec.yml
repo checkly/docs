@@ -54,6 +54,9 @@ jobs:
     - name: Generate pages for any new endpoints
       run: node .github/scripts/detect-new-endpoints.mjs
 
+    - name: Sync native API group badges from the schema
+      run: node .github/scripts/sync-api-group-tags.mjs
+
     # New pages land in docs.json navigation, which is what the sitemap is
     # generated from. Without this the static-docs-checks "Sitemap up to date"
     # gate fails on every PR that adds an endpoint page.

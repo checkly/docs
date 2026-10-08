@@ -24,16 +24,180 @@ npx checkly deploy [options]
 |--------|----------|-------------|
 | `--config, -c` | - | The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts\|js` file in the current directory. |
 | `--force, -f` | - | Force mode. Skips the confirmation dialog. |
-| `--debug-bundle` | - | Generate a JSON file containing the data sent to our servers when you deploy. **Note**: This flag is in beta. The bundle’s structure is not considered a stable format and may change without notice. It’s intended for one-off troubleshooting, and note it may contain secrets before sharing. |
-| `--output, -o` | - | Show the changes made after the deploy command. |
-| `--preview, -p` | - | Show a preview of the changes made by the deploy command. |
+| `--cancel-in-progress-deployment` | - | If a deployment for this project is already in progress, cancel it instead of waiting for it to finish. |
+| `--debug-bundle` | - | Write the data a deploy would send to `./debug-bundle.json` and exit without deploying anything. **Note**: This flag is in beta. The bundle’s structure is not considered a stable format and may change without notice. It’s intended for one-off troubleshooting, and note it may contain secrets before sharing. |
+| `--dry-run` | - | Print what the deploy would do as JSON and exit without deploying. With `--plan`, the JSON carries the plan. |
+| `--output, -o` | - | Show the changes made after the deploy command. With `--plan`, includes a diff of every updated resource. |
+| `--[no-]plan` | - | Ask Checkly for a plan first and deploy that plan: only the resources that differ are written. Off by default. |
+| `--plan-token` | - | Deploy only if the plan still matches this token from an earlier run. Aborts if anything changed in your Checkly account since then. Requires `--plan`. |
+| `--preview, -p` | - | Show a preview of the changes made by the deploy command. With `--plan`, includes a diff of every updated resource. |
 | `--preserve-resources` | - | Detach resources removed from code (keeping them and their run history) instead of deleting them. |
+| `--prune-relations` | - | Delete the alert channel subscriptions and private location assignments on this project's checks and groups that the project does not manage. Requires `--plan`. |
 | `--[no-]schedule-on-deploy` | - | Enables automatic check scheduling after a deploy. |
 | `--schedule-on-deploy-threshold` | - | Schedule no checks after the deploy if it would schedule more than this many. Defaults to `auto`, which leaves the threshold to Checkly. |
 | `--schedule-on-deploy-min-frequency` | - | After the deploy, schedule only the checks that run every N minutes or less often; more frequent checks wait for their next scheduled run. Defaults to `auto`, which leaves the minimum to Checkly. |
 | `--[no-]verify-runtime-dependencies` | - | Return an error if checks import dependencies that are not supported by the selected runtime. |
+| `--verbose, -v` | - | Show resource names and IDs in the deploy output. Implies `--output`. |
+
+## How a deploy previews its changes
+
+By default, a deploy writes every resource your project declares, whether or not it changed, and deletes the ones you removed from your code. Its preview lists the resources it would create, update and delete, and every resource that already exists counts as an update.
+
+With `--plan`, the deploy works from a plan instead. Before it writes anything, `checkly deploy --plan` asks Checkly what the deploy would change and shows you the plan. It prints the full preview (the overview of every resource it would create, update or delete, with the unchanged ones counted, and a diff of every updated resource) and then asks whether to apply the changes or cancel. While the plan is being checked nothing is uploaded, so cancelling at the prompt leaves your account untouched. In agent or CI environments the plan is returned as a `confirmation_required` envelope instead (see [Deleting vs. detaching removed resources](#deleting-vs-detaching-removed-resources)).
+
+<Note>
+`--plan` is a preview feature that you opt in to per deploy; see [`--[no-]plan`](#command-options). The rest of this section describes a deploy run with `--plan`.
+</Note>
+
+The plan compares your code against what the project last deployed with a plan (see [the first plan of a project](#the-first-plan-of-a-project) for when there is no such deploy), so it can also tell you when a resource was edited in the Checkly web app or through the API since then. Such an edit is overwritten by the deploy, because your code is the source of truth for the resources it declares; the property listing and the `--dry-run` envelope mark it as changed in Checkly, while the construct diff simply shows your account's current value on the deployed side. In a terminal you can instead have the CLI [update your code with that edit](#updating-your-code-with-changes-made-in-checkly).
+
+With `--plan`, `--preview` and `--output` print the plan as an overview of every resource the deploy touches, followed by a diff per updated resource. Each row in the overview carries a marker, the construct type, the logical ID and either the source file or a note saying what happens to the resource:
+
+- `+` create, `~` update, `-` delete. A deleted resource is noted `permanently deleted, run history lost`.
+- `-` with `kept in your Checkly account, now managed from the Checkly web app` for a resource removed from code that [`--preserve-resources`](#command-options) detaches instead of deleting.
+- `-` on a relation with `relation not managed by this project, deleted by --prune-relations`, and `!` on a check or group that has such relations when [`--prune-relations`](#command-options) is not passed.
+- `·` with `skipped (testOnly)` for checks marked `testOnly: true`, which are never deployed.
+- A closing `N unchanged` row counting the resources the deploy leaves alone.
+
+Without `--plan` the overview has the same markers, but no source file column, no unchanged row and no diffs: every resource that exists is listed as an update, and the totals line always reads `0 unchanged`.
+
+Under the overview, every updated resource gets a header line with its type, logical ID and source file, followed by a diff of the construct as it is in your account against the construct in your code. A legend under the header says what the two sides are: `-` lines are what is live in Checkly, replaced or removed by this deploy; `+` lines are what is in your code, added or changed by this deploy. Everything else is context, and `⋯` marks skipped lines. A `-` line with no `+` line after it is a value your code no longer sets, which the deploy removes. Once the deploy is done, the legend reads `was live in Checkly` and `now live in Checkly` instead. Both sides are rendered the way `checkly import` writes a construct, which leaves out a property whose value is its default. The properties your code spells out are the exception: they are shown on both sides whatever their values, so a move to or from a default reads as a change of that one line. Other constructs are referred to by the names your code gives them. Both need the CLI to find the construct's `new …('id', { … })` call in your code; options passed in a variable or spread into the call keep the import rendering. Facts a diff cannot show are printed as `~` notes:
+
+- The property's path, such as `/script:`, followed by a diff of two texts rather than of the construct, for a change that lives outside it: a browser or multi-step check's script, an API check's setup or teardown script.
+- A property Checkly stores encrypted, such as a locked environment variable, is shown inline with its value masked as `'********'`. The side that changed reads `'******** (changed)'`, or `'******** (changed in Checkly)'` on the deployed side. When the change cannot be shown inline, for example a secret that was renamed, the note `secret changed: <property>` names the property holding it instead.
+- `changed: code bundle` or `changed: dependency cache`, or one note naming both, for a resource whose only change is what it bundles.
+- `payload format changed (CLI upgrade)` when the only differences come from a newer CLI describing the same construct differently, such as a private location list or retry strategy being sent in a new form. The deploy rewrites the stored form and nothing about the resource changes.
+- A plain list of the changed properties when the CLI cannot render the resource as a construct.
+
+The last line totals the plan: how many resources are to be created, updated and deleted, and how many are unchanged. After a deploy, `--output` prints the same overview and diffs for what was done, with the totals in the past tense.
+
+Every plan comes with a **plan token** that pins the account state it was computed against, so a deploy cannot silently apply to an account that changed in the meantime. See [`--plan-token`](#command-options).
+
+With a plan, resources that did not change are not written at all. Deploying the same code twice with `--plan` finds nothing to apply the second time.
+
+When a plan has nothing to create, update, delete or detach and no relation to prune, there is nothing to review, so the deploy asks for no confirmation, in a terminal and in agent or CI environments alike. It prints `No changes.` with the number of resources that match your code in place of the overview, and completes:
+
+```text Terminal
+$ npx checkly deploy --plan
+
+Parsing your project... ✅
+Validating project resources... ✅
+Bundling project resources... ✅
+Checking what would change... ✅
+
+No changes. All 13 resources in account "Monitoring as Code" match your code.
+
+Recording the deployment... ✅
+
+Project "Website Monitoring" is up to date. Checks were scheduled to run.
+```
+
+Such a deploy writes no resource. It still records the deployment with its Git information, schedules your checks unless you pass `--no-schedule-on-deploy`, and clears the mark the Checkly web app puts on a resource that was edited outside your code once your code agrees with that edit. Rows that announce no write are still listed above the sentence: a `!` row for a check or group with relations the project does not manage, and a `·` row for a `testOnly` check. `--plan --preview` prints the same sentence without a plan token, since there is no plan to pin, and `--dry-run` prints its envelope as usual.
+
+### The first plan of a project
+
+The first `checkly deploy --plan` of an existing project has no earlier planned deploy to compare with, and neither has the first one after any deploy without `--plan`, which writes every resource and records nothing to compare against. Such a deploy updates every resource it already deployed once to set a baseline: the plan compares your code with what is live in Checkly, lists each of those resources as an update whether or not anything differs, and counts them in a note under the overview.
+
+```text Terminal
+$ npx checkly deploy --plan --preview
+
+Deploy preview · Website Monitoring → account Monitoring as Code
+
+  ~ EmailAlertChannel  on-call-email     __checks__/alert-channels.ts
+  ~ ApiCheck           books-api         __checks__/api/books-api.check.ts
+  ~ BrowserCheck       homepage-browser  __checks__/browser/homepage.check.ts
+  ~ CheckGroupV2       storefront        __checks__/groups.ts
+
+4 resources are updated to set a baseline for --plan. Later deploys with --plan show only what changed.
+
+4 to update, 0 unchanged
+Deploy exactly this plan: checkly deploy --plan --plan-token v1.Q1uXFJQ9iWX5AGK5-VALMA
+```
+
+A resource that differs from what is live shows its diff under the overview as usual. The note counts the resources with no baseline, whatever the reason. Besides a project's very first plan and the first plan after a deploy without `--plan`, that is a resource added to the project with `checkly import`, which has no earlier plan to compare with either, and a baseline that a Checkly update made unusable.
+
+Such a plan is applied like any other: it has resources to write, so the deploy asks for confirmation, and in agent or CI environments the `confirmation_required` envelope lists them as updates, summing up the rest of a long plan as usual.
+
+<Warning>
+On these resources the plan shows the properties your code sets. A value that was set only in Checkly, on a property your code does not set, is not part of the comparison, and the deploy may reset it without the plan showing it. A deploy without `--plan` has always done the same. From the second planned deploy on, such an edit is reported as changed in Checkly before it is overwritten.
+</Warning>
+
+A deploy without `--plan` in between starts this over for the resources it wrote, so a project gets the most out of plans when every deploy uses `--plan`.
+
+The machine-readable plan marks each of these entries with `"basis": "live"`, so a script reading the `--dry-run` or `confirmation_required` envelope can tell them apart.
+
+### Updating your code with changes made in Checkly
+
+When the plan shows a resource that was edited in the Checkly web app or through the API, and the edit is on a property the CLI can write into your code, the prompt gets a third choice next to applying and cancelling:
+
+```text Terminal
+? Apply these changes? ›
+    Yes, apply these changes
+    Update my code with the changes made in Checkly (deploys nothing)
+  ❯ Cancel
+```
+
+Choosing it writes your account's current values into the construct files and ends the run without deploying, so you can review the result with `git diff` and run `checkly deploy --plan` again. Only what can be written without guessing is written, so a reason found once the file is read (listed below) can still leave nothing to write:
+
+- On every check: `name`, `description`, `activated`, `muted`, `shouldFail`, `tags`, `locations`, `frequency` and `alertEscalationPolicy`; `retryStrategy` on every check except agentic and Playwright checks, which do not take one. Also `degradedResponseTime` and `maxResponseTime` on API checks and URL, TCP, DNS, gRPC, SSL and traceroute monitors; the packet-loss thresholds on ICMP monitors; `period` and `grace` on heartbeat monitors, each written together with its unit; `environmentVariables` and `runtimeId` on API, browser, multistep and Playwright checks (a check that relied on the project-wide runtime gets the value pinned, like any other defaulted property); `sslCheckDomain` and `aiAutoRepairEnabled` on browser checks and `aiAutoRepairEnabled` on multistep checks; `prompt` on agentic checks (a multi-line prompt written as a template literal stays one); the `request` of an API check (`url`, `method`, `headers`, `queryParameters`, `body`, `bodyType`, `basicAuth`, `followRedirects`, `skipSSL`, `ipFamily`), URL monitor (`url`, `followRedirects`, `skipSSL`, `ipFamily`), TCP monitor (`hostname`, `port`, `data`, `ipFamily`), DNS monitor (`query`, `recordType`, `protocol`, and `nameServer` and `port`, written together), ICMP monitor (`hostname`, `pingCount`, `ipFamily`), gRPC monitor (`url`, `port`, `skipSSL`, `timeout`, `ipFamily` and the `grpcConfig` keys, except `metadata`, whose values Checkly never returns), SSL monitor (`hostname`, `port`, `ipFamily` and the `sslConfig` keys) or traceroute monitor (every key); and the `request.assertions` of an API check and of every URL, TCP, DNS, gRPC, SSL, ICMP and traceroute monitor. Agentic checks take no `shouldFail`.
+- On a check group: `name`, `activated`, `muted`, `tags`, `locations`, `concurrency`, `environmentVariables`, `runtimeId`, `retryStrategy`, `alertEscalationPolicy`, and `apiCheckDefaults` (`url`, `headers`, `queryParameters`, `basicAuth`, `assertions`).
+- On every alert channel: `sendRecovery`, `sendFailure`, `sendDegraded`, `sslExpiry` and `sslExpiryThreshold`, plus the channel's own properties: `address` on an email channel; `channel` on a Slack channel; `slackChannels` on a Slack app channel; `name`, `webhookType`, `template` and `method` on a webhook channel; `name`, `region` and `priority` on an Opsgenie channel; `account` and `serviceName` on a PagerDuty channel; `phoneNumber` and `name` on an SMS or phone call channel; `name` and `payload` on an MS Teams or incident.io channel; `name` on a Telegram channel. A credential (a webhook or Slack URL, an API key, a service key, a webhook secret, the values of `headers` and `queryParameters`) is never written, since Checkly does not return it; a channel's type, and the webhook type and method the MS Teams, Telegram and incident.io constructs fix, cannot change in the code; Telegram's `chatId`, `messageThreadId`, `payload` and `apiKey` are packed into the message template and URL, which the CLI does not unpack.
+- On a private location: `name`, `slugName` and `icon` (`proxyUrl` is never written).
+- On a dashboard: every property except `customCSS`, which is a stylesheet rather than a value; `tags` is written whole.
+- On a maintenance window: `name`, `tags`, `startsAt` and `endsAt` (written as `new Date('…')` from the timestamp Checkly reports, over an existing `new Date(…)` or a string), and `repeatInterval`, `repeatUnit` and `repeatEndsAt`, which are written together or not at all.
+- On a status page: `name`, `url`, `customDomain`, `logo`, `redirectTo`, `favicon` and `defaultTheme`, and on a `StatusPageV3` also `logoDark`, `description`, `privacyPolicyLink`, `termsOfServiceLink`, `supportLink`, `footerText`, `googleAnalyticsTag`, `allowIndexing` and each colour of `themeColors` (a colour under `light` or `dark` is added only when your code already has that object). The `cards` of a `StatusPage` hold services and are not written.
+- On a status page service: `name`. On a `StatusPageV3Component`: `type`, `name`, `description`, `hidden`, `displayOrder`, `showHistoricalData` and `expandedByDefault` (its page and parent are references). On a `StatusPageV3AutomationRule`: `name`, `enabled`, `firstUpdate`, `lastUpdate`, `notifySubscribers`, `tags` and `coolDownMinutes` (its page and components are references).
+- The construct has to be declared as `new ApiCheck('logical-id', { … })` in a JavaScript or TypeScript file, with the class imported by name from `checkly/constructs` or destructured from a top-level `require` of it (a namespace import or a re-export from your own module is not recognised) and its options written out as an object literal. An existing value is replaced only when it is itself a literal (a string, number or boolean, or an array or object of those) or, for the properties below, an expression on the same helper whose arguments are literals; a property the code does not set is added after the last one of the object that holds it (`request` itself has to exist for `request.body` to be added), in the file's own quoting and indentation. Nothing else in the file is touched. The file searched is the one the CLI was loading when the construct was created, so a construct declared in a module that several files import (a common layout for alert channels and status pages) is looked for in the first file that imported it, where the lookup fails and the construct is listed as not updated.
+- `frequency`, `retryStrategy`, `alertEscalationPolicy` and `assertions` are written the way `checkly import` spells them: `Frequency.EVERY_30S` (a whole-minute schedule stays a number where your code uses one), `RetryStrategyBuilder.fixedStrategy({ maxRetries: 3 })`, `AlertEscalationBuilder.runBasedEscalation(3, …)`, `AssertionBuilder.statusCode().equals(200)` and the corresponding builder of each monitor type. A helper the file does not import yet is added to its `import { … } from 'checkly/constructs'` (or to its `const { … } = require('checkly/constructs')`), which the output reports as well. A check group of the `CheckGroupV2` class moved to the global alert policy gets `alertEscalationPolicy: 'global'`.
+
+A change that was also made in your code since the last deploy is written over it, and the output notes it as `replaced a local edit`; a list such as `tags` or `assertions` that your code changed too is left alone instead, since the CLI cannot merge the two. Every change that cannot be written is listed under `Not updated · edit these by hand`, per resource, with its reason; the usual ones are a reference to another resource (alert channels, private locations, a group, a status page's services, components or parent), an incident trigger (Checkly does not report its settings), a secret or a locked variable that Checkly does not return, a script or code bundle, `doubleCheck` (replaced by `retryStrategy`, whether or not a retry strategy sits beside it) and `runParallel`, the offset of a whole-minute schedule (Checkly assigns it), a property your code also changed, a helper call holding a variable, a check or a `CheckGroup` on the global alert policy or a group without a policy of its own (remove `alertEscalationPolicy` by hand; nothing is ever removed from your code), a retry strategy, alert policy or assertion this CLI version cannot spell, a helper name your file already uses for something else, a file with no `checkly/constructs` import to add a helper to, options built from a variable or a spread, or a construct the CLI cannot locate in the file (its id is computed, two constructs share it, or it is declared in a module several files import). TypeScript and JSX files need `typescript` installed in the project, as TypeScript check files already do.
+
+The CLI then prints what it wrote in the layout of the plan: a header per resource with its construct, logical ID and file, and under it a diff of the construct's source as it was against as it is now, followed by `~` notes for each helper it imported and each local edit it replaced.
+
+```text Terminal
+Updated your code · 2 properties in 1 file
+
+~ ApiCheck homepage-api  __checks__/homepage-api.check.ts
+    export const homepageApi = new ApiCheck('homepage-api', {
+      name: 'Homepage API',
+  -   frequency: Frequency.EVERY_5M,
+  +   frequency: Frequency.EVERY_10M,
+      retryStrategy: RetryStrategyBuilder.fixedStrategy({
+        baseBackoffSeconds: 60,
+  -     maxRetries: 2,
+  +     maxRetries: 3,
+      }),
+    })
+
+Not updated · edit these by hand
+
+! ApiCheck homepage-api  __checks__/homepage-api.check.ts
+    groupId  references another resource
+
+Nothing was deployed. Review with `git diff`, then run `npx checkly deploy --plan` again.
+```
+
+A helper-spelled property is written as the whole expression, in the spelling `checkly import` uses, so the diff can show more lines than the one value that changed when your formatting differs from it.
+
+There is no flag for the choice, and the `confirmation_required` envelope does not change.
+
+<Note>
+When Checkly cannot provide a plan, the CLI warns that it could not get one, for example `Could not check what this deploy would change` or `Checkly has deploy plans switched off at the moment`, and deploys without one, which is what a deploy without `--plan` does on purpose. Without a plan, a deploy that deletes removed resources finds them with a dry run and lists them in the confirmation; with `--preserve-resources` nothing is listed. Either way the code bundle is uploaded only after you confirm. `--plan-token` and `--prune-relations` need a plan and are refused without one.
+</Note>
 
 ## Command Options
+
+<ResponseField name="--cancel-in-progress-deployment" type="boolean">
+
+A deploy waits for a deployment of the same project that is still in progress. When that wait runs out, the CLI reports `A deployment for this project is still in progress.` Pass this flag to cancel the running deployment and deploy now instead of waiting.
+
+**Usage:**
+
+```bash Terminal
+npx checkly deploy --cancel-in-progress-deployment
+```
+
+</ResponseField>
 
 <ResponseField name="--config, -c" type="string">
 
@@ -48,11 +212,24 @@ npx checkly deploy -c="./checkly.staging.config.ts"
 
 </ResponseField>
 
+<ResponseField name="--dry-run" type="boolean">
+
+Print what the deploy would do as a JSON envelope and exit without deploying. Without `--plan`, the envelope lists the deploy's options and the resources it would delete. With `--plan`, it carries every resource the deploy would touch and, for each updated one, the changed properties with their values before and after, together with the plan token. A value longer than 256 characters (a script, a request body) is replaced by an `$omitted` marker carrying its length. A sensitive value is a `{ "$masked": "same" | "changed" }` marker, `changed` on the element whose secret moved. A change is flagged `secret: true` when a secret moved or when a sensitive list element has no counterpart on the other side (added, removed or renamed), in which case no marker reads `changed` and the list itself shows the difference. The deployed state itself is not included. Useful for scripts and agents that want to inspect a deploy before running it with `--plan-token`.
+
+**Usage:**
+
+```bash Terminal
+npx checkly deploy --dry-run
+npx checkly deploy --plan --dry-run
+```
+
+</ResponseField>
+
 <ResponseField name="--force, -f" type="boolean">
 
 Skip the interactive confirmation dialog and proceed with the operation.
 
-Use `--force` to set up automated CI/CD pipelines testing preview environments and deploying monitoring changes automatically.
+Use `--force` to set up automated CI/CD pipelines testing preview environments and deploying monitoring changes automatically. With `--plan`, a forced deploy still computes the plan; if the account changes while the code bundle is uploading, it plans again and deploys the current plan rather than failing the pipeline. A run pinned with `--plan-token` is refused instead, even with `--force`.
 
 **Usage:**
 
@@ -69,6 +246,7 @@ $ npx checkly deploy --force
 Parsing your project... ✅
 Validating project resources... ✅
 Bundling project resources... ✅
+Deploying project... ✅
 
 Successfully deployed project "Website Monitoring" to account "Monitoring as Code".
 ```
@@ -77,7 +255,7 @@ Successfully deployed project "Website Monitoring" to account "Monitoring as Cod
 
 <ResponseField name="--output, -o" type="boolean">
 
-Show applied differences after deploying, providing a summary of what was changed.
+Show the changes after deploying, in the same layout as [`--preview`](#command-options). With `--plan`, the output includes the diff of every updated resource and counts the unchanged ones; without it, every resource that already existed is listed as updated.
 
 **Usage:**
 
@@ -89,56 +267,108 @@ npx checkly deploy -o
 **Examples:**
 
 ```bash Terminal
-$ npx checkly deploy --output --force
+$ npx checkly deploy --plan --output --force
 
 Parsing your project... ✅
 Validating project resources... ✅
 Bundling project resources... ✅
+Checking what would change... ✅
+Deploying project... ✅
 
-Create:
-  UrlMonitor:: homepage-uptime
-  MultiStepCheck: auth-api-flow
+  ~ ApiCheck  homepage-api  __checks__/homepage.check.ts
+    12 unchanged
 
-Delete:
-  Check: legacy-api-check
+~ ApiCheck homepage-api  __checks__/homepage.check.ts
+    new ApiCheck('homepage-api', {
+      name: 'Homepage API',
+      request: {
+  -     url: 'https://example.com/health',
+  +     url: 'https://example.com/v2/health',
+        method: 'GET',
+      },
+    })
 
-Update and Unchanged:
-  SmsAlertChannel: sms-channel-1
+1 updated, 12 unchanged
 
 Successfully deployed project "Website Monitoring" to account "Monitoring as Code".
 ```
+
+</ResponseField>
+
+<ResponseField name="--[no-]plan" type="boolean" default="false">
+
+Ask Checkly for a plan before deploying, and deploy that plan. The plan compares every resource in your code, property by property, with what the project last deployed and with its current state in your account. The deploy then writes only the resources that differ, leaves the others alone, and refuses to run if your account changed after the plan was made. See [How a deploy previews its changes](#how-a-deploy-previews-its-changes).
+
+Without `--plan`, a deploy writes every resource the project declares. An edit made to one of them in the Checkly web app or through the API is overwritten without being reported.
+
+`--plan` is off by default and will become the default in the next major version of the CLI. `--no-plan` states today's default explicitly, so a pipeline that passes it keeps its behavior across that upgrade.
+
+If Checkly cannot provide a plan, the CLI says so and deploys without one, unless the run also passed `--plan-token` or `--prune-relations`, in which case nothing is deployed.
+
+**Usage:**
+
+```bash Terminal
+npx checkly deploy --plan
+npx checkly deploy --plan --force
+npx checkly deploy --no-plan
+```
+
+</ResponseField>
+
+<ResponseField name="--plan-token" type="string">
+
+Deploy exactly the plan an earlier `checkly deploy --plan --preview` or `--plan --dry-run` showed. The token is a fingerprint of your account's state at that time; if anything changed since, the deploy refuses and nothing is deployed, instead of overwriting an edit nobody reviewed. Run `checkly deploy --plan --preview` again to see the current plan and get a fresh token. Requires `--plan`.
+
+**Usage:**
+
+```bash Terminal
+npx checkly deploy --plan --plan-token v1.Yq2PnD7Kzx0m8sVxLh4cQw
+```
+
 </ResponseField>
 
 <ResponseField name="--preview, -p" type="boolean">
 
-Show a preview of the changes that would be made by the deploy command.
+Show a preview of the changes that would be made by the deploy command, without deploying. With `--plan`, every updated resource is printed with a diff of its construct as it is in your account against as it is in your code, and the plan token is printed at the end.
 
 **Usage:**
 
 ```bash Terminal
 npx checkly deploy --preview
 npx checkly deploy -p
+npx checkly deploy --plan --preview
 ```
 
 **Examples**
 
 ```bash Terminal
-$ npx checkly deploy --preview
+$ npx checkly deploy --plan --preview
 
 Parsing your project... ✅
 Validating project resources... ✅
 Bundling project resources... ✅
+Checking what would change... ✅
 
-Create:
-  UrlMonitor:: homepage-uptime
-  MultiStepCheck: auth-api-flow
+Deploy preview · Website Monitoring → account Monitoring as Code
 
-Delete:
-  Check: legacy-api-check
+  + MultiStepCheck   auth-api-flow     __checks__/auth-api-flow.check.ts
+  + UrlMonitor       homepage-uptime   __checks__/homepage-uptime.check.ts
+  ~ SmsAlertChannel  sms-channel-1     __checks__/alert-channels.ts
+  - Check            legacy-api-check  permanently deleted, run history lost
+    12 unchanged
 
-Update and Unchanged:
-  SmsAlertChannel: sms-channel-1
+~ SmsAlertChannel sms-channel-1  __checks__/alert-channels.ts
+    export const smsChannel1Alert = new SmsAlertChannel('sms-channel-1', {
+      name: 'On-call phone',
+  -   phoneNumber: '+31612345678',
+  +   phoneNumber: '+31687654321',
+    })
+
+2 to create, 1 to update, 1 to delete, 12 unchanged
+Deploy exactly this plan: checkly deploy --plan --plan-token v1.Yq2PnD7Kzx0m8sVxLh4cQw
 ```
+
+The lines printed under an updated resource are described in [How a deploy previews its changes](#how-a-deploy-previews-its-changes).
 
 </ResponseField>
 
@@ -154,22 +384,33 @@ This mirrors [`checkly destroy --preserve-resources`](/cli/checkly-destroy), but
 npx checkly deploy --preserve-resources
 ```
 
-In the deploy output, detached resources are listed under a `Detached (kept in account, now managed in the Checkly Webapp):` section instead of `Delete:`.
+In the deploy output, a detached resource keeps its `-` marker but is noted `kept in your Checkly account, now managed from the Checkly web app` instead of being reported as deleted; see [Deleting vs. detaching removed resources](#deleting-vs-detaching-removed-resources).
+
+</ResponseField>
+
+<ResponseField name="--prune-relations" type="boolean">
+
+Alert channel subscriptions and private location assignments can be added to a check or group from the Checkly web app, outside your code. A deploy leaves those alone and reports them as relations the project does not manage. Pass `--prune-relations` to delete them, so the check or group ends up with exactly the alert channels and private locations your code declares. Requires `--plan`, which is what finds those relations and lists them before anything is deleted.
+
+Without the flag, a check or group whose only reported change is such a relation gets a `!` row noted `has alert channels or private locations this project does not manage (pass --plan --prune-relations to delete them)`. With it, every relation to be deleted gets its own `-` row noted `relation not managed by this project, deleted by --prune-relations`, and is named in the confirmation, so you can see what goes before it does.
+
+**Usage:**
+
+```bash Terminal
+npx checkly deploy --plan --prune-relations
+```
 
 </ResponseField>
 
 <ResponseField name="--[no-]schedule-on-deploy" type="boolean" default="true">
 
-Prevent checks from running automatically when they are deployed.
+Checks are scheduled to run as soon as they are deployed. Pass `--no-schedule-on-deploy` to deploy them without scheduling, which is useful when you want to deploy changes but delay monitoring execution until later.
 
 **Usage:**
 
 ```bash Terminal
-npx checkly deploy --schedule-on-deploy
 npx checkly deploy --no-schedule-on-deploy
 ```
-
-Useful when you want to deploy changes but delay monitoring execution until later.
 
 Checks that run more often than the minimum frequency are not scheduled, and a deploy with more checks than the scheduling threshold schedules none of them, even with `--schedule-on-deploy`. See `--schedule-on-deploy-min-frequency` and `--schedule-on-deploy-threshold`.
 
@@ -227,42 +468,73 @@ Runtime-dependent checks run in a specific runtime with a pre-defined set of dep
 
 </ResponseField>
 
+<ResponseField name="--verbose, -v" type="boolean">
+
+Show the name and the ID of every created and updated resource in the deploy output. Implies `--output`, so the changes are printed after the deploy, with their diffs.
+
+**Usage:**
+
+```bash Terminal
+npx checkly deploy --verbose
+npx checkly deploy -v
+```
+
+</ResponseField>
+
 ## Deleting vs. detaching removed resources
 
 When you remove a resource from your code and deploy, the CLI reconciles your account with your local configuration. By default, resources that no longer exist in code are **deleted** from your account, which also **permanently deletes their run history**.
 
-Before performing any deletes, a non-forced `checkly deploy` first lists the resources that would be permanently deleted and asks you to confirm:
+A non-forced `checkly deploy` lists the resources it is about to delete and asks you to confirm. With `--plan` it shows you the whole plan instead, with the same overview and diffs as [`--preview`](#command-options) but without the `Deploy exactly this plan` line since this run already pins the token, and asks you to apply it:
 
 ```bash Terminal
-$ npx checkly deploy
+$ npx checkly deploy --plan
 
-The following resources were removed from code and will be DELETED, losing their run history:
-    Check: legacy-api-check
+Parsing your project... ✅
+Validating project resources... ✅
+Bundling project resources... ✅
+Checking what would change... ✅
 
-Pass --preserve-resources to detach and keep them (and their run history) instead.
+Deploy preview · Website Monitoring → account Monitoring as Code
+
+  ~ ApiCheck  homepage-api      __checks__/homepage-api.check.ts
+  - Check     legacy-api-check  permanently deleted, run history lost
+    12 unchanged
+
+~ ApiCheck homepage-api  __checks__/homepage-api.check.ts
+    export const homepageApi = new ApiCheck('homepage-api', {
+      name: 'Homepage API',
+  -   frequency: Frequency.EVERY_10M,
+  +   frequency: Frequency.EVERY_5M,
+    })
+
+1 to update, 1 to delete, 12 unchanged
 
 This will:
-  - Permanently delete 1 resource(s) removed from code, losing their run history
-  - Delete Check: legacy-api-check
+  - Deploy project "Website Monitoring" to account "Monitoring as Code"
+  - Schedule checks after deploy
+  - Delete any resources removed from code, losing their run history. Pass --preserve-resources to keep them in your Checkly account instead
 
-? Proceed? › (y/N)
+? Apply these changes? › (y/N)
 ```
 
-This confirmation is skipped when you pass `--force` (for CI/CD), and it does not appear when you pass `--preserve-resources`. In agent or CI environments the CLI instead returns a `confirmation_required` JSON envelope and exits with code `2` rather than prompting.
+This confirmation is skipped when you pass `--force` (for CI/CD), and when a plan has [nothing to apply](#how-a-deploy-previews-its-changes). In agent or CI environments the CLI instead returns a `confirmation_required` JSON envelope and exits with code `2` rather than prompting. With `--plan` the envelope carries the plan and its token, and names the command that deploys that exact plan. Its `changes` list deletions and detachments in full and created and updated resources up to 20, with the rest counted; the `--dry-run` envelope is capped the same way, while the `preview.diff` both carry is not.
 
 To keep removed resources and their run history, deploy with [`--preserve-resources`](#command-options). Instead of deleting them, the CLI **detaches** them — they remain in your Checkly account as regular account-level resources, managed from the UI, and can be re-attached later by adding them back to your code:
 
 ```bash Terminal
-$ npx checkly deploy --preserve-resources --output
+$ npx checkly deploy --plan --preserve-resources --output
 
-Detached (kept in account, now managed in the Checkly Webapp):
-    Check: legacy-api-check
+  - Check  legacy-api-check  kept in your Checkly account, now managed from the Checkly web app
+    12 unchanged
+
+1 kept in your account, 12 unchanged
 
 Successfully deployed project "Website Monitoring" to account "Monitoring as Code".
 ```
 
 <Note>
-Detach-on-deploy requires a recent Checkly backend. Against older backends, `--preserve-resources` still keeps your resources, but they may be reported under `Delete:` rather than `Detach:` in the deploy output.
+Detach-on-deploy requires a recent Checkly backend. Against older backends, `--preserve-resources` still keeps your resources, but the deploy output may report them as permanently deleted rather than as kept in your account.
 </Note>
 
 ## Git Integration

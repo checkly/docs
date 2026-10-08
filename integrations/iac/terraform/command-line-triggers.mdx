@@ -15,7 +15,8 @@ resource "checkly_trigger_check" "test-trigger-check" {
 }
 
 output "test-trigger-check-url" {
-  value = checkly_trigger_check.test-trigger-check.url  // This will output the trigger url
+  value     = checkly_trigger_check.test-trigger-check.url  // This will output the trigger url
+  sensitive = true
 }
 
 resource "checkly_trigger_group" "test-trigger-group" { // The id of the group to be triggered
@@ -23,8 +24,11 @@ resource "checkly_trigger_group" "test-trigger-group" { // The id of the group t
 }
 
 output "test-trigger-group-url" {
-  value = checkly_trigger_group.test-trigger-group.url  // This will output the trigger url
+  value     = checkly_trigger_group.test-trigger-group.url  // This will output the trigger url
+  sensitive = true
 }
 ```
+
+The trigger `url` and `token` contain a secret token, so the Checkly provider marks them as sensitive and Terraform requires any output that references them to set `sensitive = true`. Sensitive outputs are hidden in `terraform plan` and `terraform apply` output; read the value with `terraform output -raw test-trigger-check-url`.
 
 You can see all the configuration options for [group triggers](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/trigger_group), as well as more examples [check triggers](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/trigger_check), on the official Terraform registry documentation page.

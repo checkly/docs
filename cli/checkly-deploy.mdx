@@ -30,6 +30,7 @@ npx checkly deploy [options]
 | `--preserve-resources` | - | Detach resources removed from code (keeping them and their run history) instead of deleting them. |
 | `--[no-]schedule-on-deploy` | - | Enables automatic check scheduling after a deploy. |
 | `--schedule-on-deploy-threshold` | - | Schedule no checks after the deploy if it would schedule more than this many. Defaults to `auto`, which leaves the threshold to Checkly. |
+| `--schedule-on-deploy-min-frequency` | - | After the deploy, schedule only the checks that run every N minutes or less often; more frequent checks wait for their next scheduled run. Defaults to `auto`, which leaves the minimum to Checkly. |
 | `--[no-]verify-runtime-dependencies` | - | Return an error if checks import dependencies that are not supported by the selected runtime. |
 
 ## Command Options
@@ -170,13 +171,13 @@ npx checkly deploy --no-schedule-on-deploy
 
 Useful when you want to deploy changes but delay monitoring execution until later.
 
-A deploy with more checks than the scheduling threshold schedules none of them, even with `--schedule-on-deploy`. See `--schedule-on-deploy-threshold`.
+Checks that run more often than the minimum frequency are not scheduled, and a deploy with more checks than the scheduling threshold schedules none of them, even with `--schedule-on-deploy`. See `--schedule-on-deploy-min-frequency` and `--schedule-on-deploy-threshold`.
 
 </ResponseField>
 
 <ResponseField name="--schedule-on-deploy-threshold" type="number | auto" default="auto">
 
-The most checks a deploy may schedule to run right after it is deployed. A deploy with more checks than this schedules none of them, as if it were run with `--no-schedule-on-deploy`; the checks run at their next scheduled time instead. Heartbeat monitors are not counted, since they are never scheduled.
+The most checks a deploy may schedule to run right after it is deployed, not counting the ones `--schedule-on-deploy-min-frequency` leaves out. A deploy with more checks than this schedules none of them, as if it were run with `--no-schedule-on-deploy`; the checks run at their next scheduled time instead. Heartbeat monitors are not counted, since they are never scheduled.
 
 With `auto`, Checkly applies its default threshold of 500 checks. You can set any whole number up to 2000; a higher value fails the deploy.
 
@@ -187,6 +188,25 @@ npx checkly deploy --schedule-on-deploy-threshold=1000
 ```
 
 When Checkly does not schedule the checks of a deploy that asked for it, the CLI prints a warning saying so.
+
+</ResponseField>
+
+<ResponseField name="--schedule-on-deploy-min-frequency" type="number | auto" default="auto">
+
+After the deploy, schedule only the checks that run every N minutes or less often. More frequent checks are left out and run at their next scheduled time; they gain little from an extra run right after a deploy.
+
+The frequency is the one Checkly resolves for each check, including its defaults: an SSL or traceroute monitor without an explicit frequency runs every minute, so the default minimum leaves it out. Sub-minute checks count as running more often than every minute. Heartbeat monitors are never scheduled.
+
+With `auto`, Checkly applies its default minimum of 10 minutes. You can set any whole number up to 1440; a higher value fails the deploy. `0` schedules every check.
+
+When the minimum leaves checks out, the deploy says how many.
+
+**Usage:**
+
+```bash Terminal
+npx checkly deploy --schedule-on-deploy-min-frequency=5
+npx checkly deploy --schedule-on-deploy-min-frequency=0
+```
 
 </ResponseField>
 

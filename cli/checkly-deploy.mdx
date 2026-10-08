@@ -55,7 +55,7 @@ With `--plan`, `--preview` and `--output` print the plan as an overview of every
 
 - `+` create, `~` update, `-` delete. A deleted resource is noted `permanently deleted, run history lost`.
 - `-` with `kept in your Checkly account, now managed from the Checkly web app` for a resource removed from code that [`--preserve-resources`](#command-options) detaches instead of deleting.
-- `-` on a relation with `relation not managed by this project, deleted by --prune-relations`, and `!` on a check or group that has such relations when [`--prune-relations`](#command-options) is not passed.
+- `-` on a relation with `relation on Check <id> not managed by this project, deleted by --prune-relations` (or `CheckGroup`), naming the check or group it hangs off, and `!` on a check or group that has such relations when [`--prune-relations`](#command-options) is not passed.
 - `·` with `skipped (testOnly)` for checks marked `testOnly: true`, which are never deployed.
 - A closing `N unchanged` row counting the resources the deploy leaves alone.
 
@@ -65,7 +65,7 @@ Under the overview, every updated resource gets a header line with its type, log
 
 - The property's path, such as `/script:`, followed by a diff of two texts rather than of the construct, for a change that lives outside it: a browser or multi-step check's script, an API check's setup or teardown script.
 - A property Checkly stores encrypted, such as a locked environment variable, is shown inline with its value masked as `'********'`. The side that changed reads `'******** (changed)'`, or `'******** (changed in Checkly)'` on the deployed side. When the change cannot be shown inline, for example a secret that was renamed, the note `secret changed: <property>` names the property holding it instead.
-- `changed: code bundle` or `changed: dependency cache`, or one note naming both, for a resource whose only change is what it bundles.
+- `changed: <what>`, such as `changed: code bundle` or `changed: dependency cache, playwright version`, naming every cause in one note, for a change the plan reports by its cause rather than as a property: what the resource bundles or depends on, a setup or teardown snippet, its snapshots, its private locations.
 - `payload format changed (CLI upgrade)` when the only differences come from a newer CLI describing the same construct differently, such as a private location list or retry strategy being sent in a new form. The deploy rewrites the stored form and nothing about the resource changes.
 - A plain list of the changed properties when the CLI cannot render the resource as a construct.
 
@@ -131,10 +131,10 @@ The machine-readable plan marks each of these entries with `"basis": "live"`, so
 When the plan shows a resource that was edited in the Checkly web app or through the API, and the edit is on a property the CLI can write into your code, the prompt gets a third choice next to applying and cancelling:
 
 ```text Terminal
-? Apply these changes? ›
+? Apply these changes? › - Use arrow-keys. Return to submit.
     Yes, apply these changes
     Update my code with the changes made in Checkly (deploys nothing)
-  ❯ Cancel
+❯   Cancel
 ```
 
 Choosing it writes your account's current values into the construct files and ends the run without deploying, so you can review the result with `git diff` and run `checkly deploy --plan` again. Only what can be written without guessing is written, so a reason found once the file is read (listed below) can still leave nothing to write:
@@ -144,13 +144,13 @@ Choosing it writes your account's current values into the construct files and en
 - On every alert channel: `sendRecovery`, `sendFailure`, `sendDegraded`, `sslExpiry` and `sslExpiryThreshold`, plus the channel's own properties: `address` on an email channel; `channel` on a Slack channel; `slackChannels` on a Slack app channel; `name`, `webhookType`, `template` and `method` on a webhook channel; `name`, `region` and `priority` on an Opsgenie channel; `account` and `serviceName` on a PagerDuty channel; `phoneNumber` and `name` on an SMS or phone call channel; `name` and `payload` on an MS Teams or incident.io channel; `name` on a Telegram channel. A credential (a webhook or Slack URL, an API key, a service key, a webhook secret, the values of `headers` and `queryParameters`) is never written, since Checkly does not return it; a channel's type, and the webhook type and method the MS Teams, Telegram and incident.io constructs fix, cannot change in the code; Telegram's `chatId`, `messageThreadId`, `payload` and `apiKey` are packed into the message template and URL, which the CLI does not unpack.
 - On a private location: `name`, `slugName` and `icon` (`proxyUrl` is never written).
 - On a dashboard: every property except `customCSS`, which is a stylesheet rather than a value; `tags` is written whole.
-- On a maintenance window: `name`, `tags`, `startsAt` and `endsAt` (written as `new Date('…')` from the timestamp Checkly reports, over an existing `new Date(…)` or a string), and `repeatInterval`, `repeatUnit` and `repeatEndsAt`, which are written together or not at all.
+- On a maintenance window: `name`, `timezone`, `pauseAllChecks`, `silenceAllAlerts`, `tags`, `silenceAlertsTags`, `startsAt` and `endsAt` (written as `new Date('…')` from the timestamp Checkly reports, over an existing `new Date(…)` or a string), and `repeatInterval`, `repeatUnit` and `repeatEndsAt`, which are written together or not at all.
 - On a status page: `name`, `url`, `customDomain`, `logo`, `redirectTo`, `favicon` and `defaultTheme`, and on a `StatusPageV3` also `logoDark`, `description`, `privacyPolicyLink`, `termsOfServiceLink`, `supportLink`, `footerText`, `googleAnalyticsTag`, `allowIndexing` and each colour of `themeColors` (a colour under `light` or `dark` is added only when your code already has that object). The `cards` of a `StatusPage` hold services and are not written.
 - On a status page service: `name`. On a `StatusPageV3Component`: `type`, `name`, `description`, `hidden`, `displayOrder`, `showHistoricalData` and `expandedByDefault` (its page and parent are references). On a `StatusPageV3AutomationRule`: `name`, `enabled`, `firstUpdate`, `lastUpdate`, `notifySubscribers`, `tags` and `coolDownMinutes` (its page and components are references).
 - The construct has to be declared as `new ApiCheck('logical-id', { … })` in a JavaScript or TypeScript file, with the class imported by name from `checkly/constructs` or destructured from a top-level `require` of it (a namespace import or a re-export from your own module is not recognised) and its options written out as an object literal. An existing value is replaced only when it is itself a literal (a string, number or boolean, or an array or object of those) or, for the properties below, an expression on the same helper whose arguments are literals; a property the code does not set is added after the last one of the object that holds it (`request` itself has to exist for `request.body` to be added), in the file's own quoting and indentation. Nothing else in the file is touched. The file searched is the one the CLI was loading when the construct was created, so a construct declared in a module that several files import (a common layout for alert channels and status pages) is looked for in the first file that imported it, where the lookup fails and the construct is listed as not updated.
 - `frequency`, `retryStrategy`, `alertEscalationPolicy` and `assertions` are written the way `checkly import` spells them: `Frequency.EVERY_30S` (a whole-minute schedule stays a number where your code uses one), `RetryStrategyBuilder.fixedStrategy({ maxRetries: 3 })`, `AlertEscalationBuilder.runBasedEscalation(3, …)`, `AssertionBuilder.statusCode().equals(200)` and the corresponding builder of each monitor type. A helper the file does not import yet is added to its `import { … } from 'checkly/constructs'` (or to its `const { … } = require('checkly/constructs')`), which the output reports as well. A check group of the `CheckGroupV2` class moved to the global alert policy gets `alertEscalationPolicy: 'global'`.
 
-A change that was also made in your code since the last deploy is written over it, and the output notes it as `replaced a local edit`; a list such as `tags` or `assertions` that your code changed too is left alone instead, since the CLI cannot merge the two. Every change that cannot be written is listed under `Not updated · edit these by hand`, per resource, with its reason; the usual ones are a reference to another resource (alert channels, private locations, a group, a status page's services, components or parent), an incident trigger (Checkly does not report its settings), a secret or a locked variable that Checkly does not return, a script or code bundle, `doubleCheck` (replaced by `retryStrategy`, whether or not a retry strategy sits beside it) and `runParallel`, the offset of a whole-minute schedule (Checkly assigns it), a property your code also changed, a helper call holding a variable, a check or a `CheckGroup` on the global alert policy or a group without a policy of its own (remove `alertEscalationPolicy` by hand; nothing is ever removed from your code), a retry strategy, alert policy or assertion this CLI version cannot spell, a helper name your file already uses for something else, a file with no `checkly/constructs` import to add a helper to, options built from a variable or a spread, or a construct the CLI cannot locate in the file (its id is computed, two constructs share it, or it is declared in a module several files import). TypeScript and JSX files need `typescript` installed in the project, as TypeScript check files already do.
+A change that was also made in your code since the last deploy is written over it, and the output notes it as `replaced a local edit`; a list such as `tags` or `assertions` that your code changed too is left alone instead, since the CLI cannot merge the two. Every change that cannot be written is listed under `Not updated · edit these by hand`, per resource, with its reason; the usual ones are a reference to another resource (alert channels, private locations, a group, a status page's services, components or parent), an incident trigger (Checkly does not report its settings), a secret or a locked variable that Checkly does not return, a script or code bundle, `doubleCheck` (replaced by `retryStrategy`; not listed when the retry strategy itself was written) and `runParallel`, the offset of a whole-minute schedule (Checkly assigns it), a property your code also changed, a helper call holding a variable, a check or a `CheckGroup` on the global alert policy or a group without a policy of its own (remove `alertEscalationPolicy` by hand; nothing is ever removed from your code), a retry strategy, alert policy or assertion this CLI version cannot spell, a helper name your file already uses for something else, a file with no `checkly/constructs` import to add a helper to, options built from a variable or a spread, or a construct the CLI cannot locate in the file (its id is computed, two constructs share it, or it is declared in a module several files import). TypeScript and JSX files need `typescript` installed in the project, as TypeScript check files already do.
 
 The CLI then prints what it wrote in the layout of the plan: a header per resource with its construct, logical ID and file, and under it a diff of the construct's source as it was against as it is now, followed by `~` notes for each helper it imported and each local edit it replaced.
 
@@ -214,7 +214,7 @@ npx checkly deploy -c="./checkly.staging.config.ts"
 
 <ResponseField name="--dry-run" type="boolean">
 
-Print what the deploy would do as a JSON envelope and exit without deploying. Without `--plan`, the envelope lists the deploy's options and the resources it would delete. With `--plan`, it carries every resource the deploy would touch and, for each updated one, the changed properties with their values before and after, together with the plan token. A value longer than 256 characters (a script, a request body) is replaced by an `$omitted` marker carrying its length. A sensitive value is a `{ "$masked": "same" | "changed" }` marker, `changed` on the element whose secret moved. A change is flagged `secret: true` when a secret moved or when a sensitive list element has no counterpart on the other side (added, removed or renamed), in which case no marker reads `changed` and the list itself shows the difference. The deployed state itself is not included. Useful for scripts and agents that want to inspect a deploy before running it with `--plan-token`.
+Print what the deploy would do as a JSON envelope and exit without deploying. Without `--plan`, the envelope lists the deploy's options and the resources it would delete. With `--plan`, it carries every resource in the plan, unchanged ones included and, for each updated one, the changed properties with their values before and after, together with the plan token. A value longer than 256 characters (a script, a request body) is replaced by an `$omitted` marker carrying its length. A sensitive value is a `{ "$masked": "same" | "changed" }` marker, `changed` on the element whose secret moved. A change is flagged `secret: true` when a secret moved or when a sensitive list element has no counterpart on the other side (added, removed or renamed), in which case no marker reads `changed` and the list itself shows the difference. The deployed state itself is not included. Useful for scripts and agents that want to inspect a deploy before running it with `--plan-token`.
 
 **Usage:**
 
@@ -279,7 +279,9 @@ Deploying project... ✅
     12 unchanged
 
 ~ ApiCheck homepage-api  __checks__/homepage.check.ts
-    new ApiCheck('homepage-api', {
+    - was live in Checkly   replaced or removed by the deploy
+    + now live in Checkly   added or changed by the deploy
+    export const homepageApi = new ApiCheck('homepage-api', {
       name: 'Homepage API',
       request: {
   -     url: 'https://example.com/health',
@@ -358,6 +360,8 @@ Deploy preview · Website Monitoring → account Monitoring as Code
     12 unchanged
 
 ~ SmsAlertChannel sms-channel-1  __checks__/alert-channels.ts
+    - live in Checkly   replaced or removed by this deploy
+    + in your code      added or changed by this deploy
     export const smsChannel1Alert = new SmsAlertChannel('sms-channel-1', {
       name: 'On-call phone',
   -   phoneNumber: '+31612345678',
@@ -390,9 +394,9 @@ In the deploy output, a detached resource keeps its `-` marker but is noted `kep
 
 <ResponseField name="--prune-relations" type="boolean">
 
-Alert channel subscriptions and private location assignments can be added to a check or group from the Checkly web app, outside your code. A deploy leaves those alone and reports them as relations the project does not manage. Pass `--prune-relations` to delete them, so the check or group ends up with exactly the alert channels and private locations your code declares. Requires `--plan`, which is what finds those relations and lists them before anything is deleted.
+Alert channel subscriptions and private location assignments can be added to a check or group from the Checkly web app, outside your code. A deploy leaves those alone, and with `--plan` reports them as relations the project does not manage. Pass `--prune-relations` to delete them, so the check or group ends up with exactly the alert channels and private locations your code declares. Requires `--plan`, which is what finds those relations and lists them before anything is deleted.
 
-Without the flag, a check or group whose only reported change is such a relation gets a `!` row noted `has alert channels or private locations this project does not manage (pass --plan --prune-relations to delete them)`. With it, every relation to be deleted gets its own `-` row noted `relation not managed by this project, deleted by --prune-relations`, and is named in the confirmation, so you can see what goes before it does.
+Without the flag, a check or group whose only reported change is such a relation gets a `!` row noted `has alert channels or private locations this project does not manage (pass --plan --prune-relations to delete them)`. With it, every relation to be deleted gets its own `-` row noted `relation on Check <id> not managed by this project, deleted by --prune-relations` (or `CheckGroup`), and is named in the confirmation, so you can see what goes before it does.
 
 **Usage:**
 
@@ -470,7 +474,7 @@ Runtime-dependent checks run in a specific runtime with a pre-defined set of dep
 
 <ResponseField name="--verbose, -v" type="boolean">
 
-Show the name and the ID of every created and updated resource in the deploy output. Implies `--output`, so the changes are printed after the deploy, with their diffs.
+Show the name and the ID of every created and updated resource in the deploy output. Implies `--output`, so the changes are printed after the deploy, with their diffs when run with `--plan`.
 
 **Usage:**
 
@@ -502,6 +506,8 @@ Deploy preview · Website Monitoring → account Monitoring as Code
     12 unchanged
 
 ~ ApiCheck homepage-api  __checks__/homepage-api.check.ts
+    - live in Checkly   replaced or removed by this deploy
+    + in your code      added or changed by this deploy
     export const homepageApi = new ApiCheck('homepage-api', {
       name: 'Homepage API',
   -   frequency: Frequency.EVERY_10M,

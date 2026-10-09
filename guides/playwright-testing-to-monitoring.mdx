@@ -223,7 +223,7 @@ Both variants from step 2 ran because the sample contains both. Open the session
 ## Step 4: Deploy
 
 ```bash Terminal
-npx checkly deploy
+npx checkly deploy --schedule-on-deploy
 ```
 
 ```text Terminal
@@ -241,7 +241,7 @@ Deploy preview · Docs guide: Playwright tests to monitors → account Checkly M
 
 This will:
   - Deploy project "Docs guide: Playwright tests to monitors" to account "Checkly Marketing"
-  - Schedule checks after deploy
+  - Schedule changed checks after deploy
   - Delete any resources removed from code, losing their run history. Pass --preserve-resources to keep them in your Checkly account instead
 
 ? Apply these changes? › (y/N) y
@@ -252,7 +252,7 @@ Deploying project... ✅
 Successfully deployed project "Docs guide: Playwright tests to monitors" to account "Checkly Marketing".
 ```
 
-The suite now runs on its schedule. The first run starts immediately with `CHECKLY_RUN_SOURCE=CLI_DEPLOY`, then every ten minutes from both locations. It appears in your check list as a Playwright check.
+The suite now runs on its schedule. Because of `--schedule-on-deploy`, the first run starts immediately with `CHECKLY_RUN_SOURCE=CLI_DEPLOY`, then every ten minutes from both locations. It appears in your check list as a Playwright check.
 
 <Frame>
   <img src="/images/guides/playwright-to-monitoring/check-list.png" alt="The Checkly check list showing the Shop critical flows Playwright check with its locations and pass rate" />

@@ -42,7 +42,7 @@ npx checkly deploy [options]
 
 ## How a deploy previews its changes
 
-A deploy works from a plan. Before it writes anything, `checkly deploy` asks Checkly what the deploy would change and shows you the plan. It prints the full preview (the overview of every resource it would create, update or delete, with the unchanged ones counted, and a diff of every updated resource) and then asks whether to apply the changes or cancel. While the plan is being checked nothing is uploaded, so cancelling at the prompt leaves your account untouched. In agent or CI environments the plan is returned as a `confirmation_required` envelope instead (see [Deleting vs. detaching removed resources](#deleting-vs-detaching-removed-resources)).
+A deploy works from a plan, from CLI version 10 on. Before it writes anything, `checkly deploy` asks Checkly what the deploy would change and shows you the plan. It prints the full preview (the overview of every resource it would create, update or delete, with the unchanged ones counted, and a diff of every updated resource) and then asks whether to apply the changes or cancel. While the plan is being checked nothing is uploaded, so cancelling at the prompt leaves your account untouched. In agent or CI environments the plan is returned as a `confirmation_required` envelope instead (see [Deleting vs. detaching removed resources](#deleting-vs-detaching-removed-resources)).
 
 <Note>
 `--no-plan` deploys without a plan: every resource your project declares is written, whether or not it changed, and the ones you removed from your code are deleted; see [`--[no-]plan`](#command-options). The rest of this section describes a deploy with a plan.

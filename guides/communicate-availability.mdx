@@ -274,7 +274,7 @@ Open `https://<your-url>.checkly-status-page.com`. Every component is operationa
 
 ## Verify it works
 
-Break the API check on purpose. In `checks/books-api.check.ts`, change `statusCode().equals(200)` to `statusCode().equals(201)` and run `npx checkly deploy`.
+Break the API check on purpose. In `checks/books-api.check.ts`, change `statusCode().equals(200)` to `statusCode().equals(201)` and run `npx checkly deploy --schedule-on-deploy`, so that the check runs right away instead of at its next scheduled time.
 
 When the sample was deployed that way, the first run failed, was retried twice 30 seconds apart, and the incident opened about a minute after the deploy. The page in the screenshot at the top of this guide is what customers saw: Catalog API in major outage, Storefront degraded, and the first update from the rule.
 
@@ -292,7 +292,7 @@ Once you know the cause, post it from the same session:
 Post an Identified update to that incident: "We found the cause: a bad deploy of the Catalog API. A fix is rolling out." Do not notify subscribers.
 ```
 
-The update goes straight to the public page, so read what your agent drafted before you let it post. Change the assertion back to `equals(200)` and deploy again. The next passing run resolves the incident with the rule's last update, and the incident page keeps the full timeline:
+The update goes straight to the public page, so read what your agent drafted before you let it post. Change the assertion back to `equals(200)` and run `npx checkly deploy --schedule-on-deploy` again. The next passing run resolves the incident with the rule's last update, and the incident page keeps the full timeline:
 
 <Frame>
   <img src="/images/guides/communicate-availability/incident-resolved.png" alt="Public incident page for Catalog API outage, lasted 1 minute, with Catalog API in major outage and Storefront in degraded performance on the component timeline, and three updates: Investigating from the automation rule, Identified posted through the MCP server, and Resolved from the automation rule" />

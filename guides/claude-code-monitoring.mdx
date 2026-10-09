@@ -333,33 +333,48 @@ In our example, we want to deploy a couple of checks at once, so it's worth chec
 npx checkly deploy -p
 ```
 
-This command won't deploy anything, just parse our project and show us what will be changed when we run the command without the preview flag. When you first run `deploy -p` you should just see a long list of created checks in the deployment command. For this tutorial, here's the preview of a more complex project state:
+This command won't deploy anything, just parse our project and show us what will be changed when we run the command without the preview flag. When you first run `deploy -p` you should just see a long list of created checks in the deployment command. For this tutorial, here's the preview of a project that was deployed before, after the two checks above were added, the homepage check's frequency was changed and a check was removed from the code:
 
 ```bash
 Bundling project resources... ✅
+Checking what would change... ✅
 
-Create:
-    BrowserCheck: __checks__/crime-category.spec.ts
-    BrowserCheck: __checks__/fantasy-category.spec.ts
-    BrowserCheck: __checks__/homepage-elements.spec.ts
-    BrowserCheck: __checks__/navigation-menu.spec.ts
-    BrowserCheck: __checks__/search-functionality.spec.ts
-    BrowserCheck: book-detail-visibility-check-v1
-    BrowserCheck: signup-form-elements-check-v1
+Deploy preview · Danube Web Shop → account Monitoring as Code
 
-Delete:
+  + BrowserCheck  book-detail-visibility-check-v1  __checks__/book-detail-visibility.check.ts
+  + BrowserCheck  signup-form-elements-check-v1    __checks__/signup-form-elements.check.ts
+  ~ BrowserCheck  homepage-check-v1                __checks__/homepage.check.ts
+  - Check         danube-web-shop-monitor          permanently deleted, run history lost
+    5 unchanged
 
-    Check: danube-web-shop-monitor
+~ BrowserCheck homepage-check-v1  __checks__/homepage.check.ts
+    - live in Checkly   replaced or removed by this deploy
+    + in your code      added or changed by this deploy
+    new BrowserCheck('homepage-check-v1', {
+      name: 'Homepage Check',
+      code: {
+        entrypoint: './homepage.spec.ts',
+      },
+  -   frequency: Frequency.EVERY_10M,
+  +   frequency: Frequency.EVERY_5M,
+      locations: [
+        'us-east-1',
+        'eu-west-1',
+      ],
+    ⋯
 
-Update and Unchanged:
-    BrowserCheck: __checks__/homepage.spec.ts
+2 to create, 1 to update, 1 to delete, 5 unchanged
+Deploy exactly this plan: checkly deploy --plan-token v1.Q1uXFJQ9iWX5AGK5-VALMA
 ```
 
 Let's discuss the output of this preview command in detail, as it's critical to understand how Checkly handles deployments from your project:
-* Checks that have no `.check.ts` config file are listed by their filename and will be named for their file name in the Checkly web UI. In general, it's better to include a config file for every check since it gives you explicit control of the check's logical ID. We've left out the config for five checks for demonstration purposes.
-* Checks with a config file are shown by their logical ID. 
+* Checks with a config file are shown by their logical ID. A check that has no `.check.ts` config file is listed by its filename and named for it in the Checkly web UI; the five unchanged checks here are of that kind. In general, it's better to include a config file for every check since it gives you explicit control of the check's logical ID.
 * Checks previously deployed from this project that are not present in this deployment will be deleted.
-* Checks with a matching logical ID from a previous deployment will be listed as "Update and Unchanged".
+* Checks with a matching logical ID from a previous deployment are marked `~` when something about them changed, and the preview shows a diff of the construct as it is live in Checkly against the one in your code. The ones that did not change are only counted. See [How a deploy previews its changes](/cli/checkly-deploy#how-a-deploy-previews-its-changes).
+
+<Note>
+A project deployed only with CLIs older than version 10 has no earlier plan to compare with. Its first planned deploy lists every existing resource as an update and says so under the overview: `N resources are updated to set a baseline. Later deploys show only what changed.` From the next deploy on, the preview looks like the one above. See [The first plan of a project](/cli/checkly-deploy#the-first-plan-of-a-project).
+</Note>
 
 If you're getting strange results from a preview of `deploy` and you're not sure why, it might be time to get in touch with the Checkly team. [Join our Slack](https://checklyhq.com/slack) for deployment advice! 
 

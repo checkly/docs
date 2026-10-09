@@ -93,8 +93,6 @@ new ApiCheck("api-check-1", {
 | `environmentVariables` | `object[]` | ❌ | `[]` | Group-level environment variables |
 | `concurrency` | `number` | ❌ | `10` | Number of concurrent Checks to run when a group is triggered |
 | `frequency` | `Frequency` | ❌ | - | How often to run checks within the group |
-| `localSetupScript` (deprecated) | `string` | ❌ | - | Code to run before each check/monitor in this group |
-| `localTearDownScript` (deprecated) | `string` | ❌ | - | Code to run after each check/monitor in this group |
 | `locations` | `string[]` | ❌ | - | Public locations for all checks in the group |
 | `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
 | `privateLocations` | `string[]` | ❌ | - | Private Location slugs |
@@ -104,6 +102,8 @@ new ApiCheck("api-check-1", {
 | `tags` | `string[]` | ❌ | `[]` | Tags to organize all checks in the group |
 | `browserChecks` | `object` | ❌ | - | Settings for Browser Checks in the group |
 | `multistepChecks` | `object` | ❌ | - | Settings for Multistep Checks in the group |
+
+<Note>Checkly CLI version 10 and later no longer include the deprecated group-level `localSetupScript` and `localTearDownScript` properties. Set [`setupScript` and `tearDownScript`](/constructs/api-check) on each `ApiCheck` in the group instead.</Note>
 
 ### Group Options
 

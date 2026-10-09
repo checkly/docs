@@ -35,7 +35,7 @@ npx checkly trigger [options]
 | `--retries` | - | How many times to retry a check run. |
 | `--tags, -t` | - | Filter the checks to be run using a comma separated list of tags. |
 | `--test-session-name, -n` | - | A name to use when recording results in Checkly. |
-| `--timeout` | - | A timeout (in seconds) to wait for each check to make progress: start running, report a retry attempt, or report its result. |
+| `--timeout` | - | A timeout (in seconds) to wait for each check to make progress once it starts running: report a retry attempt or its result. Checks that have not started yet get up to 900 additional seconds for server-side scheduling. |
 | `--verbose, -v` | - | Always show the full logs of the checks. |
 
 ## Command Options
@@ -362,9 +362,11 @@ Default: 0, Maximum: 3. Useful for handling transient failures.
 
 <ResponseField name="--timeout" type="number" default="600">
 
-A timeout (in seconds) to wait for each check to make progress: start running, report a retry attempt, or report its result.
+A timeout (in seconds) to wait for each check to make progress once it starts running: report a retry attempt or its result. Checks that have not started yet get up to 900 additional seconds for server-side scheduling.
 
 The timer restarts whenever a check starts running and whenever it reports a failed attempt that will be retried, so a check that retries several times can take longer than this value in total. The timeout only ends the wait when a check stops reporting progress.
+
+Checkly can stagger the start of checks in large test sessions by up to 900 seconds. If a check still has not started within this value plus that allowance, the CLI reports that the check did not start. That usually means a problem on Checkly's side: check [the status page](https://is.checkly.online) or contact support.
 
 **Usage:**
 

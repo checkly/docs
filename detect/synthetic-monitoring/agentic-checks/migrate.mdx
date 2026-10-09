@@ -27,7 +27,9 @@ You can create the replacement in two ways:
 </Accordion>
 
 <Note>
-If a Checkly CLI project manages the Agentic Check, create the replacement in that project instead: replace the `AgenticCheck` construct with a `BrowserCheck` or `MultiStepCheck` construct and deploy. [Checkly Skills](../../../ai/skills) help your agent write and test the check. Changes made in the Checkly app or through the MCP Server to a check that a CLI project manages are overwritten by its next deploy.
+If a Checkly CLI project manages the Agentic Check, create the replacement in that project instead: replace the `AgenticCheck` construct with a `BrowserCheck` or `MultiStepCheck` construct and deploy. A deploy deletes checks that are no longer in the project, so this deletes the Agentic Check together with its history instead of deactivating it. [Checkly Skills](../../../ai/skills) help your agent write and test the check. Changes made in the Checkly app or through the MCP Server to a check that a CLI project manages are overwritten by its next deploy.
+
+Checkly CLI version 10 and later no longer include the `AgenticCheck` construct. To keep managing existing Agentic Checks as code until December 1, 2026, stay on the version 9 release line. See the [Agentic Check construct reference](/constructs/agentic-check) for version 9.
 </Note>
 
 ## Create the replacement with your own AI agent

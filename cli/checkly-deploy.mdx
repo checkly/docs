@@ -34,7 +34,8 @@ npx checkly deploy [options]
 | `--preserve-resources` | - | Detach resources removed from code (keeping them and their run history) instead of deleting them. |
 | `--prune-relations` | - | Delete the alert channel subscriptions and private location assignments on this project's checks and groups that the project does not manage. Not available with `--no-plan`. |
 | `--[no-]schedule-on-deploy` | - | Enables automatic check scheduling after a deploy. |
-| `--schedule-on-deploy-threshold` | - | Schedule no checks after the deploy if it would schedule more than this many. Defaults to `auto`, which leaves the threshold to Checkly. |
+| `--schedule-on-deploy-scope` | - | Which checks to schedule after the deploy: `changed` (the default) schedules the checks the deploy created or updated, `all` also the ones it left unchanged. |
+| `--schedule-on-deploy-threshold` | - | Schedule no checks after the deploy if it would schedule more than this many, not counting the ones the scope and the minimum frequency leave out. Defaults to `auto`, which leaves the threshold to Checkly. |
 | `--schedule-on-deploy-min-frequency` | - | After the deploy, schedule only the checks that run every N minutes or less often; more frequent checks wait for their next scheduled run. Defaults to `auto`, which leaves the minimum to Checkly. |
 | `--[no-]verify-runtime-dependencies` | - | Return an error if checks import dependencies that are not supported by the selected runtime. |
 | `--verbose, -v` | - | Show resource names and IDs in the deploy output. Implies `--output`. |
@@ -87,10 +88,10 @@ No changes. All 13 resources in account "Monitoring as Code" match your code.
 
 Recording the deployment... ✅
 
-Project "Website Monitoring" is up to date. Checks were scheduled to run.
+Project "Website Monitoring" is up to date.
 ```
 
-Such a deploy writes no resource. It still records the deployment with its Git information, schedules your checks unless you pass `--no-schedule-on-deploy`, and clears the mark the Checkly web app puts on a resource that was edited outside your code once your code agrees with that edit. Rows that announce no write are still listed above the sentence: a `!` row for a check or group with relations the project does not manage, and a `·` row for a `testOnly` check. `--preview` prints the same sentence without a plan token, since there is no plan to pin, and `--dry-run` prints its envelope as usual.
+Such a deploy writes no resource. It still records the deployment with its Git information, schedules your checks if you pass `--schedule-on-deploy-scope=all` (by default a deploy schedules only the checks it changed, so this one schedules none and says nothing about scheduling), and clears the mark the Checkly web app puts on a resource that was edited outside your code once your code agrees with that edit. Rows that announce no write are still listed above the sentence: a `!` row for a check or group with relations the project does not manage, and a `·` row for a `testOnly` check. `--preview` prints the same sentence without a plan token, since there is no plan to pin, and `--dry-run` prints its envelope as usual.
 
 ### The first plan of a project
 
@@ -405,7 +406,7 @@ npx checkly deploy --prune-relations
 
 <ResponseField name="--[no-]schedule-on-deploy" type="boolean" default="true">
 
-Checks are scheduled to run as soon as they are deployed. Pass `--no-schedule-on-deploy` to deploy them without scheduling, which is useful when you want to deploy changes but delay monitoring execution until later.
+The checks the deploy created or updated are scheduled to run as soon as they are deployed; `--schedule-on-deploy-scope` widens that to every check. Pass `--no-schedule-on-deploy` to deploy them without scheduling, which is useful when you want to deploy changes but delay monitoring execution until later.
 
 **Usage:**
 
@@ -417,9 +418,23 @@ Checks that run more often than the minimum frequency are not scheduled, and a d
 
 </ResponseField>
 
+<ResponseField name="--schedule-on-deploy-scope" type="changed | all" default="changed">
+
+Which checks are scheduled to run right after the deploy. `changed` schedules the checks the deploy created or updated, including a check whose only change is one of its own alert channel subscriptions or private location assignments; `all` also schedules the checks the deploy left unchanged.
+
+A check whose group changed while the check itself did not counts as unchanged. `all` schedules checks the way every deploy did before this option existed.
+
+**Usage:**
+
+```bash Terminal
+npx checkly deploy --schedule-on-deploy-scope=all
+```
+
+</ResponseField>
+
 <ResponseField name="--schedule-on-deploy-threshold" type="number | auto" default="auto">
 
-The most checks a deploy may schedule to run right after it is deployed, not counting the ones `--schedule-on-deploy-min-frequency` leaves out. A deploy with more checks than this schedules none of them, as if it were run with `--no-schedule-on-deploy`; the checks run at their next scheduled time instead. Heartbeat monitors are not counted, since they are never scheduled.
+The most checks a deploy may schedule to run right after it is deployed, not counting the ones `--schedule-on-deploy-scope` and `--schedule-on-deploy-min-frequency` leave out. A deploy with more checks than this schedules none of them, as if it were run with `--no-schedule-on-deploy`; the checks run at their next scheduled time instead. Heartbeat monitors are not counted, since they are never scheduled.
 
 With `auto`, Checkly applies its default threshold of 500 checks. You can set any whole number up to 2000; a higher value fails the deploy.
 

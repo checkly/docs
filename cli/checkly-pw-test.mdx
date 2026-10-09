@@ -49,7 +49,7 @@ Define `checkly pw-test` specific options before the `--` separator:
 | `--reporter` | - | One or more custom reporters for the test output. Supports comma-separated values and repeated flags. |
 | `--stream-logs` | - | Stream logs from the test run to the console. |
 | `--test-session-name` | - | A name to use when storing results in Checkly |
-| `--timeout` | - | A timeout (in seconds) to wait for checks to complete. |
+| `--timeout` | - | A timeout (in seconds) to wait for each check to make progress: start running, report a retry attempt, or report its result. |
 | `--verbose` | - | Always show the full logs of the checks. |
 
 </Tab>
@@ -296,7 +296,9 @@ npx checkly pw-test --test-session-name="Daily regression suite"
 
 <ResponseField name="--timeout" type="number" default="600">
 
-Set a timeout (in seconds) to wait for checks to complete.
+A timeout (in seconds) to wait for each check to make progress: start running, report a retry attempt, or report its result.
+
+The timer restarts whenever a check starts running and whenever it reports a failed attempt that will be retried, so a check that retries several times can take longer than this value in total. The timeout only ends the wait when a check stops reporting progress.
 
 **Usage:**
 

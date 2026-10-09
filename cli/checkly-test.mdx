@@ -35,7 +35,7 @@ npx checkly test [arguments] [options]
 | `--retries` | - | How many times to retry a failing test run. |
 | `--tags, -t` | - | Filter the checks to be run using a comma separated list of tags. |
 | `--test-session-name, -n` | - | A name to use when recording results in Checkly. |
-| `--timeout` | - | A timeout (in seconds) to wait for checks to complete. |
+| `--timeout` | - | A timeout (in seconds) to wait for each check to make progress: start running, report a retry attempt, or report its result. |
 | `--update-snapshots, -u` | - | Update any snapshots using the actual result of this test run. |
 | `--verbose, -v` | - | Always show the full logs of the checks. |
 | `--[no-]verify-runtime-dependencies` | - | Return an error if checks import dependencies that are not supported by the selected runtime. |
@@ -274,6 +274,8 @@ npx checkly test --refresh-cache
 
 How many times to retry a failing test run. Default: 0, max: 3
 
+A check that passes after one or more retries still counts as passed, but the output shows how many retries it needed, for example `(2 retries)`, and the summary counts it as flaky.
+
 **Usage:**
 
 ```bash Terminal
@@ -310,7 +312,9 @@ npx checkly test -n="Nightly Test Run"
 
 <ResponseField name="--timeout" type="number" default="600">
 
-A timeout (in seconds) to wait for checks to complete.
+A timeout (in seconds) to wait for each check to make progress: start running, report a retry attempt, or report its result.
+
+The timer restarts whenever a check starts running and whenever it reports a failed attempt that will be retried, so a check that retries several times can take longer than this value in total. The timeout only ends the wait when a check stops reporting progress.
 
 **Usage:**
 

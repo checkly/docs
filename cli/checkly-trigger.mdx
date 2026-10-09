@@ -35,7 +35,7 @@ npx checkly trigger [options]
 | `--retries` | - | How many times to retry a check run. |
 | `--tags, -t` | - | Filter the checks to be run using a comma separated list of tags. |
 | `--test-session-name, -n` | - | A name to use when recording results in Checkly. |
-| `--timeout` | - | A timeout (in seconds) to wait for checks to complete. |
+| `--timeout` | - | A timeout (in seconds) to wait for each check to make progress: start running, report a retry attempt, or report its result. |
 | `--verbose, -v` | - | Always show the full logs of the checks. |
 
 ## Command Options
@@ -362,7 +362,9 @@ Default: 0, Maximum: 3. Useful for handling transient failures.
 
 <ResponseField name="--timeout" type="number" default="600">
 
-Timeout in seconds to wait for checks to complete.
+A timeout (in seconds) to wait for each check to make progress: start running, report a retry attempt, or report its result.
+
+The timer restarts whenever a check starts running and whenever it reports a failed attempt that will be retried, so a check that retries several times can take longer than this value in total. The timeout only ends the wait when a check stops reporting progress.
 
 **Usage:**
 

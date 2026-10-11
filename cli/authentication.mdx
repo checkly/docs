@@ -34,6 +34,20 @@ To log out and clear your stored credentials:
 npx checkly logout
 ```
 
+## Working with several accounts
+
+Your `checkly login` belongs to you, not to one account, so it works with every account you're a member of. Commands use your default account, which you choose when you log in and change with `checkly switch`.
+
+To use another account for a single command without changing the default, set `CHECKLY_ACCOUNT_ID` on that command:
+
+```bash Terminal
+CHECKLY_ACCOUNT_ID=a43... npx checkly test-sessions get <id>
+```
+
+`checkly whoami` lists your accounts and their IDs. When a lookup by ID finds nothing, the error names the account that was searched, so you can try another.
+
+`CHECKLY_ACCOUNT_ID` in your shell or a project's `.env` file works the same way for every command until you remove it, whatever your default is. A project can use this to pin its account while each developer logs in with their own `checkly login`. Without a stored login, the first command logs you in and then uses that account. `checkly whoami` shows when the variable picks the account, and `checkly switch` and `checkly login` warn that it takes precedence over the default they store. A variable set on the command line wins over the value in `.env`.
+
 ## From CI
 
 You can also authenticate using environment variables, which is useful for CI/CD pipelines and automated environments.
@@ -41,6 +55,8 @@ You can also authenticate using environment variables, which is useful for CI/CD
 You will need to export two environment variables in the shell:
 - `CHECKLY_API_KEY`
 - `CHECKLY_ACCOUNT_ID`
+
+Setting `CHECKLY_API_KEY` switches the CLI to API key credentials: it ignores any stored login, and `checkly login` refuses to run until you remove the variables. A `CHECKLY_ACCOUNT_ID` without `CHECKLY_API_KEY` only picks the account for your login (see above); in CI, where no login can happen, the CLI asks you to set `CHECKLY_API_KEY` as well.
 
 To get your API key, go to your Settings page in Checkly and grab a API key from [the API keys tab](https://app.checklyhq.com/settings/user/api-keys) and your Account ID from the [Account settings tab](https://app.checklyhq.com/settings/account/general).
 

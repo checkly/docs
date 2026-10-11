@@ -18,11 +18,20 @@ If you only have access to one account, this command will indicate no alternativ
 
 ## Usage
 
-The basic command displays available accounts and provides an interactive selection interface.
+The basic command displays available accounts and provides an interactive selection interface. It changes the default account: the one commands use from then on.
 
 ```bash Terminal
 npx checkly switch [options]
 ```
+
+Without a terminal to answer the menu, `checkly switch` lists the accounts instead:
+
+- In CI and other runs without a terminal, it fails with the available accounts and the `--account-id` command to use.
+- Under an AI agent, it prints a JSON line with the default account and the choices, so the agent can ask you which account to use.
+
+To use another account for a single command without changing the default, set `CHECKLY_ACCOUNT_ID` on that command instead. See [Working with several accounts](/cli/authentication#working-with-several-accounts).
+
+<Note>While `CHECKLY_ACCOUNT_ID` is set (on the command line, in your shell or in `.env`), commands use that account instead of the default. `checkly switch` still changes the stored default, and warns that the variable takes precedence.</Note>
 
 | Option | Required | Description |
 |--------|----------|-------------|
@@ -67,7 +76,7 @@ npx checkly switch
 npx checkly switch --account-id="a43....."
 
 # Output
-Account switched to "a43....."
+Account switched to Staging (a43.....)
 ```
 
 </Tab>

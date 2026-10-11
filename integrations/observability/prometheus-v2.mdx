@@ -191,6 +191,12 @@ The different histogram metrics can all be used to compute averages. For example
 sum by(type) (rate(checkly_browser_check_web_vitals_seconds_sum{name="Check Name"}[30m])) / sum by(type) (rate(checkly_browser_check_web_vitals_seconds_count{name="Check Name"}[30m]))
 ```
 
+<Note>
+The histogram metrics exposed by the Checkly exporter only ship a single `le="+Inf"` bucket — they don't include the finite bucket boundaries that `histogram_quantile()` needs. That means percentile queries such as `histogram_quantile(0.95, rate(checkly_api_check_timing_seconds_bucket[5m]))` will not return a useful value.
+
+Use the `_sum / _count` average pattern shown above for aggregations. If you need percentile-style latency signals, compute them in your alerting layer from the raw check run data rather than from the `_bucket` series.
+</Note>
+
 ## Heartbeat Metrics
 
 [Heartbeat monitors](/detect/uptime-monitoring/heartbeat-monitors/overview) are passive checks that wait for your scheduled jobs and automated processes to send a ping. The Prometheus exporter includes heartbeat checks in the standard `checkly_check_status` and `checkly_check_result_total` metrics, plus two heartbeat-specific gauges designed for [dead man's switch](https://en.wikipedia.org/wiki/Dead_man%27s_switch) alerting.

@@ -21,7 +21,8 @@ Before creating gRPC Monitors, ensure you have:
 
 - An initialized Checkly CLI project
 - The hostname and port of the gRPC service you want to monitor
-- In BEHAVIOR mode: the fully-qualified method name, and either server reflection enabled on the target or an inline `.proto` file
+- In BEHAVIOR mode: the fully-qualified method name and a service definition. Use server reflection, an inline `.proto` file, or a compiled FlatBuffers `.bfbs` schema.
+- For FlatBuffers: install the [`flatc` compiler](https://flatbuffers.dev/flatbuffers_guide_using_schema_compiler.html)
 
 For additional setup information, see [CLI overview](/cli/overview).
 </Accordion>
@@ -83,6 +84,47 @@ new GrpcMonitor('grpc-behavior-1', {
 ```
 
 </CodeGroup>
+
+## Use a FlatBuffers schema
+
+Checkly consumes a compiled binary FlatBuffers schema (`.bfbs`), not the source `.fbs` file. Compile your schema locally:
+
+```bash Terminal
+flatc -b --schema --bfbs-builtins schema.fbs
+```
+
+The command creates `schema.bfbs`. The `--bfbs-builtins` flag preserves attributes used for streaming and nested FlatBuffers fields. Load that binary file as base64 in your monitor:
+
+```ts grpc-flatbuffers.check.ts
+import { readFileSync } from 'node:fs'
+import { GrpcAssertionBuilder, GrpcMonitor } from 'checkly/constructs'
+
+new GrpcMonitor('grpc-flatbuffers', {
+  name: 'FlatBuffers gRPC service',
+  request: {
+    url: 'grpc.example.com',
+    port: 443,
+    grpcConfig: {
+      mode: 'BEHAVIOR',
+      tls: true,
+      encoding: 'FLATBUFFERS',
+      bfbsContent: readFileSync('schema.bfbs').toString('base64'),
+      method: 'example.Greeter/Greet',
+      message: JSON.stringify({ name: 'Checkly' }),
+    },
+    assertions: [
+      GrpcAssertionBuilder.statusCode().equals(0),
+      GrpcAssertionBuilder.responseTime().lessThan(1000),
+    ],
+  },
+})
+```
+
+<Note>
+Do not set `serviceDefinition` or `protoContent` for FlatBuffers. The compiled `bfbsContent` provides the service definition.
+</Note>
+
+Recompile the `.fbs` source whenever it changes. Checkly uploads the compiled `.bfbs` content and does not compile the source schema during a test or deployment.
 
 ## Configuration
 
@@ -155,9 +197,11 @@ gRPC-specific call configuration nested inside `request`.
 | `mode` | `string` | ❌ | `'BEHAVIOR'` | Monitoring mode: `'BEHAVIOR'` \| `'HEALTH'` |
 | `tls` | `boolean` | ❌ | `true` | Use TLS for the connection. Set to `false` for plaintext. |
 | `metadata` | `Array<{key: string, value: string}>` | ❌ | `[]` | gRPC metadata (request headers) sent with the call |
+| `encoding` | `string` | ❌ | `'PROTOBUF'` | Request and response encoding: `'PROTOBUF'` \| `'FLATBUFFERS'`. BEHAVIOR mode only. |
 | `method` | `string` | BEHAVIOR | - | Fully-qualified method: `package.Service/Method`. Required in BEHAVIOR mode. |
 | `serviceDefinition` | `string` | ❌ | `'REFLECTION'` | How to resolve the method schema: `'REFLECTION'` \| `'PROTO_FILE'`. BEHAVIOR mode only. |
 | `protoContent` | `string` | ❌ | - | Inline `.proto` file content. Required when `serviceDefinition` is `'PROTO_FILE'`. |
+| `bfbsContent` | `string` | FLATBUFFERS | - | Base64-encoded compiled `.bfbs` schema. Required when `encoding` is `'FLATBUFFERS'`. |
 | `message` | `string` | ❌ | - | JSON-encoded request payload. BEHAVIOR mode only. |
 | `service` | `string` | ❌ | - | Service name to health-check. HEALTH mode only. Leave empty to query overall server health. |
 

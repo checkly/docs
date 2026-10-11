@@ -101,6 +101,12 @@ Variables can be used in the following API checks fields:
 - Query parameters values
 - Basic authentication username and password
 
+#### Preserving special characters with triple brackets
+
+Double-bracket references are encoded before the request is sent. Characters such as `&`, `<`, `>`, `"`, and `'` are replaced with their encoded equivalents (for example, `&` becomes `&amp;`). This can break header values, API keys, and tokens that must be sent verbatim.
+
+Use triple brackets when the raw value must reach the target server unchanged. For example, if the value of an `X-API-Key` header stored in `USER_API_KEY` contains an ampersand, reference it as `{{{USER_API_KEY}}}` in the header value so the ampersand is not encoded.
+
 ### Using helpers and built-in variables
 
 Next to your own variables, we've added some built-in ones.

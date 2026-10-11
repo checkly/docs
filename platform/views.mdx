@@ -33,6 +33,8 @@ Each screen has its own views. A view saved on one screen doesn't show on anothe
 
 **Heartbeats:** you filter the list by typing in the filter field, for example `status:is:failing` or `availability:<:99.9`. **Period** and **Grace** compare durations such as `30s`, `5m`, `1h` or `1d`, and **Availability** compares the percentage for the selected time range. The time range is always set, so you can change it but not remove it.
 
+Filters join with **and** or **or**: click the word between two filters to switch it. To mix both, drop a filter onto another one to group them. A group has its own **and** or **or**: `status:is:failing and (period:>:1h or availability:<:99.9)` finds failing heartbeats that either expect a ping less often than hourly or are below 99.9% available. Drag filters to reorder them or to move them in and out of a group, and drag a group by its handle. A view saves the whole query.
+
 ## How views work
 
 - **All** is always the first tab and shows the list without filters.

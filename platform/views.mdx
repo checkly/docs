@@ -18,6 +18,7 @@ A view is a named set of filters for a list in the Checkly app. Views show as ta
 |--------|-----------------------|-------------|
 | Monitors | Search, Status, Check type, Tags, Traces, Project and the time range | Total, Passing, Degraded or Failing |
 | Test sessions | Search, Session status, Branch, User, Provider and the time range | None |
+| Heartbeats | Name, Status, Tags, Period, Grace, Availability and the time range | Total, Passing or Failing |
 
 Each screen has its own views. A view saved on one screen doesn't show on another.
 
@@ -29,6 +30,8 @@ Each screen has its own views. A view saved on one screen doesn't show on anothe
   <img className="block dark:hidden" src="/images/views/test-sessions-view-tabs.png" alt="Test sessions list with view tabs below the page tabs and the session filters underneath" />
   <img className="hidden dark:block" src="/images/views/test-sessions-view-tabs-dark.png" alt="Test sessions list with view tabs below the page tabs and the session filters underneath" />
 </Frame>
+
+**Heartbeats:** you filter the list by typing in the filter field, for example `status:is:failing` or `availability:<:99.9`. **Period** and **Grace** compare durations such as `30s`, `5m`, `1h` or `1d`, and **Availability** compares the percentage for the selected time range. The time range is always set, so you can change it but not remove it.
 
 ## How views work
 
@@ -66,7 +69,7 @@ When the filters on screen differ from the selected view, its tab shows a dot an
 
 ## View options
 
-Click **View options**, the three-dot button next to the search field, to act on the selected view. Right-click any tab to open the same menu for that view without switching to it.
+Click **View options**, the three-dot button next to the search field (the filter field on Heartbeats), to act on the selected view. Right-click any tab to open the same menu for that view without switching to it.
 
 The menu first says whether the view is private or who shared it. Then it lists the actions you're allowed to take:
 
@@ -168,6 +171,8 @@ On screens with counters, a view can show a number on its tab. Pick it in **View
 - **None**
 - **Total**: every check the view shows.
 - **Passing**, **Degraded** or **Failing**: the active checks in that state.
+
+On Heartbeats, the choices are **None**, **Total**, **Passing** and **Failing**.
 
 The selected tab counts what's on screen, including changes you haven't saved. Every other tab counts its saved filters. A count of zero shows nothing.
 

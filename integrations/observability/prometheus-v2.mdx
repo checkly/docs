@@ -88,6 +88,10 @@ checkly_check_status{name="Passing Browser Check",status="degraded"} 0
 
 `checkly_check_status` can be useful for viewing the current status of a check, whereas `checkly_check_result_total` can be useful for calculating overall statistics.
 
+<Note>
+`checkly_check_result_total` counts individual **check run results** over a 1-hour window and is intended for statistics and alerting, not for reconciling billing. Plan usage and billing are tracked separately in the Checkly app under [Billing](https://app.checklyhq.com/settings/account/billing) and via the CLI ([`checkly account plan`](/cli/checkly-account)), which report **active checks** and **check run volume** as measured by the billing system. A difference between this metric and your billing dashboard is expected — they measure different things.
+</Note>
+
 The metrics `checkly_browser_check_web_vitals_seconds`, `checkly_browser_check_errors`, `checkly_api_check_timing_seconds`, `checkly_tcp_monitor_timing_seconds`, `checkly_icmp_monitor_timing_seconds`, and `checkly_dns_monitor_timing_seconds` contain a `type` label.
 This label indicates the different Web Vitals, error types, and timing phases being measured.
 

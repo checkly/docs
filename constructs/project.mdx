@@ -198,7 +198,7 @@ export default defineConfig({
 | `privateLocations` | `string[]` | ❌ | `[]` | Default private locations for all checks |
 | `retryStrategy` | `object` | ❌ | - | Control the retry behavior for failed checks |
 | `runtimeId` | `string` | ❌ | - | Default runtime ID for all checks |
-| `shouldFail` | `boolean` | ❌ | `false` | Whether the behavior of when a check/alert is considered to fail is inverted. |
+| `shouldFail` | `boolean` | ❌ | `false` | Whether the behavior of when a check/alert is considered to fail is inverted. Only applies to API checks, URL monitors and TCP monitors. |
 | `tags` | `string[]` | ❌ | `[]` | Default tags applied to all checks |
 | `browserChecks` | `object` | ❌ | - | Default settings for browser checks |
 | `multiStepChecks` | `object` | ❌ | - | Default settings for multi-step checks |
@@ -348,6 +348,8 @@ export default defineConfig({
 ```
 
 <Tip>Find a list of [all public locations in the general documentation](/concepts/locations).</Tip>
+
+<Note>Give every check a location: set `locations` or `privateLocations` on the check or its group, or set a default with `checks.locations` or `checks.privateLocations`. A check without any location runs in a location chosen by Checkly, and since CLI version 10, `checkly deploy` and `checkly validate` warn about it. Heartbeat monitors and test-only checks don't need a location.</Note>
 
 </ResponseField>
 
@@ -603,7 +605,9 @@ export default defineConfig({
 | `pwProjects` | `string` \| `string[]` | ❌ | - | Projects to run from your configuration |
 | `pwTags` | `string` \| `string[]` | ❌ | - | Tags to filter tests using Playwright's grep functionality |
 | `include` | `string` \| `string[]` | ❌ | - | File patterns to include when bundling the test project |
-| `groupName` | `string` | ❌ | - | Name of the check group to assign this check to |
+| `group` | `CheckGroup` | ❌ | - | The CheckGroup this check suite belongs to |
+
+<Note>Checkly CLI version 10 and later no longer include the deprecated `groupName` option. Set `group` to the `CheckGroup` instead.</Note>
 
 </Tab>
 <Tab title="General Options">

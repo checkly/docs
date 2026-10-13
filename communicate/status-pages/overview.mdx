@@ -44,7 +44,7 @@ A component's status is set by open [incidents](/communicate/status-pages/incide
 
 Automation rules open and resolve incidents based on your checks. A rule matches failing checks by **tag**: when a check carrying one of the rule's tags fails, Checkly opens one incident impacting the components the rule lists, and resolves it when the check recovers.
 
-Manage rules on the **Automation** tab of your status page, or in code with the [`StatusPageV3AutomationRule`](/constructs/status-page-v3-automation-rule) construct.
+Manage rules on the **Automation** tab of your status page, or in code with the [`StatusPageV3AutomationRule`](/constructs/status-page-v3-automation-rule) construct or the [`checkly_status_page_v3_automation_rule`](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/status_page_v3_automation_rule) Terraform resource.
 
 <Note>
 Incident automation is available on Team and Enterprise plans. [View pricing](https://checklyhq.com/pricing)
@@ -67,6 +67,8 @@ A group shows the average uptime of its child components. Uptime is driven by in
 ## Monitoring as code
 
 Status pages, components, and automation rules can be fully managed with the Checkly CLI. See the [`StatusPageV3`](/constructs/status-page-v3) construct. `checkly import status-page:<id>` imports an existing page with its components and rules into your project.
+
+With [Terraform](/integrations/iac/terraform/overview), use the [`checkly_status_page_v3`](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/status_page_v3), [`checkly_status_page_v3_component`](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/status_page_v3_component), and [`checkly_status_page_v3_automation_rule`](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/status_page_v3_automation_rule) resources.
 
 ## Best practices
 

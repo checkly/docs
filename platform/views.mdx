@@ -1,0 +1,182 @@
+---
+title: 'Views'
+description: 'Save the filters of a list in the Checkly app as a named view, keep it private or share it with your account, and arrange your own views bar.'
+sidebarTitle: 'Views'
+canonical: 'https://www.checklyhq.com/docs/platform/views/'
+---
+
+A view is a named set of filters for a list in the Checkly app. Views show as tabs above the list's filters, so the lists you check most are one click away. Each view is private or shared with the account, and every member arranges their own tabs.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/views/monitors-view-tabs.png" alt="Monitors page with the All, Passing, Degraded and Failing view tabs and a private view, each showing a counter, above the filters" />
+  <img className="hidden dark:block" src="/images/views/monitors-view-tabs-dark.png" alt="Monitors page with the All, Passing, Degraded and Failing view tabs and a private view, each showing a counter, above the filters" />
+</Frame>
+
+## Where you can use views
+
+| Screen | Filters a view stores | Tab counter |
+|--------|-----------------------|-------------|
+| Monitors | Search, Status, Check type, Tags, Traces, Project and the time range | Total, Passing, Degraded or Failing |
+| Test sessions | Search, Session status, Branch, User, Provider and the time range | None |
+
+Each screen has its own views. A view saved on one screen doesn't show on another.
+
+**Monitors:** every account starts with shared [Passing, Degraded and Failing](#passing-degraded-and-failing-on-monitors) views, and each view can show a [counter](#counters) on its tab.
+
+**Test sessions:** the view tabs sit below the page tabs. The selected view and its filters stay when you switch between **Test Sessions** and **Error Groups**.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/views/test-sessions-view-tabs.png" alt="Test sessions list with view tabs below the page tabs and the session filters underneath" />
+  <img className="hidden dark:block" src="/images/views/test-sessions-view-tabs-dark.png" alt="Test sessions list with view tabs below the page tabs and the session filters underneath" />
+</Frame>
+
+## How views work
+
+- **All** is always the first tab and shows the list without filters.
+- Selecting a view replaces the filters on screen with the view's filters.
+- The arrow at the right end of the tab row hides or shows the filters. Your browser remembers the choice for each screen.
+
+## Create a view
+
+New views are private, so only you see them until you [share them](#private-and-shared-views).
+
+**From filters:** set filters while **All** is selected. They show as an **Unsaved view** tab. Click **Save as new view**, type a name and press Enter.
+
+**With New view:** click **New view** at the end of the tabs, type a name and press Enter. The new view stores the filters on screen.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/views/unsaved-view.png" alt="An Unsaved view tab next to All, with the Save as new view button next to the filters" />
+  <img className="hidden dark:block" src="/images/views/unsaved-view-dark.png" alt="An Unsaved view tab next to All, with the Save as new view button next to the filters" />
+</Frame>
+
+The **Unsaved view** goes away when you save it, clear its filters by choosing **All**, or choose another view.
+
+## Change a view's filters
+
+When the filters on screen differ from the selected view, its tab shows a dot and these buttons appear next to the filters:
+
+- **Reset** puts the view's saved filters back.
+- **Save as new** saves the current filters as a new private view.
+- **Save view** updates the view. It only shows when you can edit the view.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/views/view-changes.png" alt="A selected view with a changed filter, a dot on its tab, and the Reset, Save as new and Save view buttons" />
+  <img className="hidden dark:block" src="/images/views/view-changes-dark.png" alt="A selected view with a changed filter, a dot on its tab, and the Reset, Save as new and Save view buttons" />
+</Frame>
+
+## View options
+
+Click **View options**, the three-dot button next to the search field, to act on the selected view. Right-click any tab to open the same menu for that view without switching to it.
+
+The menu first says whether the view is private or who shared it. Then it lists the actions you're allowed to take:
+
+- **Counter** picks the number the tab shows, on screens that have [counters](#counters).
+- **Rename** edits the name in place. Double-clicking a tab does the same.
+- **Move left** and **Move right** reorder your bar.
+- **Hide from bar** or **Show in bar**.
+- **Share with account** or **Make private**.
+- **Delete**. Deleting a shared view asks for confirmation, because it removes the view for everyone.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/views/view-options-menu.png" alt="The View options menu of a private view, with the Counter submenu open and Failing selected" />
+  <img className="hidden dark:block" src="/images/views/view-options-menu-dark.png" alt="The View options menu of a private view, with the Counter submenu open and Failing selected" />
+</Frame>
+
+## Private and shared views
+
+A **private** view belongs to you. You can rename it, change its filters, or delete it, and nobody else sees it.
+
+A view **shared with the account** shows in the bar of every member who can see shared views. To share one of your private views, choose **Share with account** in its menu.
+
+**Make private** turns a shared view back into a private one. It goes back to the member who shared it if they're still in the account. Otherwise it becomes yours.
+
+If a teammate deletes the view you're looking at, or makes it private, its filters stay on screen as an **Unsaved view**.
+
+### Permissions
+
+Your own private views and the order of your bar need no permission. Shared views need these:
+
+| Permission | What it allows | Built-in roles |
+|------------|----------------|----------------|
+| View shared views | See the views shared with the account, on their screens and in **Account settings > Views** | All roles |
+| Share views | Share one of your own views with the account | Owner, Admin, Read & Write |
+| Edit shared views | Rename shared views and change their filters and counter | Owner, Admin, Read & Write |
+| Delete shared views | Delete shared views, or make one private again | Owner, Admin, Read & Write |
+
+Custom roles can grant these permissions one by one. They're listed under **Shared views**. See [Team member roles](/admin/team-management/overview#team-member-roles) for the built-in roles.
+
+## Arrange your bar
+
+Your bar is yours. Reordering or hiding views only changes what you see, never what your teammates see.
+
+- **Reorder:** drag a tab, or use **Move left** and **Move right**. **All** and the **Unsaved view** stay where they are.
+- **Hide:** choose **Hide from bar**. Hiding the selected view switches you back to **All**.
+- **Find hidden views:** open the menu at the end of the tabs, labeled with the number of views it holds, such as **+3**. Hidden views are listed under **Hidden**. Tabs that don't fit the width of the screen are listed there too.
+- **Show a hidden view:** select it in that menu. It shows as a tab right after **All** until you choose another view. To keep it in the bar, choose **Show in bar** or drag its tab into place.
+
+Right-clicking a view in that menu opens its options too.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/views/more-menu.png" alt="The menu at the end of the view tabs, listing views that don't fit and two views under Hidden" />
+  <img className="hidden dark:block" src="/images/views/more-menu-dark.png" alt="The menu at the end of the view tabs, listing views that don't fit and two views under Hidden" />
+</Frame>
+
+<Note>
+On a phone, the tabs scroll sideways. Press and hold a tab to drag it, and use **View options** instead of right-clicking.
+</Note>
+
+## Share a link to a view
+
+The URL holds the selected view and every filter it applies. Copy it from your browser to send the same list to anyone in the account, even when the view is private.
+
+- **A view you can see** opens selected. If the link's filters differ from the view's saved filters, the view shows as changed: **Reset** puts the saved filters back, and **Save view** stores the link's filters in the view if you can edit it.
+- **A view you can't see**, such as another member's private view or a deleted view, opens as the **Unsaved view** with the link's filters. Click **Save as new view** to keep them as your own private view.
+- **A link that names only the view**, like the one **Open** uses in Account settings > Views, opens the view with its saved filters. So does a link that adds only a time range, except that the link's range replaces the view's.
+
+After you save a view, the address bar shows the view and its filters in their shortest form. Following a view link adds one entry to your browser history, so **Back** returns to the page you opened it from.
+
+## Manage shared views
+
+**Account settings > Views** lists every view shared with the account, across all screens, with its filters, who shared it and when it last changed. Search by name, or filter by **Page** and **Shared by**.
+
+**Shared by** shows **Checkly** for the views every account starts with, and **Former member** for views shared by someone who has left the account.
+
+Each view's menu has:
+
+- **Open** takes you to the view's screen with the view selected and its filters applied.
+- **Rename**, with **Edit shared views**.
+- **Delete**, with **Delete shared views**.
+
+Private views don't appear here. The page is available to members with **View shared views**.
+
+<Frame>
+  <img className="block dark:hidden" src="/images/views/account-settings-views.png" alt="Account settings Views page with a table of shared views showing their name, page, filters, who shared them and when they were last updated" />
+  <img className="hidden dark:block" src="/images/views/account-settings-views-dark.png" alt="Account settings Views page with a table of shared views showing their name, page, filters, who shared them and when they were last updated" />
+</Frame>
+
+## Limits
+
+- Each member can keep **10 private views** per screen. At the limit, **New view** and **Save as new** are disabled. Sharing a view frees a slot.
+- Each account can have **10 shared views** per screen.
+- Making a shared view private fails if the member it goes to already has 10 private views on that screen.
+- View names can be up to 200 characters.
+
+## Counters
+
+On screens with counters, a view can show a number on its tab. Pick it in **View options > Counter**. On Monitors, the choices are:
+
+- **None**
+- **Total**: every check the view shows.
+- **Passing**, **Degraded** or **Failing**: the active checks in that state.
+
+The selected tab counts what's on screen, including changes you haven't saved. Every other tab counts its saved filters. A count of zero shows nothing.
+
+New views start with no counter. The counter is part of the view, so everyone sees the same counter on a shared view, and changing it needs **Edit shared views**.
+
+Test sessions has no counters.
+
+## Passing, Degraded and Failing on Monitors
+
+Every account starts with three shared views on Monitors: **Passing**, **Degraded** and **Failing**. Each one filters on its status and counts those checks on its tab.
+
+They behave like any other shared view. You can rename them, change their filters or counter, hide them from your bar, or delete them. A deleted one doesn't come back, but you can recreate it from the **Status** filter.

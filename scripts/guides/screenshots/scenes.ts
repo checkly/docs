@@ -63,6 +63,12 @@ const GUIDE_DEBUG = {
   checkId: '8c688bf9-2c0a-4614-be7b-e66008b1093a',
   failedResultId: '01a0df0e-99a6-7379-aab4-9e3f0bfcf420',
 }
+const GUIDE_API = {
+  groupId: '6924492',
+  ordersCheckId: '320c5131-42c5-4fac-8726-11c1be76f51a',
+  passingSession: '01a0e88b-ddc4-77ac-b5a5-0da4142068f1',
+  failingSession: '01a0e88c-0faa-77e8-a702-7d50a59bd061',
+}
 const GUIDE_UPTIME = {
   group: 6887126,
   ssl: '66c3df01-432a-4baa-a7ab-e296fc4be8a1',
@@ -228,6 +234,40 @@ export const scenes: Scene[] = [
       await page.waitForTimeout(4000)
     },
     clip: { x: 240, y: 170, width: 1200, height: 620 },
+  },
+
+  // Guide: Monitor your API end to end
+  {
+    id: 'guide-api-group',
+    name: 'Docs guide (API monitoring) — Shop API group page with four API checks',
+    tags: ['guide-api-monitoring', 'docs', 'api-checks', 'detail'],
+    url: `/groups/${GUIDE_API.groupId}`,
+    viewport: { width: 1440, height: 1000 },
+    delay: 3000,
+    clip: { x: 240, y: 58, width: 1200, height: 700 },
+  },
+  {
+    id: 'guide-api-orders-detail',
+    name: 'Docs guide (API monitoring) — POST /orders check detail',
+    tags: ['guide-api-monitoring', 'docs', 'api-checks', 'detail'],
+    url: `/checks/${GUIDE_API.ordersCheckId}`,
+    viewport: { width: 1440, height: 1000 },
+    delay: 2500,
+    setup: waitForCheckDetail,
+    clip: { x: 240, y: 58, width: 1200, height: 600 },
+  },
+  {
+    id: 'guide-api-result-failing',
+    name: 'Docs guide (API monitoring) — failing JSON body assertion in a test session',
+    tags: ['guide-api-monitoring', 'docs', 'api-checks', 'check-result'],
+    url: `/test-sessions/${GUIDE_API.failingSession}`,
+    viewport: { width: 1440, height: 1500 },
+    delay: 3000,
+    setup: async (page) => {
+      await page.locator('a', { hasText: 'GET /books/{id}' }).first().click({ timeout: 10000 }).catch(() => {})
+      await page.waitForTimeout(4000)
+    },
+    clip: { x: 240, y: 58, width: 1200, height: 900 },
   },
 
   // Guide: Structure a Checkly project for a real codebase

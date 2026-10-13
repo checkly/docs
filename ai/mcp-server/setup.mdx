@@ -21,7 +21,7 @@ The Checkly MCP Server supports the `2026-07-28` and `2025-06-18` protocol versi
 | --- | --- | --- |
 | OAuth (recommended) | Interactive use with a [supported OAuth client](#supported-oauth-clients) | Uses your Checkly user and the permissions granted during sign-in. |
 | User API key | Personal clients that cannot use Checkly OAuth but can send custom HTTP headers | Uses your Checkly user and account memberships. User API keys start with `cu_...`. |
-| Service API key | Shared or non-interactive clients that need a stable, account-scoped identity | Uses the account and role configured on the key. Service API keys start with `sv_...` and require an Enterprise plan. |
+| Service API key | Shared or non-interactive clients that need a stable, account-scoped identity | Uses the account and role configured on the key. Service API keys start with `sv_...` and require a Starter, Team, or Enterprise plan. |
 
 OAuth avoids storing a long-lived Checkly credential in your MCP client. Use an API key when OAuth is unavailable or when a non-interactive workflow needs an account-scoped service identity.
 
@@ -270,7 +270,7 @@ Deprecated account API keys and old `sk_...` service-key formats are rejected.
 | Key | Use it when | Access behavior |
 | --- | --- | --- |
 | User API key (`cu_...`) | You need a personal fallback for a client that cannot use Checkly OAuth. | Inherits your user access and account memberships. Removing your user from an account removes the key's access to that account. |
-| Service API key (`sv_...`) | A shared or non-interactive client needs a stable identity that is not tied to a user. | Limited to one account and the role selected when the key is created. Available on Enterprise plans. |
+| Service API key (`sv_...`) | A shared or non-interactive client needs a stable identity that is not tied to a user. | Limited to one account and the role selected when the key is created. Available on Starter, Team, and Enterprise plans. |
 
 See [Creating an API key in Checkly](/admin/creating-api-key) for key creation, roles, and revocation.
 

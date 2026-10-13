@@ -33,6 +33,8 @@ flowchart TD
 
 Defines the navigational structure of the docs. The "API" section determines the sidebar navigation structure of the API reference. Each path points to an MDX page in `/api-reference`.
 
+Usage v2 and legacy Status Pages entries instead reference a schema operation, such as `"api-reference/openapi.json GET /v2/usage/summary"`. Mintlify generates these pages directly from the schema in their existing navigation positions.
+
 ### `api-reference/{category}/\*.mdx`
 
 Each page has an `openapi` attribute that points to an endpoint listed in `api-reference/openapi.json`. Mintlify auto-generates the documentation based on this information.
@@ -40,6 +42,14 @@ Each page has an `openapi` attribute that points to an endpoint listed in `api-r
 ### `api-reference/openapi.json`
 
 Contains a copy of the OpenAPI spec that all our API reference pages pull from. It's automatically updated every 48 hours by our [Github Actions](https://github.com/checkly/docs/actions/workflows/update-api-spec.yml) workflow.
+
+### Endpoint status badges and warnings
+
+Usage v2 operations declare the Beta badge in `x-mint.metadata.tag`. Legacy Status Pages operations use the standard `deprecated: true` flag, which Mintlify renders as a deprecation label. Both include a native `<Warning>` component through `x-mint.content`. Set this metadata in the backend routes so API spec refreshes preserve it.
+
+The operation's `x-mint.href` preserves its existing page URL. `x-mint.metadata` also carries authored titles, descriptions, and the trailing-slash canonical URL. Keep these URL fields when changing an endpoint's lifecycle status.
+
+Do not add an MDX file at a generated page's URL. Mintlify processes existing MDX files after generating endpoints and would overwrite the schema metadata and content. The shared API navigation tooling checks for this conflict and validates generated canonicals. Sitemap generation, legacy redirect checks, and endpoint discovery resolve these entries through `x-mint.href`.
 
 ## Updating `api-reference/openapi.json` via Github Actions
 
@@ -51,10 +61,12 @@ Checkly's public OpenAPI spec can be found here: https://api.checklyhq.com/opena
 
 ## Adding new endpoints
 
-If you need to add an endpoint to an API reference:
+Choose how the endpoint page is created:
 
-1. Create the sidebar navigation item in `docs.json`
-2. Create a new file in `api-reference/{category}/\*.mdx`. That file should have an `openapi` attribute that references the corresponding endpoint. You can also define a custom title, if the OpenAPI spec doesn't have a nice one. For example:
+* For a native schema-driven page, declare its `x-mint.href`, canonical, and any custom metadata or content in the backend route. Add an operation reference to `docs.json`, such as `"api-reference/openapi.json GET /v2/usage/summary"`. Endpoint discovery also uses native navigation for new operations that declare `x-mint.href`.
+* For an authored MDX page, create a file in `api-reference/{category}/\*.mdx` with an `openapi` attribute referencing the endpoint, and add its file path to `docs.json`.
+
+An authored page can define a custom title. For example:
 ```md
 ---
 openapi: get /v1/analytics/api-checks/{id}
@@ -72,4 +84,4 @@ The pre-Mintlify API reference lived on ReadMe.io at `developers.checklyhq.com/r
 
 * One explicit redirect per historical slug maps to its endpoint page, so old bookmarks deep-link correctly.
 * A trailing catch-all `/reference/:slug*` → `/api-reference/overview` backstops slugs whose endpoints were removed after the ReadMe era. Mintlify resolves exact sources before wildcards, so the catch-all never shadows the explicit entries. **If you ever add a real docs page under `/reference/`, this catch-all will intercept it — narrow or remove it first.**
-* `mint broken-links` does **not** validate these destinations (nothing links to `/reference/*` in page content), so `.github/scripts/check_redirect_destinations.py` runs in the static-docs-checks workflow on every docs PR and fails if a page rename/delete breaks any of them.
+* `mint broken-links` does **not** validate these destinations (nothing links to `/reference/*` in page content), so `.github/scripts/check-redirect-destinations.mjs` runs in the static-docs-checks workflow on every docs PR. It validates destinations against both authored MDX and schema-generated pages.

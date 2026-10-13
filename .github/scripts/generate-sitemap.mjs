@@ -19,33 +19,15 @@
  * Run:  npm run generate-sitemap
  * CI (static-docs-checks) regenerates and fails if the committed file drifts.
  */
-import { readFileSync, writeFileSync } from 'node:fs'
+import { writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { getNavigationPages } from './api-navigation.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const BASE = 'https://www.checklyhq.com/docs/'
 
-const docs = JSON.parse(readFileSync(join(ROOT, 'docs.json'), 'utf8'))
-
-// Collect every page slug referenced anywhere in the navigation tree.
-const slugs = new Set()
-function walk(node) {
-  if (Array.isArray(node)) return node.forEach(walk)
-  if (node && typeof node === 'object') {
-    for (const [key, value] of Object.entries(node)) {
-      if (key === 'pages' && Array.isArray(value)) {
-        for (const item of value) {
-          if (typeof item === 'string') slugs.add(item.replace(/^\/+|\/+$/g, ''))
-          else walk(item)
-        }
-      } else {
-        walk(value)
-      }
-    }
-  }
-}
-walk(docs.navigation)
+const slugs = new Set(getNavigationPages(ROOT).map((page) => page.slug))
 
 // The docs home (index.mdx) is served at /docs/ but is not a nav slug, so add
 // it explicitly — otherwise the homepage is missing from the sitemap.

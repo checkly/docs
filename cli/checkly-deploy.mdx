@@ -56,6 +56,7 @@ The plan compares your code against what the project last deployed with a plan (
 - `-` with `kept in your Checkly account, now managed from the Checkly web app` for a resource removed from code that [`--preserve-resources`](#command-options) detaches instead of deleting.
 - `-` on a relation with `relation on Check <id> not managed by this project, deleted by --prune-relations` (or `CheckGroup`), naming the check or group it hangs off, and `!` on a check or group that has such relations when [`--prune-relations`](#command-options) is not passed.
 - `·` with `skipped (testOnly)` for checks marked `testOnly: true`, which are never deployed.
+- `=` for a resource that shows no difference from what is live and is written once to [set a baseline](#the-first-plan-of-a-project), listed after the resources the deploy changes.
 - A closing `N unchanged` row counting the resources the deploy leaves alone.
 
 With `--no-plan` the overview has the same markers, but no source file column, no unchanged row and no diffs: every resource that exists is listed as an update, and the totals line always reads `0 unchanged`.
@@ -95,27 +96,27 @@ Such a deploy writes no resource. It still records the deployment with its Git i
 
 ### The first plan of a project
 
-The first planned `checkly deploy` of an existing project has no earlier planned deploy to compare with. This mostly concerns projects first deployed with a CLI older than version 10, whose deploys did not plan. A project first deployed with version 10 or later sets its baseline on that first deploy, which creates every resource, and sees a baseline deploy again only in the cases that follow. The same goes for the first deploy after one that did not plan, whether a deploy with `--no-plan` or one by an earlier major version of the CLI: it wrote every resource and recorded nothing to compare against. Such a deploy updates every resource it already deployed once to set a baseline: the plan compares your code with what is live in Checkly, lists each of those resources as an update whether or not anything differs, and counts them in a note under the overview.
+The first planned `checkly deploy` of an existing project has no earlier planned deploy to compare with. This mostly concerns projects first deployed with a CLI older than version 10, whose deploys did not plan. A project first deployed with version 10 or later sets its baseline on that first deploy, which creates every resource, and sees a baseline deploy again only in the cases that follow. The same goes for the first deploy after one that did not plan, whether a deploy with `--no-plan` or one by an earlier major version of the CLI: it wrote every resource and recorded nothing to compare against. Such a deploy writes every resource it already deployed once to set a baseline: the plan compares your code with what is live in Checkly, and a resource that shows no difference is listed with the marker `=` after the resources the deploy changes, counted as `to set a baseline` rather than `to update`, and explained in a note under the overview.
 
 ```text Terminal
 $ npx checkly deploy --preview
 
 Deploy preview · Website Monitoring → account Monitoring as Code
 
-  ~ EmailAlertChannel  on-call-email     __checks__/alert-channels.ts
-  ~ ApiCheck           books-api         __checks__/api/books-api.check.ts
-  ~ BrowserCheck       homepage-browser  __checks__/browser/homepage.check.ts
-  ~ CheckGroupV2       storefront        __checks__/groups.ts
+  = EmailAlertChannel  on-call-email     __checks__/alert-channels.ts
+  = ApiCheck           books-api         __checks__/api/books-api.check.ts
+  = BrowserCheck       homepage-browser  __checks__/browser/homepage.check.ts
+  = CheckGroupV2       storefront        __checks__/groups.ts
 
-4 resources are updated to set a baseline. Later deploys show only what changed.
+= 4 resources show no difference from what is live and are written once to set the baseline later deploys compare with.
 
-4 to update, 0 unchanged
+4 to set a baseline, 0 unchanged
 Deploy exactly this plan: checkly deploy --plan-token v1.Q1uXFJQ9iWX5AGK5-VALMA
 ```
 
-A resource that differs from what is live shows its diff under the overview as usual. The note counts the resources with no baseline, whatever the reason. Besides a project's very first plan and the first plan after a deploy with `--no-plan`, that is a resource added to the project with `checkly import`, which has no earlier plan to compare with either, and a baseline that a Checkly update made unusable.
+A resource that differs from what is live is listed as an update and shows its diff under the overview as usual. The `=` rows and the note cover the resources with no baseline in which nothing differs, whatever the reason. Besides a project's very first plan and the first plan after a deploy with `--no-plan`, that is a resource added to the project with `checkly import`, which has no earlier plan to compare with either, and a baseline that a Checkly update made unusable.
 
-Such a plan is applied like any other: it has resources to write, so the deploy asks for confirmation, and in agent or CI environments the `confirmation_required` envelope lists them as updates, summing up the rest of a long plan as usual.
+Such a plan is applied like any other: it has resources to write, so the deploy asks for confirmation, and in agent or CI environments the `confirmation_required` envelope lists each as `Set a baseline for <Type>: <id>`, summing up the rest of a long plan as usual.
 
 <Warning>
 On these resources the plan shows the properties your code sets. A value that was set only in Checkly, on a property your code does not set, is not part of the comparison, and the deploy may reset it without the plan showing it. A deploy with `--no-plan` does the same. From the second planned deploy on, such an edit is reported as changed in Checkly before it is overwritten.

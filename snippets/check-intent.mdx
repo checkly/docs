@@ -1,5 +1,9 @@
 <ResponseField name="intent" type="CheckIntent">
-Describe what your check is intended to verify and the behavior that should be preserved. Checkly uses this structured guidance for root cause analysis and check repair. It is separate from `description` and does not replace executable assertions.
+Describe what your check is intended to verify and the behavior that should be preserved. Checkly uses intent for root cause analysis across all check types. It is separate from `description` and does not replace executable assertions.
+
+<Note>
+Intent is used for automatic repair only for Browser and Multistep Checks.
+</Note>
 
 The object accepts the following fields:
 
@@ -15,14 +19,16 @@ Each constraint has a required `type` and `statement`:
 
 Each `statement` must contain 1–1,000 characters after trimming. You can specify at most 20 constraints of each type. The CLI trims leading and trailing whitespace from the goal and statements and rejects unknown fields.
 
-For example, configure intent on a Playwright Check Suite:
+For example, configure intent on a Browser Check:
 
 ```ts
-import { PlaywrightCheck } from "checkly/constructs"
+import { BrowserCheck } from "checkly/constructs"
 
-new PlaywrightCheck("dashboard-intent", {
+new BrowserCheck("dashboard-intent", {
   name: "Authenticated dashboard",
-  playwrightConfigPath: "./playwright.config.ts",
+  code: {
+    entrypoint: "./dashboard.spec.ts",
+  },
   intent: {
     goal: "Verify that authenticated users can open the dashboard.",
     constraints: [
@@ -39,5 +45,4 @@ new PlaywrightCheck("dashboard-intent", {
 })
 ```
 
-The CLI supports `intent` on `ApiCheck`, `BrowserCheck`, `MultiStepCheck`, `PlaywrightCheck`, `UrlMonitor`, `TcpMonitor`, `DnsMonitor`, `IcmpMonitor`, and `GrpcMonitor`. It is not supported on `HeartbeatMonitor`, `SslMonitor`, or `TracerouteMonitor`. Setting intent does not itself enable automatic check repair.
 </ResponseField>

@@ -26,7 +26,7 @@ When the account has more than one member or invitation, these filters sit above
 
 ## Select members
 
-A row has a checkbox when you can act on it: a member whose role you can change or whom you can remove, or an invitation you can resend or remove. Your own row and the owner's never have one.
+A row has a checkbox when you can act on it: a member whose role you can change or whom you can remove, or any invitation if you can invite members. Your own row and the owner's never have one.
 
 - The checkbox in the table header selects every row you can act on.
 - On a phone, each card has its own checkbox.
@@ -64,13 +64,16 @@ Members lose any permission the new role doesn't hold. These rules apply:
 - The owner's role only changes by [transferring ownership](/admin/team-management/overview#transferring-ownership).
 - Invitations keep the role they were sent with, so the change leaves out any invitation you selected. To invite someone with another role, remove their invitation and invite them again.
 - On the Hobby plan, changing roles needs an upgrade to the Team plan.
-- If the change isn't allowed for one of the members when you confirm, for example because their role changed in the meantime, nobody's role changes.
+- If the change isn't allowed for one of the members when you confirm, for example because their role changed in the meantime, nobody's role changes and an error tells you why.
+- Members who left the account after you loaded the page are skipped. The others get the new role, and a message names the ones that were skipped.
 
 When the role you pick holds exactly your own permissions, as when an Admin makes a member an Admin, the dialog warns you. Those members become your peers: you can no longer change their role or remove them. Only someone with more access than you, such as the owner, can undo it.
 
 ## Resend invitations
 
-Select the invitations and click **Resend invitations**, or **Resend invitation** for one. Each invitee gets the email again, and the invitation stays valid for another month. You can only resend invitations you sent: the others in the selection are left out, and the action is disabled when none of them are yours.
+Select the invitations and click **Resend invitations**, or **Resend invitation** for one. Each invitee gets the email again, and the invitation stays valid for another month. You can resend any invitation if you can invite members, whoever sent it.
+
+If an invitation was accepted or removed after you loaded the page, it's skipped, and a message tells you which ones. The same message names any invitee whose email couldn't be sent, so you can try again.
 
 ## Remove members and invitations
 
@@ -83,8 +86,9 @@ Select the members and invitations and click **Remove**. The confirmation names 
 
 - Removed members lose access to the account right away.
 - Removed invitations can no longer be accepted.
-- You can only remove members and invitations with less access than you. The owner can't be removed.
-- If a member you selected left, or an invitation was accepted or removed, after you loaded the page, nothing is removed and an error tells you so. Reload the page and try again.
+- You can only remove members with less access than you. The owner can't be removed.
+- You can remove any invitation if you can invite members, whoever sent it.
+- If part of your selection changed after you loaded the page, Checkly removes the rest and tells you what it skipped and why: a member who already left, an invitation that was already removed, or one that was accepted. An accepted invitation isn't removed, because the person is now a member. The list refreshes, so you can remove them as a member if you need to.
 
 <Note>
 A removed member who signs in through the account's SSO connection can come back. If they aren't a member of any other Checkly account, they rejoin the next time they open Checkly, with the **Default Role** set in **Account settings > SSO configuration**, as long as [JIT provisioning](/admin/team-management/single-sign-on#just-in-time-jit-provisioning) is on and the account has room for another member. To keep them out, remove their access in your identity provider, or have the owner turn off **JIT Provisioning** on that page.
@@ -126,8 +130,8 @@ Every role can see the members list. Acting on it needs these permissions:
 | Permission | What it allows | Built-in roles |
 |------------|----------------|----------------|
 | Change members' roles | Give members with less access than you a role whose permissions you hold | Owner, Admin |
-| Remove members | Remove members and invitations with less access than you | Owner, Admin |
-| Invite members | Invite people and resend the invitations you sent | Owner, Admin |
+| Remove members | Remove members with less access than you | Owner, Admin |
+| Invite members | Invite people, and resend or remove any invitation | Owner, Admin |
 | Lower your own role | Move yourself to a role whose permissions you already hold | Owner, Admin, Read & Write |
 
 The owner holds **Lower your own role**, but changes role only by transferring ownership. See [Team member roles](/admin/team-management/overview#team-member-roles) for what each role can do.

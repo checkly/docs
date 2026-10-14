@@ -36,6 +36,63 @@ You can also write the intent yourself. Use this option when the script does not
 
 You can also define `intent` in your [Monitoring as Code](/cli/overview) configuration using the Checkly CLI. Keep the goal, required outcomes, and guardrails alongside your check definition. See the General Check Options in the [Browser Check](/constructs/browser-check#general-check-options), [Multistep Check](/constructs/multistep-check#general-check-options), and [Playwright Check Suite](/constructs/playwright-check#general-check-options) construct references for the `intent` schema and a complete configuration example.
 
+Use your existing browser test file or Playwright configuration in these examples.
+
+<Tabs>
+<Tab title="Browser Check">
+
+```ts
+import { BrowserCheck } from "checkly/constructs"
+
+new BrowserCheck("dashboard-browser", {
+  name: "Authenticated dashboard",
+  code: {
+    entrypoint: "./dashboard.spec.ts",
+  },
+  intent: {
+    goal: "Verify that authenticated users can open the dashboard.",
+    constraints: [
+      {
+        type: "REQUIRED_OUTCOME",
+        statement: "Authentication succeeds for a valid user.",
+      },
+      {
+        type: "MUST_PRESERVE",
+        statement: "Do not remove or weaken the authentication assertion.",
+      },
+    ],
+  },
+})
+```
+
+</Tab>
+<Tab title="Playwright Check Suite">
+
+```ts
+import { PlaywrightCheck } from "checkly/constructs"
+
+new PlaywrightCheck("dashboard-playwright", {
+  name: "Authenticated dashboard",
+  playwrightConfigPath: "./playwright.config.ts",
+  intent: {
+    goal: "Verify that authenticated users can open the dashboard.",
+    constraints: [
+      {
+        type: "REQUIRED_OUTCOME",
+        statement: "Authentication succeeds for a valid user.",
+      },
+      {
+        type: "MUST_PRESERVE",
+        statement: "Do not remove or weaken the authentication assertion.",
+      },
+    ],
+  },
+})
+```
+
+</Tab>
+</Tabs>
+
 Defining `intent` does not by itself enable automatic repair or change which check types support Checkly-managed repair.
 
 ## AI invocation usage

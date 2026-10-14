@@ -15,22 +15,28 @@ Each constraint has a required `type` and `statement`:
 
 Each `statement` must contain 1–1,000 characters after trimming. You can specify at most 20 constraints of each type. The CLI trims leading and trailing whitespace from the goal and statements and rejects unknown fields.
 
-For example, add this property to your check or monitor configuration:
+For example, configure intent on a Playwright Check Suite:
 
 ```ts
-intent: {
-  goal: "Verify that authenticated users can open the dashboard.",
-  constraints: [
-    {
-      type: "REQUIRED_OUTCOME",
-      statement: "Authentication succeeds for a valid user.",
-    },
-    {
-      type: "MUST_PRESERVE",
-      statement: "Do not remove or weaken the authentication assertion.",
-    },
-  ],
-},
+import { PlaywrightCheck } from "checkly/constructs"
+
+new PlaywrightCheck("dashboard-intent", {
+  name: "Authenticated dashboard",
+  playwrightConfigPath: "./playwright.config.ts",
+  intent: {
+    goal: "Verify that authenticated users can open the dashboard.",
+    constraints: [
+      {
+        type: "REQUIRED_OUTCOME",
+        statement: "Authentication succeeds for a valid user.",
+      },
+      {
+        type: "MUST_PRESERVE",
+        statement: "Do not remove or weaken the authentication assertion.",
+      },
+    ],
+  },
+})
 ```
 
 The CLI supports `intent` on `ApiCheck`, `BrowserCheck`, `MultiStepCheck`, `PlaywrightCheck`, `UrlMonitor`, `TcpMonitor`, `DnsMonitor`, `IcmpMonitor`, and `GrpcMonitor`. It is not supported on `HeartbeatMonitor`, `SslMonitor`, or `TracerouteMonitor`. Setting intent does not itself enable automatic check repair.

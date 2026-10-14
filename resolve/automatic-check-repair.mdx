@@ -7,7 +7,7 @@ canonical: 'https://www.checklyhq.com/docs/resolve/automatic-check-repair/'
 
 For a check managed in Checkly, automatic repair can attempt to fix a Browser or Multistep Check when its script fails because of a check issue. A check intent states the goal, required outcomes, and guardrails that a repair must preserve. A failed check is not automatically repaired just because this setting is on; Rocky AI first needs a repairable failure and a valid intent.
 
-Checks linked to a GitHub source file can also receive a repair proposal through a pull request, including other check types. Merge and deploy that change to update the running check.
+Browser and Multistep Checks linked to a GitHub source file can also receive a repair proposal through a pull request. Merge and deploy that change to update the running check.
 
 <Accordion title="Prerequisites">
 
@@ -34,9 +34,9 @@ You can also write the intent yourself. Use this option when the script does not
 
 ## Define intent with Monitoring as Code
 
-You can also define `intent` in your [Monitoring as Code](/cli/overview) configuration using the Checkly CLI. Keep the goal, required outcomes, and guardrails alongside your check definition. See the General Check Options in the [Browser Check](/constructs/browser-check#general-check-options), [Multistep Check](/constructs/multistep-check#general-check-options), and [Playwright Check Suite](/constructs/playwright-check#general-check-options) construct references for the `intent` schema and a complete configuration example.
+You can also define `intent` in your [Monitoring as Code](/cli/overview) configuration using the Checkly CLI. Keep the goal, required outcomes, and guardrails alongside your check definition. See the General Check Options in the [Browser Check](/constructs/browser-check#general-check-options) and [Multistep Check](/constructs/multistep-check#general-check-options) construct references for the `intent` schema and a complete configuration example.
 
-Use your existing browser test file or Playwright configuration in these examples.
+Use your existing Browser or Multistep Check test file in these examples.
 
 <Tabs>
 <Tab title="Browser Check">
@@ -66,16 +66,18 @@ new BrowserCheck("dashboard-browser", {
 ```
 
 </Tab>
-<Tab title="Playwright Check Suite">
+<Tab title="Multistep Check">
 
 ```ts
-import { PlaywrightCheck } from "checkly/constructs"
+import { MultiStepCheck } from "checkly/constructs"
 
-new PlaywrightCheck("dashboard-playwright", {
-  name: "Authenticated dashboard",
-  playwrightConfigPath: "./playwright.config.ts",
+new MultiStepCheck("authenticated-api", {
+  name: "Authenticated API flow",
+  code: {
+    entrypoint: "./authenticated-api.spec.ts",
+  },
   intent: {
-    goal: "Verify that authenticated users can open the dashboard.",
+    goal: "Verify that authenticated users can retrieve their account through the API.",
     constraints: [
       {
         type: "REQUIRED_OUTCOME",

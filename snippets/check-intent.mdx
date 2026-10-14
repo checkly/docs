@@ -1,0 +1,48 @@
+<ResponseField name="intent" type="CheckIntent">
+Describe what your check is intended to verify and the behavior that should be preserved. Checkly uses intent for root cause analysis across all check types. It is separate from `description` and does not replace executable assertions.
+
+<Note>
+Intent is used for [automatic repair](/resolve/automatic-check-repair) only for Browser and Multistep Checks.
+</Note>
+
+The object accepts the following fields:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `goal` | `string` | Yes | The outcome your check should verify. Must contain 1–2,000 characters after trimming. |
+| `constraints` | `CheckIntentConstraint[]` | No | Outcomes and guardrails that refine the goal. Omitted constraints become an empty array. |
+
+Each constraint has a required `type` and `statement`:
+
+- `REQUIRED_OUTCOME`: an outcome the check must verify.
+- `MUST_PRESERVE`: behavior or an assertion that should be preserved when repairing the check.
+
+Each `statement` must contain 1–1,000 characters after trimming. You can specify at most 20 constraints of each type. The CLI trims leading and trailing whitespace from the goal and statements and rejects unknown fields.
+
+For example, configure intent on a Browser Check:
+
+```ts
+import { BrowserCheck } from "checkly/constructs"
+
+new BrowserCheck("dashboard-intent", {
+  name: "Authenticated dashboard",
+  code: {
+    entrypoint: "./dashboard.spec.ts",
+  },
+  intent: {
+    goal: "Verify that authenticated users can open the dashboard.",
+    constraints: [
+      {
+        type: "REQUIRED_OUTCOME",
+        statement: "Authentication succeeds for a valid user.",
+      },
+      {
+        type: "MUST_PRESERVE",
+        statement: "Do not remove or weaken the authentication assertion.",
+      },
+    ],
+  },
+})
+```
+
+</ResponseField>

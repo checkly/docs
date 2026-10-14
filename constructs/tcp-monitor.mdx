@@ -5,6 +5,8 @@ sidebarTitle: 'TCP Monitor'
 canonical: 'https://www.checklyhq.com/docs/constructs/tcp-monitor/'
 ---
 
+import CheckIntent from '/snippets/check-intent.mdx';
+
 import GeneralMonitorOptionsTable from '/snippets/general-monitor-options-table.mdx';
 
 <Tip>
@@ -81,6 +83,7 @@ The TCP Monitoring configuration consists of specific TCP monitoring options and
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `request` | `object` | ✅ | - | TCP connection configuration object |
+| `intent` | `CheckIntent` | ❌ | - | Structured guidance for root cause analysis and check repair. See [General Monitor Options](#general-monitor-options). |
 | `degradedResponseTime` | `number` | ❌ | `4000` | Response time threshold in milliseconds for degraded status |
 | `maxResponseTime` | `number` | ❌ | `5000` | Maximum response time in milliseconds before marking as failed |
 | `shouldFail` | `boolean` | ❌ | `false` | Treat connection failures (e.g. timeouts or refused ports) as passed. Successful connections still pass. Only failed assertions will cause the check to fail. |
@@ -428,6 +431,8 @@ new TcpMonitor("maintenance-db", {
 })
 ```
 </ResponseField>
+
+<CheckIntent />
 
 ## Examples
 

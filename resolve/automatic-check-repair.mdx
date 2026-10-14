@@ -7,7 +7,7 @@ canonical: 'https://www.checklyhq.com/docs/resolve/automatic-check-repair/'
 
 For a check managed in Checkly, automatic repair can attempt to fix a Browser or Multistep Check when its script fails because of a check issue. A check intent states the goal, required outcomes, and guardrails that a repair must preserve. A failed check is not automatically repaired just because this setting is on; Rocky AI first needs a repairable failure and a valid intent.
 
-Checks linked to a GitHub source file can also receive a repair proposal through a pull request, including other check types. Merge and deploy that change to update the running check.
+Browser and Multistep Checks linked to a GitHub source file can also receive a repair proposal through a pull request. Merge and deploy that change to update the running check.
 
 <Accordion title="Prerequisites">
 
@@ -31,6 +31,71 @@ An AI-generated check already has an intent. Review it before enabling repair. R
 For an existing Browser or Multistep Check, select **Initialize from saved check** in the **Check intent** section. Checkly reads the saved script and dependencies and suggests an intent. Review the suggestion, edit its goal and outcomes if needed, then save the check. The suggestion is not saved and repair is not enabled just by selecting the button.
 
 You can also write the intent yourself. Use this option when the script does not express all of the business requirements a repair must preserve. For example, a script might check that a page loads while the actual goal also requires a signed-in user to see the correct account.
+
+## Define intent with Monitoring as Code
+
+You can also define `intent` in your [Monitoring as Code](/cli/overview) configuration using the Checkly CLI. Keep the goal, required outcomes, and guardrails alongside your check definition. See the General Check Options in the [Browser Check](/constructs/browser-check#general-check-options) and [Multistep Check](/constructs/multistep-check#general-check-options) construct references for the `intent` schema and a complete configuration example.
+
+Use your existing Browser or Multistep Check test file in these examples.
+
+<Tabs>
+<Tab title="Browser Check">
+
+```ts
+import { BrowserCheck } from "checkly/constructs"
+
+new BrowserCheck("dashboard-browser", {
+  name: "Authenticated dashboard",
+  code: {
+    entrypoint: "./dashboard.spec.ts",
+  },
+  intent: {
+    goal: "Verify that authenticated users can open the dashboard.",
+    constraints: [
+      {
+        type: "REQUIRED_OUTCOME",
+        statement: "Authentication succeeds for a valid user.",
+      },
+      {
+        type: "MUST_PRESERVE",
+        statement: "Do not remove or weaken the authentication assertion.",
+      },
+    ],
+  },
+})
+```
+
+</Tab>
+<Tab title="Multistep Check">
+
+```ts
+import { MultiStepCheck } from "checkly/constructs"
+
+new MultiStepCheck("authenticated-api", {
+  name: "Authenticated API flow",
+  code: {
+    entrypoint: "./authenticated-api.spec.ts",
+  },
+  intent: {
+    goal: "Verify that authenticated users can retrieve their account through the API.",
+    constraints: [
+      {
+        type: "REQUIRED_OUTCOME",
+        statement: "Authentication succeeds for a valid user.",
+      },
+      {
+        type: "MUST_PRESERVE",
+        statement: "Do not remove or weaken the authentication assertion.",
+      },
+    ],
+  },
+})
+```
+
+</Tab>
+</Tabs>
+
+Defining `intent` does not by itself enable automatic repair or change which check types support Checkly-managed repair.
 
 ## AI invocation usage
 

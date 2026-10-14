@@ -1,98 +1,205 @@
 ---
 title: 'Checkly Documentation'
+sidebarTitle: 'Home'
 description: 'The AI Native Application Reliability Platform built for modern engineering teams.'
-mode: "wide"
+mode: "custom"
 canonical: 'https://www.checklyhq.com/docs/'
-
 ---
 
+<Visibility for="agents">
+> **For AI agents:** Start with [llms.txt](https://www.checklyhq.com/docs/llms.txt) for the full documentation index. Append `.md` to any docs URL to get its Markdown. To set Checkly up in a project, follow the [Quickstart](https://www.checklyhq.com/docs/quickstart.md).
 
-## Ready to get started?
+# Build with Checkly
 
-Checkly combines **testing**, **monitoring**, and **incident communication** <br />into a single platform to help you catch issues before your users do.
+Testing, monitoring, and incident communication in one AI-native platform.
 
-<Columns cols={2}>
-<Card title="What is Checkly?" icon="rocket" href="/what-is-checkly">
-Learn more about how Checkly works for modern teams.
-</Card>
+## Onboard your agent
 
-<Card title="Quick Start" icon="bolt" href="/quickstart">
-Get up and running with tests and monitors deployed in 5 minutes.
-</Card>
-</Columns>
+Run this in your project directory. It installs the Checkly CLI and [Checkly Skills](/ai/skills), creates a `checkly.config.ts`, and copies a starter prompt for your coding agent:
 
----
+```bash
+npx checkly init
+```
 
-## Product Documentation
+## Installation
+
+**Checkly CLI**
+
+```bash
+npm install --save-dev checkly
+```
+
+**Checkly Skills** for Claude Code, Cursor, Codex, and other agents
+
+```bash
+npx checkly skills install
+```
+
+## Explore the platform
+
+- [Detect](/detect/overview): synthetic monitoring, uptime monitoring, and testing
+- [Communicate](/communicate/overview): alerts, status pages, and dashboards
+- [Resolve](/resolve/overview): traces, Rocky AI root cause analysis, and debugging
+
+## Developer resources
+
+- [Constructs reference](/constructs/overview)
+- [CLI reference](/cli/overview)
+- [API reference](/api-reference/overview)
+- [Guides](/guides/)
+- [Checkly for AI agents](/ai/overview)
+</Visibility>
+
+<Visibility for="humans">
+<div className="home">
+
+<div className="home-hero">
+  <h1 className="home-title">Build with <span className="home-title-accent">Checkly</span></h1>
+  <p className="home-subtitle">Testing, monitoring, and incident communication in one AI-native platform. Catch issues before your users do.</p>
+</div>
+
+<div className="home-section home-section-lead">
+  <h2 className="home-heading">Onboard your agent</h2>
+  <p className="home-lead">Run this in your project. It installs the Checkly CLI and [Checkly Skills](/ai/skills), then copies a starter prompt for Claude Code, Cursor, Codex, or any agent that supports skills.</p>
+
+```bash Terminal
+npx checkly init
+```
+
+  <p className="home-footnote">Prefer to set things up by hand? Follow the [Quickstart](/quickstart).</p>
+</div>
+
+<div className="home-section">
+  <h2 className="home-heading">Install the tools</h2>
+  <p className="home-lead">Add the CLI to an existing project, or give your agent the Checkly skill.</p>
+  <div className="home-install">
+    <div>
+      <p className="home-install-label"><Icon icon="terminal" size={16} /> Checkly CLI</p>
+
+```bash
+npm install --save-dev checkly
+```
+
+    </div>
+    <div>
+      <p className="home-install-label"><Icon icon="sparkles" size={16} /> Checkly Skills</p>
+
+```bash
+npx checkly skills install
+```
+
+    </div>
+  </div>
+</div>
+
+<div className="home-section">
+  <h2 className="home-heading">Try it now</h2>
+  <p className="home-lead">Every check is code. Drop one into your `__checks__` folder, then run `npx checkly test` to run it from Checkly's global infrastructure.</p>
+
+<Tabs>
+  <Tab title="URL Monitor" icon="globe">
+  ```ts __checks__/homepage.check.ts
+  import { Frequency, UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs'
+
+  new UrlMonitor('homepage-uptime', {
+    name: 'Homepage uptime',
+    frequency: Frequency.EVERY_1M,
+    request: {
+      url: 'https://www.checklyhq.com',
+      assertions: [UrlAssertionBuilder.statusCode().equals(200)],
+    },
+  })
+  ```
+  </Tab>
+  <Tab title="API Check" icon="code">
+  ```ts __checks__/runtimes-api.check.ts
+  import { ApiCheck, AssertionBuilder } from 'checkly/constructs'
+
+  new ApiCheck('runtimes-api', {
+    name: 'Runtimes API',
+    request: {
+      method: 'GET',
+      url: 'https://api.checklyhq.com/v1/runtimes',
+      assertions: [AssertionBuilder.statusCode().equals(200)],
+    },
+  })
+  ```
+  </Tab>
+  <Tab title="Browser Check" icon="window">
+  ```ts __checks__/homepage.spec.ts
+  import { test, expect } from '@playwright/test'
+
+  test('homepage loads', async ({ page }) => {
+    const response = await page.goto('https://www.checklyhq.com')
+    expect(response?.status()).toBeLessThan(400)
+    await expect(page).toHaveTitle(/Checkly/)
+  })
+  ```
+  </Tab>
+  <Tab title="Heartbeat Monitor" icon="heart-pulse">
+  ```ts __checks__/nightly-backup.check.ts
+  import { HeartbeatMonitor } from 'checkly/constructs'
+
+  new HeartbeatMonitor('nightly-backup', {
+    name: 'Nightly backup job',
+    period: 1,
+    periodUnit: 'days',
+    grace: 2,
+    graceUnit: 'hours',
+  })
+  ```
+  </Tab>
+</Tabs>
+</div>
+
+<div className="home-section">
+  <h2 className="home-heading">Explore the platform</h2>
+  <p className="home-lead">Checkly covers the full reliability loop, from catching an issue to fixing it.</p>
 
 <Columns cols={3}>
 <Card title="Detect" href="/detect/overview" img="/images/Detect.svg">
-Detect issues before they happen with multiple layers of detection from around the globe.
+Synthetic monitoring, uptime monitoring, and testing from locations around the globe.
 </Card>
 
 <Card title="Communicate" href="/communicate/overview" img="/images/Communicate.svg">
-Get notified when issues happen with smart alerting, status pages, and dashboards.
+Smart alerting, status pages, and dashboards that keep your team and users informed.
 </Card>
 
 <Card title="Resolve" href="/resolve/overview" img="/images/Resolve.svg">
-Debug issues with distributed OTel tracing, AI-powered insights, and performance analysis.
+Debug failures with traces, AI-powered root cause analysis, and performance insights.
 </Card>
 </Columns>
+</div>
 
----
-
-## Developer Tools Documentation
+<div className="home-section">
+  <h2 className="home-heading">Developer resources</h2>
 
 <Columns cols={3}>
 <Card title="Constructs" icon="building-columns" href="/constructs/overview">
-Build and deploy monitoring infrastructure with reusable code constructs.
+Every check, alert channel, and status page you can define in code.
 </Card>
 
 <Card title="CLI" icon="terminal" href="/cli/overview">
-Get everything you need to monitor and test your applications continuously with the Checkly CLI.
+Test, deploy, and manage your monitoring from the terminal or CI.
 </Card>
 
 <Card title="API" icon="code" href="/api-reference/overview">
-Extend the Checkly platform with our powerful REST API and SDKs.
-</Card>
-</Columns>
-
----
-
-## Learn More
-
-<Columns cols={3}>
-<Card title="Learn" icon="graduation-cap" href="/learn/overview">
-Learn the fundamentals of reliability and how to build a reliable application.
+Extend the Checkly platform with the REST API.
 </Card>
 
 <Card title="Guides" icon="book-open" href="/guides/">
 Implementation tutorials, best practices, and real-world examples.
 </Card>
 
+<Card title="AI" icon="sparkles" href="/ai/overview">
+Skills, MCP server, and Rocky AI for agent-driven monitoring.
+</Card>
+
 <Card title="Community" icon="slack" href="https://www.checklyhq.com/slack/">
 Ask questions and get help from the Checkly team and other users.
 </Card>
 </Columns>
+</div>
 
----
-
-## Quick Links
-
-<Columns cols={4}>
-<Card title="What is Checkly?" icon="circle-info" href="/what-is-checkly">
-Platform overview
-</Card>
-
-<Card title="Structure a Checkly project" icon="folder-tree" href="/guides/structuring-a-checkly-project">
-Organize monitoring for a real codebase
-</Card>
-
-<Card title="Set up Alerts" icon="bell" href="/communicate/overview">
-Get notified
-</Card>
-
-<Card title="Turn Playwright tests into monitors" icon="masks-theater" href="/guides/playwright-testing-to-monitoring">
-Reuse your existing Playwright tests
-</Card>
-</Columns>
+</div>
+</Visibility>

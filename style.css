@@ -103,3 +103,115 @@ header button[aria-label="More actions"]::after {
   height: 44px;
   transform: translate(-50%, -50%);
 }
+
+/* Docs homepage (index.mdx, mode: custom). Custom mode ships no default
+   typography, so the layout is styled here rather than with Tailwind
+   utilities (see the sign-up CTA note above). */
+.home {
+  --home-line: rgba(9, 9, 11, 0.1);
+  --home-muted: #52525b;
+  width: 100%;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 1.5rem 5rem;
+}
+
+.dark .home {
+  --home-line: rgba(255, 255, 255, 0.12);
+  --home-muted: #a1a1aa;
+}
+
+.home-hero {
+  padding: 6rem 0 4rem;
+  text-align: center;
+}
+
+.home-title {
+  font-size: 3.5rem;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.home-title-accent {
+  color: #0075ff;
+}
+
+.dark .home-title-accent {
+  color: #2b8aff;
+}
+
+.home-subtitle {
+  max-width: 40rem;
+  margin: 0 auto;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  color: var(--home-muted);
+}
+
+.home-section {
+  padding: 2.5rem 0;
+  border-top: 1px solid var(--home-line);
+}
+
+.home-section-lead {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.home-heading {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.home-lead,
+.home-footnote {
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  color: var(--home-muted);
+  margin-bottom: 1rem;
+}
+
+.home-footnote {
+  margin: 0.75rem 0 0;
+}
+
+.home-lead a,
+.home-footnote a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.home-install {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .home-install {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.home-install-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .home-hero {
+    padding: 4rem 0 3rem;
+  }
+
+  .home-title {
+    font-size: 2.5rem;
+  }
+}

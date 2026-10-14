@@ -87,7 +87,7 @@ A DNS Monitor has its own DNS-specific settings, plus the standard monitor optio
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `request` | `object` | ✅ | - | DNS request configuration object |
-| `intent` | `CheckIntent` | ❌ | - | Structured guidance for root cause analysis and check repair. See [intent](#intent). |
+| `intent` | `CheckIntent` | ❌ | - | Structured guidance for root cause analysis and check repair. See [General Monitor Options](#general-monitor-options). |
 | `degradedResponseTime` | `number` | ❌ | `500` | Response time threshold in milliseconds for degraded status |
 | `maxResponseTime` | `number` | ❌ | `1000` | Maximum response time in milliseconds before marking as failed |
 
@@ -98,10 +98,6 @@ A DNS Monitor has its own DNS-specific settings, plus the standard monitor optio
 
 </Tab>
 </Tabs>
-
-### Intent
-
-<CheckIntent />
 
 ### `DnsMonitor` Options
 
@@ -212,6 +208,8 @@ DnsAssertionBuilder.jsonAnswer('$.Answer.length').equals(4)
 Learn more in our docs on [Assertions](/detect/assertions).
 
 ### General Monitor Options
+
+<CheckIntent />
 
 <ResponseField name="name" type="string" required>
 Friendly name for your DNS Monitor that will be displayed in the Checkly dashboard and used in notifications.

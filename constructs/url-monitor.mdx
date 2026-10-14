@@ -78,7 +78,7 @@ The URL Monitoring configuration consists of specific URL monitoring options and
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `request` | `object` | ✅ | - | HTTP request configuration object |
-| `intent` | `CheckIntent` | ❌ | - | Structured guidance for root cause analysis and check repair. See [intent](#intent). |
+| `intent` | `CheckIntent` | ❌ | - | Structured guidance for root cause analysis and check repair. See [General Monitor Options](#general-monitor-options). |
 | `degradedResponseTime` | `number` | ❌ | `3000` | Response time threshold in milliseconds for degraded status |
 | `maxResponseTime` | `number` | ❌ | `5000` | Maximum response time in milliseconds before marking as failed |
 | `shouldFail` | `boolean` | ❌ | false | Treat HTTP error codes (4xx and 5xx) as passed. Please note that successful responses still pass. Only failed assertions will cause the check to fail. |
@@ -90,10 +90,6 @@ The URL Monitoring configuration consists of specific URL monitoring options and
 
 </Tab>
 </Tabs>
-
-### Intent
-
-<CheckIntent />
 
 ### `UrlMonitor` Options
 
@@ -266,6 +262,8 @@ UrlAssertionBuilder.statusCode().lessThan(300)
 Learn more in our docs on [Assertions](/detect/assertions).
 
 ### General Monitor Options
+
+<CheckIntent />
 
 <ResponseField name="name" type="string" required>
 Friendly name for your URL monitor that will be displayed in the Checkly dashboard and used in notifications.

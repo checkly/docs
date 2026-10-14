@@ -83,7 +83,7 @@ The TCP Monitoring configuration consists of specific TCP monitoring options and
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `request` | `object` | ✅ | - | TCP connection configuration object |
-| `intent` | `CheckIntent` | ❌ | - | Structured guidance for root cause analysis and check repair. See [intent](#intent). |
+| `intent` | `CheckIntent` | ❌ | - | Structured guidance for root cause analysis and check repair. See [General Monitor Options](#general-monitor-options). |
 | `degradedResponseTime` | `number` | ❌ | `4000` | Response time threshold in milliseconds for degraded status |
 | `maxResponseTime` | `number` | ❌ | `5000` | Maximum response time in milliseconds before marking as failed |
 | `shouldFail` | `boolean` | ❌ | `false` | Treat connection failures (e.g. timeouts or refused ports) as passed. Successful connections still pass. Only failed assertions will cause the check to fail. |
@@ -95,10 +95,6 @@ The TCP Monitoring configuration consists of specific TCP monitoring options and
 
 </Tab>
 </Tabs>
-
-### Intent
-
-<CheckIntent />
 
 ### `TcpMonitor` Options
 
@@ -288,6 +284,8 @@ TcpAssertionBuilder.responseData().contains('ping')
 Learn more in our docs on [Assertions](/detect/assertions).
 
 ### General Monitor Options
+
+<CheckIntent />
 
 <ResponseField name="name" type="string" required>
 Friendly name for your TCP monitor that will be displayed in the Checkly dashboard and used in notifications.

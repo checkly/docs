@@ -96,7 +96,7 @@ gRPC monitors have their own gRPC-specific settings, plus the standard monitor o
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `request` | `object` | ✅ | - | gRPC request configuration object |
-| `intent` | `CheckIntent` | ❌ | - | Structured guidance for root cause analysis and check repair. See [intent](#intent). |
+| `intent` | `CheckIntent` | ❌ | - | Structured guidance for root cause analysis and check repair. See [General Monitor Options](#general-monitor-options). |
 | `degradedResponseTime` | `number` | ❌ | `10000` | Response time in milliseconds at which the monitor is marked as degraded |
 | `maxResponseTime` | `number` | ❌ | `20000` | Response time in milliseconds at which the monitor is marked as failed (max 180,000) |
 
@@ -107,10 +107,6 @@ gRPC monitors have their own gRPC-specific settings, plus the standard monitor o
 
 </Tab>
 </Tabs>
-
-### Intent
-
-<CheckIntent />
 
 ### `GrpcMonitor` Options
 
@@ -265,6 +261,8 @@ GrpcAssertionBuilder.responseMetadata('content-type').contains('grpc')
 Learn more in our docs on [Assertions](/detect/assertions).
 
 ### General Monitor Options
+
+<CheckIntent />
 
 <ResponseField name="name" type="string" required>
 Friendly name for your gRPC Monitor displayed in the Checkly dashboard and used in notifications.

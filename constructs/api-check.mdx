@@ -5,6 +5,8 @@ sidebarTitle: 'API Check'
 canonical: 'https://www.checklyhq.com/docs/constructs/api-check/'
 ---
 
+import CheckIntent from '/snippets/check-intent.mdx';
+
 <Tip>
 Learn more about API Checks in [the API Checks overview](/detect/synthetic-monitoring/api-checks/overview).
 </Tip>
@@ -94,6 +96,7 @@ The API Check configuration consists of specific API Check options and inherited
 |----------|------|----------|---------|-------------|
 | `name` | `string` | ✅ | - | Friendly name for your check |
 | `description` | `string` | ❌ | `null` | A description of the check. Supports markdown. Max 500 characters |
+| `intent` | `CheckIntent` | ❌ | - | Structured guidance for root cause analysis and check repair. See [General Check Options](#general-check-options). |
 | `activated` | `boolean` | ❌ | `true` | Whether the check is enabled |
 | `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Array of AlertChannel objects for notifications |
 | `alertEscalationPolicy` | `AlertEscalationPolicy` | ❌ | - | Advanced alert settings |
@@ -460,6 +463,10 @@ AssertionBuilder.headers('strict-transport-security', 'max-age=(\\d+)').greaterT
 // Equivalent to:
 { source: 'HEADERS', regex: 'max-age=(\d+)', property: 'strict-transport-security', comparison: 'GREATER_THAN', target: '10000' }
 ```
+
+### General Check Options
+
+<CheckIntent />
 
 ## Examples
 

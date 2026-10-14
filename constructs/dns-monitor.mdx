@@ -5,6 +5,8 @@ sidebarTitle: 'DNS Monitor'
 canonical: 'https://www.checklyhq.com/docs/constructs/dns-monitor/'
 ---
 
+import CheckIntent from '/snippets/check-intent.mdx';
+
 import GeneralMonitorOptionsTable from '/snippets/general-monitor-options-table.mdx';
 
 <Tip>
@@ -85,6 +87,7 @@ A DNS Monitor has its own DNS-specific settings, plus the standard monitor optio
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `request` | `object` | ✅ | - | DNS request configuration object |
+| `intent` | `CheckIntent` `null` | ❌ | Omitted | Structured guidance for root cause analysis and check repair. See [intent](#intent). |
 | `degradedResponseTime` | `number` | ❌ | `500` | Response time threshold in milliseconds for degraded status |
 | `maxResponseTime` | `number` | ❌ | `1000` | Maximum response time in milliseconds before marking as failed |
 
@@ -95,6 +98,10 @@ A DNS Monitor has its own DNS-specific settings, plus the standard monitor optio
 
 </Tab>
 </Tabs>
+
+### Intent
+
+<CheckIntent />
 
 ### `DnsMonitor` Options
 

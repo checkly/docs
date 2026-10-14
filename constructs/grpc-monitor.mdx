@@ -5,6 +5,8 @@ sidebarTitle: 'gRPC Monitor'
 canonical: 'https://www.checklyhq.com/docs/constructs/grpc-monitor/'
 ---
 
+import CheckIntent from '/snippets/check-intent.mdx';
+
 import GeneralMonitorOptionsTable from '/snippets/general-monitor-options-table.mdx';
 
 <Tip>
@@ -94,6 +96,7 @@ gRPC monitors have their own gRPC-specific settings, plus the standard monitor o
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `request` | `object` | ✅ | - | gRPC request configuration object |
+| `intent` | `CheckIntent` `null` | ❌ | Omitted | Structured guidance for root cause analysis and check repair. See [intent](#intent). |
 | `degradedResponseTime` | `number` | ❌ | `10000` | Response time in milliseconds at which the monitor is marked as degraded |
 | `maxResponseTime` | `number` | ❌ | `20000` | Response time in milliseconds at which the monitor is marked as failed (max 180,000) |
 
@@ -104,6 +107,10 @@ gRPC monitors have their own gRPC-specific settings, plus the standard monitor o
 
 </Tab>
 </Tabs>
+
+### Intent
+
+<CheckIntent />
 
 ### `GrpcMonitor` Options
 

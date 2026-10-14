@@ -1,20 +1,20 @@
 ---
 title: "Managing team members"
-description: "Find members in your Checkly account, change their roles or remove them several at a time, withdraw invitations, change your own role, and leave an account."
+description: "Find members in your Checkly account, change their roles or remove them several at a time, resend or withdraw invitations, change your own role, and leave an account."
 sidebarTitle: "Managing Team Members"
 canonical: 'https://www.checklyhq.com/docs/admin/team-management/managing-team-members/'
 ---
 
-**Account settings > Members** lists the members of your account and the invitations that haven't been accepted yet. From there you change members' roles, remove members and invitations, change your own role, or leave the account. To invite someone, see [Adding team members](/admin/team-management/adding-team-members).
+**Account settings > Members** lists the members of your account and the invitations that haven't been accepted yet. From there you change members' roles, remove members, resend or remove invitations, change your own role, or leave the account. To invite someone, see [Adding team members](/admin/team-management/adding-team-members).
 
 ## The members list
 
-The **Account members** table shows each member's **Name**, **Email**, **SSO** and **MFA** status, **Role** and **Created** date. Invitations show as **Pending invite**, with a **Resend** button if you can invite members.
+The **Account members** table shows each member's **Name**, **Email**, **SSO** and **MFA** status, **Role** and **Created** date. Invitations show as **Pending invite**.
 
 When the account has more than one member or invitation, these filters sit above the table:
 
 - The search field matches names and emails.
-- **Role** keeps the members and invitations holding the roles you pick, built-in or custom.
+- **Role** keeps the members and invitations holding the roles you pick.
 - **Has SSO** keeps members who signed in through single sign-on.
 - **Has MFA** keeps members with multi-factor authentication turned on.
 - **Editable by you** keeps the rows you can act on, the ones with a checkbox. It only shows when you can act on someone.
@@ -26,7 +26,7 @@ When the account has more than one member or invitation, these filters sit above
 
 ## Select members
 
-A row has a checkbox when you can act on it: a member whose role you can change or whom you can remove, or an invitation you can remove. Your own row and the owner's never have one.
+A row has a checkbox when you can act on it: a member whose role you can change or whom you can remove, or an invitation you can resend or remove. Your own row and the owner's never have one.
 
 - The checkbox in the table header selects every row you can act on.
 - On a phone, each card has its own checkbox.
@@ -35,14 +35,14 @@ A row has a checkbox when you can act on it: a member whose role you can change 
 With rows checked, a bar at the bottom of the screen shows how many are selected and offers:
 
 - **Select all**, with the number of rows you can act on, while some of them aren't checked.
-- **Change role** and **Remove**. An action that can't apply to the selection is disabled, and hovering it tells you why.
+- **Change role**, **Resend invitations** when the selection includes invitations, and **Remove**. An action that can't apply to the selection is disabled, and hovering it tells you why.
 - The **x** button, which clears the selection. Pressing Escape while the bar has focus does the same.
 
 On a phone, the bar is docked to the bottom edge, and its actions open from **Actions**.
 
 <Frame>
-  <img className="block dark:hidden" src="/images/team-management/members-selection.png" alt="Account members table with several rows checked and the selection bar at the bottom showing the count, Select all, Change role and Remove" />
-  <img className="hidden dark:block" src="/images/team-management/members-selection-dark.png" alt="Account members table with several rows checked and the selection bar at the bottom showing the count, Select all, Change role and Remove" />
+  <img className="block dark:hidden" src="/images/team-management/members-selection.png" alt="Account members table with two members and an invitation checked and the selection bar at the bottom showing the count, Select all, Change role, Resend invitation and Remove" />
+  <img className="hidden dark:block" src="/images/team-management/members-selection-dark.png" alt="Account members table with two members and an invitation checked and the selection bar at the bottom showing the count, Select all, Change role, Resend invitation and Remove" />
 </Frame>
 
 If your account is managed through the [Vercel native integration](/integrations/ci-cd/vercel/managing-plan#user-management), you manage its members in Vercel, and the table has no checkboxes.
@@ -50,12 +50,12 @@ If your account is managed through the [Vercel native integration](/integrations
 ## Change members' roles
 
 1. Select the members and click **Change role**.
-2. Pick a role. The picker lists the built-in roles first, then the account's custom roles by name, and you can type to search. It only offers roles you can give to every member you selected, and shows the description of the one you pick.
+2. Pick a role. You can type to search the picker. It only offers roles you can give to every member you selected, and shows the description of the one you pick.
 3. Click **Change role**.
 
 <Frame>
-  <img className="block dark:hidden" src="/images/team-management/members-change-role.png" alt="The Change role dialog with the role picker open, listing the built-in roles and then the account's custom roles below a search field" />
-  <img className="hidden dark:block" src="/images/team-management/members-change-role-dark.png" alt="The Change role dialog with the role picker open, listing the built-in roles and then the account's custom roles below a search field" />
+  <img className="block dark:hidden" src="/images/team-management/members-change-role.png" alt="The Change role dialog with the role picker open, listing the roles below a search field" />
+  <img className="hidden dark:block" src="/images/team-management/members-change-role-dark.png" alt="The Change role dialog with the role picker open, listing the roles below a search field" />
 </Frame>
 
 Members lose any permission the new role doesn't hold. These rules apply:
@@ -67,6 +67,10 @@ Members lose any permission the new role doesn't hold. These rules apply:
 - If the change isn't allowed for one of the members when you confirm, for example because their role changed in the meantime, nobody's role changes.
 
 When the role you pick holds exactly your own permissions, as when an Admin makes a member an Admin, the dialog warns you. Those members become your peers: you can no longer change their role or remove them. Only someone with more access than you, such as the owner, can undo it.
+
+## Resend invitations
+
+Select the invitations and click **Resend invitations**, or **Resend invitation** for one. Each invitee gets the email again, and the invitation stays valid for another month. You can only resend invitations you sent: the others in the selection are left out, and the action is disabled when none of them are yours.
 
 ## Remove members and invitations
 
@@ -123,8 +127,7 @@ Every role can see the members list. Acting on it needs these permissions:
 |------------|----------------|----------------|
 | Change members' roles | Give members with less access than you a role whose permissions you hold | Owner, Admin |
 | Remove members | Remove members and invitations with less access than you | Owner, Admin |
+| Invite members | Invite people and resend the invitations you sent | Owner, Admin |
 | Lower your own role | Move yourself to a role whose permissions you already hold | Owner, Admin, Read & Write |
 
-The owner holds **Lower your own role**, but changes role only by transferring ownership.
-
-Custom roles can grant these permissions one by one. They're listed under **Members**. **Change members' roles** needs **Lower your own role**, so granting it grants both. See [Team member roles](/admin/team-management/overview#team-member-roles) for the built-in roles.
+The owner holds **Lower your own role**, but changes role only by transferring ownership. See [Team member roles](/admin/team-management/overview#team-member-roles) for what each role can do.

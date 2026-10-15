@@ -27,16 +27,16 @@ You need a Checkly project in a GitHub repository with at least one check, and a
 <div id="ai-setup-prompt">
 
 ```txt Prompt
-Set up this Checkly project so a failing critical check starts a Claude Code routine that investigates the failure and opens a pull request.
+Set up this Checkly project so a failing check that should be handled automatically starts a Claude Code routine that investigates the failure and opens a pull request.
 
 Success criteria:
 1. Add a runbook skill at .claude/skills/checkly-alert-runbook/SKILL.md. It reads the check ID and result ID from the alert, triages the failure with the Checkly CLI, classifies it as app regression, stale check, upstream outage, or flake, and opens a pull request only for the first two. It never merges, never runs `npx checkly checks run`, and never weakens an assertion to make a check pass.
 2. Add a WebhookAlertChannel that POSTs to `https://api.anthropic.com/v1/claude_code/routines/{{CLAUDE_ROUTINE_ID}}/fire` with the `Authorization: Bearer {{CLAUDE_ROUTINE_TOKEN}}` and `anthropic-version: 2023-06-01` headers. The body is JSON with a single `text` field holding the alert title, alert type, check ID, result ID, location, result link, and AI root cause. Send failure and degraded alerts, no recoveries.
-3. Subscribe only the checks I name as critical to the channel, with a run-based escalation of 2 failed runs and no reminders.
+3. Subscribe only the checks I want handled automatically to the channel, with a run-based escalation of 2 failed runs and no reminders.
 4. Run `npx checkly test --record` and show me the session link.
 5. Wait for my confirmation before `npx checkly deploy`.
 
-Ask me which checks are critical. I store CLAUDE_ROUTINE_ID and CLAUDE_ROUTINE_TOKEN in Checkly myself.
+Ask me which checks should be handled automatically. I store CLAUDE_ROUTINE_ID and CLAUDE_ROUTINE_TOKEN in Checkly myself.
 ```
 
 </div>

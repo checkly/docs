@@ -167,12 +167,14 @@ Subscribe only the checks that cover critical flows, so a flaky marketing page d
 ```ts login.check.ts
 import { AlertEscalationBuilder, PlaywrightCheck } from 'checkly/constructs'
 import { claudeRoutine } from './alert-channels/claude-routine'
+import { emailAlert } from './alert-channels/email'
+import { slackAlert } from './alert-channels/slack'
 
 new PlaywrightCheck('login-check', {
   name: 'Login flow',
   playwrightConfigPath: './playwright.config.ts',
   pwTags: ['@auth'],
-  alertChannels: [claudeRoutine],
+  alertChannels: [emailAlert, slackAlert, claudeRoutine],
   alertEscalationPolicy: AlertEscalationBuilder.runBasedEscalation(
     2,
     { interval: 5, amount: 0 },
@@ -181,7 +183,7 @@ new PlaywrightCheck('login-check', {
 })
 ```
 
-Keep your existing alert channels in `alertChannels` so people still hear about the failure. The escalation policy alerts after two consecutive failed runs, which filters out one-off flakes. It also sends no reminders. Every request to the fire endpoint starts a new session, and a routine accepts 30 fires per hour, so a reminder every few minutes would start a new investigation each time.
+The routine joins your existing alert channels and doesn't replace them. Email and Slack still notify your team the moment the check fails, while the agent investigates in parallel. If the agent can't find the cause or decides the failure needs no pull request, a human already knows about it. The escalation policy alerts after two consecutive failed runs, which filters out one-off flakes. It also sends no reminders. Every request to the fire endpoint starts a new session, and a routine accepts 30 fires per hour, so a reminder every few minutes would start a new investigation each time.
 
 ## Deploy
 

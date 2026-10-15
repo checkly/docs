@@ -217,7 +217,11 @@ curl -X POST "https://api.anthropic.com/v1/claude_code/routines/$CLAUDE_ROUTINE_
 
 The response contains a `claude_code_session_url`. Open it to watch the run load the runbook skill, pull the evidence with the Checkly CLI, and end with a draft pull request or a summary of why there isn't one. A green status in the routine's run list only means the session ran. Read the transcript to confirm what Claude did.
 
-When a subscribed check fails on its own, the alert channel sends the same request and a new session starts.
+When a subscribed check fails on its own, the alert channel sends the same request and a new session starts. Every alert shows up as a run in the routine's history.
+
+<Frame>
+  <img src="/images/guides/agent-driven-repair/routine-runs.png" alt="The Handle Checkly alert routine in Claude Code with a history of four runs, each started by an API trigger" />
+</Frame>
 
 ## Next
 

@@ -65,7 +65,7 @@ new ApiCheck("exponential-retry-check", {
 
 ### Default retry strategy
 
-From CLI version 10 on, a check, monitor or group that sets no `retryStrategy` uses the default for its type. For checks and monitors other than `PlaywrightCheck`, [`checks.retryStrategy`](/constructs/project#param-checks-retry-strategy) in your project config takes precedence over the default.
+A check, monitor or group that sets no `retryStrategy` uses the default for its type. For checks and monitors other than `PlaywrightCheck`, [`checks.retryStrategy`](/constructs/project#param-checks-retry-strategy) in your project config takes precedence over the default.
 
 | Construct | Default |
 |-----------|---------|
@@ -74,7 +74,7 @@ From CLI version 10 on, a check, monitor or group that sets no `retryStrategy` u
 | `PlaywrightCheck` | No retry strategy. Configure retries in your Playwright configuration instead. |
 | `CheckGroupV2` | No group retry strategy. Each check in the group uses its own. |
 
-Each deploy sets the retry strategy from your code, so a strategy changed in the Checkly web app is replaced on the next deploy by the one in your code, or by this default.
+From CLI version 10 on, each deploy sets the retry strategy from your code, so a strategy changed in the Checkly web app is replaced on the next deploy by the one in your code, or by this default.
 
 ### Retry Strategy Methods
 

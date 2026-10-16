@@ -12,7 +12,7 @@ The Usage API reports your organization's consumption across usage terms, includ
 </Accordion>
 
 <Note>
-  The v2 endpoints are in beta and may change without notice. The [v1 usage endpoints](#migrate-from-v1) are deprecated and remain available for existing integrations.
+  The v2 endpoints are in beta and may change without notice. The v1 usage endpoints are deprecated and remain available for existing integrations.
 </Note>
 
 ## Choose an endpoint
@@ -80,20 +80,6 @@ The forecast extrapolates observed credit consumption. It does not predict resou
 Terms and series return an opaque `nextId`. Send it unchanged with the same resolved dates, filters, and series options to retrieve the next page. A null cursor marks the last page. You can change the page size or reorder equivalent filters. Other query changes require starting pagination again.
 
 Each page reads current measurements and prices. Late usage or pricing corrections can change values between pages; cursors do not freeze a snapshot.
-
-## Migrate from v1
-
-The three v1 endpoints are deprecated. Their response bodies remain unchanged.
-
-| Deprecated endpoint | Replacement |
-| --- | --- |
-| [`GET /v1/usage/terms`](./get-usage-terms) | Use the v2 terms collection, or retrieve one term through `/v2/usage/terms/{id}`. |
-| [`GET /v1/usage/summary`](./get-usage-summary) | Use v2 summary for consumption and the separate term projections endpoint for forecasts. |
-| [`GET /v1/usage/series`](./get-usage-series) | Use v2 series and update your client to read `dimensions`, `creditsUsed`, and `contributions`. |
-
-V1 selects one term using `to` and clips the report to that term. V2 can span renewals; use `usageTermsIds` to select specific terms. Set `groupBy=account,checkType` to retain v1's default grouping. V2 does not accept `checkTypes`, embed v1's meters, or return the v1 series `length` field. Start pagination again when you migrate.
-
-V1 series has no `PARTIAL_WINDOW` warning. Compare its returned `period.from` and `period.to` with your requested dates to detect clipping. V1 summary and series return zero credits for contract gaps; v2 identifies those gaps and returns null credits for aggregates spanning them. V2 can also report different credits because it prices additional usage categories, allowances, and conditional rates.
 
 ## Handle errors
 

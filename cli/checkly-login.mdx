@@ -51,6 +51,7 @@ To create checks for a project, run `npx checkly init`.
 |---|---|
 | `--account-id <id>` | Use this account instead of asking which one. When you're already logged in, switch to it without logging in again. |
 | `--no-browser` | Only print the URL and code; don't try to open a browser. Setting `CHECKLY_NO_BROWSER=1` does the same, e.g. on headless hosts. |
+| `--wait` | For AI agents: wait until you approve the code an earlier run showed, instead of returning at once. |
 
 ## Authentication Flow
 
@@ -66,7 +67,7 @@ Commands that need authentication start the same login when no credentials are s
 
 ### AI agents
 
-When the CLI runs under an AI agent, `checkly login` prints a JSON line with the URL and code for the agent to pass on to you, and exits instead of waiting. After you've approved the login in the browser, the agent runs the command again to finish it. In CI, set [environment variables](/cli/authentication#from-ci) instead.
+When the CLI runs under an AI agent, `checkly login` prints a JSON line with the URL and code for the agent to pass on to you, and exits instead of waiting. The agent then runs `npx checkly login --wait`, which returns as soon as you've approved the login in the browser, so you don't have to tell the agent when you're done. If you have several accounts, the agent asks you which one to use. In CI, set [environment variables](/cli/authentication#from-ci) instead.
 
 ### New Users
 
@@ -106,9 +107,13 @@ Run [`checkly logout`](/cli/checkly-logout) first, then `checkly login` again.
 
 ### Multiple accounts
 
-If you have access to multiple Checkly accounts, you'll be prompted to select which account to use as the active account for CLI operations.
+If you have access to multiple Checkly accounts, you'll be prompted to select which account to use as the default account for CLI operations.
 
-You can also switch accounts later using [`checkly switch`](/cli/checkly-switch) or `checkly login --account-id <id>`.
+You can also switch accounts later using [`checkly switch`](/cli/checkly-switch) or `checkly login --account-id <id>`, or use another account for a single command with `CHECKLY_ACCOUNT_ID`. See [Working with several accounts](/cli/authentication#working-with-several-accounts).
+
+### Environment variables
+
+While `CHECKLY_API_KEY` is set, the CLI uses API key credentials and `checkly login` refuses to run; remove the variables to log in. A `CHECKLY_ACCOUNT_ID` on its own doesn't stop the login: it picks the account, so the login finishes without asking and stores no default.
 
 ## Related Commands
 

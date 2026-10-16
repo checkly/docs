@@ -244,11 +244,13 @@ Draft a major status page incident for the API outage and wait for confirmation 
 
 | Tool | Type | Description |
 | --- | --- | --- |
-| `get-usage-terms` | Read | Return the organization usage terms: contract dates, credit budget, per-unit credit rates, pricing rules, and the accounts covered. Call this first to learn the contract window and the account IDs accepted by the other usage tools. |
-| `get-usage-summary` | Read | Return organization usage totals for a date range plus credit projections, including the `CHECK_RUN` and `AI_INVOCATION` meters. |
-| `list-usage-series` | Read | Return organization usage per period, grouped by account and/or check type, as a zero-filled, cursor-paginated series. Supports `day`, `week`, `month`, and `total` intervals. |
+| `get-usage-terms` | Read | List organization usage terms with dates, budgets, pricing rules, and covered accounts. Supports date filters and cursor pagination. Use returned term IDs in summary and series filters or projection requests. |
+| `get-usage-summary` | Read | Return credits, pricing-rule breakdowns, and coverage gaps across usage terms. Optionally request a whole-term forecast with `projection: { usageTermsId, asOf? }`. |
+| `list-usage-series` | Read | Return cursor-paginated v2 usage for `day`, `week`, `month`, or `total` intervals. Optionally group by account, usage term, pricing rule, and check type. Include calculations, physical run counts, or observed monitor days. |
 
-Usage tools report on the whole organization the account belongs to. Use `accountIds` and `checkTypes` to narrow a report. These tools require an organization usage contract and [`usage:read`](/admin/team-management/permissions) account permission, which Owner and Admin have by default.
+Usage tools use the [v2 Usage API](../../api-reference/usage/overview) and report on the whole organization the selected account belongs to. They require the [`usage:read`](../../admin/team-management/permissions) account permission, which Owner and Admin have by default. Use `usageTermsIds`, `accountIds`, and `pricingRuleKeys` arrays to narrow summary or series. V2 has no `checkTypes` filter. Series defaults to ungrouped daily buckets; pass `groupBy` and `include` as arrays.
+
+`get-usage-terms` returns a `data` collection and `nextId`, including future terms when you omit dates. Summary returns `totals.creditsUsed`, `breakdown`, and `coverage`, rather than v1 meters. To include a forecast, supply one term ID in `projection.usageTermsId`. Its optional `asOf` defaults to yesterday UTC. The forecast covers the term's whole account scope and budget, independently of the report filters. The optional `projection` result contains either `data` or `error`, so an unavailable forecast does not discard a successful summary.
 
 Example prompt:
 

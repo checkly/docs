@@ -79,6 +79,32 @@ test('an authored MDX file cannot shadow a schema-generated endpoint', (t) => {
   assert.match(result.stderr, /would overwrite the schema-generated page/);
 });
 
+test('link checks resolve generated pages and still reject missing destinations', (t) => {
+  const { root, spec } = fixture(t);
+  const page = join(root, 'guides/example.mdx');
+  const check = () => spawnSync(process.execPath, [join(scripts, 'check-broken-links.mjs')], {
+    cwd: root, encoding: 'utf8',
+  });
+  writeFileSync(page, `---\ntitle: Example\n---\n[Relative](..${href})\n[Root](${href}/?view=example#response)\n`);
+  const valid = check();
+  assert.equal(valid.status, 0, valid.stderr);
+  assert.match(valid.stdout, /No broken internal links found/);
+  assert.ok(!existsSync(join(root, `${href}.mdx`)));
+
+  for (const missing of [`${href}-typo`, '/guides/missing']) {
+    writeFileSync(page, `---\ntitle: Example\n---\n[Missing](${missing})\n`);
+    const broken = check();
+    assert.equal(broken.status, 1);
+    assert.ok(broken.stderr.includes(missing), broken.stderr);
+  }
+
+  delete spec.paths['/probe'];
+  writeFileSync(join(root, 'api-reference/openapi.json'), JSON.stringify(spec));
+  const removed = check();
+  assert.notEqual(removed.status, 0);
+  assert.match(removed.stderr, /generated endpoints must declare x-mint.href/);
+});
+
 test('new endpoints with x-mint URLs use native navigation instead of MDX files', (t) => {
   const { root, spec, docs, run } = fixture(t);
   const newHref = '/api-reference/usage/new-probe';

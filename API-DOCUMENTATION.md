@@ -45,11 +45,13 @@ Contains a copy of the OpenAPI spec that all our API reference pages pull from. 
 
 ### Endpoint status badges and warnings
 
-Usage v2 operations declare the Beta badge in `x-mint.metadata.tag`. Legacy Status Pages operations use the standard `deprecated: true` flag, which Mintlify renders as a deprecation label. Both include a native `<Warning>` component through `x-mint.content`. Set this metadata in the backend routes so API spec refreshes preserve it.
+Usage v2 operations declare the Beta badge in `x-mint.metadata.tag`. Deprecated operations, including Usage v1 and legacy Status Pages, use the standard `deprecated: true` flag. Mintlify renders this flag as a deprecation label. Set lifecycle metadata in the backend routes so API spec refreshes preserve it. Add guidance through `x-mint.content` for a generated page or a `<Warning>` in an authored MDX page. A badge alone does not add warning content.
 
 The operation's `x-mint.href` preserves its existing page URL. `x-mint.metadata` also carries authored titles, descriptions, and the trailing-slash canonical URL. Keep these URL fields when changing an endpoint's lifecycle status.
 
 Do not add an MDX file at a generated page's URL. Mintlify processes existing MDX files after generating endpoints and would overwrite the schema metadata and content. The shared API navigation tooling checks for this conflict and validates generated canonicals. Sitemap generation, legacy redirect checks, and endpoint discovery resolve these entries through `x-mint.href`.
+
+Run `npm run check:links` to validate internal links. This uses Mintlify's link checker and recognizes schema-generated destinations through the shared navigation resolver. The CLI's `mint broken-links` command alone only recognizes files on disk and reports links to generated API pages as missing.
 
 ## Updating `api-reference/openapi.json` via Github Actions
 

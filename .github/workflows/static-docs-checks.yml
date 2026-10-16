@@ -60,6 +60,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
+        if: steps.detect.outputs.openapi_changed == 'true' || steps.detect.outputs.docs_changed == 'true'
         run: npm ci
 
       - name: Validate OpenAPI spec
@@ -107,7 +108,7 @@ jobs:
         run: |
           REPORT=$(mktemp)
           STATUS=0
-            npm run check:links > "$REPORT" 2>&1 || STATUS=$?
+          npm run check:links > "$REPORT" 2>&1 || STATUS=$?
           {
             echo "## Broken-links scan"
             echo ""

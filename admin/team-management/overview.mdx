@@ -9,7 +9,7 @@ This section covers all aspects of administering your Checkly account, from mana
 
 ## Team Member Roles
 
-Checkly has five built-in roles: **Owner**, **Admin**, **Read & Write**, **Read & Run**, and **Read Only**. Each role inherits all permissions from the roles below it. On Enterprise plans, you can also create [custom roles](/admin/team-management/custom-roles) (beta) with the permissions you pick.
+Checkly has five built-in roles: **Owner**, **Admin**, **Read & Write**, **Read & Run**, and **Read Only**. Each role inherits all permissions from the roles below it. If [custom roles](/admin/team-management/custom-roles) (beta) are enabled for your account, you can also define roles with the permissions you pick.
 
 Each account has one Owner. The account creator is the Owner until they [transfer ownership](#transferring-ownership). You can invite teammates with any other role. You can [change a member's role](/admin/team-management/managing-team-members#change-members-roles) after they join.
 
@@ -27,6 +27,30 @@ Each account has one Owner. The account creator is the Owner until they [transfe
 | Manage Private Locations | ✓ | ✓ | ✗ | ✗ | ✗ |
 | Create service API keys | ✓ | ✓ | ✗ | ✗ | ✗ |
 | Transfer ownership | ✓ | ✗ | ✗ | ✗ | ✗ |
+
+### Permissions and roles
+
+Checkly defines permissions for actions on resources. Your account role grants those permissions. In API and MCP documentation, an ID such as `checks:run` identifies the **Run checks** permission; the format is `resource:action`.
+
+The permissions referenced in these guides use the following names. If [custom roles](/admin/team-management/custom-roles#the-permission-matrix) (beta) are enabled, you can find these names under **Account settings > Roles**, in the listed group and resource row. The editor shows permission names, rather than IDs.
+
+| Permission ID | Name in the role editor | Group and resource |
+| --- | --- | --- |
+| `api-keys:create` | Create API keys | Account > API keys |
+| `api-keys:delete` | Delete API keys | Account > API keys |
+| `members:create` | Invite members | Account > Members |
+| `checks:run` | Run checks | Monitoring > Checks and monitors |
+| `checks:update` | Edit checks | Monitoring > Checks and monitors |
+| `check-repairs:create` | Repair checks with Rocky | Rocky AI > Check repairs |
+| `root-cause-analyses:run` | Start root cause analyses | Rocky AI > Root cause analyses |
+| `environment-variables:create` | Create environment variables | Check resources > Environment variables |
+| `environment-variables:update` | Edit environment variables | Check resources > Environment variables |
+| `incidents:create` | Open incidents | Communicate > Incidents |
+| `incidents:update` | Update incidents | Communicate > Incidents |
+| `status-pages:read` | View status pages | Communicate > Status pages |
+| `usage:read` | View usage | Billing > Usage |
+
+To get access, ask your account owner or an admin to [assign a role](/admin/team-management/managing-team-members#change-members-roles) with the required permissions. Use the built-in role table above to choose a role. On accounts with custom roles enabled, someone who can edit roles can adjust a role's permissions, within the [limits on granting access](/admin/team-management/custom-roles#the-permission-matrix). Custom roles are not generally available, so the Roles page may not appear in your account.
 
 ### Choosing the Right Role
 

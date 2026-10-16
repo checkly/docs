@@ -1,20 +1,20 @@
 ---
 title: "Custom roles"
-description: "Create custom roles with the permissions you pick and give them to members and invitations."
+description: "Beta documentation for creating custom roles and assigning them to members, invitations, and service API keys."
 sidebarTitle: "Custom Roles"
 tag: "Beta"
 canonical: 'https://www.checklyhq.com/docs/admin/team-management/custom-roles/'
 ---
 
 <Note>
-Custom roles are in beta for [Enterprise plans](https://www.checklyhq.com/pricing/). They aren't generally available yet. To take part in the beta, contact your customer success team.
+Custom roles are in beta and are not generally available. This documentation applies only to accounts where custom roles are enabled.
 </Note>
 
-A custom role is a named set of permissions that you pick one by one. Custom roles sit next to the [built-in roles](/admin/team-management/overview#team-member-roles). You give them to members and invitations the same way.
+A custom role is a named set of permissions that you pick one by one. Custom roles sit next to the [built-in roles](/admin/team-management/overview#team-member-roles). You can assign them to members, invitations, and [service API keys](/admin/creating-api-key#service-api-keys).
 
 ## The Roles page
 
-**Account settings > Roles** lists your account's custom roles. It shows once custom roles are turned on for your account. Each row has the role's name and description, how many permissions it grants, and how many members and pending invitations hold it. Click a role's name to open it.
+**Account settings > Roles** lists your account's custom roles. It shows once custom roles are turned on for your account. Each row has the role's name and description, how many permissions it grants, and how many members, pending invitations, and service API keys hold it. Click a role's name to open it.
 
 <Frame>
   <img className="block dark:hidden" src="/images/team-management/custom-roles-list.png" alt="The Roles page with the New role button and a table of custom roles, each showing its name and description, its number of permissions, how many members and invites hold it, and a delete button" />
@@ -26,7 +26,7 @@ A custom role is a named set of permissions that you pick one by one. Custom rol
 | View roles | See the Roles page and open a role to see its permissions | All roles |
 | Create roles | Create custom roles | Owner, Admin |
 | Edit roles | Change a role's name, description and permissions | Owner, Admin |
-| Delete roles | Delete custom roles that no member or invitation holds | Owner, Admin |
+| Delete roles | Delete custom roles and choose a replacement for affected holders | Owner, Admin |
 
 A custom role can hold these permissions too. They're listed under **Roles**.
 
@@ -44,6 +44,8 @@ A custom role can hold these permissions too. They're listed under **Roles**.
 
 ## The permission matrix
 
+The matrix uses permission names such as **Run checks**. If another guide refers to an ID such as `checks:run`, see [Permission names and IDs](/admin/team-management/overview#permissions-and-roles) to find its name, resource row, and how to get access.
+
 <Frame>
   <img className="block dark:hidden" src="/images/team-management/custom-roles-editor.png" alt="The Permissions card of the On-call responder role, with its incident, on-call and alert permissions ticked" />
   <img className="hidden dark:block" src="/images/team-management/custom-roles-editor-dark.png" alt="The Permissions card of the On-call responder role, with its incident, on-call and alert permissions ticked" />
@@ -58,16 +60,16 @@ A custom role can hold these permissions too. They're listed under **Roles**.
 
 ## Edit a role
 
-Click the role's name on the Roles page, make your changes and click **Save role**. The page says how many members and pending invitations hold the role. Changes apply to them right away.
+Click the role's name on the Roles page, make your changes and click **Save role**. The page says how many members, pending invitations, and service API keys hold the role. Changes apply to them right away.
 
 - You can only edit a role when you hold all of its permissions yourself.
 - Without **Edit roles**, the role opens read-only.
 
 ## Delete a role
 
-Click the trash button in the role's row and confirm. Deleting a role can't be undone.
+Click the trash button in the role's row. If the role is assigned, review the affected members, pending invitations, and service API keys, then choose their **Replacement role** before confirming. Their permissions change immediately. Deleting a role can't be undone.
 
-You can only delete a role that no member or pending invitation holds. Until then, the trash button is disabled. Hover it to see how many hold the role. To free the role, [change those members' roles](/admin/team-management/managing-team-members#change-members-roles) and [remove the invitations](/admin/team-management/managing-team-members#pending-invites). An invitation keeps the role it was sent with.
+You must be allowed to assign the replacement to every affected holder. If no suitable replacement is available to you, ask your account owner or an admin to make the change.
 
 ## Give a custom role
 
@@ -87,4 +89,4 @@ The same rules apply as for built-in roles:
 
 ## API keys
 
-[User API keys](/admin/creating-api-key#user-api-keys) act with their member's role. A member with a custom role has the same permissions through the API and the CLI. Changes to the role apply to their keys right away. [Service API keys](/admin/creating-api-key#service-api-keys) take a built-in role.
+[User API keys](/admin/creating-api-key#user-api-keys) act with their member's role. A member with a custom role has the same permissions through the API and the CLI. Changes to the role apply to their keys right away. When the beta is enabled, [service API keys](/admin/creating-api-key#service-api-keys) can also use a custom role whose permissions you hold.

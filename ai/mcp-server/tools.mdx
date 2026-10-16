@@ -101,6 +101,18 @@ Update the "Checkout API" check to run every 10 minutes and add the tag critical
 Trigger the checks tagged production-smoke, then poll the test session until results are available.
 ```
 
+## Interactive view tools
+
+These read-only tools display [interactive views](/ai/mcp-server/interactive-views) in clients that support MCP Apps. They require the `checkly:checks:read` session permission and `checks:read` account permission.
+
+| Tool | Type | Description |
+| --- | --- | --- |
+| `show-check-status` | Read | Display one check's status card, with last-24-hour availability, P95, and P99 response times when available. |
+| `show-check-list` | Read | Display a filtered check list with current status and up to 20 checks per page. Supports pagination without historical metrics. |
+| `show-check-response-time` | Read | Display a response-time chart for one check. Defaults to the last 24 hours; custom past windows span at most seven days and must fall within your plan's data retention. |
+
+Use these tools when you want a visual view in your conversation. For structured results, use `list-check-stats` or `get-check-performance-summary`.
+
 ## Check group tools
 
 | Tool | Type | Description |

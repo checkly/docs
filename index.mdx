@@ -9,9 +9,9 @@ canonical: 'https://www.checklyhq.com/docs/'
 <Visibility for="agents">
 > **For AI agents:** Start with [llms.txt](https://www.checklyhq.com/docs/llms.txt) for the full documentation index. Append `.md` to any docs URL to get its Markdown. To set Checkly up in a project, follow the [Quickstart](https://www.checklyhq.com/docs/quickstart.md).
 
-# Build with Checkly
+# Checkly Documentation
 
-Testing, monitoring, and incident communication in one AI-native platform.
+Checkly is the Application Reliability Platform for engineering teams: Playwright-powered monitors defined in TypeScript, run from global locations, with traces for every failure.
 
 ## Onboard your agent
 
@@ -54,60 +54,42 @@ npx checkly skills install
 <div className="home">
 
 <div className="home-hero">
-  <h1 className="home-title">Build with <span className="home-title-accent">Checkly</span></h1>
-  <p className="home-subtitle">Testing, monitoring, and incident communication in one AI-native platform. Catch issues before your users do.</p>
+  <img className="home-hero-mark" src="/images/racoon_logo.svg" alt="Checkly logo" noZoom />
+  <p className="home-eyebrow home-eyebrow-light">Checkly Docs</p>
+  <h1 className="home-title">Test, monitor, and resolve.<br />All as code.</h1>
+  <p className="home-subtitle">Checkly is the Application Reliability Platform for engineering teams. Define Playwright-powered monitors in TypeScript, run them from locations around the globe, and trace every failure back to the root cause.</p>
+  <div className="home-hero-actions">
+    <a className="home-button" href="/quickstart">Start in 5 minutes</a>
+    <a className="home-button home-button-secondary" href="/what-is-checkly">What is Checkly?</a>
+  </div>
 </div>
 
 <div className="home-section home-section-lead">
-  <h2 className="home-heading">Onboard your agent</h2>
-  <p className="home-lead">Run this in your project. It installs the Checkly CLI and [Checkly Skills](/ai/skills), then copies a starter prompt for Claude Code, Cursor, Codex, or any agent that supports skills.</p>
+  <p className="home-eyebrow">Agent-first setup</p>
+  <h2 className="home-heading">Let your AI agent set up Checkly</h2>
+  <p className="home-lead">Run this in a project you already have. It installs the Checkly CLI and [Checkly Skills](/ai/skills), scaffolds a `checkly.config.ts`, and copies a starter prompt for Claude Code, Cursor, Codex, or any agent that supports skills. Your agent scans the project, writes monitors, tests them, and deploys after you confirm.</p>
 
 ```bash Terminal
 npx checkly init
 ```
 
-  <p className="home-footnote">Prefer to set things up by hand? Follow the [Quickstart](/quickstart).</p>
+  <p className="home-footnote">Prefer to do it by hand? Every step is in the [Quickstart](/quickstart).</p>
 </div>
 
 <div className="home-section">
-  <h2 className="home-heading">Install the tools</h2>
-  <p className="home-lead">Add the CLI to an existing project, or give your agent the Checkly skill.</p>
-  <div className="home-install">
-    <div>
-      <p className="home-install-label"><Icon icon="terminal" size={16} /> Checkly CLI</p>
-
-```bash
-npm install --save-dev checkly
-```
-
-    </div>
-    <div>
-      <p className="home-install-label"><Icon icon="sparkles" size={16} /> Checkly Skills</p>
-
-```bash
-npx checkly skills install
-```
-
-    </div>
-  </div>
-</div>
-
-<div className="home-section">
-  <h2 className="home-heading">Try it now</h2>
-  <p className="home-lead">Every check is code. Drop one into your `__checks__` folder, then run `npx checkly test` to run it from Checkly's global infrastructure.</p>
+  <p className="home-eyebrow">Monitoring as Code</p>
+  <h2 className="home-heading">Monitors are code. Write one.</h2>
+  <p className="home-lead">A check is a TypeScript file in your repo, versioned and reviewed like the rest of your code. Browser Checks are plain `@playwright/test` specs, so the tests you already have can become production monitors.</p>
 
 <Tabs>
-  <Tab title="URL Monitor" icon="globe">
-  ```ts __checks__/homepage.check.ts
-  import { Frequency, UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs'
+  <Tab title="Browser Check" icon="window">
+  ```ts __checks__/homepage.spec.ts
+  import { test, expect } from '@playwright/test'
 
-  new UrlMonitor('homepage-uptime', {
-    name: 'Homepage uptime',
-    frequency: Frequency.EVERY_1M,
-    request: {
-      url: 'https://www.checklyhq.com',
-      assertions: [UrlAssertionBuilder.statusCode().equals(200)],
-    },
+  test('homepage loads', async ({ page }) => {
+    const response = await page.goto('https://www.checklyhq.com')
+    expect(response?.status()).toBeLessThan(400)
+    await expect(page).toHaveTitle(/Checkly/)
   })
   ```
   </Tab>
@@ -125,14 +107,17 @@ npx checkly skills install
   })
   ```
   </Tab>
-  <Tab title="Browser Check" icon="window">
-  ```ts __checks__/homepage.spec.ts
-  import { test, expect } from '@playwright/test'
+  <Tab title="URL Monitor" icon="globe">
+  ```ts __checks__/homepage.check.ts
+  import { Frequency, UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs'
 
-  test('homepage loads', async ({ page }) => {
-    const response = await page.goto('https://www.checklyhq.com')
-    expect(response?.status()).toBeLessThan(400)
-    await expect(page).toHaveTitle(/Checkly/)
+  new UrlMonitor('homepage-uptime', {
+    name: 'Homepage uptime',
+    frequency: Frequency.EVERY_1M,
+    request: {
+      url: 'https://www.checklyhq.com',
+      assertions: [UrlAssertionBuilder.statusCode().equals(200)],
+    },
   })
   ```
   </Tab>
@@ -150,28 +135,50 @@ npx checkly skills install
   ```
   </Tab>
 </Tabs>
+
+  <p className="home-lead home-lead-spaced">Then run it from Checkly's global infrastructure, and ship it when it passes.</p>
+  <div className="home-install">
+    <div>
+      <p className="home-install-label"><Icon icon="flask" size={16} /> Test from the terminal or CI</p>
+
+```bash Terminal
+npx checkly test
+```
+
+    </div>
+    <div>
+      <p className="home-install-label"><Icon icon="rocket" size={16} /> Deploy as always-on monitors</p>
+
+```bash Terminal
+npx checkly deploy
+```
+
+    </div>
+  </div>
 </div>
 
 <div className="home-section">
-  <h2 className="home-heading">Explore the platform</h2>
-  <p className="home-lead">Checkly covers the full reliability loop, from catching an issue to fixing it.</p>
+  <p className="home-eyebrow">The platform</p>
+  <h2 className="home-heading">Detect. Communicate. Resolve.</h2>
+  <p className="home-lead">The full reliability loop, from catching an issue before your users do to knowing why it happened.</p>
 
 <Columns cols={3}>
 <Card title="Detect" href="/detect/overview" img="/images/Detect.svg">
-Synthetic monitoring, uptime monitoring, and testing from locations around the globe.
+Playwright Browser Checks, API Checks, and uptime monitors that run from locations around the globe.
 </Card>
 
 <Card title="Communicate" href="/communicate/overview" img="/images/Communicate.svg">
-Smart alerting, status pages, and dashboards that keep your team and users informed.
+Alerts with retries and escalation, plus status pages and dashboards for your team and your users.
 </Card>
 
 <Card title="Resolve" href="/resolve/overview" img="/images/Resolve.svg">
-Debug failures with traces, AI-powered root cause analysis, and performance insights.
+OpenTelemetry traces linked to every failed run, and Rocky AI to pinpoint the root cause.
 </Card>
 </Columns>
 </div>
 
 <div className="home-section">
+  <p className="home-eyebrow">Reference</p>
   <h2 className="home-heading">Developer resources</h2>
 
 <Columns cols={3}>
@@ -188,17 +195,28 @@ Extend the Checkly platform with the REST API.
 </Card>
 
 <Card title="Guides" icon="book-open" href="/guides/">
-Implementation tutorials, best practices, and real-world examples.
+Tutorials that turn a real codebase into a monitored one.
 </Card>
 
 <Card title="AI" icon="sparkles" href="/ai/overview">
-Skills, MCP server, and Rocky AI for agent-driven monitoring.
+Skills, the MCP server, and Rocky AI for agent-driven monitoring.
 </Card>
 
 <Card title="Community" icon="slack" href="https://www.checklyhq.com/slack/">
 Ask questions and get help from the Checkly team and other users.
 </Card>
 </Columns>
+</div>
+
+<div className="home-section">
+<div className="sign-up-cta">
+	<div className="sign-up-cta-title">
+		Bugs don't stop at CI/CD. Why would Playwright? <img src="/images/icons/playwright.svg" alt="Playwright logo" noZoom />
+	</div>
+	<div className="sign-up-cta-body">
+		<a href="https://app.checklyhq.com/signup" target="_blank">Sign up</a> and start using Playwright for end-to-end monitoring with Checkly.
+	</div>
+</div>
 </div>
 
 </div>

@@ -106,40 +106,65 @@ header button[aria-label="More actions"]::after {
 
 /* Docs homepage (index.mdx, mode: custom). Custom mode ships no default
    typography, so the layout is styled here rather than with Tailwind
-   utilities (see the sign-up CTA note above). */
+   utilities (see the sign-up CTA note above). Colors follow the marketing
+   site: checkly-blue #0075FF, checkly-deep-blue #041734, blue-800 #003C80. */
 .home {
-  --home-line: rgba(9, 9, 11, 0.1);
+  --home-blue: #0075ff;
+  --home-deep-blue: #041734;
+  --home-line: rgba(128, 187, 255, 0.2);
   --home-muted: #52525b;
   width: 100%;
   max-width: 64rem;
   margin: 0 auto;
-  padding: 0 1.5rem 5rem;
+  padding: 2rem 1.5rem 5rem;
 }
 
 .dark .home {
-  --home-line: rgba(255, 255, 255, 0.12);
+  --home-blue: #2b8aff;
   --home-muted: #a1a1aa;
 }
 
 .home-hero {
-  padding: 6rem 0 4rem;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 3rem;
+  padding: 4.5rem 2rem 4rem;
+  border-radius: 1rem;
+  border: 1px solid var(--home-line);
+  background:
+    radial-gradient(60% 80% at 50% 0%, rgba(0, 117, 255, 0.35), transparent 70%),
+    linear-gradient(to bottom, var(--home-deep-blue), #003c80);
+  color: #fff;
   text-align: center;
 }
 
+.home-hero-mark {
+  display: block;
+  width: 3rem;
+  height: auto;
+  margin: 0 auto 1.25rem !important;
+}
+
+.home-eyebrow {
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--home-blue);
+}
+
+.home-eyebrow-light {
+  color: #80bbff;
+}
+
 .home-title {
-  font-size: 3.5rem;
-  line-height: 1.1;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 1rem;
-}
-
-.home-title-accent {
-  color: #0075ff;
-}
-
-.dark .home-title-accent {
-  color: #2b8aff;
+  font-size: 3.25rem;
+  line-height: 1.05;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  margin-bottom: 1.25rem;
+  color: #fff;
 }
 
 .home-subtitle {
@@ -147,7 +172,41 @@ header button[aria-label="More actions"]::after {
   margin: 0 auto;
   font-size: 1.125rem;
   line-height: 1.75rem;
-  color: var(--home-muted);
+  color: #c7d7ee;
+}
+
+.home-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.home-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  background: #0075ff;
+  color: #fff !important;
+  text-decoration: none !important;
+  transition: background-color 0.15s ease;
+}
+
+.home-button:hover {
+  background: #2b8aff;
+}
+
+.home-button-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(128, 187, 255, 0.35);
+}
+
+.home-button-secondary:hover {
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .home-section {
@@ -161,18 +220,24 @@ header button[aria-label="More actions"]::after {
 }
 
 .home-heading {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
 }
 
 .home-lead,
 .home-footnote {
-  font-size: 0.875rem;
+  max-width: 44rem;
+  font-size: 0.9375rem;
   line-height: 1.5rem;
   color: var(--home-muted);
   margin-bottom: 1rem;
+}
+
+.home-lead-spaced {
+  margin-top: 1.5rem;
 }
 
 .home-footnote {
@@ -206,12 +271,16 @@ header button[aria-label="More actions"]::after {
   font-weight: 500;
 }
 
+.home .sign-up-cta {
+  margin: 0;
+}
+
 @media (max-width: 640px) {
   .home-hero {
-    padding: 4rem 0 3rem;
+    padding: 3rem 1.25rem 2.5rem;
   }
 
   .home-title {
-    font-size: 2.5rem;
+    font-size: 2.25rem;
   }
 }

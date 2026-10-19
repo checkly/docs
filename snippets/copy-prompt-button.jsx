@@ -4,6 +4,7 @@ import { useState } from "react";
 export const CopyPromptButton = ({
   label = "Copy setup prompt",
   targetId = "ai-setup-prompt",
+  className,
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -23,12 +24,10 @@ export const CopyPromptButton = ({
   return (
     <button
       onClick={handleCopy}
-      className="inline-flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-base
-        border border-gray-200 dark:border-gray-700
-        bg-white dark:bg-gray-800
-        text-gray-800 dark:text-gray-200
-        hover:bg-gray-50 dark:hover:bg-gray-700
-        transition-colors cursor-pointer my-2"
+      className={
+        className ||
+        "inline-flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-base border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer my-2"
+      }
     >
       {copied ? (
         <>

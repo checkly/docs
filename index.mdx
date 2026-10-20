@@ -138,23 +138,20 @@ export const slack = new SlackAppAlertChannel('ops-slack', {
     </div>
   </div>
   </Tab>
-  <Tab title="Resolve" icon="telescope">
+  <Tab title="Resolve" icon="target-arrow">
   <div className="home-tab">
-    <div className="home-tab-title"><Icon icon="target-arrow" size={18} /> From failed check to root cause</div>
-    <p className="home-tab-text">Point your OpenTelemetry exporter at Checkly and every failed check result links to the backend trace behind it. Rocky AI reads the error, the trace, and the last passing run to explain what broke.</p>
+    <div className="home-tab-title"><Icon icon="target-arrow" size={18} /> Find the root cause with Rocky AI</div>
+    <p className="home-tab-text">Rocky AI uses your check's errors, logs, screenshots, and available traces to explain what failed, identify the likely root cause, and assess user impact. Enable automatic analysis for new error groups or start an analysis from a failing result.</p>
 
-```bash Terminal
-export OTEL_EXPORTER_OTLP_ENDPOINT="https://otel.eu-west-1.checklyhq.com"
-export OTEL_EXPORTER_OTLP_HEADERS="authorization=<your-checkly-otel-api-key>"
-export OTEL_EXPORTER_OTLP_PROTOCOL="http/protobuf"
-export OTEL_SERVICE_NAME="your-service-name"
-```
+    <Frame>
+      <img className="block dark:hidden" src="/images/docs/images/ai/ai-rca-analysis-1-light.png" alt="Rocky AI analysis showing user impact, the root cause of an HTTP 500 error, and supporting evidence." />
+      <img className="hidden dark:block" src="/images/docs/images/ai/ai-rca-analysis-1-dark.png" alt="Rocky AI analysis showing user impact, the root cause of an HTTP 500 error, and supporting evidence." />
+    </Frame>
 
     <div className="home-tab-links">
-      <a className="home-tab-cta" href="/resolve/traces/overview">Send traces to Checkly <Icon icon="arrow-right" size={14} /></a>
-      <a href="/resolve/ai-root-cause-analysis/overview">Rocky AI Root Cause Analysis</a>
+      <a className="home-tab-cta" href="/ai/rocky-ai">Explore Rocky AI <Icon icon="arrow-right" size={14} /></a>
+      <a href="/resolve/ai-root-cause-analysis/overview">Root cause analysis</a>
       <a href="/resolve/automatic-check-repair">Automatic check repair</a>
-      <a href="/resolve/traces/instrumentation/nodejs">Instrument Node.js</a>
     </div>
   </div>
   </Tab>

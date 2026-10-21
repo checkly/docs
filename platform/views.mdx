@@ -5,7 +5,7 @@ sidebarTitle: 'Views'
 canonical: 'https://www.checklyhq.com/docs/platform/views/'
 ---
 
-A view is a named set of filters for a list in the Checkly app. Views sit in a bar above the list's filters, one click away. Each view is private or shared with the account. Every member arranges their own bar.
+A view is a named set of filters for a list in the Checkly app. Views sit in a bar above the filter field. Each view is private or shared with the account. Every member arranges their own bar.
 
 <Frame>
   <img className="block dark:hidden" src="/images/views/monitors-view-tabs.png" alt="Monitors page with the All, Passing, Degraded and Failing views and a private view in the bar, each showing a counter, above the filter field" />
@@ -14,35 +14,35 @@ A view is a named set of filters for a list in the Checkly app. Views sit in a b
 
 ## Where you can use views
 
-| Screen | Filters a view stores | Counter |
-|--------|-----------------------|---------|
-| Monitors | Every [filter](/platform/filters) with its and/or groups, and the time range | Total, Passing, Degraded or Failing |
-| Test sessions | Every [filter](/platform/filters) with its and/or groups, and the time range | None |
-| Heartbeats | Every [filter](/platform/filters) with its and/or groups, and the time range | Total, Passing or Failing |
+| Screen | [Counter](#counters) |
+|--------|---------|
+| Monitors | Total, Passing, Degraded or Failing |
+| Heartbeats | Total, Passing or Failing |
+| Test sessions | None |
 
 Each screen has its own views. A view saved on one screen doesn't show on another.
 
-**Monitors:** every account starts with shared [Passing, Degraded and Failing](#passing-degraded-and-failing-on-monitors) views. Each view can show a [counter](#counters).
+A view stores the [filters](/platform/filters) in the filter field, their groups and the time range.
 
-**Test sessions:** the views bar sits below the page tabs, on the **Test Sessions** tab only. **Error Groups** has its own filters and no views. Switching between the two tabs clears the filters.
+**Monitors:** every account starts with shared [Passing, Degraded and Failing](#passing-degraded-and-failing-on-monitors) views.
+
+**Test sessions:** the views bar sits below the page tabs. It shows on the **Test Sessions** tab only. The **Error Groups** tab has its own filters and no views. Switching between the two tabs clears the filters.
 
 <Frame>
   <img className="block dark:hidden" src="/images/views/test-sessions-view-tabs.png" alt="Test sessions list with the views bar below the page tabs and the filter field underneath" />
   <img className="hidden dark:block" src="/images/views/test-sessions-view-tabs-dark.png" alt="Test sessions list with the views bar below the page tabs and the filter field underneath" />
 </Frame>
 
-**Filters:** on every screen with views, you filter the list in the filter field. There, filters join with **and** or **or** and can be grouped. See [Filters](/platform/filters). A view saves the whole query.
-
 ## How views work
 
-- **All** is always first in the bar and shows the list without filters.
+- **All** is always first in the bar. It shows the list without filters.
 - Selecting a view replaces the filters on screen with the view's filters.
 
 ## Create a view
 
 New views are private. Only you see them until you [share them](#private-and-shared-views).
 
-Set filters while **All** is selected. A **Create view** button shows next to the filters. Click it, type a name and press Enter. Press Escape or click elsewhere to cancel.
+Set filters while **All** is selected. A **Create view** button shows next to the filter field. Click it, type a name and press Enter. Press Escape or click elsewhere to cancel.
 
 <Frame>
   <img className="block dark:hidden" src="/images/views/create-view.png" alt="All selected with two filters set, and the Create view button next to the filter field" />
@@ -51,7 +51,7 @@ Set filters while **All** is selected. A **Create view** button shows next to th
 
 ## Change a view's filters
 
-When the filters on screen differ from the selected view, these buttons show next to the filters:
+When the filters on screen differ from the selected view, these buttons show next to the filter field:
 
 - **Reset** puts the view's saved filters back.
 - **Save as new** saves the current filters as a new private view.
@@ -64,7 +64,7 @@ When the filters on screen differ from the selected view, these buttons show nex
 
 ## View options
 
-Click **View options**, the three-dot button on the selected view, to act on it. Right-click any view in the bar to open the same menu without switching to it.
+**View options** is the three-dot button on the selected view. Click it to act on that view. Right-click any view in the bar to open the same menu without switching to it.
 
 The menu first says whether the view is private or who shared it. Then it lists the actions you're allowed to take:
 
@@ -105,12 +105,12 @@ Your own private views and the order of your bar need no permission. Shared view
 
 ## Arrange your bar
 
-Your bar is yours. Reordering or hiding views only changes what you see, never what your teammates see.
+Your bar is yours. Reordering or hiding views changes only your own bar. Your teammates' bars stay as they are.
 
 - **Reorder:** drag a view, or use **Move left** and **Move right**. **All** stays first.
 - **Hide:** choose **Hide from bar**. Hiding the selected view switches you back to **All**.
-- **Find hidden views:** open the menu at the end of the bar, labeled with the number of views it holds, such as **+3**. Hidden views are listed under **Hidden**. Views that don't fit the width of the screen are listed there too.
-- **Show a hidden view:** select it in that menu. It goes back into your bar, at the end. **Show in bar** does the same without selecting it.
+- **Find hidden views:** open the menu at the end of the bar. Its label is the number of views it holds, such as **+3**. Hidden views are listed under **Hidden**. Views that don't fit the width of the screen are listed there too.
+- **Show a hidden view:** select it in that menu. It goes back to the end of your bar. **Show in bar** does the same without selecting it.
 
 Right-clicking a view in that menu opens its options too.
 
@@ -129,7 +129,7 @@ The URL holds the selected view and every filter it applies. Copy it from your b
 
 - **A view you can see** opens selected. If the link's filters differ from the view's saved filters, the view shows as changed. **Reset** puts the saved filters back. **Save view** stores the link's filters in the view if you can edit it. A hidden view goes back into your bar.
 - **A view you can't see**, such as another member's private view or a deleted view, opens with **All** selected and the link's filters on screen. Click **Create view** to keep them as your own private view.
-- **A link that names only the view**, like the one **Open** uses in Account settings > Views, opens the view with its saved filters. So does a link that adds only a time range, except that the link's range replaces the view's.
+- **A link that names only the view**, like the one **Open** uses in **Account settings > Views**, opens the view with its saved filters. So does a link that adds only a time range. The link's range then replaces the view's.
 
 After you save a view, the address bar shows the view and its filters in their shortest form. Following a view link adds one entry to your browser history. **Back** returns to the page you opened it from.
 
@@ -169,9 +169,9 @@ On screens with counters, a view can show a number next to its name. Pick it in 
 
 On Heartbeats, the choices are **None**, **Total**, **Passing** and **Failing**.
 
-The selected view counts what's on screen, including changes you haven't saved. Every other view counts its saved filters. A count of zero shows in gray, without the color of its state.
+The selected view counts what's on screen. That count includes changes you haven't saved. Every other view counts its saved filters. A count of zero shows in gray.
 
-New views start with no counter. The counter is part of the view. Everyone sees the same counter on a shared view. Changing it needs **Edit shared views**.
+New views start with no counter. The counter is part of the view. Everyone sees the same counter on a shared view. Changing the counter of a shared view needs **Edit shared views**.
 
 Test sessions has no counters.
 

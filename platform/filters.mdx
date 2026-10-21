@@ -1,11 +1,11 @@
 ---
 title: 'Filters'
-description: 'Filter the Monitors, Heartbeats, Test sessions and Error Groups lists in the filter field, join filters with and or or, and group them.'
+description: 'Filter the Monitors, Heartbeats, Test sessions and Error Groups lists, join filters with "and" or "or", and group them.'
 sidebarTitle: 'Filters'
 canonical: 'https://www.checklyhq.com/docs/platform/filters/'
 ---
 
-On **Monitors**, **Heartbeats**, **Test sessions** and **Error Groups**, you filter the list in the filter field above it. Each filter is a block with a field, an operator and a value, such as **status is failing**. Filters join with **and** or **or**. Groups let you mix both.
+On Monitors, Heartbeats, Test sessions and Error Groups, you filter the list in the filter field above it. Each filter is a block with a field, an operator and a value, such as **status is failing**. Filters join with **and** or **or**. Groups let you mix both.
 
 <Frame>
   <img className="block dark:hidden" src="/images/filters/filter-groups.png" alt="The Monitors filter field with the time range, a status filter and a group that joins a tags filter and a name filter with or" />
@@ -14,11 +14,13 @@ On **Monitors**, **Heartbeats**, **Test sessions** and **Error Groups**, you fil
 
 ## Add a filter
 
-Click the filter field to see every field you can filter on, each with a short description. Pick one, or type the start of its name and press Enter. Typing the name followed by a colon, such as `name:`, does the same.
+Click the filter field to list every field you can filter on. Each field shows a short description. Pick a field, or type the start of its name and press Enter. Typing the name followed by a colon, such as `name:`, does the same.
 
 A text field such as **Name** then waits for its value. Type it and press Enter.
 
-A field with a fixed set of values, such as **Status** or **Tags**, starts with one of its values. Click the value to pick others. With the keyboard, move to the value and start typing. Fields like **Tags** take several values. The filter then matches any of them. The block shows how many it holds, such as **3 tags**. Long lists, such as your tags, have a search at the top of the picker.
+A field with a fixed set of values, such as **Status** or **Tags**, starts with one of its values. Click the value to pick others. With the keyboard, move to the value and start typing.
+
+Fields like **Tags** take several values. The filter then matches any of them. The block shows how many it holds, such as **3 tags**. Long lists, such as your tags, have a search at the top of the picker.
 
 Text that doesn't start a field name searches by name when you press Enter. On Test sessions, it searches the project name. On Error Groups, it searches the error message.
 
@@ -31,27 +33,27 @@ Text that doesn't start a field name searches by name when you press Enter. On T
 | Test sessions | Project, Environment, Branch, Commit, User, Status, Provider, Duration, Check, Check type, Tags, File and the time range |
 | Error Groups | Message, Project, Environment, Check type, Playwright project, Count and the time range |
 
-- **Text fields** such as **Name**, **Group** and **URL** match when the text holds every word you type, in any order.
-- **Tags** on Monitors match the tags of a check and the tags of its group.
+- **Text fields** such as **Name**, **Group** and **URL** match when the text holds every word you type. The words can be in any order.
+- On Monitors, **Tags** matches the tags of a check and the tags of its group.
 - **Project** shows when the account has checks deployed with the [Checkly CLI](/cli/overview). **Traces** shows when the account [imports traces](/resolve/traces/import/overview).
 - **Period**, **Grace** and **Duration** compare durations such as `30s`, `5m`, `1h` or `1d`. **Availability** compares the percentage for the selected time range. These four take `>`, `>=`, `<`, `<=` and `=`.
 - On Test sessions, **Commit** matches the commit ID or its message. **User** matches the person or the API key that started the session. **Duration** is how long the session ran. A session still running never matches it.
-- **Check**, **Check type**, **Tags** and **File** match a test session when any check that ran in it matches. **Tags** count the tags of the check and of its group. **File** is the Playwright test file.
-- On Error Groups, **Count** compares the number of errors in the time range. The time range covers when each error group was last seen.
-- **Test Sessions** and **Error Groups** have their own filters. Switching between the two tabs clears them.
-- **The time range** is always set. You can change it but not remove it. It always applies with **and**.
+- On Test sessions, **Check**, **Check type**, **Tags** and **File** match a session when any check that ran in it matches. **Tags** matches the tags of the check and of its group. **File** is the Playwright test file.
+- On Error Groups, **Count** compares the number of errors in the time range. The time range filters error groups by when they were last seen.
+- The **Test Sessions** and **Error Groups** tabs each have their own filters. Switching tabs clears them.
+- **The time range** can't be removed. It always applies with **and**.
 
-## Join filters with and or or
+## Join filters
 
 Filters join with **and** by default. The list then shows what matches every filter. Click the word between two filters to switch it to **or**. The list then shows what matches any filter. The switch applies to every join at that level.
 
-To join only the next filter with **or**, type `or` before it. With **status is failing and name contains api** in the field, type `or url` and press Enter, then type `health` and press Enter. The field then reads **status is failing and (name contains api or url contains health)**. The new filter is grouped with the filter right before it. The other joins don't change. Typing `and` before a filter works the same way.
+To join only the next filter with **or**, type `or` before it. For example, with **status is failing and name contains api** in the field, type `or url` and press Enter. Then type `health` and press Enter. The field now reads **status is failing and (name contains api or url contains health)**. The new filter is grouped with the filter right before it. The other joins don't change. Typing `and` before a filter works the same way.
 
 ## Group filters
 
-A group holds filters joined by its own **and** or **or**. Groups let one query mix both. Click the word inside a group to switch it.
+A group holds filters joined by its own **and** or **or**. Click the word inside a group to switch it.
 
-To build a group as you type, type `(` in the filter field. An empty group opens with the cursor inside it. The filters you add next go into it. Type `or` before a filter to join the group's filters with **or**. Type `)` to close the group and go back to the top level. Leaving the field or pressing Escape also closes it.
+To build a group from the keyboard, type `(` in the filter field. An empty group opens with the cursor inside it. The filters you add next go into it. Type `or` before a filter to join the group's filters with **or**. Type `)` to close the group and go back to the top level. Leaving the field or pressing Escape also closes it.
 
 For example, to find checks with "checkout" in their name or in their URL:
 
@@ -68,12 +70,12 @@ With the mouse:
 - **Move filters:** drag a filter to reorder it, or to move it into or out of a group.
 - **Move a group:** drag it by its handle.
 
-Groups hold filters only. A group can't hold another group.
+A group can't hold another group.
 
 More examples:
 
 - On Heartbeats, **status is failing and (period > 1h or availability < 99.9)** finds failing heartbeats that either expect a ping less often than hourly or are below 99.9% available.
-- On Monitors, **status is failing or tags is critical** lists every failing check and every check tagged `critical`, whatever its status.
+- On Monitors, **status is failing or tags is critical** lists every failing check and every check tagged `critical`.
 
 ## Use the keyboard
 
@@ -81,14 +83,14 @@ Every part of a filter is reachable from the keyboard.
 
 | Key | What it does |
 |-----|--------------|
-| Tab, Shift+Tab, Left, Right | Move between the parts of the filters and the joining words |
+| Tab, Shift+Tab, Left, Right | Moves between the parts of the filters and the joining words |
 | Typing on a value | Changes the value, or searches the picker of a field with many values |
 | Enter, Space | Opens the picker of the focused part, or switches the focused joining word |
 | Backspace, Delete | Removes the focused filter |
-| Alt+Left, Alt+Right | Moves the focused filter, into and out of groups too |
+| Alt+Left, Alt+Right | Moves the focused filter left or right. It can move into and out of groups. |
 
-In the filter field, type `and` or `or` and press Enter to switch how the filters at the top level join. Inside an open group, it switches the group's join instead.
+In the filter field, type `and` or `or` and press Enter to switch how the filters at the top level join. Inside an open group, this switches the group's join.
 
 ## Save and share filters
 
-The page URL holds every filter and its groups. Copy it to send the same list to a teammate. To keep filters you use often one click away, save them as a [view](/platform/views).
+The page URL holds every filter and its groups. Copy it to send the same list to a teammate. On Monitors, Heartbeats and Test sessions, you can save filters you use often as a [view](/platform/views).

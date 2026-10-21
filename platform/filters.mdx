@@ -30,14 +30,14 @@ Text that doesn't start a field name searches by name when you press Enter. On T
 |--------|--------|
 | Monitors | Name, Group, URL, Logical ID, Status, Check type, Tags, Project, Traces and the time range |
 | Heartbeats | Name, Ping URL, Status, Tags, Period, Grace, Availability and the time range |
-| Test sessions | Project, Environment, Branch, Commit, User, Status, Provider, Duration, Check, Check type, Tags, File and the time range |
+| Test sessions | Project, Environment, Branch, Commit, User, Has user, Status, Provider, Duration, Check, Check type, Tags, File and the time range |
 | Error Groups | Message, Project, Environment, Check type, Playwright project, Count and the time range |
 
 - **Text fields** such as **Name**, **Group** and **URL** match when the text holds every word you type. The words can be in any order.
 - On Monitors, **Tags** matches the tags of a check and the tags of its group.
 - **Project** shows when the account has checks deployed with the [Checkly CLI](/cli/overview). **Traces** shows when the account [imports traces](/resolve/traces/import/overview).
 - **Period**, **Grace** and **Duration** compare durations such as `30s`, `5m`, `1h` or `1d`. **Availability** compares the percentage for the selected time range. These four take `>`, `>=`, `<`, `<=` and `=`.
-- On Test sessions, **Commit** matches the commit ID or its message. **User** matches the person or the API key that started the session. **Duration** is how long the session ran. A session still running never matches it.
+- On Test sessions, **Commit** matches the commit ID or its message. **User** matches the person or the API key that started the session. **Has user** is false when no person or API key is linked to the session. **Duration** is how long the session ran. A session still running never matches it.
 - On Test sessions, **Check**, **Check type**, **Tags** and **File** match a session when any check that ran in it matches. **Tags** matches the tags of the check and of its group. **File** is the Playwright test file.
 - On Error Groups, **Count** compares the number of errors in the time range. The time range filters error groups by when they were last seen.
 - The **Test Sessions** and **Error Groups** tabs each have their own filters. Switching tabs clears them.

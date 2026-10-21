@@ -1,11 +1,11 @@
 ---
 title: 'Filters'
-description: 'Filter the Monitors, Heartbeats and Test sessions lists in the filter field, join filters with and or or, and group them.'
+description: 'Filter the Monitors, Heartbeats, Test sessions and Error Groups lists in the filter field, join filters with and or or, and group them.'
 sidebarTitle: 'Filters'
 canonical: 'https://www.checklyhq.com/docs/platform/filters/'
 ---
 
-On **Monitors**, **Heartbeats** and **Test sessions**, you filter the list in the filter field above it. Each filter is a block with a field, an operator and a value, such as **status is failing**. Filters join with **and** or **or**. Groups let you mix both.
+On **Monitors**, **Heartbeats**, **Test sessions** and **Error Groups**, you filter the list in the filter field above it. Each filter is a block with a field, an operator and a value, such as **status is failing**. Filters join with **and** or **or**. Groups let you mix both.
 
 <Frame>
   <img className="block dark:hidden" src="/images/filters/filter-groups.png" alt="The Monitors filter field with the time range, a status filter and a group that joins a tags filter and a name filter with or" />
@@ -20,7 +20,7 @@ A text field such as **Name** then waits for its value. Type it and press Enter.
 
 A field with a fixed set of values, such as **Status** or **Tags**, starts with one of its values. Click the value to pick others. With the keyboard, move to the value and start typing. Fields like **Tags** take several values. The filter then matches any of them. The block shows how many it holds, such as **3 tags**. Long lists, such as your tags, have a search at the top of the picker.
 
-Text that doesn't start a field name searches by name when you press Enter. On Test sessions, it searches the project name.
+Text that doesn't start a field name searches by name when you press Enter. On Test sessions, it searches the project name. On Error Groups, it searches the error message.
 
 ## Fields
 
@@ -29,6 +29,7 @@ Text that doesn't start a field name searches by name when you press Enter. On T
 | Monitors | Name, Group, URL, Logical ID, Status, Check type, Tags, Project, Traces and the time range |
 | Heartbeats | Name, Ping URL, Status, Tags, Period, Grace, Availability and the time range |
 | Test sessions | Project, Environment, Branch, Commit, User, Status, Provider, Duration, Check, Check type, Tags, File and the time range |
+| Error Groups | Message, Project, Environment, Check type, Playwright project, Count and the time range |
 
 - **Text fields** such as **Name**, **Group** and **URL** match when the text holds every word you type, in any order.
 - **Tags** on Monitors match the tags of a check and the tags of its group.
@@ -36,6 +37,8 @@ Text that doesn't start a field name searches by name when you press Enter. On T
 - **Period**, **Grace** and **Duration** compare durations such as `30s`, `5m`, `1h` or `1d`. **Availability** compares the percentage for the selected time range. These four take `>`, `>=`, `<`, `<=` and `=`.
 - On Test sessions, **Commit** matches the commit ID or its message. **User** matches the person or the API key that started the session. **Duration** is how long the session ran. A session still running never matches it.
 - **Check**, **Check type**, **Tags** and **File** match a test session when any check that ran in it matches. **Tags** count the tags of the check and of its group. **File** is the Playwright test file.
+- On Error Groups, **Count** compares the number of errors in the time range. The time range covers when each error group was last seen.
+- **Test Sessions** and **Error Groups** have their own filters. Switching between the two tabs clears them.
 - **The time range** is always set. You can change it but not remove it. It always applies with **and**.
 
 ## Join filters with and or or

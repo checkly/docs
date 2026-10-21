@@ -2,7 +2,7 @@ name: Static docs checks
 
 # Runs static validations on every PR — works without a Mintlify preview URL,
 # so it fills the gap for PRs (e.g. the auto-update API spec ones) where the
-# preview deployment is skipped or fails. Fails the PR if `mint broken-links`
+# preview deployment is skipped or fails. Fails the PR if `npm run check:links`
 # reports any broken internal links.
 #
 # Required check in the branch ruleset. When no docs files changed the
@@ -108,7 +108,7 @@ jobs:
         run: |
           REPORT=$(mktemp)
           STATUS=0
-          npx mint broken-links > "$REPORT" 2>&1 || STATUS=$?
+          npm run check:links > "$REPORT" 2>&1 || STATUS=$?
           {
             echo "## Broken-links scan"
             echo ""

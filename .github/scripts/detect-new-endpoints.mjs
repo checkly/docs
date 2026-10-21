@@ -74,6 +74,9 @@ const MONITOR_SUBGROUP_PATTERNS = [
   { pattern: /dns/i,    dir: 'monitors', subgroup: 'DNS Monitor' },
   { pattern: /tcp/i,    dir: 'checks',   subgroup: 'TCP Monitor' },
   { pattern: /url/i,    dir: 'monitors', subgroup: 'URL Monitor' },
+  { pattern: /ssl/i,    dir: 'monitors', subgroup: 'SSL Monitor' },
+  { pattern: /traceroute/i, dir: 'monitors', subgroup: 'Traceroute Monitor' },
+  { pattern: /grpc/i,   dir: 'monitors', subgroup: 'gRPC Monitor' },
 ];
 
 // ---------------------------------------------------------------------------

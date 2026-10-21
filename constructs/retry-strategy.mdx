@@ -63,6 +63,17 @@ new ApiCheck("exponential-retry-check", {
 
 ## Configuration
 
+### Default retry strategy
+
+A check, monitor or group that sets no `retryStrategy` uses the default for its type. For checks and monitors other than `PlaywrightCheck`, [`checks.retryStrategy`](/constructs/project#param-checks-retry-strategy) in your project config takes precedence over the default.
+
+| Construct | Default |
+|-----------|---------|
+| `ApiCheck`, `BrowserCheck`, `MultiStepCheck`, `CheckGroup` | `RetryStrategyBuilder.singleRetry({ baseBackoffSeconds: 0, sameRegion: false })`: one immediate retry in a different location |
+| Monitors | `RetryStrategyBuilder.noRetries()` |
+| `PlaywrightCheck` | No retry strategy. Configure retries in your Playwright configuration instead. |
+| `CheckGroupV2` | No group retry strategy. Each check in the group uses its own. |
+
 ### Retry Strategy Methods
 
 Use the `RetryStrategyBuilder` methods to apply different retry strategies to your checks and monitors.

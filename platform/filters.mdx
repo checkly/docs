@@ -14,13 +14,13 @@ On **Monitors** and **Heartbeats**, you filter the list in the filter field abov
 
 ## Add a filter
 
-Click the filter field to see every field you can filter on, each with a short description. Pick one, or type the start of its name and press Enter.
+Click the filter field to see every field you can filter on, each with a short description. Pick one, or type the start of its name and press Enter. Typing the name followed by a colon, such as `name:`, does the same.
 
-You can also type a whole filter as `field:operator:value` and press Enter, for example `status:is:failing` or `availability:<:99.9`. Put values with spaces in quotes: `name:contains:'checkout api'`.
+A text field such as **Name** then waits for its value. Type it and press Enter.
 
-Text that isn't a filter searches by name. Type it and press Enter.
+A field with a fixed set of values, such as **Status** or **Tags**, starts with one of its values. Click the value to pick others. With the keyboard, move to the value and start typing. Fields like **Tags** take several values. The filter then matches any of them. The block shows how many it holds, such as **3 tags**. Long lists, such as your tags, have a search at the top of the picker.
 
-Fields with a fixed set of values, such as **Status** or **Tags**, open a picker. Fields like **Tags** take several values. The filter then matches any of them. The block then shows how many it holds, such as **3 tags**. Long lists, such as your tags, have a search at the top of the picker.
+Text that doesn't start a field name searches by name when you press Enter.
 
 ## Fields
 
@@ -39,7 +39,7 @@ Fields with a fixed set of values, such as **Status** or **Tags**, open a picker
 
 Filters join with **and** by default. The list then shows what matches every filter. Click the word between two filters to switch it to **or**. The list then shows what matches any filter. The switch applies to every join at that level.
 
-To join only the next filter with **or**, type `or` before it. With **status is failing and name contains api** in the field, typing `or tags:is:critical` and pressing Enter gives **status is failing and (name contains api or tags is critical)**. The new filter is grouped with the filter right before it. The other joins don't change. Typing `and` before a filter works the same way.
+To join only the next filter with **or**, type `or` before it. With **status is failing and name contains api** in the field, type `or url` and press Enter, then type `health` and press Enter. The field then reads **status is failing and (name contains api or url contains health)**. The new filter is grouped with the filter right before it. The other joins don't change. Typing `and` before a filter works the same way.
 
 ## Group filters
 
@@ -47,7 +47,14 @@ A group holds filters joined by its own **and** or **or**. Groups let one query 
 
 To build a group as you type, type `(` in the filter field. An empty group opens with the cursor inside it. The filters you add next go into it. Type `or` before a filter to join the group's filters with **or**. Type `)` to close the group and go back to the top level. Leaving the field or pressing Escape also closes it.
 
-For example, typing `status:is:failing`, then `(`, `tags:is:critical`, `or name:contains:checkout` and `)`, pressing Enter after each filter, gives **status is failing and (tags is critical or name contains checkout)**.
+For example, to find checks with "checkout" in their name or in their URL:
+
+1. Type `(`.
+2. Type `name` and press Enter. Type `checkout` and press Enter.
+3. Type `or url` and press Enter. Type `checkout` and press Enter.
+4. Type `)`.
+
+The field then holds **(name contains checkout or url contains checkout)**.
 
 With the mouse:
 
@@ -57,7 +64,10 @@ With the mouse:
 
 Groups hold filters only. A group can't hold another group.
 
-For example, on Heartbeats, `status:is:failing and (period:>:1h or availability:<:99.9)` finds failing heartbeats that either expect a ping less often than hourly or are below 99.9% available. On Monitors, `status:is:failing or tags:is:critical` lists every failing check and every check tagged `critical`, whatever its status.
+More examples:
+
+- On Heartbeats, **status is failing and (period > 1h or availability < 99.9)** finds failing heartbeats that either expect a ping less often than hourly or are below 99.9% available.
+- On Monitors, **status is failing or tags is critical** lists every failing check and every check tagged `critical`, whatever its status.
 
 ## Use the keyboard
 

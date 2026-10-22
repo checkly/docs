@@ -25,6 +25,7 @@ npx checkly test [arguments] [options]
 | `--detach, -d` | - | Keep checks running in the cloud when you stop the CLI with Ctrl+C, instead of cancelling the run. |
 | `--env, -e` | - | Env vars to be passed to the test run. Can be used multiple times. |
 | `--env-file` | - | dotenv file path to be passed. For example `--env-file="./.env"` |
+| `--[no-]fail-on-no-matching` | - | Exit with a failing status code when there are no matching checks. Enabled by default. |
 | `--grep, -g` | - | Only run checks where the check name matches a regular expression. Default: `.*` |
 | `--list` | - | List all checks but don't run them. |
 | `--location, -l` | - | The location to run the checks at. |
@@ -99,6 +100,33 @@ Path to a dotenv file containing environment variables.
 npx checkly test --env-file="./.env"
 npx checkly test --env-file="./config/.env.production"
 ```
+
+</ResponseField>
+
+<ResponseField name="--[no-]fail-on-no-matching" type="boolean" default="true">
+
+Exit with a failing status code (`1`) when there are no checks to run, for example because the file arguments, `--grep` or `--tags` filters match none. This keeps a typo in a filter from turning a CI job green without running anything.
+
+**Usage:**
+
+```bash Terminal
+npx checkly test --fail-on-no-matching
+npx checkly test --no-fail-on-no-matching
+```
+
+**Examples:**
+
+```bash Terminal
+# Default behavior (enabled)
+npx checkly test --tags non-existent-tag
+# Exits with status code 1 because no checks match
+
+# Disable the behavior
+npx checkly test --no-fail-on-no-matching --tags optional-tag
+# Exits successfully even if no checks match
+```
+
+<Note>Available since CLI v10.0.0. Earlier versions always exit successfully when no checks match.</Note>
 
 </ResponseField>
 
@@ -182,7 +210,7 @@ npx checkly test --tags="critical,api" --tags="critical,ui"
 
 <ResponseField name="--list" type="boolean">
 
-List all checks to be run but don't run them.
+List all checks to be run but don't run them. The command exits successfully even when no checks match.
 
 **Usage:**
 
@@ -203,7 +231,7 @@ npx checkly test --list --tags="production"
 
 One or more custom reporters for the test output. Options: `list`, `dot`, `ci`, `github`, `json`.
 
-You can combine multiple reporters by passing multiple `--reporter` flags or using a comma-separated list. When no `--reporter` flag is provided, the CLI falls back to the `cli.reporters` array in `checkly.config.ts`, then defaults to `list` (or `ci` in CI environments).
+You can combine multiple reporters by passing multiple `--reporter` flags or using a comma-separated list. When no `--reporter` flag is provided, the CLI falls back to the `cli.reporters` array in `checkly.config.ts`, then defaults to `ci` when the CLI detects a CI environment or an AI agent, and to `list` otherwise. Set `CHECKLY_CLI_MODE` to `interactive`, `ci` or `agent` to override the detection.
 
 **Usage:**
 

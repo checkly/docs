@@ -32,10 +32,11 @@ Text that doesn't start a field name searches by name when you press Enter. On T
 | Heartbeats | Name, Ping URL, Status, Tags, Period, Grace and Availability |
 | Test sessions | Project, Environment, Branch, Commit, User, Has user, Status, Provider, Duration, Check, Check type, Tags and File |
 | Error Groups | Message, Project, Environment, Check type, Playwright project and Count |
-| Reporting | Name, Group, URL, Logical ID, Check type, Tags, Project and Created by |
+| Reporting | Name, Group, URL, Logical ID, Status, Check type, Tags, Project and Created by |
 
 - **Text fields** such as **Name**, **Group** and **URL** match when the text holds every word you type. The words can be in any order.
 - On Monitors and Reporting, **Tags** matches the tags of a check and the tags of its group.
+- On Reporting, **Status** is the alert state during the time range. **Failing** matches a check that was failing at some point in the range. A failure that started before the range and was still open counts. **Degraded** works the same way. **Passing** matches a check that ran in the range and was never failing or degraded. A check changes state only when it raises an alert. A failed run that raised no alert doesn't make it failing.
 - On Reporting, **Created by** matches the user or the API key that created the check. **Group by Location** is a button next to the filter field. It shows one row for each location a check runs in.
 - **Project** shows when the account has checks deployed with the [Checkly CLI](/cli/overview). **Traces** shows when the account [imports traces](/resolve/traces/import/overview).
 - **Period**, **Grace** and **Duration** compare durations such as `30s`, `5m`, `1h` or `1d`. **Availability** compares the percentage for the selected time range. These four take `>`, `>=`, `<`, `<=` and `=`.

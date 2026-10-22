@@ -1,11 +1,11 @@
 ---
 title: 'Filters'
-description: 'Filter the Monitors, Heartbeats, Test sessions and Error Groups lists, join filters with "and" or "or", and group them.'
+description: 'Filter the Monitors, Heartbeats, Test sessions, Error Groups and Reporting lists, join filters with "and" or "or", and group them.'
 sidebarTitle: 'Filters'
 canonical: 'https://www.checklyhq.com/docs/platform/filters/'
 ---
 
-On Monitors, Heartbeats, Test sessions and Error Groups, you filter the list in the filter field above it. Each filter is a block with a field, an operator and a value, such as **status is failing**. Filters join with **and** or **or**. Groups let you mix both.
+On Monitors, Heartbeats, Test sessions, Error Groups and Reporting, you filter the list in the filter field above it. Each filter is a block with a field, an operator and a value, such as **status is failing**. Filters join with **and** or **or**. Groups let you mix both.
 
 <Frame>
   <img className="block dark:hidden" src="/images/filters/filter-groups.png" alt="The Monitors date picker and filter field, with a status filter and a group that joins a tags filter and a name filter with or" />
@@ -32,9 +32,11 @@ Text that doesn't start a field name searches by name when you press Enter. On T
 | Heartbeats | Name, Ping URL, Status, Tags, Period, Grace and Availability |
 | Test sessions | Project, Environment, Branch, Commit, User, Has user, Status, Provider, Duration, Check, Check type, Tags and File |
 | Error Groups | Message, Project, Environment, Check type, Playwright project and Count |
+| Reporting | Name, Group, URL, Logical ID, Check type, Tags, Project and Created by |
 
 - **Text fields** such as **Name**, **Group** and **URL** match when the text holds every word you type. The words can be in any order.
-- On Monitors, **Tags** matches the tags of a check and the tags of its group.
+- On Monitors and Reporting, **Tags** matches the tags of a check and the tags of its group.
+- On Reporting, **Created by** matches the user or the API key that created the check. **Group by Location** is a button next to the filter field. It shows one row for each location a check runs in.
 - **Project** shows when the account has checks deployed with the [Checkly CLI](/cli/overview). **Traces** shows when the account [imports traces](/resolve/traces/import/overview).
 - **Period**, **Grace** and **Duration** compare durations such as `30s`, `5m`, `1h` or `1d`. **Availability** compares the percentage for the selected time range. These four take `>`, `>=`, `<`, `<=` and `=`.
 - On Test sessions, **Commit** matches the commit ID or its message. **User** matches the person or the API key that started the session. **Has user** is false when no person or API key is linked to the session. **Duration** is how long the session ran. A session still running never matches it.

@@ -8,8 +8,8 @@ canonical: 'https://www.checklyhq.com/docs/platform/filters/'
 On Monitors, Heartbeats, Test sessions and Error Groups, you filter the list in the filter field above it. Each filter is a block with a field, an operator and a value, such as **status is failing**. Filters join with **and** or **or**. Groups let you mix both.
 
 <Frame>
-  <img className="block dark:hidden" src="/images/filters/filter-groups.png" alt="The Monitors filter field with the time range, a status filter and a group that joins a tags filter and a name filter with or" />
-  <img className="hidden dark:block" src="/images/filters/filter-groups-dark.png" alt="The Monitors filter field with the time range, a status filter and a group that joins a tags filter and a name filter with or" />
+  <img className="block dark:hidden" src="/images/filters/filter-groups.png" alt="The Monitors date picker and filter field, with a status filter and a group that joins a tags filter and a name filter with or" />
+  <img className="hidden dark:block" src="/images/filters/filter-groups-dark.png" alt="The Monitors date picker and filter field, with a status filter and a group that joins a tags filter and a name filter with or" />
 </Frame>
 
 ## Add a filter
@@ -28,10 +28,10 @@ Text that doesn't start a field name searches by name when you press Enter. On T
 
 | Screen | Fields |
 |--------|--------|
-| Monitors | Name, Group, URL, Logical ID, Status, Check type, Tags, Project, Traces and the time range |
-| Heartbeats | Name, Ping URL, Status, Tags, Period, Grace, Availability and the time range |
-| Test sessions | Project, Environment, Branch, Commit, User, Has user, Status, Provider, Duration, Check, Check type, Tags, File and the time range |
-| Error Groups | Message, Project, Environment, Check type, Playwright project, Count and the time range |
+| Monitors | Name, Group, URL, Logical ID, Status, Check type, Tags, Project and Traces |
+| Heartbeats | Name, Ping URL, Status, Tags, Period, Grace and Availability |
+| Test sessions | Project, Environment, Branch, Commit, User, Has user, Status, Provider, Duration, Check, Check type, Tags and File |
+| Error Groups | Message, Project, Environment, Check type, Playwright project and Count |
 
 - **Text fields** such as **Name**, **Group** and **URL** match when the text holds every word you type. The words can be in any order.
 - On Monitors, **Tags** matches the tags of a check and the tags of its group.
@@ -41,13 +41,16 @@ Text that doesn't start a field name searches by name when you press Enter. On T
 - On Test sessions, **Check**, **Check type**, **Tags** and **File** match a session when any check that ran in it matches. **Tags** matches the tags of the check and of its group. **File** is the Playwright test file.
 - On Error Groups, **Count** compares the number of errors in the time range. The time range filters error groups by when they were last seen.
 - The **Test Sessions** and **Error Groups** tabs each have their own filters. Switching tabs clears them.
-- **The time range** can't be removed. It always applies with **and**.
+
+## Pick the time range
+
+The date picker left of the filter field sets the time range. Click it and pick a preset, such as **Last 24 hours**. To pick days on a calendar, open **Custom**. A custom range shows as its days, such as **21-22 Oct**. The time range always applies on top of the filters. A view saves it with the filters.
 
 ## Join filters
 
 Filters join with **and** by default. The list then shows what matches every filter. Click the word between two filters to switch it to **or**. The list then shows what matches any filter. The switch applies to every join at that level.
 
-To join only the next filter with **or**, type `or` before it. For example, with **status is failing and name contains api** in the field, type `or url` and press Enter. Then type `health` and press Enter. The field now reads **status is failing and (name contains api or url contains health)**. The new filter is grouped with the filter right before it. The other joins don't change. Typing `and` before a filter works the same way.
+To join only the next filter with **or**, type `or` and a space. The **or** shows at the end of the field. The next filter you add joins with it. For example, with **status is failing and name contains api** in the field, type `or url` and press Enter. Then type `health` and press Enter. The field now reads **status is failing and (name contains api or url contains health)**. The new filter is grouped with the filter right before it. The other joins don't change. Typing `and` works the same way. Without a typed join, a new filter joins with **and**. Press Backspace in the empty field to remove a typed join.
 
 ## Group filters
 
@@ -86,10 +89,10 @@ Every part of a filter is reachable from the keyboard.
 | Tab, Shift+Tab, Left, Right | Moves between the parts of the filters and the joining words |
 | Typing on a value | Changes the value, or searches the picker of a field with many values |
 | Enter, Space | Opens the picker of the focused part, or switches the focused joining word |
-| Backspace, Delete | Removes the focused filter |
+| Backspace, Delete | Removes the focused filter, or a filter whose value you are typing while it is empty |
 | Alt+Left, Alt+Right | Moves the focused filter left or right. It can move into and out of groups. |
 
-In the filter field, type `and` or `or` and press Enter to switch how the filters at the top level join. Inside an open group, this switches the group's join.
+In the empty filter field, Backspace removes a typed join first, then the last filter.
 
 ## Save and share filters
 

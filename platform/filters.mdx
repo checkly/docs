@@ -1,11 +1,11 @@
 ---
 title: 'Filters'
-description: 'Filter the Monitors, Heartbeats, Test sessions, Error Groups and Reporting lists, join filters with "and" or "or", and group them.'
+description: 'Filter a list in the Checkly app, join filters with "and" or "or", group them, and share or save the result.'
 sidebarTitle: 'Filters'
 canonical: 'https://www.checklyhq.com/docs/platform/filters/'
 ---
 
-On Monitors, Heartbeats, Test sessions, Error Groups and Reporting, you filter the list in the filter field above it. Each filter is a block with a field, an operator and a value, such as **status is failing**. Filters join with **and** or **or**. Groups let you mix both.
+Lists in the Checkly app that support filtering have a filter field above them. Each filter is a block with a field, an operator and a value, such as **status is failing**. Filters join with **and** or **or**. Groups let you mix both.
 
 <Frame>
   <img className="block dark:hidden" src="/images/filters/filter-groups.png" alt="The Monitors date picker and filter field, with a status filter and a group that joins a tags filter and a name filter with or" />
@@ -22,31 +22,110 @@ A field with a fixed set of values, such as **Status** or **Tags**, starts with 
 
 Fields like **Tags** take several values. The filter then matches any of them. The block shows how many it holds, such as **3 tags**. Long lists, such as your tags, have a search at the top of the picker.
 
-Text that doesn't start a field name searches by name when you press Enter. On Test sessions, it searches the project name. On Error Groups, it searches the error message.
+Text that doesn't start a field name searches by name when you press Enter. A list that searches another field says so in its section under [Fields](#fields).
 
 ## Fields
 
-| Screen | Fields |
-|--------|--------|
-| Monitors | Name, Group, URL, Logical ID, Status, Check type, Tags, Project and Traces |
-| Heartbeats | Name, Ping URL, Status, Tags, Period, Grace and Availability |
-| Test sessions | Project, Environment, Branch, Commit, User, Has user, Status, Provider, Duration, Check, Check type, Tags and File |
-| Error Groups | Message, Project, Environment, Check type, Playwright project and Count |
-| Reporting | Name, Group, URL, Logical ID, Status, Ran, Check type, Tags, Project, Location, Created by, Success, Avg, P95 and P99 |
+Each list has its own fields. A field matches in one of four ways:
 
-- **Text fields** such as **Name**, **Group** and **URL** match when the text holds every word you type. The words can be in any order.
-- On Monitors and Reporting, **Tags** matches the tags of a check and the tags of its group.
-- On Reporting, **Status** is the alert state during the time range. **Failing** matches a check that was failing at some point in the range. A failure that started before the range and was still open counts. **Degraded** works the same way. **Passing** matches a check that ran in the range and was never failing or degraded. A check changes state only when it raises an alert. A failed run that raised no alert doesn't make it failing.
-- On Reporting, **Created by** matches the user or the API key that created the check.
-- On Reporting, **Ran** is true for a check with results in the time range, and false for one without.
-- On Reporting, **Location** matches a check that runs in one of the locations. When you [group by location](#group-the-rows), it matches the rows of those locations.
-- On Reporting, **Success**, **Avg**, **P95** and **P99** compare the numbers the table shows for the time range. **Success** is a percentage, such as `99.9`. **Avg**, **P95** and **P99** are response times, such as `500ms` or `2s`. A number without a unit is in milliseconds. **Avg**, **P95** and **P99** count only runs with a measured response time. A failed run that records no response time doesn't count. A check without results in the time range matches none of the four. A check whose runs all failed shows a dash for **Avg**, **P95** and **P99**. It matches none of them. When you group by location, a check matches on its numbers across all locations.
-- **Project** shows when the account has checks deployed with the [Checkly CLI](/cli/overview). **Traces** shows when the account [imports traces](/resolve/traces/import/overview).
-- **Period**, **Grace** and **Duration** compare durations such as `30s`, `5m`, `1h` or `1d`. **Availability** compares the percentage for the selected time range. These fields and the Reporting numbers take `>`, `>=`, `<`, `<=` and `=`.
-- On Test sessions, **Commit** matches the commit ID or its message. **User** matches the person or the API key that started the session. **Has user** is false when no person or API key is linked to the session. **Duration** is how long the session ran. A session still running never matches it.
-- On Test sessions, **Check**, **Check type**, **Tags** and **File** match a session when any check that ran in it matches. **Tags** matches the tags of the check and of its group. **File** is the Playwright test file.
-- On Error Groups, **Count** compares the number of errors in the time range. The time range filters error groups by when they were last seen.
-- The **Test Sessions** and **Error Groups** tabs each have their own filters. Switching tabs clears them.
+| Kind | Examples | Matches when |
+|------|----------|--------------|
+| Text | Name, Group, URL | The text holds every word you type, in any order. |
+| Choice | Status, Check type, Tags | The item has any of the values you picked. |
+| Number | Duration, Availability, P95 | The number compares true with `>`, `>=`, `<`, `<=` or `=`. |
+| Yes or no | Has user, Ran | The answer is the one you picked. |
+
+Durations take a unit, such as `30s`, `5m`, `1h` or `1d`. Percentages are plain numbers, such as `99.9`.
+
+### Monitors
+
+| Field | What it matches |
+|-------|-----------------|
+| Name | The name of the check. |
+| Group | The name of the check's group. |
+| URL | The URL the check requests. |
+| Logical ID | The ID of the check in your Checkly CLI project. |
+| Status | The current status of the check. |
+| Check type | The type of check. |
+| Tags | The tags of the check and of its group. |
+| Project | The [Checkly CLI](/cli/overview) project the check is deployed from. It shows when the account has checks deployed with the CLI. |
+| Traces | Whether the check receives traces. It shows when the account [imports traces](/resolve/traces/import/overview). |
+
+### Heartbeats
+
+| Field | What it matches |
+|-------|-----------------|
+| Name | The name of the heartbeat. |
+| Ping URL | The URL your job calls to send a ping. |
+| Status | The current status of the heartbeat. |
+| Tags | The tags of the heartbeat. |
+| Period | The expected time between pings. |
+| Grace | The extra time Checkly waits for a late ping before it alerts. |
+| Availability | The availability over the time range, as a percentage. |
+
+### Test sessions
+
+Text without a field searches the project name.
+
+| Field | What it matches |
+|-------|-----------------|
+| Project | The project name of the session. |
+| Environment | The environment the session ran in. |
+| Branch | The Git branch of the session. |
+| Commit | The ID or the message of the commit the session ran on. |
+| User | The commit owner, or the person or API key that started the session. |
+| Has user | Whether a person or an API key started the session. |
+| Status | The status of the session. |
+| Provider | The tool or integration that started the session. |
+| Duration | How long the session took to run. A session still running never matches. |
+| Check | The name of a check that ran in the session. |
+| Check type | The type of a check that ran in the session. |
+| Tags | The tags of a check that ran in the session, and of its group. |
+| File | The Playwright test file of a check that ran in the session. |
+
+### Error Groups
+
+The **Error Groups** tab has its own filters. Switching between it and the **Test Sessions** tab clears them. Text without a field searches the error message. The time range keeps the error groups last seen within it.
+
+| Field | What it matches |
+|-------|-----------------|
+| Message | The error message. |
+| Project | The project name of the error group. |
+| Environment | The environment the error occurred in. |
+| Check type | The type of check the error occurred in. |
+| Playwright project | The Playwright project the error occurred in. |
+| Count | How many times the error occurred in the time range. |
+
+### Reporting
+
+Reporting filters on the details of each check and on its results in the time range.
+
+**Check details**
+
+| Field | What it matches |
+|-------|-----------------|
+| Name | The name of the check. |
+| Group | The name of the check's group. |
+| URL | The URL the check requests. |
+| Logical ID | The ID of the check in your Checkly CLI project. |
+| Check type | The type of check. |
+| Tags | The tags of the check and of its group. |
+| Project | The Checkly CLI project the check is deployed from. It shows when the account has checks deployed with the CLI. |
+| Location | A location the check runs in. When you [group by location](#group-the-rows), the location of the row. |
+| Created by | The user or API key that created the check. |
+
+**Results in the time range**
+
+| Field | What it matches |
+|-------|-----------------|
+| Status | The alert state of the check during the time range. |
+| Ran | Whether the check has results in the time range. |
+| Success | The success ratio, as a percentage. |
+| Avg, P95, P99 | The response times, such as `500ms` or `2s`. A number without a unit is in milliseconds. |
+
+**Status** follows the check's alerts. **Failing** matches a check that was failing at any point in the time range. A failure that started before the range and was still open counts. **Degraded** works the same way. **Passing** matches a check that ran in the range and was never failing or degraded. A failed run that raised no alert doesn't change the check's state.
+
+**Success**, **Avg**, **P95** and **P99** compare the numbers the table shows. **Avg**, **P95** and **P99** count only runs with a measured response time. A failed run records none. A check whose runs all failed shows a dash in those columns. It matches no filter on them. A check without results in the time range matches none of the four. When you group by location, these filters still compare each check's numbers across all its locations.
 
 ## Pick the time range
 
@@ -88,9 +167,9 @@ More examples:
 
 ## Group the rows
 
-On Reporting, you can group the rows by location. Type `group by location` or `groupBy:location` in the filter field and press Enter. A **group by Location** block shows in the field. The table then lists one row for each check and location. A **Location** column shows before **Success**.
+Reporting can list one row for each check and location. Type `group by location` or `groupBy:location` in the filter field and press Enter. A **group by Location** block appears in the field. The table adds a **Location** column before **Success**.
 
-The block isn't a filter. It doesn't join filters with **and** or **or**. It can't go into a group. Drag it, or press Alt+Left or Alt+Right on it, to move it anywhere in the field. Remove it to list one row per check again.
+The block groups the rows. It takes no **and** or **or** and can't go into a group. Drag it, or press Alt+Left or Alt+Right on it, to move it anywhere in the field. Remove it to go back to one row per check.
 
 ## Use the keyboard
 
@@ -108,4 +187,4 @@ In the empty filter field, Backspace removes a typed join first, then the last f
 
 ## Save and share filters
 
-The page URL holds every filter and its groups. Copy it to send the same list to a teammate. On Monitors, Heartbeats, Test sessions and Reporting, you can save filters you use often as a [view](/platform/views).
+The page URL holds every filter and its groups. Copy it to send the same list to a teammate. A list with a views bar can also save filters you use often as a [view](/platform/views).

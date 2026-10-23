@@ -11,7 +11,7 @@ The reporting dashboard provides comprehensive insights into your monitoring per
 
 ## Dashboard Overview
 
-The reporting dashboard displays your first 15 checks with key performance metrics at a glance. Use this view to:
+The reporting dashboard lists your checks with their key performance metrics. It shows 25 checks per page. **Avg**, **P95** and **P99** count only runs with a measured response time. A check whose runs all failed shows a dash. Use this view to:
 
 - Quickly identify underperforming checks
 - Monitor trends across your monitoring infrastructure  
@@ -28,16 +28,23 @@ Select the time period for your analysis. The dashboard adjusts data granularity
 </Accordion>
 
 <Accordion title="Check Filters">
-Filter by:
-- **Check Type**: API, Browser, or Multistep checks
-- **Check Tags**: Filter by tags applied to individual checks
-- **Check Group Tags**: Filter by tags applied to check groups
+Type in the filter field to narrow the list. You can filter on:
+- **Check details**: name, group, URL, logical ID, check type, tags, project, location and creator
+- **Results in the date range**: status, whether the check ran, success, Avg, P95 and P99
+
+Filters join with **and** or **or** and can be grouped. See [Filters](/platform/filters#reporting) for what each field matches. Save filters you use often as a [view](/platform/views).
+</Accordion>
+
+<Accordion title="Group by Location">
+Type `group by location` in the filter field and press Enter to list one row per check and location. The table adds a **Location** column before **Success**. See [Group the rows](/platform/filters#group-the-rows).
 </Accordion>
 
 <Accordion title="Sorting Options">
 Sort your results by:
 - **Name**: Alphabetical order (ASC/DESC)
 - **Check Type**: Group similar check types together (ASC/DESC)
+- **Location**: Alphabetical order of the location name, when grouped by location (ASC/DESC)
+- **Success**, **Avg**, **P95** or **P99**: The values for the selected date range (ASC/DESC). Checks without a value come last.
 </Accordion>
 </AccordionGroup>
 
@@ -79,7 +86,7 @@ Use check type, tags, and other filters to narrow your dataset if needed.
 </Step>
 
 <Step title="Download">
-Click **Download as CSV** in the toolbar to generate your export file.
+Click **Download CSV** at the top of the page to generate your export file.
 </Step>
 </Steps>
 
@@ -87,16 +94,18 @@ Click **Download as CSV** in the toolbar to generate your export file.
 
 The CSV export includes the following columns:
 
-| Field | Description |
-|-------|-------------|
-| Name | Check name for identification |
-| Check ID | Unique identifier for the check |
-| Check Type | API, Browser, or Multistep |
-| Success Ratio | Percentage of successful runs |
-| Response Time (Average) | Mean response time |
-| Response Time (P95) | 95th percentile response time |
-| Response Time (P99) | 99th percentile response time |
-| Check Tags | Applied tags for categorization |
+| Column | Description |
+|--------|-------------|
+| id | Unique identifier for the check |
+| name | Check name |
+| activated | Whether the check is active |
+| group | Name of the check's group |
+| type | Check type |
+| successRatio | Percentage of successful runs |
+| avg | Average response time in milliseconds |
+| p95 | 95th percentile response time in milliseconds |
+| p99 | 99th percentile response time in milliseconds |
+| tags | Tags of the check and of its group |
 
 <Note>
 All statistics are calculated based on your selected date range. The default range is "Last 24 Hours".

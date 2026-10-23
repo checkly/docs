@@ -32,13 +32,15 @@ Text that doesn't start a field name searches by name when you press Enter. On T
 | Heartbeats | Name, Ping URL, Status, Tags, Period, Grace and Availability |
 | Test sessions | Project, Environment, Branch, Commit, User, Has user, Status, Provider, Duration, Check, Check type, Tags and File |
 | Error Groups | Message, Project, Environment, Check type, Playwright project and Count |
-| Reporting | Name, Group, URL, Logical ID, Status, Check type, Tags, Project, Created by, Success, Avg, P95 and P99 |
+| Reporting | Name, Group, URL, Logical ID, Status, Ran, Check type, Tags, Project, Location, Created by, Success, Avg, P95 and P99 |
 
 - **Text fields** such as **Name**, **Group** and **URL** match when the text holds every word you type. The words can be in any order.
 - On Monitors and Reporting, **Tags** matches the tags of a check and the tags of its group.
 - On Reporting, **Status** is the alert state during the time range. **Failing** matches a check that was failing at some point in the range. A failure that started before the range and was still open counts. **Degraded** works the same way. **Passing** matches a check that ran in the range and was never failing or degraded. A check changes state only when it raises an alert. A failed run that raised no alert doesn't make it failing.
-- On Reporting, **Created by** matches the user or the API key that created the check. **Group by Location** is a button next to the filter field. It shows one row for each location a check runs in.
-- On Reporting, **Success**, **Avg**, **P95** and **P99** compare the numbers the table shows for the time range. **Success** is a percentage, such as `99.9`. **Avg**, **P95** and **P99** are response times, such as `500ms` or `2s`. A number without a unit is in milliseconds. A check without results in the time range matches none of them. With **Group by Location**, a check matches on its numbers across all locations.
+- On Reporting, **Created by** matches the user or the API key that created the check.
+- On Reporting, **Ran** is true for a check with results in the time range, and false for one without.
+- On Reporting, **Location** matches a check that runs in one of the locations. When you [group by location](#group-the-rows), it matches the rows of those locations.
+- On Reporting, **Success**, **Avg**, **P95** and **P99** compare the numbers the table shows for the time range. **Success** is a percentage, such as `99.9`. **Avg**, **P95** and **P99** are response times, such as `500ms` or `2s`. A number without a unit is in milliseconds. A check without results in the time range matches none of them. When you group by location, a check matches on its numbers across all locations.
 - **Project** shows when the account has checks deployed with the [Checkly CLI](/cli/overview). **Traces** shows when the account [imports traces](/resolve/traces/import/overview).
 - **Period**, **Grace** and **Duration** compare durations such as `30s`, `5m`, `1h` or `1d`. **Availability** compares the percentage for the selected time range. These fields and the Reporting numbers take `>`, `>=`, `<`, `<=` and `=`.
 - On Test sessions, **Commit** matches the commit ID or its message. **User** matches the person or the API key that started the session. **Has user** is false when no person or API key is linked to the session. **Duration** is how long the session ran. A session still running never matches it.
@@ -84,6 +86,12 @@ More examples:
 - On Heartbeats, **status is failing and (period > 1h or availability < 99.9)** finds failing heartbeats that either expect a ping less often than hourly or are below 99.9% available.
 - On Monitors, **status is failing or tags is critical** lists every failing check and every check tagged `critical`.
 
+## Group the rows
+
+On Reporting, you can group the rows by location. Type `group by location` or `groupBy:location` in the filter field and press Enter. A **group by Location** block shows in the field, and the table lists one row for each check and location, with a **Location** column.
+
+The block isn't a filter. It doesn't join the filters with **and** or **or**, and it doesn't go into a group. Drag it, or press Alt+Left or Alt+Right on it, to move it anywhere in the field. Remove it to list one row per check again.
+
 ## Use the keyboard
 
 Every part of a filter is reachable from the keyboard.
@@ -100,4 +108,4 @@ In the empty filter field, Backspace removes a typed join first, then the last f
 
 ## Save and share filters
 
-The page URL holds every filter and its groups. Copy it to send the same list to a teammate. On Monitors, Heartbeats and Test sessions, you can save filters you use often as a [view](/platform/views).
+The page URL holds every filter and its groups. Copy it to send the same list to a teammate. On Monitors, Heartbeats, Test sessions and Reporting, you can save filters you use often as a [view](/platform/views).

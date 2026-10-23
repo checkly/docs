@@ -29,6 +29,7 @@ npx checkly test [arguments] [options]
 | `--grep, -g` | - | Only run checks where the check name matches a regular expression. Default: `.*` |
 | `--list` | - | List all checks but don't run them. |
 | `--location, -l` | - | The location to run the checks at. |
+| `--max-failures` | - | Stop waiting for the remaining checks once this many checks have failed, and exit with a failing status code. |
 | `--private-location` | - | The private location to run checks at. |
 | `--[no-]record` | - | Record test session results in Checkly with full logs, traces and videos. Records by default since CLI v8.0.0. |
 | `--refresh-cache` | - | Force a fresh install of dependencies and update the cached version. |
@@ -152,6 +153,34 @@ The location to run the checks at.
 ```bash Terminal
 npx checkly test --location="us-east-1"
 npx checkly test -l="eu-west-1"
+```
+
+</ResponseField>
+
+<ResponseField name="--max-failures" type="number">
+
+Stop waiting for the remaining checks once this many checks have failed (a whole number of 1 or more), and exit with a failing status code. Use it in CI to see a broken change fail early instead of waiting for the whole run. Overrides `cli.maxFailures` in your Checkly config.
+
+Only a check's final result counts toward the limit: a check that passes after a retry does not count, and neither does a degraded check. If the failure that reaches the limit is the last check to finish, the run completes normally.
+
+When the limit is reached, the CLI writes its reports, marks the remaining checks as not finished, and asks Checkly to cancel the test session. Only some check types, such as Playwright Check Suites, can be cancelled once they are running, so other checks may still run to completion in Checkly. The `json` reporter gives those checks `"result": "Not finished"` and adds a top-level `"stoppedEarly": { "reason": "maxFailures", "maxFailures": <n> }` field.
+
+Cannot be combined with `--detach` or `--update-snapshots`.
+
+**Usage:**
+
+```bash Terminal
+npx checkly test --max-failures=1
+```
+
+**Examples:**
+
+```bash Terminal
+# Stop at the first failed check
+npx checkly test --max-failures=1
+
+# Retry failing checks, and stop once three checks still fail after their retries
+npx checkly test --retries=2 --max-failures=3
 ```
 
 </ResponseField>

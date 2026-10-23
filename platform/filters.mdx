@@ -32,14 +32,15 @@ Text that doesn't start a field name searches by name when you press Enter. On T
 | Heartbeats | Name, Ping URL, Status, Tags, Period, Grace and Availability |
 | Test sessions | Project, Environment, Branch, Commit, User, Has user, Status, Provider, Duration, Check, Check type, Tags and File |
 | Error Groups | Message, Project, Environment, Check type, Playwright project and Count |
-| Reporting | Name, Group, URL, Logical ID, Status, Check type, Tags, Project and Created by |
+| Reporting | Name, Group, URL, Logical ID, Status, Check type, Tags, Project, Created by, Success, Avg, P95 and P99 |
 
 - **Text fields** such as **Name**, **Group** and **URL** match when the text holds every word you type. The words can be in any order.
 - On Monitors and Reporting, **Tags** matches the tags of a check and the tags of its group.
 - On Reporting, **Status** is the alert state during the time range. **Failing** matches a check that was failing at some point in the range. A failure that started before the range and was still open counts. **Degraded** works the same way. **Passing** matches a check that ran in the range and was never failing or degraded. A check changes state only when it raises an alert. A failed run that raised no alert doesn't make it failing.
 - On Reporting, **Created by** matches the user or the API key that created the check. **Group by Location** is a button next to the filter field. It shows one row for each location a check runs in.
+- On Reporting, **Success**, **Avg**, **P95** and **P99** compare the numbers the table shows for the time range. **Success** is a percentage, such as `99.9`. **Avg**, **P95** and **P99** are response times, such as `500ms` or `2s`. A number without a unit is in milliseconds. A check without results in the time range matches none of them. With **Group by Location**, a check matches on its numbers across all locations.
 - **Project** shows when the account has checks deployed with the [Checkly CLI](/cli/overview). **Traces** shows when the account [imports traces](/resolve/traces/import/overview).
-- **Period**, **Grace** and **Duration** compare durations such as `30s`, `5m`, `1h` or `1d`. **Availability** compares the percentage for the selected time range. These four take `>`, `>=`, `<`, `<=` and `=`.
+- **Period**, **Grace** and **Duration** compare durations such as `30s`, `5m`, `1h` or `1d`. **Availability** compares the percentage for the selected time range. These fields and the Reporting numbers take `>`, `>=`, `<`, `<=` and `=`.
 - On Test sessions, **Commit** matches the commit ID or its message. **User** matches the person or the API key that started the session. **Has user** is false when no person or API key is linked to the session. **Duration** is how long the session ran. A session still running never matches it.
 - On Test sessions, **Check**, **Check type**, **Tags** and **File** match a session when any check that ran in it matches. **Tags** matches the tags of the check and of its group. **File** is the Playwright test file.
 - On Error Groups, **Count** compares the number of errors in the time range. The time range filters error groups by when they were last seen.

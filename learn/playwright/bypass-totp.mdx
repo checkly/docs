@@ -38,6 +38,10 @@ Following the flow, people log in with their credentials and are prompted with a
 
 And indeed, testing a passcode coming from a mobile application or SMS is challenging, but as it turns out, authenticator apps don’t include as much magic as I initially thought!
 
+<Note>
+This article covers **authenticator app / TOTP** flows only. If your login uses an OTP delivered by **SMS or email**, `otpauth` can't help — the code is generated server-side and delivered out of band. See the [SMS and email one-time passcodes](/learn/playwright/authentication#sms-and-email-one-time-passcodes) section of the authentication guide for the patterns we recommend (test-mode bypass, programmable inbox providers, or reading the code from your own backend).
+</Note>
+
 ### Authenticator apps and TOTP
 
 Let’s look at GitHub’s 2FA flow. When setting up 2FA with an authenticator app, the service greets you with the following screen.

@@ -101,7 +101,7 @@ npx checkly login
 
 Run the CLI through `npx checkly` from your project, so the CLI version is the one in your `package.json`.
 
-Commands that load your project (`test`, `deploy`, `trigger`, `destroy`, `validate`, `pw-test` and `import`) only work with the `checkly` package your project installs, because your checks register with that copy. Since CLI version 10.0.0, when you run one of these commands with any other installation, for example a global `npm i -g checkly`, `pnpm dlx checkly` or `npx checkly@<version>` outside your project's `node_modules`, the CLI hands the command to your project's installation. If the two versions differ, the CLI says which version runs. To use another version, install that version in your project.
+Your checks only load with the `checkly` package your project installs, because they register with that copy. Since CLI version 10.0.0, when you run `checkly` from any other installation, for example a global `npm i -g checkly`, `pnpm dlx checkly` or `npx checkly@<version>`, inside a project that has its own `checkly` package, the CLI hands the command to your project's installation, as `npx checkly` would. This applies to every command. If the two versions differ, the CLI says which version runs. To use another version, install that version in your project.
 
 Set `CHECKLY_NO_DELEGATION=1` to turn off the hand-off. Older global installs, and any install with the hand-off turned off, fail on projects that have their own `checkly` package with `Unable to create a construct ... outside a Checkly CLI project`.
 

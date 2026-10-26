@@ -25,9 +25,11 @@ npx checkly test [arguments] [options]
 | `--detach, -d` | - | Keep checks running in the cloud when you stop the CLI with Ctrl+C, instead of cancelling the run. |
 | `--env, -e` | - | Env vars to be passed to the test run. Can be used multiple times. |
 | `--env-file` | - | dotenv file path to be passed. For example `--env-file="./.env"` |
+| `--[no-]fail-on-no-matching` | - | Exit with a failing status code when there are no matching checks. Enabled by default. |
 | `--grep, -g` | - | Only run checks where the check name matches a regular expression. Default: `.*` |
 | `--list` | - | List all checks but don't run them. |
 | `--location, -l` | - | The location to run the checks at. |
+| `--max-failures` | - | Stop waiting for the remaining checks once this many checks have failed, and exit with a failing status code. |
 | `--private-location` | - | The private location to run checks at. |
 | `--[no-]record` | - | Record test session results in Checkly with full logs, traces and videos. Records by default since CLI v8.0.0. |
 | `--refresh-cache` | - | Force a fresh install of dependencies and update the cached version. |
@@ -102,6 +104,33 @@ npx checkly test --env-file="./config/.env.production"
 
 </ResponseField>
 
+<ResponseField name="--[no-]fail-on-no-matching" type="boolean" default="true">
+
+Exit with a failing status code (`1`) when there are no checks to run, for example because the file arguments, `--grep` or `--tags` filters match none. This keeps a typo in a filter from turning a CI job green without running anything.
+
+**Usage:**
+
+```bash Terminal
+npx checkly test --fail-on-no-matching
+npx checkly test --no-fail-on-no-matching
+```
+
+**Examples:**
+
+```bash Terminal
+# Default behavior (enabled)
+npx checkly test --tags non-existent-tag
+# Exits with status code 1 because no checks match
+
+# Disable the behavior
+npx checkly test --no-fail-on-no-matching --tags optional-tag
+# Exits successfully even if no checks match
+```
+
+<Note>Available since CLI v10.0.0. Earlier versions always exit successfully when no checks match.</Note>
+
+</ResponseField>
+
 <ResponseField name="--grep, -g" type="string">
 
 Only run checks where the check name matches a regular expression. Default: `.*`
@@ -124,6 +153,34 @@ The location to run the checks at.
 ```bash Terminal
 npx checkly test --location="us-east-1"
 npx checkly test -l="eu-west-1"
+```
+
+</ResponseField>
+
+<ResponseField name="--max-failures" type="number">
+
+Stop waiting for the remaining checks once this many checks have failed (a whole number of 1 or more), and exit with a failing status code. Use it in CI to see a broken change fail early instead of waiting for the whole run. Overrides `cli.maxFailures` in your Checkly config.
+
+Only a check's final result counts toward the limit: a check that passes after a retry does not count, and neither does a degraded check. If the failure that reaches the limit is the last check to finish, the run completes normally.
+
+When the limit is reached, the CLI writes its reports, marks the remaining checks as not finished, and asks Checkly to cancel the test session. Only some check types, such as Playwright Check Suites, can be cancelled once they are running, so other checks may still run to completion in Checkly. The `json` reporter gives those checks `"result": "Not finished"` and adds a top-level `"stoppedEarly": { "reason": "maxFailures", "maxFailures": <n> }` field.
+
+Cannot be combined with `--detach` or `--update-snapshots`.
+
+**Usage:**
+
+```bash Terminal
+npx checkly test --max-failures=1
+```
+
+**Examples:**
+
+```bash Terminal
+# Stop at the first failed check
+npx checkly test --max-failures=1
+
+# Retry failing checks, and stop once three checks still fail after their retries
+npx checkly test --retries=2 --max-failures=3
 ```
 
 </ResponseField>
@@ -182,7 +239,7 @@ npx checkly test --tags="critical,api" --tags="critical,ui"
 
 <ResponseField name="--list" type="boolean">
 
-List all checks to be run but don't run them.
+List all checks to be run but don't run them. The command exits successfully even when no checks match.
 
 **Usage:**
 
@@ -203,7 +260,7 @@ npx checkly test --list --tags="production"
 
 One or more custom reporters for the test output. Options: `list`, `dot`, `ci`, `github`, `json`.
 
-You can combine multiple reporters by passing multiple `--reporter` flags or using a comma-separated list. When no `--reporter` flag is provided, the CLI falls back to the `cli.reporters` array in `checkly.config.ts`, then defaults to `list` (or `ci` in CI environments).
+You can combine multiple reporters by passing multiple `--reporter` flags or using a comma-separated list. When no `--reporter` flag is provided, the CLI falls back to the `cli.reporters` array in `checkly.config.ts`, then defaults to `ci` when the CLI detects a CI environment or an AI agent, and to `list` otherwise. Set `CHECKLY_CLI_MODE` to `interactive`, `ci` or `agent` to override the detection.
 
 **Usage:**
 
@@ -317,6 +374,8 @@ A timeout (in seconds) to wait for each check to make progress once it starts ru
 The timer restarts whenever a check starts running and whenever it reports a failed attempt that will be retried, so a check that retries several times can take longer than this value in total. The timeout only ends the wait when a check stops reporting progress.
 
 Checkly can stagger the start of checks in large test sessions by up to 900 seconds. If a check still has not started within this value plus that allowance, the CLI reports that the check did not start. That usually means a problem on Checkly's side: check [the status page](https://is.checkly.online) or contact support.
+
+When the CLI stops waiting for a check, whether it stopped making progress or never started, it reports the check as timed out rather than failed: the CLI did not receive a result, and the check may still run and pass in Checkly. Reporters mark it with ⏱ (`T` in the `dot` reporter) and count it as timed out in the summary, and the `json` reporter gives it `"result": "Timed out"`. The run still exits with code 1.
 
 **Usage:**
 

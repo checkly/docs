@@ -33,7 +33,7 @@ npx checkly deploy [options]
 | `--plan-token` | - | Deploy only if the plan still matches this token from an earlier run. Aborts if anything changed in your Checkly account since then. Not available with `--no-plan`. |
 | `--preview, -p` | - | Show a preview of the changes made by the deploy command, with a diff of every updated resource. |
 | `--preserve-resources` | - | Detach resources removed from code (keeping them and their run history) instead of deleting them. |
-| `--prune-relations` | - | Delete the alert channel subscriptions and private location assignments on this project's checks and groups that the project does not manage. Not available with `--no-plan`. |
+| `--prune-unmanaged-relations` | - | Delete the alert channel subscriptions and private location assignments on this project's checks and groups that the project does not manage. Not available with `--no-plan`. |
 | `--[no-]schedule-on-deploy` | - | Schedule checks to run right after the deploy instead of waiting for their next scheduled run. Off by default; the other `--schedule-on-deploy-*` options apply only with it. |
 | `--schedule-on-deploy-scope` | - | Which checks to schedule after the deploy: `changed` (the default) schedules the checks the deploy created or updated, `all` also the ones it left unchanged. |
 | `--schedule-on-deploy-threshold` | - | Schedule no checks after the deploy if it would schedule more than this many, not counting the ones the scope and the minimum frequency leave out. Defaults to `auto`, which leaves the threshold to Checkly. |
@@ -57,7 +57,7 @@ The plan compares your code against what the project last deployed with a plan (
 
 - `+` create, `~` update, `-` delete. A deleted resource is noted `permanently deleted, run history lost`.
 - `-` with `kept in your Checkly account, now managed from the Checkly web app` for a resource removed from code that [`--preserve-resources`](#command-options) detaches instead of deleting.
-- `-` on a relation with `relation on Check <id> not managed by this project, deleted by --prune-relations` (or `CheckGroup`), naming the check or group it hangs off, and `!` on a check or group that has such relations when [`--prune-relations`](#command-options) is not passed.
+- `-` on a relation with `relation on Check <id> not managed by this project, deleted by --prune-unmanaged-relations` (or `CheckGroup`), naming the check or group it hangs off, and `!` on a check or group that has such relations when [`--prune-unmanaged-relations`](#command-options) is not passed.
 - `·` with `skipped (testOnly)` for checks marked `testOnly: true`, which are never deployed.
 - `=` for a resource that shows no difference from what is live and is written once to [set a baseline](#the-first-plan-of-a-project), listed after the resources the deploy changes.
 - A closing `N unchanged` row counting the resources the deploy leaves alone.
@@ -184,7 +184,7 @@ A helper-spelled property is written as the whole expression, in the spelling `c
 There is no flag for the choice, and the `confirmation_required` envelope does not change. To stop an unattended deploy from overwriting changes made in Checkly, use [`--fail-on-drift`](#command-options).
 
 <Note>
-When Checkly cannot provide a plan, the CLI warns that it could not get one, for example `Could not check what this deploy would change` or `Checkly has deploy plans switched off at the moment`, and deploys without one, which is what a deploy with `--no-plan` does on purpose. Without a plan, a deploy that deletes removed resources finds them with a dry run and lists them in the confirmation; with `--preserve-resources` nothing is listed. Either way the code bundle is uploaded only after you confirm. `--plan-token`, `--prune-relations` and `--fail-on-drift` need a plan and are refused without one.
+When Checkly cannot provide a plan, the CLI warns that it could not get one, for example `Could not check what this deploy would change` or `Checkly has deploy plans switched off at the moment`, and deploys without one, which is what a deploy with `--no-plan` does on purpose. Without a plan, a deploy that deletes removed resources finds them with a dry run and lists them in the confirmation; with `--preserve-resources` nothing is listed. Either way the code bundle is uploaded only after you confirm. `--plan-token`, `--prune-unmanaged-relations` and `--fail-on-drift` need a plan and are refused without one.
 </Note>
 
 ## Command Options
@@ -328,7 +328,7 @@ Plan the deploy before running it, and deploy that plan. The plan compares every
 
 Pass `--no-plan` to deploy without a plan: every resource the project declares is written, and an edit made to one of them in the Checkly web app or through the API is overwritten without being reported. That is how a deploy ran in earlier major versions of the CLI unless it passed `--plan`. The next planned deploy then [sets a baseline again](#the-first-plan-of-a-project) for the resources it wrote.
 
-If Checkly cannot provide a plan, the CLI says so and deploys without one, unless the run also passed `--plan-token`, `--prune-relations` or `--fail-on-drift`, in which case nothing is deployed.
+If Checkly cannot provide a plan, the CLI says so and deploys without one, unless the run also passed `--plan-token`, `--prune-unmanaged-relations` or `--fail-on-drift`, in which case nothing is deployed.
 
 **Usage:**
 
@@ -415,16 +415,16 @@ In the deploy output, a detached resource keeps its `-` marker but is noted `kep
 
 </ResponseField>
 
-<ResponseField name="--prune-relations" type="boolean">
+<ResponseField name="--prune-unmanaged-relations" type="boolean">
 
-Alert channel subscriptions and private location assignments can be added to a check or group from the Checkly web app, outside your code. A deploy leaves those alone and reports them as relations the project does not manage. Pass `--prune-relations` to delete them, so the check or group ends up with exactly the alert channels and private locations your code declares. Not available with `--no-plan`: the plan is what finds those relations and lists them before anything is deleted.
+Alert channel subscriptions and private location assignments can be added to a check or group from the Checkly web app, outside your code. A deploy leaves those alone and reports them as relations the project does not manage. Pass `--prune-unmanaged-relations` to delete them, so the check or group ends up with exactly the alert channels and private locations your code declares. Not available with `--no-plan`: the plan is what finds those relations and lists them before anything is deleted.
 
-Without the flag, a check or group whose only reported change is such a relation gets a `!` row noted `has alert channels or private locations this project does not manage (pass --prune-relations to delete them)`. With it, every relation to be deleted gets its own `-` row noted `relation on Check <id> not managed by this project, deleted by --prune-relations` (or `CheckGroup`), and is named in the confirmation, so you can see what goes before it does.
+Without the flag, a check or group whose only reported change is such a relation gets a `!` row noted `has alert channels or private locations this project does not manage (pass --prune-unmanaged-relations to delete them)`. With it, every relation to be deleted gets its own `-` row noted `relation on Check <id> not managed by this project, deleted by --prune-unmanaged-relations` (or `CheckGroup`), and is named in the confirmation, so you can see what goes before it does.
 
 **Usage:**
 
 ```bash Terminal
-npx checkly deploy --prune-relations
+npx checkly deploy --prune-unmanaged-relations
 ```
 
 </ResponseField>

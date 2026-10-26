@@ -27,6 +27,7 @@ npx checkly deploy [options]
 | `--cancel-in-progress-deployment` | - | If a deployment for this project is already in progress, cancel it instead of waiting for it to finish. |
 | `--debug-bundle` | - | Write the data a deploy would send to `./debug-bundle.json` and exit without deploying anything. **Note**: This flag is in beta. The bundle’s structure is not considered a stable format and may change without notice. It’s intended for one-off troubleshooting, and note it may contain secrets before sharing. |
 | `--dry-run` | - | Print what the deploy would do as JSON and exit without deploying. The JSON carries the plan. |
+| `--[no-]fail-on-drift` | - | Deploy nothing and fail if the deploy would overwrite a change made in Checkly since the last planned deploy. Also set with `CHECKLY_FAIL_ON_DRIFT=1`. Not available with `--no-plan`. |
 | `--output, -o` | - | Show the changes made after the deploy command, with a diff of every updated resource. |
 | `--[no-]plan` | - | Plan the deploy first and deploy that plan: only the resources that differ are written. On by default; `--no-plan` writes every resource without a plan. |
 | `--plan-token` | - | Deploy only if the plan still matches this token from an earlier run. Aborts if anything changed in your Checkly account since then. Not available with `--no-plan`. |
@@ -180,10 +181,10 @@ Nothing was deployed. Review with `git diff`, then run `npx checkly deploy` agai
 
 A helper-spelled property is written as the whole expression, in the spelling `checkly import` uses, so the diff can show more lines than the one value that changed when your formatting differs from it.
 
-There is no flag for the choice, and the `confirmation_required` envelope does not change.
+There is no flag for the choice, and the `confirmation_required` envelope does not change. To stop an unattended deploy from overwriting changes made in Checkly, use [`--fail-on-drift`](#command-options).
 
 <Note>
-When Checkly cannot provide a plan, the CLI warns that it could not get one, for example `Could not check what this deploy would change` or `Checkly has deploy plans switched off at the moment`, and deploys without one, which is what a deploy with `--no-plan` does on purpose. Without a plan, a deploy that deletes removed resources finds them with a dry run and lists them in the confirmation; with `--preserve-resources` nothing is listed. Either way the code bundle is uploaded only after you confirm. `--plan-token` and `--prune-relations` need a plan and are refused without one.
+When Checkly cannot provide a plan, the CLI warns that it could not get one, for example `Could not check what this deploy would change` or `Checkly has deploy plans switched off at the moment`, and deploys without one, which is what a deploy with `--no-plan` does on purpose. Without a plan, a deploy that deletes removed resources finds them with a dry run and lists them in the confirmation; with `--preserve-resources` nothing is listed. Either way the code bundle is uploaded only after you confirm. `--plan-token`, `--prune-relations` and `--fail-on-drift` need a plan and are refused without one.
 </Note>
 
 ## Command Options
@@ -222,6 +223,28 @@ Print what the deploy would do as a JSON envelope and exit without deploying. Th
 ```bash Terminal
 npx checkly deploy --dry-run
 npx checkly deploy --no-plan --dry-run
+```
+
+</ResponseField>
+
+<ResponseField name="--[no-]fail-on-drift" type="boolean" default="false">
+
+Deploy nothing and exit with code 1 if the deploy would overwrite a change made in the Checkly web app or through the API since the last planned deploy: a property edited there, or a resource deleted there that the deploy would create again. The error lists each such resource with the properties that changed. Use it in CI, where a forced deploy otherwise overwrites those changes without anyone seeing the plan.
+
+To keep the changes, add them to your code; an interactive `checkly deploy --no-fail-on-drift` shows them and can [update your code](#updating-your-code-with-changes-made-in-checkly) for many of them.
+
+- Set `CHECKLY_FAIL_ON_DRIFT=1` to turn it on for every deploy in a pipeline. `--no-fail-on-drift` turns it off for one run, which overwrites the changes made in Checkly.
+- With `--preview`, the plan is printed and the command then fails, which makes it a drift check that deploys nothing.
+- With `--dry-run`, the flag is ignored, and the JSON envelope reports each change made in Checkly as `"origin": "remote"` or `"both"`.
+- It needs a plan: it is refused with `--no-plan`, and when Checkly cannot provide a plan nothing is deployed.
+- A resource the plan has [no baseline](#the-first-plan-of-a-project) for cannot be checked; the deploy writes it and warns that it could not be checked. Resources removed from your code, and alert channels and private locations the project does not manage, are not checked either.
+
+**Usage:**
+
+```bash Terminal
+npx checkly deploy --force --fail-on-drift
+npx checkly deploy --preview --fail-on-drift
+CHECKLY_FAIL_ON_DRIFT=1 npx checkly deploy --force
 ```
 
 </ResponseField>
@@ -305,7 +328,7 @@ Plan the deploy before running it, and deploy that plan. The plan compares every
 
 Pass `--no-plan` to deploy without a plan: every resource the project declares is written, and an edit made to one of them in the Checkly web app or through the API is overwritten without being reported. That is how a deploy ran in earlier major versions of the CLI unless it passed `--plan`. The next planned deploy then [sets a baseline again](#the-first-plan-of-a-project) for the resources it wrote.
 
-If Checkly cannot provide a plan, the CLI says so and deploys without one, unless the run also passed `--plan-token` or `--prune-relations`, in which case nothing is deployed.
+If Checkly cannot provide a plan, the CLI says so and deploys without one, unless the run also passed `--plan-token`, `--prune-relations` or `--fail-on-drift`, in which case nothing is deployed.
 
 **Usage:**
 

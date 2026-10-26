@@ -565,7 +565,7 @@ This will:
 ? Apply these changes? › (y/N)
 ```
 
-This confirmation is skipped when you pass `--force` (for CI/CD), and when a plan has [nothing to apply](#how-a-deploy-previews-its-changes). In agent or CI environments the CLI instead returns a `confirmation_required` JSON envelope and exits with code `3` (`2` before CLI 10) rather than prompting. The envelope carries the plan and its token, and names the command that deploys that exact plan; with `--no-plan` it lists the deploy's options and the resources it would delete. Its `changes` list deletions and detachments in full and created and updated resources up to 20, with the rest counted; the `--dry-run` envelope is capped the same way, while the `preview.diff` both carry is not.
+This confirmation is skipped when you pass `--force` (for CI/CD), and when a plan has [nothing to apply](#how-a-deploy-previews-its-changes). In agent or CI environments the CLI instead returns a `confirmation_required` JSON envelope and exits with code `3` (`2` before CLI version 10) rather than prompting. The envelope carries the plan and its token, and names the command that deploys that exact plan; with `--no-plan` it lists the deploy's options and the resources it would delete. Its `changes` list deletions and detachments in full and created and updated resources up to 20, with the rest counted; the `--dry-run` envelope is capped the same way, while the `preview.diff` both carry is not.
 
 To keep removed resources and their run history, deploy with [`--preserve-resources`](#command-options). Instead of deleting them, the CLI **detaches** them — they remain in your Checkly account as regular account-level resources, managed from the UI, and can be re-attached later by adding them back to your code:
 

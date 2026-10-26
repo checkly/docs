@@ -375,6 +375,8 @@ The timer restarts whenever a check starts running and whenever it reports a fai
 
 Checkly can stagger the start of checks in large test sessions by up to 900 seconds. If a check still has not started within this value plus that allowance, the CLI reports that the check did not start. That usually means a problem on Checkly's side: check [the status page](https://is.checkly.online) or contact support.
 
+When the CLI stops waiting for a check, whether it stopped making progress or never started, it reports the check as timed out rather than failed: the CLI did not receive a result, and the check may still run and pass in Checkly. Reporters mark it with ⏱ (`T` in the `dot` reporter) and count it as timed out in the summary, and the `json` reporter gives it `"result": "Timed out"`. The run still exits with code 1.
+
 **Usage:**
 
 ```bash Terminal

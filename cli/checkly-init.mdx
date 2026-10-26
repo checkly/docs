@@ -77,6 +77,8 @@ When you choose the manual path, the command:
 
 In CI environments, the command runs non-interactively and outputs setup instructions. The CLI detects CI from `CI=true` and, since CLI v10.0.0, from the variables that CI providers set, such as GitHub Actions, GitLab CI, Jenkins, TeamCity and AWS CodeBuild. Set `CI=false` to turn CI detection off, or set `CHECKLY_CLI_MODE` to choose the mode yourself. A detected AI agent takes precedence over CI.
 
+From CLI version 10, the command exits with code 1 when it cannot finish the setup, for example when installing dependencies fails, so the CI job fails too.
+
 ```bash Terminal
 CI=true npx checkly init
 ```

@@ -9,7 +9,11 @@ canonical: 'https://www.checklyhq.com/docs/constructs/check-group/'
 Learn more about Check Groups in [the Groups overview](/platform/groups).
 </Tip>
 
-<Warning>`CheckGroup` is deprecated. Please use `CheckGroupV2` instead. See [CheckGroupV2 documentation](/constructs/check-group-v2) for details.</Warning>
+<Warning>
+`CheckGroup` is deprecated. Please use `CheckGroupV2` instead. See [CheckGroupV2 documentation](/constructs/check-group-v2) for details.
+
+In `CheckGroup`, `alertEscalationPolicy`, `retryStrategy` and `runParallel` always override the settings of the checks in the group, even when you don't set them: the checks then use the global account alert settings, a single retry from a different location, and round-robin scheduling. `CheckGroupV2` only overrides the settings you set.
+</Warning>
 
 Use `CheckGroup` to organize your checks into logical groups. This provides better organization, shared configuration, and group-level controls for your monitoring setup.
 
@@ -88,10 +92,10 @@ new ApiCheck("api-check-1", {
 | `name` | `string` | ✅ | - | Friendly name for your check group |
 | `activated` | `boolean` | ❌ | `true` | Whether checks in the group are running |
 | `apiCheckDefaults` | `object` | ❌ | - | Default settings for API checks in the group |
-| `alertEscalationPolicy` | `AlertEscalationPolicy` | ❌ | - | Advanced alert escalation settings |
+| `alertEscalationPolicy` | `AlertEscalationPolicy` | ❌ | Global account alert settings | Advanced alert escalation settings |
 | `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Alert channels for all checks in the group |
 | `environmentVariables` | `object[]` | ❌ | `[]` | Group-level environment variables |
-| `concurrency` | `number` | ❌ | `10` | Number of concurrent Checks to run when a group is triggered |
+| `concurrency` | `number` | ❌ | `3` | Number of concurrent Checks to run when a group is triggered |
 | `frequency` | `Frequency` | ❌ | - | How often to run checks within the group |
 | `localSetupScript` (deprecated) | `string` | ❌ | - | Code to run before each check/monitor in this group |
 | `localTearDownScript` (deprecated) | `string` | ❌ | - | Code to run after each check/monitor in this group |
@@ -100,10 +104,10 @@ new ApiCheck("api-check-1", {
 | `privateLocations` | `string[]` | ❌ | - | Private Location slugs |
 | `retryStrategy` | `RetryStrategy` | ❌ | [`singleRetry()`](/constructs/retry-strategy#default-retry-strategy) | Strategy for configured retries |
 | `runtimeId` | `string` | ❌ | - | Runtime ID for all checks in the group |
-| `runParallel` | `boolean` | ❌ | - | Whether to run checks in parallel across locations |
+| `runParallel` | `boolean` | ❌ | `false` | Whether to run checks in parallel across locations |
 | `tags` | `string[]` | ❌ | `[]` | Tags to organize all checks in the group |
 | `browserChecks` | `object` | ❌ | - | Settings for Browser Checks in the group |
-| `multistepChecks` | `object` | ❌ | - | Settings for Multistep Checks in the group |
+| `multiStepChecks` | `object` | ❌ | - | Settings for Multistep Checks in the group |
 
 ### Group Options
 
@@ -154,7 +158,7 @@ const group = new CheckGroup("api-monitoring-group", {
 
 <ResponseField name="frequency" type="Frequency">
 
-How often to run checks within the group. This frequency applies to all checks in the group unless overridden at the check level.
+How often to run checks within the group. Checks in your project that don't set their own frequency use this value. For Browser and Multistep Checks, the group's `browserChecks.frequency` or `multiStepChecks.frequency`, and then the same settings under `checks` in your project config, take precedence. It isn't stored on the group, so checks added to the group outside your project don't use it.
 
 **Usage:**
 
@@ -167,13 +171,13 @@ const group = new CheckGroup("api-monitoring-group", {
 })
 ```
 
-**Available frequencies**: `EVERY_10S`, `EVERY_20S`, `EVERY_30S`, `EVERY_1M`, `EVERY_2M`, `EVERY_5M`, `EVERY_10M`, `EVERY_15M`, `EVERY_30M`, `EVERY_1H`, `EVERY_2H`, `EVERY_6H`, `EVERY_12H`, `EVERY_24H`
+**Available frequencies**: `EVERY_10S`, `EVERY_20S`, `EVERY_30S`, `EVERY_1M`, `EVERY_2M`, `EVERY_5M`, `EVERY_10M`, `EVERY_15M`, `EVERY_30M`, `EVERY_1H`, `EVERY_2H`, `EVERY_3H`, `EVERY_6H`, `EVERY_12H`, `EVERY_24H`
 
 <Tip>Generally, Check Groups support all available frequencies, but if a group includes a check type that doesn't support high frequencies, `npx checkly deploy` will fail. We recommend separating high-frequency ones into their own groups.</Tip>
 </ResponseField>
 
 <ResponseField name="locations" type="string[]" default="[]">
-Public locations for all checks in the group. Checks inherit these locations unless they specify their own.
+Public locations for all checks in the group. If this or `privateLocations` is set to a non-empty value, the group's locations and private locations replace those of every check in the group.
 
 **Usage:**
 
@@ -316,7 +320,7 @@ const group = new CheckGroup("api-multistep-group", {
       frequency: Frequency.EVERY_2M,
       locations: ["us-east-1"], // Single region focus
       tags: ["us-east", "regional"],
-      runParallel: false, // Sequential execution
+      runParallel: false, // Round-robin scheduling
       alertEscalationPolicy: AlertEscalationBuilder.runBasedEscalation(2, {
         interval: 5,
         amount: 2,

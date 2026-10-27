@@ -68,7 +68,7 @@ const webhookChannel = new WebhookAlertChannel('webhook-channel-1', {
 
 ### Webhook Alert Channel Options
 
-<ResponseField name="url" type="URL" required>
+<ResponseField name="url" type="URL | string" required>
 Target URL for the webhook request.
 
 ```ts highlight={4}
@@ -80,11 +80,11 @@ new WebhookAlertChannel('webhook-channel-1', {
 ```
 </ResponseField>
 
-<ResponseField name="method" type="string" required>
+<ResponseField name="method" type="string" default="POST">
 The HTTP method, either `GET`, `POST`, `PUT`, `PATCH`, `HEAD` or `DELETE`.
 </ResponseField>
 
-<ResponseField name="name" type="string">
+<ResponseField name="name" type="string" required>
 Friendly name for the webhook channel.
 </ResponseField>
 

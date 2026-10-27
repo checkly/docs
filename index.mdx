@@ -119,13 +119,10 @@ test('homepage loads', async ({ page }) => {
     <div className="home-tab-title"><Icon icon="bell" size={18} /> Alerts and status pages as code</div>
     <p className="home-tab-text">Define alert channels once and attach them to any check or group. Route failures to Slack, email, PagerDuty, or webhooks, and publish a status page from the same project.</p>
 
-<Accordion title="Prerequisites">
-Install the [Checkly Slack App](/constructs/slack-app-alert-channel) in your Slack workspace before deploying this example.
-</Accordion>
-
 ```ts __checks__/alerts.check.ts
 import { SlackAppAlertChannel } from 'checkly/constructs'
 
+// Install the Checkly Slack App in your Slack workspace before deploying.
 export const slack = new SlackAppAlertChannel('ops-slack', {
   slackChannels: ['#ops'],
   sendFailure: true,

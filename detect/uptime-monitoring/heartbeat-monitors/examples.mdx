@@ -165,17 +165,11 @@ spec:
                 echo "Backup successful, sending heartbeat..."
                 curl -m 5 --retry 3 \
                   -H "Origin: k8s-cluster-prod" \
-                  "$HEARTBEAT_URL"
+                  https://ping.checklyhq.com/your-heartbeat-id
               else
                 echo "Backup failed, no heartbeat sent"
                 exit 1
               fi
-            env:
-            - name: HEARTBEAT_URL
-              valueFrom:
-                secretKeyRef:
-                  name: heartbeat-secrets
-                  key: backup-heartbeat-url
           restartPolicy: OnFailure
 ```
 

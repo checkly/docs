@@ -137,7 +137,7 @@ When `use.extraHTTPHeaders` is missing from the Playwright configuration, Checkl
 
 Playwright Check Suites also provide specific configuration for your Playwright monitoring.
 
-* `installCommand:` Override the command to install dependencies. `npm install --dev` is used by default.
+* `installCommand:` Override the command to install dependencies. By default, Checkly uses the package manager it detects from your lockfile and installs both `dependencies` and `devDependencies` (with npm: `npm install --no-save`).
 
 * `testCommand:` Append to the command that runs tests. `npx playwright test` is used by default with the tags, projects, and config file options your check specifies.
 
@@ -147,7 +147,7 @@ Playwright Check Suites also provide specific configuration for your Playwright 
 
 ### Customize install and test commands
 
-By default, Checkly runs `npm install --dev` to install dependencies and `npx playwright test` to run tests. The `testCommand` automatically includes your `pwProjects`, `pwTags`, and Playwright config file path.
+By default, Checkly installs dependencies with the package manager it detects from your lockfile and runs `npx playwright test` to run tests. The `testCommand` automatically includes your `pwProjects`, `pwTags`, and Playwright config file path.
 
 You can override these commands to:
 
@@ -220,17 +220,17 @@ export default defineConfig({
 
 ## Testing configuration locally
 
-Before deploying your Playwright Check Suites, validate your configuration locally:
+Before deploying your Playwright Check Suites, test your configuration:
 
 ```bash
 # Test your configuration without deploying
 npx checkly test
 
-# Test a specific check by logical ID
-npx checkly test --grep=e2e-test-suite
+# Test a specific check by name
+npx checkly test --grep "E2E test suite"
 ```
 
-The `npx checkly test` command runs your Playwright tests locally using the same configuration that Checkly will use in production. This helps catch configuration errors before deployment.
+The `npx checkly test` command runs your Playwright Check Suites on Checkly, without deploying them, using the same configuration that Checkly will use in production. This helps catch configuration errors before deployment.
 
 ## Cancelling runs
 
@@ -254,7 +254,7 @@ Cancelled runs show a **Cancelled** status in run history. See [Cancellation](/c
 #### Invalid `logicalId`
 
 ```
-Error: logicalId must be unique across all checks
+A check with logicalId "e2e-test-suite" already exists.
 ```
 
 Ensure each Playwright Check Suite has a unique `logicalId`. The `logicalId` is used as a stable reference across deployments.
@@ -262,7 +262,7 @@ Ensure each Playwright Check Suite has a unique `logicalId`. The `logicalId` is 
 #### Missing Playwright configuration
 
 ```
-Error: Cannot find playwright.config.ts at path: ./playwright.config.ts
+Playwright config "/path/to/project/playwright.config.ts" does not exist
 ```
 
 Verify that `playwrightConfigPath` points to the correct relative path from your `checkly.config.ts` file.

@@ -1,7 +1,7 @@
 ---
 title: 'Checkly Documentation'
 sidebarTitle: 'Home'
-description: 'The AI Native Application Reliability Platform built for modern engineering teams.'
+description: 'The active monitoring layer for engineers and agents. Detect, communicate, and resolve failures with checks defined as code.'
 mode: "frame"
 canonical: 'https://www.checklyhq.com/docs/'
 ---
@@ -13,7 +13,7 @@ import { CopyPromptButton } from '/snippets/copy-prompt-button.jsx';
 
 # Checkly Documentation
 
-Checkly is the active monitoring layer for engineers & agents. Detect downtime with Playwright-powered monitors defined in TypeScript running from global or internal locations. Communicate outages with custom alerts and status pages. Resolve errors with traces and AI root cause analysis for every failure.
+Checkly is the active monitoring layer for engineers & agents. Detect downtime with Playwright-powered monitors defined in TypeScript running from global or internal locations. Communicate outages with custom alerts and status pages. Resolve errors with traces and AI root cause analysis for new failures.
 
 ## Set up Checkly in a project
 
@@ -63,7 +63,8 @@ npx checkly skills install
   </div>
 </div>
 
-<div id="home-agent-prompt" className="home-prompt-source">
+<details id="home-agent-prompt" className="home-prompt-preview">
+<summary>Preview the prompt</summary>
 
 ```txt
 Set up Checkly monitoring in this project.
@@ -72,13 +73,13 @@ Set up Checkly monitoring in this project.
 2. If there is no `checkly.config.ts`, create one with `defineConfig` from 'checkly'. Reference: https://www.checklyhq.com/docs/cli/overview.md
 3. Inspect the project structure, existing tests, and endpoints. Create a small set of monitors as code that match this codebase: URL monitors for key pages, API checks for important endpoints, and Browser Checks or a Playwright Check Suite if a Playwright config exists. Start with the most critical flow, not full coverage.
 4. Ask me for an alert email address or Slack channel and create at least one alert channel assigned to the checks. Do not use placeholder values.
-5. Run `npx checkly test --record` and fix anything that fails. If I am not logged in, ask me to run `npx checkly login`.
+5. Run `npx checkly test` and fix anything that fails. If I am not logged in, ask me to run `npx checkly login`.
 6. Show me what you changed and stop for my confirmation before running `npx checkly deploy`.
 
 Documentation index: https://www.checklyhq.com/docs/llms.txt (append .md to any docs URL for Markdown).
 ```
 
-</div>
+</details>
 
 {/* Detect / Communicate / Resolve */}
 
@@ -86,7 +87,7 @@ Documentation index: https://www.checklyhq.com/docs/llms.txt (append .md to any 
   <div className="home-section-head">
     <div>
       <h2 className="home-heading">The active monitoring layer for engineers & agents</h2>
-      <p className="home-lead">Detect downtime with Playwright-powered monitors defined in TypeScript running from global or internal locations. Communicate outages with custom alerts and status pages. Resolve errors with traces and AI root cause analysis for every failure.</p>
+      <p className="home-lead">Detect downtime with Playwright-powered monitors defined in TypeScript running from global or internal locations. Communicate outages with custom alerts and status pages. Resolve errors with traces and AI root cause analysis for new failures.</p>
     </div>
   </div>
 
@@ -143,10 +144,10 @@ export const slack = new SlackAppAlertChannel('ops-slack', {
   <Tab title="Resolve" icon="target-arrow">
   <div className="home-tab">
     <div className="home-tab-title"><Icon icon="target-arrow" size={18} /> Find the root cause with Rocky AI</div>
-    <p className="home-tab-text">Rocky AI uses your check's errors, logs, screenshots, and available traces to explain what failed, identify the likely root cause, and assess user impact. Enable automatic analysis for new error groups or start an analysis from a failing result.</p>
+    <p className="home-tab-text">Rocky AI uses your check's errors, logs, screenshots, and available traces to explain what failed, identify the likely root cause, and assess user impact. By default, Rocky AI analyzes every new error group automatically, and you can start an analysis from any failing result.</p>
 
 ```bash Terminal
-npx checkly checks get <check-id>
+npx checkly checks get <check-id> --error-group=<error-group-id>
 ```
 
     <div className="home-tab-links">
@@ -210,49 +211,41 @@ npx checkly checks get <check-id>
 
   <div className="home-news">
     <a className="home-news-card home-news-featured" href="https://www.checklyhq.com/changelog/whats-new-in-september-2026/">
-      <span className="home-card-meta"><span>October</span></span>
       <span className="home-news-title">Create and manage checks from your AI agent</span>
       <span className="home-news-text">The Checkly MCP server can now create, update, and delete checks, monitors, and check groups, so an agent can go from "this endpoint matters" to a running monitor without leaving the conversation.</span>
-      <span className="home-card-link">Read update <Icon icon="arrow-right" size={12} /></span>
+      <span className="home-card-link">Read more <Icon icon="arrow-right" size={12} /></span>
     </a>
     <a className="home-news-card" href="/resolve/automatic-check-repair">
-      <span className="home-card-meta"><span>October</span></span>
       <span className="home-news-title">Automatic check repair (Beta)</span>
       <span className="home-news-text">Rocky AI proposes, tests, and applies fixes for repairable errors such as outdated selectors in Browser and Multistep checks.</span>
       <span className="home-card-link">Read more <Icon icon="arrow-right" size={12} /></span>
     </a>
     <a className="home-news-card" href="/constructs/status-page-v3">
-      <span className="home-card-meta"><span>October</span></span>
       <span className="home-news-title">Status pages rebuilt around components</span>
       <span className="home-news-text">Group services into components with StatusPageV3, and let automation rules open and resolve incidents for you.</span>
       <span className="home-card-link">Read more <Icon icon="arrow-right" size={12} /></span>
     </a>
     <a className="home-news-card" href="https://www.checklyhq.com/changelog/whats-new-in-september-2026/">
-      <span className="home-card-meta"><span>October</span></span>
       <span className="home-news-title">Pull requests from the UI</span>
       <span className="home-news-text">With the GitHub App installed, Export to Code and UI edits to code-managed checks open a pull request against the defining file.</span>
       <span className="home-card-link">Read more <Icon icon="arrow-right" size={12} /></span>
     </a>
     <a className="home-news-card" href="https://www.checklyhq.com/changelog/whats-new-in-september-2026/">
-      <span className="home-card-meta"><span>October</span></span>
       <span className="home-news-title">Track contract usage and credit budgets</span>
       <span className="home-news-text">Contract customers can see consumed and remaining credits, usage trends, and projected consumption by account and check type.</span>
       <span className="home-card-link">Read more <Icon icon="arrow-right" size={12} /></span>
     </a>
     <a className="home-news-card" href="https://www.checklyhq.com/changelog/whats-new-in-august-2026/">
-      <span className="home-card-meta"><span>September</span></span>
       <span className="home-news-title">Private Locations report their own errors</span>
       <span className="home-news-text">A new Errors tab shows error trends, stack traces, and agent details for every Private Location.</span>
       <span className="home-card-link">Read more <Icon icon="arrow-right" size={12} /></span>
     </a>
     <a className="home-news-card" href="https://www.checklyhq.com/changelog/whats-new-in-august-2026/">
-      <span className="home-card-meta"><span>September</span></span>
       <span className="home-news-title">Inspect projects from the app</span>
       <span className="home-news-text">Monitoring as Code projects now appear in the UI with their resources, deployment history, and any drift from code.</span>
       <span className="home-card-link">Read more <Icon icon="arrow-right" size={12} /></span>
     </a>
     <a className="home-news-card" href="https://www.checklyhq.com/changelog/whats-new-in-august-2026/">
-      <span className="home-card-meta"><span>September</span></span>
       <span className="home-news-title">Timezone-aware maintenance windows</span>
       <span className="home-news-text">Recurring maintenance windows stay at their local time through daylight saving changes.</span>
       <span className="home-card-link">Read more <Icon icon="arrow-right" size={12} /></span>
@@ -303,8 +296,8 @@ npx checkly checks get <check-id>
       <span className="home-card-link">Connect the MCP server <Icon icon="arrow-right" size={12} /></span>
     </a>
     <a className="home-feature" href="/ai/rocky-ai">
-      <span className="home-feature-title">Root cause analysis for every failure</span>
-      <span className="home-feature-text">Rocky reads errors, traces, screenshots, and the last passing run, then explains the impact and suggests a fix.</span>
+      <span className="home-feature-title">Root cause analysis for new failures</span>
+      <span className="home-feature-text">Rocky AI reads errors, traces, screenshots, and the last passing run, then explains the impact and suggests a fix.</span>
       <span className="home-card-link">Meet Rocky AI <Icon icon="arrow-right" size={12} /></span>
     </a>
   </div>
@@ -353,7 +346,7 @@ npx checkly checks get <check-id>
     <div className="home-connect-card">
       <span className="home-tag">Open source</span>
       <span className="home-feature-title">View the source</span>
-      <span className="home-feature-text">The CLI, the Checkly Agent, and the Terraform and Pulumi providers are developed in the open.</span>
+      <span className="home-feature-text">The CLI and the Terraform and Pulumi providers are developed in the open.</span>
       <span className="home-connect-links">
         <a href="https://github.com/checkly/checkly-cli">checkly-cli</a>
         <a href="https://github.com/checkly/terraform-provider-checkly">Terraform</a>

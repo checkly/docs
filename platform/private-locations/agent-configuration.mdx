@@ -13,7 +13,7 @@ Variable|Description
 `API_KEY`|API key for the Private Location in which the agent will serve. The API key is shown in the web app once, when initially creating a Private Location.
 `HTTPS_PROXY`|HTTPS proxy configuration for the outbound connection to the Checkly API, used for agent management and monitoring. `https://user:password@127.0.0.1:8080`
 `HTTP_PROXY`|HTTP proxy configuration for the outbound connection to the Checkly API, used for agent management and monitoring. Used if the proxy server does not accept HTTPS connections. `http://user:password@127.0.0.1:8080`
-`JOB_CONCURRENCY`|(Default: 1, max: 10) Number of concurrent Browser, Multistep and Playwright checks that are run by the agent. Not used by the [uptime image](/platform/private-locations/agent-images#uptime-image).
+`JOB_CONCURRENCY`|(Default: 1, recommended: up to 10) Number of concurrent Browser, Multistep and Playwright checks that are run by the agent. Not used by the [uptime image](/platform/private-locations/agent-images#uptime-image).
 `AGENT_WORKER_COUNT`|(Default: 10, max: 50) Number of concurrent API checks and uptime monitors (URL, TCP, DNS, ICMP) that are run by the agent. Applies to agent v7.0.0 and later. Values above 50 are capped to 50.
 `LOG_LEVEL`|(Default: `INFO`) Set the log level of the agent. Can be one of `DEBUG`, `INFO`, `WARN` or `ERROR`.
 `DEPENDENCY_CACHE`|(Default: `OFF`) Set to `CHECKLY_S3` to enable dependency caching for [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview). Caches installed dependencies between runs to speed up check execution. Learn more about [dependency caching](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#dependency-caching).
@@ -28,7 +28,7 @@ docker run -e API_KEY="pl_...." -d checkly/agent:latest
 
 Here are some more usage examples:
 
-1. Set the `JOB_CONCURRENCY` (1-10) and `AGENT_WORKER_COUNT` (1-50) to the appropriate values based on your [scaling calculations](/platform/private-locations/scaling-redundancy):
+1. Set the `JOB_CONCURRENCY` (recommended: 1-10) and `AGENT_WORKER_COUNT` (1-50) to the appropriate values based on your [scaling calculations](/platform/private-locations/scaling-redundancy):
 
 ```bash Terminal
 -e JOB_CONCURRENCY=4 -e AGENT_WORKER_COUNT=20

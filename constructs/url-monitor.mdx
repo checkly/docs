@@ -507,6 +507,25 @@ new UrlMonitor("maintenance-site", {
     })
     ```
   </Tab>
+  <Tab title="Multiple Status Codes">
+    ```ts
+    new UrlMonitor("maintenance-page", {
+      name: "Maintenance Page Check",
+      frequency: Frequency.EVERY_5M,
+      maxResponseTime: 3000,
+      degradedResponseTime: 1500,
+      tags: ["maintenance", "status"],
+      request: {
+        url: "https://status.example.com",
+        followRedirects: true,
+        assertions: [
+          UrlAssertionBuilder.statusCode().greaterThan(200),
+          UrlAssertionBuilder.statusCode().lessThan(300),
+        ],
+      },
+    });
+    ```
+  </Tab>
 </Tabs>
 
 <Info>

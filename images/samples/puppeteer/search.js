@@ -39,6 +39,7 @@ const assert = require('chai').assert
       (e) => e.innerText
     )
 
+    assert.include(bookList, resultTitle)
     const index = bookList.indexOf(resultTitle)
     bookList.splice(index, 1)
   }

@@ -71,7 +71,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install Pulumi
@@ -106,7 +106,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install Pulumi
@@ -148,7 +148,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install Pulumi
@@ -186,7 +186,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -209,7 +209,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install Pulumi
@@ -237,7 +237,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install Pulumi
@@ -265,7 +265,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install Pulumi
@@ -293,7 +293,7 @@ stages:
   - deploy
 
 variables:
-  NODE_VERSION: "18"
+  NODE_VERSION: "22"
 
 test:
   stage: test
@@ -370,7 +370,7 @@ pipeline {
     agent any
 
     environment {
-        NODE_VERSION = '18'
+        NODE_VERSION = '22'
         PULUMI_VERSION = '3.100.0'
     }
 
@@ -472,7 +472,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  nodeVersion: '18.x'
+  nodeVersion: '22.x'
   pulumiVersion: '3.100.0'
 
 stages:
@@ -605,7 +605,7 @@ orbs:
 jobs:
   test:
     docker:
-      - image: cimg/node:18.17
+      - image: cimg/node:22.22
     steps:
       - checkout
       - node/install-packages:
@@ -619,7 +619,7 @@ jobs:
 
   preview:
     docker:
-      - image: cimg/node:18.17
+      - image: cimg/node:22.22
     steps:
       - checkout
       - node/install-packages:
@@ -641,7 +641,7 @@ jobs:
 
   deploy-staging:
     docker:
-      - image: cimg/node:18.17
+      - image: cimg/node:22.22
     steps:
       - checkout
       - node/install-packages:
@@ -663,7 +663,7 @@ jobs:
 
   deploy-production:
     docker:
-      - image: cimg/node:18.17
+      - image: cimg/node:22.22
     steps:
       - checkout
       - node/install-packages:

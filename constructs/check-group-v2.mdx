@@ -86,7 +86,7 @@ new ApiCheck("api-check-1", {
 | `alertEscalationPolicy` | `AlertEscalationPolicy` | ❌ | - | Advanced alert escalation settings |
 | `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Alert channels for all checks in the group |
 | `environmentVariables` | `object[]` | ❌ | `[]` | Group-level environment variables |
-| `concurrency` | `number` | ❌ | `10` | Number of concurrent Checks to run when a group is triggered |
+| `concurrency` | `number` | ❌ | `3` | Number of concurrent Checks to run when a group is triggered |
 | `frequency` | `Frequency` | ❌ | - | How often to run checks within the group |
 | `localSetupScript` (deprecated) | `string` | ❌ | - | Code to run before each check/monitor in this group |
 | `localTearDownScript` (deprecated) | `string` | ❌ | - | Code to run after each check/monitor in this group |
@@ -98,7 +98,7 @@ new ApiCheck("api-check-1", {
 | `runParallel` | `boolean` | ❌ | - | Whether to run checks in parallel across locations |
 | `tags` | `string[]` | ❌ | `[]` | Tags to organize all checks in the group |
 | `browserChecks` | `object` | ❌ | - | Settings for Browser Checks in the group |
-| `multistepChecks` | `object` | ❌ | - | Settings for Multistep Checks in the group |
+| `multiStepChecks` | `object` | ❌ | - | Settings for Multistep Checks in the group |
 
 <Warning>
   If you want the group's alert settings to override check-level alert settings, you must set the [`alertEscalationPolicy`](/constructs/check-group-v2#param-alert-escalation-policy). Otherwise, the alert settings of individual checks will be used, even if `alertChannels` is defined in your group.
@@ -153,7 +153,7 @@ const group = new CheckGroupV2("api-monitoring-group", {
 </ResponseField>
 
 <ResponseField name="frequency" type="Frequency">
-How often to run checks within the group. This frequency applies to all checks in the group unless overridden at the check level.
+How often to run checks within the group. Checks in your project that don't set their own frequency use this value. For Browser and Multistep Checks, `browserChecks.frequency` or `multiStepChecks.frequency` takes precedence. It isn't stored on the group, so checks added to the group outside your project don't use it.
 
 **Usage:**
 
@@ -166,13 +166,13 @@ const group = new CheckGroupV2('api-monitoring-group', {
 })
 ```
 
-**Available frequencies**: `EVERY_10S`, `EVERY_20S`, `EVERY_30S`, `EVERY_1M`, `EVERY_2M`, `EVERY_5M`, `EVERY_10M`, `EVERY_15M`, `EVERY_30M`, `EVERY_1H`, `EVERY_2H`, `EVERY_6H`, `EVERY_12H`, `EVERY_24H`
+**Available frequencies**: `EVERY_10S`, `EVERY_20S`, `EVERY_30S`, `EVERY_1M`, `EVERY_2M`, `EVERY_5M`, `EVERY_10M`, `EVERY_15M`, `EVERY_30M`, `EVERY_1H`, `EVERY_2H`, `EVERY_3H`, `EVERY_6H`, `EVERY_12H`, `EVERY_24H`
 
 <Tip>Generally, Check Groups support all available frequencies, but if a group includes a check type that doesn't support high frequencies, `npx checkly deploy` will fail. We recommend separating high-frequency ones into their own groups.</Tip>
 </ResponseField>
 
 <ResponseField name="locations" type="string[]" default="[]">
-Public locations for all checks in the group. Checks inherit these locations unless they specify their own.
+Public locations for all checks in the group. If this or `privateLocations` is set to a non-empty value, the group's locations and private locations replace those of every check in the group.
 
 **Usage:**
 

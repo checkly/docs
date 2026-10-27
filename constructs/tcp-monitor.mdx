@@ -84,8 +84,8 @@ The TCP Monitoring configuration consists of specific TCP monitoring options and
 |-----------|------|----------|---------|-------------|
 | `request` | `object` | ✅ | - | TCP connection configuration object |
 | `intent` | `CheckIntent` | ❌ | - | Structured guidance for root cause analysis and check repair. See [General Monitor Options](#general-monitor-options). |
-| `degradedResponseTime` | `number` | ❌ | `4000` | Response time threshold in milliseconds for degraded status |
-| `maxResponseTime` | `number` | ❌ | `5000` | Maximum response time in milliseconds before marking as failed |
+| `degradedResponseTime` | `number` | ❌ | `4000` | Response time threshold in milliseconds for degraded status (max 5000) |
+| `maxResponseTime` | `number` | ❌ | `5000` | Maximum response time in milliseconds before marking as failed (max 5000) |
 | `shouldFail` | `boolean` | ❌ | `false` | Treat connection failures (e.g. timeouts or refused ports) as passed. Successful connections still pass. Only failed assertions will cause the check to fail. |
 
 </Tab>
@@ -242,10 +242,10 @@ new TcpMonitor("performance-db", {
   },
 })
 
-// Service with higher tolerance
+// Service with the highest tolerance
 new TcpMonitor("batch-service", {
   name: "Batch Processing Service",
-  maxResponseTime: 10000, // 10 seconds
+  maxResponseTime: 5000, // 5 seconds, the maximum for TCP monitors
   request: {
     hostname: "batch.example.com",
     port: 8080,
@@ -480,12 +480,13 @@ new TcpMonitor("maintenance-db", {
     new TcpMonitor("smtp-check", {
       name: "SMTP Server Check",
       frequency: Frequency.EVERY_10M,
-      maxResponseTime: 10000,
-      degradedResponseTime: 5000,
+      maxResponseTime: 5000,
+      degradedResponseTime: 4000,
       tags: ["email", "smtp"],
       request: {
         hostname: "mail.example.com",
         port: 587,
+        data: "EHLO example.com\r\n", // the monitor only reads a response after sending data
         assertions: [
           TcpAssertionBuilder.responseTime().lessThan(3000),
           TcpAssertionBuilder.responseData().contains("220"),
@@ -508,7 +509,6 @@ new TcpMonitor("maintenance-db", {
         port: 22,
         assertions: [
           TcpAssertionBuilder.responseTime().lessThan(1000),
-          TcpAssertionBuilder.responseData().contains("SSH"),
         ],
       },
     })
@@ -531,23 +531,6 @@ new TcpMonitor("maintenance-db", {
           TcpAssertionBuilder.responseTime().lessThan(1000),
           TcpAssertionBuilder.responseData().contains("OK"),
         ],
-      },
-    })
-    ```
-  </Tab>
-
-  <Tab title="Connection Failure Test">
-    ```ts
-    new TcpMonitor("blocked-port-check", {
-      name: "Verify Port is Blocked",
-      frequency: Frequency.EVERY_30M,
-      maxResponseTime: 5000,
-      degradedResponseTime: 2000,
-      tags: ["security", "firewall"],
-      request: {
-        hostname: "secure.example.com",
-        port: 23, // Telnet port that should be blocked
-        assertions: [TcpAssertionBuilder.responseTime().lessThan(5000)],
       },
     })
     ```

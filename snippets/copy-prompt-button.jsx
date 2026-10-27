@@ -9,16 +9,22 @@ export const CopyPromptButton = ({
   className,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
 
   const handleCopy = async () => {
     try {
       const el = document.getElementById(targetId);
       const code = el?.querySelector("code");
       const text = code?.textContent || el?.textContent || "";
+      if (!text.trim()) {
+        throw new Error(`No prompt found in #${targetId}`);
+      }
       await navigator.clipboard.writeText(text);
+      setCopyFailed(false);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
+      setCopyFailed(true);
       console.error("Failed to copy prompt:", err);
     }
   };
@@ -46,7 +52,7 @@ export const CopyPromptButton = ({
             <path d="M7 9.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667l0 -8.666" />
             <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" />
           </svg>
-          {label}
+          {copyFailed ? "Copy failed. Try again." : label}
         </>
       )}
     </button>

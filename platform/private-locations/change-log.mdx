@@ -24,6 +24,8 @@ Learn more about:
 - Secrets are now also removed from API check setup and teardown script logs.
 - A trace that cannot be fully scrubbed is left out of the result, and the check log says why.
 - Playwright Check Suites scrub secrets several times faster.
+- The agent now exposes a single port, 8080, for health probes and Prometheus metrics. If your Kubernetes probes or scrape configuration use port 8081 or 8082, point them to 8080.
+- A single `/metrics` endpoint now covers every check type the agent runs. Use the `component` label to separate uptime metrics from synthetics metrics. Metric names and labels are consistent across both, so one dashboard covers the whole agent.
 </Update>
 
 <Update label="v8.11.0" tags={["October 2026"]}>

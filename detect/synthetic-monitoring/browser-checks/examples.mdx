@@ -633,55 +633,20 @@ test('Video streaming platform workflow', async ({ page }) => {
 You don't need custom code to measure Core Web Vitals. Checkly collects Web Vitals automatically for every page your browser check visits. See [Performance & Web Vitals](/detect/synthetic-monitoring/browser-checks/performance-metrics).
 
 ### Accessibility Compliance Testing
-Ensure web accessibility standards are met:
+Run automated accessibility checks with [axe-core](https://github.com/dequelabs/axe-core). Checkly runtimes include `@axe-core/playwright`:
 
 ```typescript
+import { test, expect } from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
+
 test('Accessibility compliance validation', async ({ page }) => {
   await page.goto('https://app.example.com')
-  
-  // Keyboard navigation testing
-  await page.keyboard.press('Tab')
-  const focusedElement = await page.evaluate(() => document.activeElement.tagName)
-  expect(['BUTTON', 'A', 'INPUT']).toContain(focusedElement)
-  
-  // Screen reader compatibility
-  const ariaLabels = await page.locator('[aria-label]').count()
-  expect(ariaLabels).toBeGreaterThan(0)
-  
-  // Color contrast validation
-  const buttons = page.locator('button')
-  const buttonCount = await buttons.count()
-  
-  for (let i = 0; i < buttonCount; i++) {
-    const button = buttons.nth(i)
-    const isVisible = await button.isVisible()
-    if (isVisible) {
-      const styles = await button.evaluate((el) => {
-        const computed = window.getComputedStyle(el)
-        return {
-          color: computed.color,
-          backgroundColor: computed.backgroundColor
-        }
-      })
-      
-      // Basic contrast check (simplified)
-      expect(styles.color).not.toBe(styles.backgroundColor)
-    }
-  }
-  
-  // Form accessibility
-  const inputs = page.locator('input')
-  const inputCount = await inputs.count()
-  
-  for (let i = 0; i < inputCount; i++) {
-    const input = inputs.nth(i)
-    const hasLabel = await input.evaluate((el) => {
-      return el.labels && el.labels.length > 0 || 
-             el.getAttribute('aria-label') ||
-             el.getAttribute('aria-labelledby')
-    })
-    expect(hasLabel).toBeTruthy()
-  }
+
+  const results = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa'])
+    .analyze()
+
+  expect(results.violations).toEqual([])
 })
 ```
 

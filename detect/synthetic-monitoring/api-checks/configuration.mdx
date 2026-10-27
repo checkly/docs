@@ -68,7 +68,7 @@ Form encodes bodies are commonly used "traditional" HTML form submissions.
 
 If the predefined data types don't work for you, use `Raw data`. Make sure to define your `Content-Type` header explicitly then.
 
-> To monitor an XML/SOAP-based API define `text/xml; charset=utf-8` as `Content-Type` header, send your XML as `Raw data` and [use a setup script to parse required access tokens](/detect/synthetic-monitoring/api-checks/examples#parse-xmlsoap-data).
+> To monitor an XML/SOAP-based API define `text/xml; charset=utf-8` as `Content-Type` header, send your XML as `Raw data` and [use a setup script to parse required access tokens](/detect/synthetic-monitoring/api-checks/setup-and-teardown).
 
 ## Headers
 
@@ -113,7 +113,7 @@ These variables are specific to API checks:
 | `{{REQUEST_URL}}`    | The request URL. |
 | `{{$UUID}}`          | Generates a random UUID/v4, i.e.  9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d. |
 | `{{$RANDOM_NUMBER}}` | Generates a random decimal number between 0 and 10000, i.e. 345. |
-| `{{moment}}`         | Generates a date or time using **moment.js** and allows for formatting: <ul> <li>`{{moment "YYYY-MM-DD"}}` generates a date, i.e. 2020-08-26</li> <li>`{{moment "2 days ago" "YYYY-MM-DD"}}` generates the date two days ago: 2020-08-24</li> <li>`{{moment "last week" "X"}}` generates a UNIX timestamp from last week: 1597924480</li> </ul> |
+| `{{moment}}`         | Generates a date or time, formatted with moment.js-style format tokens: <ul> <li>`{{moment "YYYY-MM-DD"}}` generates a date, i.e. 2020-08-26</li> <li>`{{moment "2 days ago" "YYYY-MM-DD"}}` generates the date two days ago: 2020-08-24</li> <li>`{{moment "last week" "X"}}` generates a UNIX timestamp from last week: 1597924480</li> </ul> |
 
 A practical example of using the `{{moment}}` helper would be setting the pagination options on a typical API endpoint:
 

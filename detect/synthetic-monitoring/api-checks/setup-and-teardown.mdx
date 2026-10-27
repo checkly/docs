@@ -142,7 +142,7 @@ Benefits of this structure:
 - Reuse authentication logic across multiple API checks
 - Test authentication logic separately from Checkly-specific code
 
-Check our [setup script examples](/detect/synthetic-monitoring/api-checks/examples) for OAuth2, HMAC signing, JWT tokens, and other auth methods.
+See the [setup scripts guide](/guides/setup-scripts-for-apis) for worked examples of setup and teardown scripts.
 
 ### Error handling in setup scripts
 
@@ -164,7 +164,6 @@ Common use cases:
 - Cleaning up test data created during the check
 - Scrubbing sensitive data from responses before logging
 - Normalizing response data for consistent assertions
-- Extracting and storing values for subsequent checks
 
 ### Accessing the response
 
@@ -283,12 +282,12 @@ Response properties are exposed as a standard JavaScript object. These are only 
 
 | Property | Description | Type | Modifiable |
 |----------|-------------|------|------------|
-| `response.statusCode` | The response status code, e.g., 200 or 404. | Number | No |
-| `response.statusText` | The response status text, e.g., 'Ok' or 'Not found'. | String | No |
+| `response.statusCode` | The response status code, e.g., 200 or 404. | Number | Yes |
+| `response.statusMessage` | The response status text, e.g., 'Ok' or 'Not found'. | String | Yes |
 | `response.body` | The response body in string format. Use `JSON.parse()` for JSON. | String | Yes |
-| `response.headers` | The response headers. | Object | No |
+| `response.headers` | The response headers. | Object | Yes |
 | `response.timings` | Timestamps for each request stage relative to start time. | Object | No |
-| `response.timingPhases` | Time durations for each request phase. | Object | No |
+| `response.timingPhases` | Time durations for each request phase. | Object | Yes |
 
 ### Built-in runtime variables
 
@@ -341,4 +340,4 @@ Access environment variables in the request body with `{{MY_VALUE}}` notation.
 
 ![Checkly API check editor showing a JSON request body that uses the MY_VALUE environment variable.](/images/docs/images/api-checks/setup-env-variables.png)
 
-For more examples, check our [setup script examples](/detect/synthetic-monitoring/api-checks/examples).
+For more examples, see the [setup scripts guide](/guides/setup-scripts-for-apis).

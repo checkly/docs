@@ -35,7 +35,9 @@ Alternatively, when using the `request` API, you can add the header to the reque
 
 ```ts api-request.spec.ts
 await request.get('https://my-production-url.vercel.app/', {
-  'x-vercel-protection-bypass': process.env.VERCEL_BYPASS_TOKEN
+  headers: {
+    'x-vercel-protection-bypass': process.env.VERCEL_BYPASS_TOKEN
+  }
 })
 ```
 
@@ -45,7 +47,7 @@ For an API check you can do something similar
 2. Add a query parameter to the request with the token.
 3. Or use a setup script to manipulate the request before it is sent.
 
-```bash setup-script.js
+```js setup-script.js
 request.headers['x-vercel-protection-bypass'] = process.env.VERCEL_BYPASS_TOKEN
 ```
 

@@ -145,8 +145,12 @@ const response = await request.get('/api/search', {
 <Tab title="Form Data">
 ```typescript
 const response = await request.post('/api/upload', {
-  form: {
-    file: fs.readFileSync('document.pdf'),
+  multipart: {
+    file: {
+      name: 'document.pdf',
+      mimeType: 'application/pdf',
+      buffer: fs.readFileSync('document.pdf')
+    },
     description: 'Important document'
   }
 })

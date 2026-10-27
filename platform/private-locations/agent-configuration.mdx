@@ -15,8 +15,7 @@ Variable|Description
 `HTTP_PROXY`|HTTP proxy configuration for the outbound connection to the Checkly API, used for agent management and monitoring. Used if the proxy server does not accept HTTPS connections. `http://user:password@127.0.0.1:8080`
 `JOB_CONCURRENCY`|(Default: 1, max: 10) Number of concurrent Browser, Multistep and Playwright checks that are run by the agent. Not used by the [uptime image](/platform/private-locations/agent-images#uptime-image).
 `AGENT_WORKER_COUNT`|(Default: 10, max: 50) Number of concurrent API checks and uptime monitors (URL, TCP, DNS, ICMP) that are run by the agent. Applies to agent v7.0.0 and later. Values above 50 are capped to 50.
-`LOG_LEVEL`|(Default: `INFO`) Set the log level of the agent. Can be one of `DEBUG`, `LOG`, `INFO`, `WARN` or `ERROR`.
-`USE_OS_DNS_RESOLVER`|When set to true, TCP monitors will resolve DNS using `getaddrinfo` C function, instead of using the network. This enables easier DNS resolution for internal services e.g. services running in the same Kubernetes cluster.
+`LOG_LEVEL`|(Default: `INFO`) Set the log level of the agent. Can be one of `DEBUG`, `INFO`, `WARN` or `ERROR`.
 `DEPENDENCY_CACHE`|(Default: `OFF`) Set to `CHECKLY_S3` to enable dependency caching for [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview). Caches installed dependencies between runs to speed up check execution. Learn more about [dependency caching](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#dependency-caching).
 `AGENT_HEALTH_PORT`|(Default: `8081`) Port for the HTTP [health probe endpoints](#health-probe-endpoints).
 `EXTERNAL_OBSERVABILITY`| Enabled by default. Set to `off` to disable [external observability](#external-observability) reporting of agent runtime errors to Checkly.
@@ -168,7 +167,7 @@ The Checkly Agent exposes HTTP health probe endpoints on port `8081` by default.
 
 Endpoint|Description
 ---|---
-`GET /-/readiness`|Returns `200 OK` when the agent is ready to accept work. Returns `503 Service Unavailable` during shutdown.
+`GET /-/readiness`|Returns `200 OK` when the agent is ready to accept work.
 `GET /-/liveness`|Returns `200 OK` to indicate the agent process is running.
 `GET /health`|Returns `200 OK` as a general health check.
 

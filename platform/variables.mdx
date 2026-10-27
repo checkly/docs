@@ -91,7 +91,7 @@ How variables are accessed depends on where you're accessing them from:
 * In [webhook alert channels](/integrations/alerts/webhooks#template-variables), also use the Handlebar/Moustache format, i.e. `{{VARIABLE_NAME}}`
 
 <Note>
-  Handlebar (double brackets) variables will be URI encoded. To avoid encoding, you can access your environment variables with triple brackets, i.e. `{{{VARIABLE_NAME}}}`.
+  Handlebar (double brackets) variables are HTML-escaped: `&`, `<`, `>`, `"`, `'`, `` ` `` and `=` are replaced with HTML entities, for example `&` becomes `&amp;`. They are not URI encoded. To insert the raw value, access your environment variables with triple brackets, i.e. `{{{VARIABLE_NAME}}}`.
 </Note>
 
 ## Playwright Check Suite Variables

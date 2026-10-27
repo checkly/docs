@@ -190,32 +190,3 @@ test("Verify Binary Payloads", async ({ request }) => {
   }
 })
 ```
-
-
-## Dynamic Configuration
-```typescript
-import { test, expect } from "@playwright/test"
-
-// Environment-specific configuration
-const config = {
-  baseURL: process.env.API_BASE_URL || "https://api.example.com",
-  authEndpoint: process.env.AUTH_ENDPOINT || "/api/auth/login",
-  testUser: {
-    email: process.env.TEST_USER_EMAIL,
-    password: process.env.TEST_USER_PASSWORD
-  }
-}
-
-test("Environment-aware workflow", async ({ request }) => {
-  await test.step("Authenticate with environment credentials", async () => {
-    const response = await request.post(`${config.baseURL}${config.authEndpoint}`, {
-      headers: {
-        "User-Agent": "Checkly-Multistep-Check/1.0"
-      },
-      data: config.testUser
-    })
-
-    expect(response.status()).toBe(200)
-  })
-})
-```

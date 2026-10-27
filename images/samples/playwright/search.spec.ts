@@ -29,6 +29,7 @@ test('search', async ({ page }) => {
       (e) => e.innerText
     )
 
+    expect(bookList).toContain(resultTitle)
     const index = bookList.indexOf(resultTitle)
     bookList.splice(index, 1)
   }

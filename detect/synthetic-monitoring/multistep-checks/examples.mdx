@@ -20,7 +20,7 @@ This example uses environment variables to avoid sharing secrets in clear text. 
 ```ts  auth.spec.ts
 import { test, expect } from "@playwright/test"
 
-const baseUrl = "https://api.checklyhq.com/v1"
+const baseUrl = "https://api.checklyhq.com"
 
 const headers = {
   Authorization: `Bearer ${process.env.API_KEY}`,
@@ -31,11 +31,11 @@ test("Verify Group API", async ({ request }) => {
   /**
    * Create a group
    */
-  const group = await test.step("POST /check-groups", async () => {
-    const response = await request.post(`${baseUrl}/check-groups/`, {
+  const group = await test.step("POST /v2/check-groups", async () => {
+    const response = await request.post(`${baseUrl}/v2/check-groups`, {
       data: {
         locations: ["eu-west-1"],
-        name: "createdViaApiCheck",
+        name: "createdViaMultistepCheck",
       },
       headers,
     })
@@ -47,8 +47,8 @@ test("Verify Group API", async ({ request }) => {
   /**
    * Get the newly created group
    */
-  await test.step("GET /check-groups/{id}", async () => {
-    const response = await request.get(`${baseUrl}/check-groups/${group.id}`, {
+  await test.step("GET /v1/check-groups/{id}", async () => {
+    const response = await request.get(`${baseUrl}/v1/check-groups/${group.id}`, {
       headers,
     })
     expect(response).toBeOK()
@@ -60,9 +60,10 @@ test("Verify Group API", async ({ request }) => {
   /**
    * Update the new group
    */
-  await test.step("PUT /check-groups/{id}", async () => {
-    const response = await request.put(`${baseUrl}/check-groups/${group.id}`, {
+  await test.step("PUT /v2/check-groups/{id}", async () => {
+    const response = await request.put(`${baseUrl}/v2/check-groups/${group.id}`, {
       data: {
+        name: "createdViaMultistepCheck",
         tags: ["public-api", "added-by-check"],
       },
       headers,
@@ -73,9 +74,9 @@ test("Verify Group API", async ({ request }) => {
   /**
    * Delete the new group
    */
-  await test.step("DELETE /check-group/{id}", async () => {
+  await test.step("DELETE /v1/check-groups/{id}", async () => {
     const response = await request.delete(
-      `${baseUrl}/check-groups/${group.id}`,
+      `${baseUrl}/v1/check-groups/${group.id}`,
       { headers },
     )
     expect(response).toBeOK()
@@ -90,62 +91,64 @@ In this example we use `beforeAll` to verify that there's no old test data that 
 
 To learn more about these methods see the [Playwright documentation](https://playwright.dev/docs/api/class-test#test-after-all).
 
-An API_KEY from https://crudapi.co.uk/ is required for this example to work.
+This example uses the same Checkly API key and account ID as the [example above](#api-authentication-and-crud-testing).
 
 ```ts  setup-teardown.spec.ts
 import { test, expect } from "@playwright/test"
 
-const baseUrl = "https://crudapi.co.uk/api/v1/todo"
+const baseUrl = "https://api.checklyhq.com"
+const groupName = "createdViaMultistepCheck"
 
 const headers = {
-  Authorization: `Bearer ${process.env.CRUD_API_KEY}`,
-  "Content-Type": "application/json",
+  Authorization: `Bearer ${process.env.API_KEY}`,
+  "x-checkly-account": process.env.ACCOUNT_ID,
 }
 
 /**
  * Share state between hooks and test.steps
  */
-let createdResources = null
+let createdGroup = null
 
 /**
  * Use `beforeAll` as a setup script
- * to make sure no todo's exist.
+ * to make sure no group with this name exists.
  */
 test.beforeAll(async ({ request }) => {
-  const response = await request.get(baseUrl, { headers })
-  const { items } = await response.json()
-  expect(items.length).toEqual(0)
+  const response = await request.get(`${baseUrl}/v1/check-groups`, {
+    headers,
+    params: { name: groupName },
+  })
+  expect(response).toBeOK()
+
+  const groups = await response.json()
+  expect(groups.length).toEqual(0)
 })
 
 /**
  * Use `afterAll` as a teardown script
- * to remove the created todo before the check ends
+ * to remove the created group before the check ends
  */
 test.afterAll(async ({ request }) => {
-  if (createdResources) {
-    const response = await request.delete(baseUrl, {
+  if (createdGroup) {
+    const response = await request.delete(`${baseUrl}/v1/check-groups/${createdGroup.id}`, {
       headers,
-      data: createdResources,
     })
     expect(response).toBeOK()
   }
 })
 
-test("Todo List", async ({ request }) => {
-  await test.step("Create a Todo", async () => {
-    const response = await request.post(baseUrl, {
+test("Check Group", async ({ request }) => {
+  await test.step("Create a group", async () => {
+    const response = await request.post(`${baseUrl}/v2/check-groups`, {
       headers,
-      data: [
-        {
-          title: "Testing Checkly Multistep checks",
-          done: true,
-        },
-      ],
+      data: {
+        name: groupName,
+        locations: ["eu-west-1"],
+      },
     })
-
     expect(response).toBeOK()
-    const { items } = await response.json()
-    createdResources = items
+
+    createdGroup = await response.json()
   })
 })
 

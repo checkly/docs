@@ -13,6 +13,10 @@ Before diving into specific examples, remember these key principles:
 4. **Position correctly** - Place pings at the very end of your success path
 5. **Use source headers** - Help identify which system sent the ping
 
+<Note>
+Checkly records that a ping arrived, plus its `User-Agent` and `Origin` or `Referer` header. A request body is ignored, so any job metadata sent in the examples below isn't stored in Checkly.
+</Note>
+
 ## Shell Scripts and Command Line
 
 ### Basic cURL Examples
@@ -35,7 +39,7 @@ curl -m 5 --retry 3 -s \
 ```
 
 ```bash POST Request
-# POST request (useful for sending job metadata)
+# POST request (the request body is ignored)
 curl -X POST -m 5 --retry 3 \
   -H "Content-Type: application/json" \
   -d '{"job":"backup", "duration": 120, "files": 1500}' \
@@ -140,6 +144,7 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
+      backoffLimit: 2
       template:
         spec:
           containers:
@@ -160,7 +165,7 @@ spec:
                 echo "Backup successful, sending heartbeat..."
                 curl -m 5 --retry 3 \
                   -H "Origin: k8s-cluster-prod" \
-                  https://ping.checklyhq.com/your-heartbeat-id
+                  "$HEARTBEAT_URL"
               else
                 echo "Backup failed, no heartbeat sent"
                 exit 1
@@ -172,7 +177,6 @@ spec:
                   name: heartbeat-secrets
                   key: backup-heartbeat-url
           restartPolicy: OnFailure
-          backoffLimit: 2
 ```
 
 ### Advanced CronJob with Sidecar
@@ -616,6 +620,7 @@ if __name__ == "__main__":
 import requests
 import logging
 import json
+import time
 from datetime import datetime
 from typing import Optional, Dict, Any
 

@@ -84,8 +84,8 @@ The TCP Monitoring configuration consists of specific TCP monitoring options and
 |-----------|------|----------|---------|-------------|
 | `request` | `object` | ✅ | - | TCP connection configuration object |
 | `intent` | `CheckIntent` | ❌ | - | Structured guidance for root cause analysis and check repair. See [General Monitor Options](#general-monitor-options). |
-| `degradedResponseTime` | `number` | ❌ | `4000` | Response time threshold in milliseconds for degraded status (max 5000) |
-| `maxResponseTime` | `number` | ❌ | `5000` | Maximum response time in milliseconds before marking as failed (max 5000) |
+| `degradedResponseTime` | `number` | ❌ | `4000` | Response time threshold in milliseconds for degraded status (max 5000 by default) |
+| `maxResponseTime` | `number` | ❌ | `5000` | Maximum response time in milliseconds before marking as failed (max 5000 by default) |
 | `shouldFail` | `boolean` | ❌ | `false` | Treat connection failures (e.g. timeouts or refused ports) as passed. Successful connections still pass. Only failed assertions will cause the check to fail. |
 
 </Tab>
@@ -245,7 +245,7 @@ new TcpMonitor("performance-db", {
 // Service with the highest tolerance
 new TcpMonitor("batch-service", {
   name: "Batch Processing Service",
-  maxResponseTime: 5000, // 5 seconds, the maximum for TCP monitors
+  maxResponseTime: 5000, // 5 seconds, the default maximum for TCP monitors
   request: {
     hostname: "batch.example.com",
     port: 8080,

@@ -30,7 +30,7 @@ This is the list of Playwright features that are currently supported. We will up
 | Typescript               | Yes                                                                                                                       |
 | Global configuration     | Yes, a subset of playwright config options.                                                                               |
 | Visual comparisons       | Yes                                           |
-| Test retry               | No, enable Checkly's ["Double-check on failure"](/communicate/alerts/configuration) in the check settings to retry a check. |
+| Test retry               | No, configure a [retry strategy](/communicate/alerts/retries) in the check settings to retry a check. |
 | Parallelism and sharding | No                                                                                                                        |
 
 
@@ -85,7 +85,7 @@ We currently support the following configuration options. We will update this li
     | `actionTimeout`      | ✅         |
     | `navigationTimeout ` | ✅         |
     | `testIdAttribute`    | ✅         |
-    | `connectOptions`     | ✅         |
+    | `connectOptions`     | ❌         |
     | `contextOptions`     | ✅         |
     | `bypassCSP`          | ✅         |
     | `proxy`              | ✅         |
@@ -311,7 +311,7 @@ await page.keyboard.press('Enter')
 await page.mouse.click(100, 200)
 await page.hover('.tooltip-trigger')
 
-// File operations
+// File operations (the file must exist in the check's sandbox, see Using the file system)
 await page.setInputFiles('input[type="file"]', './document.pdf')
 ```
 
@@ -412,24 +412,3 @@ await newPage.waitForLoadState()
 await expect(newPage).toHaveTitle('External Service')
 ```
 
-### Authentication and Session Management
-```typescript
-// Login once and reuse session
-test('Setup authentication', async ({ page }) => {
-  await page.goto('https://app.example.com/login')
-  await page.fill('[name="email"]', process.env.TEST_EMAIL)
-  await page.fill('[name="password"]', process.env.TEST_PASSWORD)
-  await page.click('[type="submit"]')
-
-  // Save authentication state
-  await page.context().storageState({ path: 'auth-state.json' })
-})
-
-// Use saved authentication
-test.use({ storageState: 'auth-state.json' })
-test('Authenticated user workflow', async ({ page }) => {
-  // User is already logged in
-  await page.goto('https://app.example.com/dashboard')
-  await expect(page.locator('.welcome-message')).toBeVisible()
-})
-```

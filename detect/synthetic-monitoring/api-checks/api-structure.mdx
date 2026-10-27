@@ -117,28 +117,32 @@ process.env.TEST_USER_ID = userData.id
 ```
 
 ### GraphQL Support
-Monitor GraphQL APIs:
-```javascript
-// GraphQL query example
-const query = `
-  query GetUser($id: ID!) {
-    user(id: $id) {
-      id
-      name
-      email
-      profile {
-        avatar
-        bio
-      }
-    }
-  }
-`
-
-// Request body
-{
-  "query": query,
-  "variables": {
-    "id": "123"
-  }
-}
+Monitor GraphQL APIs by sending the query and its variables as a JSON body:
+```typescript
+new ApiCheck('graphql-get-user', {
+  name: 'GraphQL: get user',
+  request: {
+    method: 'POST',
+    url: 'https://api.example.com/graphql',
+    bodyType: 'JSON',
+    body: JSON.stringify({
+      query: `
+        query GetUser($id: ID!) {
+          user(id: $id) {
+            id
+            name
+            email
+          }
+        }
+      `,
+      variables: { id: '123' },
+    }),
+    assertions: [
+      AssertionBuilder.statusCode().equals(200),
+      AssertionBuilder.jsonBody('$.data.user.id').equals('123'),
+    ],
+  },
+})
 ```
+
+With `bodyType: 'GRAPHQL'`, Checkly sends the body as the query without variables. Use a JSON body when your query needs variables.

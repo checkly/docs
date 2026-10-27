@@ -7,7 +7,7 @@ canonical: 'https://www.checklyhq.com/docs/cli/checkly-whoami/'
 
 The `checkly whoami` command displays detailed information about your current Checkly authentication, including the logged-in user account and active Checkly account details.
 
-This command can also be run without authentication to check your current status.
+If you aren't logged in, the command starts `checkly login` in an interactive terminal. In CI, it fails with an error instead.
 
 ## Usage
 
@@ -17,6 +17,7 @@ The basic command shows current authentication status and account information.
 npx checkly whoami
 ```
 
+Use `--output json` (or `-o json`) to get the user and account details as JSON.
 
 ### Authenticated
 
@@ -25,18 +26,18 @@ If you're logged in, you'll see:
 ```bash Terminal
 npx checkly whoami
 
-You are currently on account "Monitoring as Code" (b2f...) as raccoon@checklyhq.com.
+You are currently on account "Monitoring as Code" (b2f...) as Raccoon.
+Plan: Team
 ```
 
 ### Not Authenticated
 
-If not logged in, you'll see:
+If you aren't logged in and the command can't start the login flow, for example in CI, you'll see:
 
 ```bash Terminal
 npx checkly whoami
 
-Error: Run `npx checkly login` or manually set `CHECKLY_API_KEY` & `CHECKLY_ACCOUNT_ID`
-environment variables to setup authentication.
+Error: Run `npx checkly login` or set `CHECKLY_API_KEY` & `CHECKLY_ACCOUNT_ID` in your environment or .env file.
 ```
 
 ## Related Commands

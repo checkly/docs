@@ -384,14 +384,19 @@ header button[aria-label="More actions"]::after {
   grid-row: span 2;
 }
 
-/* Reuse the marketing site's wave artwork as a faint card background. */
+.home-news-featured .home-news-text {
+  padding-bottom: 10rem;
+}
+
+/* Reuse the marketing site's wave artwork beneath the featured update. */
 .home-news-featured::before {
   content: "";
   position: absolute;
   z-index: -1;
-  inset: 0;
-  background: url("/images/home-news-waves.svg") center / 42rem 10rem repeat;
-  opacity: 0.16;
+  inset: auto -1.25rem 2.5rem;
+  height: 10rem;
+  background: url("/images/home-news-waves.svg") center / auto 100% no-repeat;
+  opacity: 0.85;
   pointer-events: none;
 }
 
@@ -507,5 +512,15 @@ header button[aria-label="More actions"]::after {
 
   .home-news-featured {
     grid-row: auto;
+    padding-bottom: 7.5rem;
+  }
+
+  .home-news-featured .home-news-text {
+    padding-bottom: 0;
+  }
+
+  .home-news-featured::before {
+    bottom: -1rem;
+    height: 8rem;
   }
 }

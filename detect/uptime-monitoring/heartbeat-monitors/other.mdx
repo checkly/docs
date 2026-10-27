@@ -179,41 +179,9 @@ services:
 
 Integrate heartbeat monitoring with your existing monitoring stack for unified observability.
 
-### Prometheus Integration
+### Prometheus and Grafana
 
-```yaml
-# prometheus.yml
-scrape_configs:
-  - job_name: 'heartbeat-monitors'
-    static_configs:
-      - targets: ['checkly-exporter:8080']
-    metrics_path: '/metrics'
-    scrape_interval: 30s
-```
-
-### Grafana Dashboard
-
-Create custom dashboards to visualize heartbeat monitor status alongside other metrics:
-
-```json
-{
-  "dashboard": {
-    "title": "Heartbeat Monitors Overview",
-    "panels": [
-      {
-        "title": "Heartbeat Status",
-        "type": "stat",
-        "targets": [
-          {
-            "expr": "heartbeat_monitor_status",
-            "legendFormat": "{{monitor_name}}"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
+Checkly exposes check and heartbeat status as Prometheus metrics, such as `checkly_check_status`, from a Checkly-hosted endpoint. See the [Prometheus v2 integration](/integrations/observability/prometheus-v2) to set up scraping and use the metrics in Grafana.
 
 ## With Development Tools
 
@@ -281,7 +249,8 @@ export HEARTBEAT_URL_STAGING="https://ping.checklyhq.com/staging-backup-id"
 export HEARTBEAT_URL_DEV="https://ping.checklyhq.com/dev-backup-id"
 
 # Use appropriate URL based on environment
-HEARTBEAT_URL="${HEARTBEAT_URL_${ENVIRONMENT^^}}"
+HEARTBEAT_URL_VAR="HEARTBEAT_URL_$(echo "$ENVIRONMENT" | tr '[:lower:]' '[:upper:]')"
+HEARTBEAT_URL="${!HEARTBEAT_URL_VAR}"
 ```
 
 ### Error Handling

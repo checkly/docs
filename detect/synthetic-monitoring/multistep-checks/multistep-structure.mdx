@@ -144,12 +144,13 @@ const response = await request.get('/api/search', {
 </Tab>
 <Tab title="Form Data">
 ```typescript
+const file = await request.get('https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf')
 const response = await request.post('/api/upload', {
   multipart: {
     file: {
       name: 'document.pdf',
       mimeType: 'application/pdf',
-      buffer: fs.readFileSync('document.pdf')
+      buffer: await file.body()
     },
     description: 'Important document'
   }

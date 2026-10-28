@@ -78,13 +78,12 @@ jobs:
       - name: Test API navigation tooling
         run: npm run test:api-docs
 
-      # Typechecks MDX snippets that import from `checkly` against the
-      # installed CLI constructs, so examples don't drift from the CLI API.
-      # Errors show up as inline annotations on the PR. Report-only until the
-      # existing failures are fixed; then drop continue-on-error.
+      # Typechecks MDX snippets that import from `checkly`, and fragments
+      # marked with {/* typecheck-wrap */}, against the installed CLI
+      # constructs, so examples don't drift from the CLI API. Errors show up
+      # as inline annotations on the PR.
       - name: Typecheck checkly snippets
         if: steps.detect.outputs.docs_changed == 'true' || steps.detect.outputs.snippets_tooling_changed == 'true'
-        continue-on-error: true
         run: |
           npm run test:snippets
           npm run check:snippets

@@ -13,12 +13,11 @@ Variable|Description
 `API_KEY`|API key for the private location in which the agent will serve. The API key is shown in the web app once, when initially creating a private location.
 `HTTPS_PROXY`|HTTPS proxy configuration for the outbound connection to the Checkly API, used for agent management and monitoring. `https://user:password@127.0.0.1:8080`
 `HTTP_PROXY`|HTTP proxy configuration for the outbound connection to the Checkly API, used for agent management and monitoring. Used if the proxy server does not accept HTTPS connections. `http://user:password@127.0.0.1:8080`
-`JOB_CONCURRENCY`|(Default: 1, max: 10) Number of concurrent Browser, Multistep and Playwright checks that are run by the agent. Not used by the [uptime image](/platform/private-locations/agent-images#uptime-image).
+`JOB_CONCURRENCY`|(Default: 1, recommended: up to 10) Number of concurrent Browser, Multistep and Playwright checks that are run by the agent. Not used by the [uptime image](/platform/private-locations/agent-images#uptime-image).
 `AGENT_WORKER_COUNT`|(Default: 10, max: 50) Number of concurrent API checks and uptime monitors (URL, TCP, DNS, ICMP) that are run by the agent. Applies to agent v7.0.0 and later. Values above 50 are capped to 50.
-`LOG_LEVEL`|(Default: `INFO`) Set the log level of the agent. Can be one of `DEBUG`, `LOG`, `INFO`, `WARN` or `ERROR`.
-`USE_OS_DNS_RESOLVER`|When set to true, TCP monitors will resolve DNS using `getaddrinfo` C function, instead of using the network. This enables easier DNS resolution for internal services e.g. services running in the same Kubernetes cluster.
+`LOG_LEVEL`|(Default: `INFO`) Set the log level of the agent. Can be one of `DEBUG`, `INFO`, `WARN` or `ERROR`.
 `DEPENDENCY_CACHE`|(Default: `OFF`) Set to `CHECKLY_S3` to enable dependency caching for [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview). Caches installed dependencies between runs to speed up check execution. Learn more about [dependency caching](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#dependency-caching).
-`AGENT_HEALTH_PORT`|(Default: `8081`) Port for the HTTP [health probe endpoints](#health-probe-endpoints).
+`AGENT_SERVER_PORT`|(Default: `8080`) Port for the HTTP [health probe endpoints](#health-probe-endpoints) and Prometheus metrics. Applies to agent v8.12.0 and later. Earlier agents use `AGENT_HEALTH_PORT` (default `8081`) for health probes.
 `EXTERNAL_OBSERVABILITY`| Enabled by default. Set to `off` to disable [external observability](#external-observability) reporting of agent runtime errors to Checkly.
 
 For example, you can add these variables to the standard docker run command like this:
@@ -29,7 +28,7 @@ docker run -e API_KEY="pl_...." -d checkly/agent:latest
 
 Here are some more usage examples:
 
-1. Set the `JOB_CONCURRENCY` (1-10) and `AGENT_WORKER_COUNT` (1-50) to the appropriate values based on your [scaling calculations](/platform/private-locations/scaling-redundancy):
+1. Set the `JOB_CONCURRENCY` (recommended: 1-10) and `AGENT_WORKER_COUNT` (1-50) to the appropriate values based on your [scaling calculations](/platform/private-locations/scaling-redundancy):
 
 ```bash Terminal
 -e JOB_CONCURRENCY=4 -e AGENT_WORKER_COUNT=20
@@ -164,13 +163,14 @@ Alternatively, you can tell the Node.js worker to accept unauthorized certificat
 
 ## Health Probe Endpoints
 
-The Checkly Agent exposes HTTP health probe endpoints on port `8081` by default. You can change this port using the `AGENT_HEALTH_PORT` environment variable.
+The Checkly Agent exposes HTTP health probe endpoints and Prometheus metrics on port `8080` by default. You can change this port using the `AGENT_SERVER_PORT` environment variable. Agents before v8.12.0 serve health probes on port `8081` (set with `AGENT_HEALTH_PORT`) and metrics on port `8082`.
 
 Endpoint|Description
 ---|---
-`GET /-/readiness`|Returns `200 OK` when the agent is ready to accept work. Returns `503 Service Unavailable` during shutdown.
+`GET /-/readiness`|Returns `200 OK` when the agent is ready to accept work.
 `GET /-/liveness`|Returns `200 OK` to indicate the agent process is running.
 `GET /health`|Returns `200 OK` as a general health check.
+`GET /metrics`|Prometheus metrics for every check type the agent runs. Use the `component` label to separate uptime from synthetics metrics.
 
 These endpoints are useful for configuring [Kubernetes readiness and liveness probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) or any other container orchestration health checks.
 

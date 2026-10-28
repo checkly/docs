@@ -17,16 +17,11 @@ Each tool is shown only when the MCP session has the required permission. Your [
 | `get-account-entitlements` | Read | Return the resolved account plan and feature entitlement state. |
 | `list-account-members` | Read | List account members and pending invites. |
 | `invite-account-member` | Write | Invite a user to the resolved account. OAuth-only. Requires [`members:create`](/admin/team-management/permissions) and all permissions of the built-in role you give. Owner and [custom role](/admin/team-management/custom-roles) (beta) invitations are unsupported. Sends an invite email and is not idempotent. |
-| `prepare-local-check-authoring` | Read | Return an account-aware runbook for creating, testing, and deploying check code with the local Checkly CLI. |
 
 Example prompts:
 
 ```text title="Prompt" wrap
 Use Checkly to show which accounts I can access.
-```
-
-```text title="Prompt" wrap
-Prepare the local Checkly CLI steps to create a browser check for checkout.
 ```
 
 ## Check tools
@@ -81,7 +76,7 @@ When updating, `update-check` accepts either shared top-level properties (`name`
 `delete-check` permanently removes the check and its result history. The tool first returns a confirmation handle, and the deletion only proceeds when your client passes that handle back after you explicitly agree. To stop a check from running while keeping it, use `update-check` with `activated: false` instead.
 </Warning>
 
-Playwright Check Suites are managed as Monitoring as Code with the Checkly CLI. Use `prepare-local-check-authoring` for a CLI handoff. Changes made through MCP to a check that a CLI project manages are overwritten by that project's next deploy.
+Playwright Check Suites are managed as Monitoring as Code with the Checkly CLI. Changes made through MCP to a check that a CLI project manages are overwritten by that project's next deploy.
 
 Example prompts:
 

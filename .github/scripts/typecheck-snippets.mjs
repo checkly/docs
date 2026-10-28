@@ -1,9 +1,10 @@
 // Typechecks MDX code snippets that import from `checkly` against the
 // installed Checkly CLI constructs, so docs examples don't drift from the CLI.
 //
-// Complete snippets (ones with a `checkly` import) are checked. Fragments are
-// checked when `{/* typecheck-wrap: ApiCheck */}` (or `{/* typecheck-wrap */}`
-// for statements) is on the line before their fence. Snippets with a `/* More options... */` comment may omit required
+// Complete snippets (ones with a `checkly` import) are checked, and so are
+// fragments that use a checkly export. Property fragments like `request: {...}`
+// are checked when `{/* typecheck-wrap: ApiCheck */}` (or `{/* typecheck-wrap */}`
+// for other statements) is on the line before their fence. Snippets with a `/* More options... */` comment may omit required
 // props. Opt a block out with `{/* typecheck-skip */}` on the line before it.
 //
 // Usage: node .github/scripts/typecheck-snippets.mjs [root]

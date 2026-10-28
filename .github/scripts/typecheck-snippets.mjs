@@ -70,17 +70,32 @@ const MISSING_PROPS = new Set([2739, 2740, 2741]);
 const isOnlyMissingProps = d => d.code === 2345 && typeof d.messageText === 'object'
   && d.messageText.next?.length > 0 && d.messageText.next.every(n => MISSING_PROPS.has(n.code));
 
-// Marked fragments get every runtime export of `checkly/constructs` and
+// Exports of a module read from its type declarations, split into values and
+// types, because JavaScript files can't import types.
+function moduleExports(specifiers) {
+  const files = specifiers.map(s => ts.resolveModuleName(s, join(repoRoot, 'index.ts'), compilerOptions, ts.sys).resolvedModule.resolvedFileName);
+  const program = ts.createProgram(files, compilerOptions);
+  const checker = program.getTypeChecker();
+  return files.map(f => {
+    const symbols = checker.getExportsOfModule(checker.getSymbolAtLocation(program.getSourceFile(f)));
+    const isValue = s => ((s.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(s) : s).flags & ts.SymbolFlags.Value) !== 0;
+    return { all: symbols.map(s => s.name), values: symbols.filter(isValue).map(s => s.name) };
+  });
+}
+
+// Marked fragments get every export of `checkly/constructs` and
 // `checkly/util` imported, plus `defineConfig` and `path` for
 // `path.join(__dirname, ...)` entrypoints. Property fragments (first code line
 // is `key: ...`) are wrapped in the named construct as a partial snippet;
 // statements like `new ApiCheck(...)` or `const x = ...` only get the imports.
-const AUTO_IMPORTS = [
-  `import { ${Object.keys(await import('checkly/constructs')).join(', ')} } from 'checkly/constructs'`,
-  `import { ${Object.keys(await import('checkly/util')).join(', ')} } from 'checkly/util'`,
+const [constructExports, utilExports] = moduleExports(['checkly/constructs', 'checkly/util']);
+const autoImports = kind => [
+  `import { ${constructExports[kind].join(', ')} } from 'checkly/constructs'`,
+  `import { ${utilExports[kind].join(', ')} } from 'checkly/util'`,
   `import { defineConfig } from 'checkly'`,
   `import * as path from 'node:path'`,
 ].join('; ');
+const AUTO_IMPORTS = { ts: autoImports('all'), js: autoImports('values') };
 
 // Fragments reference values defined elsewhere on the page (`statusPage`,
 // `group`). Checkly exports are auto-imported, so an unknown lowercase name is
@@ -92,8 +107,9 @@ const isPropertyFragment = code => /^\w+\??:\s/.test(code.split('\n').map(l => l
 
 function source(snippet) {
   if (!snippet.wrap) return { code: snippet.code, offset: 0 };
-  if (typeof snippet.wrap !== 'string' || !isPropertyFragment(snippet.code)) return { code: `${AUTO_IMPORTS}\n${snippet.code}`, offset: 1 };
-  return { code: `${AUTO_IMPORTS}\nnew ${snippet.wrap}('snippet', {\n/* More options... */\n${snippet.code}\n})`, offset: 3 };
+  const imports = AUTO_IMPORTS[snippet.ext];
+  if (typeof snippet.wrap !== 'string' || !isPropertyFragment(snippet.code)) return { code: `${imports}\n${snippet.code}`, offset: 1 };
+  return { code: `${imports}\nnew ${snippet.wrap}('snippet', {\n/* More options... */\n${snippet.code}\n})`, offset: 3 };
 }
 
 export function typecheckSnippets(snippets) {

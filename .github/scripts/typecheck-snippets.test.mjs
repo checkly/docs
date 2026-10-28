@@ -222,6 +222,21 @@ test('ignores undeclared lowercase names in fragments, which refer to page conte
   assert.deepEqual(errors.map(e => e.line), [30, 51]);
 });
 
+test('auto-imports type-only exports like IncidentTrigger', () => {
+  const errors = typecheckSnippets([
+    fragment(`const trigger: IncidentTrigger = {\n  name: 'Search down',\n  description: 'Search is failing',\n  severity: 'MAJOR',\n  notifySubscribers: true,\n  service: searchService,\n}`, true),
+    fragment(`const trigger: NotAType = {}`, true, 30),
+  ]);
+
+  assert.deepEqual(errors.map(e => e.line), [30]);
+});
+
+test('auto-imports only value exports into JavaScript fragments', () => {
+  const errors = typecheckSnippets([{ ...fragment(`UrlAssertionBuilder.statusCode().equals(200)`, true), ext: 'js' }]);
+
+  assert.deepEqual(errors, []);
+});
+
 test('auto-imports defineConfig from checkly', () => {
   const errors = typecheckSnippets([fragment(`export default defineConfig({\n  projectName: 'P',\n  logicalId: 'p',\n})`, true)]);
 

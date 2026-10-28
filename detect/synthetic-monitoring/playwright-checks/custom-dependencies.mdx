@@ -127,10 +127,12 @@ Add your `.npmrc` file to the `checks.include` property in your `checkly.config.
 
 When you run `npx checkly test` or `npx checkly deploy`, the CLI bundles and uploads these files. This makes them available when Checkly runs `installCommand` to install your dependencies.
 
-```typescript checkly.config.ts highlight={6}
+```typescript checkly.config.ts highlight={10}
 import { defineConfig } from 'checkly'
 
 export default defineConfig({
+  projectName: 'My Project',
+  logicalId: 'my-project',
   checks: {
     playwrightConfigPath: './playwright.config.ts',
     // Include .npmrc for authentication with private registries
@@ -154,6 +156,8 @@ If you're confident your dependencies work without lifecycle scripts, you can us
 import { defineConfig } from 'checkly'
 
 export default defineConfig({
+  projectName: 'My Project',
+  logicalId: 'my-project',
   checks: {
     playwrightChecks: [
       {
@@ -172,6 +176,8 @@ If a dependency does require its install hooks to function correctly, use the [`
 import { defineConfig } from 'checkly'
 
 export default defineConfig({
+  projectName: 'My Project',
+  logicalId: 'my-project',
   checks: {
     include: ['scripts/**/*', 'config/**/*'],
     playwrightChecks: [

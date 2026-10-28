@@ -61,11 +61,12 @@ Common packages included in Checkly runtimes:
 
 Specify a runtime version in your `checkly.config.ts`:
 
-```typescript checkly.config.ts highlight={6}
+```typescript checkly.config.ts highlight={7}
 import { defineConfig } from 'checkly'
 
 export default defineConfig({
   projectName: 'My Project',
+  logicalId: 'my-project',
   checks: {
     runtimeId: '2025.04',
   }
@@ -81,7 +82,9 @@ import { ApiCheck } from 'checkly/constructs'
 new ApiCheck('books-api-check-2', {
   name: 'Books API',
   runtimeId: '2025.04',
+  request: { method: 'GET', url: 'https://danube-web.shop/api/books' },
   /* More options... */
+})
 ```
 
 Or in your check groups:

@@ -15,12 +15,13 @@ Use the `checkly.config.ts/js` file to define your Playwright Check Suite. Each 
 
 To add Playwright Check Suites to your Checkly monitoring setup, specify the path to your `playwright.config.ts/js` and add a new `playwrightChecks` property to the existing `checks` configuration in your `checkly.config.ts/js`.
 
-```typescript checkly.config.ts highlight={8-14}
+```typescript checkly.config.ts highlight={9-15}
 import { defineConfig } from 'checkly'
 import { Frequency } from 'checkly/constructs'
 
 export default defineConfig({
-  // ...
+  projectName: 'My Project',
+  logicalId: 'my-project',
 
   checks: {
     playwrightConfigPath: './playwright.config.ts',
@@ -195,6 +196,8 @@ import { Frequency } from 'checkly/constructs'
 import { productionGroup } from './production-group.check'
 
 export default defineConfig({
+  projectName: 'My Project',
+  logicalId: 'my-project',
   // Shared Checkly configuration (scheduling, locations, etc.)
   // ...
   checks: {
@@ -287,10 +290,12 @@ Specify this option in your `playwright.config` or the `testCommand` in your `ch
     ```
   </Tab>
   <Tab title="checkly.config.ts">
-    ```typescript checkly.config.ts highlight={11}
+    ```typescript checkly.config.ts highlight={13}
     import { defineConfig } from 'checkly'
 
     export default defineConfig({
+      projectName: 'My Project',
+      logicalId: 'my-project',
       checks: {
         playwrightConfigPath: './playwright.config.ts',
         playwrightChecks: [
@@ -324,10 +329,12 @@ Specify this option in your `playwright.config` or the `testCommand` in your `ch
     ```
   </Tab>
   <Tab title="checkly.config.ts">
-    ```typescript checkly.config.ts highlight={11}
+    ```typescript checkly.config.ts highlight={13}
     import { defineConfig } from 'checkly'
 
     export default defineConfig({
+      projectName: 'My Project',
+      logicalId: 'my-project',
       checks: {
         playwrightConfigPath: './playwright.config.ts',
         playwrightChecks: [

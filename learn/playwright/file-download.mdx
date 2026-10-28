@@ -49,8 +49,8 @@ test('file download', async ({ page }) => {
   await page.getByRole('button', { name: 'Sign In' }).click()
   await page.locator('#account').click()
 
-  const link = await page.getByRole('link', { name: 'Invoice' })
-  const downloadUrl = await link.evaluateHandle(el => el.href)
+  const link = page.getByRole('link', { name: 'Invoice' })
+  const downloadUrl = await link.getAttribute('href')
   const response = await axios.get(downloadUrl, { responseType: 'arraybuffer' })
   const newFile = Buffer.from(response.data)
   const testFile = fs.readFileSync('fixtures/testfile.pdf')

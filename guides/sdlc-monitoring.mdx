@@ -14,7 +14,7 @@ By the end of this guide, your pull requests will test their preview URL before 
   <img src="/images/guides/checks-on-deploy/session.png" alt="Passing URL monitor and browser check with the Production environment, repository, branch, and commit recorded" />
 </Frame>
 
-The [sample project](https://github.com/checkly/docs/tree/main/samples/guides/checks-on-deploy) monitors the Danube shop with one URL monitor and one Browser Check.
+The [sample project](https://github.com/checkly/docs/tree/main/samples/guides/checks-on-deploy) monitors the Danube shop with one URL monitor and one Browser check.
 
 <Accordion title="Let your agent do it" icon="sparkles">
   <GuideAgentIntro />
@@ -77,7 +77,7 @@ new BrowserCheck('deploy-shop-browser', {
 })
 ```
 
-The URL monitor reads the local variable when the CLI builds it. The Browser Check reads the remote variable when Playwright runs:
+The URL monitor reads the local variable when the CLI builds it. The Browser check reads the remote variable when Playwright runs:
 
 ```typescript __checks__/shop.spec.ts
 import { test, expect } from '@playwright/test'
@@ -89,7 +89,7 @@ test('shop displays books', async ({ page }) => {
 })
 ```
 
-Both [Browser Checks](/detect/synthetic-monitoring/browser-checks/overview) and [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview) work with this deployment pattern. This sample uses a Browser Check. For a target behind your firewall, see [private locations](/platform/private-locations/overview).
+Both [Browser checks](/detect/synthetic-monitoring/browser-checks/overview) and [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview) work with this deployment pattern. This sample uses a Browser check. For a target behind your firewall, see [private locations](/platform/private-locations/overview).
 
 From the sample directory, test and deploy the production defaults:
 
@@ -223,7 +223,7 @@ The Action supplies commit metadata from the event. Checkout uses the same SHA, 
 
 For local runs, the CLI reads git metadata from your checkout and `repoUrl` from the project config. Uncommitted edits are tested, but the recorded SHA still identifies the current commit. Commit your checks before using that SHA to reproduce a run.
 
-`CHECKLY_RUN_SOURCE` describes what started a run, not its environment or commit. In Playwright Check Suites, recorded CLI tests use `TEST_RECORD`, recorded triggers use `TRIGGER_RECORD`, and scheduled runs use `SCHEDULER`. A GitHub Action running `trigger` is still `TRIGGER_RECORD`; `DEPLOYMENT` denotes a Checkly deployment hook. This sample's Browser Check did not expose that variable, so it logs the target URL instead.
+`CHECKLY_RUN_SOURCE` describes what started a run, not its environment or commit. In Playwright Check Suites, recorded CLI tests use `TEST_RECORD`, recorded triggers use `TRIGGER_RECORD`, and scheduled runs use `SCHEDULER`. A GitHub Action running `trigger` is still `TRIGGER_RECORD`; `DEPLOYMENT` denotes a Checkly deployment hook. This sample's Browser check did not expose that variable, so it logs the target URL instead.
 
 ## Verify it works
 

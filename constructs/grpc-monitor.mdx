@@ -1,7 +1,7 @@
 ---
 title: 'GrpcMonitor Construct'
 description: 'Learn how to configure gRPC monitors with the Checkly CLI.'
-sidebarTitle: 'gRPC Monitor'
+sidebarTitle: 'gRPC monitor'
 canonical: 'https://www.checklyhq.com/docs/constructs/grpc-monitor/'
 ---
 
@@ -10,16 +10,16 @@ import CheckIntent from '/snippets/check-intent.mdx';
 import GeneralMonitorOptionsTable from '/snippets/general-monitor-options-table.mdx';
 
 <Tip>
-Learn more about gRPC Monitors in [the gRPC monitor overview](/detect/uptime-monitoring/grpc-monitors/overview).
+Learn more about gRPC monitors in [the gRPC monitor overview](/detect/uptime-monitoring/grpc-monitors/overview).
 </Tip>
 
-Use gRPC Monitors to verify that your gRPC services are reachable, responding correctly, and meeting performance expectations. Monitors run in two modes:
+Use gRPC monitors to verify that your gRPC services are reachable, responding correctly, and meeting performance expectations. Monitors run in two modes:
 
 - **BEHAVIOR** — Invokes a unary gRPC method and asserts on the response
 - **HEALTH** — Queries the standard `grpc.health.v1.Health/Check` endpoint
 
 <Accordion title="Prerequisites">
-Before creating gRPC Monitors, ensure you have:
+Before creating gRPC monitors, ensure you have:
 
 - An initialized Checkly CLI project
 - The hostname and port of the gRPC service you want to monitor
@@ -91,7 +91,7 @@ new GrpcMonitor('grpc-behavior-1', {
 gRPC monitors have their own gRPC-specific settings, plus the standard monitor options shared across all check types.
 
 <Tabs>
-<Tab title="gRPC Monitor Settings">
+<Tab title="gRPC monitor settings">
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
@@ -263,7 +263,7 @@ Learn more in our docs on [Assertions](/detect/assertions).
 ### General Monitor Options
 
 <ResponseField name="name" type="string" required>
-Friendly name for your gRPC Monitor displayed in the Checkly dashboard and used in notifications.
+Friendly name for your gRPC monitor displayed in the Checkly dashboard and used in notifications.
 
 **Usage:**
 
@@ -277,7 +277,7 @@ new GrpcMonitor('my-grpc-monitor', {
 </ResponseField>
 
 <ResponseField name="frequency" type="Frequency">
-How often the gRPC Monitor should run. Use the `Frequency` enum to set the check interval.
+How often the gRPC monitor should run. Use the `Frequency` enum to set the check interval.
 
 **Usage:**
 
@@ -293,7 +293,7 @@ new GrpcMonitor('my-grpc-monitor', {
 </ResponseField>
 
 <ResponseField name="locations" type="string[]" default="[]">
-Array of [public location codes](/concepts/locations/#public-locations) where the gRPC Monitor runs from. Multiple locations provide geographic coverage.
+Array of [public location codes](/concepts/locations/#public-locations) where the gRPC monitor runs from. Multiple locations provide geographic coverage.
 
 **Usage:**
 
@@ -308,7 +308,7 @@ new GrpcMonitor('global-grpc-monitor', {
 </ResponseField>
 
 <ResponseField name="activated" type="boolean" default="true">
-Whether the gRPC Monitor is enabled and will run according to its schedule.
+Whether the gRPC monitor is enabled and will run according to its schedule.
 
 **Usage:**
 

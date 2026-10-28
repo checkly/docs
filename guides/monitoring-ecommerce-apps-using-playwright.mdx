@@ -180,7 +180,7 @@ export default defineConfig({
 
 ## Step 4: Define the monitor
 
-Install the CLI if this repository does not have it yet, then describe the monitor next to your Playwright config. A Playwright Check Suite runs the whole suite with your config and shows one test case per spec. A Browser Check runs a single spec file on its own. Pick one.
+Install the CLI if this repository does not have it yet, then describe the monitor next to your Playwright config. A Playwright Check Suite runs the whole suite with your config and shows one test case per spec. A Browser check runs a single spec file on its own. Pick one.
 
 ```bash Terminal
 npm install --save-dev checkly
@@ -239,7 +239,7 @@ new BrowserCheck('shop-checkout-browser-check', {
 
 </CodeGroup>
 
-The base URL is a check-level environment variable in both paths. A staging monitor is the same entry with a different `SHOP_URL`, and the tests never change. The Browser Check path needs a copy of the checkout spec that opens `process.env.SHOP_URL` itself, kept in `checks/checkout.spec.ts` in the sample.
+The base URL is a check-level environment variable in both paths. A staging monitor is the same entry with a different `SHOP_URL`, and the tests never change. The Browser check path needs a copy of the checkout spec that opens `process.env.SHOP_URL` itself, kept in `checks/checkout.spec.ts` in the sample.
 
 ## Step 5: Run it on Checkly, then deploy
 
@@ -290,7 +290,7 @@ The suite now runs every ten minutes from both locations, and every later deploy
 
 ## Same thing in Terraform
 
-If your team manages infrastructure with Terraform, the checkout flow is one `checkly_check` resource: a Browser Check with the self-contained spec and the same `SHOP_URL` variable.
+If your team manages infrastructure with Terraform, the checkout flow is one `checkly_check` resource: a Browser check with the self-contained spec and the same `SHOP_URL` variable.
 
 ```terraform terraform/main.tf
 # Provider block as in the Terraform overview, then:

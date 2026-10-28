@@ -11,14 +11,14 @@ How dependencies work depends on the check type:
 
 | Check type | Dependency model | Environment field |
 |------------|------------------|-------------------|
-| Browser Checks and Multistep Checks | Run in a Checkly runtime with fixed Checkly-provided dependencies | `runtimeId` |
+| Browser checks and Multistep checks | Run in a Checkly runtime with fixed Checkly-provided dependencies | `runtimeId` |
 | Playwright Check Suites | Install dependencies from your project files, including `package.json` and your lock file | `engine` |
 
-Use `runtimeId` to choose a custom Checkly runtime for Browser Checks and Multistep Checks. Use `engine` only for Playwright Check Suites, where it overrides the JavaScript engine version that runs your own Playwright project.
+Use `runtimeId` to choose a custom Checkly runtime for Browser checks and Multistep checks. Use `engine` only for Playwright Check Suites, where it overrides the JavaScript engine version that runs your own Playwright project.
 
 ## npm packages
 
-### Browser, Multistep, and API Checks
+### Browser, Multistep, and API checks
 
 <Note>Not all npm packages are available in a Checkly runtime.</Note>
 
@@ -53,7 +53,7 @@ This is useful for defining helper functions to be reused across multiple checks
 The Checkly CLI automatically detects these dependencies and bundles them with the check.
 No additional configuration is needed.
 
-Here is a [Browser Check](/detect/synthetic-monitoring/browser-checks/overview) example of how this works in practice.
+Here is a [Browser check](/detect/synthetic-monitoring/browser-checks/overview) example of how this works in practice.
 
 The directory tree looks like the following:
 
@@ -64,7 +64,7 @@ __checks__
 └── login-helper.ts
 ```
 
-`login-helper.ts` defines a function `gitHubLogin` that can be used by multiple Browser Checks.
+`login-helper.ts` defines a function `gitHubLogin` that can be used by multiple Browser checks.
 
 ```ts login-helper.ts
 export async function gitHubLogin (page, username, password) {

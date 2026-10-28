@@ -119,6 +119,31 @@ test('ignores unresolvable relative imports from multi-file examples', () => {
   assert.deepEqual(errors, []);
 });
 
+test('allows missing required props in snippets marked with a "More options" comment', () => {
+  const errors = typecheckSnippets([
+    snippet(`import { BrowserCheck, Frequency } from 'checkly/constructs'\nnew BrowserCheck('a', {\n  frequency: Frequency.EVERY_5M,\n  /* More options... */\n})`),
+    snippet(`import { TcpMonitor } from 'checkly/constructs'\nnew TcpMonitor('a', {\n  /* More options ... */\n})`),
+  ]);
+
+  assert.deepEqual(errors, []);
+});
+
+test('still reports wrong props in snippets marked with a "More options" comment', () => {
+  const errors = typecheckSnippets([
+    snippet(`import { BrowserCheck } from 'checkly/constructs'\nnew BrowserCheck('a', {\n  frequency: 'often',\n  /* More options... */\n})`),
+    snippet(`import { BrowserCheck } from 'checkly/constructs'\nnew BrowserCheck('a', {\n  doesNotExist: true,\n  /* More options... */\n})`, 50),
+  ]);
+
+  assert.deepEqual(errors.map(e => e.line), [12, 52]);
+});
+
+test('reports missing required props in complete snippets', () => {
+  const errors = typecheckSnippets([snippet(`import { BrowserCheck } from 'checkly/constructs'\nnew BrowserCheck('a', { name: 'A' })`)]);
+
+  assert.equal(errors.length, 1);
+  assert.match(errors[0].message, /'code' is missing/);
+});
+
 test('reports syntax errors without hiding type errors in other snippets', () => {
   const errors = typecheckSnippets([
     snippet(`import { ApiCheck } from 'checkly/constructs'\nnew ApiCheck('a', {\n  ...\n})`, 10),

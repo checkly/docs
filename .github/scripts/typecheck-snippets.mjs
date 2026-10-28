@@ -1,8 +1,9 @@
 // Typechecks MDX code snippets that import from `checkly` against the
 // installed Checkly CLI constructs, so docs examples don't drift from the CLI.
 //
-// Only complete snippets (ones with a `checkly` import) are checked. Opt a
-// block out by putting `{/* typecheck-skip */}` on the line before its fence.
+// Only complete snippets (ones with a `checkly` import) are checked. Snippets
+// with a `/* More options... */` comment may omit required props. Opt a block
+// out by putting `{/* typecheck-skip */}` on the line before its fence.
 //
 // Usage: node .github/scripts/typecheck-snippets.mjs [root]
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
@@ -58,6 +59,13 @@ const compilerOptions = {
 // resolve here; the imports become `any`, which keeps the `checkly` usage checked.
 const isUnresolvedRelativeImport = d => d.code === 2307 && /module '\.\.?\//.test(ts.flattenDiagnosticMessageText(d.messageText, '\n'));
 
+// Usage snippets mark omitted props with `/* More options... */`. In those,
+// a missing required prop is intended; wrong or unknown props still fail.
+const PARTIAL_MARKER = /\/\*\s*More options/i;
+const MISSING_PROPS = new Set([2739, 2740, 2741]);
+const isOnlyMissingProps = d => d.code === 2345 && typeof d.messageText === 'object'
+  && d.messageText.next?.length > 0 && d.messageText.next.every(n => MISSING_PROPS.has(n.code));
+
 export function typecheckSnippets(snippets) {
   const virtual = new Map(snippets.map((s, i) => [join(repoRoot, '.snippets', `${i}.${s.ext}`).split(sep).join('/'), s]));
   const host = ts.createCompilerHost(compilerOptions);
@@ -75,7 +83,9 @@ export function typecheckSnippets(snippets) {
     const source = program.getSourceFile(path);
     const syntactic = program.getSyntacticDiagnostics(source);
     // Type errors on code that doesn't parse are noise; report the parse errors only.
-    const diagnostics = syntactic.length > 0 ? syntactic : program.getSemanticDiagnostics(source).filter(d => !isUnresolvedRelativeImport(d));
+    const partial = PARTIAL_MARKER.test(snippet.code);
+    const diagnostics = syntactic.length > 0 ? syntactic : program.getSemanticDiagnostics(source)
+      .filter(d => !isUnresolvedRelativeImport(d) && !(partial && isOnlyMissingProps(d)));
     for (const d of diagnostics) {
       const { line, character } = source.getLineAndCharacterOfPosition(d.start ?? 0);
       errors.push({

@@ -7,13 +7,15 @@
 // for other statements) is on the line before their fence. Snippets with a `/* More options... */` comment may omit required
 // props. Opt a block out with `{/* typecheck-skip */}` on the line before it.
 //
-// Usage: node .github/scripts/typecheck-snippets.mjs [root]
+// Usage: npm install && npm run check (in .github/snippet-typecheck)
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 
-const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
+// Modules resolve from this folder's node_modules, which installs the latest
+// checkly release independently of the docs project's own dependencies.
+const toolRoot = dirname(fileURLToPath(import.meta.url));
 const SKIP_MARKER = '{/* typecheck-skip */}';
 const WRAP_MARKER = /^\{\/\* typecheck-wrap(?:: (\w+))? \*\/\}$/;
 const LANGS = { ts: 'ts', typescript: 'ts', js: 'js', javascript: 'js' };
@@ -60,6 +62,9 @@ const compilerOptions = {
   skipLibCheck: true,
   noEmit: true,
   types: ['node'],
+  // Snippets read `process.env.X` without null checks, as checks usually do.
+  // TypeScript 6 turns strict on by default, so keep it off explicitly.
+  strict: false,
 };
 
 // Multi-file examples import siblings like `./group.check`. Those can't
@@ -76,7 +81,7 @@ const isOnlyMissingProps = d => MISSING_PROPS.has(d.code) || (d.code === 2345 &&
 // Exports of a module read from its type declarations, split into values and
 // types, because JavaScript files can't import types.
 function moduleExports(specifiers) {
-  const files = specifiers.map(s => ts.resolveModuleName(s, join(repoRoot, 'index.ts'), compilerOptions, ts.sys).resolvedModule.resolvedFileName);
+  const files = specifiers.map(s => ts.resolveModuleName(s, join(toolRoot, 'index.ts'), compilerOptions, ts.sys).resolvedModule.resolvedFileName);
   const program = ts.createProgram(files, compilerOptions);
   const checker = program.getTypeChecker();
   return files.map(f => {
@@ -128,7 +133,7 @@ function source(snippet) {
 }
 
 export function typecheckSnippets(snippets) {
-  const virtual = new Map(snippets.map((s, i) => [join(repoRoot, '.snippets', `${i}.${s.ext}`).split(sep).join('/'), { ...s, ...source(s) }]));
+  const virtual = new Map(snippets.map((s, i) => [join(toolRoot, '.snippets', `${i}.${s.ext}`).split(sep).join('/'), { ...s, ...source(s) }]));
   const host = ts.createCompilerHost(compilerOptions);
   const { getSourceFile, fileExists, readFile } = host;
   host.fileExists = f => virtual.has(f) || fileExists(f);
@@ -162,8 +167,8 @@ export function typecheckSnippets(snippets) {
   return errors;
 }
 
-function mdxFiles(root) {
-  const ignoredDirs = ['node_modules', 'samples', '.git'];
+export function mdxFiles(root) {
+  const ignoredDirs = ['samples', '.git'];
   const mintignore = join(root, '.mintignore');
   if (existsSync(mintignore)) {
     for (const entry of readFileSync(mintignore, 'utf8').split('\n')) {
@@ -177,7 +182,7 @@ function mdxFiles(root) {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       const path = join(dir, entry.name);
       if (entry.isDirectory()) {
-        if (!ignoredDirs.includes(relative(root, path).split(sep).join('/'))) walk(path);
+        if (entry.name !== 'node_modules' && !ignoredDirs.includes(relative(root, path).split(sep).join('/'))) walk(path);
       } else if (entry.name.endsWith('.mdx')) {
         files.push(path);
       }
@@ -200,7 +205,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     }
   }
 
-  const checklyVersion = JSON.parse(readFileSync(join(repoRoot, 'node_modules/checkly/package.json'), 'utf8')).version;
+  const checklyVersion = JSON.parse(readFileSync(join(toolRoot, 'node_modules/checkly/package.json'), 'utf8')).version;
   console.log(`Typechecked ${snippets.length} snippets against checkly@${checklyVersion}: ${errors.length} error(s).`);
   if (errors.length > 0) process.exitCode = 1;
 }

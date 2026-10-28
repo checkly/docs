@@ -45,9 +45,9 @@ jobs:
             echo "openapi_changed=false" >> "$GITHUB_OUTPUT"
           fi
 
-          # A checkly CLI bump or a change to the snippet checker re-runs the
-          # snippet typecheck even when no docs changed.
-          if echo "$CHANGED" | grep -qE '^(package(-lock)?\.json|\.github/scripts/typecheck-snippets(\.test)?\.mjs)$'; then
+          # A change to the snippet checker re-runs the snippet typecheck even
+          # when no docs changed.
+          if echo "$CHANGED" | grep -q '^\.github/snippet-typecheck/'; then
             echo "snippets_tooling_changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "snippets_tooling_changed=false" >> "$GITHUB_OUTPUT"
@@ -68,7 +68,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        if: steps.detect.outputs.openapi_changed == 'true' || steps.detect.outputs.docs_changed == 'true' || steps.detect.outputs.snippets_tooling_changed == 'true'
+        if: steps.detect.outputs.openapi_changed == 'true' || steps.detect.outputs.docs_changed == 'true'
         run: npm ci
 
       - name: Validate OpenAPI spec
@@ -78,15 +78,19 @@ jobs:
       - name: Test API navigation tooling
         run: npm run test:api-docs
 
-      # Typechecks MDX snippets that import from `checkly`, and fragments
-      # marked with {/* typecheck-wrap */}, against the installed CLI
-      # constructs, so examples don't drift from the CLI API. Errors show up
-      # as inline annotations on the PR.
+      # Typechecks MDX snippets that use `checkly`, and fragments marked with
+      # {/* typecheck-wrap */}, against the latest CLI constructs, so examples
+      # don't drift from the CLI API. The checker has its own package.json
+      # without a lockfile, so every run installs the latest checkly release
+      # rather than the docs project's pinned version. Errors show up as
+      # inline annotations on the PR.
       - name: Typecheck checkly snippets
         if: steps.detect.outputs.docs_changed == 'true' || steps.detect.outputs.snippets_tooling_changed == 'true'
+        working-directory: .github/snippet-typecheck
         run: |
-          npm run test:snippets
-          npm run check:snippets
+          npm install --no-audit --no-fund
+          npm test
+          npm run check
 
       - name: Check API group badges match the schema
         run: npm run sync:api-group-tags -- --check

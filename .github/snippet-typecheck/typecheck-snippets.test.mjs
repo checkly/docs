@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import test from 'node:test';
-import { extractSnippets, typecheckSnippets } from './typecheck-snippets.mjs';
+import { extractSnippets, mdxFiles, typecheckSnippets } from './typecheck-snippets.mjs';
 
 const fence = '```';
 
@@ -138,6 +141,14 @@ test('extracts fragments marked with typecheck-wrap even without a checkly impor
 
   assert.equal(fragment.wrap, 'ApiCheck');
   assert.equal(fragment.line, 3);
+});
+
+test('finds MDX files outside node_modules folders at any depth', () => {
+  const root = mkdtempSync(join(tmpdir(), 'snippets-'));
+  for (const dir of ['docs', 'node_modules/pkg', 'tools/node_modules/pkg']) mkdirSync(join(root, dir), { recursive: true });
+  for (const file of ['docs/page.mdx', 'node_modules/pkg/readme.mdx', 'tools/node_modules/pkg/readme.mdx']) writeFileSync(join(root, file), '');
+
+  assert.deepEqual(mdxFiles(root).map(f => f.slice(root.length + 1)), ['docs/page.mdx']);
 });
 
 function snippet(code, line = 10) {

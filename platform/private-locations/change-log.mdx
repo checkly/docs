@@ -17,7 +17,18 @@ Learn more about:
 
 ## Full release history
 
-<Update label="v8.11.0" tags={["Oktober 2026"]}>
+<Update label="v8.12.0" tags={["October 2026"]}>
+- Security: updated every bundled Node.js to releases that fix CVE-2026-111497 (Brotli remote code execution) and carry the current CA store. Runtime 2026-04 now runs Node.js 24.22.1 (was 24.13.1), and Playwright Check Suites run on Node.js 22.23.4, 24.22.1 or 26.12.1. Upgrade to this version or newer.
+- Added Bun 1.4 as a Playwright Check Suite engine version.
+- Improved secret scrubbing for Browser and Multistep checks. Secrets are now removed from traces, reports and logs before upload, including request and response bodies, attachments and encoded values.
+- Secrets are now also removed from API check setup and teardown script logs.
+- A trace that cannot be fully scrubbed is left out of the result, and the check log says why.
+- Playwright Check Suites scrub secrets several times faster.
+- The agent now exposes a single port, 8080, for health probes and Prometheus metrics. If your Kubernetes probes or scrape configuration use port 8081 or 8082, point them to 8080.
+- A single `/metrics` endpoint now covers every check type the agent runs. Use the `component` label to separate uptime metrics from synthetics metrics. Metric names and labels are consistent across both, so one dashboard covers the whole agent.
+</Update>
+
+<Update label="v8.11.0" tags={["October 2026"]}>
 - Expanded native Fetch API support in runtimes 2025-04 and 2026-04. Scripts can now use FormData, Blob, File, Headers, Request, and Response, including multipart/form-data requests and file uploads with native fetch().
 - Added compression for logs and reports from scheduled checks, enabled per account, to reduce artifact upload sizes.
 - Updated agent and bundled 2026-04 runtime dependencies to fix vulnerabilities.

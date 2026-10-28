@@ -34,10 +34,10 @@ API checks are automated HTTP requests that validate API endpoint functionality 
 - Third-party API dependency monitoring
 - Payment and transaction APIs
 
-<Accordion title="Key capabilities" icon="api">
+<Accordion title="Key capabilities" icon="braces">
 - HTTP method support (GET, POST, PUT, DELETE, etc.)
 - Request/response validation
-- JSON schema validation
+- JSON path assertions
 - Authentication handling
 - Performance measurement
 - Global monitoring locations
@@ -55,7 +55,7 @@ API checks perform comprehensive endpoint validation:
 1. **HTTP Request** - Sends configured requests with headers, body, and authentication
 2. **Response Analysis** - Captures status codes, headers, body content, and timing
 3. **Validation** - Runs assertions against response data and performance metrics
-4. **Performance Tracking** - Measures response times and identifies trends
+4. **Performance Tracking** - Records the response time and timing phases
 5. **Alert Generation** - Notifies teams when endpoints fail or degrade
 
 <Tip>
@@ -79,9 +79,11 @@ These include:
   * Check job log
 
 * Timings phases: 
+  * `wait`: Time spent initializing the socket
   * `dns`: Duration of DNS lookup
   * `tcp`: Duration of TCP connection
   * `firstByte`: Duration of HTTP server response
   * `download`: Duration of HTTP download
+  * `total`: Total duration of the request
 
 Learn more in our documentation on [Results](/concepts/results).

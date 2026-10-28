@@ -70,6 +70,20 @@ test('skips a block preceded by a typecheck-skip comment', () => {
   assert.equal(snippets[0].line, 7);
 });
 
+test('extracts fragments marked with typecheck-wrap even without a checkly import', () => {
+  const mdx = [
+    '{/* typecheck-wrap: ApiCheck */}',
+    `${fence}ts REST API`,
+    `request: { method: 'GET', url: 'https://x.dev' },`,
+    fence,
+  ].join('\n');
+
+  const [fragment] = extractSnippets(mdx, 'page.mdx');
+
+  assert.equal(fragment.wrap, 'ApiCheck');
+  assert.equal(fragment.line, 3);
+});
+
 function snippet(code, line = 10) {
   return { file: 'page.mdx', line, ext: 'ts', code };
 }
@@ -142,6 +156,49 @@ test('reports missing required props in complete snippets', () => {
 
   assert.equal(errors.length, 1);
   assert.match(errors[0].message, /'code' is missing/);
+});
+
+function fragment(code, wrap = 'ApiCheck', line = 10) {
+  return { file: 'page.mdx', line, ext: 'ts', code, wrap };
+}
+
+test('typechecks a property fragment inside the wrap construct with auto-imports', () => {
+  const errors = typecheckSnippets([fragment([
+    `request: {`,
+    `  method: 'GET',`,
+    `  url: 'https://x.dev',`,
+    `  assertions: [AssertionBuilder.statusCode().equals(200)],`,
+    `},`,
+    `frequency: Frequency.EVERY_5M,`,
+  ].join('\n'))]);
+
+  assert.deepEqual(errors, []);
+});
+
+test('reports wrong props in a wrapped fragment at the MDX line', () => {
+  const errors = typecheckSnippets([fragment([
+    `request: {`,
+    `  method: 'GTE',`,
+    `  url: 'https://x.dev',`,
+    `},`,
+  ].join('\n'))]);
+
+  assert.equal(errors.length, 1);
+  assert.equal(errors[0].line, 11);
+  assert.match(errors[0].message, /GTE/);
+});
+
+test('only adds imports to a marked fragment that already calls the constructor', () => {
+  const errors = typecheckSnippets([fragment([
+    `new ApiCheck('a', {`,
+    `  name: 'A',`,
+    `  maxResponseTime: 'slow',`,
+    `  request: { method: 'GET', url: 'https://x.dev' },`,
+    `})`,
+  ].join('\n'))]);
+
+  assert.equal(errors.length, 1);
+  assert.equal(errors[0].line, 12);
 });
 
 test('reports syntax errors without hiding type errors in other snippets', () => {

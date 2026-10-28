@@ -1,9 +1,10 @@
 // Typechecks MDX code snippets that import from `checkly` against the
 // installed Checkly CLI constructs, so docs examples don't drift from the CLI.
 //
-// Only complete snippets (ones with a `checkly` import) are checked. Snippets
-// with a `/* More options... */` comment may omit required props. Opt a block
-// out by putting `{/* typecheck-skip */}` on the line before its fence.
+// Complete snippets (ones with a `checkly` import) are checked. Fragments are
+// checked when `{/* typecheck-wrap: ApiCheck */}` is on the line before their
+// fence. Snippets with a `/* More options... */` comment may omit required
+// props. Opt a block out with `{/* typecheck-skip */}` on the line before it.
 //
 // Usage: node .github/scripts/typecheck-snippets.mjs [root]
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
@@ -13,6 +14,7 @@ import ts from 'typescript';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const SKIP_MARKER = '{/* typecheck-skip */}';
+const WRAP_MARKER = /^\{\/\* typecheck-wrap: (\w+) \*\/\}$/;
 const LANGS = { ts: 'ts', typescript: 'ts', js: 'js', javascript: 'js' };
 const CHECKLY_IMPORT = /from\s+['"]checkly(\/[\w-]+)?['"]/;
 
@@ -27,13 +29,14 @@ export function extractSnippets(mdx, file) {
       if (!match) return;
       let prev = i - 1;
       while (prev >= 0 && lines[prev].trim() === '') prev--;
-      open = { indent: match[1].length, ext: LANGS[match[2]], start: i + 1, body: [], skip: prev >= 0 && lines[prev].trim() === SKIP_MARKER };
+      const marker = prev >= 0 ? lines[prev].trim() : '';
+      open = { indent: match[1].length, ext: LANGS[match[2]], start: i + 1, body: [], skip: marker === SKIP_MARKER, wrap: marker.match(WRAP_MARKER)?.[1] };
       return;
     }
     if (/^\s*```\s*$/.test(text)) {
       const code = open.body.join('\n');
-      if (open.ext && !open.skip && CHECKLY_IMPORT.test(code)) {
-        snippets.push({ file, line: open.start + 1, ext: open.ext, code });
+      if (open.ext && !open.skip && (open.wrap || CHECKLY_IMPORT.test(code))) {
+        snippets.push({ file, line: open.start + 1, ext: open.ext, code, ...(open.wrap && { wrap: open.wrap }) });
       }
       open = null;
       return;
@@ -66,8 +69,23 @@ const MISSING_PROPS = new Set([2739, 2740, 2741]);
 const isOnlyMissingProps = d => d.code === 2345 && typeof d.messageText === 'object'
   && d.messageText.next?.length > 0 && d.messageText.next.every(n => MISSING_PROPS.has(n.code));
 
+// Fragments marked with `{/* typecheck-wrap: ApiCheck */}` get every runtime
+// export of `checkly/constructs` and `checkly/util` imported. Property
+// fragments are wrapped in the named construct as a partial snippet;
+// fragments that already call a constructor only get the imports.
+const AUTO_IMPORTS = [
+  `import { ${Object.keys(await import('checkly/constructs')).join(', ')} } from 'checkly/constructs'`,
+  `import { ${Object.keys(await import('checkly/util')).join(', ')} } from 'checkly/util'`,
+].join('; ');
+
+function source(snippet) {
+  if (!snippet.wrap) return { code: snippet.code, offset: 0 };
+  if (/^\s*new\s/.test(snippet.code)) return { code: `${AUTO_IMPORTS}\n${snippet.code}`, offset: 1 };
+  return { code: `${AUTO_IMPORTS}\nnew ${snippet.wrap}('snippet', {\n/* More options... */\n${snippet.code}\n})`, offset: 3 };
+}
+
 export function typecheckSnippets(snippets) {
-  const virtual = new Map(snippets.map((s, i) => [join(repoRoot, '.snippets', `${i}.${s.ext}`).split(sep).join('/'), s]));
+  const virtual = new Map(snippets.map((s, i) => [join(repoRoot, '.snippets', `${i}.${s.ext}`).split(sep).join('/'), { ...s, ...source(s) }]));
   const host = ts.createCompilerHost(compilerOptions);
   const { getSourceFile, fileExists, readFile } = host;
   host.fileExists = f => virtual.has(f) || fileExists(f);
@@ -88,10 +106,11 @@ export function typecheckSnippets(snippets) {
       .filter(d => !isUnresolvedRelativeImport(d) && !(partial && isOnlyMissingProps(d)));
     for (const d of diagnostics) {
       const { line, character } = source.getLineAndCharacterOfPosition(d.start ?? 0);
+      // Errors in generated wrapper lines point at the fragment's first line.
       errors.push({
         file: snippet.file,
-        line: snippet.line + line,
-        column: character + 1,
+        line: snippet.line + Math.max(0, line - snippet.offset),
+        column: line < snippet.offset ? 1 : character + 1,
         message: `TS${d.code}: ${ts.flattenDiagnosticMessageText(d.messageText, '\n')}`,
       });
     }

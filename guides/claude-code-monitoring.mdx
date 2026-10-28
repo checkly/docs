@@ -42,7 +42,7 @@ claude mcp add playwright npx @playwright/mcp@latest
 This will let us ask Claude Code to do things like crawling a particular website and interacting with pages.
 
 ## Give Claude Code Some Context
-Everything we write into the CLI interface is part of a 'prompt,' and by default, Claude Code will add a bit of information to what we submit as 'context' on that prompt. Ideally, our requests written into Claude Code would include context about our specific project: its structure, language, and even its purpose. Because of the `npm create` command we ran above, our folder already has a boilerplate version of a Checkly project. We can't feed in all of these files as context, but we can add a summary of our whole project as context by opening Claude Code and running [the slash command](https://docs.anthropic.com/en/docs/claude-code/slash-commands):
+Everything we write into the CLI interface is part of a 'prompt,' and by default, Claude Code will add a bit of information to what we submit as 'context' on that prompt. Ideally, our requests written into Claude Code would include context about our specific project: its structure, language, and even its purpose. Because of the `npx checkly init` command we ran above, our folder already has a boilerplate version of a Checkly project. We can't feed in all of these files as context, but we can add a summary of our whole project as context by opening Claude Code and running [the slash command](https://docs.anthropic.com/en/docs/claude-code/slash-commands):
 
 ```{title="Prompt:"}
 /init
@@ -50,15 +50,13 @@ Everything we write into the CLI interface is part of a 'prompt,' and by default
 
 Claude Code will scan the whole project, write a summary, and then store that summary in a local `CLAUDE.md` file. Claude Code will read that file and add it to our prompt every time it's run within this project from now on.
 
-Let's add a bit more to this context, we want test files that make sense as a [Checkly construct](/constructs/overview). Let's add [Checkly's AI rules file](/ai/overview) to our `CLAUDE.md` context file:
+Let's add a bit more to this context, we want test files that make sense as a [Checkly construct](/constructs/overview). Let's install the [Checkly skill](/ai/skills) for Claude Code:
 
 ```bash
-mkdir -p .claude &&
-curl -o .claude/checkly.rules.md https://www.checklyhq.com/docs/ai/checkly.rules.md -L 
-echo "- examine checkly.rules.md for code generation rules" >> .claude/CLAUDE.md
+npx checkly skills install --target claude
 ```
 
-After this you'll need to exit and restart Claude Code for it to pick up changes to our context file.
+After this you'll need to exit and restart Claude Code for it to pick up the skill.
 
 ## Create new URL Monitors
 
@@ -186,14 +184,14 @@ new BrowserCheck('book-detail-visibility-check-v1', {
   frequency: Frequency.EVERY_30M,
   // Alert escalation policy defining when and how alerts are sent
   alertEscalationPolicy: AlertEscalationBuilder.runBasedEscalation(1, {
-    // Number of failed runs before sending alert (0 = immediate)
+    // Number of reminder notifications to send after the first alert
     amount: 2,
-    // Time interval between escalation checks in minutes
+    // Minutes between reminder notifications
     interval: 5,
   }, {
-    // Whether percentage-based escalation is enabled
+    // Whether to alert only when a percentage of parallel locations fail
     enabled: false,
-    // Percentage threshold for escalation (when enabled)
+    // Percentage of parallel locations that must fail (when enabled)
     percentage: 10,
   }),
   // Retry strategy configuration for failed checks
@@ -221,7 +219,6 @@ With this check created, let's add the following lines to your updated `CLAUDE.m
 ```markdown
 - When writing Playwright, don't set locators equal to const, rather just perform expect tests directly on locators
 - When writing a spec.ts file, don't use locators based on CSS class
-Oh that's smart. yeah I'll add something like:
 - Before creating more check files scan `__checks__` for more info and base setup
 ```
 
@@ -392,7 +389,6 @@ Throughout this tutorial, we added a few lines to the CLAUDE.md context file. In
 
 ```markdown
 ## Memories and Best Practices
-- Follow the rules in .claude/checkly.rules.md
 ### When writing checkly playwright tests
 - load the target page in a browser
 - don't set locators equal to const, rather just perform expect tests directly on locators

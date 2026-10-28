@@ -88,8 +88,8 @@ A DNS Monitor has its own DNS-specific settings, plus the standard monitor optio
 |-----------|------|----------|---------|-------------|
 | `request` | `object` | ✅ | - | DNS request configuration object |
 | `intent` | `CheckIntent` | ❌ | - | Structured guidance for root cause analysis and check repair. See [General Monitor Options](#general-monitor-options). |
-| `degradedResponseTime` | `number` | ❌ | `500` | Response time threshold in milliseconds for degraded status |
-| `maxResponseTime` | `number` | ❌ | `1000` | Maximum response time in milliseconds before marking as failed |
+| `degradedResponseTime` | `number` | ❌ | `500` | Response time threshold in milliseconds for degraded status (max 5000 by default) |
+| `maxResponseTime` | `number` | ❌ | `1000` | Maximum response time in milliseconds before marking as failed (max 5000 by default) |
 
 </Tab>
 <Tab title="General Monitor Settings">
@@ -126,8 +126,8 @@ new DnsMonitor("dns-monitor", {
 |-----------|------|----------|---------|-------------|
 | `query` | `string` | ✅ | - | The DNS query (domain name or IP address) |
 | `recordType` | `DnsRecordType` | ✅ | - | DNS record type: A, AAAA, CNAME, MX, NS, TXT, SOA, HTTPS |
-| `nameServer` | `string` | ❌ | - | Custom DNS server to query (e.g. "9.9.9.9") |
-| `port` | `number` | ❌ | `53` | Port of the DNS server |
+| `nameServer` | `string` | ❌ | - | Custom DNS server to query (e.g. "9.9.9.9"). Requires `port` |
+| `port` | `number` | ❌ | `53` | Port of the DNS server. Required when `nameServer` is set, and only allowed with `nameServer` |
 | `protocol` | `DnsProtocol` | ❌ | `UDP` | Protocol to use: UDP or TCP |
 | `assertions` | `DnsAssertion[]` | ❌ | `[]` | Response assertions using `DnsAssertionBuilder` |
 

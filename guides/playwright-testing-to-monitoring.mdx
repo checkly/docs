@@ -117,7 +117,7 @@ export default defineConfig({
 })
 ```
 
-Three settings matter for monitoring and not for testing. `baseURL` makes the same `page.goto('/')` hit production on Checkly. `maxFailures: 1` stops the run at the first failure so the alert goes out sooner. `retries` absorbs a transient network blip before it becomes an alert. Checkly records a trace on every run regardless of your `trace` setting.
+Three settings matter for monitoring and not for testing. `baseURL` makes the same `page.goto('/')` hit production on Checkly. `maxFailures: 1` stops the run at the first failure so the alert goes out sooner. `retries` absorbs a transient network blip before it becomes an alert. Checkly records a trace on every run to collect network and console data, then keeps the trace file according to your `trace` setting, so with `retain-on-failure` only failed tests keep a trace.
 
 <Tip>
 If your config starts a `webServer`, guard it the same way: `webServer: onCheckly ? undefined : { ... }`. On Checkly the deployed site is already running.
@@ -214,7 +214,7 @@ playwright.config.ts
 2 passed, 2 total
 ```
 
-Both variants from step 2 ran because the sample contains both. Open the session link. Each test in the suite shows its steps, timing, a trace, and a video, the same artifacts you get from a local run.
+Both variants from step 2 ran because the sample contains both. Open the session link. Each test in the suite shows its steps and timing. With this config, traces and videos are kept for failed or retried tests, the same as a local run. Set `trace: 'on'` if you want a trace for passing tests too.
 
 <Frame>
   <img src="/images/guides/playwright-to-monitoring/result-passing.png" alt="A passing Shop critical flows result in Checkly listing the checkout and search test cases with trace and video attachments" />

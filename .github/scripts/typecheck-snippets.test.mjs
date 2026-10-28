@@ -142,6 +142,14 @@ test('allows missing required props in snippets marked with a "More options" com
   assert.deepEqual(errors, []);
 });
 
+test('allows missing required props on typed variables marked with a "More options" comment', () => {
+  const errors = typecheckSnippets([
+    fragment(`const trigger: IncidentTrigger = {\n  service: searchService,\n  /* More options... */\n}`, true),
+  ]);
+
+  assert.deepEqual(errors, []);
+});
+
 test('still reports wrong props in snippets marked with a "More options" comment', () => {
   const errors = typecheckSnippets([
     snippet(`import { BrowserCheck } from 'checkly/constructs'\nnew BrowserCheck('a', {\n  frequency: 'often',\n  /* More options... */\n})`),

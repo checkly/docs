@@ -67,8 +67,8 @@ const isUnresolvedRelativeImport = d => d.code === 2307 && /module '\.\.?\//.tes
 // a missing required prop is intended; wrong or unknown props still fail.
 const PARTIAL_MARKER = /\/\*\s*More options/i;
 const MISSING_PROPS = new Set([2739, 2740, 2741]);
-const isOnlyMissingProps = d => d.code === 2345 && typeof d.messageText === 'object'
-  && d.messageText.next?.length > 0 && d.messageText.next.every(n => MISSING_PROPS.has(n.code));
+const isOnlyMissingProps = d => MISSING_PROPS.has(d.code) || (d.code === 2345 && typeof d.messageText === 'object'
+  && d.messageText.next?.length > 0 && d.messageText.next.every(n => MISSING_PROPS.has(n.code)));
 
 // Exports of a module read from its type declarations, split into values and
 // types, because JavaScript files can't import types.

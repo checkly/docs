@@ -114,7 +114,7 @@ Root cause:     The test immediately asserts that the success message "All good,
 
 The error says what did not happen: the order confirmation never appeared after **Buy**. Rocky read the trace and found what happened instead: the form showed `Please fill in all fields.`. That is the lead.
 
-Rocky's conclusion is a hypothesis, and this one is wrong in a detail that matters. Open the spec: it fills name, surname, address, zipcode, and city. Checkly scrubs form input values from stored traces, so the analysis could not see them. Whenever the analysis and your code disagree, the trace decides.
+Rocky's conclusion is a hypothesis, and this one is wrong in a detail that matters. Open the spec: it fills name, surname, address, zipcode, and city. Whenever the analysis and your code disagree, the trace decides.
 
 <Note>
 Rocky analyzes every new error group automatically. To rerun it with what you know, use `npx checkly rca run --error-group <id> --user-context "..." --watch`.

@@ -70,12 +70,14 @@ const isOnlyMissingProps = d => d.code === 2345 && typeof d.messageText === 'obj
   && d.messageText.next?.length > 0 && d.messageText.next.every(n => MISSING_PROPS.has(n.code));
 
 // Fragments marked with `{/* typecheck-wrap: ApiCheck */}` get every runtime
-// export of `checkly/constructs` and `checkly/util` imported. Property
-// fragments are wrapped in the named construct as a partial snippet;
-// fragments that already call a constructor only get the imports.
+// export of `checkly/constructs` and `checkly/util` imported, plus `path` for
+// `path.join(__dirname, ...)` entrypoints. Property fragments are wrapped in
+// the named construct as a partial snippet; fragments that already call a
+// constructor only get the imports.
 const AUTO_IMPORTS = [
   `import { ${Object.keys(await import('checkly/constructs')).join(', ')} } from 'checkly/constructs'`,
   `import { ${Object.keys(await import('checkly/util')).join(', ')} } from 'checkly/util'`,
+  `import * as path from 'node:path'`,
 ].join('; ');
 
 function source(snippet) {

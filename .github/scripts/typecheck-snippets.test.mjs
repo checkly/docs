@@ -188,6 +188,12 @@ test('reports wrong props in a wrapped fragment at the MDX line', () => {
   assert.match(errors[0].message, /GTE/);
 });
 
+test('auto-imports node:path for fragments that reference entrypoint files', () => {
+  const errors = typecheckSnippets([fragment(`setupScript: { entrypoint: path.join(__dirname, 'setup.ts') },`)]);
+
+  assert.deepEqual(errors, []);
+});
+
 test('only adds imports to a marked fragment that already calls the constructor', () => {
   const errors = typecheckSnippets([fragment([
     `new ApiCheck('a', {`,

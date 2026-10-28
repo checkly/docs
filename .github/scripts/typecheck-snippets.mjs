@@ -36,8 +36,10 @@ export function extractSnippets(mdx, file) {
     }
     if (/^\s*```\s*$/.test(text)) {
       const code = open.body.join('\n');
-      if (open.ext && !open.skip && (open.wrap || CHECKLY_IMPORT.test(code))) {
-        snippets.push({ file, line: open.start + 1, ext: open.ext, code, ...(open.wrap && { wrap: open.wrap }) });
+      const imports = CHECKLY_IMPORT.test(code);
+      const wrap = open.wrap ?? (!imports && CHECKLY_USE.test(code) ? true : undefined);
+      if (open.ext && !open.skip && (wrap || imports)) {
+        snippets.push({ file, line: open.start + 1, ext: open.ext, code, ...(wrap && { wrap }) });
       }
       open = null;
       return;
@@ -97,6 +99,17 @@ const autoImports = kind => [
 ].join('; ');
 const AUTO_IMPORTS = { ts: autoImports('all'), js: autoImports('values') };
 
+// Blocks without a `checkly` import are checked as statement fragments when
+// they use a checkly export (`new BrowserCheck(`, `Frequency.EVERY_5M`).
+// Exports that are also globals, like `Request`, don't count.
+const usableExports = [...constructExports.values, ...utilExports.values].filter(name => !(name in globalThis)).join('|');
+const CHECKLY_USE = new RegExp(`(?<![\\w.$])(?:new\\s+(?:${usableExports})\\s*\\(|(?:${usableExports})\\.\\w)`);
+
+// Assertion examples end with the raw object they compile to, which isn't
+// valid code on its own: `// Equivalent to:` and everything after it is dropped.
+const EQUIVALENT_TO = /^\s*\/\/ Equivalent to:/m;
+const withoutEquivalent = code => code.split(EQUIVALENT_TO)[0];
+
 // Fragments reference values defined elsewhere on the page (`statusPage`,
 // `group`). Checkly exports are auto-imported, so an unknown lowercase name is
 // page context; an unknown PascalCase name is a missing or misspelled construct.
@@ -106,10 +119,11 @@ const isPageContextName = d => (d.code === 2304 || d.code === 18004)
 const isPropertyFragment = code => /^\w+\??:\s/.test(code.split('\n').map(l => l.trim()).find(l => l && !l.startsWith('//')) ?? '');
 
 function source(snippet) {
-  if (!snippet.wrap) return { code: snippet.code, offset: 0 };
+  const code = withoutEquivalent(snippet.code);
+  if (!snippet.wrap) return { code, offset: 0 };
   const imports = AUTO_IMPORTS[snippet.ext];
-  if (typeof snippet.wrap !== 'string' || !isPropertyFragment(snippet.code)) return { code: `${imports}\n${snippet.code}`, offset: 1 };
-  return { code: `${imports}\nnew ${snippet.wrap}('snippet', {\n/* More options... */\n${snippet.code}\n})`, offset: 3 };
+  if (typeof snippet.wrap !== 'string' || !isPropertyFragment(code)) return { code: `${imports}\n${code}`, offset: 1 };
+  return { code: `${imports}\nnew ${snippet.wrap}('snippet', {\n/* More options... */\n${code}\n})`, offset: 3 };
 }
 
 export function typecheckSnippets(snippets) {

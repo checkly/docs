@@ -75,6 +75,39 @@ test('reports construct API mismatches in CommonJS snippets', () => {
   assert.match(errors[0].message, /Foo/);
 });
 
+test('extracts unmarked blocks that use a checkly export as statement fragments', () => {
+  const mdx = [
+    `${fence}ts Login Flow`,
+    `new BrowserCheck('login', { name: 'Login' })`,
+    fence,
+    '',
+    `${fence}ts`,
+    `UrlAssertionBuilder.statusCode().equals(200)`,
+    fence,
+    '',
+    `${fence}js`,
+    `const res = await fetch(new Request('https://x.dev'))`,
+    fence,
+    '',
+    `${fence}ts`,
+    `const frequency = 'often'`,
+    fence,
+  ].join('\n');
+
+  const snippets = extractSnippets(mdx, 'page.mdx');
+
+  assert.deepEqual(snippets.map(s => [s.line, s.wrap]), [[2, true], [6, true]]);
+});
+
+test('ignores the object literal after an "Equivalent to" comment', () => {
+  const errors = typecheckSnippets([
+    fragment(`UrlAssertionBuilder.statusCode().equals(200)\n// Equivalent to:\n{ source: 'STATUS_CODE', comparison: 'EQUALS', target: '200' }`, true),
+    fragment(`UrlAssertionBuilder.statusCode().isFast()\n// Equivalent to:\n{ source: 'STATUS_CODE' }`, true, 30),
+  ]);
+
+  assert.deepEqual(errors.map(e => e.line), [30]);
+});
+
 test('skips a block preceded by a typecheck-skip comment', () => {
   const mdx = [
     '{/* typecheck-skip */}',

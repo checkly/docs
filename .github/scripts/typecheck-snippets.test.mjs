@@ -52,6 +52,29 @@ test('strips fence indentation and maps js fences to .js', () => {
   assert.equal(snippet.code, 'const { ApiCheck } = {}\nimport { Frequency } from "checkly/constructs"');
 });
 
+test('extracts JavaScript blocks that require checkly', () => {
+  const mdx = [`${fence}js api.check.js`, `const { ApiCheck } = require('checkly/constructs')`, fence].join('\n');
+
+  const snippets = extractSnippets(mdx, 'page.mdx');
+
+  assert.equal(snippets.length, 1);
+  assert.equal(snippets[0].ext, 'js');
+});
+
+test('reports construct API mismatches in CommonJS snippets', () => {
+  const errors = typecheckSnippets([{ ...snippet([
+    `const { ApiCheck } = require('checkly/constructs')`,
+    `new ApiCheck('a', {`,
+    `  name: 'A',`,
+    `  request: { method: 'Foo', url: 'https://x.dev' },`,
+    `})`,
+  ].join('\n')), ext: 'js' }]);
+
+  assert.equal(errors.length, 1);
+  assert.equal(errors[0].line, 13);
+  assert.match(errors[0].message, /Foo/);
+});
+
 test('skips a block preceded by a typecheck-skip comment', () => {
   const mdx = [
     '{/* typecheck-skip */}',

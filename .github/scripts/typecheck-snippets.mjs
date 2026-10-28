@@ -16,7 +16,7 @@ const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const SKIP_MARKER = '{/* typecheck-skip */}';
 const WRAP_MARKER = /^\{\/\* typecheck-wrap(?:: (\w+))? \*\/\}$/;
 const LANGS = { ts: 'ts', typescript: 'ts', js: 'js', javascript: 'js' };
-const CHECKLY_IMPORT = /from\s+['"]checkly(\/[\w-]+)?['"]/;
+const CHECKLY_IMPORT = /(from\s+|require\(\s*)['"]checkly(\/[\w-]+)?['"]/;
 
 export function extractSnippets(mdx, file) {
   const lines = mdx.split('\n');

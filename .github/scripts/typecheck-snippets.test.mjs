@@ -212,6 +212,16 @@ test('only adds imports to statement fragments', () => {
   assert.deepEqual(errors.map(e => e.line), [30]);
 });
 
+test('ignores undeclared lowercase names in fragments, which refer to page context', () => {
+  const errors = typecheckSnippets([
+    fragment(`new ApiCheck('api', {\n  group,\n  name: 'API',\n  alertChannels: [slackChannel],\n  request: { method: 'GET', url: 'https://x.dev' },\n})`),
+    fragment(`new NotAConstruct('a', {})`, true, 30),
+    snippet(`import { ApiCheck } from 'checkly/constructs'\nnew ApiCheck('a', { name: 'A', group, request: { method: 'GET', url: 'https://x.dev' } })`, 50),
+  ]);
+
+  assert.deepEqual(errors.map(e => e.line), [30, 51]);
+});
+
 test('auto-imports defineConfig from checkly', () => {
   const errors = typecheckSnippets([fragment(`export default defineConfig({\n  projectName: 'P',\n  logicalId: 'p',\n})`, true)]);
 

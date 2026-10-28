@@ -82,6 +82,12 @@ const AUTO_IMPORTS = [
   `import * as path from 'node:path'`,
 ].join('; ');
 
+// Fragments reference values defined elsewhere on the page (`statusPage`,
+// `group`). Checkly exports are auto-imported, so an unknown lowercase name is
+// page context; an unknown PascalCase name is a missing or misspelled construct.
+const isPageContextName = d => (d.code === 2304 || d.code === 18004)
+  && /'[a-z_$][\w$]*'/.test(ts.flattenDiagnosticMessageText(d.messageText, '\n'));
+
 const isPropertyFragment = code => /^\w+\??:\s/.test(code.split('\n').map(l => l.trim()).find(l => l && !l.startsWith('//')) ?? '');
 
 function source(snippet) {
@@ -109,7 +115,7 @@ export function typecheckSnippets(snippets) {
     // Type errors on code that doesn't parse are noise; report the parse errors only.
     const partial = PARTIAL_MARKER.test(snippet.code);
     const diagnostics = syntactic.length > 0 ? syntactic : program.getSemanticDiagnostics(source)
-      .filter(d => !isUnresolvedRelativeImport(d) && !(partial && isOnlyMissingProps(d)));
+      .filter(d => !isUnresolvedRelativeImport(d) && !(partial && isOnlyMissingProps(d)) && !(snippet.wrap && isPageContextName(d)));
     for (const d of diagnostics) {
       const { line, character } = source.getLineAndCharacterOfPosition(d.start ?? 0);
       // Errors in generated wrapper lines point at the fragment's first line.

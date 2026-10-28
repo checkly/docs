@@ -172,7 +172,7 @@ new SslMonitor('shop-certificate', {
 })
 ```
 
-The SSL monitor connects to the host, completes a handshake, and inspects what comes back: expiry, hostname match, chain trust, and the negotiated protocol. It fails when the certificate has fewer than 14 days left, and also when the chain is broken or the hostname does not match, which are the same failures a browser would show your users.
+The SSL monitor connects to the host, completes a handshake, and inspects what comes back: expiry, hostname match, chain trust, and the negotiated protocol. It turns degraded when the certificate has fewer than 14 days left, which reaches any alert channel that opts in to degraded results. It fails once the certificate has expired, and also when the chain is broken or the hostname does not match, which are the same failures a browser would show your users.
 
 Test everything, then deploy:
 

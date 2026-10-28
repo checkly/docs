@@ -2,8 +2,8 @@
 // installed Checkly CLI constructs, so docs examples don't drift from the CLI.
 //
 // Complete snippets (ones with a `checkly` import) are checked. Fragments are
-// checked when `{/* typecheck-wrap: ApiCheck */}` is on the line before their
-// fence. Snippets with a `/* More options... */` comment may omit required
+// checked when `{/* typecheck-wrap: ApiCheck */}` (or `{/* typecheck-wrap */}`
+// for statements) is on the line before their fence. Snippets with a `/* More options... */` comment may omit required
 // props. Opt a block out with `{/* typecheck-skip */}` on the line before it.
 //
 // Usage: node .github/scripts/typecheck-snippets.mjs [root]
@@ -14,7 +14,7 @@ import ts from 'typescript';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const SKIP_MARKER = '{/* typecheck-skip */}';
-const WRAP_MARKER = /^\{\/\* typecheck-wrap: (\w+) \*\/\}$/;
+const WRAP_MARKER = /^\{\/\* typecheck-wrap(?:: (\w+))? \*\/\}$/;
 const LANGS = { ts: 'ts', typescript: 'ts', js: 'js', javascript: 'js' };
 const CHECKLY_IMPORT = /from\s+['"]checkly(\/[\w-]+)?['"]/;
 
@@ -30,7 +30,8 @@ export function extractSnippets(mdx, file) {
       let prev = i - 1;
       while (prev >= 0 && lines[prev].trim() === '') prev--;
       const marker = prev >= 0 ? lines[prev].trim() : '';
-      open = { indent: match[1].length, ext: LANGS[match[2]], start: i + 1, body: [], skip: marker === SKIP_MARKER, wrap: marker.match(WRAP_MARKER)?.[1] };
+      const wrap = marker.match(WRAP_MARKER);
+      open = { indent: match[1].length, ext: LANGS[match[2]], start: i + 1, body: [], skip: marker === SKIP_MARKER, wrap: wrap ? wrap[1] ?? true : undefined };
       return;
     }
     if (/^\s*```\s*$/.test(text)) {
@@ -69,20 +70,23 @@ const MISSING_PROPS = new Set([2739, 2740, 2741]);
 const isOnlyMissingProps = d => d.code === 2345 && typeof d.messageText === 'object'
   && d.messageText.next?.length > 0 && d.messageText.next.every(n => MISSING_PROPS.has(n.code));
 
-// Fragments marked with `{/* typecheck-wrap: ApiCheck */}` get every runtime
-// export of `checkly/constructs` and `checkly/util` imported, plus `path` for
-// `path.join(__dirname, ...)` entrypoints. Property fragments are wrapped in
-// the named construct as a partial snippet; fragments that already call a
-// constructor only get the imports.
+// Marked fragments get every runtime export of `checkly/constructs` and
+// `checkly/util` imported, plus `defineConfig` and `path` for
+// `path.join(__dirname, ...)` entrypoints. Property fragments (first code line
+// is `key: ...`) are wrapped in the named construct as a partial snippet;
+// statements like `new ApiCheck(...)` or `const x = ...` only get the imports.
 const AUTO_IMPORTS = [
   `import { ${Object.keys(await import('checkly/constructs')).join(', ')} } from 'checkly/constructs'`,
   `import { ${Object.keys(await import('checkly/util')).join(', ')} } from 'checkly/util'`,
+  `import { defineConfig } from 'checkly'`,
   `import * as path from 'node:path'`,
 ].join('; ');
 
+const isPropertyFragment = code => /^\w+\??:\s/.test(code.split('\n').map(l => l.trim()).find(l => l && !l.startsWith('//')) ?? '');
+
 function source(snippet) {
   if (!snippet.wrap) return { code: snippet.code, offset: 0 };
-  if (/^\s*new\s/.test(snippet.code)) return { code: `${AUTO_IMPORTS}\n${snippet.code}`, offset: 1 };
+  if (typeof snippet.wrap !== 'string' || !isPropertyFragment(snippet.code)) return { code: `${AUTO_IMPORTS}\n${snippet.code}`, offset: 1 };
   return { code: `${AUTO_IMPORTS}\nnew ${snippet.wrap}('snippet', {\n/* More options... */\n${snippet.code}\n})`, offset: 3 };
 }
 

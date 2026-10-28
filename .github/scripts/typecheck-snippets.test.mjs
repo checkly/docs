@@ -194,6 +194,37 @@ test('auto-imports node:path for fragments that reference entrypoint files', () 
   assert.deepEqual(errors, []);
 });
 
+test('extracts fragments marked with typecheck-wrap without a construct name', () => {
+  const mdx = ['{/* typecheck-wrap */}', `${fence}ts`, `UrlAssertionBuilder.statusCode().equals(200)`, fence].join('\n');
+
+  const [marked] = extractSnippets(mdx, 'page.mdx');
+
+  assert.equal(marked.wrap, true);
+});
+
+test('only adds imports to statement fragments', () => {
+  const errors = typecheckSnippets([
+    fragment(`const alert = AlertEscalationBuilder.runBasedEscalation(2)`, true),
+    fragment(`UrlAssertionBuilder.statusCode().equals(200)`, true),
+    fragment(`UrlAssertionBuilder.statusCode().isFast()`, true, 30),
+  ]);
+
+  assert.deepEqual(errors.map(e => e.line), [30]);
+});
+
+test('auto-imports defineConfig from checkly', () => {
+  const errors = typecheckSnippets([fragment(`export default defineConfig({\n  projectName: 'P',\n  logicalId: 'p',\n})`, true)]);
+
+  assert.deepEqual(errors, []);
+});
+
+test('wraps property fragments that start with a comment', () => {
+  const errors = typecheckSnippets([fragment(`// Fail fast\nmaxResponseTime: 'slow',`)]);
+
+  assert.equal(errors.length, 1);
+  assert.equal(errors[0].line, 11);
+});
+
 test('only adds imports to a marked fragment that already calls the constructor', () => {
   const errors = typecheckSnippets([fragment([
     `new ApiCheck('a', {`,

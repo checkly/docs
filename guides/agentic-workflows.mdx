@@ -35,10 +35,17 @@ Before your AI assistant can effectively configure Checkly monitoring, it needs 
 Install the [Checkly skill](/ai/skills) in your project. It gives your agent instructions on project structure, CLI commands, links to documentation and code examples for all the different Checkly check types.
 
 ```bash
+# Start an interactive prompt to pick your agent
+npx checkly skills install
+
+# Skip the prompt and install for a specific agent
 npx checkly skills install --target claude
+
+# See all options
+npx checkly skills install --help
 ```
 
-This guide uses Claude Code, so the skill is installed to `.claude/skills/checkly/SKILL.md`. Use `--target` to install it for another agent, such as `cursor` or `codex`. Your agent loads the skill only when a task needs it, so the Checkly context doesn't fill every conversation.
+Your agent loads the skill only when a task needs it, so the Checkly context doesn't fill every conversation.
 
 ### Initialize Checkly in your project (optional)
 

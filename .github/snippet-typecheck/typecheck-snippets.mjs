@@ -75,6 +75,7 @@ const isUnresolvedRelativeImport = d => d.code === 2307 && /module '\.\.?\//.tes
 // a missing required prop is intended; wrong or unknown props still fail.
 const PARTIAL_MARKER = /\/\*\s*More options/i;
 const MISSING_PROPS = new Set([2739, 2740, 2741]);
+const MORE_OPTIONS_HINT = 'Shortened on purpose? Add `/* More options... */` where the props are left out.';
 const isOnlyMissingProps = d => MISSING_PROPS.has(d.code) || (d.code === 2345 && typeof d.messageText === 'object'
   && d.messageText.next?.length > 0 && d.messageText.next.every(n => MISSING_PROPS.has(n.code)));
 
@@ -159,7 +160,7 @@ export function typecheckSnippets(snippets) {
         file: snippet.file,
         line: snippet.line + Math.max(0, line - snippet.offset),
         column: line < snippet.offset ? 1 : character + 1,
-        message: `TS${d.code}: ${ts.flattenDiagnosticMessageText(d.messageText, '\n')}`,
+        message: `TS${d.code}: ${ts.flattenDiagnosticMessageText(d.messageText, '\n')}${isOnlyMissingProps(d) ? `\n${MORE_OPTIONS_HINT}` : ''}`,
       });
     }
   }

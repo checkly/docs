@@ -233,6 +233,17 @@ test('reports missing required props in complete snippets', () => {
   assert.match(errors[0].message, /'code' is missing/);
 });
 
+test('suggests a "More options" comment for missing props, and only for those', () => {
+  const errors = typecheckSnippets([
+    snippet(`import { BrowserCheck } from 'checkly/constructs'\nnew BrowserCheck('a', { name: 'A' })`),
+    snippet(`import { BrowserCheck } from 'checkly/constructs'\nnew BrowserCheck('a', { name: 'A', code: { content: '' }, doesNotExist: true })`, 30),
+  ]);
+
+  assert.equal(errors.length, 2);
+  assert.match(errors[0].message, /'code' is missing[\s\S]*Shortened on purpose\? Add `\/\* More options\.\.\. \*\/`/);
+  assert.doesNotMatch(errors[1].message, /More options/);
+});
+
 function fragment(code, wrap = 'ApiCheck', line = 10) {
   return { file: 'page.mdx', line, ext: 'ts', code, wrap };
 }

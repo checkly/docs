@@ -266,8 +266,8 @@ npx checkly trigger --reporter ci
 # GitHub Actions reporter
 npx checkly trigger --reporter github
 
-# JSON output for programmatic use
-npx checkly trigger --reporter json > results.json
+# JSON report, written to checkly-json-report.json in the current directory
+npx checkly trigger --reporter json
 
 # Multiple reporters using comma-separated values
 npx checkly trigger --reporter list,json
@@ -278,6 +278,8 @@ npx checkly trigger --reporter list --reporter json
 # Short form with multiple reporters
 npx checkly trigger -r github -r json
 ```
+
+The `json` reporter writes its report to `checkly-json-report.json` in the current directory and prints a summary and the path of that file. From CLI v10.0.0 on, `checkly trigger` writes only the reporter output to stdout. The progress message `Running 1 checks in eu-west-1.` goes to stderr. Earlier versions print it to stdout, mixed with the reporter output.
 
 </ResponseField>
 

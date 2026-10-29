@@ -1,16 +1,16 @@
 ---
 title: 'Private Packages and Internal Registries in Playwright Check Suites'
-description: 'Run Playwright Check Suites that depend on private packages from internal registries Checkly cannot reach, by embedding and pruning dependencies in the code bundle.'
+description: 'Run Playwright Check Suites that depend on private packages from internal registries Checkly cannot reach, and speed up dependency installs, by embedding and pruning dependencies in the code bundle.'
 sidebarTitle: 'Internal Registries'
 canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/internal-registries/'
 ---
 
 When you run `npx checkly test` or `npx checkly deploy`, the CLI packs your Playwright tests into a code bundle together with the files your package manager needs: `package.json` files, the lockfile, and `.npmrc`. Before each run, Checkly installs your dependencies from that bundle, fetching packages from the registries your project uses.
 
-That install fails when your project depends on private packages from an internal registry that Checkly can't reach, such as an Artifactory, Nexus, or Verdaccio instance behind your firewall or VPN, or an intranet-only mirror of the public npm registry. This page covers the CLI options for those setups.
+That install fails when your project depends on private packages from an internal registry that Checkly can't reach, such as an Artifactory, Nexus, or Verdaccio instance behind your firewall or VPN, or an intranet-only mirror of the public npm registry. This page covers the CLI options for those setups. The pruning options also [speed up dependency installs](#speed-up-dependency-installs) in any project, because the runner installs fewer packages.
 
 <Note>
-If your private registry is reachable from the internet and only needs a token, such as GitHub Packages or a hosted npm organization, you don't need this page. Configure your `.npmrc` as described in [Using private dependencies](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#using-private-dependencies).
+If your private registry is reachable from the internet and only needs a token, such as GitHub Packages or a hosted npm organization, you don't need to embed or route packages. Configure your `.npmrc` as described in [Using private dependencies](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#using-private-dependencies).
 </Note>
 
 Choose the option that matches your setup:
@@ -21,6 +21,7 @@ Choose the option that matches your setup:
 | Your `.npmrc` points at an internal mirror, but the packages are also available from registries Checkly can reach | [Route runner installs](#route-runner-installs-to-other-registries) with `runner.registries` |
 | Your monorepo has internal packages that your checks don't use, in workspace members outside the code bundle | [Lockfile pruning](#lockfile-pruning) leaves them out automatically |
 | The install still pulls in internal packages your checks don't use, such as unused peer dependencies | [Prune manifest dependencies](#prune-manifest-dependencies) with `bundle.packages.prune` |
+| Dependency installs are slow because your `package.json` declares tooling your checks don't use, such as linters | [Speed up dependency installs](#speed-up-dependency-installs) with `bundle.packages.prune` |
 
 All of these options apply to Playwright Check Suites only, not to Browser Checks or Multistep Checks. You configure them at the top level of `checkly.config.ts`, not per check.
 
@@ -105,7 +106,7 @@ If a download fails to authenticate, the error names the credential source the C
 
 ## Pruning
 
-Pruning reduces what the runner installs to what your code bundle needs. This keeps internal packages your checks never use out of the install, so you don't have to embed them or make their registry reachable. The CLI never modifies the files on disk; it only rewrites the copies in the code bundle.
+Pruning reduces what the runner installs to what your code bundle needs. This keeps internal packages your checks never use out of the install, so you don't have to embed them or make their registry reachable, and it makes the install faster. The CLI never modifies the files on disk; it only rewrites the copies in the code bundle.
 
 ### Lockfile pruning
 
@@ -227,6 +228,48 @@ Prefer exact member names with `keep`, since a wildcard can match a member you a
 
 - When the bundle contains a lockfile, `prune` only takes effect if lockfile pruning succeeds in the same run, so the manifests and lockfile stay in sync. Otherwise the original `package.json` files ship unchanged and the CLI prints a warning. A bundle without a lockfile always ships the pruned manifests.
 - The CLI doesn't check your code against the pruned dependencies. Don't remove anything your tests need at runtime.
+
+### Speed up dependency installs
+
+The runner installs your dependencies whenever the [dependency cache](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#dependency-caching) can't be used: on the first run, after your dependencies change, and on every run in Private Locations that don't have dependency caching turned on. Every package it installs adds to that time, so pruning packages your checks never load makes those runs start faster.
+
+In a monorepo, [lockfile pruning](#lockfile-pruning) already leaves out the dependencies of workspace members outside the bundle. To go further, remove the development tooling that your `package.json` declares but your tests don't need, such as linters, formatters, and component workshops:
+
+```typescript checkly.config.ts highlight={6-19}
+import { defineConfig } from 'checkly'
+
+export default defineConfig({
+  projectName: 'Acme Website',
+  logicalId: 'acme-website',
+  bundle: {
+    packages: {
+      prune: {
+        devDependencies: [
+          'eslint*',
+          '@eslint/*',
+          '@typescript-eslint/*',
+          'prettier',
+          'storybook',
+          '@storybook/*',
+        ],
+      },
+    },
+  },
+  checks: {
+    playwrightConfigPath: './playwright.config.ts',
+    playwrightChecks: [
+      { name: 'Acme E2E', logicalId: 'acme-e2e' },
+    ],
+  },
+})
+```
+
+This config removes ESLint and its plugins, Prettier, and Storybook from the `devDependencies` of the bundled `package.json` files. The CLI then regenerates the bundled lockfile, so everything those tools depend on drops out too, and the runner installs only what remains. Your local `package.json` is unchanged, so linting and Storybook keep working on your machine.
+
+Pruning works the same way in a single-package project as in a monorepo. Keep these points in mind:
+
+- Only remove packages your tests don't import or run. The CLI doesn't check this for you.
+- A prune change that alters the bundled `package.json` files or lockfile invalidates the dependency cache once, so the next run does a full install. Patterns that match nothing leave the cache untouched.
 
 ## Route runner installs to other registries
 

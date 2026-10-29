@@ -203,6 +203,8 @@ When dependency caching is enabled:
 
 Caching significantly reduces check execution time, especially for projects with many or large dependencies.
 
+When the cache can't be used, the install takes longer the more packages your project declares. To make those installs faster, remove dependencies your checks don't use, such as linters or Storybook, from the code bundle with [`bundle.packages.prune`](/detect/synthetic-monitoring/playwright-checks/internal-registries#speed-up-dependency-installs).
+
 The dependency cache uses a least-recently-used (LRU) policy. Active Playwright Check Suites automatically refresh their cache entry, so caches only expire for check suites that have not run in the last 30 days.
 
 ### Force a reinstall
@@ -292,6 +294,7 @@ If Checkly uses the wrong package manager:
 If package installation exceeds time limits:
 
 - Check for large dependencies that can be optimized
+- Remove dependencies your checks don't use from the code bundle with [`bundle.packages.prune`](/detect/synthetic-monitoring/playwright-checks/internal-registries#speed-up-dependency-installs)
 - Consider using a custom `installCommand` to install only required packages
 
 ### Memory usage exceeded
@@ -299,6 +302,7 @@ If package installation exceeds time limits:
 If you see errors indicating that memory limits were exceeded during installation:
 
 - Optimize your dependencies to reduce memory consumption
+- Remove dependencies your checks don't use from the code bundle with [`bundle.packages.prune`](/detect/synthetic-monitoring/playwright-checks/internal-registries#speed-up-dependency-installs)
 - Consider using a custom `installCommand` to install only necessary packages
 
 ### General installation failures

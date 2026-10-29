@@ -1,0 +1,275 @@
+---
+title: 'Private Packages and Internal Registries in Playwright Check Suites'
+description: 'Run Playwright Check Suites that depend on private packages from internal registries Checkly cannot reach, by embedding and pruning dependencies in the code bundle.'
+sidebarTitle: 'Internal Registries'
+canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/internal-registries/'
+---
+
+When you run `npx checkly test` or `npx checkly deploy`, the CLI packs your Playwright tests into a code bundle together with the files your package manager needs: `package.json` files, the lockfile, and `.npmrc`. Before each run, Checkly installs your dependencies from that bundle, fetching packages from the registries your project uses.
+
+That install fails when your project depends on private packages from an internal registry that Checkly can't reach, such as an Artifactory, Nexus, or Verdaccio instance behind your firewall or VPN, or an intranet-only mirror of the public npm registry. This page covers the CLI options for those setups.
+
+<Note>
+If your private registry is reachable from the internet and only needs a token, such as GitHub Packages or a hosted npm organization, you don't need this page. Configure your `.npmrc` as described in [Using private dependencies](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#using-private-dependencies).
+</Note>
+
+Choose the option that matches your setup:
+
+| Situation | Option |
+|-----------|--------|
+| Your private packages are only available from an internal registry Checkly can't reach | [Embed the packages](#embed-private-packages) with `bundle.packages.embed` |
+| Your `.npmrc` points at an internal mirror, but the packages are also available from registries Checkly can reach | [Route runner installs](#route-runner-installs-to-other-registries) with `runner.registries` |
+| Your monorepo has internal packages that your checks don't use, in workspace members outside the code bundle | [Lockfile pruning](#lockfile-pruning) leaves them out automatically |
+| The install still pulls in internal packages your checks don't use, such as unused peer dependencies | [Prune manifest dependencies](#prune-manifest-dependencies) with `bundle.packages.prune` |
+
+All of these options apply to Playwright Check Suites only, not to Browser Checks or Multistep Checks. You configure them at the top level of `checkly.config.ts`, not per check.
+
+## Embed private packages
+
+<Info>Available since CLI version 8.22.0. `!` exclusions and `**` patterns that match across the `/` in scoped names require CLI version 8.23.0.</Info>
+
+If some of your dependencies come from a private registry that Checkly's infrastructure can't reach, list them in `bundle.packages.embed`. The CLI downloads those packages on the machine where you run it, verifies each tarball against the integrity hash in your lockfile, and ships them inside the code bundle. The runner then installs them without contacting your registry.
+
+```typescript checkly.config.ts highlight={6-10}
+import { defineConfig } from 'checkly'
+
+export default defineConfig({
+  projectName: 'Acme Website',
+  logicalId: 'acme-website',
+  bundle: {
+    packages: {
+      embed: ['@acme/*', '!@acme/public-sdk', 'legacy-private-pkg@2.1.0'],
+    },
+  },
+  checks: {
+    playwrightConfigPath: './playwright.config.ts',
+    playwrightChecks: [
+      // ...
+    ],
+  },
+})
+```
+
+Each entry is one of:
+
+- A package name, such as `'@acme/private-utils'`. Embeds every version of the package found in the lockfile.
+- An exact version pin, such as `'legacy-private-pkg@2.1.0'`.
+- A name [pattern](#package-name-patterns), such as `'@acme/*'`, optionally prefixed with `!` to exclude packages that earlier entries selected.
+
+List every package the runner can't fetch, including private packages that are only transitive dependencies of other private packages. Dependencies of listed packages are not embedded automatically.
+
+### Supported lockfiles
+
+The CLI resolves entries against the lockfile at the workspace root:
+
+| Lockfile | Supported |
+|----------|-----------|
+| `pnpm-lock.yaml` | ✅ |
+| `package-lock.json` | ✅ |
+| `bun.lock` (text format) | ✅ |
+| `yarn.lock` (Yarn Berry, v2 and later) | ✅ |
+| `yarn.lock` (Yarn Classic, v1) | ❌ |
+| `bun.lockb` (binary format) | ❌ Run `bun install --save-text-lockfile` to create a `bun.lock` |
+
+Yarn Berry lockfiles don't record npm tarball hashes, so for Yarn Berry the CLI fetches them from your registry's package metadata on every deploy.
+
+### Validation
+
+The CLI validates the list before deploying:
+
+- An entry that matches no package in the lockfile fails validation and blocks the deploy. Only list packages your project actually uses.
+- An entry whose only matches can't be embedded also fails validation. Packages installed from git, a local path, or a URL, and lockfile entries without an integrity hash, can't be embedded; the runner must fetch them itself.
+- A `!` exclusion that matches nothing is ignored.
+- A list that ends up selecting no packages at all only prints a warning.
+
+### Registry credentials
+
+Embedded packages are downloaded on the machine running the CLI, so your registry credentials must work there, not only in Checkly. The CLI reads credentials from:
+
+- The project, workspace root, and user `.npmrc` files
+- `npm_config_*` environment variables
+- pnpm's global `auth.ini`, where `pnpm login` stores tokens on pnpm 11 and later
+
+Scope tokens to the registry (`//registry.example.com/:_authToken=${NPM_TOKEN}`) rather than setting a bare `_authToken`. Because `.npmrc` is uploaded with the code bundle, reference tokens through environment variables instead of writing them in plain text, and make sure those variables are set wherever you run `checkly test` or `checkly deploy`.
+
+If you use bun or Yarn Berry and your credentials only live in `bunfig.toml` or `.yarnrc.yml`, copy them into `.npmrc` or set them as `npm_config_*` variables; the CLI doesn't read those files. bun projects must also keep their registry URLs in `.npmrc`.
+
+If a download fails to authenticate, the error names the credential source the CLI used.
+
+## Pruning
+
+Pruning reduces what the runner installs to what your code bundle needs. This keeps internal packages your checks never use out of the install, so you don't have to embed them or make their registry reachable. The CLI never modifies the files on disk; it only rewrites the copies in the code bundle.
+
+### Lockfile pruning
+
+<Info>Available since CLI version 8.23.0. `CHECKLY_LOCKFILE_PRUNE_TIMEOUT` requires CLI version 9.2.0.</Info>
+
+In a monorepo, your code bundle often contains only some of the workspace members. Installing from the full lockfile would make the runner fetch dependencies of members that aren't in the bundle, and fail if any of those come from a registry it can't reach. The CLI therefore prunes the bundled lockfile to the bundle's contents automatically. You don't need to configure anything.
+
+Lockfile pruning supports the same lockfiles as [embedding](#supported-lockfiles), and requires your package manager to be installed on the machine running the CLI. pnpm and npm reuse their local caches and only contact your registry for packages they haven't cached; Yarn Berry and bun prune offline.
+
+If pruning is needed but can't run or can't verify its result, the CLI ships the original lockfile unchanged and prints a note explaining why. Embedding follows the pruned lockfile: a package that only workspace members outside the bundle depend on is not embedded, even if an entry matches it, because the runner never installs it.
+
+Control lockfile pruning with these environment variables:
+
+| Variable | Description |
+|----------|-------------|
+| `CHECKLY_LOCKFILE_PRUNE` | Set to `0` or `false` to turn lockfile pruning off. This also turns off [`bundle.packages.prune`](#prune-manifest-dependencies) when a lockfile is bundled. |
+| `CHECKLY_LOCKFILE_PRUNE_TIMEOUT` | Time budget for pruning, in seconds. Defaults to `30`. Raise it if pruning times out, for example `CHECKLY_LOCKFILE_PRUNE_TIMEOUT=120`. Set to `0` to turn the timeout off. |
+
+<Tip>If a package you need stops being embedded after pruning, the workspace member that depends on it is probably not part of the bundle. Import that member from your test code instead of turning pruning off.</Tip>
+
+### Prune manifest dependencies
+
+<Info>Available since CLI version 8.23.0. Member-scoped entries require CLI version 8.23.1.</Info>
+
+Use `bundle.packages.prune` to remove dependencies from the `package.json` files in the code bundle: the workspace root's and every bundled workspace member's. The CLI rewrites the manifests before it prunes the lockfile, so the removed packages drop out of the bundled lockfile too.
+
+The most common use is unused peer dependencies. With pnpm's `auto-install-peers` setting, which is on by default, a member's peer dependencies end up in the lockfile even when your tests never import them. If those peers come from a registry Checkly can't reach, the install fails:
+
+```typescript checkly.config.ts highlight={6-10}
+import { defineConfig } from 'checkly'
+
+export default defineConfig({
+  projectName: 'Acme Website',
+  logicalId: 'acme-website',
+  bundle: {
+    packages: {
+      prune: { peerDependencies: true },
+    },
+  },
+})
+```
+
+`prune` accepts two forms:
+
+<Tabs>
+<Tab title="Pattern list">
+
+An array of package name [patterns](#package-name-patterns). Matching packages are removed from every dependency class of every bundled `package.json`:
+
+```typescript checkly.config.ts
+bundle: {
+  packages: {
+    // Remove the @acme scope, except @acme/runtime
+    prune: ['@acme/*', '!@acme/runtime', 'storybook'],
+  },
+},
+```
+
+</Tab>
+<Tab title="Per dependency class">
+
+An object keyed by dependency class: `dependencies`, `devDependencies`, `peerDependencies`, or `optionalDependencies`. Each value is `true` to remove the whole class, or a pattern list to remove only matching packages from that class:
+
+```typescript checkly.config.ts
+bundle: {
+  packages: {
+    prune: {
+      peerDependencies: true,
+      devDependencies: ['@storybook/**', 'eslint*'],
+    },
+  },
+},
+```
+
+`true` can't be combined with `!` exclusions. To remove a whole class except some packages, use `['**', '!package-to-keep']`.
+
+</Tab>
+</Tabs>
+
+Unlike `embed`, prune patterns don't accept version pins. A pattern that matches nothing is ignored. Removing a peer dependency also removes its `peerDependenciesMeta` entry.
+
+#### Target specific workspace members
+
+To prune only some workspace members, use member-scoped entries in the array form. `member` is a pattern list matched against each manifest's `name`; use `'.'` for the workspace root. Each entry has exactly one of `remove` or `keep`, which take a pattern list or a per-class object:
+
+```typescript checkly.config.ts
+bundle: {
+  packages: {
+    prune: [
+      // Remove packages from matching members only
+      { member: ['@acme/web'], remove: { peerDependencies: true } },
+      // Declare the member's complete dependency set; everything else is removed
+      { member: ['@acme/e2e'], keep: { dependencies: ['@acme/test-utils'] } },
+    ],
+  },
+},
+```
+
+- `remove` works like the global patterns, but only for the matched members. Entries apply in the order you list them.
+- `keep` declares a member's entire remaining dependency set. Anything it doesn't select is removed, classes a per-class `keep` doesn't mention are emptied, and no other entry can remove a kept package. `keep: []` removes every dependency.
+
+Prefer exact member names with `keep`, since a wildcard can match a member you add later. The CLI warns when a `member` selector matches no workspace member, or when a `keep` pattern keeps nothing in a bundled member.
+
+#### Requirements and caveats
+
+- When the bundle contains a lockfile, `prune` only takes effect if lockfile pruning succeeds in the same run, so the manifests and lockfile stay in sync. Otherwise the original `package.json` files ship unchanged and the CLI prints a warning. A bundle without a lockfile always ships the pruned manifests.
+- The CLI doesn't check your code against the pruned dependencies. Don't remove anything your tests need at runtime.
+
+## Route runner installs to other registries
+
+<Info>Available since CLI version 8.23.0.</Info>
+
+If your `.npmrc` points at a registry URL that only works on your network, such as a VPN-only mirror, but the same packages are available to Checkly from other registries, use `runner.registries` instead of embedding. It tells the runner which registries to install from, replacing the registries named in the bundled configuration files:
+
+```typescript checkly.config.ts highlight={6-20}
+import { defineConfig } from 'checkly'
+
+export default defineConfig({
+  projectName: 'Acme Website',
+  logicalId: 'acme-website',
+  runner: {
+    registries: {
+      upstreams: {
+        acme: {
+          url: 'https://npm.acme.example.com/',
+          auth: { type: 'bearer', token: '${ACME_NPM_TOKEN}' },
+        },
+        npmjs: { url: 'https://registry.npmjs.org/' },
+      },
+      packages: [
+        { pattern: '@acme/*', upstreams: ['acme'] },
+        { pattern: '**', upstreams: ['npmjs'] },
+      ],
+    },
+  },
+})
+```
+
+- `upstreams` names the registries the runner may use. A `token` must be a single `${VARIABLE}` reference to a Checkly [environment variable](/platform/variables), which the runner resolves at install time. Literal tokens are rejected.
+- `packages` routes package names to upstreams. The first rule whose [pattern](#package-name-patterns) matches wins. The runner tries the rule's upstreams in order, but never falls through to a later rule, so private package names aren't sent to a broader registry. The last rule must be `{ pattern: '**', ... }`.
+- Routing patterns don't accept `!` exclusions or version pins.
+- [Embedded packages](#embed-private-packages) always take priority over routing rules.
+
+`runner.registries` only affects the install on Checkly. Embedding and lockfile pruning still run on your machine and use your `.npmrc` credentials.
+
+## Package name patterns
+
+`bundle.packages.embed`, `bundle.packages.prune`, and `runner.registries` share the same pattern syntax:
+
+| Pattern | Matches |
+|---------|---------|
+| `@acme/utils` | Exactly `@acme/utils` |
+| `@acme/*` | Every package in the `@acme` scope |
+| `acme-*` | Unscoped packages starting with `acme-` |
+| `*` | Every unscoped package. A single `*` never crosses the `/` in a scoped name. |
+| `**` | Every package, scoped or not |
+| `**/utils` | `utils` and `utils` in any scope, such as `@acme/utils` |
+| `!@acme/legacy` | Excludes `@acme/legacy` from what earlier entries selected (`embed` and `prune` only) |
+
+Exclusions only remove packages selected by entries before them, so order matters: `['@acme/*', '!@acme/legacy']` selects the scope except `@acme/legacy`, while `['!@acme/legacy', '@acme/*']` selects the whole scope.
+
+## Troubleshooting
+
+### See what was embedded or pruned
+
+Run the CLI with debug logging to see which packages each `embed` entry matched, and why lockfile pruning was skipped:
+
+```bash Terminal
+DEBUG='checkly:cli:services:embedded-packages,checkly:cli:services:check-parser:*' npx checkly test
+```
+
+### Dependencies are reinstalled after a change
+
+Changing the set of embedded packages, the pruned manifests, or `runner.registries` invalidates the runner's [dependency cache](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#dependency-caching). The next run installs dependencies from scratch.

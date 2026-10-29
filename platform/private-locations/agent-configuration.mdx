@@ -1,6 +1,6 @@
 ---
 title: 'Agent Configuration'
-description: "Configure the Checkly Agent for a private location with environment variables for API keys, proxies, job concurrency, log level, and dependency caching."
+description: "Configure the Checkly Agent for a private location with environment variables for API keys, proxies, job concurrency, log level, dependency caching, health probes, and Prometheus metrics."
 canonical: 'https://www.checklyhq.com/docs/platform/private-locations/agent-configuration/'
 ---
 
@@ -18,7 +18,9 @@ Variable|Description
 `LOG_LEVEL`|(Default: `INFO`) Set the log level of the agent. Can be one of `DEBUG`, `LOG`, `INFO`, `WARN` or `ERROR`.
 `USE_OS_DNS_RESOLVER`|When set to true, TCP monitors will resolve DNS using `getaddrinfo` C function, instead of using the network. This enables easier DNS resolution for internal services e.g. services running in the same Kubernetes cluster.
 `DEPENDENCY_CACHE`|(Default: `OFF`) Set to `CHECKLY_S3` to enable dependency caching for [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview). Caches installed dependencies between runs to speed up check execution. Learn more about [dependency caching](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#dependency-caching).
-`AGENT_HEALTH_PORT`|(Default: `8081`) Port for the HTTP [health probe endpoints](#health-probe-endpoints).
+`AGENT_SERVER_PORT`|(Default: `8080`) Port for the HTTP [health probe endpoints](#health-probe-endpoints) and the [Prometheus metrics endpoint](#prometheus-metrics). Applies to agent v8.12.0 and later. Replaces `AGENT_HEALTH_PORT`.
+`AGENT_METRICS_PER_CHECK`|(Default: `false`) Set to `true` to expose [check-level metrics](#check-level-metrics) with `check_id`, `name`, `check_type` and `tags` labels. Applies to agent v8.13.0 and later.
+`AGENT_METRICS_IDLE_TTL_SECONDS`|(Default: `3600`) Time after which the agent drops the check-level series of a check that has no schedule, such as a test session, when it recorded no result. Scheduled checks expire after three missed runs of their own frequency.
 `EXTERNAL_OBSERVABILITY`| Enabled by default. Set to `off` to disable [external observability](#external-observability) reporting of agent runtime errors to Checkly.
 
 For example, you can add these variables to the standard docker run command like this:
@@ -164,7 +166,11 @@ Alternatively, you can tell the Node.js worker to accept unauthorized certificat
 
 ## Health Probe Endpoints
 
-The Checkly Agent exposes HTTP health probe endpoints on port `8081` by default. You can change this port using the `AGENT_HEALTH_PORT` environment variable.
+The Checkly Agent exposes HTTP health probe endpoints on port `8080` by default. You can change this port using the `AGENT_SERVER_PORT` environment variable.
+
+<Note>
+Agent versions before v8.12.0 serve these endpoints on port `8081`, configured with `AGENT_HEALTH_PORT`. When you upgrade, point your Kubernetes probes to port `8080`.
+</Note>
 
 Endpoint|Description
 ---|---
@@ -173,6 +179,54 @@ Endpoint|Description
 `GET /health`|Returns `200 OK` as a general health check.
 
 These endpoints are useful for configuring [Kubernetes readiness and liveness probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) or any other container orchestration health checks.
+
+## Prometheus Metrics
+
+Starting with agent v8.12.0, the Checkly Agent exposes Prometheus metrics at `GET /metrics` on the same port as the health probes (`8080` by default, configurable with `AGENT_SERVER_PORT`). One endpoint covers every check type the agent runs. Each metric carries a `component` label: `uptime` for API checks and uptime monitors, `synthetics` for Browser, Multistep and Playwright checks. The [uptime image](/platform/private-locations/agent-images#uptime-image) only reports `component="uptime"`.
+
+```bash Terminal
+curl -s http://localhost:8080/metrics | grep checkly_agent_
+```
+
+### Agent metrics
+
+These metrics are always on.
+
+Metric|Type|Description
+---|---|---
+`checkly_agent_checks_slots_total`|gauge|Maximum number of checks the agent can run at the same time.
+`checkly_agent_checks_slots_free`|gauge|Number of free check slots.
+`checkly_agent_checks_duration_ms`|histogram|Processing time per check, including execution and posting of the result. Labelled with `check_type`.
+`checkly_agent_time_waited_ms`|histogram|Time since the agent last acquired a job from the Checkly API.
+`checkly_agent_node_worker_scraped`|gauge|`1` when the last scrape included the synthetics worker, `0` when the worker was unreachable.
+
+### Check-level metrics
+
+Starting with agent v8.13.0, set `AGENT_METRICS_PER_CHECK=true` to expose one set of series per check. These series carry the labels `check_id`, `name`, `check_type` and `tags`. Timings are in seconds. Histograms have five buckets. These metrics have the same names and labels as the [Prometheus V2 integration](/integrations/observability/prometheus-v2/), so you can reuse the same dashboards.
+
+Metric|Type|Check types|Extra labels
+---|---|---|---
+`checkly_agent_check_result_total`|counter|all|`status`: `passing`, `degraded` or `failing`
+`checkly_agent_check_status`|gauge|all|`status`. `1` for the status of the last result.
+`checkly_agent_api_check_timing_seconds`, `checkly_agent_url_monitor_timing_seconds`|histogram|API, URL|`type`: `total`, `wait`, `dns`, `tcp`, `first byte`
+`checkly_agent_tcp_monitor_timing_seconds`|histogram|TCP|`type`: `dns`, `connection`, `data`, `total`
+`checkly_agent_dns_monitor_timing_seconds`|histogram|DNS|
+`checkly_agent_icmp_monitor_timing_seconds`|histogram|ICMP|`type`: `dns`, `latency_avg`, `latency_min`, `latency_max`
+`checkly_agent_icmp_monitor_packet_loss_ratio`|gauge|ICMP|
+`checkly_agent_traceroute_monitor_timing_seconds`|histogram|Traceroute|`type`: `dns`, `latency_avg`, `latency_min`, `latency_max`
+`checkly_agent_traceroute_monitor_hops`, `checkly_agent_traceroute_monitor_destination_reached`|gauge|Traceroute|
+`checkly_agent_grpc_monitor_timing_seconds`|histogram|gRPC|`type`: `dns`, `connect`, `total`
+`checkly_agent_grpc_monitor_status_code`|gauge|gRPC|
+`checkly_agent_ssl_monitor_handshake_seconds`|histogram|SSL|
+`checkly_agent_ssl_monitor_info`|gauge|SSL|`tls_version`, `cipher_suite`, `baseline_verdict`, `baseline_grade`. Always `1`.
+`checkly_agent_ssl_monitor_days_until_expiry`, `checkly_agent_ssl_monitor_hostname_verified`, `checkly_agent_ssl_monitor_chain_trusted`, `checkly_agent_ssl_monitor_ocsp_stapled`, `checkly_agent_ssl_monitor_key_size_bits`|gauge|SSL|
+`checkly_agent_browser_check_duration_seconds`, `checkly_agent_multistep_check_duration_seconds`, `checkly_agent_playwright_check_duration_seconds`|histogram|Browser, Multistep, Playwright|
+`checkly_agent_browser_check_web_vitals_seconds`|histogram|Browser|`type`: `TTFB`, `FCP`, `LCP`, `TBT`, `loaded`, `CLS` (score, not seconds)
+`checkly_agent_browser_check_errors_total`|counter|Browser|`type`: `console`, `network`, `user`, `document`
+
+<Warning>
+Each check adds its own set of series. An agent that runs many checks produces a large scrape, which costs memory on the agent and on your Prometheus server. The agent drops the series of a scheduled check after three missed runs, and the series of a check without a schedule after `AGENT_METRICS_IDLE_TTL_SECONDS`.
+</Warning>
 
 ## External Observability
 

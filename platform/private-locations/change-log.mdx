@@ -17,6 +17,16 @@ Learn more about:
 
 ## Full release history
 
+<Update label="v8.13.0" tags={["November 2026"]}>
+- Added opt-in [check-level Prometheus metrics](/platform/private-locations/agent-configuration#check-level-metrics). Set `AGENT_METRICS_PER_CHECK=true` to get result counts, status and timing metrics per check, with the same names and labels as the Prometheus V2 integration.
+- `LOG_LEVEL` now applies to the Go process that runs API checks and uptime monitors. Before, it only applied to the synthetics worker.
+</Update>
+
+<Update label="v8.12.0" tags={["October 2026"]}>
+- The agent now serves health probes and [Prometheus metrics](/platform/private-locations/agent-configuration#prometheus-metrics) on one port, `8080`, configured with `AGENT_SERVER_PORT`. `AGENT_HEALTH_PORT` is removed. If your Kubernetes probes or scrape config use port `8081` or `8082`, point them to `8080`.
+- One `/metrics` endpoint now covers every check type the agent runs. Use the `component` label to split `uptime` from `synthetics` metrics.
+</Update>
+
 <Update label="v8.11.0" tags={["Oktober 2026"]}>
 - Expanded native Fetch API support in runtimes 2025-04 and 2026-04. Scripts can now use FormData, Blob, File, Headers, Request, and Response, including multipart/form-data requests and file uploads with native fetch().
 - Added compression for logs and reports from scheduled checks, enabled per account, to reduce artifact upload sizes.

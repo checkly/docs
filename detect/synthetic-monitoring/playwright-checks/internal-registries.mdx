@@ -30,7 +30,7 @@ All of these options apply to Playwright Check Suites only, not to Browser Check
 
 If some of your dependencies come from a private registry that Checkly's infrastructure can't reach, list them in `bundle.packages.embed`. The CLI downloads those packages on the machine where you run it, verifies each tarball against the integrity hash in your lockfile, and ships them inside the code bundle. The runner then installs them without contacting your registry.
 
-```typescript checkly.config.ts highlight={6-10}
+```typescript checkly.config.ts highlight={6-14}
 import { defineConfig } from 'checkly'
 
 export default defineConfig({
@@ -38,7 +38,11 @@ export default defineConfig({
   logicalId: 'acme-website',
   bundle: {
     packages: {
-      embed: ['@acme/*', '!@acme/public-sdk', 'legacy-private-pkg@2.1.0'],
+      embed: [
+        '@acme/*',
+        '!@acme/public-sdk',
+        'legacy-private-pkg@2.1.0',
+      ],
     },
   },
   checks: {
@@ -49,6 +53,8 @@ export default defineConfig({
   },
 })
 ```
+
+This config embeds every package in the `@acme` scope that your lockfile contains, except `@acme/public-sdk`, which the runner must then fetch itself. If your `.npmrc` sends the whole `@acme` scope to your internal registry, route `@acme/public-sdk` to a registry the runner can reach with [`runner.registries`](#route-runner-installs-to-other-registries). It also embeds version 2.1.0 of the unscoped `legacy-private-pkg`. Every other package installs from its usual registry.
 
 Each entry is one of:
 
@@ -79,6 +85,7 @@ The CLI validates the list before deploying:
 
 - An entry that matches no package in the lockfile fails validation and blocks the deploy. Only list packages your project actually uses.
 - An entry whose only matches can't be embedded also fails validation. Packages installed from git, a local path, or a URL, and lockfile entries without an integrity hash, can't be embedded; the runner must fetch them itself.
+- In a pnpm workspace, an entry that also matches a workspace member that another member depends on prints a warning on every run, because workspace members are bundled as source code rather than embedded. Exclude those members with `!`, for example `['@acme/*', '!@acme/design-system']`.
 - A `!` exclusion that matches nothing is ignored.
 - A list that ends up selecting no packages at all only prints a warning.
 
@@ -141,6 +148,8 @@ export default defineConfig({
 })
 ```
 
+This config removes every entry under `peerDependencies` from the workspace root's and each bundled member's `package.json`. When the CLI then prunes the lockfile, the peers that were only installed to satisfy those entries drop out, so the runner doesn't try to fetch them.
+
 `prune` accepts two forms:
 
 <Tabs>
@@ -156,6 +165,8 @@ bundle: {
   },
 },
 ```
+
+This removes every `@acme` package except `@acme/runtime`, plus `storybook`, from `dependencies`, `devDependencies`, `peerDependencies`, and `optionalDependencies`.
 
 </Tab>
 <Tab title="Per dependency class">
@@ -173,6 +184,8 @@ bundle: {
 },
 ```
 
+This removes all peer dependencies, and removes the `@storybook` scope and unscoped packages starting with `eslint` from `devDependencies` only. `dependencies` and `optionalDependencies` are left as they are.
+
 `true` can't be combined with `!` exclusions. To remove a whole class except some packages, use `['**', '!package-to-keep']`.
 
 </Tab>
@@ -189,13 +202,21 @@ bundle: {
   packages: {
     prune: [
       // Remove packages from matching members only
-      { member: ['@acme/web'], remove: { peerDependencies: true } },
-      // Declare the member's complete dependency set; everything else is removed
-      { member: ['@acme/e2e'], keep: { dependencies: ['@acme/test-utils'] } },
+      {
+        member: ['@acme/web'],
+        remove: { peerDependencies: true },
+      },
+      // Declare the member's complete dependency set
+      {
+        member: ['@acme/design-system'],
+        keep: { dependencies: ['@acme/tokens'] },
+      },
     ],
   },
 },
 ```
+
+The first entry removes the peer dependencies of `@acme/web` and leaves every other member's peers in place. The second entry reduces `@acme/design-system` to a single dependency, `@acme/tokens`: its other `dependencies` and all of its `devDependencies`, `peerDependencies`, and `optionalDependencies` are removed.
 
 - `remove` works like the global patterns, but only for the matched members. Entries apply in the order you list them.
 - `keep` declares a member's entire remaining dependency set. Anything it doesn't select is removed, classes a per-class `keep` doesn't mention are emptied, and no other entry can remove a kept package. `keep: []` removes every dependency.
@@ -237,6 +258,8 @@ export default defineConfig({
 })
 ```
 
+With this config, the runner installs `@acme` packages only from `https://npm.acme.example.com/`, authenticating with the `ACME_NPM_TOKEN` environment variable, and every other package from the public npm registry. If an `@acme` package is missing from the Acme registry, the install fails instead of asking the public registry for it.
+
 - `upstreams` names the registries the runner may use. A `token` must be a single `${VARIABLE}` reference to a Checkly [environment variable](/platform/variables), which the runner resolves at install time. Literal tokens are rejected.
 - `packages` routes package names to upstreams. The first rule whose [pattern](#package-name-patterns) matches wins. The runner tries the rule's upstreams in order, but never falls through to a later rule, so private package names aren't sent to a broader registry. The last rule must be `{ pattern: '**', ... }`.
 - Routing patterns don't accept `!` exclusions or version pins.
@@ -270,6 +293,104 @@ bundle: {
 ```
 
 If your private packages share a scope, a wildcard such as `@acme/*` embeds the whole scope at every depth, including private packages you only depend on indirectly.
+
+## Examples
+
+### Monorepo with an internal registry
+
+Your tests live in one member of a pnpm workspace, and your `.npmrc` points the `@acme` scope at a registry that's only reachable from your network:
+
+```text
+acme/
+├── .npmrc              # Points @acme at the internal registry
+├── package.json
+├── pnpm-lock.yaml
+└── packages/
+    ├── e2e/            # Tests and checkly.config.ts
+    ├── design-system/  # Imported by the tests
+    └── admin/          # Not used by the tests
+```
+
+`design-system` depends on the private `@acme/tokens` and declares the private `@acme/analytics` as a peer dependency, which the tests don't use. `admin` depends on the private `@acme/billing-sdk`.
+
+```typescript packages/e2e/checkly.config.ts
+import { defineConfig } from 'checkly'
+
+export default defineConfig({
+  projectName: 'Acme Website',
+  logicalId: 'acme-website',
+  bundle: {
+    packages: {
+      embed: [
+        '@acme/*',
+        '!@acme/design-system', // Workspace member, bundled as source
+      ],
+      prune: [
+        {
+          member: ['@acme/design-system'],
+          remove: { peerDependencies: ['@acme/analytics'] },
+        },
+      ],
+    },
+  },
+  checks: {
+    playwrightConfigPath: './playwright.config.ts',
+    playwrightChecks: [
+      { name: 'Acme E2E', logicalId: 'acme-e2e' },
+    ],
+  },
+})
+```
+
+When you run `npx checkly deploy`, the CLI:
+
+1. Bundles `e2e` and `design-system`, because the tests import `design-system`. `admin` is left out.
+2. Removes `@acme/analytics` from the bundled copy of `design-system`'s `package.json`.
+3. Prunes the bundled lockfile to the bundle's contents. `@acme/billing-sdk` drops out because only `admin` needs it, and `@acme/analytics` drops out because nothing declares it anymore.
+4. Embeds the `@acme` packages that remain in the pruned lockfile, here `@acme/tokens`, downloading them through your `.npmrc`. The `!@acme/design-system` exclusion keeps the pattern away from the workspace member, which is bundled as source code and can't be embedded.
+
+On Checkly, the runner installs `@acme/tokens` from the bundle and all public packages from npm. It never contacts your internal registry.
+
+The `prune` entry isn't required for the install to work: without it, `@acme/*` would also embed `@acme/analytics`. Pruning the unused peer saves downloading and shipping a package the tests never load. It becomes required when the runner can neither install the peer from the bundle nor fetch it itself, for example a peer installed from an internal Git server.
+
+### Private scope behind a VPN-only mirror
+
+Your `.npmrc` sends every install through a mirror that's only reachable on your VPN. The mirror proxies the public npm registry and also hosts your `@acme` packages:
+
+```text .npmrc
+registry=https://npm-mirror.vpn.acme.example.com/
+```
+
+```typescript checkly.config.ts
+import { defineConfig } from 'checkly'
+
+export default defineConfig({
+  projectName: 'Acme Website',
+  logicalId: 'acme-website',
+  bundle: {
+    packages: {
+      embed: ['@acme/*'],
+    },
+  },
+  runner: {
+    registries: {
+      upstreams: {
+        npmjs: { url: 'https://registry.npmjs.org/' },
+      },
+      packages: [
+        { pattern: '**', upstreams: ['npmjs'] },
+      ],
+    },
+  },
+})
+```
+
+The two options split the work:
+
+- `embed` downloads the `@acme` packages through the mirror on your machine, where the VPN is available, and ships them in the code bundle.
+- `runner.registries` sends every other package to the public npm registry instead of the mirror. Embedded packages take priority over routing rules, so the `@acme` packages never reach the `**` rule.
+
+Run `checkly test` and `checkly deploy` with the VPN connected, so the CLI can download the embedded packages.
 
 ## Package name patterns
 

@@ -202,7 +202,15 @@ Metric|Type|Description
 
 ### Check-level metrics
 
-Starting with agent v8.13.0, set `AGENT_METRICS_PER_CHECK=true` to expose one set of series per check. These series carry the labels `check_id`, `name`, `check_type` and `tags`. Timings are in seconds. Histograms have five buckets. These metrics have the same names and labels as the [Prometheus V2 integration](/integrations/observability/prometheus-v2/), so you can reuse the same dashboards.
+Starting with agent v8.13.0, set `AGENT_METRICS_PER_CHECK=true` to expose one set of series per check. These series carry the labels `check_id`, `name`, `check_type` and `tags`. Timings are in seconds. Histograms have five buckets.
+
+The metrics follow the [Prometheus V2 integration](/integrations/observability/prometheus-v2/), with these differences:
+
+- Names use the `checkly_agent_` prefix.
+- `check_type` values are upper-case, for example `API` or `BROWSER`.
+- There are no `group`, `muted`, `activated` or `location` labels, and `key:value` tags are not parsed into labels. Add a `location` label in your scrape config.
+- Heartbeat metrics and `checkly_time_to_ssl_expiry_seconds` are not reported. Use `checkly_agent_ssl_monitor_days_until_expiry`.
+- `checkly_agent_browser_check_errors_total` is a counter.
 
 Metric|Type|Check types|Extra labels
 ---|---|---|---

@@ -39,7 +39,7 @@ Paths are appended to `DOCS_BASE_URL` (defaults to `https://www.checklyhq.com/do
 
 Note: CheckGroupV2 makes `locations`, `runParallel`, and `retryStrategy` non-overridable from individual checks once set on the group.
 
-The group is `muted: true` while the new monitoring is being shaken out — checks still run but no alerts fire. Unmute in `__checks__/group.ts` when ready.
+The group alerts Slack `#ops` on failures and recoveries, not on degraded results (`__checks__/alertChannels.ts`).
 
 ## Deploys
 

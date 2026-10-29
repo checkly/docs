@@ -37,6 +37,6 @@ for (const path of paths) {
     await page.locator('script[data-mint-script]').first().waitFor({ state: 'attached' })
     await page.waitForLoadState('networkidle')
 
-    expect(errors).toEqual([])
+    expect(errors).toHaveLength(0)
   })
 }

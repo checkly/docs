@@ -1,9 +1,9 @@
 name: Preview checks
 
 # Runs the Checkly synthetic checks against the Mintlify PR preview URL.
-# Skips silently when a PR touches neither the site nor the checks. Falls back
-# to production when a PR has no preview. Fails when the Mintlify preview
-# itself failed.
+# Skips silently when a PR touches neither the site nor the checks, or when a
+# PR without site changes has no preview to test. Fails when the Mintlify
+# preview itself failed.
 #
 # Runs on every PR, with no paths filter, so a required check never waits forever.
 # The detection step below skips the Checkly run when nothing relevant changed.
@@ -20,7 +20,8 @@ concurrency:
 jobs:
   preview-checks:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Up to 20 min waiting for the preview plus up to 20 min of Checkly runs.
+    timeout-minutes: 45
     permissions:
       contents: read
       pull-requests: read
@@ -50,6 +51,14 @@ jobs:
             echo "run_checks=true" >> "$GITHUB_OUTPUT"
           fi
 
+          # Same docs-detection regex as docs-gate: Mintlify only deploys when these change.
+          NON_DOCS_RE='^(\.github/|.*\.sh$|[^/]+\.md$|package(-lock)?\.json$|node_modules/|checkly\.config\.ts$|block-headless\.js$|__checks__/)'
+          if git diff --name-only "$MERGE_BASE" "$HEAD_SHA" | grep -vqE "$NON_DOCS_RE"; then
+            echo "site_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "site_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Resolve preview URL
         if: steps.detect.outputs.run_checks == 'true'
         id: preview
@@ -57,18 +66,34 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          SITE_CHANGED: ${{ steps.detect.outputs.site_changed }}
         run: |
           set -euo pipefail
-          PRODUCTION_URL=https://www.checklyhq.com/docs
-          TIMEOUT=1200          # 20 min for a deployment to finish
-          NO_DEPLOY_TIMEOUT=120 # Mintlify doesn't report on every PR
+          TIMEOUT=1200 # 20 min for a deployment to finish
           SLEEP=15
           elapsed=0
 
-          use_production() {
-            echo "$1 — testing production: $PRODUCTION_URL"
-            echo "url=$PRODUCTION_URL" >> "$GITHUB_OUTPUT"
-            exit 0
+          # Exits with the preview URL when the PR's preview is ready, fails
+          # when it failed, and returns while it is still building.
+          read_preview() {
+            COMMENT_BODY=$(gh api "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" \
+              --jq '[.[] | select(.user.login == "mintlify[bot]" and (.body | contains("mintlify-preview-comment")))] | last | .body // empty')
+
+            # Status emoji-prefixed token in the table row
+            if echo "$COMMENT_BODY" | grep -q '🔴 Failed'; then
+              echo "Mintlify preview deployment failed — cannot run checks."
+              echo "Preview comment:"
+              echo "$COMMENT_BODY"
+              exit 1
+            fi
+
+            URL=$(echo "$COMMENT_BODY" | grep -oE 'https://[a-z0-9-]+\.(mintlify\.(app|site)|mintlifysite\.com)' | head -1 || true)
+
+            if echo "$COMMENT_BODY" | grep -q '🟢 Ready' && [ -n "$URL" ]; then
+              echo "Mintlify Deployment $DEPLOY — preview: $URL"
+              echo "url=$URL" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
           }
 
           while [ "$elapsed" -lt "$TIMEOUT" ]; do
@@ -84,36 +109,22 @@ jobs:
             ')
 
             case "$DEPLOY" in
-              none)
-                if [ "$elapsed" -ge "$NO_DEPLOY_TIMEOUT" ]; then
-                  use_production "No Mintlify Deployment for $HEAD_SHA"
-                fi
-                ;;
               pending)
                 ;;
-              success|skipped)
-                # `skipped` means the site didn't change, so the last preview still applies.
-                COMMENT_BODY=$(gh api "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" \
-                  --jq '[.[] | select(.user.login == "mintlify[bot]" and (.body | contains("mintlify-preview-comment")))] | last | .body // empty')
-
-                # Status emoji-prefixed token in the table row
-                if echo "$COMMENT_BODY" | grep -q '🔴 Failed'; then
-                  echo "Mintlify preview deployment failed — cannot run checks."
-                  echo "Preview comment:"
-                  echo "$COMMENT_BODY"
-                  exit 1
-                fi
-
-                URL=$(echo "$COMMENT_BODY" | grep -oE 'https://[a-z0-9-]+\.(mintlify\.(app|site)|mintlifysite\.com)' | head -1 || true)
-
-                if echo "$COMMENT_BODY" | grep -q '🟢 Ready' && [ -n "$URL" ]; then
-                  echo "Mintlify Deployment $DEPLOY — preview: $URL"
-                  echo "url=$URL" >> "$GITHUB_OUTPUT"
-                  exit 0
-                fi
-
-                if [ "$DEPLOY" = "skipped" ] && [ -z "$COMMENT_BODY" ]; then
-                  use_production "Mintlify Deployment skipped and no preview exists"
+              success)
+                read_preview
+                ;;
+              none|skipped)
+                # Mintlify deploys every site change, so keep waiting for it.
+                if [ "$DEPLOY" = "none" ] && [ "$SITE_CHANGED" = "true" ]; then
+                  :
+                else
+                  # The site didn't change, so the PR's last preview still applies.
+                  read_preview
+                  if [ -z "$COMMENT_BODY" ]; then
+                    echo "No site changes and no preview for this PR — skipping preview checks."
+                    exit 0
+                  fi
                 fi
                 ;;
               *)
@@ -131,24 +142,24 @@ jobs:
           exit 1
 
       - name: Set up Node
-        if: steps.detect.outputs.run_checks == 'true'
+        if: steps.preview.outputs.url != ''
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
       - name: Verify schema-generated API pages on preview
-        if: steps.detect.outputs.run_checks == 'true'
+        if: steps.preview.outputs.url != ''
         env:
           DOCS_PREVIEW_URL: ${{ steps.preview.outputs.url }}
         run: node .github/scripts/check-api-preview.mjs "$DOCS_PREVIEW_URL"
 
       - name: Install dependencies
-        if: steps.detect.outputs.run_checks == 'true'
+        if: steps.preview.outputs.url != ''
         run: npm ci
 
       - name: Run Checkly checks against preview
-        if: steps.detect.outputs.run_checks == 'true'
+        if: steps.preview.outputs.url != ''
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
           CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
@@ -170,5 +181,5 @@ jobs:
             --timeout=1200
 
       - name: Publish Checkly report to step summary
-        if: always() && steps.detect.outputs.run_checks == 'true'
+        if: always() && steps.preview.outputs.url != ''
         run: cat checkly-github-report.md >> "$GITHUB_STEP_SUMMARY" || true

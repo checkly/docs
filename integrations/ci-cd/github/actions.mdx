@@ -105,6 +105,8 @@ The `reporting` input controls whether the workflow waits for the Checkly test s
 | `github-check` | Require detached GitHub Check reporting. The Action fails preflight before running checks when the Checkly GitHub App cannot report to the repository. |
 | `github-actions` | Always wait for the test session. The workflow job carries the result and the Action writes the Checkly report to the job summary. |
 
+With `reporting: github-actions`, cancelling the workflow job also cancels the Checkly test session, from `checkly/checkly-action@v1.1.3` on (`@v1` includes it). This covers a run superseded through `concurrency` with `cancel-in-progress: true`. The test session ends with the status `CANCELLED`. The Action still sets its `test-session-id` and `test-session-url` [outputs](https://github.com/checkly/checkly-action#outputs), so a later step with `if: cancelled()` can link to the session. With older versions, the test session keeps running until every check has finished. See [Cancellation](/concepts/cancellation) for which check types stop when a session is cancelled.
+
 Detached reporting produces two separate GitHub Check Runs: the GitHub Actions job and the external Checkly GitHub Check. The workflow job can finish successfully after starting the detached test session while the external Checkly GitHub Check is still running.
 
 Use `github-check-name` to set the external GitHub Check Run name. It defaults to `Checkly`; it is not the name of a Checkly check.

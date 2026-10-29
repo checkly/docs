@@ -80,3 +80,16 @@ Metric|Type|Check types|Extra labels
 **High cardinality.** With `AGENT_METRICS_PER_CHECK=true`, every check adds its own set of series: one per metric, label combination and histogram bucket. An agent that runs hundreds of checks produces a scrape of tens of thousands of series, which costs memory on the agent and on your Prometheus server and slows down dashboards. Enable it only when you need per-check data from the agent, and keep check `name` and `tags` values stable, because every new value creates new series. The agent drops the series of a scheduled check after three missed runs, and the series of a check without a schedule after [`AGENT_METRICS_IDLE_TTL_SECONDS`](/platform/private-locations/agent-configuration).
 </Warning>
 
+### Reduce cardinality in Kubernetes
+
+A check can run on any pod of a Private Location, so each check's series appears once per pod. If your scrape config adds `pod` and `instance` labels, you store one series set per check and pod.
+
+For gauges, such as `checkly_agent_check_status` and `checkly_agent_ssl_monitor_days_until_expiry`, you can drop both labels. All pods report the same value for a check, so the last write wins and nothing is lost.
+
+```yaml PodMonitor
+metricRelabelings:
+  - action: labeldrop
+    regex: pod|instance
+```
+
+Do not drop these labels from counters and histograms. Several pods then write into one series, the values interleave and `rate()` reports resets. Aggregate them instead, with a recording rule such as `sum without (pod, instance) (rate(checkly_agent_check_result_total[5m]))`, or with an aggregation feature of your metrics backend.

@@ -196,6 +196,17 @@ Metric|Type|Description
 `checkly_agent_time_waited_ms`|histogram|Time since the agent last acquired a job from the Checkly API.
 `checkly_agent_node_worker_scraped`|gauge|`1` when the last scrape included the synthetics worker, `0` when the worker was unreachable.
 
+### Runtime metrics
+
+The endpoint also serves the standard runtime metrics of both agent processes. Use them to size CPU and memory for the container.
+
+Prefix|Component|Source
+---|---|---
+`go_*`, `process_*`|`uptime`|Go runtime: goroutines, garbage collection, heap, CPU, open file descriptors.
+`nodejs_*`, `process_*`|`synthetics`|Node.js runtime: heap, event loop lag, active handles, CPU. Not present on the uptime image.
+
+`process_*` metrics with the same name, such as `process_cpu_seconds_total` and `process_resident_memory_bytes`, appear once per `component`. Sum over `component` to get the container total.
+
 ### Check-level metrics
 
 Starting with agent v8.13.0, set `AGENT_METRICS_PER_CHECK=true` to expose one set of series per check. These series carry the labels `check_id`, `name`, `check_type` and `tags`. Timings are in seconds. Histograms have five buckets.

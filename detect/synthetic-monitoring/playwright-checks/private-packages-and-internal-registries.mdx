@@ -101,6 +101,16 @@ If you use bun or Yarn Berry and your credentials only live in `bunfig.toml` or 
 
 If a download fails to authenticate, the error names the credential source the CLI used.
 
+### Code bundle size
+
+The Checkly API accepts code bundles of up to 30 MB, compressed. Embedded packages ship inside the code bundle, so embedding large packages, or many packages that add up, can push the bundle over that limit. `checkly test`, `checkly pw-test`, and `checkly deploy` then fail when they upload the bundle:
+
+```text Terminal
+The code bundle is too large to upload: the compressed bundle is 34.2 MB, but the Checkly API accepts at most 30 MB. Reduce the bundle size by removing large files from the Playwright project, narrowing any 'include' patterns, or embedding fewer private packages ('bundle.packages.embed').
+```
+
+To stay under the limit, embed only the packages the runner can't fetch from a registry it can reach, and let [lockfile pruning](#lockfile-pruning) and [`bundle.packages.prune`](#prune-manifest-dependencies) drop the packages your checks don't use. Packages that pruning removes from the bundled lockfile aren't embedded.
+
 ## Pruning
 
 Pruning reduces what the runner installs to what your code bundle needs. This keeps internal packages your checks never use out of the install, so you don't have to embed them or make their registry reachable, and it makes the install faster. The CLI never modifies the files on disk; it only rewrites the copies in the code bundle.
@@ -446,6 +456,10 @@ Run the CLI with debug logging to see which packages each `embed` entry matched,
 ```bash Terminal
 DEBUG='checkly:cli:services:embedded-packages,checkly:cli:services:check-parser:*' npx checkly test
 ```
+
+### The code bundle is too large to upload
+
+The compressed bundle exceeds the 30 MB the Checkly API accepts. Embedded packages count toward it; see [Code bundle size](#code-bundle-size).
 
 ### Dependencies are reinstalled after a change
 

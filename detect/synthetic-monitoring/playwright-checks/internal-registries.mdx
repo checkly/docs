@@ -27,8 +27,6 @@ All of these options apply to Playwright Check Suites only, not to Browser Check
 
 ## Embed private packages
 
-<Info>Available since CLI version 8.22.0. `!` exclusions and `**` patterns that match across the `/` in scoped names require CLI version 8.23.0.</Info>
-
 If some of your dependencies come from a private registry that Checkly's infrastructure can't reach, list them in `bundle.packages.embed`. The CLI downloads those packages on the machine where you run it, verifies each tarball against the integrity hash in your lockfile, and ships them inside the code bundle. The runner then installs them without contacting your registry.
 
 ```typescript checkly.config.ts highlight={6-14}
@@ -110,8 +108,6 @@ Pruning reduces what the runner installs to what your code bundle needs. This ke
 
 ### Lockfile pruning
 
-<Info>Available since CLI version 8.23.0. `CHECKLY_LOCKFILE_PRUNE_TIMEOUT` requires CLI version 9.2.0.</Info>
-
 In a monorepo, your code bundle often contains only some of the workspace members. Installing from the full lockfile would make the runner fetch dependencies of members that aren't in the bundle, and fail if any of those come from a registry it can't reach. The CLI therefore prunes the bundled lockfile to the bundle's contents automatically. You don't need to configure anything.
 
 Lockfile pruning supports the same lockfiles as [embedding](#supported-lockfiles), and requires your package manager to be installed on the machine running the CLI. pnpm and npm reuse their local caches and only contact your registry for packages they haven't cached; Yarn Berry and bun prune offline.
@@ -128,8 +124,6 @@ Control lockfile pruning with these environment variables:
 <Tip>If a package you need stops being embedded after pruning, the workspace member that depends on it is probably not part of the bundle. Import that member from your test code instead of turning pruning off.</Tip>
 
 ### Prune manifest dependencies
-
-<Info>Available since CLI version 8.23.0. Member-scoped entries require CLI version 8.23.1.</Info>
 
 Use `bundle.packages.prune` to remove dependencies from the `package.json` files in the code bundle: the workspace root's and every bundled workspace member's. The CLI rewrites the manifests before it prunes the lockfile, so the removed packages drop out of the bundled lockfile too.
 
@@ -272,8 +266,6 @@ Pruning works the same way in a single-package project as in a monorepo. Keep th
 - A prune change that alters the bundled `package.json` files or lockfile invalidates the dependency cache once, so the next run does a full install. Patterns that match nothing leave the cache untouched.
 
 ## Route runner installs to other registries
-
-<Info>Available since CLI version 8.23.0.</Info>
 
 If your `.npmrc` points at a registry URL that only works on your network, such as a VPN-only mirror, but the same packages are available to Checkly from other registries, use `runner.registries` instead of embedding. It tells the runner which registries to install from, replacing the registries named in the bundled configuration files:
 

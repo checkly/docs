@@ -129,24 +129,6 @@ registry=https://yourcompany.jfrog.io/artifactory/api/npm/npm-local/:_authToken=
 
 When you run `npx checkly test` or `npx checkly deploy`, the CLI bundles and uploads your `.npmrc` files automatically: the one at the workspace root and any next to a workspace member's `package.json`. This makes them available when Checkly runs `installCommand` to install your dependencies.
 
-On CLI versions before 8.15.0, add your `.npmrc` file to the `checks.include` property in your `checkly.config.ts` instead:
-
-```typescript checkly.config.ts highlight={6}
-import { defineConfig } from 'checkly'
-
-export default defineConfig({
-  checks: {
-    playwrightConfigPath: './playwright.config.ts',
-    // Include .npmrc for authentication with private registries
-    // Works with npm, yarn, and pnpm
-    include: ['.npmrc'],
-    playwrightChecks: [
-      // ...
-    ]
-  }
-})
-```
-
 #### Using lifecycle scripts
 
 Some npm packages define lifecycle scripts (such as `prepare`, `postinstall`, or `preinstall`) that run during installation and may require access to files not automatically included in the CLI's code bundle.
@@ -229,10 +211,6 @@ export default defineConfig({
 
 The value can be a string or an integer. An unset or empty value leaves the cache untouched, so a value read from an environment variable, such as `version: process.env.DEPENDENCY_CACHE_VERSION`, is safe when the variable isn't set.
 
-<Info>
-`runner.cache.install.version` is available since CLI version 9.1.0. CLI versions 8.20.0 to 9.x also accept the older `caching.dependencyCache.version`, which CLI version 10 no longer supports.
-</Info>
-
 For a one-off fresh install, pass `--refresh-cache` to [`checkly test`](/cli/checkly-test), [`checkly pw-test`](/cli/checkly-pw-test), [`checkly trigger`](/cli/checkly-trigger), or [`checkly checks run`](/cli/checkly-checks) instead.
 
 ### Automatic retries
@@ -268,7 +246,7 @@ Browser caching requires Private Location agent v8.2.0 or later.
 
 If you see errors like `404 Not Found` or `Package '@your-org/package' not found`:
 
-- Verify your `.npmrc` file is at the workspace root or next to the `package.json` that needs it (on CLI versions before 8.15.0, that it's included in `checks.include`)
+- Verify your `.npmrc` file is at the workspace root or next to the `package.json` that needs it
 - If the registry is only reachable from your own network, see [Private Packages and Internal Registries](/detect/synthetic-monitoring/playwright-checks/internal-registries)
 - Check that the registry URL is correct
 - Ensure your package name matches exactly (including scope)

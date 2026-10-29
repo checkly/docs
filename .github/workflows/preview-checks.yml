@@ -4,9 +4,8 @@ name: Preview checks
 # Skips silently when a PR touches no docs files. Fails when the Mintlify
 # preview itself failed (no URL to target).
 #
-# No `paths-ignore`: this job is a required status check, so it must report
-# on every PR. The in-workflow detection below skips the Checkly run on
-# non-docs PRs and the job still succeeds.
+# Runs on every PR, with no paths filter, so a required check never waits forever.
+# The detection step below skips the Checkly run on non-docs PRs.
 
 on:
   pull_request:

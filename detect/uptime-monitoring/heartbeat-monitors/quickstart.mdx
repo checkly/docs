@@ -27,7 +27,7 @@ Follow this comprehensive guide to create your first heartbeat monitor in Checkl
 <Accordion title="Prerequisites">
 Before creating your heartbeat monitor, make sure you have:
 
-- A Checkly account with Team or Enterprise plan
+- A Checkly account. Heartbeat monitors are available on all plans; see [pricing](https://www.checklyhq.com/pricing/) for limits
 - A scheduled job, script, or automated process you want to monitor
 - Access to modify the code/script that runs your task
 </Accordion>
@@ -59,7 +59,7 @@ The **grace period** provides extra time before alerting, compensating for natur
 
 **Common grace period examples:**
 - **Daily backup at 2 AM** with 30-minute grace → Alert if no ping by 2:30 AM
-- **Weekly report on Fridays** with 4-hour grace → Alert if no ping by end of Friday
+- **Weekly report on Fridays** with 4-hour grace → Alert if no ping arrives within 4 hours of the expected time
 - **Hourly sync job** with 5-minute grace → Alert if ping is more than 5 minutes late
 
 
@@ -67,7 +67,7 @@ The **grace period** provides extra time before alerting, compensating for natur
 Grace periods compensate for natural variance in job execution times. For example:
 
 - **Daily backup at 2 AM** with 30-minute grace → Alert if no ping by 2:30 AM
-- **Weekly report on Fridays** with 4-hour grace → Alert if no ping by end of Friday
+- **Weekly report on Fridays** with 4-hour grace → Alert if no ping arrives within 4 hours of the expected time
 - **Hourly sync job** with 5-minute grace → Alert if ping is more than 5 minutes late
 
 Choose grace periods based on:
@@ -127,9 +127,11 @@ Connect your heartbeat monitor to [alert channels](/communicate/alerts/overview)
 
 Configure when alerts should fire:
 
-- **Immediate**: Alert as soon as grace period expires
-- **Delayed**: Wait for multiple missed pings before alerting
-- **Escalation**: Start with email, escalate to PagerDuty after delays
+- **Run-based**: Alert after a set number of consecutive failures
+- **Time-based**: Alert after the monitor has been failing for a set number of minutes
+- **Reminders**: Send follow-up alerts at a set interval while the monitor keeps failing
+
+All alert channels subscribed to the monitor are notified at the same time.
 
 ## Step 4: Ping URL and Implementation
 
@@ -146,8 +148,7 @@ You can manually send pings through the Checkly interface to:
 
 - Test your monitor setup before deployment
 - Start the timer for a newly created monitor
-- Reset alerts during maintenance windows
-- Verify alert configurations are working
+- Silence alarms once a late job has finished
 
 Manual pings are available both on the monitor detail page and in the quick actions menu from your monitors list.
 

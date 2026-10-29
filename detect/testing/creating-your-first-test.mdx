@@ -18,22 +18,19 @@ Checkly enables you to transform your existing Playwright tests into powerful sy
 
 ## Step 1: Initialize Your Project
 
-Start by creating a new Checkly project using the CLI:
+In your project folder, set up Checkly using the CLI:
 
 ```bash Terminal
 npx checkly init
 ```
 
 This command will:
-- Create a new project directory
+- Set up Checkly in your current folder, and offer to create a `package.json` if there isn't one
 - Install the Checkly CLI and dependencies
-- Set up a basic project structure
-- Generate example checks to get you started
+- Create a `checkly.config.ts` file
+- Optionally add example checks to get you started
 
-You'll be prompted to:
-- Choose your project name
-- Select your preferred language (JavaScript or TypeScript)
-- Configure basic project settings
+You'll first be asked whether your AI agent should set up Checkly. Answer yes to install the Checkly skill for your AI coding agent, or no to set up the project yourself and add the demo checks.
 
 ## Step 2: Project Structure
 
@@ -44,7 +41,8 @@ my-checkly-project/
 ├── __checks__/              # Your test files go here
 │   ├── api.check.ts         # Example API check
 │   ├── heartbeat.check.ts   # Example heartbeat check
-│   └── homepage.spec.ts     # Example Playwright test
+│   ├── homepage.spec.ts     # Example Playwright test
+│   └── url.check.ts         # Example URL monitor
 ├── checkly.config.ts        # Checkly configuration
 ├── package.json             # Node.js dependencies
 └── README.md
@@ -103,7 +101,7 @@ test('Homepage loads successfully', async ({ page }) => {
   expect(title).toContain('Checkly')
   
   // Verify key elements are present
-  await expect(page.locator('p')).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   
   // Take a screenshot for debugging
   await page.screenshot({ path: 'homepage.jpg' })
@@ -111,15 +109,12 @@ test('Homepage loads successfully', async ({ page }) => {
 
 ```
 
-## Step 5: Test Locally
+## Step 5: Test Your Checks
 
-Before deploying, test your checks locally:
+Before deploying, run your checks on Checkly to make sure they pass:
 
 ```bash Terminal
-# Test all checks
-npx checkly test
-
-# Test with recording (saves videos and traces)
+# Test all checks (records a test session with videos and traces)
 npx checkly test
 
 # Test specific checks
@@ -129,13 +124,21 @@ npx checkly test homepage
 npx checkly test --env ENVIRONMENT_URL="https://staging.example.com"
 ```
 
-The local test runner will:
+`npx checkly test` runs your checks from Checkly's infrastructure, not on your machine. It will:
 - Execute your Playwright tests
 - Run API checks
 - Generate screenshots, videos, and traces
 - Provide detailed output and debugging information
 
-## Step 6: View Results
+## Step 6: Deploy Your Checks
+
+Deploy your checks so Checkly runs them on a schedule:
+
+```bash Terminal
+npx checkly deploy
+```
+
+## Step 7: View Results
 
 After deployment, you can:
 - View check results in the [Checkly dashboard](https://app.checklyhq.com)

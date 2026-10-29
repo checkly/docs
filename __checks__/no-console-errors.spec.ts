@@ -16,6 +16,8 @@ const isIgnored = (url: string) => ignoredUrls.some((pattern) => pattern.test(ur
 
 for (const path of paths) {
   test(`no console errors on ${path}`, async ({ page }) => {
+    // Fail fast instead of using the 120s project timeout, which retries multiply.
+    test.setTimeout(30_000)
     const errors: string[] = []
     page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`))
     page.on('console', (message) => {
@@ -43,7 +45,15 @@ for (const path of paths) {
     // Mintlify injects custom JS from a React effect after hydration,
     // which can happen after the load event.
     await page.locator('script[data-mint-script]').first().waitFor({ state: 'attached' })
-    await page.waitForLoadState('networkidle')
+    // Third-party trackers can keep the network busy forever, so wait for the
+    // injected scripts to load instead of 'networkidle'.
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll<HTMLScriptElement>('script[data-mint-script][src]')].every(
+        (script) => performance.getEntriesByName(script.src).length > 0,
+      ),
+    )
+    // Give the scripts' async work (fetches, images) time to fail.
+    await page.waitForTimeout(2_000)
 
     expect(errors, `Errors on ${path}:\n${errors.join('\n')}`).toHaveLength(0)
   })

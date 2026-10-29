@@ -1,8 +1,8 @@
 ---
-title: 'Custom Dependencies in Playwright Check Suites'
-description: 'Use private packages, custom registries, and additional dependencies in your Playwright Check Suites.'
-sidebarTitle: 'Custom Dependencies'
-canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/custom-dependencies/'
+title: 'Dependencies in Playwright Check Suites'
+description: 'How Checkly installs the dependencies of your Playwright Check Suites, including private packages, and how to make installs faster.'
+sidebarTitle: 'Dependencies'
+canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/dependencies/'
 ---
 
 Use the [Checkly CLI](/cli/overview) to turn your Playwright tests into globally distributed monitors. Checkly uses your existing `package.json` dependencies and Playwright configuration.
@@ -65,9 +65,14 @@ Checkly supports the `exports` and `imports` features in `package.json`.
 
 No additional configuration is needed in `checkly.config.ts` for workspace support.
 
-## Using private dependencies
+## Private packages
 
-Checkly supports private packages. To authenticate with your private registry, configure your credentials in Checkly.
+How you use private packages depends on whether Checkly can reach the registry that serves them:
+
+| Your registry | What to do |
+|---------------|------------|
+| Reachable from the internet with a token, such as the npm registry, GitHub Packages, or a hosted Artifactory | Authenticate with `.npmrc`, as described below |
+| Only reachable from your own network, such as a registry behind your firewall or VPN | See [Internal Registries](/detect/synthetic-monitoring/playwright-checks/internal-registries) |
 
 ```json package.json
 {
@@ -77,14 +82,10 @@ Checkly supports private packages. To authenticate with your private registry, c
 }
 ```
 
-You need to:
+For a registry Checkly can reach, you need to:
 
 1. Add authentication configuration to your `.npmrc` file
 2. Store authentication tokens as [environment variables](/platform/variables) in Checkly
-
-<Tip>
-If your private packages come from an internal registry that Checkly can't reach, such as a registry behind your firewall or VPN, see [Private Packages and Internal Registries](/detect/synthetic-monitoring/playwright-checks/private-packages-and-internal-registries) to embed them in the code bundle instead.
-</Tip>
 
 ### Configure authentication to private dependencies
 
@@ -169,7 +170,7 @@ Learn more about [customizing install commands](/detect/synthetic-monitoring/pla
 
 ## Dependency Caching
 
-Checkly caches installed packages between check runs to speed up execution and reduce installation time. Dependencies are installed once and reused for subsequent runs until the files that define your dependencies change, such as your lock file and your `package.json` and `.npmrc` files, or until your `installCommand`, your working directory, or your [`engine`](/constructs/playwright-check#param-engine) change. Changes to [embedded or pruned packages and registry routing](/detect/synthetic-monitoring/playwright-checks/private-packages-and-internal-registries) also invalidate the cache.
+Checkly caches installed packages between check runs to speed up execution and reduce installation time. Dependencies are installed once and reused for subsequent runs until the files that define your dependencies change, such as your lock file and your `package.json` and `.npmrc` files, or until your `installCommand`, your working directory, or your [`engine`](/constructs/playwright-check#param-engine) change. Changes to [embedded or pruned packages and registry routing](/detect/synthetic-monitoring/playwright-checks/internal-registries) also invalidate the cache.
 
 ### How caching works
 
@@ -182,7 +183,7 @@ When dependency caching is enabled:
 
 Caching significantly reduces check execution time, especially for projects with many or large dependencies.
 
-When the cache can't be used, the install takes longer the more packages your project declares. To make those installs faster, remove dependencies your checks don't use, such as linters or Storybook, from the code bundle with [`bundle.packages.prune`](/detect/synthetic-monitoring/playwright-checks/private-packages-and-internal-registries#speed-up-dependency-installs).
+When the cache can't be used, the install takes longer the more packages your project declares; see [Speed up installs](#speed-up-installs).
 
 The dependency cache uses a least-recently-used (LRU) policy. Active Playwright Check Suites automatically refresh their cache entry, so caches only expire for check suites that have not run in the last 30 days.
 
@@ -220,6 +221,45 @@ Checkly automatically retries transient failures during setup steps. Cache downl
 
 **Private Locations**: Dependency caching is **OFF by default**. To enable caching and speed up check runs, set `DEPENDENCY_CACHE=CHECKLY_S3` in your [agent configuration](/platform/private-locations/agent-configuration).
 
+## Speed up installs
+
+The runner installs your dependencies whenever the [dependency cache](#dependency-caching) can't be used: on the first run, after your dependencies change, and on every run in Private Locations that don't have dependency caching turned on. Every package it installs adds to that time, so removing packages your checks never load from the install makes those runs start faster.
+
+In a monorepo, [lockfile pruning](/detect/synthetic-monitoring/playwright-checks/internal-registries#lockfile-pruning) already leaves out the dependencies of workspace members outside the bundle. To go further, remove the development tooling that your `package.json` declares but your tests don't need, such as linters, formatters, and component workshops, with `bundle.packages.prune`:
+
+```typescript checkly.config.ts highlight={6-19}
+import { defineConfig } from 'checkly'
+
+export default defineConfig({
+  projectName: 'Acme Website',
+  logicalId: 'acme-website',
+  bundle: {
+    packages: {
+      prune: {
+        devDependencies: [
+          'eslint*',
+          '@eslint/*',
+          '@typescript-eslint/*',
+          'prettier',
+          'storybook',
+          '@storybook/*',
+        ],
+      },
+    },
+  },
+  checks: {
+    playwrightConfigPath: './playwright.config.ts',
+    playwrightChecks: [
+      { name: 'Acme E2E', logicalId: 'acme-e2e' },
+    ],
+  },
+})
+```
+
+This config removes ESLint and its plugins, Prettier, and Storybook from the `devDependencies` of the bundled `package.json` files. The CLI then regenerates the bundled lockfile, so everything those tools depend on drops out too, and the runner installs only what remains. Your local `package.json` is unchanged, so linting and Storybook keep working on your machine.
+
+Pruning works the same way in a single-package project as in a monorepo. Only remove packages that neither your tests nor the install use: keep build tools such as `typescript` when an install script needs them. The CLI doesn't check this for you. See [Prune manifest dependencies](/detect/synthetic-monitoring/playwright-checks/internal-registries#prune-manifest-dependencies) for the full syntax, including entries scoped to one workspace member, and its [requirements and caveats](/detect/synthetic-monitoring/playwright-checks/internal-registries#requirements-and-caveats).
+
 ## Playwright browser caching
 
 Checkly caches Playwright browsers so that runs don't download them every time. How caching works depends on which location your checks run.
@@ -244,7 +284,7 @@ Browser caching requires Private Location agent v8.2.0 or later.
 If you see errors like `404 Not Found` or `Package '@your-org/package' not found`:
 
 - Verify your `.npmrc` file is at the workspace root or next to the `package.json` that needs it
-- If the registry is only reachable from your own network, see [Private Packages and Internal Registries](/detect/synthetic-monitoring/playwright-checks/private-packages-and-internal-registries)
+- If the registry is only reachable from your own network, see [Internal Registries](/detect/synthetic-monitoring/playwright-checks/internal-registries)
 - Check that the registry URL is correct
 - Ensure your package name matches exactly (including scope)
 
@@ -269,7 +309,7 @@ If Checkly uses the wrong package manager:
 If package installation exceeds time limits:
 
 - Check for large dependencies that can be optimized
-- Remove dependencies your checks don't use from the code bundle with [`bundle.packages.prune`](/detect/synthetic-monitoring/playwright-checks/private-packages-and-internal-registries#speed-up-dependency-installs)
+- Remove dependencies your checks don't use from the code bundle with [`bundle.packages.prune`](#speed-up-installs)
 - Consider using a custom `installCommand` to install only required packages
 
 ### Memory usage exceeded
@@ -277,7 +317,7 @@ If package installation exceeds time limits:
 If you see errors indicating that memory limits were exceeded during installation:
 
 - Optimize your dependencies to reduce memory consumption
-- Remove dependencies your checks don't use from the code bundle with [`bundle.packages.prune`](/detect/synthetic-monitoring/playwright-checks/private-packages-and-internal-registries#speed-up-dependency-installs)
+- Remove dependencies your checks don't use from the code bundle with [`bundle.packages.prune`](#speed-up-installs)
 - Consider using a custom `installCommand` to install only necessary packages
 
 ### General installation failures

@@ -19,6 +19,7 @@ Variable|Description
 `DEPENDENCY_CACHE`|(Default: `OFF`) Set to `CHECKLY_S3` to enable dependency caching for [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview). Caches installed dependencies between runs to speed up check execution. Learn more about [dependency caching](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#dependency-caching).
 `AGENT_SERVER_PORT`|(Default: `8080`) Port for the HTTP [health probe endpoints](#health-probe-endpoints) and Prometheus metrics. Applies to agent v8.12.0 and later. Earlier agents use `AGENT_HEALTH_PORT` (default `8081`) for health probes.
 `EXTERNAL_OBSERVABILITY`| Enabled by default. Set to `off` to disable [external observability](#external-observability) reporting of agent runtime errors to Checkly.
+`CHECKLY_RUN_FILE_MAX_BYTES`|(Default and maximum: 2147483647 bytes, just under 2 GiB) Largest file, in bytes, that the agent reads from a Browser or Multistep check run and uploads, such as the Playwright report. A larger file is left out of the check result, not truncated. For the Playwright report, the check log says `Report omitted because it is larger than <limit> MiB`. A value that is not a positive integer is ignored with a warning in the agent log, and the limit is then 14 MiB. Applies to agent v8.12.0 and later.
 
 For example, you can add these variables to the standard docker run command like this:
 
@@ -70,6 +71,8 @@ Docker host](https://docs.docker.com/desktop/networking/) `http://host.docker.in
 New versions of the Checkly Agent are released regularly to [Docker Hub](https://hub.docker.com/r/checkly/agent/tags). To have access to the latest improvements, you can update the Checkly Agent containers.
 
 View our [changelog](/platform/private-locations/change-log) to learn more about each version.
+
+Agents running a version older than v8.12.0 are shown with an **Outdated** badge under **Connected agents by version** on the private location page, and the API returns `isOutdated: true` for them in `runningAgents` (`GET /v1/private-locations/{id}`, or `GET /v1/private-locations?versions=true` for all private locations). Update them to v8.12.0 or later.
 
 ### Manual updates
 

@@ -83,7 +83,7 @@ The CLI validates the list before deploying:
 
 - An entry that matches no package in the lockfile fails validation and blocks the deploy. Only list packages your project actually uses.
 - An entry whose only matches can't be embedded also fails validation. Packages installed from git, a local path, or a URL, and lockfile entries without an integrity hash, can't be embedded; the runner must fetch them itself.
-- In a pnpm workspace, an entry that also matches a workspace member that another member depends on prints a warning on every run, because workspace members are bundled as source code rather than embedded. Exclude those members with `!`, for example `['@acme/*', '!@acme/design-system']`.
+- Workspace members that a pattern matches are skipped, because they're bundled as source code rather than embedded. An entry that matches only workspace members fails validation. In a pnpm workspace, a member that another member depends on can also appear in a warning saying it can't be embedded; exclude it with `!` to silence the warning, for example `['@acme/*', '!@acme/design-system']`.
 - A `!` exclusion that matches nothing is ignored.
 - A list that ends up selecting no packages at all only prints a warning.
 
@@ -95,9 +95,9 @@ Embedded packages need registry credentials only on the machine running the CLI,
 - `npm_config_*` environment variables
 - pnpm's global `auth.ini`, where `pnpm login` stores tokens on pnpm 11 and later
 
-Scope tokens to the registry (`//registry.example.com/:_authToken=${NPM_TOKEN}`) rather than setting a bare `_authToken`. Because `.npmrc` is uploaded with the code bundle, reference tokens through environment variables instead of writing them in plain text, and set those variables wherever you run `checkly test` or `checkly deploy`. Only packages the runner fetches itself need their token stored in Checkly, as described in [Using private dependencies](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#using-private-dependencies).
+Scope tokens to the registry (`//registry.example.com/:_authToken=${NPM_TOKEN}`) rather than setting a bare `_authToken`. Because `.npmrc` is uploaded with the code bundle, reference tokens through environment variables instead of writing them in plain text, and set those variables wherever you run `checkly test` or `checkly deploy`. Only packages the runner fetches itself need their token stored in Checkly, as described in [Using private dependencies](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#using-private-dependencies). If you use [`runner.registries`](#route-runner-installs-to-other-registries), set those tokens in its `auth` entries instead.
 
-If you use bun or Yarn Berry and your credentials only live in `bunfig.toml` or `.yarnrc.yml`, copy them into `.npmrc` or set them as `npm_config_*` variables; the CLI doesn't read those files. bun projects must also keep their registry URLs in `.npmrc`.
+If you use bun or Yarn Berry and your credentials only live in `bunfig.toml` or `.yarnrc.yml`, copy them into `.npmrc` or set them as `npm_config_*` variables; the CLI doesn't read those files. bun and Yarn Berry projects must also keep their registry URLs, including scoped registries, in `.npmrc`.
 
 If a download fails to authenticate, the error names the credential source the CLI used.
 
@@ -259,10 +259,7 @@ export default defineConfig({
 
 This config removes ESLint and its plugins, Prettier, and Storybook from the `devDependencies` of the bundled `package.json` files. The CLI then regenerates the bundled lockfile, so everything those tools depend on drops out too, and the runner installs only what remains. Your local `package.json` is unchanged, so linting and Storybook keep working on your machine.
 
-Pruning works the same way in a single-package project as in a monorepo. Keep these points in mind:
-
-- Only remove packages your tests don't import or run. The CLI doesn't check this for you.
-- A prune change that alters the bundled `package.json` files or lockfile invalidates the dependency cache once, so the next run does a full install. Patterns that match nothing leave the cache untouched.
+Pruning works the same way in a single-package project as in a monorepo. Only remove packages your tests don't import or run; the CLI doesn't check this for you.
 
 ## Route runner installs to other registries
 
@@ -295,6 +292,7 @@ export default defineConfig({
 With this config, the runner installs `@acme` packages only from `https://npm.acme.example.com/`, authenticating with the `ACME_NPM_TOKEN` environment variable, and every other package from the public npm registry. If an `@acme` package is missing from the Acme registry, the install fails instead of asking the public registry for it.
 
 - `upstreams` names the registries the runner may use. A `token` must be a single `${VARIABLE}` reference to a Checkly [environment variable](/platform/variables), which the runner resolves at install time. Literal tokens are rejected.
+- Once `runner.registries` is set, the runner ignores the registry credentials and TLS settings, such as `strict-ssl` and `cafile`, in your bundled `.npmrc`, `pnpm-workspace.yaml`, and `.yarnrc.yml`. Give every upstream that needs authentication its own `auth` entry.
 - `packages` routes package names to upstreams. The first rule whose [pattern](#package-name-patterns) matches wins. The runner tries the rule's upstreams in order, but never falls through to a later rule, so private package names aren't sent to a broader registry. The last rule must be `{ pattern: '**', ... }`.
 - Routing patterns don't accept `!` exclusions or version pins.
 - [Embedded packages](#embed-private-packages) always take priority over routing rules.
@@ -381,7 +379,7 @@ When you run `npx checkly deploy`, the CLI:
 1. Bundles `e2e` and `design-system`, because the tests import `design-system`. `admin` is left out.
 2. Removes `@acme/analytics` from the bundled copy of `design-system`'s `package.json`.
 3. Prunes the bundled lockfile to the bundle's contents. `@acme/billing-sdk` drops out because only `admin` needs it, and `@acme/analytics` drops out because nothing declares it anymore.
-4. Embeds the `@acme` packages that remain in the pruned lockfile, here `@acme/tokens`, downloading them through your `.npmrc`. The `!@acme/design-system` exclusion keeps the pattern away from the workspace member, which is bundled as source code and can't be embedded.
+4. Embeds the `@acme` packages that remain in the pruned lockfile, here `@acme/tokens`, downloading them through your `.npmrc`. The `!@acme/design-system` exclusion keeps the pattern away from the workspace member, which is bundled as source code, and silences the warning pnpm workspaces can print for it.
 
 On Checkly, the runner installs `@acme/tokens` from the bundle and all public packages from npm. It never contacts your internal registry.
 
@@ -454,4 +452,4 @@ DEBUG='checkly:cli:services:embedded-packages,checkly:cli:services:check-parser:
 
 ### Dependencies are reinstalled after a change
 
-Changing the set of embedded packages, the pruned manifests, or `runner.registries` invalidates the runner's [dependency cache](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#dependency-caching). The next run installs dependencies from scratch.
+Changing the set of embedded packages, the pruned manifests or lockfile, or `runner.registries` invalidates the runner's [dependency cache](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#dependency-caching). The next run installs dependencies from scratch. A prune pattern or a `!` exclusion that matches nothing changes none of these, so it leaves the cache untouched.

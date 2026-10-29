@@ -97,21 +97,14 @@ Store authentication tokens as Checkly [environment variables](/platform/variabl
 #### Using private npm packages
 
 ```txt
-# Using an environment variable (recommended)
 //registry.npmjs.org/:_authToken=${NPM_TOKEN}
-
-# Hard-coded token (not recommended)
-//registry.npmjs.org/:_authToken=npm_abc...
 ```
 
 #### Using JFrog Artifactory
 
 ```txt
-# Using an environment variable (recommended)
-registry=https://yourcompany.jfrog.io/artifactory/api/npm/npm-local/:_authToken=${ARTIFACTORY_TOKEN}
-
-# Hard-coded token (not recommended)
-registry=https://yourcompany.jfrog.io/artifactory/api/npm/npm-local/:_authToken=abc...
+registry=https://yourcompany.jfrog.io/artifactory/api/npm/npm-local/
+//yourcompany.jfrog.io/artifactory/api/npm/npm-local/:_authToken=${ARTIFACTORY_TOKEN}
 ```
 
 #### Using GitHub Packages
@@ -128,6 +121,10 @@ registry=https://yourcompany.jfrog.io/artifactory/api/npm/npm-local/:_authToken=
 ### Include authentication files
 
 When you run `npx checkly test` or `npx checkly deploy`, the CLI bundles and uploads your `.npmrc` files automatically: the one at the workspace root and any next to a workspace member's `package.json`. This makes them available when Checkly runs `installCommand` to install your dependencies.
+
+<Warning>
+Because your `.npmrc` files are uploaded with the code bundle, a token written in plain text is uploaded too. Reference tokens through environment variables, as in the examples above.
+</Warning>
 
 #### Using lifecycle scripts
 
@@ -172,14 +169,14 @@ Learn more about [customizing install commands](/detect/synthetic-monitoring/pla
 
 ## Dependency Caching
 
-Checkly caches installed packages between check runs to speed up execution and reduce installation time. Dependencies are installed once and reused for subsequent runs until your lock file, the `package.json` or `.npmrc` files in your workspace, a pnpm `.pnpmfile.cjs` or `.pnpmfile.mjs` at the workspace root, your `installCommand`, your working directory, or your [`engine`](/constructs/playwright-check#param-engine) change. Changes to [embedded or pruned packages and registry routing](/detect/synthetic-monitoring/playwright-checks/internal-registries) also invalidate the cache.
+Checkly caches installed packages between check runs to speed up execution and reduce installation time. Dependencies are installed once and reused for subsequent runs until the files that define your dependencies change, such as your lock file and your `package.json` and `.npmrc` files, or until your `installCommand`, your working directory, or your [`engine`](/constructs/playwright-check#param-engine) change. Changes to [embedded or pruned packages and registry routing](/detect/synthetic-monitoring/playwright-checks/internal-registries) also invalidate the cache.
 
 ### How caching works
 
 When dependency caching is enabled:
 
 1. On the first run, Checkly installs all packages from your lock file and stores them in cache
-2. On subsequent runs, Checkly checks if your lock file, `package.json` files, `installCommand`, working directory, or `engine` have changed
+2. On subsequent runs, Checkly checks whether any of the inputs described above have changed
 3. If unchanged, Checkly uses the cached packages, skipping the installation step
 4. If changed, Checkly installs packages again and updates the cache
 

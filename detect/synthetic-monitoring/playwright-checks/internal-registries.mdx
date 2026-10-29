@@ -19,9 +19,8 @@ Choose the option that matches your setup:
 |-----------|--------|
 | Your private packages are only available from an internal registry Checkly can't reach | [Embed the packages](#embed-private-packages) with `bundle.packages.embed` |
 | Your `.npmrc` points at an internal mirror, but the packages are also available from registries Checkly can reach | [Route runner installs](#route-runner-installs-to-other-registries) with `runner.registries` |
-| Your monorepo has internal packages that your checks don't use, in workspace members outside the code bundle | [Lockfile pruning](#lockfile-pruning) leaves them out automatically |
-| The install still pulls in internal packages your checks don't use, such as unused peer dependencies | [Prune manifest dependencies](#prune-manifest-dependencies) with `bundle.packages.prune` |
-| Dependency installs are slow because your `package.json` declares tooling your checks don't use, such as linters | [Speed up dependency installs](#speed-up-dependency-installs) with `bundle.packages.prune` |
+| Your monorepo's lockfile includes dependencies of workspace members your checks don't import | [Lockfile pruning](#lockfile-pruning) leaves them out automatically |
+| The install pulls in packages your checks don't use, such as unused peer dependencies from your internal registry, or linters that slow the install down | [Prune manifest dependencies](#prune-manifest-dependencies) with `bundle.packages.prune` |
 
 All of these options apply to Playwright Check Suites only, not to Browser Checks or Multistep Checks. You configure them at the top level of `checkly.config.ts`, not per check.
 
@@ -76,7 +75,7 @@ The CLI resolves entries against the lockfile at the workspace root:
 | `yarn.lock` (Yarn Classic, v1) | ❌ |
 | `bun.lockb` (binary format) | ❌ Run `bun install --save-text-lockfile` to create a `bun.lock` |
 
-Yarn Berry lockfiles don't record npm tarball hashes, so for Yarn Berry the CLI fetches them from your registry's package metadata on every deploy.
+Yarn Berry lockfiles don't record npm tarball hashes, so for Yarn Berry the CLI looks them up in your registry's package metadata each time it bundles your checks. Downloaded tarballs are still cached.
 
 ### Validation
 
@@ -125,7 +124,7 @@ Control lockfile pruning with these environment variables:
 
 ### Prune manifest dependencies
 
-Use `bundle.packages.prune` to remove dependencies from the `package.json` files in the code bundle: the workspace root's and every bundled workspace member's. The CLI rewrites the manifests before it prunes the lockfile, so the removed packages drop out of the bundled lockfile too.
+Use `bundle.packages.prune` to remove dependencies from the `package.json` files in the code bundle: the workspace root's and every bundled workspace member's. The CLI rewrites the manifests before it prunes the lockfile, so the removed packages drop out of the bundled lockfile too. Besides the peer dependency case below, you can use it to [speed up dependency installs](#speed-up-dependency-installs).
 
 The most common use is unused peer dependencies. With pnpm's `auto-install-peers` setting, which is on by default, a member's peer dependencies end up in the lockfile even when your tests never import them. If those peers come from a registry Checkly can't reach, the install fails:
 

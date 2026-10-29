@@ -57,7 +57,7 @@ This config embeds every package in the `@acme` scope that your lockfile contain
 Each entry is one of:
 
 - A package name, such as `'@acme/private-utils'`. Embeds every version of the package found in the lockfile.
-- An exact version pin, such as `'legacy-private-pkg@2.1.0'`. Checkly lists only the embedded versions of an embedded package, so a pin must cover every version of that package in your lockfile. Otherwise the install can fail; npm, for example, fails with a warning that names the missing version. Embed the package by name to include every version in your lockfile.
+- An exact version pin, such as `'legacy-private-pkg@2.1.0'`. Checkly lists only the embedded versions of an embedded package, so a pin must cover every version of that package in your lockfile. Otherwise the install can fail; npm, for example, can't find the missing version. `checkly test` and `checkly deploy` warn when an entry leaves versions of a package in your lockfile unembedded. Embed the package by name to include every version in your lockfile.
 - A name [pattern](#package-name-patterns), such as `'@acme/*'`, optionally prefixed with `!` to exclude packages that earlier entries selected.
 
 List every package the runner can't fetch, including private packages that are only dependencies of other private packages. Embedding a package doesn't embed its dependencies; see [Dependencies of dependencies](#dependencies-of-dependencies).

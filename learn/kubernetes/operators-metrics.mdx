@@ -35,9 +35,14 @@ This creates a project structure that includes an API definition for `WebApp`, a
 
 For observability, we can integrate Prometheus metrics into the operator. In Kubernetes, Prometheus can scrape data from custom endpoints to provide insights into application behavior. By using the `prometheus.NewCounter` method from the Prometheus Go client, we set up counters to track resource actions, such as the creation and deletion of `WebApp` instances.
 
-In the controller’s main loop, you might add code like this to register counters:
+In the controller, you might add code like this to register counters. Register them with controller-runtime's `metrics.Registry`, which is the registry the operator's `/metrics` endpoint serves. Counters registered with `prometheus.MustRegister` go to the Prometheus default registry and won't show up there.
 
 ```go
+import (
+    "github.com/prometheus/client_golang/prometheus"
+    "sigs.k8s.io/controller-runtime/pkg/metrics"
+)
+
 var (
     createCounter = prometheus.NewCounter(
         prometheus.CounterOpts{
@@ -48,7 +53,7 @@ var (
 )
 
 func init() {
-    prometheus.MustRegister(createCounter)
+    metrics.Registry.MustRegister(createCounter)
 }
 ```
 
@@ -56,7 +61,7 @@ Each time the reconciliation loop (the main loop of the controller) handles a cr
 
 #### Deploying Prometheus to Scrape Metrics
 
-You must configure Prometheus to scrape the operator’s metrics endpoint. To achieve this, add a scrape configuration to the Prometheus setup, pointing to the operator service endpoint:
+You must configure Prometheus to scrape the operator’s metrics endpoint. Recent Kubebuilder scaffolds serve metrics over HTTPS on port `8443` and require authentication. The example below assumes plain HTTP on port `8080`, which you get by starting the manager with `--metrics-bind-address=:8080 --metrics-secure=false`. To achieve this, add a scrape configuration to the Prometheus setup, pointing to the operator service endpoint:
 
 ```yaml
 scrape_configs:

@@ -75,6 +75,7 @@ The Browser Check configuration consists of specific Browser Check options and i
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `code` | `object` | ✅ | - | The Playwright test code |
+| `playwrightConfig` | `object` | ❌ | - | Playwright config for this check, with the same keys as `playwright.config.ts` (for example `use.viewport`) |
 
 </Tab>
 <Tab title="General Check">
@@ -248,7 +249,7 @@ new BrowserCheck("standard-check", {
 
 </CodeGroup>
 
-**Available frequencies**: `EVERY_1M`, `EVERY_2M`, `EVERY_5M`, `EVERY_10M`, `EVERY_15M`, `EVERY_30M`, `EVERY_1H`, `EVERY_2H`, `EVERY_6H`, `EVERY_12H`, `EVERY_24H`
+**Available frequencies**: `EVERY_1M`, `EVERY_2M`, `EVERY_5M`, `EVERY_10M`, `EVERY_15M`, `EVERY_30M`, `EVERY_1H`, `EVERY_2H`, `EVERY_3H`, `EVERY_6H`, `EVERY_12H`, `EVERY_24H`
 </ResponseField>
 
 <ResponseField name="runtimeId" type="string">
@@ -469,8 +470,8 @@ import { expect, test } from "@playwright/test"
 test("user can login successfully", async ({ page }) => {
   await page.goto("https://app.example.com/login")
 
-  await page.getByLabel('email', { name: /email/i }).fill(process.env.TEST_USERNAME)
-  await page.getByLabel('password', { name: /password/i }).fill(process.env.TEST_PASSWORD)
+  await page.getByLabel(/email/i).fill(process.env.TEST_USERNAME)
+  await page.getByLabel(/password/i).fill(process.env.TEST_PASSWORD)
   await page.getByRole('button', { name: /login/i }).click()
 
   await expect(page).toHaveURL(/dashboard/)

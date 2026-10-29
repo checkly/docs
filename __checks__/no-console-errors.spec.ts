@@ -28,6 +28,14 @@ for (const path of paths) {
         errors.push(`HTTP ${response.status()}: ${response.request().method()} ${response.url()}`)
       }
     })
+    // Chrome blocks cross-origin error responses like a missing image on
+    // Mintlify's S3 (ERR_BLOCKED_BY_ORB), so they never fire 'response'.
+    page.on('requestfailed', (request) => {
+      const failure = request.failure()?.errorText ?? ''
+      if (failure !== 'net::ERR_ABORTED' && !isIgnored(request.url())) {
+        errors.push(`request failed: ${failure} ${request.method()} ${request.url()}`)
+      }
+    })
 
     const docs = new DocsSitePage(page)
     const response = await docs.goto(path)

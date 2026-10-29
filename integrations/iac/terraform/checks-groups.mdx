@@ -22,7 +22,6 @@ resource "checkly_check" "e2e-login" {
   type                      = "BROWSER"       // The type of the check
   activated                 = true            // Whether the check will start as active on creation
   frequency                 = 10              // The frequency of the check in minutes
-  ssl_check                 = true            // Whether your SSL cert for the given domain should be checked too
   use_global_alert_settings = true            // Whether to use account level alert setting instead of the alert setting defined on this check
   run_parallel              = true            // Whether the check would run in a single location at time (round-robin) or all locations on each run
 
@@ -31,7 +30,7 @@ resource "checkly_check" "e2e-login" {
     "eu-central-1"
   ]
 
-  retry_strategy = {                          // The retry strategy used for failed runs
+  retry_strategy {                          // The retry strategy used for failed runs
     type = "LINEAR"
   }            
 
@@ -62,7 +61,6 @@ resource "checkly_check" "e2e-login" {
   activated                 = true
   should_fail               = false
   frequency                 = 1
-  ssl_check                 = false
   use_global_alert_settings = true
 
   locations = [
@@ -70,7 +68,7 @@ resource "checkly_check" "e2e-login" {
     "eu-central-1"
   ]
 
-  retry_strategy = {
+  retry_strategy {
     type = "LINEAR"
   }
 
@@ -91,7 +89,6 @@ resource "checkly_check" "get-books" {
   activated                 = true      // Whether the check will start as active on creation
   should_fail               = false     // Whether the check's HTTP response's status is expected to be >399
   frequency                 = 1         // The frequency of the check in minutes
-  ssl_check                 = true      // Whether your SSL cert for the given domain should be checked too
   use_global_alert_settings = true      // Whether to use account level alert setting instead of the alert setting defined on this check
   run_parallel              = true            // Whether the check would run in a single location at time (round-robin) or all locations on each run
 
@@ -100,7 +97,7 @@ resource "checkly_check" "get-books" {
     "eu-central-1"
   ]
   
-  retry_strategy = {                    // The retry strategy used for failed runs
+  retry_strategy {                    // The retry strategy used for failed runs
     type = "LINEAR"
   }
 
@@ -124,9 +121,8 @@ resource "checkly_check" "get-books" {
 For example, a heartbeat monitor can look as follows:
 
 ```terraform
-resource "checkly_check" "send-weekly-digest-v-2" {
+resource "checkly_heartbeat_monitor" "send-weekly-digest-v-2" {
   name                      = "Send Weekly Digest"    // The name of the monitor
-  type                      = "HEARTBEAT"             // The type of the monitor
   activated                 = true                    // Whether the monitor will start as active on creation
   heartbeat {
     period                  = 7                       // The expected period of time between each ping. Between 30 seconds and 365 days.
@@ -249,7 +245,7 @@ resource "checkly_check_group" "key-shop-flows" {
   use_global_alert_settings = false // Whether to use global alert settings or group-specific ones
   run_parallel              = true  // Whether the check would run in a single location at time (round-robin) or all locations on each run
 
-  retry_strategy = {                // The retry strategy used for failed runs
+  retry_strategy {                // The retry strategy used for failed runs
     type = "LINEAR"
   }
 }
@@ -266,7 +262,6 @@ resource "checkly_check" "get-books" {
   activated                 = true
   should_fail               = false
   frequency                 = 1
-  ssl_check                 = true
   use_global_alert_settings = true
 
   locations = [
@@ -277,7 +272,7 @@ resource "checkly_check" "get-books" {
   // This makes the check part of the group
   group_id = checkly_check_group.key-shop-flows.id
 
-  retry_strategy = {
+  retry_strategy {
     type = "LINEAR"
   }
 

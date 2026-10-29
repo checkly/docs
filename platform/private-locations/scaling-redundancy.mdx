@@ -15,8 +15,8 @@ There are two cases where checks assigned to a location could fail to run:
 1. All the agents in the Private Location have failed.
 2. There is insufficient agent capacity in the Private Location.
 
-**Checks will stay queued for 6 minutes** waiting for an available agent. If there are no agents available or the available
-agents are so busy that they cannot process all the pending checks in that timeframe, the pending checks older than 6 minutes will be lost.
+**Checks will stay queued for up to 10 minutes** waiting for an available agent. Uptime monitors, and all checks on Private Locations that still run an older agent version, stay queued for 6 minutes. If there are no agents available or the available
+agents are so busy that they cannot process all the pending checks in that timeframe, the pending checks older than that will be lost.
 
 Agents can be scaled up and scaled out. Scaling up means adding additional CPU and memory allocations to existing agent
 containers. Scaling out means adding additional agent containers.

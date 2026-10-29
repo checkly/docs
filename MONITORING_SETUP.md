@@ -35,7 +35,7 @@ All checks belong to the `docs-monitoring` group, which sets the shared defaults
 | `docs-homepage-ux`          | Browser | `/`              | 15 min    |
 | `docs-no-console-errors`    | Browser | `/`, `/api-reference`, `/cli` | 15 min |
 
-Paths are appended to `DOCS_BASE_URL` (defaults to `https://www.checklyhq.com/docs`). URL monitors follow redirects and assert the final response is HTTP 200 within `degradedResponseTime` / `maxResponseTime` thresholds. The browser check verifies the page loads, the title matches `/Checkly/i`, and primary navigation is visible. The console errors check fails on any uncaught exception or `console.error` on its pages, because Mintlify injects every `.js` file in the repo into every page.
+Paths are appended to `DOCS_BASE_URL` (defaults to `https://www.checklyhq.com/docs`). URL monitors follow redirects and assert the final response is HTTP 200 within `degradedResponseTime` / `maxResponseTime` thresholds. The browser check verifies the page loads, the title matches `/Checkly/i`, and primary navigation is visible. The console errors check fails on any uncaught exception, `console.error`, or HTTP 400+ response on its pages, because Mintlify injects every `.js` file in the repo into every page.
 
 Note: CheckGroupV2 makes `locations`, `runParallel`, and `retryStrategy` non-overridable from individual checks once set on the group.
 

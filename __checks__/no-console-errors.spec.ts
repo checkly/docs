@@ -14,6 +14,11 @@ for (const path of paths) {
         errors.push(`console.error: ${message.text()} @ ${message.location().url}`)
       }
     })
+    page.on('response', (response) => {
+      if (response.status() >= 400) {
+        errors.push(`HTTP ${response.status()}: ${response.request().method()} ${response.url()}`)
+      }
+    })
 
     const docs = new DocsSitePage(page)
     const response = await docs.goto(path)

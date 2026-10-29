@@ -90,13 +90,13 @@ The CLI validates the list before deploying:
 
 ### Registry credentials
 
-Embedded packages are downloaded on the machine running the CLI, so your registry credentials must work there, not only in Checkly. The CLI reads credentials from:
+Embedded packages need registry credentials only on the machine running the CLI, which downloads them. The runner installs them from the code bundle and never contacts your registry for them, so you don't need to store your registry token in Checkly; a token reference in the bundled `.npmrc` whose variable isn't set in Checkly doesn't break the install. The CLI reads credentials from:
 
 - The project, workspace root, and user `.npmrc` files
 - `npm_config_*` environment variables
 - pnpm's global `auth.ini`, where `pnpm login` stores tokens on pnpm 11 and later
 
-Scope tokens to the registry (`//registry.example.com/:_authToken=${NPM_TOKEN}`) rather than setting a bare `_authToken`. Because `.npmrc` is uploaded with the code bundle, reference tokens through environment variables instead of writing them in plain text, and make sure those variables are set wherever you run `checkly test` or `checkly deploy`.
+Scope tokens to the registry (`//registry.example.com/:_authToken=${NPM_TOKEN}`) rather than setting a bare `_authToken`. Because `.npmrc` is uploaded with the code bundle, reference tokens through environment variables instead of writing them in plain text, and set those variables wherever you run `checkly test` or `checkly deploy`. Only packages the runner fetches itself need their token stored in Checkly, as described in [Using private dependencies](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#using-private-dependencies).
 
 If you use bun or Yarn Berry and your credentials only live in `bunfig.toml` or `.yarnrc.yml`, copy them into `.npmrc` or set them as `npm_config_*` variables; the CLI doesn't read those files. bun projects must also keep their registry URLs in `.npmrc`.
 

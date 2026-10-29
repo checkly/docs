@@ -12,7 +12,9 @@ docs/
     ├── group.ts             # CheckGroupV2 — `docs-monitoring`
     ├── uptime.check.ts      # URL monitors for homepage, /api-reference, /cli
     ├── homepage-ux.check.ts # Browser check (Playwright)
-    └── homepage-ux.spec.ts  # Playwright spec used by homepage-ux.check.ts
+    ├── homepage-ux.spec.ts  # Playwright spec used by homepage-ux.check.ts
+    ├── no-console-errors.check.ts # Browser check (Playwright)
+    └── no-console-errors.spec.ts  # Playwright spec used by no-console-errors.check.ts
 ```
 
 `checkly.config.ts` discovers checks via `checkMatch: '**/__checks__/**/*.check?(-group).{js,ts}'`.
@@ -31,8 +33,9 @@ All checks belong to the `docs-monitoring` group, which sets the shared defaults
 | `docs-api-reference-uptime` | URL     | `/api-reference` | 10 min    |
 | `docs-cli-uptime`           | URL     | `/cli`           | 10 min    |
 | `docs-homepage-ux`          | Browser | `/`              | 15 min    |
+| `docs-no-console-errors`    | Browser | `/`, `/api-reference`, `/cli` | 15 min |
 
-Paths are appended to `DOCS_BASE_URL` (defaults to `https://www.checklyhq.com/docs`). URL monitors follow redirects and assert the final response is HTTP 200 within `degradedResponseTime` / `maxResponseTime` thresholds. The browser check verifies the page loads, the title matches `/Checkly/i`, and primary navigation is visible.
+Paths are appended to `DOCS_BASE_URL` (defaults to `https://www.checklyhq.com/docs`). URL monitors follow redirects and assert the final response is HTTP 200 within `degradedResponseTime` / `maxResponseTime` thresholds. The browser check verifies the page loads, the title matches `/Checkly/i`, and primary navigation is visible. The console errors check fails on any uncaught exception or `console.error` on its pages, because Mintlify injects every `.js` file in the repo into every page.
 
 Note: CheckGroupV2 makes `locations`, `runParallel`, and `retryStrategy` non-overridable from individual checks once set on the group.
 

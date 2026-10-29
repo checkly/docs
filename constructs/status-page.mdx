@@ -86,7 +86,7 @@ new StatusPage("acme-status", {
 |-----------|------|----------|---------|-------------|
 | `name` | `string` | ✅ | - | Name of the status page |
 | `cards` | `StatusPageCardProps[]` | ✅ | - | Array of card objects containing services |
-| `url` | `string` | ✅ | - | Subdomain under `checkly-status-page.com` (unique across all accounts) |
+| `url` | `string` | ✅ | - | Subdomain under `checkly-status-page.com` (unique across all accounts). Letters, numbers and dashes only |
 | `customDomain` | `string` | ❌ | - | Custom domain (e.g., `status.example.com`) |
 | `logo` | `string` | ❌ | - | URL to logo image for the header |
 | `redirectTo` | `string` | ❌ | - | URL to redirect when logo is clicked |
@@ -137,7 +137,7 @@ new StatusPage("company-status", {
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `name` | `string` | ✅ | Display name for the card |
-| `services` | `StatusPageService[]` | ✅ | Array of services to display on this card |
+| `services` | `StatusPageService[]` | ❌ | Array of services to display on this card |
 
 **Examples:**
 
@@ -154,11 +154,11 @@ new StatusPage("functional-status", {
   cards: [
     {
       name: "User-Facing Services", // Customer impact grouped together
-      services: [webApp, mobileApi],
+      services: [webAppService, mobileApiService],
     },
     {
       name: "Infrastructure", // Backend services grouped
-      services: [database],
+      services: [databaseService],
     },
   ],
 })
@@ -175,11 +175,11 @@ new StatusPage("team-status", {
   cards: [
     {
       name: "Frontend Team", // Team-based grouping
-      services: [frontendApp],
+      services: [frontendAppService],
     },
     {
       name: "Backend Team",
-      services: [backendApi],
+      services: [backendApiService],
     },
     {
       name: "Platform Team",
@@ -200,7 +200,7 @@ new StatusPage("priority-status", {
   cards: [
     {
       name: "Critical Services", // High-priority services
-      services: [coreApi, authService],
+      services: [coreApiService, authService],
     },
     {
       name: "Supporting Services", // Lower-priority services
@@ -241,7 +241,7 @@ Custom domain for your status page (e.g., `status.example.com`). Requires DNS co
 ```ts highlight={4}
 new StatusPage("company-status", {
   name: "Company Status",
-  url: "status.example.com",
+  url: "company-status",
   customDomain: "status.example.com",
   /* More options... */
 })
@@ -350,7 +350,7 @@ new StatusPage("saas-company-status", {
 new ApiCheck("web-api-check", {
   name: "Web API Check",
   request: {
-    url: "app.example.com/api/status",
+    url: "https://app.example.com/api/status",
     method: "GET",
   },
   // Trigger service incidents from your checks and monitors

@@ -18,7 +18,10 @@ for (const path of paths) {
     const docs = new DocsSitePage(page)
     const response = await docs.goto(path)
     expect(response?.status()).toBeLessThan(400)
-    await page.waitForLoadState('load')
+    // Mintlify injects custom JS from a React effect after hydration,
+    // which can happen after the load event.
+    await page.locator('script[data-mint-script]').first().waitFor({ state: 'attached' })
+    await page.waitForLoadState('networkidle')
 
     expect(errors).toEqual([])
   })

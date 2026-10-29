@@ -184,6 +184,20 @@ Starting with agent v8.12.0, the Checkly Agent exposes Prometheus metrics at `GE
 curl -s http://localhost:8080/metrics | grep checkly_agent_
 ```
 
+The agent container runs two processes. The Go process polls the Checkly API for jobs, runs API checks and uptime monitors, and serves the health probes and `/metrics`. The Node.js worker runs Browser, Multistep and Playwright checks. On each scrape, the Go process pulls the worker's metrics in and serves one merged page.
+
+```mermaid
+flowchart LR
+  P["Prometheus"] -->|"GET :8080/metrics"| G
+  subgraph C["Checkly Agent container"]
+    G["Go process<br/>API checks, uptime monitors<br/>component=uptime"]
+    N["Node.js worker<br/>Browser, Multistep, Playwright<br/>component=synthetics"]
+    G -->|"scrape on request"| N
+  end
+  G <-->|"jobs and results"| A["Checkly API"]
+  N <-->|"jobs and results"| A
+```
+
 ### Agent metrics
 
 These metrics are always on.

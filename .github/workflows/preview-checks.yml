@@ -133,6 +133,12 @@ jobs:
           SLACK_OPS_WEBHOOK_URL: ${{ secrets.SLACK_OPS_WEBHOOK_URL }}
           DOCS_BASE_URL: ${{ steps.preview.outputs.url }}
           CHECKLY_TEST_ENVIRONMENT: preview-pr-${{ github.event.pull_request.number }}
+          # actions/checkout uses a detached merge commit on PRs, so the CLI
+          # can't read the branch or the PR's head commit from git.
+          CHECKLY_TEST_REPO_BRANCH: ${{ github.head_ref }}
+          CHECKLY_TEST_REPO_SHA: ${{ github.event.pull_request.head.sha }}
+          CHECKLY_TEST_REPO_COMMIT_OWNER: ${{ github.event.pull_request.user.login }}
+          CHECKLY_TEST_REPO_COMMIT_MESSAGE: ${{ github.event.pull_request.title }}
         run: |
           npx checkly test \
             --env "DOCS_BASE_URL=$DOCS_BASE_URL" \

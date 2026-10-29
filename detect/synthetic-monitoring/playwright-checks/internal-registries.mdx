@@ -56,7 +56,7 @@ Each entry is one of:
 - An exact version pin, such as `'legacy-private-pkg@2.1.0'`.
 - A name [pattern](#package-name-patterns), such as `'@acme/*'`, optionally prefixed with `!` to exclude packages that earlier entries selected.
 
-List every package the runner can't fetch, including private packages that are only transitive dependencies of other private packages. Dependencies of listed packages are not embedded automatically.
+List every package the runner can't fetch, including private packages that are only dependencies of other private packages. Embedding a package doesn't embed its dependencies; see [Dependencies of dependencies](#dependencies-of-dependencies).
 
 ### Supported lockfiles
 
@@ -178,7 +178,7 @@ bundle: {
 </Tab>
 </Tabs>
 
-Unlike `embed`, prune patterns don't accept version pins. A pattern that matches nothing is ignored. Removing a peer dependency also removes its `peerDependenciesMeta` entry.
+Unlike `embed`, prune patterns don't accept version pins. A pattern that matches nothing is ignored. Removing a peer dependency also removes its `peerDependenciesMeta` entry. Patterns only match dependencies declared in `package.json` files; see [Dependencies of dependencies](#dependencies-of-dependencies).
 
 #### Target specific workspace members
 
@@ -243,6 +243,33 @@ export default defineConfig({
 - [Embedded packages](#embed-private-packages) always take priority over routing rules.
 
 `runner.registries` only affects the install on Checkly. Embedding and lockfile pruning still run on your machine and use your `.npmrc` credentials.
+
+## Dependencies of dependencies
+
+Your lockfile records every package the install needs, including dependencies of your dependencies (transitive dependencies). Each option handles them differently:
+
+| Option | Dependencies of dependencies |
+|--------|------------------------------|
+| `bundle.packages.embed` | Entries match packages at any depth in the lockfile, so you can embed a transitive dependency by name. Embedding a package doesn't embed its dependencies. |
+| Lockfile pruning | Removes the dependencies of workspace members outside the bundle at every depth, except packages that something in the bundle still needs. |
+| `bundle.packages.prune` | Patterns only match dependencies declared in `package.json` files; a pattern that names a package that is only a transitive dependency has no effect. Removing a declared dependency also removes the transitive dependencies that only it needed from the bundled lockfile. |
+| `runner.registries` | Routing rules apply to every package the runner installs, at any depth. |
+
+### Embed private dependency chains
+
+The runner installs the dependencies of an embedded package like any other package, from the registries your project uses. That works for public dependencies, but if an embedded package depends on other private packages from the same unreachable registry, you must embed those too. The CLI doesn't detect a missing one; the install on Checkly fails when it can't fetch it.
+
+For example, if `@acme/ui` depends on the private `@acme/tokens` and the public `react`, embed both private packages and let the runner fetch `react` from npm:
+
+```typescript checkly.config.ts
+bundle: {
+  packages: {
+    embed: ['@acme/ui', '@acme/tokens'],
+  },
+},
+```
+
+If your private packages share a scope, a wildcard such as `@acme/*` embeds the whole scope at every depth, including private packages you only depend on indirectly.
 
 ## Package name patterns
 

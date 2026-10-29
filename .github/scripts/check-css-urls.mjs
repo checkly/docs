@@ -6,7 +6,9 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
-export function findCssUrls(css) {
+export function findCssUrls(source) {
+  // Blank out comments but keep their newlines so line numbers still match.
+  const css = source.replace(/\/\*[\s\S]*?\*\//g, (comment) => comment.replace(/[^\n]/g, ' '));
   const found = [];
   for (const match of css.matchAll(/url\(\s*(['"]?)(.*?)\1\s*\)/g)) {
     if (match[2].startsWith('data:')) continue;

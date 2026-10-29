@@ -57,7 +57,7 @@ This config embeds every package in the `@acme` scope that your lockfile contain
 Each entry is one of:
 
 - A package name, such as `'@acme/private-utils'`. Embeds every version of the package found in the lockfile.
-- An exact version pin, such as `'legacy-private-pkg@2.1.0'`.
+- An exact version pin, such as `'legacy-private-pkg@2.1.0'`. Checkly lists only the embedded versions of an embedded package, so a pin must cover every version of that package in your lockfile. Otherwise the install can fail; npm, for example, fails with a warning that names the missing version. Embed the package by name to include every version in your lockfile.
 - A name [pattern](#package-name-patterns), such as `'@acme/*'`, optionally prefixed with `!` to exclude packages that earlier entries selected.
 
 List every package the runner can't fetch, including private packages that are only dependencies of other private packages. Embedding a package doesn't embed its dependencies; see [Dependencies of dependencies](#dependencies-of-dependencies).
@@ -83,7 +83,7 @@ The CLI validates the list before deploying:
 
 - An entry that matches no package in the lockfile fails validation and blocks the deploy. Only list packages your project actually uses.
 - An entry whose only matches can't be embedded also fails validation. Packages installed from git, a local path, or a URL, and lockfile entries without an integrity hash, can't be embedded; the runner must fetch them itself.
-- Workspace members that a pattern matches are skipped, because they're bundled as source code rather than embedded. An entry that matches only workspace members fails validation. In a pnpm workspace, a member that another member depends on can also appear in a warning saying it can't be embedded; exclude it with `!` to silence the warning, for example `['@acme/*', '!@acme/design-system']`.
+- Workspace members that a pattern matches are skipped, because they're bundled as source code rather than embedded. An entry that matches only workspace members fails validation.
 - A `!` exclusion that matches nothing is ignored.
 - A list that ends up selecting no packages at all only prints a warning.
 
@@ -295,7 +295,7 @@ With this config, the runner installs `@acme` packages only from `https://npm.ac
 - Once `runner.registries` is set, the runner ignores the registry credentials and TLS settings, such as `strict-ssl` and `cafile`, in your bundled `.npmrc`, `pnpm-workspace.yaml`, and `.yarnrc.yml`. Give every upstream that needs authentication its own `auth` entry.
 - `packages` routes package names to upstreams. The first rule whose [pattern](#package-name-patterns) matches wins. The runner tries the rule's upstreams in order, but never falls through to a later rule, so private package names aren't sent to a broader registry. The last rule must be `{ pattern: '**', ... }`.
 - Routing patterns don't accept `!` exclusions or version pins.
-- [Embedded packages](#embed-private-packages) always take priority over routing rules.
+- [Embedded packages](#embed-private-packages) never go through routing rules: the runner installs them from the code bundle and doesn't ask any routed registry about them.
 
 `runner.registries` only affects the install on Checkly. Embedding and lockfile pruning still run on your machine and use your `.npmrc` credentials.
 
@@ -308,7 +308,7 @@ Your lockfile records every package the install needs, including dependencies of
 | `bundle.packages.embed` | Entries match packages at any depth in the lockfile, so you can embed a transitive dependency by name. Embedding a package doesn't embed its dependencies. |
 | Lockfile pruning | Removes the dependencies of workspace members outside the bundle at every depth, except packages that something in the bundle still needs. |
 | `bundle.packages.prune` | Patterns only match dependencies declared in `package.json` files; a pattern that names a package that is only a transitive dependency has no effect. Removing a declared dependency also removes the transitive dependencies that only it needed from the bundled lockfile. |
-| `runner.registries` | Routing rules apply to every package the runner installs, at any depth. |
+| `runner.registries` | Routing rules apply to every package the runner fetches from a registry, at any depth. Embedded packages never reach them. |
 
 ### Embed private dependency chains
 
@@ -353,10 +353,7 @@ export default defineConfig({
   logicalId: 'acme-website',
   bundle: {
     packages: {
-      embed: [
-        '@acme/*',
-        '!@acme/design-system', // Workspace member, bundled as source
-      ],
+      embed: ['@acme/*'],
       prune: [
         {
           member: ['@acme/design-system'],
@@ -379,7 +376,7 @@ When you run `npx checkly deploy`, the CLI:
 1. Bundles `e2e` and `design-system`, because the tests import `design-system`. `admin` is left out.
 2. Removes `@acme/analytics` from the bundled copy of `design-system`'s `package.json`.
 3. Prunes the bundled lockfile to the bundle's contents. `@acme/billing-sdk` drops out because only `admin` needs it, and `@acme/analytics` drops out because nothing declares it anymore.
-4. Embeds the `@acme` packages that remain in the pruned lockfile, here `@acme/tokens`, downloading them through your `.npmrc`. The `!@acme/design-system` exclusion keeps the pattern away from the workspace member, which is bundled as source code, and silences the warning pnpm workspaces can print for it.
+4. Embeds the `@acme` packages that remain in the pruned lockfile, here `@acme/tokens`, downloading them through your `.npmrc`. The pattern also matches the workspace members, such as `design-system`; those are bundled as source code and skipped.
 
 On Checkly, the runner installs `@acme/tokens` from the bundle and all public packages from npm. It never contacts your internal registry.
 

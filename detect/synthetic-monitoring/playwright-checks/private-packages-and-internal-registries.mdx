@@ -220,7 +220,7 @@ Prefer exact member names with `keep`, since a wildcard can match a member you a
 #### Requirements and caveats
 
 - When the bundle contains a lockfile, `prune` only takes effect if lockfile pruning succeeds in the same run, so the manifests and lockfile stay in sync. Otherwise the original `package.json` files ship unchanged and the CLI prints a warning. A bundle without a lockfile always ships the pruned manifests.
-- The CLI doesn't check your code against the pruned dependencies. Don't remove anything your tests need at runtime.
+- The CLI doesn't check your code against the pruned dependencies. Don't remove anything your tests need at runtime, or anything the install itself needs. For example, keep `typescript` when a package's `prepare` or `postinstall` script compiles TypeScript during the install (see [lifecycle scripts](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#using-lifecycle-scripts)).
 
 ### Speed up dependency installs
 
@@ -259,7 +259,7 @@ export default defineConfig({
 
 This config removes ESLint and its plugins, Prettier, and Storybook from the `devDependencies` of the bundled `package.json` files. The CLI then regenerates the bundled lockfile, so everything those tools depend on drops out too, and the runner installs only what remains. Your local `package.json` is unchanged, so linting and Storybook keep working on your machine.
 
-Pruning works the same way in a single-package project as in a monorepo. Only remove packages your tests don't import or run; the CLI doesn't check this for you.
+Pruning works the same way in a single-package project as in a monorepo. Only remove packages that neither your tests nor the install use: keep build tools such as `typescript` when an install script needs them. The CLI doesn't check this for you.
 
 ## Route runner installs to other registries
 

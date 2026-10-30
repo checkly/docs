@@ -89,6 +89,7 @@ export const SetupFlow = () => {
     .map((step, i) => (i < steps.length - 1 ? "3.5rem 1fr" : "3.5rem"))
     .join(" ");
 
+  // Tabler Icons (MIT): see /snippets/tabler-LICENSE.txt.
   const renderIcon = (name) => {
     const common = {
       width: 24,
@@ -96,7 +97,7 @@ export const SetupFlow = () => {
       viewBox: "0 0 24 24",
       fill: "none",
       stroke: "currentColor",
-      strokeWidth: 1.7,
+      strokeWidth: 2,
       strokeLinecap: "round",
       strokeLinejoin: "round",
       "aria-hidden": true,
@@ -104,37 +105,42 @@ export const SetupFlow = () => {
     if (name === "terminal") {
       return (
         <svg {...common}>
-          <rect x="3.5" y="5" width="17" height="14" rx="1.5" />
-          <path d="M7 9.5l3 2.5-3 2.5M12.5 15h4" />
+          <path d="M8 9l3 3l-3 3" />
+          <path d="M13 15l3 0" />
+          <path d="M3 6a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2l0 -12" />
         </svg>
       );
     }
     if (name === "agent") {
       return (
-        <svg {...common} stroke="none" fill="currentColor">
-          <path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3Z" />
-          <path d="M18.5 14l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7.7-1.9Z" />
+        <svg {...common}>
+          <path d="M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m0 -12a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m-7 12a6 6 0 0 1 6 -6a6 6 0 0 1 -6 -6a6 6 0 0 1 -6 6a6 6 0 0 1 6 6" />
         </svg>
       );
     }
     if (name === "testing") {
       return (
         <svg {...common}>
-          <path d="M20 6L9 17l-5-5" />
+          <path d="M5 12l5 5l10 -10" />
         </svg>
       );
     }
     if (name === "deploy") {
       return (
         <svg {...common}>
-          <path d="M12 3v12M7 8l5-5 5 5M5 21h14" />
+          <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+          <path d="M7 9l5 -5l5 5" />
+          <path d="M12 4l0 12" />
         </svg>
       );
     }
     return (
       <svg {...common}>
-        <circle cx="12" cy="12" r="8.5" />
-        <path d="M3.5 12h17M12 3.5c2.5 2.4 2.5 14.6 0 17M12 3.5c-2.5 2.4-2.5 14.6 0 17" />
+        <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+        <path d="M3.6 9h16.8" />
+        <path d="M3.6 15h16.8" />
+        <path d="M11.5 3a17 17 0 0 0 0 18" />
+        <path d="M12.5 3a17 17 0 0 1 0 18" />
       </svg>
     );
   };

@@ -45,6 +45,14 @@ jobs:
             echo "openapi_changed=false" >> "$GITHUB_OUTPUT"
           fi
 
+          # A change to the snippet checker re-runs the snippet typecheck even
+          # when no docs changed.
+          if echo "$CHANGED" | grep -q '^\.github/snippet-typecheck/'; then
+            echo "snippets_tooling_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "snippets_tooling_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
           # Same docs-detection regex as docs-gate / preview-checks
           NON_DOCS_RE='^(\.github/|.*\.sh$|[^/]+\.md$|package(-lock)?\.json$|node_modules/|checkly\.config\.ts$|block-headless\.js$|__checks__/)'
           if echo "$CHANGED" | grep -vE "$NON_DOCS_RE" | grep -q .; then
@@ -56,7 +64,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -70,8 +78,29 @@ jobs:
       - name: Test API navigation tooling
         run: npm run test:api-docs
 
+      # Typechecks MDX snippets that use `checkly`, and fragments marked with
+      # {/* typecheck-wrap */}, against the latest CLI constructs, so examples
+      # don't drift from the CLI API. The checker has its own package.json
+      # without a lockfile, so every run installs the latest checkly release
+      # rather than the docs project's pinned version. Errors show up as
+      # inline annotations on the PR.
+      - name: Typecheck checkly snippets
+        if: steps.detect.outputs.docs_changed == 'true' || steps.detect.outputs.snippets_tooling_changed == 'true'
+        working-directory: .github/snippet-typecheck
+        run: |
+          npm install --no-audit --no-fund
+          npm test
+          npm run check
+
       - name: Check API group badges match the schema
         run: npm run sync:api-group-tags -- --check
+
+      # Root-relative url() paths work on previews but 404 under /docs in
+      # production, so preview checks can't catch them.
+      - name: No url() in CSS
+        run: |
+          npm run test:css-urls
+          npm run check:css-urls
 
       # Legacy /reference/* redirects are inbound-only, so `mint broken-links`
       # never validates their destinations. Runs on any docs change (.mdx or

@@ -120,7 +120,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /detect/synthetic-monitoring/playwright-checks/quickstart
 - /detect/synthetic-monitoring/playwright-checks/reference
 - /detect/synthetic-monitoring/playwright-checks/add-to-group
-- /detect/synthetic-monitoring/playwright-checks/custom-dependencies
+- /detect/synthetic-monitoring/playwright-checks/dependencies
 
 ### Detect - Testing
 - /detect/testing/overview

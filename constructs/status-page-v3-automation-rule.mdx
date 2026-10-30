@@ -52,6 +52,7 @@ A failing check matches this rule when it, or its group, carries any of these ta
 
 **Usage:**
 
+{/* typecheck-wrap: StatusPageV3AutomationRule */}
 ```ts highlight={4}
 new StatusPageV3AutomationRule("api-outage-rule", {
   statusPage,
@@ -71,7 +72,7 @@ Body of the status update that resolves the incident.
 </ResponseField>
 
 <ResponseField name="components" type="array" required>
-The components an automated incident impacts, with the impact each one gets.
+The components an automated incident impacts, with the impact each one gets. The components must belong to the rule's status page.
 
 **Parameters:**
 
@@ -87,6 +88,7 @@ The impact set on the component while the incident is open: `'UNDER_MAINTENANCE'
 
 **Usage:**
 
+{/* typecheck-wrap: StatusPageV3AutomationRule */}
 ```ts highlight={5-8}
 new StatusPageV3AutomationRule("api-outage-rule", {
   statusPage,
@@ -111,7 +113,7 @@ Whether subscribers are notified of the automated updates.
 </ResponseField>
 
 <ResponseField name="coolDownMinutes" type="number" default="5">
-Minimum minutes after an automated incident before this rule may open the next one. `0` disables the cool down.
+Minimum minutes after an automated incident before this rule may open the next one. Must be a non-negative integer. `0` disables the cool down.
 </ResponseField>
 
 <Info>

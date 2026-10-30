@@ -1,14 +1,23 @@
 ---
-title: 'Exporting Traces to Honeycomb'
-description: 'Learn how to export traces from Checkly to Honeycomb.'
+title: 'Export traces to Honeycomb'
+description: 'Send Checkly traces to Honeycomb with an Ingest API key.'
 sidebarTitle: 'Honeycomb'
 canonical: 'https://www.checklyhq.com/docs/integrations/observability/traces/honeycomb/'
 ---
 
+Before you start, read the prerequisites on the [OTLP export page](/integrations/observability/traces/otlp) and check [what is sent](/integrations/observability/traces/otlp#what-is-sent).
+This page only covers the values Honeycomb needs.
 
-1. Grab the relevant API endpoint from [the Honeycomb documentation](https://docs.honeycomb.io/send-data/opentelemetry/#using-the-honeycomb-opentelemetry-endpoint). It should look like `https://api.honeycomb.io/v1/traces`.
-2. Grab your Honeycomb Ingest API key from the **Account** > **Team settings** > **Environments and API keys** section.
-3. Add the endpoint the Checkly integration settings and provide the API key as an HTTP header `x-honeycomb-team` with
-   the value of your API key.
+1. Get the endpoint for your Honeycomb region. US is `https://api.honeycomb.io/v1/traces` and EU is `https://api.eu1.honeycomb.io/v1/traces`.
+2. Get the key. In Honeycomb, select **Environments** > **Manage Environments**, open your environment, then go to **API Keys** > **Ingest** and select **Create Ingest API Key**. Copy the key.
+3. Paste the values into Checkly. On the [Traces settings page](https://app.checklyhq.com/settings/account/traces), turn on **Enable exporting traces**, paste the URL, and add the header from the table below.
+4. Find the spans. In Honeycomb, open the environment you used. The spans appear under service `checkly`. To see failed runs, filter on the attribute `checkly.check.status` with the value `FAILED`.
 
+| Header name | Value |
+|---|---|
+| `x-honeycomb-team` | `<Ingest API key>` |
 
+Only Honeycomb Classic also needs an `x-honeycomb-dataset` header row. Environment keys do not.
+
+Honeycomb documents the endpoints in [Send data with OpenTelemetry](https://docs.honeycomb.io/send-data/opentelemetry/).
+The [OTLP export page](/integrations/observability/traces/otlp) has the span schema.

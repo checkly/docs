@@ -1,15 +1,23 @@
 ---
-title: 'Exporting Traces to New Relic'
-description: 'Learn how to export traces from Checkly to New Relic.'
+title: 'Export traces to New Relic'
+description: 'Send Checkly traces to New Relic with an Ingest - License key.'
 sidebarTitle: 'New Relic'
 canonical: 'https://www.checklyhq.com/docs/integrations/observability/traces/new-relic/'
 ---
 
-1. Make sure you have the **Traces** feature enabled in your New Relic account.
-2. Create an *Ingest - License* type API key in the **Administration** > **API keys** section.
-3. Grab the right endpoint URL for your New Relic account. It should look like `https://otlp.nr-data.net/v1/traces`.
-   Check [the full list of all New Relic OTel endpoints](https://docs.newrelic.com/docs/more-integrations/open-source-telemetry-integrations/opentelemetry/get-started/opentelemetry-set-up-your-app/#ports-and-endpoints).
-4. Add the endpoint and the API key to the Checkly integration settings. The API key is added as an HTTP header named
-   `api-key` with the value of your API key.
+Before you start, read the prerequisites on the [OTLP export page](/integrations/observability/traces/otlp) and check [what is sent](/integrations/observability/traces/otlp#what-is-sent).
+This page only covers the values New Relic needs.
 
-Find all the details in the [New Relic OpenTelemetry documentation](https://docs.newrelic.com/docs/more-integrations/open-source-telemetry-integrations/opentelemetry/get-started/opentelemetry-set-up-your-app/).
+1. Get the endpoint for your New Relic region. US is `https://otlp.nr-data.net/v1/traces`, EU is `https://otlp.eu01.nr-data.net/v1/traces`, JP is `https://otlp.jp.nr-data.net/v1/traces` and FedRAMP is `https://gov-otlp.nr-data.net/v1/traces`.
+2. Get the key. In New Relic, go to **Administration** > **API Keys**, create a key, and set the key type to **Ingest - License**. Copy the key.
+3. Paste the values into Checkly. On the [Traces settings page](https://app.checklyhq.com/settings/account/traces), turn on **Enable exporting traces**, paste the URL, and add the header from the table below.
+4. Find the spans. In New Relic, the spans appear under service `checkly`. To see failed runs, filter on the attribute `checkly.check.status` with the value `FAILED`.
+
+| Header name | Value |
+|---|---|
+| `api-key` | `<Ingest - License key>` |
+
+New Relic limits each request to 1 MB.
+
+New Relic documents the endpoints in its [OTLP best practices](https://docs.newrelic.com/docs/opentelemetry/best-practices/opentelemetry-otlp/).
+The [OTLP export page](/integrations/observability/traces/otlp) has the span schema.

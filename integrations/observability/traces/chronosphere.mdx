@@ -1,15 +1,23 @@
 ---
-title: 'Exporting Traces to Chronosphere'
-description: 'Learn how to export traces from Checkly to Chronosphere.'
+title: 'Export traces to Chronosphere'
+description: 'Send Checkly traces to Chronosphere with a restricted service account token.'
 sidebarTitle: 'Chronosphere'
 canonical: 'https://www.checklyhq.com/docs/integrations/observability/traces/chronosphere/'
 ---
 
+Before you start, read the prerequisites on the [OTLP export page](/integrations/observability/traces/otlp) and check [what is sent](/integrations/observability/traces/otlp#what-is-sent).
+This page only covers the values Chronosphere needs.
 
+Chronosphere is now Palo Alto Networks Cortex XCOR. The endpoint host is still `<instance>.chronosphere.io` and its documentation lives at docs-xcor.paloaltonetworks.com.
 
-1. Create a service account in your Chronosphere account with write permissions for traces. Chronosphere recommends creating a restricted service account with a write-only scope.
-2. Generate an API token for the service account from the **Account** > **Service Accounts** section.
-3. Determine your Chronosphere OTLP endpoint. It should follow the format: `https://YOUR_COMPANY.chronosphere.io/data/opentelemetry/v1/traces` where `YOUR_COMPANY` is your organization name.
-4. Add the endpoint to the Checkly integration settings and provide the API token as an HTTP header `API-Token` with the value of your API token.
+1. Get the endpoint. It is `https://<instance>.chronosphere.io/data/opentelemetry/v1/traces`.
+2. Get the key. In Chronosphere, go to the admin view, then **Platform** > **Service Accounts**, and add a service account. Make it restricted and write-only. Copy the token right away, because Chronosphere shows it once.
+3. Paste the values into Checkly. On the [Traces settings page](https://app.checklyhq.com/settings/account/traces), turn on **Enable exporting traces**, paste the URL, and add the header from the table below.
+4. Find the spans. In Chronosphere, the spans appear under service `checkly`. To see failed runs, filter on the attribute `checkly.check.status` with the value `FAILED`.
 
-Find all the details in the [Chronosphere OpenTelemetry documentation](https://docs.chronosphere.io/ingest/metrics-traces/otel/otlp-endpoints).
+| Header name | Value |
+|---|---|
+| `API-Token` | `<service account token>` |
+
+Chronosphere documents the endpoint in [OTLP endpoints](https://docs-xcor.paloaltonetworks.com/ingest/metrics-traces/otel/otlp-endpoints).
+The [OTLP export page](/integrations/observability/traces/otlp) has the span schema.

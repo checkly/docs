@@ -103,3 +103,427 @@ header button[aria-label="More actions"]::after {
   height: 44px;
   transform: translate(-50%, -50%);
 }
+
+/* Docs homepage (index.mdx, mode: frame). Frame mode ships no default
+   typography, so the layout is styled here rather than with Tailwind
+   utilities (see the sign-up CTA note above). Colors follow the marketing
+   site: checkly-blue #0075FF, checkly-deep-blue #041734. Type sizes and
+   line heights match Aspen article titles, body copy, and cards. */
+.home {
+  --home-blue: #0075ff;
+  --home-line: rgba(128, 128, 128, 0.2);
+  --home-muted: #52525b;
+  --home-text: #18181b;
+  --home-surface: #fff;
+  --home-surface-muted: #fafafa;
+  width: 100%;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 5rem;
+  color: var(--home-text);
+  font-size: 1rem;
+  line-height: 1.75rem;
+}
+
+.dark .home {
+  --home-blue: #2b8aff;
+  --home-line: rgba(255, 255, 255, 0.12);
+  --home-muted: #a1a1aa;
+  --home-text: #f4f4f5;
+  --home-surface: #0b0f17;
+  --home-surface-muted: #10151f;
+}
+
+.home a {
+  text-decoration: none;
+}
+
+.home code {
+  font-size: 0.85em;
+}
+
+/* Hero */
+.home-hero {
+  padding: 1.5rem 0 2.5rem;
+}
+
+.home-title {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin: 0 0 0.75rem;
+  color: var(--home-text);
+}
+
+.home-subtitle {
+  max-width: 36rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  color: var(--home-muted);
+  margin: 0;
+}
+
+.home-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.home-hero-hint {
+  flex-basis: 100%;
+  font-size: 0.875rem;
+  color: var(--home-muted);
+  line-height: 1.25rem;
+}
+
+/* Marketing .button / .button-sm styles, adapted to the docs theme. */
+.home-button,
+.home-tab-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  border: 1px solid #041734;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  background: #041734;
+  color: #fff !important;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.home-button-secondary,
+.home-tab-cta {
+  background: transparent;
+  color: #041734 !important;
+}
+
+.dark .home-button,
+.dark .home-tab-cta {
+  border-color: #fff;
+  background: #fff;
+  color: #041734 !important;
+}
+
+.dark .home-button-secondary,
+.dark .home-tab-cta {
+  background: transparent;
+  color: #fff !important;
+}
+
+.home-button:hover,
+.home-tab-links .home-tab-cta:hover {
+  background: #002652;
+  color: #fff !important;
+}
+
+.home-button:active,
+.home-tab-links .home-tab-cta:active {
+  background: #001b3d;
+  transform: scale(0.97);
+  transition-duration: 0.1s;
+}
+
+.home-button:focus-visible,
+.home-tab-cta:focus-visible {
+  outline: 2px solid var(--home-blue);
+  outline-offset: 3px;
+}
+
+/* Sections */
+.home-section {
+  padding: 2.5rem 0;
+}
+
+.home-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.home-heading {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin: 0 0 0.375rem;
+  color: var(--home-text);
+}
+
+.home-lead {
+  max-width: 44rem;
+  font-size: 1rem;
+  line-height: 1.75rem;
+  color: var(--home-muted);
+  margin: 0;
+}
+
+.home-section-link {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--home-blue) !important;
+  white-space: nowrap;
+  line-height: 1.25rem;
+}
+
+.home-eyebrow {
+  margin: 1.75rem 0 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--home-muted);
+  line-height: 1rem;
+}
+
+.home-eyebrow:first-of-type {
+  margin-top: 0;
+}
+
+/* Product tabs */
+.home-tab {
+  padding: 1.25rem 1.25rem 1.5rem;
+  border: 1px solid var(--home-line);
+  border-radius: 0.5rem;
+  background: var(--home-surface-muted);
+}
+
+.home-tab-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--home-text);
+  line-height: 1.5rem;
+}
+
+.home-tab-title svg {
+  color: var(--home-blue);
+}
+
+.home-tab-text {
+  max-width: 44rem;
+  margin: 0.5rem 0 1rem;
+  font-size: 1rem;
+  line-height: 1.75rem;
+  color: var(--home-muted);
+}
+
+.home-tab-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.home-tab-links a {
+  color: var(--home-muted);
+}
+
+.home-tab-links a:hover {
+  color: var(--home-text);
+}
+
+/* Card grids. 1px gaps over the line color draw the Cloudflare-style
+   shared borders without doubling them up. */
+.home-grid,
+.home-news {
+  display: grid;
+  gap: 1px;
+  padding: 1px;
+  border-radius: 0.5rem;
+  background: var(--home-line);
+  overflow: hidden;
+}
+
+.home-grid {
+  grid-template-columns: 1fr;
+}
+
+.home-news {
+  grid-template-columns: 1fr;
+}
+
+.home-feature,
+.home-news-card,
+.home-connect-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  background: var(--home-surface);
+  color: var(--home-text) !important;
+  transition: background-color 0.15s ease;
+}
+
+.home-feature:hover,
+.home-news-card:hover {
+  background: var(--home-surface-muted);
+}
+
+.home-news-featured {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  grid-row: span 2;
+}
+
+.home-news-featured .home-news-text {
+  padding-bottom: 10rem;
+}
+
+/* Reuse the marketing site's wave artwork beneath the featured update. */
+.home-news-waves {
+  position: absolute;
+  z-index: -1;
+  bottom: 2.5rem;
+  left: 50%;
+  width: auto;
+  max-width: none;
+  height: 10rem;
+  margin: 0;
+  transform: translateX(-50%);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.home-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--home-blue);
+  line-height: 1rem;
+}
+
+.home-news-title,
+.home-feature-title {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+  color: var(--home-text);
+}
+
+.home-news-text,
+.home-feature-text {
+  flex: 1;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  color: var(--home-muted);
+}
+
+.home-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--home-text);
+  line-height: 1.25rem;
+}
+
+.home-card-link svg {
+  color: var(--home-blue);
+}
+
+/* Monitoring use cases */
+.home-monitoring-group {
+  padding: 1.25rem;
+  background: var(--home-surface);
+}
+
+.home-monitoring-group h3 {
+  margin: 0 0 0.75rem;
+}
+
+.home-monitoring-group ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.home-monitoring-group a {
+  color: var(--home-text);
+}
+
+.home-monitoring-group a:hover {
+  color: var(--home-blue);
+}
+
+/* Connect */
+.home-connect-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+}
+
+.home-connect-links a {
+  color: var(--home-text);
+}
+
+.home-connect-links a:hover {
+  color: var(--home-blue);
+}
+
+@media (min-width: 640px) {
+  .home-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .home-news {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 639px) {
+  .home-title {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+
+  .home-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .home-news-featured {
+    grid-row: auto;
+    padding-bottom: 7.5rem;
+  }
+
+  .home-news-featured .home-news-text {
+    padding-bottom: 0;
+  }
+
+  .home-news-waves {
+    bottom: -1rem;
+    height: 8rem;
+  }
+}

@@ -22,7 +22,7 @@ npx checkly test [arguments] [options]
 | Option | Required | Description |
 |--------|----------|-------------|
 | `--config, -c` | - | The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts\|js` file in the current directory. |
-| `--detach, -d` | - | Keep checks running in the cloud when you stop the CLI with Ctrl+C, instead of cancelling the run. |
+| `--detach, -d` | - | Start the checks in the cloud and exit after printing the test session ID, without waiting for results. |
 | `--env, -e` | - | Env vars to be passed to the test run. Can be used multiple times. |
 | `--env-file` | - | dotenv file path to be passed. For example `--env-file="./.env"` |
 | `--[no-]fail-on-no-matching` | - | Exit with a failing status code when there are no matching checks. Enabled by default. |
@@ -59,7 +59,7 @@ npx checkly test -c="./checkly.staging.config.ts"
 
 <ResponseField name="--detach, -d" type="boolean" default="false">
 
-By default, pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> during a recorded run cancels the test session. With `--detach`, <kbd>Ctrl</kbd>+<kbd>C</kbd> exits the CLI immediately instead, leaving the checks running in the cloud.
+Start the checks in the cloud and exit as soon as they're scheduled. The CLI prints the test session ID and doesn't wait for results. Get the results later with `checkly test-sessions get <test-session-id>`. `--detach` can't be combined with the `json` or `github` reporters.
 
 **Usage:**
 
@@ -146,7 +146,7 @@ npx checkly test -g="^production-.*"
 
 <ResponseField name="--location, -l" type="string">
 
-The location to run the checks at.
+The location to run the checks at. Defaults to [the `cli.runLocation` in your config](/constructs/project#param-cli).
 
 **Usage:**
 
@@ -187,7 +187,7 @@ npx checkly test --retries=2 --max-failures=3
 
 <ResponseField name="--private-location" type="string">
 
-The private location to run checks at.
+The slug name of the private location to run checks at. Can't be combined with `--location`.
 
 **Usage:**
 
@@ -470,7 +470,7 @@ npx checkly test --env ENVIRONMENT_URL="https://preview.acme.com" --env PASSWORD
 
 The CLI keeps running after the first <kbd>Ctrl</kbd>+<kbd>C</kbd> to report the cancelled results. Press <kbd>Ctrl</kbd>+<kbd>C</kbd> again to exit immediately without waiting.
 
-Pass the `--detach` flag to keep the checks running in the cloud instead — <kbd>Ctrl</kbd>+<kbd>C</kbd> then exits the CLI immediately without cancelling.
+To start checks without waiting for them, use `--detach`. The CLI then exits as soon as the checks are scheduled, and the checks keep running in the cloud.
 
 See [Cancellation](/concepts/cancellation) for the full flow.
 

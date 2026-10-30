@@ -2,6 +2,7 @@
 title: 'Creating a Playwright Check Suite'
 description: 'Turn your Playwright tests into production monitors by creating a checkly.config.ts file'
 sidebarTitle: 'Quickstart'
+canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/playwright-checks/quickstart/'
 ---
 
 import { CopyPromptButton } from "/snippets/copy-prompt-button.jsx";
@@ -95,8 +96,11 @@ Each entry in the `playwrightChecks` array becomes a separate monitor. Use `pwPr
 
 This example creates two check suites — one for critical flows running every 5 minutes, and one for secondary features at a lower frequency:
 
+{/* typecheck-wrap */}
 ```typescript checkly.config.ts
 export default defineConfig({
+  projectName: 'My Project',
+  logicalId: 'my-project',
   // ... config from above
 
   checks: {

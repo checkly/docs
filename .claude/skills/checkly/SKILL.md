@@ -32,7 +32,7 @@ Run `npx checkly skills manage` for the full reference.
 
 ## Confirmation Protocol
 
-Write commands (e.g. `incidents create`, `deploy`, `destroy`) return exit code 2 with a `confirmation_required` JSON envelope instead of executing. **Always present the `changes` to the user and wait for approval before running the `confirmCommand`.** Never auto-append `--force`. This applies to every write command individually — updates and resolutions need confirmation too, not just the initial create.
+Write commands (e.g. `incidents create`, `deploy`, `destroy`) return exit code 3 (2 before CLI version 10) with a `confirmation_required` JSON envelope instead of executing. **Always present the `changes` to the user and wait for approval before running the `confirmCommand`.** Never auto-append `--force`. This applies to every write command individually — updates and resolutions need confirmation too, not just the initial create.
 
 Run `npx checkly skills communicate` for the full protocol details.
 

@@ -61,6 +61,16 @@
 - Alt text on all images
 - Relative paths for internal links
 
+## Casing and terminology
+CI blocks a PR when a line it adds or changes breaks these rules. Run `npm run lint:casing` before you push (it needs [Vale](https://vale.sh/docs/install)); `npm run lint:casing -- --all <file.mdx>` checks whole files.
+
+- **Headings and titles use sentence case:** capitalize the first word and names only. This covers Markdown headings, frontmatter `title` and `sidebarTitle`, and `title="…"` on Card, Step, Tab, Accordion, Expandable and Update. Acronyms (API, RCA) and mixed-case names (gRPC, OpenTelemetry) are fine. Other names that keep their capitals are listed in `styles/Checkly/proper-nouns.txt`; add a new name there in the same PR.
+- **Check and monitor types:** capitalize the type, lowercase the generic noun: Browser check, API check, Multistep check, URL monitor, TCP monitor, DNS monitor, ICMP monitor, SSL monitor, gRPC monitor, Traceroute monitor, Heartbeat monitor. Keep "Playwright Check Suite" and "Agentic Check" as they are (product names).
+- **Checkly features:** lowercase a single instance ("a status page", "each private location", "your alert channel"). Capitalize only when the text names the feature itself ("Keep your customers informed with Status Pages"). When in doubt, lowercase.
+- **Third-party names:** official casing, such as GitHub, GitLab, JavaScript, TypeScript, Node.js, OpenTelemetry, Opsgenie, PagerDuty, HashiCorp, Microsoft Teams.
+- **Never change** code, commands, URLs, file paths, construct names (`BrowserCheck`) or UI labels quoted exactly as the app shows them (in **bold** or quotes). The check skips those too.
+- The rules live in `styles/Checkly/` (Vale) and `.github/scripts/check-casing.mjs`.
+
 ## Component usage rules
 - Use Steps component for sequential procedures sparingly.
 - Don't use Cards to display information. Only for navigation on Overview type pages

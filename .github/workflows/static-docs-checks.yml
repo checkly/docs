@@ -132,6 +132,20 @@ jobs:
             exit 1
           fi
 
+      # Blocks casing mistakes in the lines this PR adds or changes: headings
+      # and titles in sentence case, check and monitor types ("Browser check",
+      # "URL monitor"), third-party names, single feature instances. Existing
+      # text elsewhere in a file never fails the check. Rules: AGENTS.md,
+      # "Casing and terminology"; run locally with `npm run lint:casing`.
+      - name: Casing check
+        if: steps.detect.outputs.docs_changed == 'true'
+        env:
+          VALE_VERSION: '3.25.1'
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          curl -sSfL "https://github.com/errata-ai/vale/releases/download/v${VALE_VERSION}/vale_${VALE_VERSION}_Linux_64-bit.tar.gz" | tar -xz -C "$RUNNER_TEMP" vale
+          PATH="$RUNNER_TEMP:$PATH" node .github/scripts/check-casing.mjs --base "$BASE_SHA"
+
       - name: Broken-links scan
         if: steps.detect.outputs.docs_changed == 'true'
         run: |

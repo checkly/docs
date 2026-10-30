@@ -3,6 +3,7 @@ title: Playwright Reporter Changelog
 sidebarTitle: Reporter Changelog
 description: Release history for the Checkly Playwright Reporter
 rss: true
+canonical: 'https://www.checklyhq.com/docs/detect/testing/playwright-reporter-changelog/'
 ---
 
 View your test sessions at [app.checklyhq.com/test-sessions](https://app.checklyhq.com/test-sessions).
@@ -12,6 +13,43 @@ Learn more about:
 - [Configuration options](/detect/testing/playwright-reporter#configuration)
 
 ## Full release history
+
+<Update label="v1.14.0" tags={["October 2026"]}>
+  **Added**
+
+  - **Web vitals:** Set `webVitals: true` to collect Core Web Vitals (LCP, CLS, INP, FCP, TTFB and TBT) from your tests. Checkly test sessions show them.
+  - **Uploading traces that can't be scrubbed:** Set `scrubbing.unscrubbableTraces` to `'upload'` to upload them as recorded.
+
+  **Changed**
+
+  - **Playwright compatibility:** The reporter is tested with Playwright 1.40 to 1.64.1.
+  - **Smaller traces:** Scrubbed traces are smaller.
+
+  **Fixed**
+
+  - **Secret scrubbing in traces:** Secrets are now removed from page text, JSON values, headers, cookies and storage state in traces.
+  - **Traces that can't be scrubbed:** These traces are no longer uploaded.
+  - **Playwright 1.63 and 1.64:** Trace screenshots, test source code and step subtitles now work with these versions.
+  - **Local report file:** `checkly-report.json` no longer contains unscrubbed values.
+
+  **Security**
+
+  - **Dependencies:** The reporter's dependencies no longer have the advisories that `npm audit` reports for 1.13.2.
+
+  The full list of changes is in `CHANGELOG.md` in the [npm package](https://www.npmjs.com/package/@checkly/playwright-reporter?activeTab=code).
+</Update>
+
+<Update label="v1.13.2" tags={["June 2026"]}>
+  **Fixed**
+
+  - **Traces and attachments with a custom `outputDir`** — Fixed a regression in 1.13.1 where traces, videos, and screenshots stored under a custom Playwright `outputDir` could be listed but not opened, leaving View Trace greyed out in test sessions.
+</Update>
+
+<Update label="v1.13.1" tags={["June 2026"]}>
+  **Fixed**
+
+  - **Attachments with a custom `outputDir`** — Traces and other attachments stored under a custom Playwright `outputDir` were not linked in test sessions, leaving View Trace greyed out.
+</Update>
 
 <Update label="v1.13.0" tags={["May 2026"]}>
   **Added**

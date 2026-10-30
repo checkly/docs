@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+/**
+ * Generates a custom sitemap.xml that OVERRIDES Mintlify's auto-generated one.
+ *
+ * Why: Mintlify serves and canonicalizes docs URLs without a trailing slash,
+ * but the site actually serves — and Google indexes — the trailing-slash form
+ * (and every page now declares a trailing-slash canonical). This emits a sitemap
+ * whose <loc>s match that trailing-slash form, so canonical + sitemap + served
+ * URL all agree.
+ *
+ * Source of truth: the docs.json navigation (exactly the pages Mintlify indexes).
+ * Output: sitemap.xml at the repo root, which Mintlify serves in place of its
+ * auto-generated file (https://www.mintlify.com/docs/optimize/seo).
+ *
+ * NOTE: this script lives under .github/ on purpose — Mintlify does not build
+ * the .github tree, so a stray .mjs here can never break the docs build (a root
+ * scripts/*.mjs previously did).
+ *
+ * Run:  npm run generate-sitemap
+ * CI (static-docs-checks) regenerates and fails if the committed file drifts.
+ */
+import { writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { dirname, join } from 'node:path'
+import { getNavigationPages } from './api-navigation.mjs'
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
+const BASE = 'https://www.checklyhq.com/docs/'
+
+const slugs = new Set(getNavigationPages(ROOT).map((page) => page.slug))
+
+// The docs home (index.mdx) is served at /docs/ but is not a nav slug, so add
+// it explicitly — otherwise the homepage is missing from the sitemap.
+const locs = [BASE, ...[...slugs].sort().map((slug) => `${BASE}${slug}/`)]
+const urls = locs
+  .map((loc) => `  <url>\n    <loc>${loc}</loc>\n  </url>`)
+  .join('\n')
+
+const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>
+`
+
+writeFileSync(join(ROOT, 'sitemap.xml'), xml)
+console.log(`Wrote sitemap.xml with ${locs.length} trailing-slash URLs (incl. home)`)

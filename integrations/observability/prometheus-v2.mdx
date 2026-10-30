@@ -2,6 +2,7 @@
 title: 'Exporting Metrics & Data via Prometheus V2'
 description: 'Export Checkly monitoring data to Prometheus for advanced metrics analysis and Grafana dashboards'
 sidebarTitle: 'Prometheus V2'
+canonical: 'https://www.checklyhq.com/docs/integrations/observability/prometheus-v2/'
 ---
 <Info>
 This page describes a new V2 version of the Prometheus exporter. For information about the old Prometheus exporter, see the [Prometheus V1 docs](/integrations/observability/prometheus).
@@ -14,7 +15,7 @@ for dashboarding, you can expose Checkly's core metrics on a dedicated, secured 
 
 Activating this integration is simple.
 
-1. Navigate to the <a href="https://app.checklyhq.com/settings/account/integrations" target="_blank">integrations</a> tab on the account screen and click the 'Create Prometheus endpoint' button.
+1. Open **Account settings** from the left sidebar, then select **Integrations** (or go directly to the <a href="https://app.checklyhq.com/settings/account/integrations" target="_blank">Integrations page</a>) and click the **Create Prometheus endpoint** button.
 ![Prometheus integration step 1](/images/docs/images/integrations/prometheus_step1.png)
 
 2. We directly create an endpoint for you and provide its URL and the required Bearer token.
@@ -65,12 +66,26 @@ The following metrics are available to monitor checks:
 | `checkly_browser_check_errors` | Histogram | The errors encountered during a full browser session. |
 | `checkly_api_check_timing_seconds` | Histogram | The response time for the API request, as well as the duration of the different phases. |
 | `checkly_url_monitor_timing_seconds` | Histogram | The response time for the HTTP request, as well as the duration of the different phases. |
+| `checkly_check_http_status_code` | Gauge | The HTTP status code returned on the latest run of an API check or URL monitor. |
 | `checkly_tcp_monitor_timing_seconds` | Histogram | The response time for the TCP request, as well as the duration of the different phases. |
 | `checkly_tcp_check_timing_seconds` | Histogram | **Deprecated:** use `checkly_tcp_monitor_timing_seconds` instead. Emits identical values. |
 | `checkly_icmp_monitor_timing_seconds` | Histogram | The timing phases of the ICMP monitor, including DNS resolution and latency measurements (avg, min, max). |
 | `checkly_icmp_monitor_packet_loss_ratio` | Gauge | The average packet loss ratio (0-1) for the ICMP monitor. |
 | `checkly_dns_monitor_timing_seconds` | Histogram | The total duration of the DNS monitor. |
+| `checkly_grpc_monitor_timing_seconds` | Histogram | The timing phases of the gRPC monitor, including DNS resolution, connection, and total RPC duration. |
+| `checkly_grpc_monitor_status_code` | Gauge | The gRPC status code returned on the latest run (`0` = OK). |
+| `checkly_traceroute_monitor_timing_seconds` | Histogram | The timing phases of the traceroute monitor, including DNS resolution and final hop latency. |
+| `checkly_traceroute_monitor_hops` | Gauge | The total number of hops for the traceroute monitor. |
+| `checkly_traceroute_monitor_destination_reached` | Gauge | Whether the traceroute reached its destination on the latest run (`1`) or not (`0`). |
+| `checkly_ssl_monitor_days_until_expiry` | Gauge | The average days remaining until the certificate checked by the SSL monitor expires, over the current scrape window. |
+| `checkly_ssl_monitor_handshake_seconds` | Histogram | The TLS handshake duration of the SSL monitor. |
+| `checkly_ssl_monitor_chain_trusted` | Gauge | Whether the certificate chain was trusted on the latest run (`1`) or not (`0`). |
+| `checkly_ssl_monitor_hostname_verified` | Gauge | Whether the certificate hostname was verified on the latest run (`1`) or not (`0`). |
+| `checkly_ssl_monitor_ocsp_stapled` | Gauge | Whether an OCSP staple was present on the latest run (`1`) or not (`0`). |
+| `checkly_ssl_monitor_key_size_bits` | Gauge | The size in bits of the leaf certificate key seen on the latest run. |
+| `checkly_ssl_monitor_info` | Gauge | Always `1`. Carries the latest negotiated TLS attributes (version, cipher suite) and the baseline assessment (verdict, grade) as labels. |
 | `checkly_multistep_check_duration_seconds` | Histogram | The total check duration. This includes all requests done and any waits. |
+| `checkly_playwright_check_duration_seconds` | Histogram | The total duration of the Playwright Check Suite. |
 | `checkly_heartbeat_last_success_timestamp_seconds` | Gauge | The Unix timestamp of the last successful heartbeat ping. A value of `0` means no successful ping has ever been received. |
 | `checkly_heartbeat_expected_interval_seconds` | Gauge | The configured maximum interval between heartbeat pings, in seconds. Derived from the heartbeat monitor's period and period unit settings. |
 | `checkly_time_to_ssl_expiry_seconds` | Gauge | The amount of time remaining before the SSL certificate of the monitored domain expires. See the [SSL certificate expiration docs](/communicate/alerts/ssl-expiration) for more information on monitoring SSL certificates with checks. |
@@ -102,7 +117,7 @@ In addition, the check metrics all contain the following labels:
 |-------|-------------|
 | `name` | The name of the check. |
 | `check_id` | The unique UUID of the check. |
-| `check_type` | The type of check: `api`, `browser`, `multi_step`, `playwright`, `heartbeat`, `tcp`, `icmp`, `dns`, `url`. |
+| `check_type` | The type of check: `api`, `browser`, `multi_step`, `playwright`, `heartbeat`, `tcp`, `icmp`, `dns`, `url`, `grpc`, `traceroute`, `ssl`. |
 | `muted` | Whether the check is muted, configured to not send alerts. |
 | `activated` | Whether the check is activated. Deactivated checks aren't be run. |
 | `group` | The name of the check group. |
@@ -245,7 +260,7 @@ The following metrics are available to monitor Private Locations:
 | `checkly_private_location_oldest_scheduled_check_run` | Gauge | The age in seconds of the oldest check run job scheduled to the Private Location queue. A high value indicates that checks are becoming backlogged. |
 | `checkly_private_location_queue_duration_ms` | Gauge | The scheduling delay in milliseconds for check runs routed through a Private Location, by queue and `stat`. Derived from the last 2 minutes of check run data. Used to evaluate whether sufficient agent capacity is provisioned for the Private Location. |
 | `checkly_private_location_agent_count` | Gauge | The number of agents connected for the Private Location. |
-| `checkly_private_location_check_runs` | Gauge | The count of check runs in the Private Location, broken down by lifecycle state via the `state` label. Used as the signal for [autoscaling Checkly Agents](/platform/private-locations/autoscaling). |
+| `checkly_private_location_check_runs` | Gauge | The count of check runs in the Private Location, broken down by lifecycle state via the `state` label and by routing queue via the `queue` label. Used as the signal for [autoscaling Checkly Agents](/platform/private-locations/autoscaling). |
 
 The Private Location metrics all contain the following labels:
 
@@ -255,7 +270,7 @@ The Private Location metrics all contain the following labels:
 | `private_location_slug_name` | the Private Location's human readable unique identifier. |
 | `private_location_id` | the Private Location's UUID. |
 
-`checkly_private_location_check_runs` additionally carries a `state` label. The values relevant for autoscaling are:
+`checkly_private_location_check_runs` additionally carries a `queue` label (`uptime` or `main`) and a `state` label. The `state` values relevant for autoscaling are:
 
 - `queued` — the check run has been scheduled but not yet picked up by an agent.
 - `inflight` — the check run is currently being executed by an agent.

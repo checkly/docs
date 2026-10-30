@@ -65,6 +65,7 @@ Creates an alert escalation policy that triggers after a specified number of con
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts
 AlertEscalationBuilder.runBasedEscalation(
   failedRuns,
@@ -85,6 +86,7 @@ AlertEscalationBuilder.runBasedEscalation(
 
 <CodeGroup>
 
+{/* typecheck-wrap */}
 ```ts Immediate Alert
 // Alert immediately on first failure
 const immediateAlert = AlertEscalationBuilder.runBasedEscalation(
@@ -102,6 +104,7 @@ new ApiCheck("critical-service-check", {
 })
 ```
 
+{/* typecheck-wrap */}
 ```ts Conservative Alert
 // Wait for multiple failures before alerting
 const conservativeAlert = AlertEscalationBuilder.runBasedEscalation(
@@ -133,6 +136,7 @@ Creates an alert escalation policy that triggers after a specified duration of c
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts
 AlertEscalationBuilder.timeBasedEscalation(
   minutesFailing,
@@ -153,6 +157,7 @@ AlertEscalationBuilder.timeBasedEscalation(
 
 <CodeGroup>
 
+{/* typecheck-wrap */}
 ```ts Alert after 15 minutes
 // Wait for batch jobs or slow services
 const timeBasedAlert = AlertEscalationBuilder.timeBasedEscalation(
@@ -252,6 +257,7 @@ parallelRunFailureThreshold: {
 
 <CodeGroup>
 
+{/* typecheck-wrap */}
 ```ts Regional Redundancy
 // Only alert if majority of regions fail
 const regionalAlert = AlertEscalationBuilder.runBasedEscalation(
@@ -272,6 +278,7 @@ new ApiCheck("global-service-check", {
 })
 ```
 
+{/* typecheck-wrap */}
 ```ts CDN Monitoring
 // Alert if 10% of CDN edges are failing
 const cdnAlert = AlertEscalationBuilder.runBasedEscalation(

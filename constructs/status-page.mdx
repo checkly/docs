@@ -86,7 +86,7 @@ new StatusPage("acme-status", {
 |-----------|------|----------|---------|-------------|
 | `name` | `string` | ✅ | - | Name of the status page |
 | `cards` | `StatusPageCardProps[]` | ✅ | - | Array of card objects containing services |
-| `url` | `string` | ✅ | - | Subdomain under `checkly-status-page.com` (unique across all accounts) |
+| `url` | `string` | ✅ | - | Subdomain under `checkly-status-page.com` (unique across all accounts). Letters, numbers and dashes only |
 | `customDomain` | `string` | ❌ | - | Custom domain (e.g., `status.example.com`) |
 | `logo` | `string` | ❌ | - | URL to logo image for the header |
 | `redirectTo` | `string` | ❌ | - | URL to redirect when logo is clicked |
@@ -103,6 +103,7 @@ Name of the status page displayed in the header and browser title.
 
 **Usage:**
 
+{/* typecheck-wrap: StatusPage */}
 ```ts highlight={2}
 new StatusPage("company-status", {
   name: "Company Status Page",
@@ -119,6 +120,7 @@ Array of card objects that organize services into logical groups on the status p
 
 **Usage:**
 
+{/* typecheck-wrap: StatusPage */}
 ```ts highlight={3-8}
 new StatusPage("company-status", {
   name: "Company Status",
@@ -137,12 +139,13 @@ new StatusPage("company-status", {
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `name` | `string` | ✅ | Display name for the card |
-| `services` | `StatusPageService[]` | ✅ | Array of services to display on this card |
+| `services` | `StatusPageService[]` | ❌ | Array of services to display on this card |
 
 **Examples:**
 
 <CodeGroup>
 
+{/* typecheck-wrap: StatusPageService */}
 ```ts Functional Organization
 const webAppService = new StatusPageService("web-app", { name: "Web Application" })
 const mobileApiService = new StatusPageService("mobile-api", { name: "Mobile API" })
@@ -154,16 +157,17 @@ new StatusPage("functional-status", {
   cards: [
     {
       name: "User-Facing Services", // Customer impact grouped together
-      services: [webApp, mobileApi],
+      services: [webAppService, mobileApiService],
     },
     {
       name: "Infrastructure", // Backend services grouped
-      services: [database],
+      services: [databaseService],
     },
   ],
 })
 ```
 
+{/* typecheck-wrap: StatusPageService */}
 ```ts Team Organization
 const frontendAppService = new StatusPageService("frontend", { name: "Frontend App" })
 const backendApiService = new StatusPageService("backend", { name: "Backend API" })
@@ -175,11 +179,11 @@ new StatusPage("team-status", {
   cards: [
     {
       name: "Frontend Team", // Team-based grouping
-      services: [frontendApp],
+      services: [frontendAppService],
     },
     {
       name: "Backend Team",
-      services: [backendApi],
+      services: [backendApiService],
     },
     {
       name: "Platform Team",
@@ -189,6 +193,7 @@ new StatusPage("team-status", {
 })
 ```
 
+{/* typecheck-wrap: StatusPageService */}
 ```ts Priority Organization
 const coreApiService = new StatusPageService("core-api", { name: "Core API" })
 const authService = new StatusPageService("auth", { name: "Authentication" })
@@ -200,7 +205,7 @@ new StatusPage("priority-status", {
   cards: [
     {
       name: "Critical Services", // High-priority services
-      services: [coreApi, authService],
+      services: [coreApiService, authService],
     },
     {
       name: "Supporting Services", // Lower-priority services
@@ -238,10 +243,11 @@ Custom domain for your status page (e.g., `status.example.com`). Requires DNS co
 
 **Usage:**
 
+{/* typecheck-wrap: StatusPage */}
 ```ts highlight={4}
 new StatusPage("company-status", {
   name: "Company Status",
-  url: "status.example.com",
+  url: "company-status",
   customDomain: "status.example.com",
   /* More options... */
 })
@@ -256,6 +262,7 @@ URL to logo image displayed in the status page header. Must be publicly accessib
 
 **Usage:**
 
+{/* typecheck-wrap: StatusPage */}
 ```ts highlight={3}
 new StatusPage("company-status", {
   name: "Company Status",
@@ -272,6 +279,7 @@ URL to redirect users when they click the logo. Typically your main website or s
 
 **Usage:**
 
+{/* typecheck-wrap: StatusPage */}
 ```ts highlight={4}
 new StatusPage("company-status", {
   name: "Company Status",
@@ -290,6 +298,7 @@ URL to favicon image displayed in browser tabs. Must be publicly accessible.
 
 **Usage:**
 
+{/* typecheck-wrap: StatusPage */}
 ```ts highlight={3}
 new StatusPage("company-status", {
   name: "Company Status",
@@ -307,6 +316,7 @@ Default color theme for the status page. Options: 'LIGHT', 'DARK', or 'AUTO' (fo
 
 **Usage:**
 
+{/* typecheck-wrap: StatusPage */}
 ```ts highlight={3}
 new StatusPage("company-status", {
   name: "Company Status",
@@ -350,7 +360,7 @@ new StatusPage("saas-company-status", {
 new ApiCheck("web-api-check", {
   name: "Web API Check",
   request: {
-    url: "app.example.com/api/status",
+    url: "https://app.example.com/api/status",
     method: "GET",
   },
   // Trigger service incidents from your checks and monitors

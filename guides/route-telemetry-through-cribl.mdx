@@ -45,11 +45,11 @@ The agent does the Checkly and Collector steps below, in the open. The two Cribl
 
 ## Create a Raw HTTP Source in Cribl Stream
 
-1. Add a [**Raw HTTP/S** Source](https://docs.cribl.io/stream/sources-raw-http/), not the HTTP/S Bulk API Source.
+1. Under **Data** > **Sources**, add a [**Raw HTTP** Source](https://docs.cribl.io/stream/sources-raw-http/), not the **HTTP** Source.
 2. Set **Port** to one in `20000` to `20010`, here `20001`.
 3. In the server-side [TLS settings](https://docs.cribl.io/stream/securing-sources-destinations-tls/), turn on **Enabled** and set **Private key path** to `$CRIBL_CLOUD_KEY` and **Certificate path** to `$CRIBL_CLOUD_CRT`. Cribl.Cloud requires these paths on that port range.
-4. Under **Auth tokens**, select **Generate** for one **Token**. Clients send it as `Authorization: <token>` with no prefix.
-5. Turn on **Auto parse** so the JSON fields become event fields.
+4. Under **Auth tokens**, select **Add Token**, set **Authentication method** to **Manual** and select **Generate**. Clients send it as `Authorization: <token>` with no prefix.
+5. Under **Processing Settings** > **Pre-Processing**, turn on **Auto parse** so the JSON fields become event fields.
 6. Select **Save**, then **Commit & Deploy**.
 
 Keep the token as `<alerts-token>` and the address `https://default.main.<Org-ID>.cribl.cloud:20001`, where `default` is your Worker Group name and `<Org-ID>` is your **Organization ID**, shown under **Organization Details**.
@@ -59,7 +59,7 @@ Keep the token as `<alerts-token>` and the address `https://default.main.<Org-ID
 ## Create an OpenTelemetry Source in Cribl Stream
 
 1. Add an [**OpenTelemetry** Source](https://docs.cribl.io/stream/sources-otel/) for Checkly alone. A Source of its own is the simplest routing key.
-2. Set **Protocol** to `HTTP` and **Port** to `20002`. Port `4318` is not available on Cribl-managed Worker Groups in [Cribl.Cloud](https://docs.cribl.io/stream/ports/). Keep **OTLP version** at `1.3.1`.
+2. Set **Protocol** to `HTTP` and **Port** to `20002`. The **Port** field keeps `4317` when you switch the protocol, so type the port yourself. Port `4318` is not available on Cribl-managed Worker Groups in [Cribl.Cloud](https://docs.cribl.io/stream/ports/). Keep **OTLP version** at `1.3.1`.
 3. Turn on TLS with the same **Private key path** and **Certificate path**.
 4. Under **Auth methods**, select **Add Method**, choose **Token** as the **Authentication type** and enter a long random token, for example from `openssl rand -hex 32`. Keep it as `<otel-token>`.
 5. Turn on **Extract spans** so each span is one event you can route.
@@ -116,7 +116,7 @@ export const criblAlerts = new WebhookAlertChannel('cribl-alerts', {
     { key: 'Content-Type', value: 'application/json' },
   ],
   // One line on purpose: Cribl's default Event Breaker splits events on newlines.
-  template: '{"source":"checkly","alertType":"{{ALERT_TYPE}}","title":"{{ALERT_TITLE}}","check":{"name":"{{CHECK_NAME}}","id":"{{CHECK_ID}}","type":"{{CHECK_TYPE}}","group":"{{GROUP_NAME}}"},"resultId":"{{CHECK_RESULT_ID}}","location":"{{RUN_LOCATION}}","startedAt":"{{STARTED_AT}}","responseTimeMs":"{{RESPONSE_TIME}}","resultLink":"{{RESULT_LINK}}","traceId":"{{OTEL_TRACE_ID}}",{{#if AI_ANALYSIS_LINK}}"classification":"{{AI_ANALYSIS_CLASSIFICATION}}","aiAnalysisLink":"{{AI_ANALYSIS_LINK}}",{{/if}}"tags":[{{#each TAGS}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}]}',
+  template: '{"sender":"checkly","alertType":"{{ALERT_TYPE}}","title":"{{ALERT_TITLE}}","check":{"name":"{{CHECK_NAME}}","id":"{{CHECK_ID}}","type":"{{CHECK_TYPE}}","group":"{{GROUP_NAME}}"},"resultId":"{{CHECK_RESULT_ID}}","location":"{{RUN_LOCATION}}","startedAt":"{{STARTED_AT}}","responseTimeMs":"{{RESPONSE_TIME}}","resultLink":"{{RESULT_LINK}}","traceId":"{{OTEL_TRACE_ID}}",{{#if AI_ANALYSIS_LINK}}"classification":"{{AI_ANALYSIS_CLASSIFICATION}}","aiAnalysisLink":"{{AI_ANALYSIS_LINK}}",{{/if}}"tags":[{{#each TAGS}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}]}',
   sendFailure: true,
   sendDegraded: true,
   sendRecovery: true,
@@ -280,7 +280,7 @@ Each scrape, once a minute, arrives in the OpenTelemetry Source's **Live Data** 
 
 ## Verify it works
 
-First, open the **Live Data** tab of both Sources and select **Start Capture**. A capture only records events that arrive while it runs. Then break the checkout on purpose: open `http://localhost:8080/feature/` and set `paymentFailure` to `100%`. The page saves as soon as you pick a variant. The shop's checkout API now returns a payment error, so the check's confirmation assertion fails. Run the check:
+First, open the **Live Data** tab of both Sources and select **Capture**. Set **Capture time (sec)** to `120` and **Capture up to N events** to `100`, then select **Start**. A capture only records events that arrive while it runs. Then break the checkout on purpose: open `http://localhost:8080/feature/` and set `paymentFailure` to `100%`. The page saves as soon as you pick a variant. The shop's checkout API now returns a payment error, so the check's confirmation assertion fails. Run the check:
 
 ```bash Terminal
 npx checkly checks run --tags=cribl-guide

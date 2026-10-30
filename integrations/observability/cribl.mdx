@@ -23,8 +23,7 @@ Export traces to Cribl Stream once, then use Routes to send them to one or more 
 - A Cribl Stream Worker Group where you can add Sources and **Commit & Deploy**.
 </Accordion>
 
-1. Get the endpoint. In Cribl Stream, create an [**OpenTelemetry** Source](https://docs.cribl.io/stream/sources-otel/) for Checkly alone. A Source of its own is the simplest routing key. Set **Protocol** to `HTTP` on a Cribl.Cloud port between `20000` and `20010`, here `20002`. Port `4318` is not available on Cribl-managed Worker Groups in [Cribl.Cloud](https://docs.cribl.io/stream/ports/). Keep **OTLP version** at `1.3.1`. Turn on TLS with the private key path `$CRIBL_CLOUD_KEY` and the certificate path `$CRIBL_CLOUD_CRT`, which [Cribl.Cloud requires](https://docs.cribl.io/stream/securing-tls-cloud/) on those ports, and add a **Token** authentication method. Leave **Extract spans** off to pass whole payloads to storage, or turn it on to work per span. Select **Save**, then **Commit & Deploy**. The URL is `https://default.main.<Org-ID>.cribl.cloud:20002/v1/traces`.
-   {/* VERIFY: Commit & Deploy vs single-instance Save */}
+1. Get the endpoint. In Cribl Stream, create an [**OpenTelemetry** Source](https://docs.cribl.io/stream/sources-otel/) for Checkly alone. A Source of its own is the simplest routing key. Set **Protocol** to `HTTP` on a Cribl.Cloud port between `20000` and `20010`, here `20002`. Port `4318` is not available on Cribl-managed Worker Groups in [Cribl.Cloud](https://docs.cribl.io/stream/ports/). The **Port** field keeps `4317` when you switch the protocol, so type `20002` yourself. Keep **OTLP version** at `1.3.1`. Turn on TLS with the private key path `$CRIBL_CLOUD_KEY` and the certificate path `$CRIBL_CLOUD_CRT`, which [Cribl.Cloud requires](https://docs.cribl.io/stream/securing-tls-cloud/) on those ports, and under **Auth methods** select **Add Method**, set **Authentication type** to **Token** and enter a long random token. Leave **Extract spans** off to pass whole payloads to storage, or turn it on to work per span. Select **Save**, then **Commit & Deploy**. A single-instance deployment applies the change on **Save**. The URL is `https://default.main.<Org-ID>.cribl.cloud:20002/v1/traces`.
 2. Get the key. Copy the token you added to the Source.
 3. Paste the values into Checkly. On the [Traces settings page](https://app.checklyhq.com/settings/account/traces), under **Export Traces**, select **Enable exporting traces**, paste the URL, click **Add header** and add the header from the table below.
 4. Find the spans. Add a Route that sends the Source's data to your destination. There, the spans appear under service `checkly`. To see failed runs, filter on the attribute `checkly.check.status` with the value `FAILED`.
@@ -103,7 +102,7 @@ export const criblAlerts = new WebhookAlertChannel('cribl-alerts', {
     { key: 'Content-Type', value: 'application/json' },
   ],
   // One line on purpose: the default Event Breaker splits events on newlines.
-  template: '{"source":"checkly","alertType":"{{ALERT_TYPE}}","title":"{{ALERT_TITLE}}","check":{"name":"{{CHECK_NAME}}","id":"{{CHECK_ID}}","type":"{{CHECK_TYPE}}","group":"{{GROUP_NAME}}"},"resultId":"{{CHECK_RESULT_ID}}","location":"{{RUN_LOCATION}}","startedAt":"{{STARTED_AT}}","responseTimeMs":"{{RESPONSE_TIME}}","resultLink":"{{RESULT_LINK}}","traceId":"{{OTEL_TRACE_ID}}",{{#if AI_ANALYSIS_LINK}}"classification":"{{AI_ANALYSIS_CLASSIFICATION}}","aiAnalysisLink":"{{AI_ANALYSIS_LINK}}",{{/if}}"tags":[{{#each TAGS}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}]}',
+  template: '{"sender":"checkly","alertType":"{{ALERT_TYPE}}","title":"{{ALERT_TITLE}}","check":{"name":"{{CHECK_NAME}}","id":"{{CHECK_ID}}","type":"{{CHECK_TYPE}}","group":"{{GROUP_NAME}}"},"resultId":"{{CHECK_RESULT_ID}}","location":"{{RUN_LOCATION}}","startedAt":"{{STARTED_AT}}","responseTimeMs":"{{RESPONSE_TIME}}","resultLink":"{{RESULT_LINK}}","traceId":"{{OTEL_TRACE_ID}}",{{#if AI_ANALYSIS_LINK}}"classification":"{{AI_ANALYSIS_CLASSIFICATION}}","aiAnalysisLink":"{{AI_ANALYSIS_LINK}}",{{/if}}"tags":[{{#each TAGS}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}]}',
   sendFailure: true,
   sendDegraded: true,
   sendRecovery: true,
@@ -121,17 +120,14 @@ Triple braces keep the token unencoded. Double braces encode values, so a double
 
 In Cribl Stream:
 
-1. Add a [**Raw HTTP/S** Source](https://docs.cribl.io/stream/sources-raw-http/), not the [HTTP/S Bulk API Source](https://docs.cribl.io/stream/sources-https/), which expects specific API formats.
+1. Under **Data** > **Sources**, add a [**Raw HTTP** Source](https://docs.cribl.io/stream/sources-raw-http/), not the [**HTTP** Source](https://docs.cribl.io/stream/sources-https/), which expects specific API formats.
 2. Set **Port** to one in `20000` to `20010`, here `20001`.
-   {/* VERIFY: webhook delivery to port 20001 */}
 3. Turn on TLS as above, with **Private key path** `$CRIBL_CLOUD_KEY` and **Certificate path** `$CRIBL_CLOUD_CRT`.
-4. Under **Auth tokens**, select **Generate** for one **Token**. Clients send it as `Authorization: <token>` with no prefix, so the channel header holds the bare token.
-5. Turn on **Auto parse** so the JSON fields become event fields.
-   {/* VERIFY: Auto parse top-level fields */}
+4. Under **Auth tokens**, select **Add Token**, set **Authentication method** to **Manual** and select **Generate**. Clients send it as `Authorization: <token>` with no prefix, so the channel header holds the bare token.
+5. Under **Processing Settings** > **Pre-Processing**, turn on **Auto parse** so the JSON fields become event fields.
 6. Select **Save**, then **Commit & Deploy**.
 
-To verify deliveries, add a [webhook secret](/integrations/alerts/webhooks#webhook-secrets) so Checkly signs each one in `x-checkly-signature`, turn on **Capture request headers**, and compare that header in `__headers` with [`C.Crypto.createHmac`](https://docs.cribl.io/stream/expressions-crypto/) over the body in an **Eval** Function, dropping mismatches with a [**Drop** Function](https://docs.cribl.io/stream/drop-function/). Remove `__headers` with an **Eval** Function before any Destination that reads it, such as Webhook or Kafka, or that Destination re-sends your inbound token.
-{/* VERIFY: __headers key casing and HMAC match */}
+To verify deliveries, add a [webhook secret](/integrations/alerts/webhooks#webhook-secrets) so Checkly signs each one in `x-checkly-signature`, turn on **Capture request headers** under **Advanced Settings**, and compare `__headers['x-checkly-signature']` with [`C.Crypto.createHmac`](https://docs.cribl.io/stream/expressions-crypto/) over `_raw`, which holds the body byte for byte, in an **Eval** Function, dropping mismatches with a [**Drop** Function](https://docs.cribl.io/stream/drop-function/). The Source also adds a `headers` field with every request header, `authorization` included, to each event. Remove it with an **Eval** Function before any Destination, or that Destination re-sends your inbound token.
 
 Route `alertType=='ALERT_FAILURE'` to your paging tool and every alert to your log store, with Destinations such as [Webhook](https://docs.cribl.io/stream/destinations-webhook/), [Splunk HEC](https://docs.cribl.io/stream/destinations-splunk-hec/) or [Elasticsearch](https://docs.cribl.io/stream/destinations-elastic/). A [Slack recipe](https://docs.cribl.io/stream/usecase-webhook-slack/) shows the Webhook Destination posting to a channel.
 
@@ -161,8 +157,7 @@ This changes your existing pipeline. Extract spans on the Source your applicatio
 In Cribl Stream:
 
 1. On the [**OpenTelemetry** Source](https://docs.cribl.io/stream/sources-otel/) your applications use, turn on **Extract spans** so each span is one event.
-2. Add a [Route](https://docs.cribl.io/stream/routes/) whose filter keeps spans with `checkly=true` in their trace state. Capture an event from the Source to see the exact field path.
-   {/* VERIFY: trace state field path */}
+2. Add a [Route](https://docs.cribl.io/stream/routes/) whose filter keeps spans with `checkly=true` in their trace state. With Extract spans on, each event carries the trace state in its `trace_state` field, so a filter such as `(trace_state || '').includes('checkly=true')` keeps the right spans.
 3. End the Route's Pipeline with the [**OTLP Traces** Function](https://docs.cribl.io/stream/otlp-traces-function/), with **OTLP version** `1.3.1` and **Batch OTLP traces** set to **Yes**, so the spans are re-batched.
 4. Send the Route to an [**OpenTelemetry** Destination](https://docs.cribl.io/stream/destinations-otel/): **Protocol** `gRPC` with **Use TLS** on and **Endpoint** `otel.eu-west-1.checklyhq.com:4317`, or **Protocol** `HTTP` with **Endpoint** `https://otel.eu-west-1.checklyhq.com`. For gRPC, write the port, because the Destination defaults to `443` with TLS.
 5. Set **Authentication type** to **None** and add the header yourself on the **Advanced Settings** tab. For gRPC, under **Metadata** select **Add Metadata** with **Key** `authorization` and the OTel API key, in quotes, as the **Value**. For HTTP, under **Extra HTTP headers** select **Add Header** with **Name** `authorization` and the key as the **Value**.

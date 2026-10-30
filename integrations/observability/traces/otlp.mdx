@@ -21,10 +21,10 @@ When trace export is on, Checkly sends each API check, URL monitor, Browser chec
 Open [Settings > Traces](https://app.checklyhq.com/settings/account/traces) and, under **Export Traces**, select **Enable exporting traces**.
 </Step>
 <Step title="Enter the endpoint URL">
-Enter your backend's OTLP/HTTP traces URL, for example `https://otel.acme.com/v1/traces`. Use an `https` URL that ends in `/v1/traces`. Checkly does not check this when you save.
+Enter your backend's OTLP/HTTP traces URL, for example `https://otel.acme.com/v1/traces`. Use an `https` URL that ends in `/v1/traces`. Checkly only checks that the URL is well formed when you save, not the scheme, the path or that the endpoint answers.
 </Step>
 <Step title="Add authentication headers">
-Click **Add header** and enter each header your endpoint expects as a key and a value, for example `Authorization` with `Bearer <token>`. Put credentials in header rows, not in the URL. API checks and URL monitors drop the URL's query string when they export. Click the lock next to a value to store it as an account secret, which the row then references as `{{NAME}}`.
+Click **Add header** and enter each header your endpoint expects as a key and a value, for example `Authorization` with `Bearer <token>`. Put credentials in header rows, not in the URL. API checks and URL monitors drop the URL's query string when they export. Click the lock next to a value to store it as an account secret, which the row then references as `{{NAME}}`. Any value written as `{{NAME}}` is replaced with the matching environment variable or secret when the check runs. Rows with an empty key or value are discarded.
 </Step>
 </Steps>
 
@@ -58,7 +58,7 @@ The span is named after the check and has kind `CLIENT`. Its OpenTelemetry statu
 | `checkly.check.tags` | string array | `["production", "checkout"]` | The check has at least one tag |
 | `checkly.check.status` | string | `PASSED`, `FAILED` or `DEGRADED` | Always |
 
-Each span also carries the resource attributes `service.name`, set to `checkly`, and `telemetry.sdk.language`. Its instrumentation scope name starts with `checkly`, for example `checkly-tracer`. When the [Coralogix integration](/integrations/observability/coralogix) is on as well, spans can include the resource attributes `cx.application.name` and `cx.subsystem.name`.
+Each span also carries the resource attributes `service.name`, set to `checkly`, and `telemetry.sdk.language`. Its instrumentation scope is `checkly-tracer`, or `checkly-browser-tracer` for Browser checks on the current runtime. When the [Coralogix integration](/integrations/observability/coralogix) is on as well, spans can include the resource attributes `cx.application.name` and `cx.subsystem.name`.
 
 `checkly.check.tags` carries the check's tags as a string array, the check's own tags first, then tags inherited from its group, deduplicated. Use it to filter or group traces by the same labels you organize your checks by, such as a team or workflow tag.
 
@@ -82,7 +82,7 @@ The exported span's trace ID is the one in the `traceparent` header the check se
 Two settings change the header your application receives:
 
 - On API checks and URL monitors, a request header you define named `traceparent` replaces Checkly's.
-- On API checks and URL monitors, a [Coralogix](/integrations/observability/coralogix) custom trace header replaces `traceparent`.
+- On API checks and URL monitors, a [Coralogix](/integrations/observability/coralogix) custom trace header replaces `traceparent`. Browser checks and Multistep checks send both headers.
 
 To send your application's spans into Checkly instead, see [How it works](/resolve/traces/how-it-works) and [Import traces](/resolve/traces/import/overview).
 

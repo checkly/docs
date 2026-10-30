@@ -5,7 +5,7 @@ sidebarTitle: 'Prometheus'
 canonical: 'https://www.checklyhq.com/docs/integrations/observability/prometheus/'
 ---
 
-If you use [Prometheus](https://prometheus.io/) for monitoring and the [Grafana](https://grafana.com/) stack for dashboards, you can scrape Checkly's metrics for every check type from a dedicated, secured endpoint.
+If you use [Prometheus](https://prometheus.io/) for monitoring and the [Grafana](https://grafana.com/) stack for dashboards, you can scrape Checkly's metrics for every check type from a dedicated, secured endpoint. Any other scraper that sends a bearer token, such as an OpenTelemetry Collector, Grafana Alloy or the Datadog Agent, reads the same endpoint.
 
 <Accordion title="Prerequisites">
 A [plan](https://www.checklyhq.com/pricing/) that includes the Prometheus integration, otherwise the endpoint returns `403`.
@@ -18,7 +18,7 @@ Looking for the v1 endpoint? See [Legacy v1 endpoint](#legacy-v1-endpoint).
 1. Go to **Account settings** > [**Integrations**](https://app.checklyhq.com/settings/account/integrations) and find the **Prometheus** card. It shows your endpoint URL, your bearer tokens and a scrape config sample.
    ![Prometheus integration card in account settings](/images/docs/images/integrations/prometheus_integration_card.png)
 2. Under **Bearer tokens**, click **Add token** and copy the value. The full value is shown only once, right after you create it. An account can have at most two tokens, so you can rotate: add a token, point your scrape config at it, then revoke the old one.
-3. Add this job to your `prometheus.yml` and replace the placeholders with your account ID and token. It matches the sample on the card, plus `scrape_timeout: 30s`.
+3. Add the `checkly` job under `scrape_configs` in your `prometheus.yml` and replace the placeholders with your account ID and token. It matches the sample on the card, plus `scrape_timeout: 30s`.
 
 ```yaml
 scrape_configs:
@@ -47,7 +47,7 @@ Add these query parameters to the endpoint URL, or under `params` in the scrape 
 | `locationLabelEnabled` | `false` | Adds a `location` label to metrics built from check results. Off by default to keep the number of series down. |
 | `includeRetryAttempts` | `false` | Counts [retry attempts](/communicate/alerts/retries/) in metrics built from check results. Without it, a run that fails and then passes on retry counts once, as passing. |
 
-The endpoint rejects any other query parameter. Each combination of parameters is cached separately.
+The endpoint rejects any other query parameter, and values other than `true` or `false`, with `400`. Each combination of parameters is cached separately.
 
 ## Check metrics
 
@@ -55,14 +55,14 @@ Together these metrics cover every check type. Each one also carries the labels 
 
 | Metric | Type | Labels | Description |
 |--------|------|--------|-------------|
-| `checkly_check_status` | Gauge | `status`: `passing`, `failing`, `degraded` | Whether a given check is currently passing, degraded, or failing. `1` for the series whose `status` matches, `0` for the other two. |
-| `checkly_check_result_total` | Counter | `status`: `passing`, `failing`, `degraded` | The number of passing, degraded, and failing check results in the hourly window. |
+| `checkly_check_status` | Gauge | `status`: `passing`, `failing`, `degraded` | Whether a given check is currently passing, degraded, or failing. `1` for the series whose `status` matches, `0` for the other two. Absent for a check that has never produced a result. |
+| `checkly_check_result_total` | Counter | `status`: `passing`, `failing`, `degraded` | The number of passing, degraded, and failing check results in the [hourly window](#behavior). |
 | `checkly_browser_check_web_vitals_seconds` | Histogram | `type`: `CLS`, `FCP`, `LCP`, `TBT`, `TTFB`, `loaded`, `DOM content loaded` | The [web vitals](/detect/synthetic-monitoring/browser-checks/performance-metrics) timings of the first page visited. |
 | `checkly_browser_check_duration_seconds` | Histogram | | The total check duration. This includes all pages visited and any waits. |
 | `checkly_browser_check_errors` | Histogram | `type`: `console`, `network`, `user`, `document` | The errors encountered during a full browser session. |
 | `checkly_api_check_timing_seconds` | Histogram | `type`: `total`, `wait`, `dns`, `tcp`, `first byte` | The response time for the API request, as well as the duration of the different phases. |
 | `checkly_url_monitor_timing_seconds` | Histogram | `type`: `total`, `wait`, `dns`, `tcp`, `first byte` | The response time for the HTTP request, as well as the duration of the different phases. |
-| `checkly_check_http_status_code` | Gauge | | The HTTP status code returned on the latest run of an API check or URL monitor. Absent when there was no run in the window. |
+| `checkly_check_http_status_code` | Gauge | | The HTTP status code returned on the latest run of an API check or URL monitor. Reads `0` when the latest run got no HTTP response. Absent when there was no run in the window. |
 | `checkly_tcp_monitor_timing_seconds` | Histogram | `type`: `dns`, `connection`, `data`, `total` | The response time for the TCP request, as well as the duration of the different phases. |
 | `checkly_tcp_check_timing_seconds` | Histogram | `type`: `dns`, `connection`, `data`, `total` | **Deprecated:** use `checkly_tcp_monitor_timing_seconds` instead. Emits identical values. |
 | `checkly_icmp_monitor_timing_seconds` | Histogram | `type`: `dns`, `latency_avg`, `latency_min`, `latency_max` | The timing phases of the ICMP monitor, including DNS resolution and latency measurements. |
@@ -110,7 +110,7 @@ checkly_check_status{name="Passing Browser Check",status="degraded"} 0
 
 ## Heartbeat metrics
 
-[Heartbeat monitors](/detect/uptime-monitoring/heartbeat-monitors/overview) are passive checks that wait for your scheduled jobs and automated processes to send a ping. The Prometheus exporter includes heartbeat checks in the standard `checkly_check_status` and `checkly_check_result_total` metrics, plus two heartbeat-specific gauges designed for [dead man's switch](https://en.wikipedia.org/wiki/Dead_man%27s_switch) alerting.
+[Heartbeat monitors](/detect/uptime-monitoring/heartbeat-monitors/overview) are passive checks that wait for your scheduled jobs and automated processes to send a ping. The Prometheus exporter includes Heartbeat monitors in the standard `checkly_check_status` and `checkly_check_result_total` metrics, plus two heartbeat-specific gauges designed for [dead man's switch](https://en.wikipedia.org/wiki/Dead_man%27s_switch) alerting.
 
 | Metric | Type | Description |
 |--------|------|-------------|
@@ -119,7 +119,7 @@ checkly_check_status{name="Passing Browser Check",status="degraded"} 0
 
 ### How heartbeats map to `checkly_check_result_total`
 
-Heartbeat checks count in `checkly_check_result_total` over the same hourly window as other check types. The `status` label values map to heartbeat event states as follows:
+Heartbeat monitors count in `checkly_check_result_total` over the same hourly window as other check types. The `status` label values map to heartbeat event states as follows:
 
 | `status` label | Heartbeat states counted |
 |----------------|--------------------------|
@@ -157,7 +157,7 @@ time() - checkly_heartbeat_last_success_timestamp_seconds
 
 The Prometheus exporter also contains metrics for monitoring [private locations](/platform/private-locations/overview). Use them to make sure your private locations have enough Checkly Agent instances running to execute all of your checks, and to drive [agent autoscaling](/platform/private-locations/autoscaling).
 
-Every private location metric carries the labels `private_location_name`, `private_location_slug_name` and `private_location_id`.
+Every private location metric carries the labels `private_location_name`, `private_location_slug_name` and `private_location_id`. Check runs flow through two queues: `main` carries Browser checks, Multistep checks and Playwright Check Suites, and `uptime` carries API checks, URL monitors and the TCP, DNS, ICMP, SSL, gRPC and Traceroute monitors.
 
 | Metric | Type | Labels | Description |
 |--------|------|--------|-------------|
@@ -165,7 +165,7 @@ Every private location metric carries the labels `private_location_name`, `priva
 | `checkly_private_location_oldest_scheduled_check_run` | Gauge | | The age in seconds of the oldest check run job scheduled to the `main` queue. Same sampling as `checkly_private_location_queue_size`. A high value indicates that checks are becoming backlogged. |
 | `checkly_private_location_queue_duration_ms` | Gauge | `queue`, `stat` | The scheduling delay in milliseconds for check runs routed through the private location. Derived from the last 2 minutes of check run data. Use it to judge whether the private location has enough agent capacity. Absent for a queue with no check runs in the last 2 minutes. |
 | `checkly_private_location_agent_count` | Gauge | | The number of agents connected for the private location. An agent counts as connected if it reported in the last 250 seconds. Always present. |
-| `checkly_private_location_check_runs` | Gauge | `queue`, `state` | The number of check runs waiting in or picked up from the private location's queues. Read from the queues, not counted from check results. Used as the signal for [autoscaling Checkly Agents](/platform/private-locations/autoscaling). |
+| `checkly_private_location_check_runs` | Gauge | `queue`, `state` | The number of check runs waiting in or picked up from the private location's queues. The `main` `queued` series is the same sample as `checkly_private_location_queue_size`, the other three are live queue reads, and a series is absent when its queue reports no data. Used as the signal for [autoscaling Checkly Agents](/platform/private-locations/autoscaling). |
 
 | Label | Values |
 |-------|--------|
@@ -176,17 +176,17 @@ Every private location metric carries the labels `private_location_name`, `priva
 ## Behavior
 
 - **Caching and limits.** Responses are cached for 60 seconds, so a scrape interval below 60 seconds fetches the same data. Responses are gzip compressed when the scraper asks for it, which Prometheus does by default. The endpoint allows 50 requests per minute per account. Above that it returns `429` with `Retry-After`, `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` headers. If you run multiple Prometheus instances, each instance scrapes independently. Align their scrape intervals where possible.
-- **Errors.** An unknown or revoked token, or a lapsed account, returns `401`. Tokens do not expire. A plan without the Prometheus integration returns `403`.
-- **Timeouts.** A scrape fails as a whole if any part of the backing query fails. The query times out after 25 seconds, which is why the sample sets `scrape_timeout: 30s`.
+- **Errors.** An unknown token or a lapsed account returns `401`. A revoked token can keep working for up to 10 minutes. Tokens do not expire. A plan without the Prometheus integration returns `403`.
+- **Timeouts.** A scrape fails as a whole if any part of the backing query fails. The query times out after 25 seconds, and a scrape that arrives while another one is refreshing the cache waits up to 20 seconds for it, which is why the sample sets `scrape_timeout: 30s`.
 - **Hourly window.** Counters and histograms reset every hour at HH:01:30, for example 14:01:30. Handle the resets with the [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) or [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions. Gauges built from runs reset too. After the reset and until a check's next run:
   - `checkly_ssl_monitor_days_until_expiry`, `checkly_icmp_monitor_packet_loss_ratio` and `checkly_traceroute_monitor_hops` read `0`.
   - `checkly_check_http_status_code`, `checkly_grpc_monitor_status_code`, `checkly_traceroute_monitor_destination_reached`, `checkly_ssl_monitor_info`, `checkly_ssl_monitor_hostname_verified`, `checkly_ssl_monitor_chain_trusted`, `checkly_ssl_monitor_ocsp_stapled` and `checkly_ssl_monitor_key_size_bits` disappear.
-  - With `locationLabelEnabled`, each location reads `0` until it runs, so checks that run round-robin read `0` on most locations.
-  - Monitors that run every hour or less often read `0` for most of the hour.
+  - With `locationLabelEnabled`, each location reads `0` or is absent until it runs, so checks that run round-robin read `0` on most locations.
+  - A monitor that runs every hour reads `0` from the reset until its run. One that runs less often reads `0` in every hour without a run.
 
-  An alert on `checkly_ssl_monitor_days_until_expiry` below a threshold therefore fires after every reset until the monitor runs again.
+  An alert on the raw `checkly_ssl_monitor_days_until_expiry` gauge below a threshold therefore fires after every reset until the monitor runs again. Alert on its highest value over a range longer than the monitor's interval instead, for example with `max_over_time`. `checkly_time_to_ssl_expiry_seconds` and `checkly_check_status` read the current status and do not reset.
 - **Histograms.** Histograms expose only the `+Inf` bucket. Use `_sum / _count` averages as in [Histogram averages](#histogram-averages), not `histogram_quantile()`. A missing web vital counts as `0` and pulls averages down.
-- **Tag parsing.** Tags become labels without any rewriting. The label name is the run of letters, digits and underscores right before the first colon, and the value is everything after that colon: `my-env:prod` becomes `env="prod"`, and `a:b:c` becomes `a="b:c"`. A key that starts with a digit produces an invalid label name. See the Prometheus [data model](https://prometheus.io/docs/concepts/data_model/) for valid label names.
+- **Tag parsing.** Checkly does not clean up tag keys. The label name is the run of letters, digits and underscores right before the first colon, and the value is everything after that colon: `my-env:prod` becomes `env="prod"`, and `a:b:c` becomes `a="b:c"`. A key that starts with a digit produces an invalid label name, and a tag whose key matches a built-in label name is ignored. See the Prometheus [data model](https://prometheus.io/docs/concepts/data_model/) for valid label names.
 - **Retries.** Retry attempts are left out unless you set `includeRetryAttempts=true`. `checkly_check_status`, `checkly_time_to_ssl_expiry_seconds` and all heartbeat metrics ignore the parameter.
 
 ## PromQL examples
@@ -203,7 +203,7 @@ This can be used to build a [Grafana table](https://grafana.com/docs/grafana/lat
 
 ### Failure percentage
 
-To calculate the percentage of check runs that failed in the last 24 hours, use:
+To calculate the share of check runs that failed in the last 24 hours, as a ratio from 0 to 1, use:
 ```bash
 increase(checkly_check_result_total{status="failing"}[24h]) / ignoring(status) sum without (status) (increase(checkly_check_result_total[24h]))
 ```
@@ -220,7 +220,7 @@ sum by(type) (rate(checkly_browser_check_web_vitals_seconds_sum{name="Check Name
 
 ## Scraping with other tools
 
-The OpenTelemetry Collector `prometheus` receiver scrapes the endpoint with the same settings:
+The `prometheus` receiver of the OpenTelemetry Collector, included in the `otelcol-contrib` distribution, scrapes the endpoint with the same settings. Replace `debug` with the exporter for your backend.
 
 ```yaml
 receivers:
@@ -240,9 +240,19 @@ receivers:
             locationLabelEnabled: ['true']
           static_configs:
             - targets: ['api.checklyhq.com']
+
+exporters:
+  debug:
+    verbosity: basic
+
+service:
+  pipelines:
+    metrics:
+      receivers: [prometheus]
+      exporters: [debug]
 ```
 
-The token file holds only the bearer token and must not end with a newline. The Collector then forwards the metrics to any OTLP metrics backend through an exporter, see [Collector configuration](https://opentelemetry.io/docs/collector/configuration/). If you scrape with the [Datadog Agent OpenMetrics check](https://docs.datadoghq.com/integrations/openmetrics/) or Grafana Alloy [`prometheus.scrape`](https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.scrape/), use the same URL, bearer token and interval.
+The token file holds only the bearer token. Exporters for every common backend are listed in the [Collector configuration docs](https://opentelemetry.io/docs/collector/configuration/). If you scrape with the [Datadog Agent OpenMetrics check](https://docs.datadoghq.com/integrations/openmetrics/) or Grafana Alloy [`prometheus.scrape`](https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.scrape/), use the same URL, bearer token and interval.
 
 ## Legacy v1 endpoint
 
@@ -277,34 +287,34 @@ Checks with no run in the last hour are absent from the three check metrics. Lab
 # HELP checkly_check_status The passing/failing status of the last check. 1 is passing, 0 is failing
 # TYPE checkly_check_status gauge
 checkly_check_status{check_name="Customer API",check_type="api",muted="false",activated="true",degraded="false",group="Public APIs",tags="alerts,public"} 1
-checkly_check_status{check_name="docs-obs browser public",check_type="browser",muted="false",activated="true",degraded="false",tags="docs-observability"} 1
-checkly_check_status{check_name="docs-obs api pl",check_type="api",muted="false",activated="true",degraded="false",tags="docs-observability"} 1
+checkly_check_status{check_name="Homepage",check_type="browser",muted="false",activated="true",degraded="false",tags="public"} 1
+checkly_check_status{check_name="Internal API",check_type="api",muted="false",activated="true",degraded="false",tags="public"} 1
 # HELP checkly_check_degraded_status The degraded status of the last check. 1 is not-degraded, 0 is degraded
 # TYPE checkly_check_degraded_status gauge
 checkly_check_degraded_status{check_name="Customer API",check_type="api",muted="false",activated="true",degraded="false",group="Public APIs",tags="alerts,public"} 1
-checkly_check_degraded_status{check_name="docs-obs browser public",check_type="browser",muted="false",activated="true",degraded="false",tags="docs-observability"} 1
-checkly_check_degraded_status{check_name="docs-obs api pl",check_type="api",muted="false",activated="true",degraded="false",tags="docs-observability"} 1
+checkly_check_degraded_status{check_name="Homepage",check_type="browser",muted="false",activated="true",degraded="false",tags="public"} 1
+checkly_check_degraded_status{check_name="Internal API",check_type="api",muted="false",activated="true",degraded="false",tags="public"} 1
 # HELP checkly_check_result The response time of the last check per region.
 # TYPE checkly_check_result gauge
-checkly_check_result{check_name="Customer API",check_type="api",region="macbook-tmp",group="Public APIs",http_status_code="200",tags="alerts,public"} 5
-checkly_check_result{check_name="docs-obs browser public",check_type="browser",region="us-east-1",tags="docs-observability"} 4376
-checkly_check_result{check_name="docs-obs api pl",check_type="api",region="otel-demo-local",http_status_code="200",tags="docs-observability"} 3
+checkly_check_result{check_name="Customer API",check_type="api",region="eu-west-1",group="Public APIs",http_status_code="200",tags="alerts,public"} 5
+checkly_check_result{check_name="Homepage",check_type="browser",region="us-east-1",tags="public"} 4376
+checkly_check_result{check_name="Internal API",check_type="api",region="acme-dc",http_status_code="200",tags="public"} 3
 # HELP checkly_private_location_queue_size The number of check runs scheduled to the private location and waiting to be executed.
 # TYPE checkly_private_location_queue_size gauge
-checkly_private_location_queue_size{private_location_name="OTel demo on this machine",private_location_slug_name="otel-demo-local",private_location_id="<id>"} 0
+checkly_private_location_queue_size{private_location_name="ACME data center",private_location_slug_name="acme-dc",private_location_id="<id>"} 0
 # HELP checkly_private_location_oldest_scheduled_check_run The age in seconds of the oldest check run job scheduled to the private location queue.
 # TYPE checkly_private_location_oldest_scheduled_check_run gauge
-checkly_private_location_oldest_scheduled_check_run{private_location_name="OTel demo on this machine",private_location_slug_name="otel-demo-local",private_location_id="<id>"} 0
+checkly_private_location_oldest_scheduled_check_run{private_location_name="ACME data center",private_location_slug_name="acme-dc",private_location_id="<id>"} 0
 # HELP checkly_private_location_agent_count The number of agents connected for the private location.
 # TYPE checkly_private_location_agent_count gauge
-checkly_private_location_agent_count{private_location_name="OTel demo on this machine",private_location_slug_name="otel-demo-local",private_location_id="<id>"} 1
+checkly_private_location_agent_count{private_location_name="ACME data center",private_location_slug_name="acme-dc",private_location_id="<id>"} 1
 ```
 
 Notice that:
 
 - `checkly_check_status` and `checkly_check_degraded_status` carry `muted`, `activated` and `degraded`, reflecting whether a check sends alerts, is running and is degraded. "Customer API" is in a check group, so it also carries `group`.
 - `checkly_check_result` has one row per region that ran the check in the last hour, with a `region` label. A run from a private location carries the private location's slug as its region. Rows for API checks also carry `http_status_code`.
-- The private location "otel-demo-local" has one Checkly Agent connected. `checkly_private_location_queue_size` and `checkly_private_location_oldest_scheduled_check_run` show no backlog of check run jobs.
+- The private location "ACME data center" has one Checkly Agent connected. `checkly_private_location_queue_size` and `checkly_private_location_oldest_scheduled_check_run` show no backlog of check run jobs.
 
 ### Legacy v1 scrape config
 
@@ -321,6 +331,6 @@ scrape_configs:
       - targets: ['api.checklyhq.com']
 ```
 
-The v1 endpoint answers with the content type `text/html`. Prometheus 3 and later reject that unless the job sets `fallback_scrape_protocol`, as above.
+The v1 endpoint answers with the content type `text/html`. Prometheus 3 and later reject that unless the job sets `fallback_scrape_protocol`, as above. Prometheus 2 does not know that setting, so remove the line there.
 
 For a worked example with Grafana, see the blog post on [monitoring website performance with Checkly, Prometheus and Grafana](https://blog.checklyhq.com/monitoring-website-performance-with-checkly-prometheus-grafana/).

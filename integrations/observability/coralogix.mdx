@@ -29,6 +29,8 @@ Export to Coralogix depends only on the Coralogix integration being enabled. Imp
 
 Checkly adds `traceparent` and `tracestate` headers to the requests your checks make, so spans from your instrumented backend join the same trace. The [OTLP page](/integrations/observability/traces/otlp#trace-headers) documents both headers.
 
+![Checkly traces in the Coralogix Tracing view](/images/docs/images/integrations/coralogix/cx_otel_int2.png)
+
 The check result page shows the trace ID and a permalink to the trace in Coralogix.
 
 ![Coralogix trace link on a Checkly check result](/images/docs/images/integrations/coralogix/cx_otel_int3.png)
@@ -59,6 +61,7 @@ With RUM enabled, Checkly injects the Coralogix RUM SDK into your Browser checks
 ![Coralogix RUM settings in Checkly](/images/docs/images/integrations/coralogix/cx_rum_int1.png)
 
 1. In Coralogix, create a Send-Your-Data API key with the **SendRUMData** role preset under **Settings > Users and Teams > API Keys**. The [Coralogix RUM documentation](https://coralogix.com/docs/user-guides/rum/sdk-installation/javascript/npm-browser/) covers the Coralogix side.
+   ![RUM integration keys in Coralogix](/images/docs/images/integrations/coralogix/cx_rum_api_creation.png)
 2. In the Coralogix integration in Checkly, select **Enable Coralogix RUM** and pick the **RUM Region** of your tenant.
 3. Set the **RUM application name** to the application your checks target, for example `my-website`.
 4. Paste the key into **RUM API key** and save the integration.

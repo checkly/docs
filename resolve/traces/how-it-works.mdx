@@ -6,6 +6,10 @@ canonical: 'https://www.checklyhq.com/docs/resolve/traces/how-it-works/'
 
 Checkly Traces use OpenTelemetry to correlate synthetic check results with your application's backend traces. The diagram below shows how the dataflows connect to Checkly's monitoring and alerting pipeline.
 
+![Checkly OpenTelemetry diagram](/images/docs/images/otel/checkly_otel_diagram.png)
+
+{/*
+Vendor-neutral Mermaid version of the diagram above, kept for reference. To swap it in, delete the PNG line and this comment wrapper.
 ```mermaid
 flowchart LR
     run["Check run"] -->|"Step 1: trace headers"| app["Your app"]
@@ -14,6 +18,7 @@ flowchart LR
     app -->|"Step 3: spans with checkly=true"| checkly["Checkly"]
     checkly -->|"Step 4: alert"| result["Check result with the full trace"]
 ```
+*/}
 
 ## The Flow
 

@@ -1,12 +1,12 @@
 ---
 title: 'MaintenanceWindow Construct'
 description: 'Learn how to configure maintenance windows with the Checkly CLI.'
-sidebarTitle: 'Maintenance Window'
+sidebarTitle: 'Maintenance window'
 canonical: 'https://www.checklyhq.com/docs/constructs/maintenance-window/'
 ---
 
 <Tip>
-Learn more about Maintenance Windows in [the Maintenance Windows documentation](/communicate/maintenance-windows/overview).
+Learn more about maintenance windows in [the maintenance windows documentation](/communicate/maintenance-windows/overview).
 </Tip>
 
 Use Maintenance Windows to schedule planned maintenance periods that prevent your checks from running and triggering alerts during expected downtime.
@@ -63,6 +63,7 @@ A name for the maintenance window that will be displayed in the Checkly dashboar
 
 Usage:
 
+{/* typecheck-wrap: MaintenanceWindow */}
 ```ts highlight={2}
 new MaintenanceWindow("my-maintenance", {
   name: "Weekly Database Backup",
@@ -79,6 +80,7 @@ Tags that filter which checks are affected by this maintenance window. Checks wi
 
 **Usage:**
 
+{/* typecheck-wrap: MaintenanceWindow */}
 ```ts highlight={3}
 new MaintenanceWindow("my-maintenance", {
   name: "API Maintenance",
@@ -99,6 +101,7 @@ Start date and time for the maintenance window in UTC (ISO 8601 timestamp).
 
 **Usage:**
 
+{/* typecheck-wrap: MaintenanceWindow */}
 ```ts highlight={3}
 new MaintenanceWindow("my-maintenance", {
   name: "Database Maintenance",
@@ -116,6 +119,7 @@ End date and time for the maintenance window in UTC (ISO 8601 timestamp).
 
 **Usage:**
 
+{/* typecheck-wrap: MaintenanceWindow */}
 ```ts highlight={4}
 new MaintenanceWindow("my-maintenance", {
   name: "Database Maintenance",
@@ -133,6 +137,7 @@ Repeat interval from the first occurrence. Used with `repeatUnit` to create recu
 
 **Usage:**
 
+{/* typecheck-wrap: MaintenanceWindow */}
 ```ts highlight={3}
 new MaintenanceWindow("recurring-maintenance", {
   name: "Weekly Maintenance",
@@ -151,6 +156,7 @@ Repeat strategy that defines the time unit for recurring maintenance windows (`D
 
 **Usage:**
 
+{/* typecheck-wrap: MaintenanceWindow */}
 ```ts highlight={4}
 new MaintenanceWindow('recurring-maintenance', {
   name: "Bi-weekly Maintenance",
@@ -164,6 +170,7 @@ new MaintenanceWindow('recurring-maintenance', {
 
 <CodeGroup>
 
+{/* typecheck-wrap: MaintenanceWindow */}
 ```ts Daily Maintenance
 new MaintenanceWindow("daily-updates", {
   name: "Daily Database Sync",
@@ -175,6 +182,7 @@ new MaintenanceWindow("daily-updates", {
 })
 ```
 
+{/* typecheck-wrap: MaintenanceWindow */}
 ```ts Weekly Maintenance
 new MaintenanceWindow("weekly-updates", {
   name: "Weekly System Updates",
@@ -186,6 +194,7 @@ new MaintenanceWindow("weekly-updates", {
 })
 ```
 
+{/* typecheck-wrap: MaintenanceWindow */}
 ```ts Monthly Maintenance
 new MaintenanceWindow("monthly-db", {
   name: "Monthly Database Maintenance",
@@ -207,6 +216,7 @@ When to stop repeating the maintenance window (ISO 8601 timestamp in UTC). If no
 
 **Usage:**
 
+{/* typecheck-wrap: MaintenanceWindow */}
 ```ts highlight={5}
 new MaintenanceWindow("limited-recurring", {
   name: "Limited Time Maintenance",
@@ -227,6 +237,7 @@ The named [IANA time zone](https://en.wikipedia.org/wiki/List_of_tz_database_tim
 
 **Usage:**
 
+{/* typecheck-wrap: MaintenanceWindow */}
 ```ts highlight={4}
 new MaintenanceWindow("nightly-maintenance", {
   name: "Nightly Maintenance",
@@ -251,6 +262,7 @@ Pause every check in the account during the maintenance window, regardless of `t
 
 **Usage:**
 
+{/* typecheck-wrap: MaintenanceWindow */}
 ```ts highlight={3}
 new MaintenanceWindow("platform-migration", {
   name: "Platform Migration",
@@ -267,6 +279,7 @@ Tags that filter which checks have their alerts silenced during the maintenance 
 
 **Usage:**
 
+{/* typecheck-wrap: MaintenanceWindow */}
 ```ts highlight={3}
 new MaintenanceWindow("degraded-api", {
   name: "Expected API Degradation",
@@ -283,6 +296,7 @@ Silence alerts for every check in the account during the maintenance window, reg
 
 **Usage:**
 
+{/* typecheck-wrap: MaintenanceWindow */}
 ```ts highlight={3}
 new MaintenanceWindow("quiet-period", {
   name: "Quiet Period",
@@ -298,6 +312,7 @@ new MaintenanceWindow("quiet-period", {
 
 <Tabs>
   <Tab title="Database Maintenance">
+    {/* typecheck-wrap: MaintenanceWindow */}
     ```ts
     new MaintenanceWindow("database-maintenance", {
       name: "Monthly Database Maintenance",
@@ -312,6 +327,7 @@ new MaintenanceWindow("quiet-period", {
   </Tab>
 
   <Tab title="Weekly System Updates">
+    {/* typecheck-wrap: MaintenanceWindow */}
     ```ts
     new MaintenanceWindow("system-updates", {
       name: "Weekly System Updates",
@@ -326,6 +342,7 @@ new MaintenanceWindow("quiet-period", {
   </Tab>
 
   <Tab title="Emergency Maintenance">
+    {/* typecheck-wrap */}
     ```ts
     // For immediate one-time maintenance
     const now = new Date()
@@ -342,6 +359,7 @@ new MaintenanceWindow("quiet-period", {
   </Tab>
 
   <Tab title="Service-Specific Maintenance">
+    {/* typecheck-wrap: MaintenanceWindow */}
     ```ts
     // API service maintenance
     new MaintenanceWindow("api-maintenance", {

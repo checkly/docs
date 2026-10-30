@@ -65,12 +65,15 @@ Control which tests run as monitors using:
 - **Projects**: Select browser and project configurations from your Playwright config with `pwProjects`
 - **Tags**: Choose tests marked with specific tags (e.g., `@critical`, `@smoke`) with `pwTags`
 - **Combinations**: Mix tags and projects for precise control
-- **testCommand**: Use `npx playwright test ...` to select the tests you want to create a monitor for, using playwright flags like `--grep-invert` or `--projects`
+- **testCommand**: Use `npx playwright test ...` to select the tests you want to create a monitor for, using Playwright flags like `--grep-invert` or `--projects`
 
 Configure test selection in your `checkly.config.ts` file:
 
+{/* typecheck-wrap */}
 ```typescript checkly.config.ts
 export default defineConfig({
+  projectName: 'My Project',
+  logicalId: 'my-project',
   checks: {
     playwrightChecks: [
       {

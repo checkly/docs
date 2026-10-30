@@ -150,7 +150,7 @@ Stop waiting for the remaining checks once this many checks have failed (a whole
 
 Only a check's final result counts toward the limit: a check that passes after a retry does not count, and neither does a degraded check. If the failure that reaches the limit is the last check to finish, the run completes normally.
 
-When the limit is reached, the CLI writes its reports, marks the remaining checks as not finished, and asks Checkly to cancel the test session. Only some check types, such as Playwright Check Suites, can be cancelled once they are running, so other checks may still run to completion in Checkly. The `json` reporter gives those checks `"result": "Not finished"` and adds a top-level `"stoppedEarly": { "reason": "maxFailures", "maxFailures": <n> }` field.
+When the limit is reached, the CLI writes its reports, marks the remaining checks as not finished, and asks Checkly to cancel the test session. Queued API checks and uptime monitors are skipped and reported as cancelled, and running Playwright Check Suite runs are interrupted; other checks still run to completion in Checkly. The `json` reporter gives those checks `"result": "Not finished"` and adds a top-level `"stoppedEarly": { "reason": "maxFailures", "maxFailures": <n> }` field.
 
 Cannot be combined with `--detach`.
 
@@ -265,8 +265,8 @@ npx checkly trigger --reporter ci
 # GitHub Actions reporter
 npx checkly trigger --reporter github
 
-# JSON output for programmatic use
-npx checkly trigger --reporter json > results.json
+# JSON report, written to checkly-json-report.json in the current directory
+npx checkly trigger --reporter json
 
 # Multiple reporters using comma-separated values
 npx checkly trigger --reporter list,json
@@ -447,7 +447,7 @@ npx checkly trigger --tags staging --test-session-name "Pre-prod validation"
 
 <Note>Available in CLI v8.0.0+.</Note>
 
-`checkly trigger` records a test session by default, so pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> cancels it. Cancellation applies only to Playwright Check Suite runs inside the session; other check types finish normally. Runs started with `--no-record` cannot be cancelled.
+`checkly trigger` records a test session by default, so pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> cancels it. Queued API checks and uptime monitors are skipped and reported as cancelled, and running Playwright Check Suite runs are interrupted; other checks finish normally. Runs started with `--no-record` cannot be cancelled.
 
 The CLI keeps running after the first <kbd>Ctrl</kbd>+<kbd>C</kbd> to report the cancelled results. Press <kbd>Ctrl</kbd>+<kbd>C</kbd> again to exit immediately without waiting.
 

@@ -7,7 +7,7 @@
 // for other statements) is on the line before their fence. Snippets with a `/* More options... */` comment may omit required
 // props. Opt a block out with `{/* typecheck-skip */}` on the line before it.
 //
-// Usage: npm install && npm run check (in .github/snippet-typecheck)
+// Usage: npm update && npm run check (in .github/snippet-typecheck)
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -147,14 +147,14 @@ export function typecheckSnippets(snippets) {
   const errors = [];
 
   for (const [path, snippet] of virtual) {
-    const source = program.getSourceFile(path);
-    const syntactic = program.getSyntacticDiagnostics(source);
+    const sourceFile = program.getSourceFile(path);
+    const syntactic = program.getSyntacticDiagnostics(sourceFile);
     // Type errors on code that doesn't parse are noise; report the parse errors only.
     const partial = PARTIAL_MARKER.test(snippet.code);
-    const diagnostics = syntactic.length > 0 ? syntactic : program.getSemanticDiagnostics(source)
+    const diagnostics = syntactic.length > 0 ? syntactic : program.getSemanticDiagnostics(sourceFile)
       .filter(d => !isUnresolvedRelativeImport(d) && !(partial && isOnlyMissingProps(d)) && !(snippet.wrap && isPageContextName(d)));
     for (const d of diagnostics) {
-      const { line, character } = source.getLineAndCharacterOfPosition(d.start ?? 0);
+      const { line, character } = sourceFile.getLineAndCharacterOfPosition(d.start ?? 0);
       // Errors in generated wrapper lines point at the fragment's first line.
       errors.push({
         file: snippet.file,

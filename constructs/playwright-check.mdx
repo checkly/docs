@@ -44,7 +44,7 @@ import { Engine, PlaywrightCheck } from "checkly/constructs"
 new PlaywrightCheck("critical-e2e-monitor", {
   name: "Critical E2E Monitor",
   description: "Runs the **critical path** e2e suite against production.",
-  include: [".npmrc", "test-files/**"],
+  include: ["test-files/**"],
   playwrightConfigPath: "./playwright.config.ts",
   engine: Engine.node("24"), // Optional: override the auto-detected engine.
   installCommand: "npm ci",
@@ -106,6 +106,7 @@ The path to the Playwright configuration file (`playwright.config.js/ts`) which 
 
 **Usage:**
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts highlight={3}
 new PlaywrightCheck("critical-e2e-monitor", {
   name: "Critical E2E Monitor",
@@ -123,6 +124,7 @@ Checkly defaults to using npm, but automatically detects other package managers 
 
 **Usage:**
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts highlight={4}
 new PlaywrightCheck("critical-e2e-monitor", {
   name: "Critical E2E Monitor",
@@ -139,6 +141,7 @@ The command to execute Playwright tests when running `npx checkly test` or runni
 
 **Usage:**
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts highlight={4}
 new PlaywrightCheck("critical-e2e-monitor", {
   name: "Critical E2E Monitor",
@@ -163,6 +166,7 @@ The defined projects to run from your Playwright configuration.
 
 <CodeGroup>
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts Single project highlight={4}
 new PlaywrightCheck("critical-e2e-monitor", {
   name: "Critical E2E Monitor",
@@ -171,6 +175,7 @@ new PlaywrightCheck("critical-e2e-monitor", {
 })
 ```
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts Multiple projects highlight={4}
 new PlaywrightCheck("critical-e2e-monitor", {
   name: "Critical E2E Monitor",
@@ -195,6 +200,7 @@ Tests matching any of these tags will be executed.
 
 <CodeGroup>
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts Single project highlight={4}
 new PlaywrightCheck("critical-e2e-monitor", {
   name: "Critical E2E Monitor",
@@ -203,6 +209,7 @@ new PlaywrightCheck("critical-e2e-monitor", {
 })
 ```
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts Multiple projects highlight={4}
 new PlaywrightCheck("critical-e2e-monitor", {
   name: "Critical E2E Monitor",
@@ -223,11 +230,12 @@ Defines the glob patterns for files and directories that should be included when
 
 **Usage:**
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts highlight={4}
 new PlaywrightCheck("critical-e2e-monitor", {
   name: "Critical E2E Monitor",
   playwrightConfigPath: "../playwright.config.ts",
-  include: [".npmrc", "test-files/**"],
+  include: ["test-files/**"],
 })
 ```
 
@@ -263,11 +271,13 @@ import { Engine, PlaywrightCheck } from "checkly/constructs"
 new PlaywrightCheck("critical-e2e-monitor", {
   name: "Critical E2E Monitor",
   playwrightConfigPath: "../playwright.config.ts",
-  engine: Engine.bun("1.3"),
+  engine: Engine.bun("1.4"),
 })
 ```
 
 </CodeGroup>
+
+To always run on the newest Bun 1.x that Checkly provides, use `Engine.bun("1")`. The check then moves to each new Bun minor version without a code change. Pin a minor version such as `Engine.bun("1.4")` to stay on it.
 
 If you omit `engine`, the Checkly CLI tries to detect it from project version files. It checks `.node-version`, `.nvmrc`, `.tool-versions` (`nodejs` or `bun`), `.bun-version`, the [Volta](https://volta.sh) pin in `package.json` (`volta.node`), and `package.json` `engines.node` or `engines.bun`, in that order. The files are read from the project root: the workspace root when your Checkly config is part of a pnpm, npm, or Yarn workspace, otherwise the directory of the nearest `package.json`.
 
@@ -282,10 +292,10 @@ Detected and explicit versions are checked against Checkly's engine rules:
 | Engine | Supported versions | Resolution behavior |
 |--------|--------------------|---------------------|
 | Node.js | `22`, `24`, `26` | Older, EOL, non-LTS, or future major versions are remapped to the nearest supported LTS version with a warning |
-| Bun | `1.3` | Older or future `1.x` versions are remapped to `1.3` with a warning; `2.x` and newer are rejected |
+| Bun | `1`, `1.3`, `1.4` | `1` runs the newest Bun 1.x Checkly provides. Versions older than `1.3` are remapped to `1.3`, and newer `1.x` versions to `1.4`, with a warning; `2.x` and newer are rejected |
 
 <Info>
-If no engine is set and the CLI cannot auto-detect one, Checkly uses the default Node.js 22 engine.
+If no engine is set and the CLI cannot auto-detect one, Checkly uses the default Node.js 22 engine. A project with a Bun lockfile runs on the newest Bun 1.x instead.
 </Info>
 
 </ResponseField>
@@ -297,6 +307,7 @@ Friendly name for your Playwright Check Suite that will be displayed in the Chec
 
 **Usage:**
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts highlight={2}
 new PlaywrightCheck("critical-e2e-monitor", {
   name: "Critical E2E Monitor",
@@ -312,6 +323,7 @@ How often the Playwright Check Suite should run. Use the `Frequency` enum to set
 
 **Usage:**
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts highlight={4}
 new PlaywrightCheck("my-pwt-check-suite", {
   name: "My Playwright Check Suite",
@@ -324,6 +336,7 @@ new PlaywrightCheck("my-pwt-check-suite", {
 
 <CodeGroup>
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts High Frequency
 // For critical user journeys
 new PlaywrightCheck("my-pwt-check-suite", {
@@ -334,6 +347,7 @@ new PlaywrightCheck("my-pwt-check-suite", {
 })
 ```
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts Standard Frequency
 // For regular monitoring
 new PlaywrightCheck("my-pwt-check-suite", {
@@ -355,6 +369,7 @@ Array of public location codes where the Playwright Check Suite should run. Mult
 
 **Usage:**
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts highlight={4}
 new PlaywrightCheck("my-pwt-check-suite", {
   name: "My Playwright Check Suite",
@@ -367,6 +382,7 @@ new PlaywrightCheck("my-pwt-check-suite", {
 
 <CodeGroup>
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts Global Coverage
 // Comprehensive global monitoring
 new PlaywrightCheck("global-pwt-check-suite", {
@@ -382,6 +398,7 @@ new PlaywrightCheck("global-pwt-check-suite", {
 })
 ```
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts Regional Focus
 // Focus on specific regions
 new PlaywrightCheck("europe-pwt-check-suite", {
@@ -402,6 +419,7 @@ Whether the Playwright Check Suite is enabled and will run according to its sche
 
 **Usage:**
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts highlight={4}
 new PlaywrightCheck("disabled-pwt-check-suite", {
   name: "Disabled Playwright Check Suite",
@@ -418,6 +436,7 @@ Array of Checkly tags to organize and categorize your Playwright Check Suite in 
 
 **Usage:**
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts highlight={4}
 new PlaywrightCheck("my-check-suite", {
   name: "My Playwright Check Suite",
@@ -430,6 +449,7 @@ new PlaywrightCheck("my-check-suite", {
 
 <CodeGroup>
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts Priority Tags
 new PlaywrightCheck("my-check-suite", {
   name: "My Playwright Check Suite",
@@ -438,6 +458,7 @@ new PlaywrightCheck("my-check-suite", {
 })
 ```
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts Environment Tags
 new PlaywrightCheck("staging-check-suite", {
   name: "Staging Playwright Check Suite",
@@ -465,7 +486,8 @@ Check-level environment variables that will be available during test execution. 
 
 **Usage:**
 
-```ts highlight={6-9}
+```ts highlight={7-10}
+import { PlaywrightCheck } from "checkly/constructs"
 import { secret } from "checkly/util"
 
 new PlaywrightCheck("user-flow-pwt-check-suite", {
@@ -491,6 +513,7 @@ new PlaywrightCheck("user-flow-pwt-check-suite", {
 <CodeGroup>
 
 ```ts Test Credentials
+import { PlaywrightCheck } from "checkly/constructs"
 import { secret } from "checkly/util"
 
 new PlaywrightCheck("user-flow-pwt-check-suite", {
@@ -503,6 +526,7 @@ new PlaywrightCheck("user-flow-pwt-check-suite", {
 })
 ```
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts Environment settings
 new PlaywrightCheck("feature-test", {
   name: "Feature Flag Test",
@@ -527,6 +551,7 @@ new PlaywrightCheck("feature-test", {
 
 <CodeGroup>
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts Multi-browser Support
 const playwrightChecks = new PlaywrightCheck("multi-browser-check", {
   name: "Multi-browser check suite",
@@ -537,6 +562,7 @@ const playwrightChecks = new PlaywrightCheck("multi-browser-check", {
 })
 ```
 
+{/* typecheck-wrap: PlaywrightCheck */}
 ```ts Project-dependency Support
 // Often, it makes sense to define different Playwright projects
 // in your `playwright.config` and make them depend on each other

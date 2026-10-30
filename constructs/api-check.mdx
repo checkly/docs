@@ -123,6 +123,7 @@ The HTTP request configuration that defines the API endpoint to monitor. This is
 
 **Usage:**
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts
 request: {
   method: 'GET',
@@ -149,6 +150,7 @@ request: {
 
 <CodeGroup>
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts REST API
 request: {
   method: "GET",
@@ -165,6 +167,7 @@ request: {
 },
 ```
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts GraphQL API
 request: {
   method: "POST",
@@ -190,6 +193,7 @@ request: {
 },
 ```
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts Form POST
 request: {
   method: "POST",
@@ -205,6 +209,7 @@ request: {
 },
 ```
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts API with Authentication
 request: {
   method: "GET",
@@ -230,6 +235,7 @@ Response time threshold in milliseconds for marking the check as degraded. This 
 
 **Usage:**
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts highlight={3}
 new ApiCheck("performance-check", {
   name: "Performance Monitoring",
@@ -250,6 +256,7 @@ Maximum response time in milliseconds before marking the check as failed. This s
 
 **Usage:**
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts highlight={3}
 new ApiCheck("timeout-check", {
   name: "API Timeout Check",
@@ -269,6 +276,7 @@ Whether a failure should count as a pass. When set to `true`, HTTP status codes 
 
 **Usage:**
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts highlight={3}
 new ApiCheck("negative-test", {
   name: "Test Error Handling",
@@ -284,6 +292,7 @@ new ApiCheck("negative-test", {
 
 <CodeGroup>
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts Error Testing
 new ApiCheck("error-handling-test", {
   name: "Error Handling Test",
@@ -297,6 +306,7 @@ new ApiCheck("error-handling-test", {
 })
 ```
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts Rate Limit Testing
 new ApiCheck("rate-limit-test", {
   name: "Rate Limit Behavior",
@@ -324,6 +334,7 @@ Script to run before the API Check execution. Useful for setting up test data or
 
 <CodeGroup>
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts File Reference highlight={3-5}
 new ApiCheck("api-with-setup", {
   name: "API with Setup Script",
@@ -337,6 +348,7 @@ new ApiCheck("api-with-setup", {
 })
 ```
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts Inline Script highlight={3-8}
 new ApiCheck('inline-setup', {
   name: 'API with Inline Setup',
@@ -347,6 +359,7 @@ new ApiCheck('inline-setup', {
     `
   },
   request: {
+    method: 'GET',
     url: 'https://api.example.com/users'
   }
 })
@@ -377,6 +390,7 @@ Script to run after the API Check execution. Useful for cleaning up test data or
 
 <CodeGroup>
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts File Reference highlight={3-5}
 new ApiCheck("api-with-teardown", {
   name: "API with Teardown Script",
@@ -390,6 +404,7 @@ new ApiCheck("api-with-teardown", {
 })
 ```
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts Inline Script highlight={3-9}
 new ApiCheck("inline-teardown", {
   name: "API with Inline Teardown",
@@ -451,7 +466,7 @@ AssertionBuilder.statusCode().equals(200)
 - Asserting a part of a JSON response body using a JSON path expression
 
 ```ts
-AssertionBuilder.jsonBody('$.data').greaterThan(2000),
+AssertionBuilder.jsonBody('$.data').greaterThan(2000)
 // Equivalent to:
 { source: 'JSON_BODY', property: '$.data', comparison: 'GREATER_THAN', target: '2000' }
 ```
@@ -459,7 +474,7 @@ AssertionBuilder.jsonBody('$.data').greaterThan(2000),
 - Asserting the value of a part of an HTTP response header. Note that you can pass in a regex as the second argument
 
 ```ts
-AssertionBuilder.headers('strict-transport-security', 'max-age=(\\d+)').greaterThan(10000),
+AssertionBuilder.headers('strict-transport-security', 'max-age=(\\d+)').greaterThan(10000)
 // Equivalent to:
 { source: 'HEADERS', regex: 'max-age=(\d+)', property: 'strict-transport-security', comparison: 'GREATER_THAN', target: '10000' }
 ```
@@ -472,6 +487,7 @@ AssertionBuilder.headers('strict-transport-security', 'max-age=(\\d+)').greaterT
 
 <CodeGroup>
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts REST API Check
 new ApiCheck("users-api-check", {
   name: "Users API Check",
@@ -493,6 +509,7 @@ new ApiCheck("users-api-check", {
 })
 ```
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts GraphQL API Check
 new ApiCheck("graphql-api-check", {
   name: "GraphQL API Check",
@@ -521,6 +538,7 @@ new ApiCheck("graphql-api-check", {
 })
 ```
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts Form Submission Check
 new ApiCheck("form-api-check", {
   name: "Form Submission Check",
@@ -539,6 +557,7 @@ new ApiCheck("form-api-check", {
 })
 ```
 
+{/* typecheck-wrap: ApiCheck */}
 ```ts Authenticated API Check
 new ApiCheck("protected-api-check", {
   name: "Protected API Check",

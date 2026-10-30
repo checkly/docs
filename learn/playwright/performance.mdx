@@ -55,11 +55,11 @@ Several approaches can be combined to gather the best insights:
 
 With Google pushing for a faster web, [the Web Vitals metrics](https://web.dev/vitals/) should be on your radar. Metrics such as Time to First Byte (TTFB), Total Blocking Time (TBT) or First Contentful Paint (FCP) are good user experience indicators and worth monitoring.
 
-Google recommends focusing on the three most important ones – Largest Contentful Paint (LCP), First Input Delay (FID) and Cumulative Layout Shift (CLS). **These three metrics are considered the Core Web Vitals** and give a good idea of a page’s loading behavior, interactivity, and visual stability.
+Google recommends focusing on the three most important ones – Largest Contentful Paint (LCP), Interaction to Next Paint (INP) and Cumulative Layout Shift (CLS). **These three metrics are considered the Core Web Vitals** and give a good idea of a page’s loading behavior, interactivity, and visual stability.
 
 <Note>
 Not all of Google's Web Vitals are suitable for synthetic monitoring and performance testing.
-**First Input Delay** relies on user interactions, and it's best measured using real user monitoring. Use **Total Blocking Time** as an interactivity metric in a lab setting instead.
+**Interaction to Next Paint** relies on user interactions, and it's best measured using real user monitoring. Use **Total Blocking Time** as an interactivity metric in a lab setting instead.
 </Note>
 
 ## Web Performance evaluation with headless tools
@@ -216,6 +216,7 @@ test('basic performance paint timing', async ({ page }) => {
   { name: 'first-paint', entryType: 'paint', startTime: 1149.5, duration: 0 },
   { name: 'first-contentful-paint', entryType: 'paint', startTime: 1149.5, duration: 0 }
 ]
+```
 
 
 #### Largest Contentful Paint API (`largest-contentful-paint`)
@@ -371,7 +372,7 @@ const util = require('util')
     `http://localhost:${chrome.port}/json/version`
   )
   const { webSocketDebuggerUrl } = JSON.parse(resp.body)
-  const browser = await chromium.connect({ wsEndpoint: webSocketDebuggerUrl })
+  const browser = await chromium.connectOverCDP(webSocketDebuggerUrl)
 
   const { lhr } = await lighthouse(
     'https://danube-web.shop/',

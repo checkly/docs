@@ -22,7 +22,7 @@ A field with a fixed set of values, such as **Status** or **Tags**, starts with 
 
 Fields like **Tags** take several values. The filter then matches any of them. The block shows how many it holds, such as **3 tags**. Long lists, such as your tags, have a search at the top of the picker.
 
-Text that doesn't start a field name searches by name when you press Enter. A list that searches another field says so in its section under [Fields](#fields).
+Text that doesn't start a field name searches by name when you press Enter.
 
 ## Fields
 
@@ -123,9 +123,9 @@ Reporting filters on the details of each check and on its results in the time ra
 | Success | The success ratio, as a percentage. |
 | Avg, P95, P99 | The response times, such as `500ms` or `2s`. A number without a unit is in milliseconds. |
 
-**Status** follows the check's alerts. **Failing** matches a check that was failing at any point in the time range. A failure that started before the range and was still open counts. **Degraded** works the same way. **Passing** matches a check that ran in the range and was never failing or degraded. A failed run that raised no alert doesn't change the check's state.
+**Status** is the check's alert state in the time range. **Failing** and **Degraded** match a check that was in that state at any point, including a failure still open from before the range. **Passing** matches a check that ran and was never failing or degraded.
 
-**Success**, **Avg**, **P95** and **P99** compare the numbers the table shows. **Avg**, **P95** and **P99** count only runs with a measured response time. A failed run records none. A check whose runs all failed shows a dash in those columns. It matches no filter on them. A check without results in the time range matches none of the four. When you group by location, these filters still compare each check's numbers across all its locations.
+**Success**, **Avg**, **P95** and **P99** compare the numbers the table shows. **Avg**, **P95** and **P99** count only runs with a measured response time. A run that got no response, such as a refused connection, has none. A check without measured runs shows a dash and matches no filter on them. A check without results in the time range matches none of the four. When you group by location, these filters still compare each check's numbers across all its locations.
 
 ## Pick the time range
 

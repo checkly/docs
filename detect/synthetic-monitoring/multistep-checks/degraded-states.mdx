@@ -1,7 +1,7 @@
 ---
 title: Degraded states in Multistep checks
 description: "Signal non-critical slowdowns in Multistep checks with the degraded state, using soft assertions and the @checkly/playwright-helpers markCheckAsDegraded helper."
-sidebarTitle: Degraded States
+sidebarTitle: Degraded states
 
 canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/multistep-checks/degraded-states/'
 ---
@@ -18,7 +18,7 @@ To trigger a degraded state, checks use a helper library, `@checkly/playwright-h
 The helper library contains two methods, `markCheckAsDegraded` and `getAPIResponseTime`. 
 </Info>
 
-### Installing and Importing
+### Installing and importing
 
 ```bash
 npm i @checkly/playwright-helpers
@@ -36,7 +36,7 @@ const { getAPIResponseTime, markCheckAsDegraded } = require('@checkly/playwright
 
 </CodeGroup>
 
-### Getting The Request Response Time
+### Getting the request response time
 To get the request response time, call `getAPIResponseTime`.
 
 **Usage**
@@ -49,7 +49,7 @@ if (getAPIResponseTime(response) > 100) {
 **Arguments**
 - `response` [APIResponse](https://playwright.dev/docs/api/class-apiresponse) *(required)*. A response from a Playwright API request.
 
-### Marking A Check As Degraded
+### Marking a check as degraded
 To mark a check as degraded, call `markCheckAsDegraded`.
 
 This can be used when:
@@ -69,7 +69,7 @@ if (foo.length > 100) {
 **Arguments**
 - `reason` String *(optional)*. Logged when the method is called. Used to identify which method caused the degradation.
 
-### Example of Marking A Check As Degraded
+### Example of marking a check as degraded
 
 A check is marked as degraded when `markCheckAsDegraded` is called and there are no regular assertions triggered.
 

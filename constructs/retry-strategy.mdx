@@ -1,7 +1,7 @@
 ---
-title: 'RetryStrategyBuilder Construct'
+title: 'RetryStrategyBuilder construct'
 description: 'Learn how to configure retry strategies with the Checkly CLI.'
-sidebarTitle: 'Retry Strategy'
+sidebarTitle: 'Retry strategy'
 canonical: 'https://www.checklyhq.com/docs/constructs/retry-strategy/'
 ---
 
@@ -74,7 +74,7 @@ A check, monitor or group that sets no `retryStrategy` uses the default for its 
 | `PlaywrightCheck` | No retry strategy. Configure retries in your Playwright configuration instead. |
 | `CheckGroupV2` | No group retry strategy. Each check in the group uses its own. |
 
-### Retry Strategy Methods
+### Retry strategy methods
 
 Use the `RetryStrategyBuilder` methods to apply different retry strategies to your checks and monitors.
 
@@ -153,7 +153,7 @@ new ApiCheck("stable-api", {
 ```
 
 </Tab>
-<Tab title="Database Check">
+<Tab title="Database check">
 
 {/* typecheck-wrap: ApiCheck */}
 ```ts highlight={4-8}
@@ -184,7 +184,7 @@ Time between retries with five seconds `baseBackoffSeconds` and three retries: `
 **Usage:**
 
 <Tabs>
-<Tab title="Gradual Backoff">
+<Tab title="Gradual backoff">
 
 {/* typecheck-wrap: ApiCheck */}
 ```ts highlight={4-8}
@@ -202,7 +202,7 @@ new ApiCheck("gradual-backoff", {
 ```
 
 </Tab>
-<Tab title="Service Recovery">
+<Tab title="Service recovery">
 
 {/* typecheck-wrap: ApiCheck */}
 ```ts highlight={4-8}
@@ -233,7 +233,7 @@ Time between retries with five seconds `baseBackoffSeconds` and three retries: `
 **Usage:**
 
 <Tabs>
-<Tab title="Overloaded Service">
+<Tab title="Overloaded service">
 
 {/* typecheck-wrap: ApiCheck */}
 ```ts highlight={4-9}
@@ -252,7 +252,7 @@ new ApiCheck("overloaded-api", {
 ```
 
 </Tab>
-<Tab title="Rate-Limited API">
+<Tab title="Rate-limited API">
 
 {/* typecheck-wrap: ApiCheck */}
 ```ts highlight={4-9}
@@ -276,7 +276,7 @@ new ApiCheck("rate-limited-api", {
 **Use cases**: Overloaded services, rate-limited APIs, aggressive backoff scenarios, circuit breaker patterns.
 </ResponseField>
 
-### Retry Strategy Options
+### Retry strategy options
 
 <ResponseField name="baseBackoffSeconds" type="number" default="60">
 Time to wait before the first retry attempt. Also used as the base value for calculating subsequent retry intervals in linear and exponential strategies.
@@ -369,7 +369,7 @@ Currently supports `'NETWORK_ERROR'` for `ApiCheck` and `UrlMonitor` constructs 
 ## Examples
 
 <Tabs>
-  <Tab title="No Retries">
+  <Tab title="No retries">
     ```ts
     import { ApiCheck, RetryStrategyBuilder } from "checkly/constructs"
 
@@ -384,7 +384,7 @@ Currently supports `'NETWORK_ERROR'` for `ApiCheck` and `UrlMonitor` constructs 
     ```
   </Tab>
 
-  <Tab title="Fixed Interval Retries">
+  <Tab title="Fixed interval retries">
     ```ts
     import { ApiCheck, RetryStrategyBuilder } from "checkly/constructs"
 
@@ -407,7 +407,7 @@ Currently supports `'NETWORK_ERROR'` for `ApiCheck` and `UrlMonitor` constructs 
     ```
   </Tab>
 
-  <Tab title="Linear Backoff">
+  <Tab title="Linear backoff">
     ```ts
     import { ApiCheck, RetryStrategyBuilder } from "checkly/constructs"
 
@@ -430,7 +430,7 @@ Currently supports `'NETWORK_ERROR'` for `ApiCheck` and `UrlMonitor` constructs 
     ```
   </Tab>
 
-  <Tab title="Exponential Backoff">
+  <Tab title="Exponential backoff">
     ```ts
     import { ApiCheck, RetryStrategyBuilder } from "checkly/constructs"
 
@@ -454,7 +454,7 @@ Currently supports `'NETWORK_ERROR'` for `ApiCheck` and `UrlMonitor` constructs 
     ```
   </Tab>
 
-  <Tab title="Group-Level Retry Strategy">
+  <Tab title="Group-level retry strategy">
     ```ts
     import {
       ApiCheck,
@@ -489,7 +489,7 @@ Currently supports `'NETWORK_ERROR'` for `ApiCheck` and `UrlMonitor` constructs 
     ```
   </Tab>
 
-  <Tab title="Project-Level Default">
+  <Tab title="Project-level default">
     ```ts checkly.config.ts
     import { defineConfig } from "checkly"
     import { Frequency, RetryStrategyBuilder } from "checkly/constructs"
@@ -512,10 +512,10 @@ Currently supports `'NETWORK_ERROR'` for `ApiCheck` and `UrlMonitor` constructs 
   </Tab>
 </Tabs>
 
-## Best Practices
+## Best practices
 
 <Tabs>
-  <Tab title="Stable vs Non-Stable">
+  <Tab title="Stable vs non-stable">
     {/* typecheck-wrap */}
     ```ts
     // For stable APIs - minimal retries
@@ -534,7 +534,7 @@ Currently supports `'NETWORK_ERROR'` for `ApiCheck` and `UrlMonitor` constructs 
     ```
   </Tab>
 
-  <Tab title="Critical vs Non-Critical">
+  <Tab title="Critical vs non-critical">
     {/* typecheck-wrap */}
     ```ts
     // Critical endpoints - fail fast to alert quickly
@@ -553,7 +553,7 @@ Currently supports `'NETWORK_ERROR'` for `ApiCheck` and `UrlMonitor` constructs 
     ```
   </Tab>
 
-  <Tab title="By Check Type">
+  <Tab title="By check type">
     {/* typecheck-wrap */}
     ```ts
     // Browser checks - longer backoff due to complexity

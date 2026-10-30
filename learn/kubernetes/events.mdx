@@ -1,5 +1,5 @@
 ---
-title: Kubernetes Events - A Native Resource for State Insight
+title: Kubernetes events - A native resource for state insight
 displayTitle: Kubernetes Events
 sidebarTitle: Events
 description: In Kubernetes, **Events** are a native resource, providing insight into actions and state changes of objects in the cluster. Events are platform-generated messages accessible through the Kubernetes API, often used by operators and users to understand what has happened to various Kubernetes objects.
@@ -20,7 +20,7 @@ Events serve as valuable resources for monitoring and debugging, allowing users 
 
 ---
 
-## Event Mechanics
+## Event mechanics
 
 Kubernetes Events can be accessed by querying the Kubernetes API. Each Event describes an action related to a Kubernetes object, such as a Pod, Deployment, or Node. These Events are often labeled with the following attributes:
 - **Type**: Indicates whether the Event is `Normal` (standard actions) or `Warning` (indicating potential issues).
@@ -31,7 +31,7 @@ Kubernetes Events can be accessed by querying the Kubernetes API. Each Event des
 
 ---
 
-### Example: Viewing Events for a Pod
+### Example: Viewing events for a pod
 
 To see Events associated with a specific Pod, use the `kubectl describe` command. Here’s an example output for a Pod named `webapp-5d8dbbd4bb-2lqfs`:
 
@@ -52,7 +52,7 @@ Warning BackOff    40s    kubelet, ip-10-0-1-233              Back-off restartin
 
 In this output, each Event shows a timestamp and message about actions related to the Pod, from scheduling to a restart back-off warning.
 
-### Example: Viewing Events for a Namespace
+### Example: Viewing events for a namespace
 
 To retrieve Events for all resources in a namespace, you can use the `kubectl get events` command:
 
@@ -71,11 +71,11 @@ LAST SEEN   TYPE    REASON               OBJECT                     MESSAGE
 This output shows Events from the namespace, covering various resources, such as Pods, ReplicaSets, and Deployments, with some Events indicating a container restart issue for further investigation.
 ---
 
-## Monitoring and Alerting with Events
+## Monitoring and alerting with events
 
 Events provide real-time insights, allowing operators to monitor Kubernetes activity. Although not commonly used for direct automation, some approaches leverage Events for alerting and monitoring:
 
-### Event Exporters
+### Event exporters
 
 An **Event exporter** can expose Events as metrics to external monitoring systems. For example, Prometheus can scrape metrics derived from Events, enabling alerting based on conditions like frequent container restarts or persistent failures in Pod scheduling. 
 

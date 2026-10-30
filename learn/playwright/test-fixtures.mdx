@@ -11,7 +11,7 @@ tags:
   - assertions
 
 weight: 7
-sidebarTitle: Test Fixtures
+sidebarTitle: Test fixtures
 learn_playwright:
   parent: "Best practices"
 canonical: 'https://www.checklyhq.com/docs/learn/playwright/test-fixtures/'
@@ -25,7 +25,7 @@ import { YoutubeEmbed } from "/snippets/youtube-embed.jsx"
 
 Playwright's test fixtures are a powerful feature for sharing setup and logic across tests, promoting code reuse and maintainability. With custom fixtures, you can share code across multiple tests, resulting in a test base that is easier to expand and easier to maintain.
 
-## Understanding Playwright Test Fixtures
+## Understanding Playwright Test fixtures
 
 At their core, fixtures in Playwright are predefined components like `page`, `context`, `browser`, and `browserName` that you can use across different test cases. They encapsulate functionality into modular blocks, simplifying test code.
 
@@ -51,11 +51,11 @@ test('test', async ({ page }) => {
 This is a fine practice for a single test, but if we have dozens that all require login as a first step, we'll find ourself copying and pasting this code several times. This means a lot of copied code, such that if we ever tweak the login process, we'll have to update this copied code in dozens of places, not good!
 
 
-## Playwright and Fixtures
+## Playwright and fixtures
 
 Playwright and its test runner Playwright Test, were designed with a broader testing scope and includes first-class support for fixtures. This design choice streamlines the setup and teardown process, making tests cleaner and reducing redundancy.
 
-### Built-in Support
+### Built-in support
 
 Playwright's test runner provides a rich set of predefined fixtures, such as `browser`, `context`, `page`, and `request`, and allows for easy customization and extension of these fixtures. This built-in support enables more structured and maintainable tests, with less manual setup required.
 
@@ -73,13 +73,13 @@ test('My authenticated test', async ({ page }) => {
 The ability to extend and customize fixtures in Playwright not only reduces boilerplate but also enhances test isolation and reusability across your test suite.
 
 
-## Create a Custom Test Fixture in Playwright Test
+## Create a custom test fixture in Playwright Test
 
 Imagine testing a web application where multiple tests require logging in. Repeating login logic in every test is inefficient and violates the DRY (Don't Repeat Yourself) principle.
 
 Let's implement __a fixture to reuse and share code across Playwright test cases__.
 
-### Step 1: Extend the Test Object
+### Step 1: Extend the test object
 
 First, create a new test file or use an existing one. Here, we're testing a web application with Playwright, accessing environment variables, and performing UI interactions.
 
@@ -111,7 +111,7 @@ const test = baseTest.extend({
 
 By using custom fixtures, test cases can reuse code defined in the `test.extend` call. In this case, all tests using the extended `test` method can rely on the `webApp` fixture.
 
-### Step 2: Use the Custom Fixture
+### Step 2: Use the custom fixture
 
 With the `webApp` fixture defined, you can use it in your tests. The fixture code will only run when a test "requests" to use it. For example, the custom `webApp` fixture will only be executed if a test case uses it.
 
@@ -125,11 +125,11 @@ test('My webApp test', async ({ webApp }) => {
 
 The `webApp` fixture encapsulates the login logic, making it accessible to any test that requires it.
 
-### Step 3: Debugging and Validation
+### Step 3: Debugging and validation
 
 Debugging is crucial to ensure your fixture works as expected. Playwright's inspector is invaluable here, allowing you to step through test execution and verify the setup and teardown processes.
 
-### Step 4: Sharing Across Tests
+### Step 4: Sharing across tests
 
 To share your custom fixture across different test files, encapsulate it in a separate module:
 
@@ -151,13 +151,13 @@ This approach keeps your tests clean and focused, with shared logic abstracted i
 
 <YoutubeEmbed id="2O7dyz6XO2s" title="Reuse Playwright Code across Files and Tests with Fixtures" />
 
-## Replace `beforeEach` / `afterEach` Hooks with Automatic Fixtures
+## Replace `beforeEach` / `afterEach` hooks with automatic fixtures
 
 As explained in the previous section, fixtures enable the sharing and distributing of code across Playwright tests. By default, fixture code is only executed when a test case accesses a fixture. But there are scenarios in which you always want to run your fixture code, like global `beforeEach` and `afterEach` hooks.
 
 Let's implement __an automatic fixture to log the current time before and after every test case__.
 
-### Define an Automatic Fixture
+### Define an automatic fixture
 
 If you want to run code before and after each test case, you can reach for the commonly known `beforeEach` and `afterEach` hooks.
 
@@ -231,7 +231,7 @@ import { expect } from '@playwright/test';
 
 Custom test fixtures in Playwright streamline test setup and teardown, fostering code reuse and reducing boilerplate. Encapsulating common functionality, such as user logins or global setups, into fixtures ensures your tests are cleaner, more maintainable, and easier to read.
 
-### Playwright Fixtures Explained on YouTube
+### Playwright fixtures explained on YouTube
 
 To discover more practical fixture examples, check out our [YouTube playlist](https://www.youtube.com/watch?v=hegZS46J0rA&list=PLMZDRUOi3a8N067UNvkxXEThKlTII_OJ-), which covers fixtures in even more depth.
 

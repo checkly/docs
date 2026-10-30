@@ -1,7 +1,7 @@
 ---
 title: Vercel Deployment Protection
 description: "Let Checkly's Browser checks reach protected Vercel preview and production deployments by passing a Protection Bypass for Automation secret in your tests."
-sidebarTitle: Deployment Protection
+sidebarTitle: Deployment protection
 canonical: 'https://www.checklyhq.com/docs/integrations/ci-cd/vercel/deployment-protection/'
 ---
 
@@ -13,7 +13,7 @@ so we can validate your preview branches before they reach production and contin
 
 Vercel has a few different ways to authenticate your deployments. Each work a bit different. We will go over each of them below.
 
-## Bypass for Automation
+## Bypass for automation
 
 You can fully bypass any deployment protection using Vercel's [Protection Bypass for Automation feature](https://vercel.com/docs/security/deployment-protection/methods-to-bypass-deployment-protection/protection-bypass-automation).
 With this feature, you can provide a secret in an HTTP header or query parameter to bypass any deployment protection.
@@ -51,14 +51,14 @@ For an API check you can do something similar
 request.headers['x-vercel-protection-bypass'] = process.env.VERCEL_BYPASS_TOKEN
 ```
 
-## Vercel Authentication
+## Vercel authentication
 
 Vercel has a few different ways to authenticate your deployments. Each work a bit different and require a different approach
 to make them work with Checkly.
 
 > Vercel enables **Standard Protection** by default on all new deployments.
 
-### Standard Protection
+### Standard protection
 [Standard Protection](https://vercel.com/docs/concepts/deployments/deployment-protection#vercel-authentication)
 works by prompting the user to log in to Vercel with their normal Vercel user before they can access the deployment. 
 
@@ -119,7 +119,7 @@ You will have to supply your GitHub username and password as environment variabl
 the code example) to your Checkly account or as part of the [Browser check's environment variables](/platform/variables).
 
 
-### Only Preview Deployments
+### Only preview deployments
 
 [Only Preview Deployments](https://vercel.com/docs/concepts/deployments/deployment-protection#vercel-authentication)
 is the same as Standard Protection, but only applies to Preview deployments. This means that we need to tweak the above code
@@ -183,7 +183,7 @@ explore bypassing 2FA using the `otpauth` library. [Check our blog post for more
 </Warning>
 
 
-## Password Protection
+## Password protection
 Vercel's [Password Protection](https://vercel.com/docs/concepts/deployments/deployment-protection#password-protection) is a paid
 addon that allows you to set a dedicated password for your deployments and specifically bypass protection for E2E tests / automation.
 You can accomplish this using the resources referenced in the docs for [Browser checks](/detect/synthetic-monitoring/browser-checks/examples#username--password-login)

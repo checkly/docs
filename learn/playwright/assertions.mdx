@@ -1,5 +1,5 @@
 ---
-title: Playwright Assertions - Types & Best Practices
+title: Playwright assertions - Types & best practices
 displayTitle: Playwright Assertions - Types & Best Practices
 metatags:
   title: Playwright Assertions - Types & Best Practices
@@ -17,17 +17,17 @@ import SignUpCta from "/snippets/sign-up-cta.mdx"
 
 <PlaywrightCheckSuiteTryOut />
 
-### What are Playwright Assertions?
+### What are Playwright assertions?
 
 Playwright is more than a testing framework. With its generalized tool at simulating user behavior in a browser (or via an API), Playwright is better defined as a web automation framework. You can use Playwright to scrape websites, automate form submissions, or any other time it would be helpful to replace a human web user with a robot. For most users, Playwright is intimately associated with end-to-end tests, and for these we must stop our automated actions and check to see if everything is working right.
 
 To make an automation into a test, we have assertions. When a hard assertion fails, the execution of a Playwright test stops, and following steps are not run.
 
-### Types of Playwright Assertions
+### Types of Playwright assertions
 
 Playwright offers a variety of assertion types to accommodate different testing scenarios, and there are two broad categories for flexible, Web-first assertions and rigid, brittle, non-retrying assertions. Web-first assertions return promises, since they will return when they are successful or time out, where as non-retrying assertions throw their response immediately.
 
-### Auto-retrying, Web-first Assertions
+### Auto-retrying, web-first assertions
 
 Auto-retrying assertions automatically recheck conditions until they pass or a timeout is reached. They both make a test more stable, and can make tests execute more quickly, and in the language of game theory should be 'strictly better' than non-retrying assertions.
 
@@ -64,7 +64,7 @@ Auto-retrying assertions automatically recheck conditions until they pass or a t
 | `expect(locator).toBeFocused()` | element is focused. |
 | `expect(locator).not.toBeFocused()` | element is not focused. |
 
-### Non-retrying Assertions
+### Non-retrying assertions
 
 Non-retrying assertions evaluate conditions only once. They are used when you expect a condition to be deterministic and want to avoid any retry logic.
 
@@ -92,11 +92,11 @@ Non-retrying assertions evaluate conditions only once. They are used when you ex
 
 This makes the most sense when using Playwright to run single end-to-end tests in a controlled environment. If you're using Playwright to run on a cadence and monitor a production system, for example, with [Checkly](/detect/synthetic-monitoring/browser-checks/playwright-support), you generally want to stick with the auto-retrying assertions to avoid unnecessary alerts.
 
-### Negating Assertions
+### Negating assertions
 
 Negating matchers allow you to assert that a condition does not hold. For example, you can use `toBeFalsy` or `not.toContain` to make negative assertions on a value. If you're checking an element directly, use a locator assertion such as `expect(locator).not.toContainText()` instead, as it implements Playwright's auto-retries.
 
-### Soft Assertions
+### Soft assertions
 
 Soft assertions won't fail your test immediately, but rather allow the test to continue running after a failure. Using soft assertions is useful for gathering more complete information during test runs. Soft assertions are a critical component of production monitoring, as when measuring things like load times, a failing response time may not mean that we want to stop the check entirely. Any Playwright test with failing soft assertions will still be listed as failed, but the test will still run to completion (or the next hard assertion that fails).
 
@@ -144,7 +144,7 @@ test("SpaceX-API Dragon Capsules & Next Launch", async ({ request }) => {
 
 In this case if the response has a `200` status code but the API response time is more than 200 milliseconds, the status of this check will be degraded and the slow API response time will be included as a failed step. If the response came back as a non-200 status (indicating an error) then the check would be 'failed,' whether or not `markCheckAsDegraded` was called. You can [configure alert channels](https://www.checklyhq.com/docs/communicate/alerts/channels#managing-alert-channels) to notify you when a check has degraded.
 
-### Custom Assertions
+### Custom assertions
 
 While Playwright has almost every scenario for testing supported in its core methods, it remains quite customizable, even [allowing custom assertions](https://www.youtube.com/watch?v=Fs-nM747TY4).
 
@@ -152,7 +152,7 @@ While Playwright has almost every scenario for testing supported in its core met
 - `expect.poll`: Polls a condition until it passes or a timeout is reached, useful for dynamic content.
 - `expect.toPass`: Runs a block of assertions until all pass, [often used for testing flaky or complex scenarios.](https://www.youtube.com/watch?v=8g7FvoRToGo)
 
-### When to Use Soft vs Hard Assertions
+### When to use soft vs hard assertions
 
 Soft assertions are helpful for tests where understanding multiple failures is beneficial, such as end-to-end tests with a wide range of checks. Hard assertions are more suitable for critical conditions where a single failure should immediately terminate the test.
 
@@ -169,18 +169,18 @@ Soft assertions are helpful for tests where understanding multiple failures is b
 | **Form field validations** | Yes. Allows collecting errors on multiple fields at once, providing more detailed feedback. | No. Stopping at the first validation failure can hinder broader test coverage. |
 | **Verifying the presence of essential elements before action** | No. If the element must exist for the test to continue, a hard assertion ensures reliability. | Yes, if the element's presence is not critical and you want the test to proceed. |
 
-### How to Get Started with Playwright Assertions in Simple Steps
+### How to get started with Playwright assertions in simple steps
 
 Follow these steps to get up and running with Playwright Assertions:
 
 1. Install Playwright:`npm init playwright@latest`.
 2. Start writing tests with various assertion types to validate application behavior.
 
-### How to Add Custom Matchers Using `expect.extend`
+### How to add custom matchers using `expect.extend`
 
 Custom matchers can be added using `expect.extend`, allowing developers to define more readable or application-specific assertions.
 
-### Playwright Custom Matchers with Example
+### Playwright custom matchers with example
 
 Here's a quick example of how to create a custom matcher for checking specific conditions:
 
@@ -208,7 +208,7 @@ expect(100).toBeWithinRange(90, 110)
 
 This can be especially useful if we're doing complex assertions, or specialized parsing of responses.
 
-## Common Assertion Errors and How to Debug Them
+## Common assertion errors and how to debug them
 
 Understanding how to diagnose assertion failures can save significant debugging time.
 
@@ -224,7 +224,7 @@ When you have page components you want to ensure are loading quickly, or you hav
 
 After that fixed period, if the next step doesn't work, the test will fail. Hard waits are the most common cause of unreliable or 'flaky' tests with Playwright. They're also inefficient, if the element we're checking for becomes available *before* the hard wait time has elapsed, the test runner still has to wait to the end of the wait time. Read more about this in our page on [waiting in Playwright](https://www.checklyhq.com/learn/playwright/waits-and-timeouts/).
 
-### Manual Assertions
+### Manual assertions
 
 While a hard wait is problematic since it doesn't benefit from Playwright's auto-waiting, an improperly structured assertion doesn't include waiting at all. By wrapping the `await` inside the `expect()` instead of vice versa, and by using a non-web-first assertion, we get no waiting. In this case we're checking that there is some text inside an element.
 
@@ -240,15 +240,15 @@ Use web-first assertions such as `toBeEmpty()` instead.
 await expect(targetPage.locatorToSomeElement).not.toBeEmpty();
 ```
 
-### Debugging Assertion Errors
+### Debugging assertion errors
 
 Playwright provides debug tools such as `page.pause()` and verbose logging to inspect what happens when a test fails. You might also consider a visual like the Playwright VS Code extension to add a visual debugger when writing or debugging tests. [Read more about debugging Playwright scripts](https://www.checklyhq.com/learn/playwright/debugging/).
 
-### Identifying Flaky Tests
+### Identifying flaky tests
 
 Flaky tests are those that fail intermittently, often due to timing issues or unpredictable environment factors. You can use `expect.poll` and `.toPass` adjust timeouts to [stabilize flaky tests](https://www.youtube.com/watch?v=8g7FvoRToGo). To identify flaky tests you can use `--repeat-each=100` to really hammer a test and see if it passes constantly.
 
-### Best Practices for Using Playwright Assertions
+### Best practices for using Playwright assertions
 
 Implementing best practices can make your tests more reliable and easier to maintain.
 

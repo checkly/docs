@@ -1,5 +1,5 @@
 ---
-title: 'Agent Configuration'
+title: 'Agent configuration'
 description: "Configure the Checkly Agent for a private location with environment variables for API keys, proxies, job concurrency, log level, and dependency caching."
 canonical: 'https://www.checklyhq.com/docs/platform/private-locations/agent-configuration/'
 ---
@@ -146,7 +146,7 @@ If you lose track of which agent containers are using the old API key, you can u
 9. Click the delete icon next to the old API key (verified by the shown trailing characters) then click the confirmation.
 10. Click Save to close the dialog. You will now only see the new API key listed for the private location.
 
-## Trusting Enterprise TLS Certificates
+## Trusting enterprise TLS certificates
 
 Some enterprise environments may use internal certificates for TLS connections. These certificates need to be trusted by the agent; otherwise, the agent's TLS connection to the Checkly platform will fail.
 
@@ -162,7 +162,7 @@ docker run -v ~/certificate.pem:/checkly/certificate.pem -e NODE_EXTRA_CA_CERTS=
 
 Alternatively, you can tell the Node.js worker to accept unauthorized certificates with the environment variable `NODE_TLS_REJECT_UNAUTHORIZED=0`. This can be appended to your `docker run ..` command with the `-e` flag.
 
-## Health Probe Endpoints
+## Health probe endpoints
 
 The Checkly Agent exposes HTTP health probe endpoints and Prometheus metrics on port `8080` by default. You can change this port using the `AGENT_SERVER_PORT` environment variable. Agents before v8.12.0 serve health probes on port `8081` (set with `AGENT_HEALTH_PORT`) and metrics on port `8082`.
 
@@ -175,7 +175,7 @@ Endpoint|Description
 
 These endpoints are useful for configuring [Kubernetes readiness and liveness probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) or any other container orchestration health checks.
 
-## External Observability
+## External observability
 
 The Checkly Agent reports error-level events to Checkly to help detect crashes, bugs, and environment-related issues. This is enabled by default starting with agent v7.0.0.
 
@@ -187,7 +187,7 @@ To disable external observability, set the `EXTERNAL_OBSERVABILITY` environment 
 -e EXTERNAL_OBSERVABILITY=off
 ```
 
-## Agent Version and Runtimes
+## Agent version and runtimes
 
 Each Checkly Agent only supports specific [runtimes](/platform/runtimes/overview/). This is to keep the container image at an acceptable size. When you change the runtime a check uses, you may also need to change to the corresponding agent version. Similarly, if you update the agent version to one using a different runtime you also need to update your checks to use the same runtime.
 
@@ -212,7 +212,7 @@ As each agent version only supports specific runtimes, we recommend pinning agen
 
 ## Troubleshooting
 
-<Accordion title="Raw socket permission denied for Traceroute or Packet Capture on private locations">
+<Accordion title="Raw socket permission denied for Traceroute or packet capture on private locations">
 Container runtimes drop `NET_RAW` by default. Traceroute and Packet Capture need raw sockets, so the Checkly Agent needs this capability explicitly granted.
 
 **How to fix**:

@@ -16,7 +16,7 @@ The OpenTelemetry Open Agent Management Protocol (OpAMP) is an emerging standard
 
 OpAMP provides a standard framework for remotely managing telemetry agents. Although current implementations primarily focus on the OpenTelemetry Collector, the protocol is flexible enough to manage various telemetry-related components, including instrumentation agents or future SDK-level integrations. The primary goal is to allow real-time configuration changes, package updates, and secure connection management without manual intervention.
 
-### Key Features of OpAMP
+### Key features of OpAMP
 
 1. **Dynamic Configuration Management:**
     
@@ -35,7 +35,7 @@ OpAMP provides a standard framework for remotely managing telemetry agents. Alth
     Tail-based sampling, a feature OpAMP aims to support, allows agents to decide which traces to retain after they are fully captured, rather than at the start. This strategy helps reduce the amount of irrelevant telemetry data, though it requires specialized architectures to handle sampling decisions across distributed collectors.
     
 
-### Deployment Models for OpAMP
+### Deployment models for OpAMP
 
 OpAMP supports multiple deployment models to fit different environments, including:
 
@@ -48,7 +48,7 @@ OpAMP supports multiple deployment models to fit different environments, includi
     The supervisor approach runs the OpAMP client as a separate process alongside the collector. It monitors the collector’s health, applies configuration changes, and ensures that the collector restarts if it crashes or fails to start after updates. This model provides greater fault tolerance, especially in Kubernetes environments where the client and collector can run as sidecars in the same pod.
     
 
-### Use Cases for OpAMP
+### Use cases for OpAMP
 
 - **Remote Configuration and Management:**
     
@@ -63,13 +63,13 @@ OpAMP supports multiple deployment models to fit different environments, includi
     TLS certificates and other credentials can be dynamically rotated, ensuring secure and compliant communication between agents and backends.
     
 
-### Challenges and Future Developments
+### Challenges and future developments
 
 Some advanced use cases, such as tail-based sampling, present challenges due to the need for stateful processing and coordinated decision-making across multiple collectors. While the protocol provides a foundation for such features, implementing them in a distributed environment requires careful architectural design.
 
 OpAMP is still evolving, with many features in beta or under active development. In the coming quarters, more user-facing tools are expected, including graphical interfaces for managing collector configurations. As vendors begin to adopt the protocol, end-users can expect smoother agent management and the ability to make configuration changes in real-time.
 
-### The Current State of OpAMP Development
+### The current state of OpAMP development
 
 The Open Agent Management Protocol (OpAMP) is evolving as a key component for managing fleets of telemetry agents, such as the OpenTelemetry Collector, at scale. As of late 2023, the protocol is still in its **beta phase**, with development focused on enabling dynamic configuration, remote updates, and secure credential management across distributed agents.
 

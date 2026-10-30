@@ -1,5 +1,5 @@
 ---
-title: 'Exporting Metrics & Data via Prometheus V2'
+title: 'Exporting metrics & data via Prometheus V2'
 description: 'Export Checkly monitoring data to Prometheus for advanced metrics analysis and Grafana dashboards'
 sidebarTitle: 'Prometheus V2'
 canonical: 'https://www.checklyhq.com/docs/integrations/observability/prometheus-v2/'
@@ -51,7 +51,7 @@ If you run multiple Prometheus instances, each instance scrapes independently. A
 Keep `enable_compression` set to `true` to reduce response size and make scrapes faster. Prometheus supports this setting in version 2.49 and later. If your account has many checks, use a longer `scrape_timeout`, such as 30 seconds, to give Prometheus enough time to scrape all metrics.
 </Tip>
 
-## Check Metrics
+## Check metrics
 
 The Prometheus exporter exposes several metrics you can use to monitor the status of your checks, as well as to inspect detailed information such as [Web Vitals](/detect/synthetic-monitoring/browser-checks/performance-metrics).
 
@@ -128,7 +128,7 @@ In addition, the check metrics all contain the following labels:
 
 > The counter and histogram metrics are reset every hour. These resets can be handled in Prometheus by using the [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) or [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions.
 
-### Check Run Location Label
+### Check run location label
 
 To avoid creating a high volume of metrics, by default the metrics don't include a label for the check run location. It is possible to enable this by adding the query param `locationLabelEnabled=true` to your API request. This will add a `location` label giving the location where the checks ran.
 
@@ -151,7 +151,7 @@ Here is an example for how to set this in your `prometheus.yml` config:
     locationLabelEnabled: ['true']
 ```
 
-### Check Retry Attempts
+### Check retry attempts
 
 By default, [retry attempts](/communicate/alerts/retries/) are not included in the reported metrics. For example, if a check is failing on the initial attempt and passing on the retry, `checkly_check_result_total` and other metrics will only report the final passing check result.
 
@@ -176,7 +176,7 @@ Here is an example for how to configure `includeRetryAttempts` in your `promethe
     includeRetryAttempts: ['true']
 ```
 
-### PromQL Examples
+### PromQL examples
 
 This section contains a few PromQL queries that you can use to start working with the Prometheus data.
 
@@ -205,7 +205,7 @@ The different histogram metrics can all be used to compute averages. For example
 sum by(type) (rate(checkly_browser_check_web_vitals_seconds_sum{name="Check Name"}[30m])) / sum by(type) (rate(checkly_browser_check_web_vitals_seconds_count{name="Check Name"}[30m]))
 ```
 
-## Heartbeat Metrics
+## Heartbeat metrics
 
 [Heartbeat monitors](/detect/uptime-monitoring/heartbeat-monitors/overview) are passive checks that wait for your scheduled jobs and automated processes to send a ping. The Prometheus exporter includes heartbeat checks in the standard `checkly_check_status` and `checkly_check_result_total` metrics, plus two heartbeat-specific gauges designed for [dead man's switch](https://en.wikipedia.org/wiki/Dead_man%27s_switch) alerting.
 
@@ -222,7 +222,7 @@ Heartbeat checks contribute to `checkly_check_result_total` using a 1-hour count
 | `failing` | `FAILING` — no ping received before the grace period expired |
 | `degraded` | Always `0` — Heartbeat monitors do not have a degraded state |
 
-### Dead Man's Switch PromQL Examples
+### Dead man's switch PromQL examples
 
 #### Alert when a heartbeat ping is overdue
 

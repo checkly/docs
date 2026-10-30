@@ -56,7 +56,7 @@ npm install --save-dev checkly
 
 <TsLoaderNote />
 
-## Step 2: Create Your checkly.config.ts
+## Step 2: Create your checkly.config.ts
 
 Create a `checkly.config.ts` file in your project root. This file defines which tests become monitors and how they run.
 
@@ -90,7 +90,7 @@ export default defineConfig({
 })
 ```
 
-## Step 3: Select Tests to Monitor
+## Step 3: Select tests to monitor
 
 Each entry in the `playwrightChecks` array becomes a separate monitor. Use `pwProjects` or `pwTags` to control which tests each check suite runs.
 
@@ -128,7 +128,7 @@ export default defineConfig({
 
 Per-check `frequency` and `locations` override the global defaults set in Step 2. For strategies on grouping tests by urgency, environment, or feature area, see [Test organization](/detect/synthetic-monitoring/playwright-checks/test-organization).
 
-## Step 4: Test Your Configuration
+## Step 4: Test your configuration
 
 Before deploying, validate your monitoring setup locally:
 
@@ -165,7 +165,7 @@ npx checkly test --env ENVIRONMENT=staging
 - `checkly pw-test` - Runs any Playwright tests defined in your `playwright.config.ts`,  directly on Checkly's cloud infrastructure. See the [CLI reference](/cli/checkly-pw-test).
 </Info>
 
-## Step 5: Deploy to Production Monitoring
+## Step 5: Deploy to production monitoring
 
 Deploy your check suites to start continuous monitoring:
 
@@ -184,24 +184,24 @@ Successfully deployed project "my-app-monitoring" to account "My Account".
 
 Your monitors run on the configured schedule. View results in your [Checkly dashboard](https://app.checklyhq.com/).
 
-## Best Practices
+## Best practices
 
 - **Start small** — Begin with 1-2 critical flows. Add more as you understand your monitoring needs.
 - **Keep suites fast** — Shorter suites mean faster alerts. See [How long should a check suite run?](/detect/synthetic-monitoring/playwright-checks/test-organization#how-long-should-an-ideal-playwright-check-suite-run) for guidance.
 - **Reuse authentication state** — Use [Playwright project dependencies and `storageState`](/detect/synthetic-monitoring/playwright-checks/test-organization#group-tests-to-reuse-authentication-states) to log in once and share the session across tests.
 
-## Next Steps
+## Next steps
 
 <CardGroup cols={2}>
-<Card title="Test Organization" href="/detect/synthetic-monitoring/playwright-checks/test-organization">
+<Card title="Test organization" href="/detect/synthetic-monitoring/playwright-checks/test-organization">
 Advanced strategies for organizing test suites
 </Card>
 
-<Card title="Configure Alerts" href="/communicate/alerts/overview">
+<Card title="Configure alerts" href="/communicate/alerts/overview">
 Set up notifications when checks fail
 </Card>
 
-<Card title="Add to Groups" href="/detect/synthetic-monitoring/playwright-checks/add-to-group">
+<Card title="Add to groups" href="/detect/synthetic-monitoring/playwright-checks/add-to-group">
 Organize checks with groups
 </Card>
 

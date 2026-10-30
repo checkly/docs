@@ -33,17 +33,17 @@ Before creating your Heartbeat monitor, make sure you have:
 </Accordion>
 
 
-## Step 1: Basic Configuration
+## Step 1: Basic configuration
 
 Start by giving your monitor a descriptive name and relevant tags and description. Choose something descriptive that clearly identifies what the monitor is tracking, like "Nightly Database Backup" or "Weekly Reports Job".
 
 Use tags to group related monitors and make them easier to find and manage.
 
-## Step 2: Timing Configuration
+## Step 2: Timing configuration
 
 The timing configuration is the heart of your Heartbeat monitor. You need to specify when you expect pings and how much flexibility to allow.
 
-### Period Setting
+### Period setting
 
 The **period** defines how often your task should ping Checkly:
 
@@ -53,7 +53,7 @@ The **period** defines how often your task should ping Checkly:
 
 ![Configure period and grace settings for your Heartbeat monitor](/images/heartbeat-monitors/getting-started-period-and-grace.png)
 
-### Grace Period
+### Grace period
 
 The **grace period** provides extra time before alerting, compensating for natural variance in job execution times:
 
@@ -63,7 +63,7 @@ The **grace period** provides extra time before alerting, compensating for natur
 - **Hourly sync job** with 5-minute grace → Alert if ping is more than 5 minutes late
 
 
-<Accordion title="Understanding Grace Periods">
+<Accordion title="Understanding grace periods">
 Grace periods compensate for natural variance in job execution times. For example:
 
 - **Daily backup at 2 AM** with 30-minute grace → Alert if no ping by 2:30 AM
@@ -76,7 +76,7 @@ Choose grace periods based on:
 - Time needed for any retries or recovery processes
 </Accordion>
 
-<Accordion title="Timer Behavior">
+<Accordion title="Timer behavior">
 The heartbeat timer works predictably:
 
 - **First ping starts the timer** - When you send the first ping, monitoring begins
@@ -89,7 +89,7 @@ This means if your job is supposed to run every 6 hours but runs late at hour 7,
 ![Understanding how grace periods and timing work in heartbeat monitoring](/images/heartbeat-monitors/heartbeats-grace.jpg)
 </Accordion>
 
-<Accordion title="How to Choose the Right Grace Period">
+<Accordion title="How to choose the right grace period">
 
 **Consider Your Job Variance**
 - How much does your job's runtime vary?
@@ -104,7 +104,7 @@ This means if your job is supposed to run every 6 hours but runs late at hour 7,
 
 </Accordion>
 
-## Step 3: Alert Configuration
+## Step 3: Alert configuration
 
 Connect your Heartbeat monitor to [alert channels](/communicate/alerts/overview) to be notified when pings are missing.
 
@@ -123,7 +123,7 @@ Connect your Heartbeat monitor to [alert channels](/communicate/alerts/overview)
 - **Medium priority**: Slack + Email
 - **High priority**: PagerDuty + Slack + Email
 
-### Alert Timing
+### Alert timing
 
 Configure when alerts should fire:
 
@@ -133,16 +133,16 @@ Configure when alerts should fire:
 
 All alert channels subscribed to the monitor are notified at the same time.
 
-## Step 4: Ping URL and Implementation
+## Step 4: Ping URL and implementation
 
 Once created, your Heartbeat monitor provides a unique ping URL. Your tasks should make an HTTP `GET` or `POST` request to this URL when they complete successfully.
 
 
-## Step 5: Testing Your Setup
+## Step 5: Testing your setup
 
 Before deploying to production, test your Heartbeat monitor:
 
-### Manual Testing
+### Manual testing
 
 You can manually send pings through the Checkly interface to:
 
@@ -159,10 +159,10 @@ You can also send manual pings directly from your monitors list using the quick 
 ![Quick ping option in the heartbeat monitors list view](/images/heartbeat-monitors/heartbeat-ping-quick-menu.png)
 
 
-## Common Configuration Patterns
+## Common configuration patterns
 
 <Tabs>
-<Tab title="Daily Backup Job">
+<Tab title="Daily backup job">
 
 ```typescript
 import { HeartbeatMonitor } from 'checkly/constructs'
@@ -178,7 +178,7 @@ new HeartbeatMonitor('daily-backup-monitor', {
 ```
 
 </Tab>
-<Tab title="Weekly Report Generation">
+<Tab title="Weekly report generation">
 
 ```typescript
 import { HeartbeatMonitor } from 'checkly/constructs'
@@ -194,7 +194,7 @@ new HeartbeatMonitor('weekly-report-monitor', {
 ```
 
 </Tab>
-<Tab title="Hourly Data Sync">
+<Tab title="Hourly data sync">
 
 ```typescript
 import { HeartbeatMonitor } from 'checkly/constructs'
@@ -212,7 +212,7 @@ new HeartbeatMonitor('hourly-sync-monitor', {
 </Tab>
 </Tabs>
 
-## Best Practices for Pings
+## Best practices for pings
 
 **Always include timeout and retry options:**
 ```bash

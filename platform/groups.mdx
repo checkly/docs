@@ -24,7 +24,7 @@ By default, newly created check groups behave like folders, with no group-level 
 
 Groups let you apply shared configuration to standardize how checks behave. Depending on the setting, group-level configuration either overrides check-level settings or is merged with them.
 
-### Check Membership
+### Check membership
 **Moving a check into a group:** If the group has group-level configuration defined, adding a check may change how it runs. Settings like API defaults, locations & scheduling, or retries & alerting can override the check's configuration.
 
 **Removing check from group:** Any group-level configuration will no longer apply, and the check will use its own configuration going forward.
@@ -66,7 +66,7 @@ An example:
 2. At the API check level, you define the same header `X-Custom` just with the value `abc`
 3. Checkly will call your API with the `X-Custom: abc` header 
 
-#### Basic Auth
+#### Basic auth
 
 Use the basic auth username and password to inject it into each API check in the group.
 
@@ -114,17 +114,17 @@ Or, in other words: **check** variables trump **group** variables trump **global
 You can make use of this by providing a default value for a specific variable at the global or group level, but allow 
 that variable to be overridden at the group level or check level.
 
-### Scheduling & Locations
+### Scheduling & locations
 - **Locations:** Override location settings for all checks in the group with selected public or private locations
 - **Scheduling strategy:** Override scheduling strategy (parallel, round-robin) for all checks in the group  
 - **Frequency:** Each check runs at its own frequency. When you use the CLI, the `frequency` property of a group sets a default for the checks you define in that group.
 
-### Retries & Alerting
+### Retries & alerting
 - **Retries:** Configure retry strategy for failed checks (fixed, single, linear, exponential)
 - **Alert settings:** Set up alert channels for the group - email, SMS, Slack, webhooks, etc. When you enable the group override, these settings replace the alert settings of every check in the group.
 
 
-### Testing & Runtimes
+### Testing & runtimes
 - **Testing:** Run checks in this group as E2E tests locally or from CI/CD pipelines
 - **Runtimes:** Set the JavaScript runtime environment for Browser checks and scripts if different from account default
 
@@ -132,7 +132,7 @@ that variable to be overridden at the group level or check level.
 
 
 
-## How Grouped Checks Execute
+## How grouped checks execute
 
 Understanding how grouped checks run is important for sophisticated monitoring setups:
 
@@ -144,7 +144,7 @@ Understanding how grouped checks run is important for sophisticated monitoring s
 
 Groups are primarily configuration containers that provide shared settings and organizational structure. This approach ensures flexibility while enabling powerful configuration management at scale.
 
-## Flexible Configuration Strategy
+## Flexible configuration strategy
 
 Groups can serve different organizational needs:
 
@@ -154,7 +154,7 @@ Groups can serve different organizational needs:
 - **Scaling mechanism:** Manage complexity through logical decomposition as your infrastructure grows
 
 
-## Mixing Checks and Monitors in a Group
+## Mixing checks and monitors in a group
 
 When you purchase a plan in Checkly, it includes access to specific monitoring features. As shown on our [pricing page](https://www.checklyhq.com/pricing), feature availability can differ between:
 

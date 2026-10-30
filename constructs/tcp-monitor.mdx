@@ -1,5 +1,5 @@
 ---
-title: 'TcpMonitor Construct'
+title: 'TcpMonitor construct'
 description: 'Learn how to configure TCP monitors with the Checkly CLI.'
 sidebarTitle: 'TCP monitor'
 canonical: 'https://www.checklyhq.com/docs/constructs/tcp-monitor/'
@@ -89,14 +89,14 @@ The TCP Monitoring configuration consists of specific TCP monitoring options and
 | `shouldFail` | `boolean` | ❌ | `false` | Treat connection failures (e.g. timeouts or refused ports) as passed. Successful connections still pass. Only failed assertions will cause the check to fail. |
 
 </Tab>
-<Tab title="General Monitor">
+<Tab title="General monitor">
 
   <GeneralMonitorOptionsTable />
 
 </Tab>
 </Tabs>
 
-### `TcpMonitor` Options
+### `TcpMonitor` options
 
 <ResponseField name="request" type="object" required>
 TCP connection configuration that defines the hostname, port, and optional data to send.
@@ -128,7 +128,7 @@ new TcpMonitor("tcp-monitor", {
 **Examples:**
 
 <Tabs>
-<Tab title="Database Connection">
+<Tab title="Database connection">
 
 {/* typecheck-wrap: TcpMonitor */}
 ```ts
@@ -144,7 +144,7 @@ new TcpMonitor("database-check", {
 ```
 
 </Tab>
-<Tab title="Redis with Commands">
+<Tab title="Redis with commands">
 
 {/* typecheck-wrap: TcpMonitor */}
 ```ts
@@ -163,7 +163,7 @@ new TcpMonitor("redis-ping", {
 ```
 
 </Tab>
-<Tab title="IPv6 Connection">
+<Tab title="IPv6 connection">
 
 {/* typecheck-wrap: TcpMonitor */}
 ```ts
@@ -264,7 +264,7 @@ new TcpMonitor("batch-service", {
 **Use cases**: Performance monitoring, SLA compliance, connection timeout management.
 </ResponseField>
 
-### `TcpMonitor` Assertions
+### `TcpMonitor` assertions
 
 To define `assertions` for the `request` of an `TcpMonitor` you should use the `TcpAssertionBuilder`. The following sources are available for TCP monitor assertions:
 
@@ -291,7 +291,7 @@ TcpAssertionBuilder.responseData().contains('ping')
 
 Learn more in our docs on [Assertions](/detect/assertions).
 
-### General Monitor Options
+### General monitor options
 
 <ResponseField name="name" type="string" required>
 Friendly name for your TCP monitor that will be displayed in the Checkly dashboard and used in notifications.
@@ -322,7 +322,7 @@ new TcpMonitor("my-monitor", {
 Examples:
 
 <Tabs>
-<Tab title="Critical Services">
+<Tab title="Critical services">
 
 {/* typecheck-wrap: TcpMonitor */}
 ```ts
@@ -335,7 +335,7 @@ new TcpMonitor("critical-db", {
 ```
 
 </Tab>
-<Tab title="Standard Services">
+<Tab title="Standard services">
 
 {/* typecheck-wrap: TcpMonitor */}
 ```ts
@@ -348,7 +348,7 @@ new TcpMonitor("app-service", {
 ```
 
 </Tab>
-<Tab title="Background Services">
+<Tab title="Background services">
 
 {/* typecheck-wrap: TcpMonitor */}
 ```ts
@@ -381,7 +381,7 @@ new TcpMonitor('global-monitor', {
 Examples:
 
 <Tabs>
-<Tab title="Multi-Region Database">
+<Tab title="Multi-region database">
 
 {/* typecheck-wrap: TcpMonitor */}
 ```ts
@@ -402,7 +402,7 @@ new TcpMonitor("global-db", {
 ```
 
 </Tab>
-<Tab title="Regional Service">
+<Tab title="Regional service">
 
 {/* typecheck-wrap: TcpMonitor */}
 ```ts
@@ -474,7 +474,7 @@ new TcpMonitor("maintenance-db", {
     ```
   </Tab>
 
-  <Tab title="Redis Cache">
+  <Tab title="Redis cache">
     {/* typecheck-wrap: TcpMonitor */}
     ```ts
     new TcpMonitor("redis-check", {
@@ -496,7 +496,7 @@ new TcpMonitor("maintenance-db", {
     ```
   </Tab>
 
-  <Tab title="SMTP Server">
+  <Tab title="SMTP server">
     {/* typecheck-wrap: TcpMonitor */}
     ```ts
     new TcpMonitor("smtp-check", {
@@ -518,7 +518,7 @@ new TcpMonitor("maintenance-db", {
     ```
   </Tab>
 
-  <Tab title="SSH Server">
+  <Tab title="SSH server">
     {/* typecheck-wrap: TcpMonitor */}
     ```ts
     new TcpMonitor("ssh-check", {
@@ -538,7 +538,7 @@ new TcpMonitor("maintenance-db", {
     ```
   </Tab>
 
-  <Tab title="Custom Application Port">
+  <Tab title="Custom application port">
     {/* typecheck-wrap: TcpMonitor */}
     ```ts
     new TcpMonitor("app-port-check", {

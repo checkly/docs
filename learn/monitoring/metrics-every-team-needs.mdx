@@ -1,7 +1,7 @@
 ---
-title: Observability Basics - Metrics that every team needs
+title: Observability basics - Metrics that every team needs
 displayTitle: Metrics Every Team Needs
-sidebarTitle:  Metrics Every Team Needs
+sidebarTitle:  Metrics every team needs
 description: This article will help define the metrics that every team needs to get tracking of their system’s performance
 date: 2025-04-15
 author: Nocnica Mellifera
@@ -57,7 +57,7 @@ Of the metrics in this article, response time can be the most difficult to measu
 
 Finally, when viewing response times **it’s critical not to just use simple averages to capture performance**. Special statistical slices like ‘percent of responses over threshold’ (how often did a user get an unacceptably slow response) and ‘95th percentile response times’ (including all but the very slowest responses, which are often outliers caused by special requests that are predictably quite slow) is critical to get an accurate picture of performance over time.
 
-## Infrastructure Metrics
+## Infrastructure metrics
 
 You should always be able to see a small group of metrics that shows the health of your infrastructure. This article doesn’t give a single answer for these infrastructure metrics due to evolution of how we host applications, and what things stress us out now. In the old days of bare metal servers, infrastructure health was usually covered by looking at available memory and CPU usage. But if a team using mainly serverless computation on a public cloud, those numbers would be both meaningless and ephemeral, and of bigger concern is a metric showing how much is being spent to handle all customer requests. Some possible examples of key infrastructure metrics:
 
@@ -71,7 +71,7 @@ These metrics are still critical for any operations or on-call team, and are esp
 
 The best practices for infrastructure management could fill a whole book, but at the very highest level the most critical skill for monitoring infrastructure is to **perform deep, blameless postmortems any time you have an outage that was user-reported**. Outages reported by users are failures that your current observability tools can’t detect. By asking ‘what did we miss’ you’ll begin to identify what needs to be measured better, and surfaced better for your engineers, from your infrastructure.
 
-## Error Rate
+## Error rate
 
 Error rate is a critical APM metric that quantifies the frequency of failed requests or transactions within an application, expressed as a percentage of total requests. It captures HTTP errors (e.g., 4xx client errors, 5xx server errors), timeouts, exceptions, and can cover business logic failures (e.g., payment declines, API call failures). This metric is often segmented by endpoint, service, or dependency to pinpoint failure hotspots. A high or rising error rate may indicate code defects, infrastructure instability (e.g., database overload), or third-party service degradation. Engineering teams use error rate alongside logs and distributed tracing to diagnose root causes. In SLOs (Service Level Objectives), error rate thresholds (e.g., &lt;0.1%) help enforce reliability targets. Proactive monitoring and alerting on error rate spikes enable faster [incident response](https://www.checklyhq.com/learn/incidents/what-is-incident-response/), reducing MTTR (Mean Time to Repair) and minimizing user impact.
 
@@ -107,7 +107,7 @@ This kind of response, with a `200 OK` status and an error in the body, may not 
 
 For all of these four key metrics, I can think of examples where only one of them will be ‘off’ during a certain type of failure. Therefore all four are the table stakes to monitoring a production application.
 
-## **Conclusions: The Sturdy Table of Your Application**
+## **Conclusions: The sturdy table of your application**
 
 Effective observability begins with tracking **four foundational metrics**: **Throughput**, **Response Time**, **Infrastructure Health**, and **Error Rate**. Each of these metrics provides a unique lens into system performance, and missing any one of them can leave critical blind spots in your monitoring strategy.
 
@@ -116,7 +116,7 @@ Effective observability begins with tracking **four foundational metrics**: **Th
 - **Infrastructure Metrics** ensure the underlying systems are healthy and cost-efficient.
 - **Error Rate** exposes *how often* things are failing—even when failures are silent.
 
-### **Key Takeaways**
+### **Key takeaways**
 
 1. **No Single Metric Tells the Whole Story**
 2. **Define Metrics Clearly and Consistently**
@@ -133,7 +133,7 @@ Effective observability begins with tracking **four foundational metrics**: **Th
     - Even "soft" errors (like payment declines) should be tracked if they impact UX.
     - Beware of **false-success responses** (HTTP 200s with error messages).
 
-### **Final Thought: Start Small, Then Expand**
+### **Final thought: Start small, then expand**
 
 While advanced observability (heatmaps, business intelligence, etc.) is valuable, these four metrics form the minimum viable dashboard every team should monitor. Once they’re stable, you can layer on deeper insights—but without them, you’re flying blind.
 

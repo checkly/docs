@@ -1,7 +1,7 @@
 ---
-title: 'Agent Images'
+title: 'Agent images'
 description: "Compare the Checkly Agent images, Standard, Dev, and Uptime, and learn the image tag format for pulling the variant and version you need."
-sidebarTitle: 'Agent Images'
+sidebarTitle: 'Agent images'
 canonical: 'https://www.checklyhq.com/docs/platform/private-locations/agent-images/'
 ---
 
@@ -13,7 +13,7 @@ Checkly provides different agent images:
 
 * [Uptime](#uptime-image): A lightweight image for running uptime monitors only
 
-## Image Tag Format
+## Image tag format
 
 Image tags define which agent variant and version you run.
 
@@ -30,7 +30,7 @@ docker pull checkly/agent-uptime:X.Y.Z
 
 <Note>Use versioned tags for reproducible deployments. Floating tags (like `:latest`) may change between pulls. Browse available versions on [Docker Hub](https://hub.docker.com/r/checkly/agent/tags).</Note>
 
-## Standard Image
+## Standard image
 
 The standard image (`checkly/agent:X.Y.Z`) is the default and recommended option for most setups.
 
@@ -41,19 +41,19 @@ It supports the full range of Checkly monitors:
 
 Use the standard image unless you have a specific need for the dev or uptime variants.
 
-## Uptime Image
+## Uptime image
 
 The uptime image (`checkly/agent-uptime:X.Y.Z`) is a lightweight version of the agent designed for [uptime monitoring](/detect/uptime-monitoring/overview) only.
 
 It supports URL, DNS, TCP and ICMP monitors. Concurrency is controlled by `AGENT_WORKER_COUNT`; `JOB_CONCURRENCY` has no effect on this image. See [agent configuration](/platform/private-locations/agent-configuration).
 
-## Dev Image
+## Dev image
 
 If any of the checks you run on private locations rely on npm packages with native code, those packages need to be compiled during installation.
 
 The standard agent is optimized for size and doesn’t ship with build tools. In those cases, you’ll need to use the dev image instead.
 
-#### When to Use the Dev Image
+#### When to use the dev image
 
 Use the dev image (`checkly/agent-dev:X.Y.Z`) when your checks require npm packages with native dependencies that need compilation. Common examples include:
 
@@ -62,7 +62,7 @@ Use the dev image (`checkly/agent-dev:X.Y.Z`) when your checks require npm packa
 
 If your checks only use pure JavaScript packages, the standard runtime image is recommended for its smaller size and faster startup.
 
-#### What's Included in the Dev Image
+#### What's included in the dev image
 
 The dev agent works exactly like the standard agent, but includes the build tools required to compile native modules. 
 

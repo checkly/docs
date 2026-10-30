@@ -1,5 +1,5 @@
 ---
-title: The Layers of the Testing Pyramid
+title: The layers of the testing pyramid
 description:
   This article gives a tour of the testing pyramid’s layers with examples, and shows you how each part is required for a complete picture of system performance.
 date: 2025-04-01
@@ -26,7 +26,7 @@ When you begin your journey in QA, SRE, Development, or Operations, you’ll ask
 
 We know our app is working by testing, but this begs the question: who should test what, when? Let’s take the tiniest possible failure: trailing whitespace in user data. Should the React frontend refuse to submit form fields with extra whitespace, should the application automatically remove whitespace before sending database requests, or should the DB controller automatically remove whitespace? The question: “in what layer should these checks happen?” brings us to the testing pyramid.
 
-## The Testing Pyramid in Full
+## The testing pyramid in full
 
 Originally conceived by Mike Cohn, and then popularized by Martin Fowler, the testing pyramid shows categories of tests, with the slowest on top and the fastest on the bottom.
 
@@ -39,7 +39,7 @@ The pyramid shape refers to the ideal distribution of tests: you should have doz
 
 Next let’s briefly describe the layers, along with how they work in a modern cloud native architecture.
 
-## Unit Tests - with examples
+## Unit tests - with examples
 
 A unit test is a highly isolated test that only works with a tiny chunk of code, possibly the code in a single file, or even a single function. A unit test is by its nature extremely high performance, and can run as frequently as the developer saves her work (or even with every entered newline).
 
@@ -184,7 +184,7 @@ await page.locator('#item-to-be-dragged').dragTo(page.locator('#item-to-drop-at'
 
 At base, the advantage of end-to-end testing is that it answers the real question of testing: ‘will this work for users or not?’ the other phases of testing answer questions more akin to: ‘does this code function without throwing errors?’ or ‘is this service fulfilling its contract to other services?’ Those are important questions for earlier phases of the SDLC. But once our tests are going into the hands of users, we must simulate that real user behavior and record if everything works.
 
-### From E2E Testing to E2E Monitoring
+### From E2E testing to E2E monitoring
 
 If we agree on the importance of end-to-end testing, it begs the question if testing should stop after deploy time. Thousands of unforseen interactions can break a production service even after the code is tested post-deployment, and our users are certainly using the service all the time. Shouldn’t our testing also continue after the code is out? For end-to-end testing on a cadence, there’s Checkly, which uses the power of Playwright to test your sites, services, and APIs around the clock. [Get started today](https://www.checklyhq.com/docs/)!
 
@@ -192,7 +192,7 @@ If we agree on the importance of end-to-end testing, it begs the question if tes
 
 While it sadly causes many arguments about which tests belong where or which layer is most important, the testing pyramid is meant to acknowledge that each test type has a role to play, and the differences in performance is natural.
 
-## Conclusions: Every Layer of Testing Matters
+## Conclusions: Every layer of testing matters
 
 We care about testing because ultimately there’s one layer of testing that no one wants to use: our users. If there’s a bug, they’ll find it, if there’s holes in a data flow, their data will fall into it. If there’s an edge case our users will find it. And every time a user is the first one to detect a problem, it hurts their trust in our service.
 
@@ -205,7 +205,7 @@ While the boundaries between these layers can sometimes blur, their collective p
 
 Ultimately, the goal is not to rigidly categorize tests but to ensure comprehensive validation at every stage. Whether you're writing unit tests for a utility function, mocking service interactions in integration tests, or automating user journeys with Playwright, each layer contributes to a more robust, resilient application. The testing pyramid isn’t just a model—it’s a reminder that quality is built step by step, from the smallest unit to the full user experience.
 
-## Dive Deeper into the Testing Pyramid with Real World Applications
+## Dive deeper into the testing pyramid with real world applications
 
 In a recent Webinar, the Checkly team got to talk about how the Testing Pyramid affects testing strategies for real world applications like React apps. Watch the whole session here:
 

@@ -1,5 +1,5 @@
 ---
-title: 'Send Alerts via Telegram'
+title: 'Send alerts via Telegram'
 description: 'Learn how to send Checkly alerts to Telegram direct chats, groups, and forum topics'
 sidebarTitle: 'Telegram'
 canonical: 'https://www.checklyhq.com/docs/integrations/alerts/telegram/'
@@ -16,7 +16,7 @@ deliver failure, degradation, and recovery messages to direct chats, groups, and
 
 </Accordion>
 
-## Telegram Bot
+## Telegram bot
 
 1. Create a **Telegram Bot** using the [@BotFather](https://t.me/botfather). Detailed instructions can be found [here](https://core.telegram.org/bots), however you can simply message the Telegram user `@BotFather` and send them the command message `/newbot`. Then follow the instructions the bot replies with.
 
@@ -32,13 +32,13 @@ deliver failure, degradation, and recovery messages to direct chats, groups, and
 
 For direct messages, you can retrieve your user Chat ID with an ID bot. For groups and forum topics, query the Telegram API to retrieve the target group's Chat ID and optional Message Thread ID.
 
-#### ID Bot
+#### ID bot
 
 You can retrieve your own Telegram Chat ID by starting a chat with another bot. This Telegram bot user can be found at `@get_id_bot`.
 
 1. Send the `@get_id_bot` bot the `/my_id` command. Copy the ID from its reply.
 
-#### API Query
+#### API query
 
 Use the bot API to retrieve a Chat ID for any target chat. For a forum group, the same response includes the Message Thread ID, which Telegram also calls the topic ID.
 
@@ -71,7 +71,7 @@ Use the bot API to retrieve a Chat ID for any target chat. For a forum group, th
 The `getUpdates` method does not work while your bot has an outgoing webhook configured. In that case, retrieve these fields from the update sent to your webhook.
 </Note>
 
-## Checkly Integration
+## Checkly integration
 
 With the **HTTP API Token**, **Chat ID**, and optional **Message Thread ID** in hand, you can create a Telegram alert channel in Checkly.
 
@@ -94,16 +94,16 @@ Congratulations! You have successfully integrated Checkly with Telegram!
 
 Telegram also accepts messages via an HTTP `GET` request. Therefore, you can use the API Token and Chat ID to create a custom Telegram alert channel with a [webhook alert channel](/integrations/alerts/webhooks). The webhook should use the `GET` method and target `https://api.telegram.org/bot<API_TOKEN>/sendMessage?chat_id=<CHAT_ID>&text=Your%20Alert%20Title`. To target a forum topic, add `&message_thread_id=<MESSAGE_THREAD_ID>` before the `text` parameter. See Telegram's [`sendMessage` documentation](https://core.telegram.org/bots/api#sendmessage) for more information.
 
-## Telegram Best Practices
+## Telegram best practices
 
-### Group vs Direct Messages
+### Group vs direct messages
 
 - **Direct Messages**: Use your personal chat ID for personal notifications
 - **Group Chats**: Add the bot to group chats and use the group's Chat ID for team notifications
 - **Forum Topics**: Use the group's Chat ID together with the topic's Message Thread ID
 - **Channels**: Bots can post to channels if added as administrators
 
-### Message Formatting
+### Message formatting
 
 Checkly sends Telegram messages with HTML formatting (`parse_mode=HTML`), so use HTML tags such as `<b>`, `<i>` and `<a href>` in your payload. Markdown syntax is shown as plain text.
 
@@ -119,7 +119,7 @@ Error: {{CHECK_ERROR_MESSAGE}}
 <a href="{{RESULT_LINK}}">View Details</a>
 ```
 
-### Security Considerations
+### Security considerations
 
 - **Bot Token Security**: Keep your bot tokens secure and never share them publicly
 - **Chat ID Privacy**: Chat IDs can be sensitive information, especially for private groups

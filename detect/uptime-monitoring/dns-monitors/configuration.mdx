@@ -9,7 +9,7 @@ canonical: 'https://www.checklyhq.com/docs/detect/uptime-monitoring/dns-monitors
 To configure a DNS monitor using code, learn more about the [DNS monitor construct](/constructs/dns-monitor).
 </Tip> */}
 
-### Basic Setup
+### Basic setup
 
 Specify the domain and record type you want to check:
 
@@ -51,7 +51,7 @@ The raw and JSON responses are shown on the results page of a DNS monitor run an
 
   Learn more about JSON path assertions: [JSON responses with JSON path](/detect/assertions/#json-responses-with-json-path).
 
-### JSON Response Schemas
+### JSON response schemas
 
 The DNS response is parsed into a structured JSON format. All responses share a common structure:
 
@@ -81,7 +81,7 @@ The DNS response is parsed into a structured JSON format. All responses share a 
 - `AD` - Authenticated data flag
 - `CD` - Checking disabled flag
 
-<Accordion title="A Record (IPv4)">
+<Accordion title="A record (IPv4)">
 ```json
 {
   "Answer": [
@@ -116,7 +116,7 @@ Common assertions:
 - `$.Answer[0].TTL` - Validate TTL value
 </Accordion>
 
-<Accordion title="AAAA Record (IPv6)">
+<Accordion title="AAAA record (IPv6)">
 ```json
 {
   "Answer": [
@@ -142,7 +142,7 @@ Common assertions:
 - `$.Answer[0].TTL` - Validate TTL value
 </Accordion>
 
-<Accordion title="CNAME Record">
+<Accordion title="CNAME record">
 ```json
 {
   "Answer": [
@@ -167,7 +167,7 @@ Common assertions:
 - `$.Answer[0].data` - Verify canonical name target
 </Accordion>
 
-<Accordion title="MX Record">
+<Accordion title="MX record">
 ```json
 {
   "Answer": [
@@ -198,7 +198,7 @@ Common assertions:
 - `$.Answer[0].data` - Check MX priority and mail server (format: "priority hostname")
 </Accordion>
 
-<Accordion title="TXT Record">
+<Accordion title="TXT record">
 ```json
 {
   "Answer": [
@@ -224,7 +224,7 @@ Common assertions:
 - Text response contains `v=spf1` - Check for SPF record
 </Accordion>
 
-<Accordion title="NS Record">
+<Accordion title="NS record">
 ```json
 {
   "Answer": [
@@ -255,7 +255,7 @@ Common assertions:
 - `$.Answer[0].data` - Check specific nameserver
 </Accordion>
 
-<Accordion title="SOA Record">
+<Accordion title="SOA record">
 ```json
 {
   "Answer": [
@@ -283,7 +283,7 @@ Common assertions:
 - Text response contains expected serial number
 </Accordion>
 
-<Accordion title="HTTPS Record (RFC 9460)">
+<Accordion title="HTTPS record (RFC 9460)">
 HTTPS records carry [SvcParams](https://www.rfc-editor.org/rfc/rfc9460) — the
 parameters a browser uses to connect over HTTP/3 on its first request (`alpn`,
 `ipv4hint`/`ipv6hint`, `ech`, …). The whole record is rendered into the `data`
@@ -327,7 +327,7 @@ scopes the match to the advertised protocols.
 **Record type support**: DNS monitors currently support A, AAAA, CNAME, MX, NS, SOA, TXT, and HTTPS record types. Additional record types (SRV, CAA, PTR, etc.) may be added in future updates.
 </Note>
 
-### Response Time Limits
+### Response time limits
 
 Define performance thresholds for degraded or failed states:
 
@@ -345,7 +345,7 @@ Set how often the monitor runs (every 10 seconds to 24 hours):
   <img className="hidden dark:block" src="/images/dns-monitors/frequency-dark.png" alt="DNS monitor frequency selection interface" />
 </Frame>
 
-### Scheduling & Locations
+### Scheduling & locations
 
 <Frame>
   <img className="block dark:hidden" src="/images/dns-monitors/scheduling.png" alt="DNS monitor scheduling strategy and location selection interface" />
@@ -355,7 +355,7 @@ Set how often the monitor runs (every 10 seconds to 24 hours):
 * **Strategy:** Choose between round-robin or parallel execution. Learn more about [scheduling strategies](/concepts/scheduling)
 * **Locations:** Select [public](/concepts/locations/#public-locations) or [private](/platform/private-locations/overview) locations to run the monitor from
 
-### Additional Settings
+### Additional settings
 
 * **Name:** Give your monitor a clear name to identify it in dashboards and alerts
 * **Description:** Add context about what this monitor does and why it matters. Supports markdown, max 500 characters. When a failure occurs, [Rocky AI](/ai/rocky-ai) uses the description to provide more accurate [root cause and user impact analysis](/resolve/ai-root-cause-analysis/overview)
@@ -363,7 +363,7 @@ Set how often the monitor runs (every 10 seconds to 24 hours):
 * **Retries:** Define how failed runs should be retried. See [retry strategies](/communicate/alerts/retries)
 * **Alerting:** Configure your [alert settings](/communicate/alerts/configuration), [alert channels](/communicate/alerts/channels), or set up [webhooks](/integrations/alerts/webhooks) for custom integrations
 
-## Common Use Cases
+## Common use cases
 
 <Accordion title="Monitor CDN failover with multiple A records">
 **Scenario**: Your CDN provides multiple IP addresses for redundancy. You need to ensure all IPs are reachable.

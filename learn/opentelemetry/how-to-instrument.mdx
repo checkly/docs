@@ -12,7 +12,7 @@ OpenTelemetry offers two main strategies for adding observability to your applic
 
 ---
 
-### Direct Instrumentation
+### Direct instrumentation
 
 Direct instrumentation involves **manually adding code** to your application to generate telemetry data. This requires developers to use the OpenTelemetry SDK specific to their programming language, explicitly invoking functions to create traces, metrics, or logs.
 
@@ -24,7 +24,7 @@ Direct instrumentation involves **manually adding code** to your application to 
 
 This approach ensures deeper insights but requires more engineering effort upfront and ongoing maintenance to ensure proper coverage and updates as the code evolves. There are of course 1,001 ways that a clever developer could ensure that the intervention needed even for direct instrumentation was miniman. For example, by wrapping the function that first receives a request, and the function class to ensure that future function calls are reported to a tracer. Direct instrumentation doesn't mean modifying n+1 lines of code, but it does require a fair amount of effort to get launched the first time, no matter how clever your developers are. 
 
-### Auto-Instrumentation
+### Auto-instrumentation
 
 Auto-instrumentation eliminates the need for manual code changes by **injecting telemetry at runtime**. This is often achieved through agents or middleware that modify existing code dynamically. For example, Java or Python applications can use agents to hook into libraries and frameworks they rely on.
 
@@ -39,7 +39,7 @@ Auto-instrumentation eliminates the need for manual code changes by **injecting 
     Finally, auto-instrumentation won’t generally produce useful results if something really unusual is happening inside your application. At base, automatic instrumentation assumes that your service is some kind of online application handling requests and sending responses. If that’s not the case, for example if your application is a machine learning system processing through a database and taking over 48 hours to produce results, you may get less useful information. In these cases, you may want to look into manually reporting [OpenTelemetry metrics](/learn/opentelemetry/metrics).
     
 
-### When to Use Each
+### When to use each
 
 - **Direct instrumentation** is ideal for teams seeking maximum flexibility, particularly for custom workflows or applications with unique behavior.
 - **Auto-instrumentation** is better suited for scenarios where rapid observability is needed, or when standard libraries provide sufficient coverage.

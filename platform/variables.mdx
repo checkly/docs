@@ -20,9 +20,9 @@ Secrets are fully supported starting with runtime version 2024.09 and later. For
 </Note>
 
 <Warning>
-To ensure the integrity of Playwright artifacts (traces, videos and screenshots), the following are not scrubbed, even when saved as secrets: The characters `/` and `*` and the full or partial match of `/artifact/`, `https://`, `http://`, `*********`, and `123`.
+To ensure the integrity of Playwright artifacts (traces, videos and screenshots), the following are not scrubbed, even when saved as secrets: The characters `/` and `*` and the full or partial match of `/artifact/`, `https://`, `http://`, `*********`, and `123`. The same exceptions apply to API check results.
 Values of the keys `sha1`, `_sha1`, `pageref`, `downloadsPath`, `tracesDir`, `pageId` and any string that ends with `sha1` will not be scrubbed from the Playwright trace, but will be scrubbed from the general check result.
-Numbers are not scrubbed from the Playwright trace, but from the general check result.
+On runtime 2025.04 and later, a secret that appears as a number or as a field name in the Playwright trace is scrubbed. A secret written in a different letter case, for example upper-cased, is not scrubbed.
 </Warning>
 
 <Tip>

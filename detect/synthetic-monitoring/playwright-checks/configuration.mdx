@@ -15,12 +15,13 @@ Use the `checkly.config.ts/js` file to define your Playwright Check Suite. Each 
 
 To add Playwright Check Suites to your Checkly monitoring setup, specify the path to your `playwright.config.ts/js` and add a new `playwrightChecks` property to the existing `checks` configuration in your `checkly.config.ts/js`.
 
-```typescript checkly.config.ts highlight={8-14}
+```typescript checkly.config.ts highlight={9-15}
 import { defineConfig } from 'checkly'
 import { Frequency } from 'checkly/constructs'
 
 export default defineConfig({
-  // ...
+  projectName: 'My Project',
+  logicalId: 'my-project',
 
   checks: {
     playwrightConfigPath: './playwright.config.ts',
@@ -55,8 +56,11 @@ You can combine `pwTags` and `pwProjects` to generate your check suite, too.
 
 For example:
 
-```typescript checkly.config.ts highlight={11, 20}
+{/* typecheck-wrap */}
+```typescript checkly.config.ts highlight={13, 22}
 export default defineConfig({
+  projectName: 'My Project',
+  logicalId: 'my-project',
   // ...
   checks: {
     playwrightConfigPath: './playwright.config.ts',
@@ -195,6 +199,8 @@ import { Frequency } from 'checkly/constructs'
 import { productionGroup } from './production-group.check'
 
 export default defineConfig({
+  projectName: 'My Project',
+  logicalId: 'my-project',
   // Shared Checkly configuration (scheduling, locations, etc.)
   // ...
   checks: {
@@ -287,10 +293,12 @@ Specify this option in your `playwright.config` or the `testCommand` in your `ch
     ```
   </Tab>
   <Tab title="checkly.config.ts">
-    ```typescript checkly.config.ts highlight={11}
+    ```typescript checkly.config.ts highlight={13}
     import { defineConfig } from 'checkly'
 
     export default defineConfig({
+      projectName: 'My Project',
+      logicalId: 'my-project',
       checks: {
         playwrightConfigPath: './playwright.config.ts',
         playwrightChecks: [
@@ -324,10 +332,12 @@ Specify this option in your `playwright.config` or the `testCommand` in your `ch
     ```
   </Tab>
   <Tab title="checkly.config.ts">
-    ```typescript checkly.config.ts highlight={11}
+    ```typescript checkly.config.ts highlight={13}
     import { defineConfig } from 'checkly'
 
     export default defineConfig({
+      projectName: 'My Project',
+      logicalId: 'my-project',
       checks: {
         playwrightConfigPath: './playwright.config.ts',
         playwrightChecks: [
@@ -360,7 +370,7 @@ If your Playwright Check Suite times out after 30 minutes:
 If dependencies fail to install:
 
 - Check that your `package.json` and lock file (e.g., `package-lock.json`) are both included in your deployment.
-- Verify that the private registry authentication is configured correctly. See the [custom dependencies guide](/detect/synthetic-monitoring/playwright-checks/custom-dependencies/) for more details.
+- Verify that the private registry authentication is configured correctly. See [Private packages](/detect/synthetic-monitoring/playwright-checks/dependencies#private-packages) for more details.
 - Adjust the `installCommand` to match your project's expectation.
 
 #### Authentication failures in tests

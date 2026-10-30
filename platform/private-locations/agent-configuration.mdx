@@ -16,9 +16,10 @@ Variable|Description
 `JOB_CONCURRENCY`|(Default: 1, recommended: up to 10) Number of concurrent Browser, Multistep and Playwright checks that are run by the agent. Not used by the [uptime image](/platform/private-locations/agent-images#uptime-image).
 `AGENT_WORKER_COUNT`|(Default: 10, max: 50) Number of concurrent API checks and uptime monitors (URL, TCP, DNS, ICMP) that are run by the agent. Applies to agent v7.0.0 and later. Values above 50 are capped to 50.
 `LOG_LEVEL`|(Default: `INFO`) Set the log level of the agent. Can be one of `DEBUG`, `INFO`, `WARN` or `ERROR`.
-`DEPENDENCY_CACHE`|(Default: `OFF`) Set to `CHECKLY_S3` to enable dependency caching for [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview). Caches installed dependencies between runs to speed up check execution. Learn more about [dependency caching](/detect/synthetic-monitoring/playwright-checks/custom-dependencies#dependency-caching).
+`DEPENDENCY_CACHE`|(Default: `OFF`) Set to `CHECKLY_S3` to enable dependency caching for [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview). Caches installed dependencies between runs to speed up check execution. Learn more about [dependency caching](/detect/synthetic-monitoring/playwright-checks/dependencies#dependency-caching).
 `AGENT_SERVER_PORT`|(Default: `8080`) Port for the HTTP [health probe endpoints](#health-probe-endpoints) and Prometheus metrics. Applies to agent v8.12.0 and later. Earlier agents use `AGENT_HEALTH_PORT` (default `8081`) for health probes.
 `EXTERNAL_OBSERVABILITY`| Enabled by default. Set to `off` to disable [external observability](#external-observability) reporting of agent runtime errors to Checkly.
+`CHECKLY_RUN_FILE_MAX_BYTES`|(Default and maximum: 2147483647 bytes, just under 2 GiB) Largest file, in bytes, that the agent reads from a Browser or Multistep check run and uploads, such as the Playwright report. A larger file is left out of the check result, not truncated. For the Playwright report, the check log says `Report omitted because it is larger than <limit> MiB`. A value that is not a positive integer is ignored with a warning in the agent log, and the limit is then 14 MiB. Applies to agent v8.12.0 and later.
 
 For example, you can add these variables to the standard docker run command like this:
 

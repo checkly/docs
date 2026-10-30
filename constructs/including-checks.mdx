@@ -24,8 +24,11 @@ Here are some best practices:
 2. Store any Checkly related Checks inside a `__checks__` folder. This neatly indicates where your Checks are organized.
 3. Use multiple `__checks__` folders throughout your code base, near the functionality it should be checking.
 
-```ts checkly.config.ts highlight={4}
+{/* typecheck-wrap */}
+```ts checkly.config.ts highlight={6}
 const config = defineConfig({
+  projectName: 'My Project',
+  logicalId: 'my-project',
   checks: {
     // A glob pattern that matches the Checks inside your repo.
     checkMatch: "**/__checks__/**/*.check.ts",
@@ -52,8 +55,11 @@ again the new `logicalId` will trigger a deletion of the "old" Check and a creat
 any historical metrics.
 
 <CodeGroup>
-```ts checkly.config.ts highlight={7}
+{/* typecheck-wrap */}
+```ts checkly.config.ts highlight={9}
 const config = defineConfig({
+  projectName: 'My Project',
+  logicalId: 'my-project',
   checks: {
     checkMatch: "**/__checks__/**/*.check.ts",
     browserChecks: {
@@ -65,6 +71,7 @@ const config = defineConfig({
 })
 ```
 
+{/* typecheck-wrap: CheckGroupV2 */}
 ```ts group.check.ts highlight={6}
 const group = new CheckGroupV2("api-monitoring-group", {
   name: "Browser Check Monitoring Group",
@@ -87,8 +94,11 @@ to prevent loading the wrong check type. For example using `browserChecks.testMa
 in all checks created as Browser checks.
 
 <CodeGroup>
-```ts checkly.config.ts highlight={7}
+{/* typecheck-wrap */}
+```ts checkly.config.ts highlight={9}
 const config = defineConfig({
+  projectName: 'My Project',
+  logicalId: 'my-project',
   checks: {
     checkMatch: "**/__checks__/**/*.check.ts",
     // A glob pattern matches any Playwright .spec.ts files
@@ -100,6 +110,7 @@ const config = defineConfig({
 })
 ```
 
+{/* typecheck-wrap: CheckGroupV2 */}
 ```ts group.check.ts highlight={6}
 const group = new CheckGroupV2("api-multistep-group", {
   name: "API Multistep Monitoring Group",

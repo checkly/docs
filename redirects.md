@@ -76,7 +76,6 @@ https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.a
 https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/monitoring/storing-secrets/
 https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/status-pages/incidents/
 https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/monitoring/check-pricing/
-https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/snippets/
 https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/traces-open-telemetry/importing-traces/sending-traces-otel-collector/
 https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/browser-checks/degraded-state/
 https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/alerting-and-retries/retries/
@@ -139,11 +138,9 @@ https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.a
 https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/traces-open-telemetry/exporting-traces/newrelic/
 https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/accounts-and-users/changing-your-email-password/
 https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/multistep-checks/upload-downloads-filesystem/
-https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/snippets/handlebars-snippets/
 https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/tcp-checks/
 https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/terraform-provider/alerting/
 https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/accounts-and-users/microsoft-azure-ad/
-https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/terraform-provider/snippets-variables/
 https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/terraform-provider/testing-scripts-locally/
 https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/terraform-provider/ci-cd/
 https://checkly-marketing-website-git-giordanodaniel-doc-9a3e7e-checkly.vercel.app/docs/integrations/rootly/

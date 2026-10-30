@@ -1,6 +1,7 @@
 ---
 title: 'How It Works'
 description: 'Understand how Checkly traces work with OpenTelemetry to provide comprehensive observability.'
+canonical: 'https://www.checklyhq.com/docs/resolve/traces/how-it-works/'
 ---
 
 Checkly Traces use OpenTelemetry to correlate synthetic check results with your application's backend traces. The diagram below shows how the dataflows connect to Checkly's monitoring and alerting pipeline.
@@ -31,9 +32,19 @@ checkly.check.name: "ACME homepage"
 checkly.check.id: "438481ea-0eab-43d6-8932-ab51bd0d49d6"
 checkly.check.type: "browser"
 checkly.check.location: "eu-west-1"
+checkly.check.tags: ["production", "checkout"]
 ```
 
 This provides rich context about the run location, check name, check type, and more.
+
+`checkly.check.tags` carries the check's tags as a string array — the check's own tags first, then tags inherited from its group, deduplicated. Use it to filter or group traces by the same labels you organize your checks by, such as a team or workflow tag.
+
+<Note>
+Tag caveats:
+
+- The attribute is only present when the check has tags. At most 20 tags are exported per span, and a tag longer than 128 characters is omitted entirely rather than truncated.
+- Attributes are set on Checkly's root span only — they do not propagate to your application's own spans within the trace. To find a whole trace by tag, filter on the root span, then use its trace ID.
+</Note>
 </Step>
 
 <Step title="Direct Trace Ingestion">

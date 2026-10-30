@@ -2,7 +2,7 @@ name: Static docs checks
 
 # Runs static validations on every PR — works without a Mintlify preview URL,
 # so it fills the gap for PRs (e.g. the auto-update API spec ones) where the
-# preview deployment is skipped or fails. Fails the PR if `mint broken-links`
+# preview deployment is skipped or fails. Fails the PR if `npm run check:links`
 # reports any broken internal links.
 #
 # Required check in the branch ruleset. When no docs files changed the
@@ -45,6 +45,14 @@ jobs:
             echo "openapi_changed=false" >> "$GITHUB_OUTPUT"
           fi
 
+          # A change to the snippet checker re-runs the snippet typecheck even
+          # when no docs changed.
+          if echo "$CHANGED" | grep -q '^\.github/snippet-typecheck/'; then
+            echo "snippets_tooling_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "snippets_tooling_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
           # Same docs-detection regex as docs-gate / preview-checks
           NON_DOCS_RE='^(\.github/|.*\.sh$|[^/]+\.md$|package(-lock)?\.json$|node_modules/|checkly\.config\.ts$|block-headless\.js$|__checks__/)'
           if echo "$CHANGED" | grep -vE "$NON_DOCS_RE" | grep -q .; then
@@ -54,10 +62,9 @@ jobs:
           fi
 
       - name: Set up Node
-        if: steps.detect.outputs.openapi_changed == 'true' || steps.detect.outputs.docs_changed == 'true'
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -68,12 +75,69 @@ jobs:
         if: steps.detect.outputs.openapi_changed == 'true'
         run: npx mint openapi-check api-reference/openapi.json
 
+      - name: Test API navigation tooling
+        run: npm run test:api-docs
+
+      # Typechecks MDX snippets that use `checkly`, and fragments marked with
+      # {/* typecheck-wrap */}, against the latest CLI constructs, so examples
+      # don't drift from the CLI API. The checker has its own package.json
+      # without a lockfile, so every run installs the latest checkly release
+      # rather than the docs project's pinned version. Errors show up as
+      # inline annotations on the PR.
+      - name: Typecheck checkly snippets
+        if: steps.detect.outputs.docs_changed == 'true' || steps.detect.outputs.snippets_tooling_changed == 'true'
+        working-directory: .github/snippet-typecheck
+        run: |
+          npm install --no-audit --no-fund
+          npm test
+          npm run check
+
+      - name: Check API group badges match the schema
+        run: npm run sync:api-group-tags -- --check
+
+      # Root-relative url() paths work on previews but 404 under /docs in
+      # production, so preview checks can't catch them.
+      - name: No url() in CSS
+        run: |
+          npm run test:css-urls
+          npm run check:css-urls
+
+      # Legacy /reference/* redirects are inbound-only, so `mint broken-links`
+      # never validates their destinations. Runs on any docs change (.mdx or
+      # docs.json) because a page rename/delete is exactly what breaks them.
+      - name: Check legacy redirect destinations
+        if: steps.detect.outputs.docs_changed == 'true'
+        run: node .github/scripts/check-redirect-destinations.mjs
+
+      # Guards the SEO frontmatter bug class: a malformed opening `---` fence
+      # (e.g. a trailing space) makes Mintlify drop a page's title/description/
+      # canonical and fall back to the no-slash canonical, which 308-redirects.
+      # Also enforces a correct self-referential trailing-slash canonical on
+      # every page. Runs on any docs change.
+      - name: Frontmatter & canonical integrity
+        if: steps.detect.outputs.docs_changed == 'true'
+        run: python3 .github/scripts/check_frontmatter.py
+
+      # sitemap.xml (custom, trailing-slash — overrides Mintlify's auto-gen) is
+      # generated from docs.json navigation. If a nav page is added/renamed/
+      # removed without regenerating, the committed sitemap drifts. Regenerate
+      # and fail if it differs.
+      - name: Sitemap up to date
+        if: steps.detect.outputs.docs_changed == 'true'
+        run: |
+          node .github/scripts/generate-sitemap.mjs
+          if ! git diff --quiet -- sitemap.xml; then
+            echo "::error::sitemap.xml is out of date. Run 'npm run generate-sitemap' and commit the result."
+            git --no-pager diff -- sitemap.xml | head -60
+            exit 1
+          fi
+
       - name: Broken-links scan
         if: steps.detect.outputs.docs_changed == 'true'
         run: |
           REPORT=$(mktemp)
           STATUS=0
-          npx mint broken-links > "$REPORT" 2>&1 || STATUS=$?
+          npm run check:links > "$REPORT" 2>&1 || STATUS=$?
           {
             echo "## Broken-links scan"
             echo ""

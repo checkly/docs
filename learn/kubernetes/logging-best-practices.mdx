@@ -9,6 +9,7 @@ githubUser: serverless-mom
 displayDescription: 
   Best practices for logging in your Kubernetes-hosted applications and infrastructure.
 weight: 20
+canonical: 'https://www.checklyhq.com/docs/learn/kubernetes/logging-best-practices/'
 ---
 Logging in Kubernetes can be a challenge, especially when dealing with data across a distributed, containerized system. To keep your logs efficient and actionable, it's essential to understand logging best practices, from handling diverse formats to managing back pressure effectively. Here are the best practices for Kubernetes logging, focused on tools, performance, and scalability.
 
@@ -62,13 +63,13 @@ In Fluent Bit, you can apply filters to drop debug-level logs in production. For
 
 Logs can sometimes contain sensitive information, such as user IDs or payment data. To prevent exposing sensitive data, redact or mask it in logs. Fluent Bit supports redaction and can modify logs to obscure sensitive data before it’s stored or transmitted.
 
-Example: Use a Lua script or regular expressions in Fluent Bit to mask sensitive information like credit card numbers.
+Example: Use the `modify` filter's `Set` rule to overwrite a sensitive field, such as a credit card number. To mask only part of a value, use a Lua script instead.
 
-```yaml fluent-bit-redaction.conf
+```ini fluent-bit-redaction.conf
 [FILTER]
     Name    modify
     Match   *
-    Add     card_number   "xxxx-xxxx-xxxx-1234"
+    Set     card_number   "xxxx-xxxx-xxxx-xxxx"
 
 ```
 
@@ -84,14 +85,21 @@ In high-throughput environments, the risk of back pressure increases, especially
 
 Configure Fluent Bit with file-based buffering for resilience:
 
-```yaml fluent-bit-output.conf
+```ini fluent-bit-output.conf
+[SERVICE]
+    storage.path  /var/log/flb-storage/
+
+[INPUT]
+    Name          tail
+    Path          /var/log/containers/*.log
+    storage.type  filesystem
+
 [OUTPUT]
     Name  es
     Match *
     Host  elasticsearch.example.com
     Port  9200
-    Buffer_Chunk_Size 1M
-    Buffer_Max_Size   5M
+    storage.total_limit_size  5G
 
 ```
 

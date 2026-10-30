@@ -1,14 +1,14 @@
 ---
 title: Monitor a shop with Terraform
 sidebarTitle: Monitoring a Shop with Terraform
-description: Declare a shop's whole monitoring stack in Terraform with the Checkly provider, from the alert channel and check group to Browser Checks loaded from spec files and an API check with body assertions.
+description: Declare a shop's whole monitoring stack in Terraform with the Checkly provider, from the alert channel and check group to Browser checks loaded from spec files and an API check with body assertions.
 canonical: 'https://www.checklyhq.com/docs/guides/monitoring-ecommerce-apps-using-terraform/'
 ---
 
 import GuideAgentIntro from '/snippets/guide-agent-intro.mdx'
 import { CopyPromptButton } from '/snippets/copy-prompt-button.jsx'
 
-By the end of this guide, your shop's monitoring lives in five Terraform resources: an email alert channel, a check group that owns locations, retries, and alerting, two Browser Checks loaded from Playwright spec files, and an API check that asserts on the response body.
+By the end of this guide, your shop's monitoring lives in five Terraform resources: an email alert channel, a check group that owns locations, retries, and alerting, two Browser checks loaded from Playwright spec files, and an API check that asserts on the response body.
 
 ```text Terminal
   # checkly_alert_channel.shop_email will be created
@@ -182,9 +182,9 @@ resource "checkly_check_group_v2" "shop" {
 
 `checkly_check_group_v2` changes nothing about its checks unless you ask it to. Each `enforce_` block you add takes that setting away from the checks and applies the group's value instead. Here the group runs every check from N. Virginia and Ireland in parallel, retries a failed run up to twice from a different region, and emails you as soon as one run still fails after its retries.
 
-The `SHOP_URL` variable reaches every Browser Check in the group. Point the whole stack at a staging shop with `terraform plan -var="shop_url=<your staging URL>"`, without touching a check.
+The `SHOP_URL` variable reaches every Browser check in the group. Point the whole stack at a staging shop with `terraform plan -var="shop_url=<your staging URL>"`, without touching a check.
 
-## Step 4: Monitor the shop's flows with Browser Checks
+## Step 4: Monitor the shop's flows with Browser checks
 
 Keep each flow in its own Playwright spec file. The file is the check's script, and you can run it locally before Terraform ever sees it.
 
@@ -244,7 +244,7 @@ Running 2 tests using 2 workers
   2 passed (1.3s)
 ```
 
-Now turn every spec into a check. A `for_each` over a map creates one Browser Check per entry, and `file()` reads the spec as the check's script:
+Now turn every spec into a check. A `for_each` over a map creates one Browser check per entry, and `file()` reads the spec as the check's script:
 
 ```terraform browser.tf
 # One Browser Check per spec file in scripts/. To monitor another flow,

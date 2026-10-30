@@ -4,13 +4,13 @@ description: "Configure the Checkly Agent for a private location with environmen
 canonical: 'https://www.checklyhq.com/docs/platform/private-locations/agent-configuration/'
 ---
 
-The Checkly Agent is a container that you need to deploy to run a Private Location in Checkly. The agent needs to be deployed on your infrastructure and executes checks on behalf of the Checkly application. For installation details, [check the getting started guide](/platform/private-locations/overview).
+The Checkly Agent is a container that you need to deploy to run a private location in Checkly. The agent needs to be deployed on your infrastructure and executes checks on behalf of the Checkly application. For installation details, [check the getting started guide](/platform/private-locations/overview).
 
 The Checkly Agent has several environment variables that can be configured:
 
 Variable|Description
 ---|---
-`API_KEY`|API key for the Private Location in which the agent will serve. The API key is shown in the web app once, when initially creating a Private Location.
+`API_KEY`|API key for the private location in which the agent will serve. The API key is shown in the web app once, when initially creating a private location.
 `HTTPS_PROXY`|HTTPS proxy configuration for the outbound connection to the Checkly API, used for agent management and monitoring. `https://user:password@127.0.0.1:8080`
 `HTTP_PROXY`|HTTP proxy configuration for the outbound connection to the Checkly API, used for agent management and monitoring. Used if the proxy server does not accept HTTPS connections. `http://user:password@127.0.0.1:8080`
 `JOB_CONCURRENCY`|(Default: 1, recommended: up to 10) Number of concurrent Browser, Multistep and Playwright checks that are run by the agent. Not used by the [uptime image](/platform/private-locations/agent-images#uptime-image).
@@ -115,16 +115,16 @@ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock containrrr/watchtow
 
 ## Rotating API keys
 
-API keys can be rotated as necessary in order to maintain good security practices or in case a key is lost or compromised. A Private Location can have two active API keys. To rotate the API keys:
+API keys can be rotated as necessary in order to maintain good security practices or in case a key is lost or compromised. A private location can have two active API keys. To rotate the API keys:
 
-1. Click **Private locations** in the left sidebar (under **Configuration**) to open the [Private Locations page](https://app.checklyhq.com/accounts/private-locations).
-2. Click the edit icon on the Private Location you want to update.
-3. There will only be a single API key in place on a new Private Location. Click Add new API key to add the second key.
+1. Click **Private locations** in the left sidebar (under **Configuration**) to open the [Private locations page](https://app.checklyhq.com/accounts/private-locations).
+2. Click the edit icon on the private location you want to update.
+3. There will only be a single API key in place on a new private location. Click Add new API key to add the second key.
 4. The new API key will appear. Click the copy icon to copy it to your clipboard and save it somewhere secure.
 
    ![new key](/images/docs/images/private-locations/new_key.png)
 
-5. Click Save to close the dialog. You can now see the trailing characters of the two defined API keys in the list of Private Locations.
+5. Click Save to close the dialog. You can now see the trailing characters of the two defined API keys in the list of private locations.
 
    ![two keys](/images/docs/images/private-locations/two_keys.png)
 
@@ -134,7 +134,7 @@ API keys can be rotated as necessary in order to maintain good security practice
 docker run -e API_KEY="pl_...." -d checkly/agent:latest
 ```
 
-7. Make sure the new agents are running properly. You can check the agent count on the Private Locations page, or check your container logs. Remove the old agent containers:
+7. Make sure the new agents are running properly. You can check the agent count on the Private locations page, or check your container logs. Remove the old agent containers:
 
 ```bash Terminal
 docker stop <old container name or ID>
@@ -142,9 +142,9 @@ docker stop <old container name or ID>
 
 If you lose track of which agent containers are using the old API key, you can use the `docker inspect <container name or ID>` command and look for the `API_KEY` variable in the output.
 
-8. Now that your new agents are in place, remove the old API key. Click the edit icon in the Private Location again.
+8. Now that your new agents are in place, remove the old API key. Click the edit icon in the private location again.
 9. Click the delete icon next to the old API key (verified by the shown trailing characters) then click the confirmation.
-10. Click Save to close the dialog. You will now only see the new API key listed for the Private Location.
+10. Click Save to close the dialog. You will now only see the new API key listed for the private location.
 
 ## Trusting Enterprise TLS Certificates
 

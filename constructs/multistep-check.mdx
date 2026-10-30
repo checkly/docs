@@ -1,24 +1,24 @@
 ---
-title: 'Multistep Check Construct'
-description: 'Learn how to configure multistep checks with the Checkly CLI.'
-sidebarTitle: 'Multistep Check'
+title: 'Multistep check construct'
+description: 'Learn how to configure Multistep checks with the Checkly CLI.'
+sidebarTitle: 'Multistep check'
 canonical: 'https://www.checklyhq.com/docs/constructs/multistep-check/'
 ---
 
 import CheckIntent from '/snippets/check-intent.mdx';
 
 <Tip>
-Learn more about Multistep Checks in [the Multistep Checks overview](/detect/synthetic-monitoring/multistep-checks/overview).
+Learn more about Multistep checks in [the Multistep checks overview](/detect/synthetic-monitoring/multistep-checks/overview).
 </Tip>
 
-Use Multistep Checks to run complex end-to-end workflows with Playwright that span multiple endpoints. The examples below show how to configure Multistep Checks for different testing scenarios.
+Use Multistep checks to run complex end-to-end workflows with Playwright that span multiple endpoints. The examples below show how to configure Multistep checks for different testing scenarios.
 
 <Accordion title="Prerequisites">
-Before creating Multistep Checks, ensure you have:
+Before creating Multistep checks, ensure you have:
 
 - An initialized Checkly CLI project
 - Public endpoints you want to monitor
-- Runtime `2023.09` or later (Multistep Checks require [newer runtimes](/platform/runtimes/runtime-specification))
+- Runtime `2023.09` or later (Multistep checks require [newer runtimes](/platform/runtimes/runtime-specification))
 
 For additional setup information, see [CLI overview](/cli/overview).
 </Accordion>
@@ -68,7 +68,7 @@ new MultiStepCheck("complex-multistep-check", {
 ## Configuration
 
 <Tabs>
-<Tab title="Multistep Check">
+<Tab title="Multistep check">
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
@@ -92,7 +92,7 @@ new MultiStepCheck("complex-multistep-check", {
 | `locations` | `string[]` | ❌ | `[]` | Array of public location codes |
 | `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
 | `runtimeId` | `string` | ❌ | - | The ID of the runtime to use (2023.09 or later required) |
-| `privateLocations` | `string[]` | ❌ | `[]` | Array of Private Location slugs |
+| `privateLocations` | `string[]` | ❌ | `[]` | Array of private location slugs |
 | `retryStrategy` | `RetryStrategy` | ❌ | [`singleRetry()`](/constructs/retry-strategy#default-retry-strategy) | Strategy for configuring retries |
 | `runParallel` | `boolean` | ❌ | `false` | Run checks in parallel or round-robin |
 | `tags` | `string[]` | ❌ | `[]` | Array of tags to organize checks |
@@ -102,10 +102,10 @@ new MultiStepCheck("complex-multistep-check", {
 </Tab>
 </Tabs>
 
-### Multistep Check Options
+### Multistep check options
 
 <ResponseField name="code" type="object" required>
-The Playwright test code that defines your Multistep Check monitor.
+The Playwright test code that defines your Multistep check monitor.
 
 **Usage:**
 
@@ -265,7 +265,7 @@ test("SpaceX-API Dragon Capsules & Next Launch", async ({ request }) => {
 ### General Check Options
 
 <ResponseField name="name" type="string" required>
-Friendly name for your multistep check that will be displayed in the Checkly dashboard and used in notifications.
+Friendly name for your Multistep check that will be displayed in the Checkly dashboard and used in notifications.
 
 **Usage:**
 
@@ -280,7 +280,7 @@ new MultiStepCheck("my-multistep", {
 </ResponseField>
 
 <ResponseField name="runtimeId" type="string">
-The Checkly runtime version used to execute the Multistep Check. Runtimes are managed execution environments for Browser and Multistep Checks. They include fixed Checkly-provided dependencies, such as Playwright, browser binaries, and runtime libraries.
+The Checkly runtime version used to execute the Multistep check. Runtimes are managed execution environments for Browser and Multistep checks. They include fixed Checkly-provided dependencies, such as Playwright, browser binaries, and runtime libraries.
 
 Multistep checks require runtime `2023.09` or later.
 
@@ -300,7 +300,7 @@ Multistep checks require runtime `2023.09` or later. Earlier runtimes do not sup
 </ResponseField>
 
 <ResponseField name="frequency" type="Frequency">
-How often the multistep check should run. Use the `Frequency` enum to set the check interval.
+How often the Multistep check should run. Use the `Frequency` enum to set the check interval.
 
 Usage:
 ```ts highlight={5}
@@ -317,7 +317,7 @@ new MultiStepCheck("my-multistep", {
 </ResponseField>
 
 <ResponseField name="locations" type="string[]" default="[]">
-Array of public location codes where the multistep check should run. Multiple locations provide geographic coverage and user experience insights.
+Array of public location codes where the Multistep check should run. Multiple locations provide geographic coverage and user experience insights.
 
 Usage:
 {/* typecheck-wrap: MultiStepCheck */}

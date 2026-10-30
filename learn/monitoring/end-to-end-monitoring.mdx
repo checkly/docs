@@ -1,6 +1,6 @@
 ---
 title: What is End to End Monitoring? An Overview with Examples
-description: Learn end-to-end monitoring with playwright to test key website flows. Follow our guide that gets you up and running in 10 minutes.
+description: Learn end-to-end monitoring with Playwright to test key website flows. Follow our guide that gets you up and running in 10 minutes.
 tags: Playwright
 sidebarTitle: What is End-to-End Monitoring?
 canonical: 'https://www.checklyhq.com/docs/learn/monitoring/end-to-end-monitoring/'
@@ -157,7 +157,7 @@ We can move our scripts to separate checks to keep them [independent](/learn/pla
 
 ![checkly dashboard screenshot](/images/guides/images/guides-checkly-dashboard.png "Checkly's dashboard")
 
-As soon as a check runs red, we are alerted in real time and can **intervene before the issue impacts our users**. Alerting can be set up with all the industry-standard channels like Pagerduty, Opsgenie, Slack, email, SMS and more.
+As soon as a check runs red, we are alerted in real time and can **intervene before the issue impacts our users**. Alerting can be set up with all the industry-standard channels like PagerDuty, Opsgenie, Slack, email, SMS and more.
 
 ![checkly alerting screenshot](/images/guides/images/guides-checkly-alerting.png "Alert channels on Checkly")
 
@@ -251,7 +251,7 @@ Once this setup is complete, log in to your Checkly account via the CLI using th
 `npx checkly login`
 You can choose to log in from the browser or in your terminal. After logging in, you'll be able to update Checkly Checks from your local machine as long as you're connected to the internet.
 Step 3: Writing Your Monitoring Scripts
-In your development environment, write JavaScript/TypeScript tests for your code updates, similar to unit tests. We typically write Playwright tests in `.spec.ts` files. The `.check.ts` files configure checks, such as API checks and heartbeat monitors.
+In your development environment, write JavaScript/TypeScript tests for your code updates, similar to unit tests. We typically write Playwright tests in `.spec.ts` files. The `.check.ts` files configure checks, such as API checks and Heartbeat monitors.
 Consider a scenario where you want to monitor the title of the Checkly documentation and take a screenshot of the page. To do this, replace the code in the `homepage.spec.ts` with the following:
 
 ```javascript homepage.spec.ts
@@ -276,7 +276,7 @@ This test uses the `page.goto` method to navigate to the specified URL (`https:/
 Then we use the `expect` function to assert that the HTTP status code of the response is less than 400. This is a way to ensure that the page is loaded successfully without any HTTP errors. 
 `page.title()` retrieves the title of the page and compares it with the expected title ('Introduction to Checkly | Checkly') using the `expect` function. This ensures that the page title matches the expected value.
 Finally, we take a screenshot of the page and save it as 'homepage.jpg'.
-Step 4: Running Test Sessions
+Step 4: Running test sessions
 Now that we have our test scripts ready, let's execute them. Run the following command in the terminal of your project repository to test your checks against Checkly's infrastructure:
 `npx checkly test`
 You can review the test session with full logging, videos and traces in the Checkly web interface.

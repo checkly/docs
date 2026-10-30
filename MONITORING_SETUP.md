@@ -35,7 +35,7 @@ All checks belong to the `docs-monitoring` group, which sets the shared defaults
 | `docs-homepage-ux`          | Browser | `/`              | 15 min    |
 | `docs-no-console-errors`    | Browser | `/`, `/api-reference`, `/cli` | 15 min |
 
-Paths are appended to `DOCS_BASE_URL` (defaults to `https://www.checklyhq.com/docs`). URL monitors follow redirects and assert the final response is HTTP 200 within `degradedResponseTime` / `maxResponseTime` thresholds. The browser check verifies the page loads, the title matches `/Checkly/i`, and primary navigation is visible. The console errors check fails on any uncaught exception, `console.error`, or HTTP 400+ response on its pages, because Mintlify injects every `.js` file in the repo into every page.
+Paths are appended to `DOCS_BASE_URL` (defaults to `https://www.checklyhq.com/docs`). URL monitors follow redirects and assert the final response is HTTP 200 within `degradedResponseTime` / `maxResponseTime` thresholds. The browser check verifies the page loads, the title matches `/Checkly/i`, and primary navigation is visible. The console errors check fails on any uncaught exception, `console.error`, HTTP 400+ response, or failed request on its pages, because Mintlify injects every `.js` file in the repo into every page. It ignores analytics and ad trackers.
 
 Note: CheckGroupV2 makes `locations`, `runParallel`, and `retryStrategy` non-overridable from individual checks once set on the group.
 
@@ -45,7 +45,17 @@ The group alerts Slack `#ops` on failures and recoveries, not on degraded result
 
 Deploys are handled by `.github/workflows/deploy-checks.yml` on merge to `main`. The workflow runs `checkly deploy --force` and sources `CHECKLY_API_KEY`, `CHECKLY_ACCOUNT_ID`, and `SLACK_OPS_WEBHOOK_URL` from GitHub Actions secrets.
 
-PR previews run via `.github/workflows/preview-checks.yml`, which targets the Mintlify PR preview URL with `checkly test --env DOCS_BASE_URL=<preview>`.
+PR previews run via `.github/workflows/preview-checks.yml`, which targets the Mintlify PR preview URL with `checkly test --env DOCS_BASE_URL=<preview>`. It skips fork PRs, which don't get the Checkly secrets.
+
+## PR gates
+
+The `main-branch-protection` ruleset requires these checks to pass before merging:
+
+| Check                | Workflow                 | Covers |
+| -------------------- | ------------------------ | ------ |
+| `docs-gate`          | `docs-gate.yml`          | Mintlify deployment, link-rot, and vale-spellcheck |
+| `static-docs-checks` | `static-docs-checks.yml` | OpenAPI, API navigation, `url()` in CSS, redirects, frontmatter, sitemap, and broken links |
+| `preview-checks`     | `preview-checks.yml`     | API pages and all Checkly checks against the PR preview |
 
 ## Running locally
 

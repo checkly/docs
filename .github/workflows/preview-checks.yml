@@ -3,7 +3,7 @@ name: Preview checks
 # Runs the Checkly synthetic checks against the Mintlify PR preview URL.
 # Skips silently when a PR touches neither the site nor the checks, or when a
 # PR without site changes has no preview to test. Fails when the Mintlify
-# preview itself failed.
+# preview itself failed. Skips fork PRs, which don't get the Checkly secrets.
 #
 # Runs on every PR, with no paths filter, so a required check never waits forever.
 # The detection step below skips the Checkly run when nothing relevant changed.
@@ -19,6 +19,8 @@ concurrency:
 
 jobs:
   preview-checks:
+    # A skipped job still satisfies a required check.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     # Up to 20 min waiting for the preview plus up to 20 min of Checkly runs.
     timeout-minutes: 45

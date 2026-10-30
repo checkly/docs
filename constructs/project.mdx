@@ -195,7 +195,7 @@ export default defineConfig({
 |-----------|------|----------|---------|-------------|
 | `activated` | `boolean` | ❌ | `true` | Whether checks are enabled by default |
 | `alertChannels` | `Array<AlertChannel \| AlertChannelRef>` | ❌ | `[]` | Default alert channels for all checks |
-| `checkMatch` | `string` | ❌ | - | Glob pattern to find check construct files |
+| `checkMatch` | `string \| string[]` | ❌ | - | Glob pattern to find check construct files |
 | `environmentVariables` | `EnvironmentVariable[]` | ❌ | `[]` | Default environment variables for all checks |
 | `frequency` | `Frequency` | ❌ | - | Default frequency for all checks |
 | `ignoreDirectoriesMatch` | `string[]` | - | - | Glob patterns for directories to ignore |
@@ -210,7 +210,8 @@ export default defineConfig({
 | `tags` | `string[]` | ❌ | `[]` | Default tags applied to all checks |
 | `browserChecks` | `object` | ❌ | - | Default settings for browser checks |
 | `multiStepChecks` | `object` | ❌ | - | Default settings for multi-step checks |
-| `playwrightChecks` | `object` | ❌ | - | Default settings for Playwright Check Suites |
+| `include` | `string \| string[]` | ❌ | - | Extra files to include when bundling the Playwright Check Suites defined in `playwrightChecks` |
+| `playwrightChecks` | `object[]` | ❌ | - | Playwright Check Suites to create from your Playwright configuration |
 
 </ResponseField>
 
@@ -260,7 +261,7 @@ export default defineConfig({
 
 </ResponseField>
 
-<ResponseField name="checks.checkMatch" type="string">
+<ResponseField name="checks.checkMatch" type="string | string[]">
 
 Glob pattern where the CLI looks for files containing Check constructs, i.e. all `.check.ts` files.
 
@@ -543,7 +544,7 @@ If your project doesn't require specific configuration and you want to quickly t
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `testMatch` | `string` | `string[]` | ❌ | - | Glob pattern for Playwright tests uses as Browser Checks |
+| `testMatch` | `string \| string[]` | ❌ | - | Glob pattern for Playwright tests used as Browser Checks |
 
 **Example:**
 
@@ -572,7 +573,7 @@ If your project doesn't require specific configuration and you want to quickly t
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `testMatch` | `string` | `string[]` | ❌ | - | Glob pattern for Playwright tests uses as Browser Checks |
+| `testMatch` | `string \| string[]` | ❌ | - | Glob pattern for Playwright tests used as Multistep Checks |
 
 **Example:**
 
@@ -624,13 +625,13 @@ export default defineConfig({
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `playwrightConfigPath` | `string` | ✅ | - | Path to the Playwright configuration file |
+| `playwrightConfigPath` | `string` | ❌ | `checks.playwrightConfigPath` | Path to the Playwright configuration file. Required if `checks.playwrightConfigPath` isn't set |
 | `installCommand` | `string` | ❌ | - | Command to install dependencies before running tests |
 | `testCommand` | `string`  | ❌ | - | Command to execute Playwright tests |
 | `pwProjects` | `string` \| `string[]` | ❌ | - | Projects to run from your configuration |
 | `pwTags` | `string` \| `string[]` | ❌ | - | Tags to filter tests using Playwright's grep functionality |
-| `include` | `string` \| `string[]` | ❌ | - | File patterns to include when bundling the test project |
 | `group` | `CheckGroup` | ❌ | - | The CheckGroup this check suite belongs to |
+| `engine` | `Engine` | ❌ | - | JavaScript engine and version used to run the check suite. See [`engine`](/constructs/playwright-check#param-engine) |
 
 <Note>Checkly CLI version 10 and later no longer include the deprecated `groupName` option. Set `group` to the `CheckGroup` instead.</Note>
 
@@ -649,7 +650,6 @@ export default defineConfig({
 | `locations` | `string[]` | ❌ | `[]` | Array of public location codes |
 | `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
 | `privateLocations` | `string[]` | ❌ | `[]` | Array of Private Location slugs |
-| `retryStrategy` | `RetryStrategy` | ❌ | - | Strategy for configuring retries |
 | `runParallel` | `boolean` | ❌ | `false` | Run check suites in parallel or round-robin |
 | `tags` | `string[]` | ❌ | `[]` | Array of tags to organize check suites |
 

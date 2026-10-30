@@ -48,9 +48,9 @@ When the Coralogix integration and the generic export on Settings > Traces are b
 
 If your backend reads a header other than `traceparent`, set its name in the **Custom trace header** field. When it is set, API checks and URL monitors send the custom header instead of `traceparent`, even when the generic OTLP export is also on, so backend spans no longer join those check runs by `traceparent`. Browser checks and Multistep checks send both headers unless every enabled export has a custom header.
 
-<Note>
-Check metrics, such as response times and availability, are not sent through this integration. To get them into Coralogix, scrape the [Prometheus endpoint](/integrations/observability/prometheus) and forward the metrics with an OpenTelemetry Collector.
-</Note>
+## Metrics
+
+This integration sends no check metrics, such as response times and availability. To get them into Coralogix, scrape the [Prometheus endpoint](/integrations/observability/prometheus) with the OpenTelemetry Collector [`prometheus` receiver](/integrations/observability/prometheus#scraping-with-other-tools). Then send them to Coralogix with the Collector exporter that the [Coralogix endpoints documentation](https://coralogix.com/docs/integrations/coralogix-endpoints/) describes.
 
 ## RUM
 

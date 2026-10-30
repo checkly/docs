@@ -9,6 +9,7 @@ const paths = ['/', '/api-reference', '/cli']
 const ignoredUrls = [
   /\/_vercel\/insights\//,
   /cdn\.segment\.com/,
+  /facebook\.(com|net)/,
   /px\.ads\.linkedin\.com/,
   /unifyintent\.com/,
 ]

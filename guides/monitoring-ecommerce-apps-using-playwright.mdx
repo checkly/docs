@@ -176,7 +176,7 @@ export default defineConfig({
 })
 ```
 
-`screenshot: 'only-on-failure'` is what puts a screenshot on the failed result in Checkly. Checkly records a trace on every run regardless of the `trace` setting, and sets `CHECKLY=1` on every run, which is what turns on the retries here. To run locally against the demo shop, prefix the command with `SHOP_URL=https://danube-web.shop`.
+`screenshot: 'only-on-failure'` is what puts a screenshot on the failed result in Checkly. Checkly records a trace on every run to collect network and console data, then keeps the trace file according to your `trace` setting, so with `retain-on-failure` only failed tests keep a trace. Checkly also sets `CHECKLY=1` on every run, which is what turns on the retries here. To run locally against the demo shop, prefix the command with `SHOP_URL=https://danube-web.shop`.
 
 ## Step 4: Define the monitor
 
@@ -268,7 +268,7 @@ playwright.config.ts
 2 passed, 2 total
 ```
 
-Both variants ran because the sample contains both. The suite result lists the four test cases, each with a trace and video.
+Both variants ran because the sample contains both. The suite result lists the four test cases. With this config, traces and screenshots are kept only for failed tests. Set `trace: 'on'` if you want a trace for passing tests too.
 
 <Frame>
   <img src="/images/guides/checkout-flow/result-passing.png" alt="A passing Shop checkout flow result in Checkly listing the browse, add to cart, checkout, and search test cases with trace and video attachments" />

@@ -10,6 +10,7 @@ Review monitoring changes in GitHub, test them, and deploy the merged code to Ch
 <Accordion title="Before you begin">
 
 - Access to edit the resource and use your Checkly account's GitHub integration.
+- If GitHub is not connected yet, the GitHub personal account owner or an active organization owner must connect it.
 - A local checkout of the repository and the [CLI prerequisites](/cli/installation), including a Node.js version supported by your Checkly version.
 - The [GitHub CLI](https://cli.github.com/manual/gh_pr_checkout) for the checkout command below. You can also use GitHub's PR checkout instructions.
 
@@ -17,7 +18,7 @@ Review monitoring changes in GitHub, test them, and deploy the merged code to Ch
 
 ## 1. Connect GitHub and choose a repository
 
-Open the resource's **Export to code** dialog and select **Code**. If prompted, connect GitHub from Checkly and grant the App access to your repository. See [GitHub integration setup](/integrations/ci-cd/github/deployments#set-up-github-deployment-hooks) for installation help; you don't need a deployment hook for this workflow.
+Open the resource's **Export to code** dialog and select **Code**. A code-managed resource that was changed in Checkly since its last deploy shows a **Drifted** badge next to **Managed by** on its page; clicking the badge opens the same **Code** tab. If prompted, authorize GitHub from Checkly, choose an installation you own, and click **Connect**. Grant the App access to your repository. See [GitHub integration setup](/integrations/ci-cd/github/deployments#set-up-github-deployment-hooks) for installation help; you don't need a deployment hook for this workflow.
 
 For a UI-created resource, choose the repository to export into. If it has multiple Checkly configs, select the folder for your project. Checkly can add the resource to a project already deployed to this account or create a config for a new project.
 
@@ -26,7 +27,7 @@ For a code-managed resource, Checkly uses its project's repository. If asked, ch
 ## 2. Open the PR
 
 - **UI-created resource:** click **Export to code**. Checkly generates the code and temporarily reserves the existing resource for the project. Your monitoring keeps running; ownership stays pending until you deploy.
-- **Code-managed resource:** save your UI changes, then click **Sync to code** to send them to its source file. **Already in Sync** means there's nothing to send.
+- **Code-managed resource:** save your UI changes. The **Code** tab lists what changed in Checkly since the last deploy, with the old and new value of each property. Changes the sync doesn't write are listed under **Changed in Checkly, but kept as it is in code**. Click **Sync to code** to send the changes to its source file. **Already in Sync** means there's nothing to send.
 
 Open the PR from the dialog or your project's **Pull requests** view in **Projects**. That view tracks PRs created through Checkly, with **Open**, **Merged**, and **Closed** filters.
 
@@ -148,7 +149,7 @@ Deploying manual import code before applying its plan creates duplicates. You ca
 
 | Problem | Next step |
 | --- | --- |
-| Repository missing or GitHub error | Check the App's access to this account and repository. Look for an existing PR before retrying: it may have been created despite the error. The reservation stays protected; use `checkly import cancel` to cancel its uncommitted plan if you're abandoning the export. |
+| Repository missing or GitHub error | Check the App's connection to this Checkly account and its repository access. For a missing account or organization, follow [GitHub connection troubleshooting](/integrations/ci-cd/github/deployments#github-account-or-organization-missing). Look for an existing PR before retrying: it may have been created despite the error. The reservation stays protected; use `checkly import cancel` to cancel its uncommitted plan if you're abandoning the export. |
 | Checkly can't select the project | Choose the config folder and check its `logicalId`, `repoUrl`, and account. An existing project must already be deployed to this account. Use [manual import](/cli/importing) if automatic export can't use it. |
 | No source file, several candidates, or unsupported sync | Confirm the file that declares the resource. If Checkly can't patch it, edit the code directly. For a resource still managed in the UI, try manual import if the CLI supports its type. A project that only **References** a resource can't sync it. |
 | Dependencies, sign-in, secrets, or tests fail | Install dependencies in the config's package, use a supported Node.js version, check `whoami`, and supply the required secrets. Fix the reported error and rerun the test or preview. |

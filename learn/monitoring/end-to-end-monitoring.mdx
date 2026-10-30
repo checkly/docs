@@ -139,7 +139,7 @@ test('test', async ({ page }) => {
 </Tab>
 </Tabs>
 
-These can be run on our own machine without issues with [very little preparation](https://playwright.dev/docs/intro) with a simple `node script.js`.
+These can be run on our own machine without issues with [very little preparation](https://playwright.dev/docs/intro) with `npx playwright test`.
 
 ## Monitoring application performance
 
@@ -149,7 +149,7 @@ Using Playwright together with browser APIs or additional performance libraries,
 
 ## End to end application monitoring
 
-Unlike headful tools, headless ones tend to not be very resource-hungry, which makes it easier to move our scripts to the cloud. Checkly runs on top of AWS Lambda, and enables us to quickly copy-paste our script and set it up to run on a schedule from locations around the world.
+Unlike headful tools, headless ones tend to not be very resource-hungry, which makes it easier to move our scripts to the cloud. Checkly enables us to quickly copy-paste our script and set it up to run on a schedule from locations around the world.
 
 ![checkly check creation screenshot](/images/guides/images/guides-checkly-check.png "Check creation on Checkly")
 
@@ -235,7 +235,7 @@ Ensure you have an active Checkly account. If not, sign up. The default free Tea
 Step 2: Setting Up Checkly in Repository
 After completing the installation steps, open a terminal in the directory of your project and run the following command:
 `npx checkly init`
-This command will bootstrap your repository with the basics needed to start using Checkly MaC in your project.
+This command will bootstrap your repository with the basics needed to start using Checkly MaC in your project. It first asks whether your AI agent should set up Checkly. If you set it up yourself instead, answer yes to **Add some demo checks to get started?** to get the check templates below.
 
 ![Checkly CLI project setup screenshot](/images/guides/images/guides-checkly-install.png "Creating a project in the Checkly CLI")
 
@@ -245,12 +245,13 @@ In your project directory, you will find a folder named “__checks__” contain
     |- api.check.ts
     |- heartbeat.check.ts
     |- homepage.spec.ts
+    |- url.check.ts
 ```
 Once this setup is complete, log in to your Checkly account via the CLI using the following command:
 `npx checkly login`
 You can choose to log in from the browser or in your terminal. After logging in, you'll be able to update Checkly Checks from your local machine as long as you're connected to the internet.
 Step 3: Writing Your Monitoring Scripts
-In your development environment, write JavaScript/TypeScript tests for your code updates, similar to unit tests. We typically use the Playwright testing framework in the `.spec.ts` or `.check.ts` file.
+In your development environment, write JavaScript/TypeScript tests for your code updates, similar to unit tests. We typically write Playwright tests in `.spec.ts` files. The `.check.ts` files configure checks, such as API checks and heartbeat monitors.
 Consider a scenario where you want to monitor the title of the Checkly documentation and take a screenshot of the page. To do this, replace the code in the `homepage.spec.ts` with the following:
 
 ```javascript homepage.spec.ts

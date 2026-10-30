@@ -1,6 +1,9 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "aspen",
+  "icons": {
+    "library": "tabler"
+  },
   "name": "Checkly Docs",
   "colors": {
     "primary": "#0075FF",
@@ -71,6 +74,7 @@
                 "group": "Platform",
                 "pages": [
                   "platform/groups",
+                  "platform/filters",
                   "platform/views",
                   {
                     "group": "Private Locations",
@@ -118,6 +122,7 @@
                     "group": "Team Management",
                     "pages": [
                       "admin/team-management/overview",
+                      "admin/team-management/permissions",
                       "admin/team-management/adding-team-members",
                       "admin/team-management/managing-team-members",
                       "admin/team-management/custom-roles",
@@ -253,7 +258,8 @@
                       "detect/synthetic-monitoring/playwright-checks/test-organization",
                       "detect/synthetic-monitoring/playwright-checks/performance-metrics",
                       "detect/synthetic-monitoring/playwright-checks/add-to-group",
-                      "detect/synthetic-monitoring/playwright-checks/custom-dependencies",
+                      "detect/synthetic-monitoring/playwright-checks/dependencies",
+                      "detect/synthetic-monitoring/playwright-checks/internal-registries",
                       "detect/synthetic-monitoring/playwright-checks/environment-variables",
                       "detect/synthetic-monitoring/playwright-checks/timeouts"
                     ]
@@ -376,6 +382,7 @@
                     "pages": [
                       "ai/mcp-server",
                       "ai/mcp-server/setup",
+                      "ai/mcp-server/interactive-views",
                       "ai/mcp-server/tools",
                       "ai/mcp-server/security-and-permissions",
                       "ai/mcp-server/troubleshooting"
@@ -483,6 +490,7 @@
                       "integrations/iac/pulumi/overview",
                       "integrations/iac/pulumi/best-practices",
                       "integrations/iac/pulumi/setup",
+                      "integrations/iac/pulumi/examples",
                       "integrations/iac/pulumi/ci-cd"
                     ]
                   }
@@ -766,12 +774,27 @@
                       "api-reference/monitors/update-an-icmp-monitor"
                     ]
                   },
-                  "api-reference/monitors/create-an-ssl-monitor",
-                  "api-reference/monitors/update-an-ssl-monitor",
-                  "api-reference/monitors/create-a-traceroute-monitor",
-                  "api-reference/monitors/update-a-traceroute-monitor",
-                  "api-reference/monitors/create-a-grpc-monitor",
-                  "api-reference/monitors/update-a-grpc-monitor"
+                  {
+                    "group": "SSL Monitor",
+                    "pages": [
+                      "api-reference/monitors/create-an-ssl-monitor",
+                      "api-reference/monitors/update-an-ssl-monitor"
+                    ]
+                  },
+                  {
+                    "group": "Traceroute Monitor",
+                    "pages": [
+                      "api-reference/monitors/create-a-traceroute-monitor",
+                      "api-reference/monitors/update-a-traceroute-monitor"
+                    ]
+                  },
+                  {
+                    "group": "gRPC Monitor",
+                    "pages": [
+                      "api-reference/monitors/create-a-grpc-monitor",
+                      "api-reference/monitors/update-a-grpc-monitor"
+                    ]
+                  }
                 ]
               },
               {
@@ -952,14 +975,14 @@
                 "group": "Usage",
                 "pages": [
                   "api-reference/usage/overview",
-                  "api-reference/usage/get-usage-terms",
-                  "api-reference/usage/get-usage-summary",
-                  "api-reference/usage/get-usage-series",
                   "api-reference/openapi.json GET /v2/usage/terms",
                   "api-reference/openapi.json GET /v2/usage/series",
                   "api-reference/openapi.json GET /v2/usage/summary",
                   "api-reference/openapi.json GET /v2/usage/terms/{id}",
-                  "api-reference/openapi.json GET /v2/usage/terms/{id}/projections"
+                  "api-reference/openapi.json GET /v2/usage/terms/{id}/projections",
+                  "api-reference/usage/get-usage-terms",
+                  "api-reference/usage/get-usage-summary",
+                  "api-reference/usage/get-usage-series"
                 ]
               },
               {
@@ -1158,7 +1181,8 @@
           {
             "group": "Resolve",
             "pages": [
-              "guides/reading-traces"
+              "guides/reading-traces",
+              "guides/agent-driven-repair"
             ]
           },
           {
@@ -1268,7 +1292,7 @@
           },
           {
             "dropdown": "Incidents",
-            "icon": "triangle-exclamation",
+            "icon": "alert-triangle",
             "pages": [
               "learn/incidents/overview",
               {
@@ -1317,7 +1341,7 @@
           },
           {
             "dropdown": "Kubernetes",
-            "icon": "dharmachakra",
+            "icon": "steering-wheel",
             "pages": [
               "learn/kubernetes/overview",
               "learn/kubernetes/centralized-logging",
@@ -1367,7 +1391,7 @@
           },
           {
             "dropdown": "OpenTelemetry",
-            "icon": "satellite-dish",
+            "icon": "satellite",
             "pages": [
               "learn/opentelemetry/overview",
               {
@@ -1456,6 +1480,66 @@
     }
   },
   "redirects": [
+    {
+      "source": "/detect/synthetic-monitoring/api-checks/examples",
+      "destination": "/detect/synthetic-monitoring/api-checks/setup-and-teardown"
+    },
+    {
+      "source": "/detect/synthetic-monitoring/browser-checks/best-practices",
+      "destination": "/detect/synthetic-monitoring/browser-checks/overview"
+    },
+    {
+      "source": "/detect/synthetic-monitoring/api-checks/best-practices",
+      "destination": "/detect/synthetic-monitoring/api-checks/overview"
+    },
+    {
+      "source": "/detect/uptime-monitoring/heartbeat-monitors/iac-configuration",
+      "destination": "/constructs/heartbeat-monitor"
+    },
+    {
+      "source": "/detect/uptime-monitoring/heartbeat-monitors/cli-configuration",
+      "destination": "/constructs/heartbeat-monitor"
+    },
+    {
+      "source": "/detect/uptime-monitoring/heartbeat-monitors/cron-configuration",
+      "destination": "/detect/uptime-monitoring/heartbeat-monitors/examples"
+    },
+    {
+      "source": "/detect/uptime-monitoring/heartbeat-monitors/ci-cd-configuration",
+      "destination": "/detect/uptime-monitoring/heartbeat-monitors/examples"
+    },
+    {
+      "source": "/detect/uptime-monitoring/heartbeat-monitors/other",
+      "destination": "/detect/uptime-monitoring/heartbeat-monitors/examples"
+    },
+    {
+      "source": "/detect/uptime-monitoring/alerting",
+      "destination": "/communicate/alerts/overview"
+    },
+    {
+      "source": "/detect/uptime-monitoring/locations",
+      "destination": "/concepts/locations"
+    },
+    {
+      "source": "/detect/uptime-monitoring/scheduling",
+      "destination": "/concepts/scheduling"
+    },
+    {
+      "source": "/detect/uptime-monitoring/cli-configuration",
+      "destination": "/detect/uptime-monitoring/overview"
+    },
+    {
+      "source": "/detect/uptime-monitoring/tcp-monitors/use-cases",
+      "destination": "/detect/uptime-monitoring/tcp-monitors/overview"
+    },
+    {
+      "source": "/concepts/monitors",
+      "destination": "/detect/uptime-monitoring/overview"
+    },
+    {
+      "source": "/communicate/alerts/best-practices",
+      "destination": "/communicate/alerts/overview"
+    },
     {
       "source": "/guides/auto-waiting-methods",
       "destination": "/learn/playwright/waits-and-timeouts"
@@ -2347,6 +2431,14 @@
     {
       "source": "/guides/empowering-developers-with-checkly",
       "destination": "/concepts/monitoring-as-code"
+    },
+    {
+      "source": "/detect/synthetic-monitoring/playwright-checks/custom-dependencies",
+      "destination": "/detect/synthetic-monitoring/playwright-checks/dependencies"
+    },
+    {
+      "source": "/detect/synthetic-monitoring/playwright-checks/private-packages-and-internal-registries",
+      "destination": "/detect/synthetic-monitoring/playwright-checks/internal-registries"
     }
   ]
 }

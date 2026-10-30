@@ -7,7 +7,7 @@ canonical: 'https://www.checklyhq.com/docs/ai/mcp-server/tools/'
 
 This reference reflects the current MCP Server v1 tool surface. It is not a roadmap or a commitment to future tools.
 
-Each tool is shown only when the MCP session has the required permission. Some write tools also require a matching Checkly account role, such as Admin or Read & Write.
+Each tool is shown only when the MCP session has the required permission. Your [account role and permissions](/admin/team-management/permissions) must also allow the action. See [security and permissions](/ai/mcp-server/security-and-permissions#role-checks).
 
 ## Account tools
 
@@ -16,17 +16,12 @@ Each tool is shown only when the MCP session has the required permission. Some w
 | `whoami` | Read | Return the authenticated user and account memberships visible to the MCP session. |
 | `get-account-entitlements` | Read | Return the resolved account plan and feature entitlement state. |
 | `list-account-members` | Read | List account members and pending invites. |
-| `invite-account-member` | Write | Invite a user to the resolved account. OAuth-only. Requires Owner or Admin access, sends an invite email, and is not idempotent. |
-| `prepare-local-check-authoring` | Read | Return an account-aware runbook for creating, testing, and deploying check code with the local Checkly CLI. |
+| `invite-account-member` | Write | Invite a user to the resolved account. OAuth-only. Requires [`members:create`](/admin/team-management/permissions) and all permissions of the built-in role you give. Owner and [custom role](/admin/team-management/custom-roles) (beta) invitations are unsupported. Sends an invite email and is not idempotent. |
 
 Example prompts:
 
 ```text title="Prompt" wrap
 Use Checkly to show which accounts I can access.
-```
-
-```text title="Prompt" wrap
-Prepare the local Checkly CLI steps to create a browser check for checkout.
 ```
 
 ## Check tools
@@ -81,7 +76,7 @@ When updating, `update-check` accepts either shared top-level properties (`name`
 `delete-check` permanently removes the check and its result history. The tool first returns a confirmation handle, and the deletion only proceeds when your client passes that handle back after you explicitly agree. To stop a check from running while keeping it, use `update-check` with `activated: false` instead.
 </Warning>
 
-Playwright Check Suites are managed as Monitoring as Code with the Checkly CLI. Use `prepare-local-check-authoring` for a CLI handoff. Changes made through MCP to a check that a CLI project manages are overwritten by that project's next deploy.
+Playwright Check Suites are managed as Monitoring as Code with the Checkly CLI. Changes made through MCP to a check that a CLI project manages are overwritten by that project's next deploy.
 
 Example prompts:
 
@@ -100,6 +95,18 @@ Update the "Checkout API" check to run every 10 minutes and add the tag critical
 ```text title="Prompt" wrap
 Trigger the checks tagged production-smoke, then poll the test session until results are available.
 ```
+
+## Interactive view tools
+
+These read-only tools display [interactive views](/ai/mcp-server/interactive-views) in clients that support MCP Apps. They require the `checkly:checks:read` session permission and `checks:read` account permission.
+
+| Tool | Type | Description |
+| --- | --- | --- |
+| `show-check-status` | Read | Display one check's status card, with last-24-hour availability, P95, and P99 response times when available. |
+| `show-check-list` | Read | Display a filtered check list with current status and up to 20 checks per page. Supports pagination without historical metrics. |
+| `show-check-response-time` | Read | Display a response-time chart for one check. Defaults to the last 24 hours; custom past windows span at most seven days and must fall within your plan's data retention. |
+
+Use these tools when you want a visual view in your conversation. For structured results, use `list-check-stats` or `get-check-performance-summary`.
 
 ## Check group tools
 
@@ -232,11 +239,13 @@ Draft a major status page incident for the API outage and wait for confirmation 
 
 | Tool | Type | Description |
 | --- | --- | --- |
-| `get-usage-terms` | Read | Return the organization usage terms: contract dates, credit budget, per-unit credit rates, pricing rules, and the accounts covered. Call this first to learn the contract window and the account IDs accepted by the other usage tools. |
-| `get-usage-summary` | Read | Return organization usage totals for a date range plus credit projections, including the `CHECK_RUN` and `AI_INVOCATION` meters. |
-| `list-usage-series` | Read | Return organization usage per period, grouped by account and/or check type, as a zero-filled, cursor-paginated series. Supports `day`, `week`, `month`, and `total` intervals. |
+| `get-usage-terms` | Read | List organization usage terms with dates, budgets, pricing rules, and covered accounts. Supports date filters and cursor pagination. Use returned term IDs in summary and series filters or projection requests. |
+| `get-usage-summary` | Read | Return credits, pricing-rule breakdowns, and coverage gaps across usage terms. Optionally request a whole-term forecast with `projection: { usageTermsId, asOf? }`. |
+| `list-usage-series` | Read | Return cursor-paginated v2 usage for `day`, `week`, `month`, or `total` intervals. Optionally group by account, usage term, pricing rule, and check type. Include calculations, physical run counts, or observed monitor days. |
 
-Usage tools report on the whole organization the account belongs to. Use `accountIds` and `checkTypes` to narrow a report. These tools require an organization usage contract and Owner or Admin access.
+Usage tools use the [v2 Usage API](../../api-reference/usage/overview) and report on the whole organization the selected account belongs to. They require the [`usage:read`](../../admin/team-management/permissions) account permission, which Owner and Admin have by default. Use `usageTermsIds`, `accountIds`, and `pricingRuleKeys` arrays to narrow summary or series. V2 has no `checkTypes` filter. Series defaults to ungrouped daily buckets; pass `groupBy` and `include` as arrays.
+
+`get-usage-terms` returns a `data` collection and `nextId`, including future terms when you omit dates. Summary returns `totals.creditsUsed`, `breakdown`, and `coverage`, rather than v1 meters. To include a forecast, supply one term ID in `projection.usageTermsId`. Its optional `asOf` defaults to yesterday UTC. The forecast covers the term's whole account scope and budget, independently of the report filters. The optional `projection` result contains either `data` or `error`, so an unavailable forecast does not discard a successful summary.
 
 Example prompt:
 

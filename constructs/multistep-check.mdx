@@ -82,6 +82,7 @@ new MultiStepCheck("complex-multistep-check", {
 | `name` | `string` | ✅ | - | Friendly name for your check |
 | `description` | `string` | ❌ | `null` | A description of the check. Supports markdown. Max 500 characters |
 | `intent` | `CheckIntent` | ❌ | - | Structured guidance for root cause analysis and check repair. See [General Check Options](#general-check-options). |
+| `aiAutoRepairEnabled` | `boolean \| null` | ❌ | - | Enable or disable automatic repair, or inherit the account setting. Requires CLI 9.4.0 or later. See [General Check Options](#general-check-options). |
 | `activated` | `boolean` | ❌ | `true` | Whether the check is enabled |
 | `alertChannels` | `AlertChannel[]` | ❌ | `[]` | Array of AlertChannel objects for notifications |
 | `alertEscalationPolicy` | `AlertEscalationPolicy` | ❌ | - | Advanced alert settings |
@@ -92,7 +93,7 @@ new MultiStepCheck("complex-multistep-check", {
 | `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
 | `runtimeId` | `string` | ❌ | - | The ID of the runtime to use (2023.09 or later required) |
 | `privateLocations` | `string[]` | ❌ | `[]` | Array of Private Location slugs |
-| `retryStrategy` | `RetryStrategy` | ❌ | - | Strategy for configuring retries |
+| `retryStrategy` | `RetryStrategy` | ❌ | [`singleRetry()`](/constructs/retry-strategy#default-retry-strategy) | Strategy for configuring retries |
 | `runParallel` | `boolean` | ❌ | `false` | Run checks in parallel or round-robin |
 | `tags` | `string[]` | ❌ | `[]` | Array of tags to organize checks |
 | `testOnly` | `boolean` | ❌ | `false` | Only run with test, not during deploy |
@@ -268,9 +269,11 @@ Friendly name for your multistep check that will be displayed in the Checkly das
 
 **Usage:**
 
+{/* typecheck-wrap: MultiStepCheck */}
 ```ts highlight={2}
 new MultiStepCheck("my-multistep", {
-  name: "Complete User Journey Test"
+  name: "Complete User Journey Test",
+  /* More options... */
 })
 ```
 
@@ -282,6 +285,7 @@ The Checkly runtime version used to execute the Multistep Check. Runtimes are ma
 Multistep checks require runtime `2023.09` or later.
 
 Usage:
+{/* typecheck-wrap: MultiStepCheck */}
 ```ts highlight={3}
 new MultiStepCheck("my-multistep", {
   name: 'My Multistep Check',
@@ -300,7 +304,7 @@ How often the multistep check should run. Use the `Frequency` enum to set the ch
 
 Usage:
 ```ts highlight={5}
-import { Frequency } from 'checkly/constructs'
+import { Frequency, MultiStepCheck } from 'checkly/constructs'
 
 new MultiStepCheck("my-multistep", {
   name: "My Multistep Check",
@@ -316,6 +320,7 @@ new MultiStepCheck("my-multistep", {
 Array of public location codes where the multistep check should run. Multiple locations provide geographic coverage and user experience insights.
 
 Usage:
+{/* typecheck-wrap: MultiStepCheck */}
 ```ts highlight={3}
 new MultiStepCheck("global-check", {
   name: "Global Multistep Check",
@@ -329,6 +334,7 @@ Examples:
 <Tabs>
 <Tab title="Global User Experience">
 
+{/* typecheck-wrap: MultiStepCheck */}
 ```ts
 // Worldwide API testing
 new MultiStepCheck("global-journey", {
@@ -347,6 +353,7 @@ new MultiStepCheck("global-journey", {
 </Tab>
 <Tab title="Regional Focus">
 
+{/* typecheck-wrap: MultiStepCheck */}
 ```ts
 // European user focus
 new MultiStepCheck("eu-workflow", {
@@ -367,3 +374,9 @@ Multistep checks are only supported on runtime `2023.09` or later. Make sure to 
 </Warning>
 
 <CheckIntent />
+
+<ResponseField name="aiAutoRepairEnabled" type="boolean | null">
+Requires Checkly CLI 9.4.0 or later. Set `true` to enable automatic repair or `false` to disable it. Left unset, or set to `null`, the check follows your account default.
+
+You also need a valid check intent. See [Configure automatic repair](../resolve/automatic-check-repair#define-intent-with-monitoring-as-code) for a complete example and repair prerequisites.
+</ResponseField>

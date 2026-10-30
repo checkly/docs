@@ -32,7 +32,7 @@ The OpenTelemetry Collector can be deployed in multiple ways:
 In larger deployments, a combination of agents and standalone services may be employed to manage scale.
 
 ### Data Storage
-The OpenTelemetry collector is fully stateless, it produces no dashboards and stores no data. It doesn't even create an API endpoint to get status information. The collector is only useful when transmitting data, so your OpenTelemetry data needs somewhere to go. SaaS tools like Coralogix can receive your data, or you'll need to set up your own datastore with something like Prometheus.
+The OpenTelemetry collector produces no dashboards and doesn't store your telemetry data long term. It can report its own health and metrics, for example through the `health_check` extension and its internal metrics endpoint. The collector is only useful when transmitting data, so your OpenTelemetry data needs somewhere to go. SaaS tools like Coralogix can receive your data, or you'll need to set up your own datastore with something like Prometheus.
 
 ## OpenTelemetry and the CNCF
 
@@ -73,14 +73,13 @@ receivers:
     protocols:
       grpc:
       http:
-    prometheus:
-      config:
-        scrape_configs:
-          - job_name: 'otel-collector'
-            scrape_interval: 5s
-            static_configs:
-              - targets: ['0.0.0.0:8888']
-
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'otel-collector'
+          scrape_interval: 5s
+          static_configs:
+            - targets: ['0.0.0.0:8888']
 ```
 There are a large number of receivers for multiple formats of data coming in to an OpenTelemetry system. Note that, sadly, not all Prometheus data can be translated 1:1 into OTLP. The Prometheus receiver on Github is [currently listed as a work in progress](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/prometheusreceiver/README.md).
 
@@ -88,18 +87,14 @@ There are a large number of receivers for multiple formats of data coming in to 
 
 ```yaml
 processors:
+  memory_limiter:
+    limit_mib: 1500
+    check_interval: 5s
   batch:
     send_batch_size: 1000
     timeout: 10s
-  memory_limiter:
-    ballast_size_mib: 683
-    limit_mib: 1500
-    check_interval: 5s
-  queued_retry:
-    num_workers: 4
-    retry_on_failure: true
 ```
-Processors are the most diverse component within a collector, with a processor doing anything from removing sensitive data, batching data for transmission, or filtering unwanted information. These examples are all about how data will be batched, the max memory to use (after which data will be thrown out in this reporting cycle), and retries for sending data.
+Processors are the most diverse component within a collector, with a processor doing anything from removing sensitive data, batching data for transmission, or filtering unwanted information. These examples are all about how data will be batched and the max memory to use (after which data will be thrown out in this reporting cycle). Put `memory_limiter` first in a pipeline.
 
 ### Exporters
 
@@ -107,25 +102,32 @@ Processors are the most diverse component within a collector, with a processor d
 exporters:
   prometheus:
     endpoint: "localhost:9090"
-  jaeger:
-    endpoint: "localhost:14250"
+  otlp/jaeger:
+    endpoint: "localhost:4317"
+    tls:
+      insecure: true
+    sending_queue:
+      num_consumers: 4
+    retry_on_failure:
+      enabled: true
 ```
-At their most basic, exporters will contain where the data is headed.
+At their most basic, exporters will contain where the data is headed. Retries and queueing are configured on each exporter with `retry_on_failure` and `sending_queue`. Jaeger accepts OTLP directly, so traces go to Jaeger through an `otlp` exporter.
 
 ### Pipelines
 
 ```yaml
-pipelines:
-  traces:
-    receivers: [jaeger, otlp]
-    processors: [batch, memory_limiter]
-    exporters: [jaeger]
-  metrics:
-    receivers: [otlp]
-    processors: [batch]
-    exporters: [prometheus]
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlp/jaeger]
+    metrics:
+      receivers: [otlp, prometheus]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus]
 ```
-Pipelines a path from receiver to exporter, and any data will go through the processors listed in order, left to right. 
+Pipelines, defined under `service`, are a path from receiver to exporter, and any data will go through the processors listed in order, left to right. 
 
 ## Backend Options for OpenTelemetry Metrics and Traces
 

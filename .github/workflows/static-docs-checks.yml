@@ -95,6 +95,13 @@ jobs:
       - name: Check API group badges match the schema
         run: npm run sync:api-group-tags -- --check
 
+      # Root-relative url() paths work on previews but 404 under /docs in
+      # production, so preview checks can't catch them.
+      - name: No url() in CSS
+        run: |
+          npm run test:css-urls
+          npm run check:css-urls
+
       # Legacy /reference/* redirects are inbound-only, so `mint broken-links`
       # never validates their destinations. Runs on any docs change (.mdx or
       # docs.json) because a page rename/delete is exactly what breaks them.

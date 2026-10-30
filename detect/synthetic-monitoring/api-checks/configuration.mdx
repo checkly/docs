@@ -93,9 +93,7 @@ request by entering a username and password in the Authentication tab.
 
 ## Accessing environment variables
 
-[Environment variables](/platform/variables) are exposed to your API checks using the common Handlebars/Moustache templating delimiters, i.e. `{{USER_API_KEY}}`. Note that Handlebars (double brackets) variables will be URI encoded. To avoid encoding, you can access your environment variables with triple brackets, i.e. `{{{USER_API_KEY}}}`. A secret is scrubbed from the stored request URL, query parameters and response body in its URI-encoded spelling as well.
-
-Use triple brackets for values that contain special characters, such as API keys or tokens with `&`. With double brackets, `&` is inserted as `&amp;`, which can make the check fail.
+[Environment variables](/platform/variables) are exposed to your API checks using the common Handlebars/Moustache templating delimiters, i.e. `{{USER_API_KEY}}`. Double-bracket variables are HTML-escaped, for example `&` becomes `&amp;`. To insert the raw value, for example an API key or token, use triple brackets: `{{{USER_API_KEY}}}`. A secret is scrubbed from the stored request URL, query parameters and response body in its URI-encoded spelling as well.
 
 Variables can be used in the following API checks fields:
 

@@ -11,7 +11,7 @@ The reporting dashboard provides comprehensive insights into your monitoring per
 
 ## Dashboard overview
 
-The reporting dashboard lists your checks, 25 per page, with key performance metrics at a glance. Use this view to:
+The reporting dashboard lists your checks, 25 per page, with key performance metrics at a glance. **Avg**, **P95** and **P99** count only runs with a measured response time. A check without measured runs shows a dash. Use this view to:
 
 - Quickly identify underperforming checks
 - Monitor trends across your monitoring infrastructure  
@@ -28,11 +28,15 @@ Select the time period for your analysis: Today, Last hour, Last 3 hours, Last 2
 </Accordion>
 
 <Accordion title="Check Filters">
-Type a filter into the search bar, for example `tags:is:prod`. You can filter by status, check type, tags, project, location, creator, name, group, URL, logical ID and whether the check ran, and by the Success, Avg, P95 and P99 metrics, and combine filters with `and` and `or`. See [Filters](/platform/filters) for the syntax. You can save any filter as a [view](/platform/views).
+Type a filter into the search bar, for example `tags:is:prod`. You can filter by status, check type, tags, project, location, creator, name, group, URL, logical ID and whether the check ran, and by the Success, Avg, P95 and P99 metrics, and combine filters with `and` and `or`. See [Filters](/platform/filters#reporting) for the syntax and what each field matches. You can save any filter as a [view](/platform/views).
+</Accordion>
+
+<Accordion title="Group by Location">
+Type `group by location` in the filter field and press Enter to list one row per check and location. See [Group the rows](/platform/filters#group-the-rows).
 </Accordion>
 
 <Accordion title="Sorting Options">
-Click a column header to sort by Type, Name, Success, Avg, P95 or P99, in ascending or descending order.
+Click a column header to sort by Type, Name, Success, Avg, P95 or P99, in ascending or descending order. When you group by location, you can also sort by Location. Checks without a value come last.
 </Accordion>
 </AccordionGroup>
 
@@ -74,7 +78,7 @@ Use check type, tags, and other filters to narrow your dataset if needed.
 </Step>
 
 <Step title="Download">
-Click **Download CSV** in the toolbar to generate your export file.
+Click **Download CSV** in the toolbar of the Table view to generate your export file.
 </Step>
 </Steps>
 
@@ -90,10 +94,10 @@ The CSV export (`checkly_export.csv`) includes the following columns:
 | `group` | The check group the check belongs to |
 | `type` | The check type |
 | `successRatio` | Percentage of successful runs |
-| `avg` | Mean response time |
-| `p95` | 95th percentile response time |
-| `p99` | 99th percentile response time |
-| `tags` | Applied tags for categorization |
+| `avg` | Mean response time in milliseconds |
+| `p95` | 95th percentile response time in milliseconds |
+| `p99` | 99th percentile response time in milliseconds |
+| `tags` | Tags of the check and of its group |
 
 <Note>
 All statistics are calculated based on your selected date range. The default range is "Last 24 Hours".

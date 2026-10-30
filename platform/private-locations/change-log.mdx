@@ -31,6 +31,7 @@ Learn more about:
 - Playwright Check Suites scrub secrets several times faster.
 - The agent now exposes a single port, 8080, for health probes and Prometheus metrics. If your Kubernetes probes or scrape configuration use port 8081 or 8082, point them to 8080.
 - A single `/metrics` endpoint now covers every check type the agent runs. Use the `component` label to separate uptime metrics from synthetics metrics. Metric names and labels are consistent across both, so one dashboard covers the whole agent.
+- Added the `CHECKLY_RUN_FILE_MAX_BYTES` environment variable to cap the size of files the agent reads from a Browser or Multistep check run, such as the Playwright report. A file above the cap is left out of the check result. The default is just under 2 GiB. See [agent configuration](/platform/private-locations/agent-configuration).
 </Update>
 
 <Update label="v8.11.0" tags={["October 2026"]}>

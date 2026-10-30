@@ -71,7 +71,7 @@ The general process is detailed below, but please reach out to your customer suc
   <Step title="Test the connection">
     Test the connection by logging in to Checkly through your IdP dashboard.
 
-    Once logged in to Checkly, verify the SSO connection worked by going to the [Members page](https://app.checklyhq.com/accounts/settings/account/members) (Click the profile picture in the top right, select **Members**) and make sure there is a checkmark in the SSO column for your user:
+    Once logged in to Checkly, verify the SSO connection worked by going to the [Members page](https://app.checklyhq.com/accounts/settings/account/members) (open **Account settings** from the left sidebar, then select **Members**) and make sure there is a checkmark in the SSO column for your user:
 
     ![checkly members page SSO check mark screenshot](/images/sso-check-mark.png)
 
@@ -123,7 +123,7 @@ When JIT is enabled, new users who sign in through your SSO connection will be a
 
 Users will be created with the default role specified on your [SSO settings page](https://app.checklyhq.com/settings/account/sso-saml), which the account owner can change at any time.
 
-We enable JIT by default when we set up your SSO connection. If you'd like JIT disabled, please let [our Support team](mailto:support@checklyhq.com) know.
+We enable JIT by default when we set up your SSO connection. The account owner can turn it off with the **JIT Provisioning** toggle on the [SSO settings page](https://app.checklyhq.com/settings/account/sso-saml).
 
 <Note>
   We only support JIT for a single tenant. If you have multiple tenants, our team will confirm which account you want JIT enabled for.
@@ -176,7 +176,7 @@ You can take several steps to make sure only SSO users are in your account:
 
 * Make sure [SP-initiated logins](/admin/team-management/single-sign-on#service-provider-sp-initiated) are enabled.
 * [Migrate all users to SSO.](/admin/team-management/single-sign-on#migrating-existing-users-to-sso)
-* Periodically remove non-SSO users. You can do this manually on the [Members page](https://app.checklyhq.com/settings/account/members) or automatically using our [CLI](/cli/checkly-members#checkly-members-update) or [public API](/api-reference/accounts/update-a-current-account-member-role).
+* Periodically remove non-SSO users. You can do this manually on the [Members page](https://app.checklyhq.com/settings/account/members) or automatically using our [CLI](/cli/checkly-members#checkly-members-delete) or [public API](/api-reference/accounts/remove-a-current-account-member).
 * Do not send invitations to users, since they can accept invitations with a non-SSO login. Instead, they should [login through SSO](/admin/team-management/single-sign-on#logging-in-with-sso) and be automatically [JIT provisioned](/admin/team-management/single-sign-on#just-in-time-jit-provisioning) to you account.
 
 Currently, there is no option to require SSO for account members. If you’d like to see this added, please let us know so we can record your interest as feedback.

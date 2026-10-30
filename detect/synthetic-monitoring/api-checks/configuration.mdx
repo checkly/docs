@@ -68,7 +68,7 @@ Form encodes bodies are commonly used "traditional" HTML form submissions.
 
 If the predefined data types don't work for you, use `Raw data`. Make sure to define your `Content-Type` header explicitly then.
 
-> To monitor an XML/SOAP-based API define `text/xml; charset=utf-8` as `Content-Type` header, send your XML as `Raw data` and [use a setup script to parse required access tokens](/detect/synthetic-monitoring/api-checks/examples#parse-xmlsoap-data).
+> To monitor an XML/SOAP-based API define `text/xml; charset=utf-8` as `Content-Type` header, send your XML as `Raw data` and [use a setup script to parse required access tokens](/detect/synthetic-monitoring/api-checks/setup-and-teardown).
 
 ## Headers
 
@@ -77,6 +77,8 @@ Add HTTP request headers. The type ahead feature is pre-populated with the most 
 ![api monitoring HTTP headers](/images/docs/images/api-checks/http-request-headers.png)
 
 Clicking the **lock icon** toggles between encrypting the value of the header on the Checkly backend and hiding it from your screen.
+
+The `Authorization`, `Proxy-Authorization`, `X-Api-Key`, `X-Auth-Token`, `Cookie` and `Set-Cookie` request and response headers are stored in the check result as `*********`, even when they contain no secret.
 
 ## Query parameters
 
@@ -91,7 +93,7 @@ request by entering a username and password in the Authentication tab.
 
 ## Accessing environment variables
 
-[Environment variables](/platform/variables) are exposed to your API checks using the common Handlebars/Moustache templating delimiters, i.e. `{{USER_API_KEY}}`. Note that Handlebars (double brackets) variables will be URI encoded. To avoid encoding, you can access your environment variables with triple brackets, i.e. `{{{USER_API_KEY}}}`.
+[Environment variables](/platform/variables) are exposed to your API checks using the common Handlebars/Moustache templating delimiters, i.e. `{{USER_API_KEY}}`. Note that Handlebars (double brackets) variables will be URI encoded. To avoid encoding, you can access your environment variables with triple brackets, i.e. `{{{USER_API_KEY}}}`. A secret is scrubbed from the stored request URL, query parameters and response body in its URI-encoded spelling as well.
 
 Variables can be used in the following API checks fields:
 
@@ -113,7 +115,7 @@ These variables are specific to API checks:
 | `{{REQUEST_URL}}`    | The request URL. |
 | `{{$UUID}}`          | Generates a random UUID/v4, i.e.  9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d. |
 | `{{$RANDOM_NUMBER}}` | Generates a random decimal number between 0 and 10000, i.e. 345. |
-| `{{moment}}`         | Generates a date or time using **moment.js** and allows for formatting: <ul> <li>`{{moment "YYYY-MM-DD"}}` generates a date, i.e. 2020-08-26</li> <li>`{{moment "2 days ago" "YYYY-MM-DD"}}` generates the date two days ago: 2020-08-24</li> <li>`{{moment "last week" "X"}}` generates a UNIX timestamp from last week: 1597924480</li> </ul> |
+| `{{moment}}`         | Generates a date or time, formatted with moment.js-style format tokens: <ul> <li>`{{moment "YYYY-MM-DD"}}` generates a date, i.e. 2020-08-26</li> <li>`{{moment "2 days ago" "YYYY-MM-DD"}}` generates the date two days ago: 2020-08-24</li> <li>`{{moment "last week" "X"}}` generates a UNIX timestamp from last week: 1597924480</li> </ul> |
 
 A practical example of using the `{{moment}}` helper would be setting the pagination options on a typical API endpoint:
 
@@ -175,7 +177,7 @@ On each API check assertion, the following sources are available:
 - **Status code:** The HTTP response status, parsed as an integer.
 - **JSON body:** The response body parsed as a JSON object. To enable parsing, the Content-Type header of the response should be set to application/json.
 - **Text body:** The response body as plain text.
-- **Headers:** The response headers as an array of key/value pairs.
+- **Headers:** The response headers as an array of key/value pairs. An assertion on one of the headers listed under [Headers](#headers) compares the real value, but the result stores `*********` as the actual value and in the error message.
 - **Response time:** The response time of the full API request in milliseconds, parsed as an integer value.
 
 For more details, see our documentation on [Assertions](/detect/assertions).

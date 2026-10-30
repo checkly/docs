@@ -15,10 +15,20 @@ resource "checkly_check" "user-login" {
   activated = true
   frequency = 5
   
-  environment_variables = {
-    TEST_EMAIL    = "user@example.com"
-    TEST_PASSWORD = "secure-password"
-    API_BASE_URL  = "https://api.example.com"
+  environment_variable {
+    key   = "TEST_EMAIL"
+    value = "user@example.com"
+  }
+
+  environment_variable {
+    key    = "TEST_PASSWORD"
+    value  = "secure-password"
+    secret = true
+  }
+
+  environment_variable {
+    key   = "API_BASE_URL"
+    value = "https://api.example.com"
   }
   
   locations = ["us-west-1", "eu-central-1"]
@@ -35,10 +45,20 @@ resource "checkly_check_group" "ecommerce-flows" {
   name      = "E-commerce Flows"
   activated = true
   
-  environment_variables = {
-    TEST_EMAIL    = "user@example.com"
-    TEST_PASSWORD = "secure-password"
-    API_BASE_URL  = "https://api.example.com"
+  environment_variable {
+    key   = "TEST_EMAIL"
+    value = "user@example.com"
+  }
+
+  environment_variable {
+    key    = "TEST_PASSWORD"
+    value  = "secure-password"
+    secret = true
+  }
+
+  environment_variable {
+    key   = "API_BASE_URL"
+    value = "https://api.example.com"
   }
   
   locations   = ["us-west-1", "eu-central-1"]
@@ -49,6 +69,19 @@ resource "checkly_check_group" "ecommerce-flows" {
 Variables defined at group level are inherited by all checks within that group.
 </Accordion>
 
-<Note>
-Account-level environment variables via Terraform are coming soon. For now, use check or group-level variables for your monitoring setup.
-</Note>
+<Accordion title="Account-level variables">
+```terraform
+resource "checkly_environment_variable" "api-base-url" {
+  key   = "API_BASE_URL"
+  value = "https://api.example.com"
+}
+
+resource "checkly_environment_variable" "test-password" {
+  key    = "TEST_PASSWORD"
+  value  = "secure-password"
+  secret = true
+}
+```
+
+Variables defined at account level are available to all checks in your account.
+</Accordion>

@@ -32,6 +32,8 @@ In both cases we use the familiar Handlebars templating braces, i.e. `{{ }}` to 
   To avoid encoding, you can access your environment variables with triple brackets, i.e. `{{{USER_API_KEY}}}`
 </Note>
 
+A JSON payload template stays valid JSON when an inserted value contains a double quote or a line break: the value is escaped in the body we send. With `{{CHECK_NAME}}` a double quote arrives as `&quot;`, with `{{{CHECK_NAME}}}` as `\"`; a line break arrives as `\n` in both cases.
+
 <AlertChannelSecrets />
 
 You can use the following event-related variables in both URL and payload.
@@ -55,6 +57,8 @@ You can use the following event-related variables in both URL and payload.
 | `CHECK_TYPE`                     | The check type, e.g. API, BROWSER  .                                                                                                                                               |
 | `GROUP_NAME`                     | The name of the group, if the check belongs to one.                                                                                                                                |
 | `IS_REMINDER`                    | Whether this alert is a reminder (`true`) or the initial alert (`false`).                                                                                                          |
+| `OTEL_TRACE_ID`                  | The OpenTelemetry trace ID for the check run. Empty when no trace ID is available. |
+| `OTEL_TRACE_LINK`                | URL to view the OpenTelemetry trace for the check run. Empty when no trace is available. |
 | `REGION`                         | Region code where check ran, e.g. "us-east-1"                                                                                                                                  |
 | `REMINDER_SEQUENCE`              | The reminder number (`0` for initial alerts, `1`+ for reminders).                                                                                                                  |
 | `RESPONSE_TIME`                  | The reported response time for this result                                                                                                                                         |
@@ -173,9 +177,9 @@ You can validate each webhook we deliver to your endpoint(s). Using the optional
 1. Check if the webhook was sent by Checkly.
 2. Check if the payload was not altered in any way during transmission.
 
-When you create a webhook secret, we proceed to use that secret token to cryptographically sign the webhook payload using the SHA256 hash algorithm. We add the resulting hash to the HTTP header `x-checkly-signature` on each webhook.
+When you create a webhook secret, we use it to sign each webhook: the HTTP header `x-checkly-signature` contains the HMAC-SHA256 of the raw request body, keyed with your secret and hex-encoded. The signature covers the exact bytes we send, for JSON and plain text bodies alike.
 
-On the receiving end, you can then use the value of the `x-checkly-signature` header to assert the validity and authenticity of the webhook and its payload.
+On the receiving end, compute the same HMAC over the raw request body, before parsing it, and compare it with the `x-checkly-signature` header to assert the validity and authenticity of the webhook and its payload. Parsing and re-serializing the body can change its bytes and break the comparison.
 
 Have a look at the code examples below on how to use the header and your favourite web framework.
 
@@ -183,9 +187,9 @@ Have a look at the code examples below on how to use the header and your favouri
 
 ```javascript Node.js
 // We store the webhook secret in an environment variable called CHECKLY_WEBHOOK_SECRET
-const app = require('express')();
-const bodyParser = require('body-parser');
+const express = require('express');
 const crypto = require('crypto');
+const app = express();
 
 function isVerifiedPayload (payload, signature) {
   const secret = process.env.CHECKLY_WEBHOOK_SECRET
@@ -194,10 +198,11 @@ function isVerifiedPayload (payload, signature) {
   return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(signature))
 }
 
-app.post('/webhook', bodyParser.json({ type: 'application/json' }), (request, response) => {
+// express.raw() keeps the body as the bytes Checkly sent; parse it only after the signature is verified
+app.post('/webhook', express.raw({ type: '*/*' }), (request, response) => {
 
   const signature = request.headers['x-checkly-signature'];
-  const payload = JSON.stringify(request.body)
+  const payload = request.body
 
   if (isVerifiedPayload(payload, signature)) {
     console.log('Signature is valid')
@@ -260,7 +265,7 @@ def webhook(request):
 
 ## Webhook Retries
 
-Checkly will retry your webhook up to **5 times** if we get an HTTP response higher than 399, e.g. a 404 or 503. Each retry is backed off 20 seconds for a total retry period of `5 * 20 = 100 seconds`.
+Checkly will retry your webhook up to **5 times** if the request fails, for example with an HTTP response higher than 399 (such as a 404 or 503), a network error, or no response within 5 seconds. Retries back off exponentially: 10, 20, 40, 80 and 160 seconds, about 5 minutes in total.
 
 This means that for checks on a 1 minute schedule, there is a potential overlap between a failure alert and recovery alert. For this reason every webhook we send has a timestamp in the `x-checkly-timestamp` header. You can use this timestamp on the receiving end to ignore any webhooks that come in "late".
 

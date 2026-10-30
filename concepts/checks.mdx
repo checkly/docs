@@ -6,7 +6,7 @@ canonical: 'https://www.checklyhq.com/docs/concepts/checks/'
 ---
 Checks are automated monitors that run against your application to verify availability, performance, and reliability. Each Check represents a specific test that runs on a schedule you define, whether that's a simple health check on an API endpoint or a complex, multi-step workflow through your entire application.
 
-Checks experience your application the same way real users would—clicking buttons, making API calls, filling forms, or connecting to services. You can run them as frequently as needed—every minute, hourly, or daily. When something breaks, you get notified immediately, often before users are affected.
+Checks experience your application the same way real users would—clicking buttons, making API calls, filling forms, or connecting to services. You can run them as frequently as needed—every 10 seconds, every minute, hourly, or daily. When something breaks, you get notified immediately, often before users are affected.
 
 This lets you catch issues early, maintain confidence in your deployments, and ensure your critical systems are working as expected.
 
@@ -107,19 +107,21 @@ Run entire Playwright test suites and projects as production monitors without co
 </Accordion>
 </AccordionGroup>
 
+Checkly also offers [SSL monitors](/detect/uptime-monitoring/ssl-monitors/overview) for certificate validity and expiry, [gRPC monitors](/detect/uptime-monitoring/grpc-monitors/overview), and [Traceroute monitors](/detect/uptime-monitoring/traceroute-monitors/overview).
+
 
 ## How Checks Execute
 
 ![monitoring and alerting pipeline](/images/docs/images/monitoring/monitoring-alerting-pipeline.svg)
 
-1. A cron process picks up a check based on its schedule, say every 5 minutes. It validates that the check is not in progress at the moment to avoid race conditions. The check is put into a queue to be run from the next configured data center location
+1. A cron process picks up a check based on its schedule, say every 5 minutes. It validates that the check is not in progress at the moment to avoid race conditions. The check is put into a queue to be run from the next configured data center location, or from every selected location if the check uses [parallel scheduling](/concepts/scheduling#parallel)
 2. If the check is an API check and has a [setup script](/detect/synthetic-monitoring/api-checks/setup-and-teardown), the setup script is executed
 3. The check is executed
 4. If the check is an API check and has a [teardown script](/detect/synthetic-monitoring/api-checks/setup-and-teardown), the teardown script is executed
 Teardown scripts are run *before* any assertions are validated
 5. The result is stored in our central database
 6. If the check fails, its retry strategy is executed. Based on the retry strategy, a check is retried one or multiple times. Any setup & teardown scripts are run again as part of the process
-7. Alerts are sent out in requested channels when the sequence is complete. It's considered complete when the check run was successful or the final attempt was executed. We will send alerts only if the final attempt has failed (no alerts sent for the initial attempts)
+7. Alerts are sent out in requested channels when the sequence is complete. It's considered complete when the check run was successful or the final attempt was executed. We will send alerts only if the final attempt has failed and your [alert escalation settings](/communicate/alerts/configuration#escalation-configuration) are met (no alerts sent for the initial attempts)
 
 
 ## Code-First Philosophy

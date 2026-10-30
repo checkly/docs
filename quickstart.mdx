@@ -19,7 +19,7 @@ _The recommended flow, end to end. Each phase is explained below._
 ## Get started with Monitoring as Code
 
 <Accordion title="Prerequisites">
-- [Node.js](https://nodejs.org) `20.19+` or `22.12+`, and npm
+- [Node.js](https://nodejs.org) `22.13+`, and npm
 - A terminal
 - (Optional) the URL of an app or API you want to monitor
 </Accordion>
@@ -128,7 +128,7 @@ The steps below use the Checkly CLI directly so you can build and deploy your mo
   ```
   </CodeGroup>
 
-  Checkly turns every `*.spec.ts` file into a Browser Check through the `browserChecks.testMatch` pattern in your `checkly.config.ts`. To monitor an endpoint instead, edit `__checks__/api.check.ts`, which defines an [API Check](/detect/synthetic-monitoring/api-checks/quickstart). For every construct and option, see the [Constructs reference](/constructs/overview).
+  Checkly turns every `*.spec.ts` file in a `__checks__` folder into a Browser Check through the `browserChecks.testMatch` pattern in your `checkly.config.ts`. To monitor an endpoint instead, edit `__checks__/api.check.ts`, which defines an [API Check](/detect/synthetic-monitoring/api-checks/quickstart). For every construct and option, see the [Constructs reference](/constructs/overview).
   </Step>
 
   <Step title="Run your checks locally">
@@ -141,14 +141,16 @@ The steps below use the Checkly CLI directly so you can build and deploy your mo
   You'll see the results in your terminal:
 
   ```
-  Running 2 checks in eu-west-1.
+  Running 3 checks in eu-central-1.
 
-  __checks__/homepage.spec.ts
-    ✔ homepage loads (24s)
   __checks__/api.check.ts
-    ✔ Hello API (222ms)
+    ✔ Books API (72ms)
+  __checks__/homepage.spec.ts
+    ✔ homepage.spec.ts (3s)
+  __checks__/url.check.ts
+    ✔ Books URL (75ms)
 
-  2 passed, 2 total
+  3 passed, 3 total
   ```
 
   Runs are recorded as [test sessions](/detect/testing/overview) by default, with full logs, traces, and videos you can review in the [Checkly web app](https://app.checklyhq.com).
@@ -217,22 +219,10 @@ When you're done experimenting, tear down everything this project created with `
 ## Go deeper
 
 <Columns cols={2}>
-  <Card title="Constructs reference" href="/constructs/overview">
-    Every check, monitor, and alert channel you can define as code.
+  <Card title="Structure a Checkly project" href="/guides/structuring-a-checkly-project">
+    Organize checks by service, share configuration, and deploy monitoring from CI.
   </Card>
-  <Card title="CLI reference" href="/cli/overview">
-    All `npx checkly` commands and options.
-  </Card>
-  <Card title="Browser Checks" href="/detect/synthetic-monitoring/browser-checks/quickstart">
-    Monitor realistic user flows with Playwright.
-  </Card>
-  <Card title="API Checks" href="/detect/synthetic-monitoring/api-checks/quickstart">
-    Monitor your backend services and endpoints.
-  </Card>
-  <Card title="Alerts" href="/communicate/alerts/overview">
-    Configure who gets notified, and how.
-  </Card>
-  <Card title="CI/CD integration" href="/integrations/ci-cd/overview">
-    Run and deploy your checks from your pipeline.
+  <Card title="Turn your Playwright tests into monitors" href="/guides/playwright-testing-to-monitoring">
+    Run the tests you already have as scheduled production monitors.
   </Card>
 </Columns>

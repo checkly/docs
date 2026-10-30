@@ -28,7 +28,7 @@ import GenericRuntimeVariablesTable from '/snippets/generic-runtime-variables-ta
 
 ## What are Multistep Checks?
 
-Multistep checks are API-focused tests that perform multiple sequential HTTP requests within a single check. They're designed to test complete user workflows that span multiple API endpoints, ensuring that complex business processes work correctly from start to finish.
+Multistep checks are API-focused tests that perform multiple sequential HTTP requests within a single check. They're designed to test complete user workflows that span multiple API endpoints, ensuring that complex business processes work correctly from start to finish. Multistep checks use Playwright's `request` fixture.
 
 **Multistep checks are perfect for:**
 - User authentication and authorization flows
@@ -45,7 +45,7 @@ Multistep checks execute a series of API requests in sequence, with the ability 
 1. **Step Execution** - Runs each API request in defined order
 2. **Data Flow** - Passes response data from one step to the next
 3. **State Validation** - Verifies system state at each step
-4. **Error Handling** - Manages failures and rollback scenarios
+4. **Error Handling** - Fails the check when a request or assertion fails. Handle cleanup steps in an `afterAll` hook
 5. **Performance Tracking** - Measures timing across the entire workflow
 6. **Result Aggregation** - Combines results from all steps
 

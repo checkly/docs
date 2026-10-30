@@ -5,16 +5,27 @@
   "main": "checkly.config.ts",
   "scripts": {
     "dev": "mint dev",
+    "test:api-docs": "node --test .github/scripts/api-navigation.test.mjs",
+    "check:links": "node .github/scripts/check-broken-links.mjs",
+    "check:snippets": "cd .github/snippet-typecheck && npm update --no-audit --no-fund --silent && npm run check --silent",
+    "test:snippets": "cd .github/snippet-typecheck && npm update --no-audit --no-fund --silent && npm test --silent",
+    "test:css-urls": "node --test .github/scripts/check-css-urls.test.mjs",
+    "check:css-urls": "node .github/scripts/check-css-urls.mjs",
+    "sync:api-group-tags": "node .github/scripts/sync-api-group-tags.mjs",
     "deploy": "checkly deploy",
     "test": "checkly test",
     "trigger": "checkly trigger",
     "login": "checkly login",
-    "generate-sitemap": "node .github/scripts/generate-sitemap.mjs"
+    "generate-sitemap": "node .github/scripts/generate-sitemap.mjs",
+    "guides:screenshots:auth": "tsx scripts/guides/screenshots/setup-auth.ts",
+    "guides:screenshots": "tsx scripts/guides/screenshots/capture.ts"
   },
   "devDependencies": {
+    "@mintlify/link-rot": "3.0.803",
     "@playwright/test": "^1.40.0",
-    "checkly": "8.2.0",
-    "mint": "4.2.259",
+    "checkly": "10.0.0",
+    "mint": "4.2.1031",
+    "tsx": "^4.23.15",
     "typescript": "^5.0.0"
   },
   "keywords": [

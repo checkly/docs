@@ -1,5 +1,5 @@
 ---
-title: Introduction to Kubernetes Operators - scraping metrics with Prometheus
+title: Introduction to Kubernetes operators - scraping metrics with Prometheus
 displayTitle: 
 sidebarTitle: Operators
 description: Operators in Kubernetes enable custom automation by encapsulating specific operational knowledge within Kubernetes itself. They function as custom controllers that manage complex applications and provide features like automated deployment, scaling, and management.
@@ -20,7 +20,7 @@ With operators, you can manage resources beyond the built-in types like Pods and
 
 Kubebuilder is a development framework for building Kubernetes operators using the Go programming language. It provides project scaffolding, resource definitions, and controller logic to simplify operator creation. In short, Kubebuilder allows developers to create CRDs (Custom Resource Definitions) and controllers, which watch Kubernetes resources and act upon changes.
 
-#### Setting Up a Project with Kubebuilder
+#### Setting up a project with Kubebuilder
 
 The typical process starts by setting up a basic project structure using the `kubebuilder init` command. This scaffolds the folders and files necessary for an operator project. The following commands initialize a project and create a custom API for a simple application:
 
@@ -31,7 +31,7 @@ kubebuilder create api --group app --version v1 --kind WebApp
 
 This creates a project structure that includes an API definition for `WebApp`, a custom resource that will deploy and manage a Kubernetes Deployment and Service.
 
-#### Adding Metrics to the Operator
+#### Adding metrics to the operator
 
 For observability, we can integrate Prometheus metrics into the operator. In Kubernetes, Prometheus can scrape data from custom endpoints to provide insights into application behavior. By using the `prometheus.NewCounter` method from the Prometheus Go client, we set up counters to track resource actions, such as the creation and deletion of `WebApp` instances.
 
@@ -59,7 +59,7 @@ func init() {
 
 Each time the reconciliation loop (the main loop of the controller) handles a creation or update event, the counter increments.
 
-#### Deploying Prometheus to Scrape Metrics
+#### Deploying Prometheus to scrape metrics
 
 You must configure Prometheus to scrape the operator’s metrics endpoint. Recent Kubebuilder scaffolds serve metrics over HTTPS on port `8443` and require authentication. The example below assumes plain HTTP on port `8080`, which you get by starting the manager with `--metrics-bind-address=:8080 --metrics-secure=false`. To achieve this, add a scrape configuration to the Prometheus setup, pointing to the operator service endpoint:
 
@@ -74,7 +74,7 @@ scrape_configs:
 
 With Prometheus deployed, the operator exposes metrics under the `/metrics` path, which Prometheus regularly scrapes to collect data.
 
-#### Running the Operator and Observing Metrics
+#### Running the operator and observing metrics
 
 After deploying the operator to a Kubernetes cluster (e.g., a local KIND cluster), we can create custom `WebApp` resources that initiate deployments. By applying YAML files with the custom `WebApp` definitions, developers can observe metrics that Prometheus scrapes and view them in a dashboard like Grafana.
 

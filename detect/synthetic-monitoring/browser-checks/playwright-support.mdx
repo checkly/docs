@@ -1,7 +1,7 @@
 ---
-title: Playwright Support in Checkly
+title: Playwright support in Checkly
 description: "See which Playwright features Checkly's Browser checks support, from trace files and video recordings to auto-waiting, locators, and visual regression testing."
-sidebarTitle: 'Playwright Support'
+sidebarTitle: 'Playwright support'
 canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/browser-checks/playwright-support/'
 ---
 
@@ -152,7 +152,7 @@ Here's an example of a Playwright Test script that fails, and provides a video o
 When running tests from the editor page, video files are always available for download and preview, regardless of whether
 the check is passing or failing. For scheduled check runs videos are only preserved when the check failed.
 
-## PageObject Model (POM)
+## PageObject model (POM)
 
 If you are structuring your test codebase following the [PageObject pattern](https://martinfowler.com/bliki/PageObject.html), you can use the [Checkly CLI](/cli/overview) out of the box. Just make sure that:
 
@@ -252,7 +252,7 @@ module.exports = config;
   </Tab>
 </Tabs>
 
-## Multi Test Checks
+## Multi test checks
 One of the key benefits of using Playwright Test is that you can split your check into multiple independent test cases, and group them using the `test.describe` function. Your Checkly check will fail if **at least one** of the test cases fails.
 
 <Tabs>
@@ -291,9 +291,9 @@ test.describe('two tests', () => {
 <Note> An executed Browser check that includes multiple Playwright test cases still counts as a single check run towards your pricing plan's defined limits.</Note>
 
 
-## Interactions & Navigations
+## Interactions & navigations
 
-### Page Interactions
+### Page interactions
 ```typescript
 // Navigation
 await page.goto('https://example.com')
@@ -315,7 +315,7 @@ await page.hover('.tooltip-trigger')
 await page.setInputFiles('input[type="file"]', './document.pdf')
 ```
 
-### Element Selection Strategies
+### Element selection strategies
 ```typescript
 // By test ID (recommended)
 await page.click('[data-testid="submit-button"]')
@@ -333,9 +333,9 @@ await page.click('//button[@class="submit-btn"]')
 await page.click('role=button[name="Submit"]')
 ```
 
-## Assertions and Validation
+## Assertions and validation
 
-### Page Content Assertions
+### Page content assertions
 ```typescript
 // Text content validation
 await expect(page.locator('.success-message')).toHaveText('Order confirmed')
@@ -354,7 +354,7 @@ await expect(page.locator('input[name="email"]')).toHaveValue('user@example.com'
 await expect(page.locator('.status-badge')).toHaveClass('status-active')
 ```
 
-### Custom Validation Logic
+### Custom validation logic
 ```typescript
 // Complex assertions with custom logic
 const orderTotal = await page.locator('[data-testid="order-total"]').textContent()
@@ -369,9 +369,9 @@ expect(productTitles).toContain('Premium Plan')
 expect(productTitles).toHaveLength(3)
 
 ```
-## Advanced Features
+## Advanced features
 
-### Screenshots and Visual Testing
+### Screenshots and visual testing
 
 Browser checks can take screenshots of the page and compare them to a baseline. This is useful for visual regression testing.
 
@@ -386,7 +386,7 @@ await page.locator('.product-card').screenshot({ path: 'product.png' })
 await expect(page).toHaveScreenshot('homepage.png')
 ```
 
-### Mobile Device Simulation
+### Mobile device simulation
 ```typescript
 // Test responsive design
 test('Mobile checkout workflow', async ({ page }) => {
@@ -400,7 +400,7 @@ test('Mobile checkout workflow', async ({ page }) => {
 })
 ```
 
-### Multi-Tab and Context Handling
+### Multi-tab and context handling
 ```typescript
 // Handle multiple tabs
 const [newPage] = await Promise.all([

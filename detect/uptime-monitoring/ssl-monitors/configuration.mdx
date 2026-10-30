@@ -9,7 +9,7 @@ canonical: 'https://www.checklyhq.com/docs/detect/uptime-monitoring/ssl-monitors
 To configure an SSL monitor using code, learn more about the [SSL monitor construct](/constructs/ssl-monitor).
 </Tip>
 
-### Basic Setup
+### Basic setup
 
 Configure your SSL monitor by specifying the target host:
 
@@ -17,7 +17,7 @@ Configure your SSL monitor by specifying the target host:
 * **Port:** The TCP port to connect to. Defaults to `443`.
 * **IP family:** Choose between IPv4 (default) or IPv6.
 
-### SSL Configuration
+### SSL configuration
 
 Fine-grained control over the TLS handshake behavior:
 
@@ -29,7 +29,7 @@ Fine-grained control over the TLS handshake behavior:
 
 * **Skip chain validation:** When enabled, Checkly does not verify the certificate chain against trusted roots. The certificate is still inspected for expiry and the security baseline. Use this when monitoring internal or self-signed certificates.
 
-### Client Certificate / mTLS
+### Client certificate / mTLS
 
 SSL monitors can present a client certificate during the TLS handshake to verify mTLS-protected endpoints:
 
@@ -40,7 +40,7 @@ Omit `clientCertificateMode` to connect without a client certificate (the defaul
 
 Client certificates are stored at the account level under **Settings → Client Certificates**.
 
-### Security Baseline
+### Security baseline
 
 The security baseline is a configurable rule set that evaluates the negotiated TLS session against best-practice requirements. It runs on each successful handshake and certificate verification, and produces a **verdict** (`pass` / `warn` / `fail`) and a **grade** (`A-`, `B`, or `F`). It is skipped when an earlier step fails (e.g. hostname mismatch or chain untrusted).
 
@@ -126,7 +126,7 @@ Certificate validity, minimum TLS version and minimum key size are also enforced
 
 For more details, see our documentation on [Assertions](/detect/assertions).
 
-### Response Time Limits
+### Response time limits
 
 Set performance thresholds based on the TLS handshake duration:
 
@@ -137,12 +137,12 @@ Set performance thresholds based on the TLS handshake duration:
 
 Set how often the monitor runs. SSL monitors run at most **once per minute** (every 1 minute to 24 hours) — sub-minute frequencies aren't available, since certificate state changes slowly.
 
-### Scheduling & Locations
+### Scheduling & locations
 
 * **Strategy:** Choose between round-robin or parallel execution. Learn more about [scheduling strategies](/concepts/scheduling).
 * **Locations:** Select [public](/concepts/locations/#public-locations) or [private](/platform/private-locations/overview) locations to run the monitor from.
 
-### Additional Settings
+### Additional settings
 
 * **Name:** Give your monitor a clear name to identify it in dashboards and alerts.
 * **Description:** Add context about what this monitor does and why it matters. Supports markdown, max 500 characters. When a failure occurs, [Rocky AI](/ai/rocky-ai) uses the description to provide more accurate [root cause and user impact analysis](/resolve/ai-root-cause-analysis/overview).

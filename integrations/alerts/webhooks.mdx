@@ -1,5 +1,5 @@
 ---
-title: "Webhook Integrations"
+title: "Webhook integrations"
 description: "Create custom webhook integrations to send Checkly alerts to any API endpoint"
 sidebarTitle: "Webhooks"
 canonical: 'https://www.checklyhq.com/docs/integrations/alerts/webhooks/'
@@ -19,7 +19,7 @@ Webhooks allow you to POST custom payloads to any endpoint in your own infrastru
 - Create a **custom payload body** using any environment variables and specific instance variables per event. Note: that means that if you are attaching the webhook to a Group, you will be able to access Group-level variables, too.
 - **Debug and test the webhook** in the editor by sending test messages.
 
-## Using Variables
+## Using variables
 
 The example above shows a webhook configured to create a Jira ticket on each event. Notice the following:
 
@@ -90,7 +90,7 @@ When [automatic Rocky AI analysis](/resolve/ai-root-cause-analysis/overview#auto
 }
 ```
 
-### Handlebars Helpers
+### Handlebars helpers
 
 Webhook templates support [Handlebars built-in helpers](https://handlebarsjs.com/guide/builtin-helpers.html), such as `if`, `unless`, and `each`, as well as these Checkly helpers:
 
@@ -170,7 +170,7 @@ Two clear benefits here:
 - You only need to create one webhook to inform a 3rd party system.
 - You can translate Checkly terms to your 3rd party tool's term for the same concept, i.e. the "up status" of a check.
 
-## Webhook Secrets
+## Webhook secrets
 
 You can validate each webhook we deliver to your endpoint(s). Using the optional webhook secret, you can:
 
@@ -263,13 +263,13 @@ def webhook(request):
 
 </CodeGroup>
 
-## Webhook Retries
+## Webhook retries
 
 Checkly will retry your webhook up to **5 times** if the request fails, for example with an HTTP response higher than 399 (such as a 404 or 503), a network error, or no response within 5 seconds. Retries back off exponentially: 10, 20, 40, 80 and 160 seconds, about 5 minutes in total.
 
 This means that for checks on a 1 minute schedule, there is a potential overlap between a failure alert and recovery alert. For this reason every webhook we send has a timestamp in the `x-checkly-timestamp` header. You can use this timestamp on the receiving end to ignore any webhooks that come in "late".
 
-## Webhook Examples
+## Webhook examples
 
 The following examples give an idea how to integrate Checkly with 3rd party alerting and issue tracking systems.
 

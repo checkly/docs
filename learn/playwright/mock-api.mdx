@@ -1,5 +1,5 @@
 ---
-title: Test Dynamic Content by Mocking API Responses
+title: Test dynamic content by mocking API responses
 description: "Stabilize tests for dynamic pages by mocking API responses in Playwright, fixing unpredictable data like stock counts while leaving the rest of the page live."
 subTitle: Manipulating and mocking API responses
 date: 2025-03-12
@@ -10,7 +10,7 @@ githubUser:
 tags:
   - network
 weight: 125
-sidebarTitle: Mocking API Responses
+sidebarTitle: Mocking API responses
 learn_playwright:
   parent: "Basics"
 canonical: 'https://www.checklyhq.com/docs/learn/playwright/mock-api/'
@@ -65,7 +65,7 @@ Here are some of the paths we could take with dynamic information like a book’
     - Not everything is particularly easy to test with regex, for example the `rating` api response here comes back as Unicode stars like “★★★★☆,” which isn’t as straightforward to test with regex as a digit.
 4. Modify the API response - Finally the option that gives us high consistency in what we’re testing and what we expect in response. By modifying the API response we can set only the key value pairs that concern us to fixed values, letting the others remain dynamic. We test how the page renders with fixed data, *and* we’re still testing that the API is available.
 
-## The Solution: Modify an API response with `await *page*.route()`
+## The solution: Modify an API response with `await *page*.route()`
 
 Let’s start by looking at the API response in full, from the network tab of either our browser or the Playwright UI mode. The body looks as follows
 
@@ -111,7 +111,7 @@ Note that, if you’re using the Playwright UI, this mocking behavior will show 
 
 The ‘fulfilled’ listing will show the patched version of your response that went to the page.
 
-## Going Further: Mocking Whole APIs
+## Going further: Mocking whole APIs
 
 If we’re able to intercept a request and change a single key/value pair, can we replace an entire payload from an API request? Sure, in fact we don’t need to wait for the real API to respond. the new version would look something like this:
 
@@ -145,7 +145,7 @@ Now we no longer wait for this API response to come back and supply the whole re
 
 The distinct disadvantage is that we’re no longer checking that this API is available. If we’re [testing against production](https://www.checklyhq.com/guides/playwright-testing-to-monitoring/) it would be a good idea to still check that this API is returning data.
 
-## Going Further: Replacing API responses to stress test our page
+## Going further: Replacing API responses to stress test our page
 
 The last use case for API mocking and response editing is simulating an unusual circumstance on a live page. For example, on our page we expect that a book with zero remaining stock should show up as sold out.
 
@@ -190,13 +190,13 @@ As we find ourselves testing correct rendering of a page under unusual condition
 
 To go further, see our full documentation on [visual regression checks in Playwright and Checkly](/detect/synthetic-monitoring/browser-checks/visual-regressions#visual-regression--snapshot-testing).
 
-## Results and Conclusions: Playwright Mocking and Testing in Production
+## Results and conclusions: Playwright mocking and testing in production
 
 With Playwright mocking you can remain tightly in control of API responses your page is using to render pages for users. This tool can help you in testing against production by ensuring that even with your production pages and data sources, your testing always sees consistent results. The result is more in-depth testing with higher reliability and fewer false alarms. And when a feature isn’t working correctly for users, you can find out before they complain.
 
 With Playwright's powerful API mocking capabilities, you gain precise control over the responses your web pages use to render content for users. This functionality is particularly valuable when testing against production environments, as it ensures consistent results even when dealing with dynamic data sources. By leveraging tools like `page.route()`, you can simulate various scenarios—such as out-of-stock items, unusual data inputs, or edge cases—without needing to alter your production database or backend systems.
 
-### Key Takeaways:
+### Key takeaways:
 
 1. **Consistency in Testing**: By mocking API responses, you can create stable and reliable tests that are not affected by fluctuating data, such as stock numbers or ratings. This reduces false positives and ensures your tests are always accurate.
 2. **Flexibility**: Playwright allows you to modify specific parts of an API response or replace the entire payload, giving you the flexibility to test a wide range of scenarios, from stress testing to edge cases.
@@ -204,14 +204,14 @@ With Playwright's powerful API mocking capabilities, you gain precise control ov
 4. **Improved Debugging**: By controlling API responses, you can isolate and test specific UI behaviors, making it easier to identify and fix issues in your application.
 5. **Visual Regression Testing**: Mocking dynamic content ensures that visual regression tests are consistent, allowing you to create reliable "golden files" for comparison.
 
-### When to Use API Mocking:
+### When to use API mocking:
 
 - **Testing Dynamic Content**: Use mocking to stabilize tests for elements that frequently change, such as stock levels, prices, or ratings.
 - **Stress Testing**: Simulate unusual or extreme conditions (e.g., zero stock, large numbers, or long text) to ensure your UI handles them gracefully.
 - **Edge Case Testing**: Test how your application behaves under rare or unexpected conditions without needing to replicate those conditions in your production environment.
 - **Visual Regression Testing**: Ensure consistent screenshots for visual comparisons by fixing dynamic content in place.
 
-### Limitations and Considerations:
+### Limitations and considerations:
 
 - **Real API Availability**: While mocking is powerful, it’s important to occasionally test against real API responses to ensure your production APIs are functioning correctly.
 - **Maintenance**: Mocked responses need to be updated if the structure of your API changes, so keep your mocks in sync with your API contracts.

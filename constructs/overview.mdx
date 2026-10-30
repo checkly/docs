@@ -1,5 +1,5 @@
 ---
-title: Using Checkly CLI Constructs
+title: Using Checkly CLI constructs
 description: 'Build monitoring infrastructure using JavaScript/TypeScript and the Checkly CLI'
 sidebarTitle: 'Overview'
 canonical: 'https://www.checklyhq.com/docs/constructs/overview/'
@@ -56,7 +56,7 @@ new ApiCheck('api-health-check', {
 
 Test this API check with `npx checkly test` and transform it to production monitoring with `npx checkly deploy`.
 
-## Project Structure
+## Project structure
 
 - `checkly.config.ts` - Mandatory global project and CLI configuration. We recommend using TypeScript.
 - `src/__checks__/*` - TS/JS files defining your checks and other resources.
@@ -78,18 +78,18 @@ Here is an example directory tree of what that would look like:
 
 The `checkly.config.ts` at the root of your project defines a range of defaults for all your checks.
 
-## Project Configuration
+## Project configuration
 
 As your project grows, you will want to override these defaults for specific checks or check groups. The recommended way to tackle this is using a mix of **global** and **local** configuration.
 
-### Global Configuration
+### Global configuration
 As mentioned, your global `checkly.config.ts` holds a set of defaults for your project, checks, and some CLI commands. Use `defineConfig` to configure your Checkly project.
 
 <ChecklyConfigCodeBlock />
 
 Find a full reference of all project properties in [the `Project` construct section](/constructs/project).
 
-### Local Configuration
+### Local configuration
 Override any of the `checks` global configuration settings at the individual check level.
 
 <CodeGroup dropdown>
@@ -155,7 +155,7 @@ The project `logicalId` can be configured in the project's [global configuration
 When changing the logical ID of a project you will keep all resources on your Checkly account, unless you run [`npx checkly destroy`](/cli/checkly-destroy/) to remove the old project.
 </Note>
 
-## Programming with Constructs
+## Programming with constructs
 
 All resources you can create and manage using the Checkly CLI are derived from "constructs". These constructs are just
 [TypeScript classes](https://github.com/checkly/checkly-cli/tree/main/packages/cli/src/constructs).

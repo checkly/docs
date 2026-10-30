@@ -1,5 +1,5 @@
 ---
-title: 'Heartbeat Examples'
+title: 'Heartbeat examples'
 description: 'Implementation examples for sending heartbeat pings to monitor your scheduled jobs.'
 sidebarTitle: Examples
 canonical: 'https://www.checklyhq.com/docs/detect/uptime-monitoring/heartbeat-monitors/examples/'
@@ -17,9 +17,9 @@ Before diving into specific examples, remember these key principles:
 Checkly records that a ping arrived, plus its `User-Agent` and `Origin` or `Referer` header. A request body is ignored, so any job metadata sent in the examples below isn't stored in Checkly.
 </Note>
 
-## Shell Scripts and Command Line
+## Shell scripts and command line
 
-### Basic cURL Examples
+### Basic cURL examples
 
 The most common way to ping Heartbeat monitors from shell scripts:
 
@@ -61,7 +61,7 @@ fi
 ```
 </CodeGroup>
 
-### wget Alternative
+### wget alternative
 
 If cURL isn't available, use wget instead:
 
@@ -90,7 +90,7 @@ wget -T 5 -t 3 -q -O /dev/null \
 echo "Backup completed successfully!"
 ```
 
-## Platform-Specific Integrations
+## Platform-specific integrations
 
 ### Heroku Scheduler
 
@@ -101,7 +101,7 @@ Monitor Heroku scheduled tasks:
 run_task.sh && curl -m 5 --retry 3 https://ping.checklyhq.com/your-heartbeat-id
 ```
 
-### Render Cron Jobs
+### Render cron jobs
 
 For Render cron job services:
 
@@ -118,7 +118,7 @@ if [ $? -eq 0 ]; then
 fi
 ```
 
-### Railway Cron Jobs
+### Railway cron jobs
 
 Similar pattern for Railway scheduled deployments:
 
@@ -128,9 +128,9 @@ npm run data-sync && \
 curl -m 5 --retry 3 https://ping.checklyhq.com/your-heartbeat-id
 ```
 
-## Kubernetes Cron Jobs
+## Kubernetes cron jobs
 
-### Basic CronJob with Heartbeat
+### Basic CronJob with heartbeat
 
 ```yaml
 apiVersion: batch/v1
@@ -173,7 +173,7 @@ spec:
           restartPolicy: OnFailure
 ```
 
-### Advanced CronJob with Sidecar
+### Advanced CronJob with sidecar
 
 For more complex scenarios, use a sidecar pattern:
 
@@ -226,7 +226,7 @@ spec:
 
 ## Node.js and JavaScript
 
-### Built-in HTTPS Module
+### Built-in HTTPS module
 
 <CodeGroup>
 ```typescript TypeScript
@@ -387,7 +387,7 @@ async function pingHeartbeat(source) {
 ```
 </CodeGroup>
 
-### Fetch API (Modern Browsers/Node.js 18+)
+### Fetch API (modern browsers/Node.js 18+)
 
 ```javascript
 async function pingHeartbeat(url, source = null) {
@@ -427,7 +427,7 @@ async function pingHeartbeat(url, source = null) {
 }
 ```
 
-## Vercel Cron Jobs
+## Vercel cron jobs
 
 Monitor your Vercel cron jobs across different routing patterns:
 
@@ -552,9 +552,9 @@ export async function GET({ request }) {
 ```
 </CodeGroup>
 
-## Python Examples
+## Python examples
 
-### Using Requests Library
+### Using requests library
 
 <CodeGroup>
 ```python Basic Example
@@ -703,7 +703,7 @@ def backup_database():
 ```
 </CodeGroup>
 
-### Django Management Commands
+### Django management commands
 
 ```python
 # management/commands/send_newsletter.py
@@ -740,7 +740,7 @@ class Command(BaseCommand):
             raise
 ```
 
-## PowerShell Examples
+## PowerShell examples
 
 For Windows environments and Azure functions:
 
@@ -838,9 +838,9 @@ try {
 ```
 </CodeGroup>
 
-## Advanced Patterns
+## Advanced patterns
 
-### Conditional Heartbeats
+### Conditional heartbeats
 
 Sometimes you only want to ping under certain conditions:
 
@@ -862,7 +862,7 @@ def conditional_heartbeat_example():
         print(f"Skipped heartbeat - only processed {results['processed_count']} items")
 ```
 
-### Multi-Step Job Monitoring
+### Multi-step job monitoring
 
 For complex jobs with multiple phases:
 
@@ -914,10 +914,10 @@ echo "All steps completed successfully"
 
 ## Troubleshooting
 
-### Common Issues
+### Common issues
 
 <AccordionGroup>
-<Accordion title="Network Timeouts">
+<Accordion title="Network timeouts">
 **Problem**: Pings fail due to network timeouts or slow connections.
 
 **Solution**: Always configure timeouts and retries:
@@ -930,7 +930,7 @@ curl --connect-timeout 10 -m 30 --retry 3 https://ping.checklyhq.com/your-id
 ```
 </Accordion>
 
-<Accordion title="Blocked User Agents">
+<Accordion title="Blocked user agents">
 **Problem**: Pings are ignored due to blocked user agents.
 
 **Blocked user agents**: Twitterbot, Slackbot, Googlebot, Discordbot, Facebot, TelegramBot, WhatsApp, LinkedInBot
@@ -941,7 +941,7 @@ curl -A "MyApp/1.0" https://ping.checklyhq.com/your-id
 ```
 </Accordion>
 
-<Accordion title="Wrong HTTP Methods">
+<Accordion title="Wrong HTTP methods">
 **Problem**: Using unsupported HTTP methods.
 
 **Supported**: GET, POST  
@@ -958,7 +958,7 @@ requests.put(heartbeat_url)
 ```
 </Accordion>
 
-<Accordion title="Timing in Error Handling">
+<Accordion title="Timing in error handling">
 **Problem**: Pings sent even when job fails.
 
 **Solution**: Structure your code correctly:
@@ -982,7 +982,7 @@ finally:
 </Accordion>
 </AccordionGroup>
 
-### Testing Your Implementation
+### Testing your implementation
 
 Before deploying, test your heartbeat integration:
 

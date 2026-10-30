@@ -1,5 +1,5 @@
 ---
-title: 'SslMonitor Construct'
+title: 'SslMonitor construct'
 description: 'Learn how to configure SSL monitors with the Checkly CLI.'
 sidebarTitle: 'SSL monitor'
 canonical: 'https://www.checklyhq.com/docs/constructs/ssl-monitor/'
@@ -97,14 +97,14 @@ SSL monitors have SSL-specific settings and inherit the standard monitor options
 | `maxResponseTime` | `number` | ❌ | `10000` | Handshake time in milliseconds at which the monitor is marked failed |
 
 </Tab>
-<Tab title="General Monitor Settings">
+<Tab title="General monitor settings">
 
   <GeneralMonitorOptionsTable />
 
 </Tab>
 </Tabs>
 
-### `SslMonitor` Options
+### `SslMonitor` options
 
 <ResponseField name="request" type="object" required>
 
@@ -175,7 +175,7 @@ new SslMonitor("my-ssl", {
 ```
 </ResponseField>
 
-### `SslConfig` Options
+### `SslConfig` options
 
 <ResponseField name="alertDaysBeforeExpiry" type="number" default="20">
 Raise a degraded alert when the certificate is within this many days of expiry. Range: 1–365.
@@ -279,7 +279,7 @@ sslConfig: {
 Each rule's `severity` can be `'fail'` \| `'degrade'` \| `'ignore'`.
 </ResponseField>
 
-### `SslMonitor` Assertions
+### `SslMonitor` assertions
 
 Define `assertions` using the `SslAssertionBuilder`. Five entry points map to the assertion sources — `certificate`/`connection` take a `property` (a field selector); `jsonResponse`/`textResponse` take a JSONPath/regex:
 
@@ -343,7 +343,7 @@ SslAssertionBuilder.connection("cipherSuite").equals(CipherSuite.TLS_AES_128_GCM
 
 Learn more in our docs on [Assertions](/detect/assertions).
 
-### General Monitor Options
+### General monitor options
 
 <ResponseField name="name" type="string" required>
 Friendly name for your SSL monitor, displayed in the Checkly dashboard and used in notifications.
@@ -401,7 +401,7 @@ new SslMonitor("my-ssl-monitor", {
 ## Examples
 
 <Tabs>
-  <Tab title="Basic Expiry Alert">
+  <Tab title="Basic expiry alert">
     ```ts
     import { Frequency, SslMonitor } from "checkly/constructs"
 
@@ -419,7 +419,7 @@ new SslMonitor("my-ssl-monitor", {
     ```
   </Tab>
 
-  <Tab title="Strict TLS Policy">
+  <Tab title="Strict TLS policy">
     ```ts
     import { Frequency, SslAssertionBuilder, SslMonitor, TlsVersion } from "checkly/constructs"
 
@@ -447,7 +447,7 @@ new SslMonitor("my-ssl-monitor", {
     ```
   </Tab>
 
-  <Tab title="Internal / Self-Signed Cert">
+  <Tab title="Internal / self-signed cert">
     ```ts
     import { Frequency, SslAssertionBuilder, SslMonitor } from "checkly/constructs"
 
@@ -471,7 +471,7 @@ new SslMonitor("my-ssl-monitor", {
     ```
   </Tab>
 
-  <Tab title="mTLS Endpoint">
+  <Tab title="mTLS endpoint">
     ```ts
     import { Frequency, SslAssertionBuilder, SslMonitor } from "checkly/constructs"
 
@@ -494,7 +494,7 @@ new SslMonitor("my-ssl-monitor", {
     ```
   </Tab>
 
-  <Tab title="SNI Override">
+  <Tab title="SNI override">
     ```ts
     import { Frequency, SslMonitor } from "checkly/constructs"
 

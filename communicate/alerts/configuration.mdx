@@ -1,5 +1,5 @@
 ---
-title: 'Alert Configuration'
+title: 'Alert configuration'
 description: 'Complete guide to configuring alert settings, escalation strategies, retry mechanisms, and threshold alerting in Checkly for optimal incident response.'
 sidebarTitle: 'Configuration'
 canonical: 'https://www.checklyhq.com/docs/communicate/alerts/configuration/'
@@ -9,24 +9,24 @@ canonical: 'https://www.checklyhq.com/docs/communicate/alerts/configuration/'
 
 Alert configuration controls **when** and **how often** you receive notifications when checks fail, degrade, or recover. Proper configuration minimizes alert fatigue while ensuring critical issues receive immediate attention.
 
-## Configuration Hierarchy
+## Configuration hierarchy
 
 Checkly provides a three-tier configuration system that allows for flexible alert management across your organization:
-<Accordion title="Account Level">
+<Accordion title="Account level">
 - Applied to all checks unless overridden
 - Organization-wide defaults
 - Simplifies management at scale
 - Consistent baseline behavior
 </Accordion>
 
-<Accordion title="Group Level">
+<Accordion title="Group level">
 - Override account defaults for checks within Groups
 - Team-based alert preferences
 - Service-specific requirements
 - Departmental escalation policies
 </Accordion>
 
-<Accordion title="Check Level">
+<Accordion title="Check level">
 - Fine-tune specific check behavior
 - Handle special requirements
 - Debug and testing scenarios
@@ -35,7 +35,7 @@ Checkly provides a three-tier configuration system that allows for flexible aler
 
 <Note>
 
-### Configuration Inheritance
+### Configuration inheritance
 Understanding how settings cascade through the hierarchy:
 
 1. **Group-level settings** take highest precedence when the group has **Group override for alert settings** enabled. They replace the alert settings of every check in the group.
@@ -50,9 +50,9 @@ Groups created with the public API `/v1/check-groups` endpoint or the CLI `Check
 Runs you [cancel](/concepts/cancellation) never trigger alerts. No failure, degraded, or recovery notification is sent for a cancelled run, regardless of the settings above.
 </Note>
 
-## Alert Configuration
+## Alert configuration
 
-### Account-Level
+### Account-level
 
 Configure organization-wide defaults that apply to all checks:
 
@@ -69,14 +69,14 @@ Configure organization-wide defaults that apply to all checks:
 - Scalability: Easy to manage large numbers of checks
 
 
-### Group-Level
+### Group-level
 
 Configure alerts for teams and service categories:
 
 ![Group-level alert settings](/images/docs/images/alerting/alert-settings-group.png)
 
 <Note>
-### Group Override
+### Group override
 Configure how group settings interact with individual checks:
 
 **If checked, Group settings override individual check settings**
@@ -93,7 +93,7 @@ Configure how group settings interact with individual checks:
 
 </Note>
 
-### Check-Level
+### Check-level
 
 Fine-tune alerting for specific checks with unique requirements:
 
@@ -105,7 +105,7 @@ Fine-tune alerting for specific checks with unique requirements:
 Start with conservative alert settings and gradually tune based on your team's response patterns and service reliability characteristics. Too many alerts can be worse than too few.
 
 </Note>
-## Escalation Configuration
+## Escalation configuration
 
 <Tip>
 **Monitoring as Code**: Learn more about [configuring escalation strategies for your Checkly constructs](/constructs/alert-escalation-policy).
@@ -128,7 +128,7 @@ The escalation box allows you to decide when an alert should be triggered. We gi
     </Frame>
 
 
-### Run-Based Escalation
+### Run-based escalation
 Get alerted when a check has failed a number of times consecutively. We call this a *Run Based* escalation. Note that failed checks retried
 from a different region are not considered "consecutive".
 <Frame>
@@ -160,7 +160,7 @@ from a different region are not considered "consecutive".
 
 
 
-### Time-Based Escalation
+### Time-based escalation
 We alert you when a check is still failing after a period of time, regardless of the amount of check runs that are failing.
 This option should mostly be used when checks are run very regularly, i.e. once every minute or five minutes.
 
@@ -190,7 +190,7 @@ This option should mostly be used when checks are run very regularly, i.e. once 
 - Network-dependent services
 
 
-### Location-Based Escalation
+### Location-based escalation
 This option can be selected in addition to the run or time-based escalation settings and only affect checks running in [parallel](/concepts/scheduling#parallel) with two or more locations selected. 
 
 When enabled, alerts will only be sent when the specified percentage of locations are failing. Use this setting to reduce alert noise and fatigue for services that can handle being unavailable from some locations before action is required. 
@@ -215,7 +215,7 @@ When enabled, alerts will only be sent when the specified percentage of location
   - Accommodates CDN and geo-distributed services
   - Filters out single-location network problems
 
-## Reminder Configuration
+## Reminder configuration
 
 Configure follow-up notifications for unresolved incidents.
 
@@ -236,19 +236,19 @@ Configure follow-up notifications for unresolved incidents.
 Checkly automatically manages reminder lifecycle:
 
 <Steps>
-<Step title="Initial Alert Sent">
+<Step title="Initial alert sent">
 Primary alert sent to configured channels when escalation threshold is met
 </Step>
 
-<Step title="Reminder Timer Starts">
+<Step title="Reminder timer starts">
 Reminder countdown begins based on configuration
 </Step>
 
-<Step title="Reminder Notifications">
+<Step title="Reminder notifications">
 Follow-up alerts sent at configured intervals
 </Step>
 
-<Step title="Automatic Cancellation">
+<Step title="Automatic cancellation">
 All pending reminders cancelled when check recovers
 </Step>
 </Steps>
@@ -257,7 +257,7 @@ All pending reminders cancelled when check recovers
 When a check failure is resolved, we cancel any outstanding reminders so you don't get mixed signals.
 </Note>
 
-## Muting and Temporary Controls
+## Muting and temporary controls
 
 Toggling the "mute" checkbox on a check stops the sending of all alerts but keeps the check running. This is useful when
 your check might be flapping or showing other unpredictable behavior. Just mute the alerts but keep the check going while

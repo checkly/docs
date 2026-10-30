@@ -1,7 +1,7 @@
 ---
-title: 'Pulumi Setup Guide'
+title: 'Pulumi setup guide'
 description: 'Detailed setup instructions for Pulumi CLI and Checkly integration'
-sidebarTitle: 'Setup Guide'
+sidebarTitle: 'Setup guide'
 canonical: 'https://www.checklyhq.com/docs/integrations/iac/pulumi/setup/'
 ---
 
@@ -20,7 +20,7 @@ Before starting, ensure you have:
 ## Step 1: Install Pulumi CLI
 
 <Steps>
-<Step title="Choose Installation Method">
+<Step title="Choose installation method">
 Select your preferred installation method based on your operating system and package manager
 </Step>
 
@@ -28,12 +28,12 @@ Select your preferred installation method based on your operating system and pac
 Run the appropriate installation command for your system
 </Step>
 
-<Step title="Verify Installation">
+<Step title="Verify installation">
 Confirm Pulumi CLI is working correctly
 </Step>
 </Steps>
 
-### Installation Options
+### Installation options
 
 <CodeGroup>
 ```bash install-pulumi-brew
@@ -45,7 +45,7 @@ curl -fsSL https://get.pulumi.com | sh
 ```
 </CodeGroup>
 
-### Verify Installation
+### Verify installation
 
 ```bash verify-installation
 pulumi version
@@ -56,15 +56,15 @@ You should see output similar to:
 v3.100.0
 ```
 
-## Step 2: Pulumi Account Setup
+## Step 2: Pulumi account setup
 
-### Create Account
+### Create account
 
 1. Visit [app.pulumi.com/signup](https://app.pulumi.com/signup)
 2. Sign up with your preferred method (GitHub, GitLab, etc.)
 3. Complete the account verification process
 
-### Generate Access Token
+### Generate access token
 
 1. Navigate to [app.pulumi.com/account/tokens](https://app.pulumi.com/account/tokens)
 2. Click "Create token"
@@ -89,15 +89,15 @@ Verify your login:
 pulumi whoami
 ```
 
-## Step 3: Checkly API Configuration
+## Step 3: Checkly API configuration
 
-### Get Your Account ID
+### Get your account ID
 
 1. Log into [app.checklyhq.com](https://app.checklyhq.com)
 2. Navigate to **Settings** → **Account** → **General**
 3. Copy your **Account ID**
 
-### Create API Key
+### Create API key
 
 1. Go to **Settings** → **User** → **API Keys**
 2. Click "Create API Key"
@@ -108,15 +108,15 @@ pulumi whoami
 API keys act with the [role and permissions](/admin/creating-api-key) of the user who created them. Keep them secure and never commit them to version control.
 </Warning>
 
-## Step 4: Project Setup
+## Step 4: Project setup
 
-### Create Project Directory
+### Create project directory
 
 ```bash create-project
 mkdir my-checkly-monitoring && cd my-checkly-monitoring
 ```
 
-### Initialize Pulumi Project
+### Initialize Pulumi project
 
 ```bash init-pulumi-project
 pulumi new javascript
@@ -127,7 +127,7 @@ Follow the prompts:
 - **Project description**: `Checkly monitoring infrastructure as code`
 - **Stack name**: `dev` (or your preferred environment name)
 
-### Install Checkly Provider
+### Install Checkly provider
 
 <CodeGroup>
 ```bash install-checkly-npm
@@ -139,7 +139,7 @@ yarn add @checkly/pulumi
 ```
 </CodeGroup>
 
-## Step 5: Configure Authentication
+## Step 5: Configure authentication
 
 ### Option 1: Environment variables (recommended for development)
 
@@ -156,7 +156,7 @@ Reload your shell or source the profile:
 source ~/.bashrc  # or ~/.zshrc
 ```
 
-### Option 2: Pulumi Configuration (Recommended for Teams)
+### Option 2: Pulumi configuration (recommended for teams)
 
 ```bash setup-pulumi-config
 pulumi config set checkly:apiKey your_api_key --secret
@@ -167,7 +167,7 @@ pulumi config set checkly:accountId your_account_id
 Using Pulumi configuration is better for team environments as it stores settings with your stack and can be shared across team members.
 </Tip>
 
-### Verify Configuration
+### Verify configuration
 
 Test that your credentials are accessible:
 
@@ -182,7 +182,7 @@ Or check Pulumi config:
 pulumi config
 ```
 
-## Step 6: Create Your First Check
+## Step 6: Create your first check
 
 ### Update index.js
 
@@ -214,9 +214,9 @@ new checkly.Check('hello-world-api', {
 })
 ```
 
-## Step 7: Deploy Your Infrastructure
+## Step 7: Deploy your infrastructure
 
-### Preview Changes
+### Preview changes
 
 ```bash preview-changes
 pulumi preview
@@ -236,25 +236,25 @@ When prompted, type `yes` to confirm the deployment.
 Congratulations! You've successfully set up Pulumi with Checkly and deployed your first monitoring check.
 </Callout>
 
-## Step 8: Verify Deployment
+## Step 8: Verify deployment
 
 1. Visit your [Checkly dashboard](https://app.checklyhq.com)
 2. Navigate to **Checks**
 3. You should see your new "Hello World API" check
 4. The check should be running and showing as "Passing"
 
-## Next Steps
+## Next steps
 
 <Columns cols={2}>
 <Card title="Examples" icon="code" href="/integrations/iac/pulumi/examples">
 Explore more complex examples and configurations
 </Card>
 
-<Card title="Best Practices" icon="shield-check" href="/integrations/iac/pulumi/best-practices">
+<Card title="Best practices" icon="shield-check" href="/integrations/iac/pulumi/best-practices">
 Learn best practices for managing monitoring as code
 </Card>
 
-<Card title="CI/CD Integration" icon="git-merge" href="/integrations/iac/pulumi/ci-cd">
+<Card title="CI/CD integration" icon="git-merge" href="/integrations/iac/pulumi/ci-cd">
 Set up automated deployments in your CI/CD pipeline
 </Card>
 
@@ -265,10 +265,10 @@ Common issues and solutions
 
 ## Troubleshooting
 
-### Common Issues
+### Common issues
 
 <AccordionGroup>
-<Accordion title="Authentication Errors">
+<Accordion title="Authentication errors">
 If you see authentication errors, verify:
 - Your Checkly API key is correct and active
 - Your account ID is correct
@@ -276,14 +276,14 @@ If you see authentication errors, verify:
 - You're logged into Pulumi (`pulumi whoami`)
 </Accordion>
 
-<Accordion title="Provider Not Found">
+<Accordion title="Provider not found">
 If the Checkly provider isn't found:
 - Ensure you've installed `@checkly/pulumi`
 - Check your `package.json` for the dependency
 - Run `npm install` or `yarn install`
 </Accordion>
 
-<Accordion title="Permission Denied">
+<Accordion title="Permission denied">
 If you get permission errors:
 - Verify your API key has the necessary permissions
 - Check that your account ID is correct

@@ -5,6 +5,8 @@ sidebarTitle: 'gRPC Monitor'
 canonical: 'https://www.checklyhq.com/docs/constructs/grpc-monitor/'
 ---
 
+import CheckIntent from '/snippets/check-intent.mdx';
+
 import GeneralMonitorOptionsTable from '/snippets/general-monitor-options-table.mdx';
 
 <Tip>
@@ -94,6 +96,7 @@ gRPC monitors have their own gRPC-specific settings, plus the standard monitor o
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `request` | `object` | ✅ | - | gRPC request configuration object |
+| `intent` | `CheckIntent` | ❌ | - | Structured guidance for root cause analysis and check repair. See [General Monitor Options](#general-monitor-options). |
 | `degradedResponseTime` | `number` | ❌ | `10000` | Response time in milliseconds at which the monitor is marked as degraded |
 | `maxResponseTime` | `number` | ❌ | `20000` | Response time in milliseconds at which the monitor is marked as failed (max 180,000) |
 
@@ -113,6 +116,7 @@ gRPC connection and call configuration.
 
 **Usage:**
 
+{/* typecheck-wrap: GrpcMonitor */}
 ```ts
 new GrpcMonitor('grpc-monitor', {
   name: 'My gRPC Service',
@@ -168,6 +172,7 @@ Response time in milliseconds at which the monitor is marked as degraded (warnin
 
 **Usage:**
 
+{/* typecheck-wrap: GrpcMonitor */}
 ```ts highlight={3}
 new GrpcMonitor('grpc-thresholds', {
   name: 'gRPC Latency Thresholds',
@@ -188,6 +193,7 @@ Response time in milliseconds at which the monitor is marked as failed. Maximum:
 
 **Usage:**
 
+{/* typecheck-wrap: GrpcMonitor */}
 ```ts highlight={3}
 new GrpcMonitor('grpc-thresholds', {
   name: 'gRPC Latency Thresholds',
@@ -264,6 +270,7 @@ Friendly name for your gRPC Monitor displayed in the Checkly dashboard and used 
 
 **Usage:**
 
+{/* typecheck-wrap: GrpcMonitor */}
 ```ts highlight={2}
 new GrpcMonitor('my-grpc-monitor', {
   name: 'User Service Health',
@@ -278,6 +285,7 @@ How often the gRPC Monitor should run. Use the `Frequency` enum to set the check
 
 **Usage:**
 
+{/* typecheck-wrap: GrpcMonitor */}
 ```ts highlight={3}
 new GrpcMonitor('my-grpc-monitor', {
   name: 'User Service Health',
@@ -294,6 +302,7 @@ Array of [public location codes](/concepts/locations/#public-locations) where th
 
 **Usage:**
 
+{/* typecheck-wrap: GrpcMonitor */}
 ```ts highlight={3}
 new GrpcMonitor('global-grpc-monitor', {
   name: 'Global gRPC Health',
@@ -309,6 +318,7 @@ Whether the gRPC Monitor is enabled and will run according to its schedule.
 
 **Usage:**
 
+{/* typecheck-wrap: GrpcMonitor */}
 ```ts highlight={3}
 new GrpcMonitor('my-grpc-monitor', {
   name: 'User Service Health',
@@ -318,6 +328,8 @@ new GrpcMonitor('my-grpc-monitor', {
 ```
 
 </ResponseField>
+
+<CheckIntent />
 
 ## Examples
 

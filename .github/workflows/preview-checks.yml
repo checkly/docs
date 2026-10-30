@@ -1,27 +1,17 @@
 name: Preview checks
 
 # Runs the Checkly synthetic checks against the Mintlify PR preview URL.
-# Skips silently when a PR touches no docs files. Fails when the Mintlify
-# preview itself failed (no URL to target).
+# Skips silently when a PR touches neither the site nor the checks, or when a
+# PR without site changes has no preview to test. Fails when the Mintlify
+# preview itself failed. Skips fork PRs, which don't get the Checkly secrets.
 #
-# `paths-ignore` keeps the runner from spinning up at all on non-docs PRs.
-# The in-workflow detection below is the fine-grained backstop for the
-# rare case where a PR mixes docs and non-docs paths.
+# Runs on every PR, with no paths filter, so a required check never waits forever.
+# The detection step below skips the Checkly run when nothing relevant changed.
 
 on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened, ready_for_review]
-    paths-ignore:
-      - '.github/**'
-      - '**/*.sh'
-      - '*.md'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'node_modules/**'
-      - 'checkly.config.ts'
-      - 'block-headless.js'
-      - '__checks__/**'
 
 concurrency:
   group: preview-checks-${{ github.event.pull_request.number }}
@@ -29,8 +19,11 @@ concurrency:
 
 jobs:
   preview-checks:
+    # A skipped job still satisfies a required check.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Up to 20 min waiting for the preview plus up to 20 min of Checkly runs.
+    timeout-minutes: 45
     permissions:
       contents: read
       pull-requests: read
@@ -40,61 +33,53 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Detect docs changes
+      - name: Detect site or check changes
         id: detect
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
-          NON_DOCS_RE='^(\.github/|.*\.sh$|[^/]+\.md$|package(-lock)?\.json$|node_modules/|checkly\.config\.ts$|block-headless\.js$|__checks__/)'
+          # Unlike docs-gate, check and workflow changes count: they change what runs here.
+          IRRELEVANT_RE='^([^/]+\.md$|.*\.sh$)'
           MERGE_BASE=$(git merge-base "$BASE_SHA" "$HEAD_SHA")
-          CHANGED=$(git diff --name-only "$MERGE_BASE" "$HEAD_SHA" | grep -vE "$NON_DOCS_RE" || true)
+          CHANGED=$(git diff --name-only "$MERGE_BASE" "$HEAD_SHA" | grep -vE "$IRRELEVANT_RE" || true)
           if [ -z "$CHANGED" ]; then
-            echo "No docs changes — skipping preview checks."
-            echo "docs_changed=false" >> "$GITHUB_OUTPUT"
+            echo "No site or check changes — skipping preview checks."
+            echo "run_checks=false" >> "$GITHUB_OUTPUT"
           else
-            echo "Docs changed:"
+            echo "Changed:"
             echo "$CHANGED"
-            echo "docs_changed=true" >> "$GITHUB_OUTPUT"
+            echo "run_checks=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Wait for Mintlify preview URL
-        if: steps.detect.outputs.docs_changed == 'true'
+          # Same docs-detection regex as docs-gate: Mintlify only deploys when these change.
+          NON_DOCS_RE='^(\.github/|.*\.sh$|[^/]+\.md$|package(-lock)?\.json$|node_modules/|checkly\.config\.ts$|block-headless\.js$|__checks__/)'
+          if git diff --name-only "$MERGE_BASE" "$HEAD_SHA" | grep -vqE "$NON_DOCS_RE"; then
+            echo "site_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "site_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Resolve preview URL
+        if: steps.detect.outputs.run_checks == 'true'
         id: preview
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          SITE_CHANGED: ${{ steps.detect.outputs.site_changed }}
         run: |
           set -euo pipefail
-          MAX_ATTEMPTS=40   # 40 * 30s = 20 min
-          SLEEP=30
+          TIMEOUT=1200 # 20 min for a deployment to finish
+          SLEEP=15
+          elapsed=0
 
-          for attempt in $(seq 1 $MAX_ATTEMPTS); do
-            # Short-circuit: if Mintlify Deployment was skipped, no preview
-            # URL will ever appear. Skip the Checkly test run cleanly.
-            DEPLOY_CONCLUSION=$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA/check-runs" --paginate --jq '
-              [.check_runs[] | select(.name == "Mintlify Deployment")]
-              | sort_by(.started_at) | reverse | .[0]
-              | if . == null or .status != "completed" then ""
-                else .conclusion // ""
-                end
-            ')
-            if [ "$DEPLOY_CONCLUSION" = "skipped" ]; then
-              echo "Mintlify Deployment was skipped — no preview to test."
-              echo "skipped=true" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-
+          # Exits with the preview URL when the PR's preview is ready, fails
+          # when it failed, and returns while it is still building.
+          read_preview() {
             COMMENT_BODY=$(gh api "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" \
               --jq '[.[] | select(.user.login == "mintlify[bot]" and (.body | contains("mintlify-preview-comment")))] | last | .body // empty')
-
-            if [ -z "$COMMENT_BODY" ]; then
-              echo "[$attempt/$MAX_ATTEMPTS] Waiting for Mintlify preview comment..."
-              sleep $SLEEP
-              continue
-            fi
 
             # Status emoji-prefixed token in the table row
             if echo "$COMMENT_BODY" | grep -q '🔴 Failed'; then
@@ -104,40 +89,91 @@ jobs:
               exit 1
             fi
 
-            URL=$(echo "$COMMENT_BODY" | grep -oE 'https://[a-z0-9-]+\.mintlify\.(app|site)' | head -1 || true)
+            URL=$(echo "$COMMENT_BODY" | grep -oE 'https://[a-z0-9-]+\.(mintlify\.(app|site)|mintlifysite\.com)' | head -1 || true)
 
             if echo "$COMMENT_BODY" | grep -q '🟢 Ready' && [ -n "$URL" ]; then
-              echo "Mintlify preview ready: $URL"
+              echo "Mintlify Deployment $DEPLOY — preview: $URL"
               echo "url=$URL" >> "$GITHUB_OUTPUT"
               exit 0
             fi
+          }
 
-            echo "[$attempt/$MAX_ATTEMPTS] Preview not ready yet..."
-            sleep $SLEEP
+          while [ "$elapsed" -lt "$TIMEOUT" ]; do
+            # Mintlify's verdict for this exact commit. Waiting for it keeps us
+            # from testing a preview that is still being rebuilt.
+            DEPLOY=$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA/check-runs" --paginate --jq '
+              [.check_runs[] | select(.name == "Mintlify Deployment")]
+              | sort_by(.started_at) | reverse | .[0]
+              | if . == null then "none"
+                elif .status != "completed" then "pending"
+                else .conclusion // "unknown"
+                end
+            ')
+
+            case "$DEPLOY" in
+              pending)
+                ;;
+              success)
+                read_preview
+                ;;
+              none|skipped)
+                # Mintlify deploys every site change, so keep waiting for it.
+                if [ "$DEPLOY" = "none" ] && [ "$SITE_CHANGED" = "true" ]; then
+                  :
+                else
+                  # The site didn't change, so the PR's last preview still applies.
+                  read_preview
+                  if [ -z "$COMMENT_BODY" ]; then
+                    echo "No site changes and no preview for this PR — skipping preview checks."
+                    exit 0
+                  fi
+                fi
+                ;;
+              *)
+                echo "Mintlify Deployment concluded '$DEPLOY' — cannot run checks."
+                exit 1
+                ;;
+            esac
+
+            echo "[${elapsed}s] Mintlify Deployment: $DEPLOY — waiting..."
+            sleep "$SLEEP"
+            elapsed=$((elapsed + SLEEP))
           done
 
           echo "Timed out waiting for Mintlify preview URL."
           exit 1
 
       - name: Set up Node
-        if: steps.detect.outputs.docs_changed == 'true' && steps.preview.outputs.skipped != 'true'
+        if: steps.preview.outputs.url != ''
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
+      - name: Verify schema-generated API pages on preview
+        if: steps.preview.outputs.url != ''
+        env:
+          DOCS_PREVIEW_URL: ${{ steps.preview.outputs.url }}
+        run: node .github/scripts/check-api-preview.mjs "$DOCS_PREVIEW_URL"
+
       - name: Install dependencies
-        if: steps.detect.outputs.docs_changed == 'true' && steps.preview.outputs.skipped != 'true'
+        if: steps.preview.outputs.url != ''
         run: npm ci
 
       - name: Run Checkly checks against preview
-        if: steps.detect.outputs.docs_changed == 'true' && steps.preview.outputs.skipped != 'true'
+        if: steps.preview.outputs.url != ''
         env:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
           CHECKLY_ACCOUNT_ID: ${{ secrets.CHECKLY_ACCOUNT_ID }}
           SLACK_OPS_WEBHOOK_URL: ${{ secrets.SLACK_OPS_WEBHOOK_URL }}
           DOCS_BASE_URL: ${{ steps.preview.outputs.url }}
           CHECKLY_TEST_ENVIRONMENT: preview-pr-${{ github.event.pull_request.number }}
+          # actions/checkout uses a detached merge commit on PRs, so the CLI
+          # can't read the branch or the PR's head commit from git.
+          CHECKLY_TEST_REPO_BRANCH: ${{ github.head_ref }}
+          CHECKLY_TEST_REPO_SHA: ${{ github.event.pull_request.head.sha }}
+          CHECKLY_TEST_REPO_COMMIT_OWNER: ${{ github.event.pull_request.user.login }}
+          CHECKLY_TEST_REPO_COMMIT_MESSAGE: ${{ github.event.pull_request.title }}
         run: |
           npx checkly test \
             --env "DOCS_BASE_URL=$DOCS_BASE_URL" \
@@ -147,5 +183,5 @@ jobs:
             --timeout=1200
 
       - name: Publish Checkly report to step summary
-        if: always() && steps.detect.outputs.docs_changed == 'true' && steps.preview.outputs.skipped != 'true'
+        if: always() && steps.preview.outputs.url != ''
         run: cat checkly-github-report.md >> "$GITHUB_STEP_SUMMARY" || true

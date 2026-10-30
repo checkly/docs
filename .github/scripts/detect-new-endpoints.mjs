@@ -3,8 +3,8 @@
 /**
  * detect-new-endpoints.mjs
  *
- * For every endpoint that exists in api-reference/openapi.json but has no
- * MDX page yet, generate an MDX stub and add it to docs.json navigation.
+ * Add undocumented OpenAPI endpoints to docs.json navigation. Operations with
+ * x-mint.href use native pages; other operations receive an MDX stub.
  * Writes changes directly to the working tree — the caller (CI workflow)
  * is responsible for committing/pushing.
  *
@@ -15,12 +15,15 @@
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse as yamlParse } from './yaml-lite.mjs';
+import { getNavigationPages, readOpenApiSpec } from './api-navigation.mjs';
 
 const DRY_RUN = process.env.DRY_RUN === '1';
 const ROOT = process.cwd();
 const SPEC_PATH = join(ROOT, 'api-reference', 'openapi.json');
 const DOCS_JSON_PATH = join(ROOT, 'docs.json');
 const IGNORE_PATH = join(ROOT, '.api-doc-ignore');
+// Must match BASE in .github/scripts/check_frontmatter.py.
+const SITE_BASE = 'https://www.checklyhq.com/docs/';
 
 // ---------------------------------------------------------------------------
 // Tag → directory + docs.json group mapping.
@@ -61,6 +64,7 @@ const TAG_MAP = {
   'Subscriptions':         { dir: 'status-pages',        group: 'Status Page Subscribers' },
   'Test sessions':         { dir: 'test-sessions',       group: 'Test Sessions' },
   'Triggers':              { dir: 'triggers',            group: 'Check Triggers' },
+  'Usage':                 { dir: 'usage',               group: 'Usage' },
 };
 
 // Monitor-type endpoints under the "Checks" or "Monitors" tag go into
@@ -70,6 +74,9 @@ const MONITOR_SUBGROUP_PATTERNS = [
   { pattern: /dns/i,    dir: 'monitors', subgroup: 'DNS Monitor' },
   { pattern: /tcp/i,    dir: 'checks',   subgroup: 'TCP Monitor' },
   { pattern: /url/i,    dir: 'monitors', subgroup: 'URL Monitor' },
+  { pattern: /ssl/i,    dir: 'monitors', subgroup: 'SSL Monitor' },
+  { pattern: /traceroute/i, dir: 'monitors', subgroup: 'Traceroute Monitor' },
+  { pattern: /grpc/i,   dir: 'monitors', subgroup: 'gRPC Monitor' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -85,14 +92,7 @@ function slugify(text) {
 }
 
 function loadSpec() {
-  const raw = readFileSync(SPEC_PATH, 'utf-8');
-  // OpenAPI descriptions may contain literal control chars (newlines in JSON strings)
-  return JSON.parse(raw.replace(/[\x00-\x1f]/g, (ch) => {
-    if (ch === '\n') return '\\n';
-    if (ch === '\r') return '\\r';
-    if (ch === '\t') return '\\t';
-    return '';
-  }));
+  return readOpenApiSpec(SPEC_PATH);
 }
 
 function loadExclusions() {
@@ -114,8 +114,11 @@ function normalisePath(p) {
   return p.length > 1 ? p.replace(/\/+$/, '') : p;
 }
 
-function scanExistingMdx() {
+function scanDocumentedEndpoints() {
   const documented = new Set();
+  for (const page of getNavigationPages(ROOT)) {
+    if (page.operation) documented.add(`${page.method.toUpperCase()} ${normalisePath(page.path)}`);
+  }
   const apiRefDir = join(ROOT, 'api-reference');
 
   function walk(dir) {
@@ -163,6 +166,19 @@ function getVersionSuffix(path) {
   return match ? `-${match[1]}` : '';
 }
 
+// A page whose filename needed a version suffix sits next to another version of
+// the same operation, and both would render the same sidebar label — Mintlify
+// falls back to the spec summary when a page declares no title. Give the
+// suffixed page an explicit versioned title, unless the summary already names
+// the version itself (several /v2 operations end in "(V2)").
+function versionedTitle(ep) {
+  const suffix = getVersionSuffix(ep.path);
+  if (!suffix || ep.filename !== `${generateFilename(ep.summary)}${suffix}`) return null;
+  const version = suffix.slice(1);
+  if (new RegExp(`\\b${version}\\b`, 'i').test(ep.summary)) return null;
+  return `${ep.summary} (${version})`;
+}
+
 function getUniqueFilename(ep) {
   const baseFilename = generateFilename(ep.summary);
   const candidates = [
@@ -190,6 +206,21 @@ function getUniqueFilename(ep) {
 // ---------------------------------------------------------------------------
 // docs.json updater
 // ---------------------------------------------------------------------------
+
+// Append, except for a version-suffixed page whose unsuffixed sibling is
+// already in the list — that one goes directly after the sibling so the pair
+// reads together in the sidebar instead of stranding the new version at the
+// bottom of the group.
+function insertPage(pages, pagePath) {
+  if (pages.includes(pagePath)) return;
+  const sibling = pagePath.replace(/-v\d+$/, '');
+  const siblingIdx = sibling === pagePath ? -1 : pages.indexOf(sibling);
+  if (siblingIdx === -1) {
+    pages.push(pagePath);
+    return;
+  }
+  pages.splice(siblingIdx + 1, 0, pagePath);
+}
 
 function addToDocsJson(docsJson, pagePath, groupName, subgroupName) {
   // Structure: docsJson.navigation.tabs[] → { tab: "API Reference", pages: [...] }
@@ -231,13 +262,9 @@ function addToDocsJson(docsJson, pagePath, groupName, subgroupName) {
       targetGroup.pages.push(subgroup);
       console.log(`  + Created new subgroup "${subgroupName}" in docs.json`);
     }
-    if (!subgroup.pages.includes(pagePath)) {
-      subgroup.pages.push(pagePath);
-    }
+    insertPage(subgroup.pages, pagePath);
   } else {
-    if (!targetGroup.pages.includes(pagePath)) {
-      targetGroup.pages.push(pagePath);
-    }
+    insertPage(targetGroup.pages, pagePath);
   }
 
   return true;
@@ -252,7 +279,7 @@ function main() {
 
   const spec = loadSpec();
   const exclusions = loadExclusions();
-  const documented = scanExistingMdx();
+  const documented = scanDocumentedEndpoints();
 
   console.log(`📋 Spec paths: ${Object.keys(spec.paths).length}`);
   console.log(`📄 Already documented: ${documented.size}`);
@@ -276,7 +303,10 @@ function main() {
       const summary = details.summary ?? '';
       const { dir, group, subgroup } = resolveMapping(tag, summary);
 
-      const ep = { key, method: method.toUpperCase(), path, tag, summary, dir, group, subgroup };
+      const ep = {
+        key, method: method.toUpperCase(), path, schemaPath: rawPath,
+        tag, summary, dir, group, subgroup, href: details['x-mint']?.href,
+      };
       undocumented.push({ ...ep, filename: getUniqueFilename(ep) });
     }
   }
@@ -288,13 +318,26 @@ function main() {
 
   console.log(`\n🆕 Found ${undocumented.length} undocumented endpoint(s):\n`);
   for (const ep of undocumented) {
-    console.log(`  ${ep.key}  →  ${ep.dir}/${ep.filename}.mdx  [${ep.group}${ep.subgroup ? ' > ' + ep.subgroup : ''}]`);
+    const target = ep.href ?? `${ep.dir}/${ep.filename}.mdx`;
+    console.log(`  ${ep.key}  →  ${target}  [${ep.group}${ep.subgroup ? ' > ' + ep.subgroup : ''}]`);
   }
 
   // Mutate docs.json in memory; write once at the end.
   const docsJson = JSON.parse(readFileSync(DOCS_JSON_PATH, 'utf-8'));
 
   for (const ep of undocumented) {
+    if (ep.href) {
+      const slug = ep.href.replace(/^\/+|\/+$/g, '');
+      if (existsSync(join(ROOT, `${slug}.mdx`))) {
+        throw new Error(`${slug}.mdx would overwrite the schema-generated page`);
+      }
+      const reference = `api-reference/openapi.json ${ep.method} ${ep.schemaPath}`;
+      if (!addToDocsJson(docsJson, reference, ep.group, ep.subgroup)) {
+        throw new Error(`Could not add ${reference} to docs.json`);
+      }
+      console.log(`  + Added native endpoint ${reference} → ${ep.href}`);
+      continue;
+    }
     const mdxRelPath = `api-reference/${ep.dir}/${ep.filename}.mdx`;
     const docsJsonPagePath = `api-reference/${ep.dir}/${ep.filename}`;
 
@@ -304,8 +347,15 @@ function main() {
       console.log(`  + Created directory: api-reference/${ep.dir}/`);
     }
 
-    // Minimal frontmatter — Mintlify derives the title from the spec summary.
-    const mdxContent = `---\nopenapi: ${ep.method.toLowerCase()} ${ep.path}\n---\n`;
+    // Minimal frontmatter — Mintlify derives the title from the spec summary,
+    // so only version-suffixed pages need an explicit one.
+    // The canonical is self-referential and derived from the same page path
+    // docs.json gets, so it can never drift from what check_frontmatter.py
+    // expects (that check fails the PR when the key is missing or wrong).
+    const canonical = `${SITE_BASE}${docsJsonPagePath}/`;
+    const title = versionedTitle(ep);
+    const titleLine = title ? `title: '${title.replace(/'/g, "''")}'\n` : '';
+    const mdxContent = `---\nopenapi: ${ep.method.toLowerCase()} ${ep.path}\n${titleLine}canonical: '${canonical}'\n---\n`;
 
     if (!DRY_RUN) {
       writeFileSync(join(ROOT, mdxRelPath), mdxContent);

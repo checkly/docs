@@ -54,7 +54,6 @@
 
 ## Writing standards
 - Second-person voice ("you")
-- Prerequisites at start of procedural content - ALWAYS wrap prerequisites in an Accordion component
 - Test all code examples before publishing
 - Match style and formatting of existing pages
 - Include both basic and advanced use cases
@@ -63,11 +62,20 @@
 - Relative paths for internal links
 
 ## Component usage rules
-- Prerequisites Should Always be wrapped in an Accordion component with title "Prerequisites" or "Before you begin"
 - Use Steps component for sequential procedures sparingly.
 - Don't use Cards to display information. Only for navigation on Overview type pages
 - Use CodeGroups and Dropdowns for code examples that show the same example in different languages
 - Use Note/Tip/Warning callouts appropriately
+
+## Code snippet typecheck
+CI typechecks Checkly CLI snippets in `.mdx` files against the latest `checkly` release. Run it locally with `npm run check:snippets`.
+
+- Complete snippets (with a `checkly` import or `require`) and fragments that use a checkly export (`new ApiCheck(`, `Frequency.EVERY_5M`) are checked automatically.
+- `/* More options... */` marks a shortened snippet. Missing required props are allowed; wrong or unknown props still fail.
+- Add a marker comment on the line before the code fence when you need one:
+  - `{/* typecheck-wrap: ApiCheck */}`: checks a property fragment like `request: {...}` inside that construct.
+  - `{/* typecheck-wrap */}`: checks a statement like `export default defineConfig(...)`, adding imports only.
+  - `{/* typecheck-skip */}`: opts the block out. Use it only when the snippet can't match the latest CLI.
 
 ## CodeGroup Dropdown
 - Use `<CodeGroup dropdown={true}>` for code examples that show the same functionality in different programming languages
@@ -85,6 +93,9 @@
 </CodeGroup>
 
 - This replaces the older `<Tabs>` pattern for language-specific code examples
+
+## Guides
+- Any change under `guides/`, `samples/guides/`, or `images/guides/` follows the `guide-authoring` skill in `.claude/skills/guide-authoring/SKILL.md`: agent path first, tested samples, real screenshots, brand diagrams.
 
 ## Git workflow
 - NEVER use --no-verify when committing

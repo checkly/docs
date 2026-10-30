@@ -74,6 +74,8 @@ export default defineConfig({
 | `repoUrl` | `string` | ❌ | - | Optional URL to a Git repository |
 | `checks` | `object` | ❌ | - | Top-level defaults for all checks in this project |
 | `cli` | `object` | ❌ | - | Defaults for CLI commands |
+| `bundle` | `object` | ❌ | - | Dependency embedding and pruning for Playwright Check Suite code bundles. See [Internal Registries](/detect/synthetic-monitoring/playwright-checks/internal-registries), and [Speed up installs](/detect/synthetic-monitoring/playwright-checks/dependencies#speed-up-installs) for pruning to make installs faster |
+| `runner` | `object` | ❌ | - | Settings applied on Checkly runners for Playwright Check Suite installs: [registry routing](/detect/synthetic-monitoring/playwright-checks/internal-registries#route-runner-installs-to-other-registries) and the [dependency cache version](/detect/synthetic-monitoring/playwright-checks/dependencies#force-a-reinstall) |
 
 ### Core Project Options
 
@@ -82,6 +84,7 @@ Friendly name for your project that will be displayed in the Checkly dashboard a
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={2}
 export default defineConfig({
   projectName: 'Website Monitoring',
@@ -98,6 +101,7 @@ Unique identifier for this project that should remain stable across deployments.
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={2}
 export default defineConfig({
   logicalId: 'website-monitoring-prod',
@@ -118,6 +122,7 @@ Optional URL to a Git repository for documentation and team collaboration purpos
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={2}
 export default defineConfig({
   repoUrl: 'https://github.com/acme/website',
@@ -134,6 +139,7 @@ Defaults for CLI commands like `checkly test` and `checkly trigger`.
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={4-7}
 export default defineConfig({
   projectName: "Website Monitoring",
@@ -148,9 +154,10 @@ export default defineConfig({
 **Properties:**
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `runLocation` | `string` | ❌ | - | Default location for `checkly test` and `checkly trigger` |
+| `runLocation` | `string` | ❌ | `eu-central-1` | Default location for `checkly test` and `checkly trigger` |
 | `privateRunLocation` | `string` | ❌ | - | Default private location for CLI commands |
 | `retries` | `number` | ❌ | `0` | Default retry count for failing checks (max 3) |
+| `maxFailures` | `number` | ❌ | - | Stop `checkly test` and `checkly trigger` once this many checks have failed. The `--max-failures` flag overrides it. See [`checkly test`](/cli/checkly-test) |
 
 **Use cases**: Local testing defaults, CI/CD configuration, development workflow.
 </ResponseField>
@@ -164,6 +171,7 @@ Top-level defaults for all checks in this project. Individual checks and groups 
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={5-13}
 export default defineConfig({
   projectName: "Website Monitoring",
@@ -187,7 +195,7 @@ export default defineConfig({
 |-----------|------|----------|---------|-------------|
 | `activated` | `boolean` | ❌ | `true` | Whether checks are enabled by default |
 | `alertChannels` | `Array<AlertChannel \| AlertChannelRef>` | ❌ | `[]` | Default alert channels for all checks |
-| `checkMatch` | `string` \| `string[]` | ❌ | - | Glob pattern (or array of glob patterns) to find check construct files |
+| `checkMatch` | `string \| string[]` | ❌ | - | Glob pattern (or array of glob patterns) to find check construct files |
 | `environmentVariables` | `EnvironmentVariable[]` | ❌ | `[]` | Default environment variables for all checks |
 | `frequency` | `Frequency` | ❌ | - | Default frequency for all checks |
 | `ignoreDirectoriesMatch` | `string[]` | - | - | Glob patterns for directories to ignore |
@@ -198,11 +206,12 @@ export default defineConfig({
 | `privateLocations` | `string[]` | ❌ | `[]` | Default private locations for all checks |
 | `retryStrategy` | `object` | ❌ | - | Control the retry behavior for failed checks |
 | `runtimeId` | `string` | ❌ | - | Default runtime ID for all checks |
-| `shouldFail` | `boolean` | ❌ | `false` | Whether the behavior of when a check/alert is considered to fail is inverted. |
+| `shouldFail` | `boolean` | ❌ | `false` | Whether the behavior of when a check/alert is considered to fail is inverted. Only applies to API checks, URL monitors and TCP monitors. |
 | `tags` | `string[]` | ❌ | `[]` | Default tags applied to all checks |
 | `browserChecks` | `object` | ❌ | - | Default settings for browser checks |
 | `multiStepChecks` | `object` | ❌ | - | Default settings for multi-step checks |
-| `playwrightChecks` | `object` | ❌ | - | Default settings for Playwright Check Suites |
+| `include` | `string \| string[]` | ❌ | - | Extra files to include when bundling the Playwright Check Suites defined in `playwrightChecks` |
+| `playwrightChecks` | `object[]` | ❌ | - | Playwright Check Suites to create from your Playwright configuration |
 
 </ResponseField>
 
@@ -216,6 +225,7 @@ Whether the checks and monitors are enabled and will run according to its schedu
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={5}
 export default defineConfig({
   projectName: "Website Monitoring",
@@ -234,6 +244,7 @@ Default alert channels for all checks and monitors.
 
 **Usage:**
 
+{/* typecheck-wrap: SmsAlertChannel */}
 ```ts highlight={9}
 const smsAlertChannel = new SmsAlertChannel("sms-alert-channel", {
   phoneNumber: "+1234567890",
@@ -256,7 +267,8 @@ Glob pattern (or array of glob patterns) where the CLI looks for files containin
 
 **Usage:**
 
-```ts highlight={5}
+{/* typecheck-wrap */}
+```ts highlight={6}
 export default defineConfig({
   projectName: "Website Monitoring",
   logicalId: "website-monitoring-1",
@@ -279,6 +291,7 @@ Environment variables available to the check script and monitors.
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={5-10}
 export default defineConfig({
   projectName: "Website Monitoring",
@@ -302,6 +315,7 @@ Default frequency at which the checks and monitors are executed.
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={5}
 export default defineConfig({
   projectName: "Website Monitoring",
@@ -324,6 +338,7 @@ Directories to ignore when looking for check files.
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={6}
 export default defineConfig({
   projectName: "Website Monitoring",
@@ -340,6 +355,7 @@ export default defineConfig({
 <ResponseField name="checks.locations" type="string[]" default="[]">
 Array of public location codes where the URL monitor should run from. Multiple locations provide geographic coverage.
 
+{/* typecheck-wrap */}
 ```ts highlight={5}
 export default defineConfig({
   projectName: "Website Monitoring",
@@ -352,6 +368,8 @@ export default defineConfig({
 
 <Tip>Find a list of [all public locations in the general documentation](/concepts/locations).</Tip>
 
+<Note>Give every check a location: set `locations` or `privateLocations` on the check or its group, or set a default with `checks.locations` or `checks.privateLocations`. A check without any location runs in a location chosen by Checkly, and since CLI version 10, `checkly deploy` and `checkly validate` warn about it. Heartbeat monitors and test-only checks don't need a location.</Note>
+
 </ResponseField>
 
 <ResponseField name="checks.muted" type="boolean" default="false">
@@ -360,6 +378,7 @@ Determine if any notifications will be sent out when a check fails and/or recove
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={5}
 export default defineConfig({
   projectName: "Website Monitoring",
@@ -378,6 +397,7 @@ Global configuration options for the Playwright Test Runner use in [Browser Chec
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={5-16}
 export default defineConfig({
   projectName: "Website Monitoring",
@@ -411,6 +431,7 @@ Playwright config path to be used during [Playwright Check Suite](/detect/synthe
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={5}
 export default defineConfig({
   projectName: "Website Monitoring",
@@ -429,6 +450,7 @@ Private Locations to run your monitors and checks from.
 
 **Usage:**
 
+{/* typecheck-wrap: PrivateLocation */}
 ```ts highlight={12}
 const datacenterLocation = new PrivateLocation("datacenter-east-1", {
   name: "East Coast Datacenter",
@@ -452,10 +474,11 @@ export default defineConfig({
 
 <ResponseField name="checks.retryStrategy">
 
-Set a retry policy for your checks and monitors. [Use `RetryStrategyBuilder`](/constructs/retry-strategy) to create a retry policy.
+Set a retry policy for your checks and monitors. [Use `RetryStrategyBuilder`](/constructs/retry-strategy) to create a retry policy. Without one, each check, monitor and group uses the [default for its type](/constructs/retry-strategy#default-retry-strategy).
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={5}
 export default defineConfig({
   projectName: "Website Monitoring",
@@ -480,6 +503,7 @@ The runtime version used to execute checks and monitors.
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={5}
 export default defineConfig({
   projectName: "Website Monitoring",
@@ -500,6 +524,7 @@ The tags assigned to the checks and monitors.
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={5}
 export default defineConfig({
   projectName: "Website Monitoring",
@@ -522,10 +547,11 @@ If your project doesn't require specific configuration and you want to quickly t
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `testMatch` | `string` | `string[]` | ❌ | - | Glob pattern for Playwright tests uses as Browser Checks |
+| `testMatch` | `string \| string[]` | ❌ | - | Glob pattern for Playwright tests used as Browser Checks |
 
 **Example:**
 
+{/* typecheck-wrap */}
 ```ts highlight={6}
 export default defineConfig({
   projectName: "Website Monitoring",
@@ -550,10 +576,11 @@ If your project doesn't require specific configuration and you want to quickly t
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `testMatch` | `string` | `string[]` | ❌ | - | Glob pattern for Playwright tests uses as Browser Checks |
+| `testMatch` | `string \| string[]` | ❌ | - | Glob pattern for Playwright tests used as Multistep Checks |
 
 **Example:**
 
+{/* typecheck-wrap */}
 ```ts highlight={6}
 export default defineConfig({
   projectName: "API Monitoring",
@@ -574,6 +601,7 @@ export default defineConfig({
 
 **Usage:**
 
+{/* typecheck-wrap */}
 ```ts highlight={5-14}
 export default defineConfig({
   projectName: "Website Monitoring",
@@ -600,13 +628,15 @@ export default defineConfig({
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `playwrightConfigPath` | `string` | ✅ | - | Path to the Playwright configuration file |
+| `playwrightConfigPath` | `string` | ❌ | `checks.playwrightConfigPath` | Path to the Playwright configuration file. Required if `checks.playwrightConfigPath` isn't set |
 | `installCommand` | `string` | ❌ | - | Command to install dependencies before running tests |
 | `testCommand` | `string`  | ❌ | - | Command to execute Playwright tests |
 | `pwProjects` | `string` \| `string[]` | ❌ | - | Projects to run from your configuration |
 | `pwTags` | `string` \| `string[]` | ❌ | - | Tags to filter tests using Playwright's grep functionality |
-| `include` | `string` \| `string[]` | ❌ | - | File patterns to include when bundling the test project |
-| `groupName` | `string` | ❌ | - | Name of the check group to assign this check to |
+| `group` | `CheckGroup` | ❌ | - | The CheckGroup this check suite belongs to |
+| `engine` | `Engine` | ❌ | - | JavaScript engine and version used to run the check suite. See [`engine`](/constructs/playwright-check#param-engine) |
+
+<Note>Checkly CLI version 10 and later no longer include the deprecated `groupName` option. Set `group` to the `CheckGroup` instead.</Note>
 
 </Tab>
 <Tab title="General Options">
@@ -623,7 +653,6 @@ export default defineConfig({
 | `locations` | `string[]` | ❌ | `[]` | Array of public location codes |
 | `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
 | `privateLocations` | `string[]` | ❌ | `[]` | Array of Private Location slugs |
-| `retryStrategy` | `RetryStrategy` | ❌ | - | Strategy for configuring retries |
 | `runParallel` | `boolean` | ❌ | `false` | Run check suites in parallel or round-robin |
 | `tags` | `string[]` | ❌ | `[]` | Array of tags to organize check suites |
 
@@ -638,6 +667,7 @@ export default defineConfig({
 
 <Tabs>
   <Tab title="Simple Website Monitoring">
+    {/* typecheck-wrap */}
     ```ts
     export default defineConfig({
       projectName: "Acme Website",

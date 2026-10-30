@@ -1,10 +1,13 @@
 ---
 title: 'StatusPageService Construct'
 description: 'Learn how to configure status page services with the Checkly CLI.'
-sidebarTitle: 'Status Page Service'
+sidebarTitle: 'Status Page Service (deprecated)'
 canonical: 'https://www.checklyhq.com/docs/constructs/status-page-service/'
 ---
 
+<Warning>
+**Deprecated.** Services belong to v2 status pages. On v3 pages, use [`StatusPageV3Component`](/constructs/status-page-v3-component) instead.
+</Warning>
 <Tip>
 Learn more about Status Pages in [the Status Pages overview](/communicate/status-pages/overview).
 </Tip>
@@ -93,6 +96,7 @@ Display name for the service on the status page. This name appears in the status
 
 **Usage:**
 
+{/* typecheck-wrap: StatusPageService */}
 ```ts highlight={2}
 new StatusPageService("api-service", {
   name: "API Service",
@@ -223,6 +227,7 @@ new StatusPage("simple-status", {
 
 StatusPageService instances can be reused across multiple status pages:
 
+{/* typecheck-wrap: StatusPageService */}
 ```ts
 // Define services once
 const apiService = new StatusPageService("api-service", {

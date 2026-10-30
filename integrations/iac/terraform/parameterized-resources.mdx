@@ -19,14 +19,13 @@ resource "checkly_check" "browser-check" {
   type                      = "BROWSER"
   activated                 = true
   frequency                 = 1
-  ssl_check                 = false
   
   locations = [
     "us-west-1",
     "eu-central-1"
   ]
 
-  retry_strategy = {
+  retry_strategy {
     type = "LINEAR"
   }
 
@@ -37,4 +36,4 @@ resource "checkly_check" "browser-check" {
 
 This will create as many browser checks running each minute as there are files in the `./scripts` folder in your project's path.
 
-> Aside from checks, these constructs can be useful for a variety of resources like alert channels, snippets and more.
+> Aside from checks, these constructs can be useful for a variety of resources like alert channels and more.

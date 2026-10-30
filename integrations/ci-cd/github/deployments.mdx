@@ -8,13 +8,14 @@ canonical: 'https://www.checklyhq.com/docs/integrations/ci-cd/github/deployments
 Use GitHub deployment hooks when you want Checkly to listen for GitHub `deployment_status` events and trigger checks linked to a repository. This is separate from the [Checkly GitHub Action](/integrations/ci-cd/github/actions), which starts test sessions from a GitHub Actions workflow.
 
 <Accordion title="Prerequisites">
-  - The Checkly GitHub integration installed from the [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) page of the Checkly account that owns the checks.
+  - To connect the integration, you must be the GitHub personal account owner or an active organization owner. Repository access or ordinary organization membership is not enough.
+  - The Checkly GitHub integration connected from the [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) page of the Checkly account that owns the checks.
   - A deployment provider that sends successful GitHub `deployment_status` events, such as Vercel for GitHub or Heroku Pipelines.
   - One or more Checkly checks linked to the GitHub repository from the check's **CI/CD** settings.
 </Accordion>
 
 <Warning>
-  Start the installation from [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) in Checkly and click **Integrate with GitHub**. Grant the installation access to the repository you want to link. Installing the app directly from GitHub does not connect it to the Checkly account, so deployment hooks and GitHub Check reporting will not work correctly.
+  Connect the installation from [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) in Checkly and grant the App access to the repository you want to link. Installing the app directly from GitHub does not connect it to the Checkly account, so deployment hooks and GitHub Check reporting will not work correctly.
 </Warning>
 
 GitHub `deployment_status` webhook events are triggered whenever a deployment service reports a successful deployment. This works with services that report successful deployment statuses through the GitHub Deployments API, including:
@@ -29,16 +30,40 @@ GitHub `deployment_status` webhook events are triggered whenever a deployment se
 
 ## Set up GitHub deployment hooks
 
-1. Go to [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations) and click **Integrate with GitHub**.
-2. In GitHub, choose the account where you want to install the Checkly GitHub App and grant it access to the repositories you want to connect. After installation, GitHub redirects you to Checkly.
-3. Open the check or check group you want to trigger and go to its **CI/CD** settings.
-4. Click **Link GitHub repo** and select the repository that reports your deployment events.
+1. Go to [Account settings > Integrations](https://app.checklyhq.com/settings/account/integrations), click **Integrate with GitHub**, then **Continue with GitHub**.
+2. Authorize GitHub, choose a Checkly App installation you own, and click **Connect**. You can connect the same installation to multiple Checkly accounts.
+3. If you need a new installation or different repository access, use **Install on another GitHub account** or **Manage repository access**. Return to Checkly, click **Refresh**, then **Connect**.
+4. Open the check or check group you want to trigger and go to its **CI/CD** settings.
+5. Click **Link GitHub repo** and select the repository that reports your deployment events.
 
 After you link the repository, Checkly listens for successful deployment events and runs the linked check or check group. You can also choose a run location, filter deployments by environment or environment URL, and include screenshots in the pull request comment.
 
 <Note>
   You can link multiple checks to the same repository. Checkly runs the linked checks as a test suite when GitHub reports a successful deployment.
 </Note>
+
+### GitHub account or organization missing
+
+Only installations you own appear in the chooser. Click **Use a different GitHub account** to sign in as the personal account owner or an organization owner.
+
+If organization ownership cannot be verified, ask an organization owner to approve **Members: read** in the Checkly App's GitHub installation settings and authorize organization SSO, then authorize GitHub again.
+
+## Manage deployment hooks with the API
+
+Use the Checkly Public API to create GitHub deployment hooks programmatically. A deployment trigger represents the link between one GitHub repository and either a check or a check group.
+
+- [Create a deployment trigger](/api-reference/deployment-triggers/create-a-deployment-trigger) for a check or check group. Repeating the request for the same target returns the existing trigger without changing its settings.
+- [List deployment triggers](/api-reference/deployment-triggers/list-all-deployment-triggers) for your account.
+
+The API supports GitHub deployment triggers. To configure the Checkly Vercel integration, use the [Vercel integration settings](/integrations/ci-cd/vercel/overview).
+
+<Warning>
+  If you omit both deployment filters, every successful deployment reported for the repository can trigger a run, including production deployments. Set `environmentRegexFilter` or `environmentUrlRegexFilter` when you only want to run checks against specific environments.
+</Warning>
+
+You can use deployment environment URLs with API, URL, browser, and multi-step checks. API and URL checks replace the host in the configured request URL. Browser and multi-step checks receive the deployment URL through the `ENVIRONMENT_URL` environment variable.
+
+To change or remove a trigger created through the API, open the check or check group in Checkly and use its **CI/CD** settings.
 
 ## Use deployment environment URLs
 

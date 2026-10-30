@@ -49,7 +49,7 @@ RUM tracks actual user interactions with your application, offering insights int
 
 ![A diagram of the Real User Monitoring model](/images/learn/images/frontend-monitoring-01.png)
 
-*A diagram of the Real User Monitoring model, with in-page Javascript reporting from a user's device to an observability service.*
+*A diagram of the Real User Monitoring model, with in-page JavaScript reporting from a user's device to an observability service.*
 
 However this approach has several challenges:
 
@@ -57,7 +57,7 @@ However this approach has several challenges:
 - Rum can impact browser performance for users.
 - Transmitting data for every user every time is quite expensive, both for you the service provider and for the user’s browser performance and network bandwidth. The suggested solution for this known issue is to sample randomly: when a user starts a session on your site, they’re randomly assigned whether that session will be tracked in detail and transmitted to your observability service. This raises the issue of missing key failures: when a key client reports an error on your site, but no data was captured, you’re stuck trying to replicate an issue with only a user description.
 - Difficulty finding patterns - user behavior is inherently inconsistent. It’s often very difficult to identify connected failures or trends based on multiple users’ inconsistent behavior. The situation is similar to the sampling problem: we’re left trying to guess what happened based on sketchy information.
-- Complex implementation - from loading a javascript package to track user experience in the browser, to endpoints to collect that information, and a system to find patterns in stochastic user behavior, RUM is a complex technical challenge with extensive technical lift. If you’re trying to create a DIY solution for RUM, you’ll find that [CORS: Cross-Origin Request Blocked](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors) errors are the first of many challenges.
+- Complex implementation - from loading a JavaScript package to track user experience in the browser, to endpoints to collect that information, and a system to find patterns in stochastic user behavior, RUM is a complex technical challenge with extensive technical lift. If you’re trying to create a DIY solution for RUM, you’ll find that [CORS: Cross-Origin Request Blocked](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors) errors are the first of many challenges.
 
 **Synthetic Monitoring**
 
@@ -73,7 +73,7 @@ Synthetic monitoring solves many of the problems listed above with RUM:
 
 ![A diagram of the Synthetic Monitoring model](/images/learn/images/frontend-monitoring-02.png)
 
-*A diagram of the Synthetic Monitoring model, with an observability service like checkly sending requests to your production service. SREs and Ops engineers can then view reports and receives alerts the moment a problem is detected.*
+*A diagram of the Synthetic Monitoring model, with an observability service like Checkly sending requests to your production service. SREs and Ops engineers can then view reports and receives alerts the moment a problem is detected.*
 
 **Application Performance Monitoring (APM)**
 

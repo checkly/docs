@@ -1,20 +1,20 @@
 ---
 title: 'Export Metrics & Data via Coralogix'
-description: 'Deep integration with Coralogix for Open Telemetry tracing, RUM monitoring, and alert notifications'
+description: 'Deep integration with Coralogix for OpenTelemetry tracing, RUM monitoring, and alert notifications'
 sidebarTitle: 'Coralogix'
 canonical: 'https://www.checklyhq.com/docs/integrations/observability/coralogix/'
 ---
 
 Checkly deeply integrates with [Coralogix](https://coralogix.com/) in three ways:
 
-1. Checkly can automatically instrument all check executions with **Open Telemetry tracing** and send the data to Coralogix 
+1. Checkly can automatically instrument all check executions with **OpenTelemetry tracing** and send the data to Coralogix
 as traces.
 2. Checkly can automatically instrument your Browser checks with **Coralogix RUM (Real User Monitoring)**.
 3. Checkly can send **alert notifications** when checks pass and/or fail to **Coralogix Logs**.
 
-## Open Telemetry tracing integration
+## OpenTelemetry tracing integration
 
-To set up the Open Telemetry tracing integration, first enable the Coralogix integration in your Checkly account in the
+To set up the OpenTelemetry tracing integration, first enable the Coralogix integration in your Checkly account in the
 [integrations section](https://app.checklyhq.com/settings/account/integrations).
 
 ![coralogix otel integration](/images/docs/images/integrations/coralogix/cx_otel_int1.png)
@@ -73,7 +73,7 @@ and forward to Coralogix using an OpenTelemetry Collector.
 
 ## RUM integration
 
-In addition to the Open Telemetry tracing, Checkly can also send RUM data to Coralogix for all Browser checks. This enables
+In addition to the OpenTelemetry tracing, Checkly can also send RUM data to Coralogix for all Browser checks. This enables
 tracking your Playwright-powered checks to be recorded as (semi) real users, so you can compare and contrast the performance
 between synthetic and real users.
 
@@ -90,7 +90,7 @@ Copy and paste the integration key into Checkly.
 
 > Only the integration key is needed for the Checkly integration.
 
-5. As Checkly automatically injects the Coralogix RUM SDK to each browser check run, uploading and setting up the SourceMap is not required. You can **skip** the **Install & setup Browser SDK Package** step and finish the set up there.
+5. As Checkly automatically injects the Coralogix RUM SDK to each Browser check run, uploading and setting up the SourceMap is not required. You can **skip** the **Install & setup Browser SDK Package** step and finish the set up there.
 
 If you are targeting multiple applications with your checks, you can override the global application name by adding the
 environment variable `CORALOGIX_RUM_APP_NAME` to your Browser check. You can find the Browser check specific environment
@@ -101,7 +101,7 @@ After enabling the RUM integration, Checkly will start sending RUM data to Coral
 > Note that you do not need to install the RUM SDK in your application, Checkly will automatically inject the necessary
 > JavaScript snippet into your Browser checks. However, if you have installed the SDK we will use the existing installation and not inject the snippet.
 
-## Alert Channel → Coralogix Logs integration
+## Alert channel → Coralogix Logs integration
 
 You can set up Coralogix as an alert channel destination, so Coralogix receives any alert notifications you have set up as logs.
 Note that you can use this integration separately from the other two integrations mentioned above.

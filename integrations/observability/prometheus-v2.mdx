@@ -74,8 +74,8 @@ The following metrics are available to monitor checks:
 | `checkly_dns_monitor_timing_seconds` | Histogram | The total duration of the DNS monitor. |
 | `checkly_grpc_monitor_timing_seconds` | Histogram | The timing phases of the gRPC monitor, including DNS resolution, connection, and total RPC duration. |
 | `checkly_grpc_monitor_status_code` | Gauge | The gRPC status code returned on the latest run (`0` = OK). |
-| `checkly_traceroute_monitor_timing_seconds` | Histogram | The timing phases of the traceroute monitor, including DNS resolution and final hop latency. |
-| `checkly_traceroute_monitor_hops` | Gauge | The total number of hops for the traceroute monitor. |
+| `checkly_traceroute_monitor_timing_seconds` | Histogram | The timing phases of the Traceroute monitor, including DNS resolution and final hop latency. |
+| `checkly_traceroute_monitor_hops` | Gauge | The total number of hops for the Traceroute monitor. |
 | `checkly_traceroute_monitor_destination_reached` | Gauge | Whether the traceroute reached its destination on the latest run (`1`) or not (`0`). |
 | `checkly_ssl_monitor_days_until_expiry` | Gauge | The average days remaining until the certificate checked by the SSL monitor expires, over the current scrape window. |
 | `checkly_ssl_monitor_handshake_seconds` | Histogram | The TLS handshake duration of the SSL monitor. |
@@ -87,7 +87,7 @@ The following metrics are available to monitor checks:
 | `checkly_multistep_check_duration_seconds` | Histogram | The total check duration. This includes all requests done and any waits. |
 | `checkly_playwright_check_duration_seconds` | Histogram | The total duration of the Playwright Check Suite. |
 | `checkly_heartbeat_last_success_timestamp_seconds` | Gauge | The Unix timestamp of the last successful heartbeat ping. A value of `0` means no successful ping has ever been received. |
-| `checkly_heartbeat_expected_interval_seconds` | Gauge | The configured maximum interval between heartbeat pings, in seconds. Derived from the heartbeat monitor's period and period unit settings. |
+| `checkly_heartbeat_expected_interval_seconds` | Gauge | The configured maximum interval between heartbeat pings, in seconds. Derived from the Heartbeat monitor's period and period unit settings. |
 | `checkly_time_to_ssl_expiry_seconds` | Gauge | The amount of time remaining before the SSL certificate of the monitored domain expires. See the [SSL certificate expiration docs](/communicate/alerts/ssl-expiration) for more information on monitoring SSL certificates with checks. |
 
 The `checkly_check_status` and `checkly_check_result_total` metrics contain a `status` label with values `passing`, `failing`, and `degraded`.
@@ -132,7 +132,7 @@ In addition, the check metrics all contain the following labels:
 
 To avoid creating a high volume of metrics, by default the metrics don't include a label for the check run location. It is possible to enable this by adding the query param `locationLabelEnabled=true` to your API request. This will add a `location` label giving the location where the checks ran.
 
-Since check status and SSL days remaining is only tracked on a per-check basis rather than by location, `checkly_check_status` and `checkly_time_to_ssl_expiry_seconds` do not have the `location` label included. Heartbeat metrics (`checkly_heartbeat_last_success_timestamp_seconds`, `checkly_heartbeat_expected_interval_seconds`, and heartbeat entries in `checkly_check_result_total`) also do not have a `location` label, since heartbeat monitors receive pings rather than running from specific locations. All other [check metrics](#check-metrics) will have the `location` label added.
+Since check status and SSL days remaining is only tracked on a per-check basis rather than by location, `checkly_check_status` and `checkly_time_to_ssl_expiry_seconds` do not have the `location` label included. Heartbeat metrics (`checkly_heartbeat_last_success_timestamp_seconds`, `checkly_heartbeat_expected_interval_seconds`, and heartbeat entries in `checkly_check_result_total`) also do not have a `location` label, since Heartbeat monitors receive pings rather than running from specific locations. All other [check metrics](#check-metrics) will have the `location` label added.
 
 Here is an example for how to set this in your `prometheus.yml` config:
 
@@ -210,7 +210,7 @@ sum by(type) (rate(checkly_browser_check_web_vitals_seconds_sum{name="Check Name
 [Heartbeat monitors](/detect/uptime-monitoring/heartbeat-monitors/overview) are passive checks that wait for your scheduled jobs and automated processes to send a ping. The Prometheus exporter includes heartbeat checks in the standard `checkly_check_status` and `checkly_check_result_total` metrics, plus two heartbeat-specific gauges designed for [dead man's switch](https://en.wikipedia.org/wiki/Dead_man%27s_switch) alerting.
 
 - **`checkly_heartbeat_last_success_timestamp_seconds`** — The Unix timestamp of the last successful ping, searched across the entire event history (no time window). A value of `0` means no successful ping has ever been received — this immediately triggers a dead man's switch alert since `time() - 0` produces a very large value.
-- **`checkly_heartbeat_expected_interval_seconds`** — The maximum expected time between pings, derived from the heartbeat monitor's configured period and period unit (e.g., `5 minutes` = `300` seconds). Use this as a threshold for alerting.
+- **`checkly_heartbeat_expected_interval_seconds`** — The maximum expected time between pings, derived from the Heartbeat monitor's configured period and period unit (e.g., `5 minutes` = `300` seconds). Use this as a threshold for alerting.
 
 ### How heartbeats map to `checkly_check_result_total`
 
@@ -220,7 +220,7 @@ Heartbeat checks contribute to `checkly_check_result_total` using a 1-hour count
 |----------------|--------------------------|
 | `passing` | `RECEIVED`, `EARLY`, `GRACE`, `LATE` — any ping that arrived |
 | `failing` | `FAILING` — no ping received before the grace period expired |
-| `degraded` | Always `0` — heartbeat monitors do not have a degraded state |
+| `degraded` | Always `0` — Heartbeat monitors do not have a degraded state |
 
 ### Dead Man's Switch PromQL Examples
 
@@ -248,27 +248,27 @@ Show how long ago each heartbeat was last seen:
 time() - checkly_heartbeat_last_success_timestamp_seconds
 ```
 
-## Private Location Metrics
+## Private location metrics
 
-The Prometheus exporter also contains metrics for monitoring [Private Locations](/platform/private-locations/overview). These metrics can be used to ensure that your Private Locations have enough Checkly Agent instances running to execute all of your checks, and to drive [agent autoscaling](/platform/private-locations/autoscaling).
+The Prometheus exporter also contains metrics for monitoring [private locations](/platform/private-locations/overview). These metrics can be used to ensure that your private locations have enough Checkly Agent instances running to execute all of your checks, and to drive [agent autoscaling](/platform/private-locations/autoscaling).
 
-The following metrics are available to monitor Private Locations:
+The following metrics are available to monitor private locations:
 
 | Metric | Type | Description |
 |--------|------|-------------|
-| `checkly_private_location_queue_size` | Gauge | The number of check runs scheduled to the Private Location and waiting to be executed. A high value indicates that checks are becoming backlogged and that you may need to [scale your Checkly Agents](/platform/private-locations/scaling-redundancy). |
-| `checkly_private_location_oldest_scheduled_check_run` | Gauge | The age in seconds of the oldest check run job scheduled to the Private Location queue. A high value indicates that checks are becoming backlogged. |
-| `checkly_private_location_queue_duration_ms` | Gauge | The scheduling delay in milliseconds for check runs routed through a Private Location, by queue and `stat`. Derived from the last 2 minutes of check run data. Used to evaluate whether sufficient agent capacity is provisioned for the Private Location. |
-| `checkly_private_location_agent_count` | Gauge | The number of agents connected for the Private Location. |
-| `checkly_private_location_check_runs` | Gauge | The count of check runs in the Private Location, broken down by lifecycle state via the `state` label and by routing queue via the `queue` label. Used as the signal for [autoscaling Checkly Agents](/platform/private-locations/autoscaling). |
+| `checkly_private_location_queue_size` | Gauge | The number of check runs scheduled to the private location and waiting to be executed. A high value indicates that checks are becoming backlogged and that you may need to [scale your Checkly Agents](/platform/private-locations/scaling-redundancy). |
+| `checkly_private_location_oldest_scheduled_check_run` | Gauge | The age in seconds of the oldest check run job scheduled to the private location queue. A high value indicates that checks are becoming backlogged. |
+| `checkly_private_location_queue_duration_ms` | Gauge | The scheduling delay in milliseconds for check runs routed through a private location, by queue and `stat`. Derived from the last 2 minutes of check run data. Used to evaluate whether sufficient agent capacity is provisioned for the private location. |
+| `checkly_private_location_agent_count` | Gauge | The number of agents connected for the private location. |
+| `checkly_private_location_check_runs` | Gauge | The count of check runs in the private location, broken down by lifecycle state via the `state` label and by routing queue via the `queue` label. Used as the signal for [autoscaling Checkly Agents](/platform/private-locations/autoscaling). |
 
-The Private Location metrics all contain the following labels:
+The private location metrics all contain the following labels:
 
 | Label | Description |
 | ------|-------------|
-| `private_location_name` | the name of the Private Location. |
-| `private_location_slug_name` | the Private Location's human readable unique identifier. |
-| `private_location_id` | the Private Location's UUID. |
+| `private_location_name` | the name of the private location. |
+| `private_location_slug_name` | the private location's human readable unique identifier. |
+| `private_location_id` | the private location's UUID. |
 
 `checkly_private_location_check_runs` additionally carries a `queue` label (`uptime` or `main`) and a `state` label. The `state` values relevant for autoscaling are:
 

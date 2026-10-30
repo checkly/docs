@@ -1,0 +1,29 @@
+receivers:
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: checkly
+          scrape_interval: 60s
+          scrape_timeout: 30s
+          scheme: https
+          metrics_path: /accounts/<your account ID>/v2/prometheus/metrics
+          authorization:
+            type: Bearer
+            credentials_file: /etc/otelcol-contrib/checkly.token
+          params:
+            includeRetryAttempts: ['true']
+            locationLabelEnabled: ['true']
+          static_configs:
+            - targets: ['api.checklyhq.com']
+
+exporters:
+  otlp_http:
+    endpoint: https://default.main.<Org-ID>.cribl.cloud:20002
+    headers:
+      authorization: Bearer ${env:CRIBL_OTEL_TOKEN}
+
+service:
+  pipelines:
+    metrics:
+      receivers: [prometheus]
+      exporters: [otlp_http]

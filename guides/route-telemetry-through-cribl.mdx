@@ -1,0 +1,328 @@
+---
+title: Route alerts, traces and metrics through Cribl Stream
+sidebarTitle: Cribl Stream
+description: Send a check's alerts, traces and metrics to Cribl Stream and see them in Live Data, ready for your Routes. Runs against the OpenTelemetry demo on your machine through a private location.
+canonical: 'https://www.checklyhq.com/docs/guides/route-telemetry-through-cribl/'
+---
+
+import GuideAgentIntro from '/snippets/guide-agent-intro.mdx'
+import { CopyPromptButton } from '/snippets/copy-prompt-button.jsx'
+
+By the end of this guide, a Browser check on the OpenTelemetry demo sends its alerts to a Cribl Stream Raw HTTP Source, and its traces and metrics to a Cribl Stream OpenTelemetry Source. Your Routes take them from there.
+
+{/* screenshot: Cribl Stream Live Data with one Checkly alert event, one Checkly span and one Checkly metric event */}
+
+The [sample project](https://github.com/checkly/docs/tree/main/samples/guides/route-telemetry-through-cribl) this guide is built on monitors the checkout of the OpenTelemetry demo shop with one Browser check and one webhook alert channel, and carries the OpenTelemetry Collector config that scrapes the metrics. Start the demo on your machine with [Docker](https://opentelemetry.io/docs/demo/docker-deployment/) first: Compose creates the `opentelemetry-demo` network the agent joins, and the shop is at `http://localhost:8080` with its feature flags at `http://localhost:8080/feature/`. The same steps work against your own application. You need the Owner or Admin role in Checkly, and a Cribl-managed Worker Group in Cribl.Cloud. Run `npx checkly whoami` first, because this guide adds two account-wide variables, turns on trace export for the whole account and adds a Prometheus token.
+
+<Accordion title="Let your agent do it" icon="sparkles">
+
+<GuideAgentIntro />
+
+<div id="ai-setup-prompt">
+
+```txt Prompt
+Send the alerts, traces and metrics of this Checkly project to Cribl Stream, using one Browser check on the OpenTelemetry demo running on my machine. Copy `__checks__/` and `checkly.config.ts` from https://github.com/checkly/docs/tree/main/samples/guides/route-telemetry-through-cribl and keep them as they are.
+
+Success criteria:
+1. Create the private location `otel-demo-local` with `npx checkly api`. Print the agent key only inside the `docker run` command, never repeat it, and wait until I say the agent is running. I run Docker myself.
+2. Ask me for the Raw HTTP Source address and token, then store `CRIBL_ALERTS_URL` as an environment variable and `CRIBL_TOKEN` as a secret.
+3. Keep the sample's webhook alert channel as it is: URL `{{CRIBL_ALERTS_URL}}`, a single-line JSON body, `Authorization` set to `{{{CRIBL_TOKEN}}}`, and failure, degraded and recovery alerts on.
+4. Keep the sample's Browser check on the private location: it completes the demo checkout at `http://frontend-proxy:8080`, tagged `cribl-guide` and subscribed to that channel.
+5. Run `npx checkly test --record` and show me the session link.
+6. Stop and wait for my confirmation before `npx checkly deploy`.
+7. Write `collector/config.yaml` from the sample with my account ID and the OpenTelemetry Source address. After I save the Prometheus token to `collector/checkly.token`, run `otel/opentelemetry-collector-contrib:0.160.0` on the `opentelemetry-demo` network with both files mounted and `CRIBL_OTEL_TOKEN` set to the OpenTelemetry Source token I give you.
+
+I create the Cribl Stream Sources, set the trace export URL and create the Prometheus token in Checkly myself.
+```
+
+</div>
+
+<CopyPromptButton />
+
+The agent does the Checkly and Collector steps below, in the open. The two Cribl Stream Sources, the trace export setting and the Prometheus token are yours.
+
+</Accordion>
+
+## Create a Raw HTTP Source in Cribl Stream
+
+1. Add a [**Raw HTTP/S** Source](https://docs.cribl.io/stream/sources-raw-http/), not the HTTP/S Bulk API Source.
+2. Set **Port** to one in `20000` to `20010`, here `20001`.
+3. In the server-side [TLS settings](https://docs.cribl.io/stream/securing-sources-destinations-tls/), turn on **Enabled** and set **Private key path** to `$CRIBL_CLOUD_KEY` and **Certificate path** to `$CRIBL_CLOUD_CRT`. Cribl.Cloud requires these paths on that port range.
+4. Under **Auth tokens**, select **Generate** for one **Token**. Clients send it as `Authorization: <token>` with no prefix.
+5. Turn on **Auto parse** so the JSON fields become event fields.
+6. Select **Save**, then **Commit & Deploy**.
+
+Keep the token as `<alerts-token>` and the address `https://default.main.<Org-ID>.cribl.cloud:20001`, where `default` is your Worker Group name and `<Org-ID>` is your **Organization ID**, shown under **Organization Details**.
+
+{/* screenshot: Raw HTTP Source form with Port 20001, TLS on, a generated token and Auto parse on */}
+
+## Create an OpenTelemetry Source in Cribl Stream
+
+1. Add an [**OpenTelemetry** Source](https://docs.cribl.io/stream/sources-otel/) for Checkly alone. A Source of its own is the simplest routing key.
+2. Set **Protocol** to `HTTP` and **Port** to `20002`. Port `4318` is not available on Cribl-managed Worker Groups in [Cribl.Cloud](https://docs.cribl.io/stream/ports/). Keep **OTLP version** at `1.3.1`.
+3. Turn on TLS with the same **Private key path** and **Certificate path**.
+4. Under **Auth methods**, select **Add Method**, choose **Token** as the **Authentication type** and enter a long random token, for example from `openssl rand -hex 32`. Keep it as `<otel-token>`.
+5. Turn on **Extract spans** so each span is one event you can route.
+6. Select **Save**, then **Commit & Deploy**.
+
+{/* screenshot: OpenTelemetry Source form with Protocol HTTP, Port 20002, a Token auth method and Extract spans on */}
+
+## Store the Cribl Stream values in Checkly
+
+Store the Raw HTTP Source's address as a variable and its token as a secret, so neither lands in your repository:
+
+```bash Terminal
+npx checkly env add CRIBL_ALERTS_URL https://default.main.<Org-ID>.cribl.cloud:20001
+npx checkly env add CRIBL_TOKEN <alerts-token> --secret
+```
+
+## Run checks next to the demo
+
+Checkly's public locations cannot reach a shop on your machine. A private location can: the Checkly Agent runs as a container next to the demo, joins the demo's Docker network, and reaches the shop as `http://frontend-proxy:8080`. One call creates the location and returns its agent key:
+
+```bash Terminal
+npx checkly api /v1/private-locations -X POST -F name="OTel demo on this machine" -F slugName=otel-demo-local --jq '{id, key: .keys[0].rawKey}'
+```
+
+```text Terminal
+{
+  "id": "372c07be-5add-401d-b329-628c738db645",
+  "key": "pl_...2fce"
+}
+```
+
+`--jq` needs [jq](https://jqlang.org/) installed. Without it, read `id` and `keys[0].rawKey` from the JSON. Start the agent with the key, then wait until `npx checkly api /v1/private-locations/<id>` lists it under `runningAgents`. The latest agent runs runtime 2026.04. If your account or project pins an older runtime, change it first.
+
+```bash Terminal
+docker run -d --name checkly-agent-otel-demo --restart unless-stopped --network opentelemetry-demo -e API_KEY="pl_..." checkly/agent:latest
+```
+
+For an application outside Docker, point the check at `http://host.docker.internal:<port>` instead and drop `--network`. On Linux, also add `--add-host=host.docker.internal:host-gateway` to the `docker run` command.
+
+## Connect the check to Cribl Stream
+
+One webhook alert channel sends every alert to the Raw HTTP Source. Checkly fills in `{{CRIBL_ALERTS_URL}}` and `{{{CRIBL_TOKEN}}}` from the variables you stored.
+
+```ts __checks__/alert-channels.ts
+import { WebhookAlertChannel } from 'checkly/constructs'
+
+// One channel, one Raw HTTP Source in Cribl Stream. Routes decide where it goes from there.
+export const criblAlerts = new WebhookAlertChannel('cribl-alerts', {
+  name: 'Cribl Stream',
+  method: 'POST',
+  url: '{{CRIBL_ALERTS_URL}}',
+  headers: [
+    { key: 'Authorization', value: '{{{CRIBL_TOKEN}}}' },
+    { key: 'Content-Type', value: 'application/json' },
+  ],
+  // One line on purpose: Cribl's default Event Breaker splits events on newlines.
+  template: '{"source":"checkly","alertType":"{{ALERT_TYPE}}","title":"{{ALERT_TITLE}}","check":{"name":"{{CHECK_NAME}}","id":"{{CHECK_ID}}","type":"{{CHECK_TYPE}}","group":"{{GROUP_NAME}}"},"resultId":"{{CHECK_RESULT_ID}}","location":"{{RUN_LOCATION}}","startedAt":"{{STARTED_AT}}","responseTimeMs":"{{RESPONSE_TIME}}","resultLink":"{{RESULT_LINK}}","traceId":"{{OTEL_TRACE_ID}}",{{#if AI_ANALYSIS_LINK}}"classification":"{{AI_ANALYSIS_CLASSIFICATION}}","aiAnalysisLink":"{{AI_ANALYSIS_LINK}}",{{/if}}"tags":[{{#each TAGS}}"{{this}}"{{#unless @last}},{{/unless}}{{/each}}]}',
+  sendFailure: true,
+  sendDegraded: true,
+  sendRecovery: true,
+})
+```
+
+The body is a Handlebars template on one line, because the default [Event Breaker](https://docs.cribl.io/stream/event-breakers/) in Cribl Stream splits events on newlines. Double braces encode values, so a double quote arrives as `&quot;` and the JSON stays valid. A backslash in a check name, group or tag still breaks it. Triple braces keep the token unencoded, and the `TAGS` loop renders a JSON array. The classification and analysis link appear only when [automatic analysis](/resolve/ai-root-cause-analysis/overview#automatic-analysis) is on.
+
+The spec buys the first product and asserts the confirmation text:
+
+```ts __checks__/checkout.spec.ts
+import { test, expect } from '@playwright/test'
+
+test('checkout completes', async ({ page }) => {
+  // frontend-proxy is the shop's name on the demo's Docker network, where the agent runs.
+  await page.goto('http://frontend-proxy:8080')
+
+  await page.locator('[data-cy="product-card"]').first().click()
+  await page.locator('[data-cy="product-add-to-cart"]').click()
+  await page.locator('[data-cy="checkout-place-order"]').click()
+
+  await expect(page.getByText('Your order is complete!')).toBeVisible()
+})
+```
+
+The check runs that spec and subscribes it to the channel:
+
+```ts __checks__/checkout.check.ts
+import { BrowserCheck } from 'checkly/constructs'
+import * as path from 'path'
+import { criblAlerts } from './alert-channels'
+
+new BrowserCheck('otel-demo-checkout', {
+  name: 'OTel demo checkout',
+  alertChannels: [criblAlerts],
+  code: {
+    entrypoint: path.join(__dirname, 'checkout.spec.ts'),
+  },
+})
+```
+
+Replace the whole `checks` block of `checkly.config.ts` with this one, so no public `locations` and no `browserChecks.testMatch` from `npx checkly init` remain. `privateLocations` runs the deployed check only from your agent, and `privateRunLocation` sends `npx checkly test` there too:
+
+```ts checkly.config.ts
+  checks: {
+    frequency: Frequency.EVERY_10M,
+    // The agent runs on the same machine as the demo, so no public location.
+    privateLocations: ['otel-demo-local'],
+    tags: ['cribl-guide'],
+    checkMatch: '**/__checks__/**/*.check.ts',
+  },
+  cli: {
+    privateRunLocation: 'otel-demo-local',
+  },
+```
+
+Run the project once on Checkly:
+
+```bash Terminal
+npx checkly test --record
+```
+
+```text Terminal
+Running 1 checks in private location otel-demo-local.
+
+__checks__/checkout.check.ts
+  ~ OTel demo checkout
+
+1 scheduling, 1 total
+
+__checks__/checkout.check.ts
+  - OTel demo checkout
+
+1 running, 1 total
+
+__checks__/checkout.check.ts
+  ✔ OTel demo checkout (6s)
+
+1 passed, 1 total
+```
+
+When the run is green, deploy and confirm the prompt:
+
+```bash Terminal
+npx checkly deploy
+```
+
+{/* capture: deploy output with the new project name "Docs guide: Route alerts, traces and metrics through Cribl Stream" */}
+
+```text Terminal
+Deploying project... ✅
+
+Successfully deployed project "Docs guide: Route Checkly alerts and traces through Cribl Stream" to account "<account-name>".
+```
+
+## Export traces to Cribl Stream
+
+Export takes one URL for the whole account. Checkly sends each API check, URL monitor, Browser check and Multistep check run there as one span, and an export you already send to another backend stops until a Cribl Stream Route forwards spans to it. This is the first of two steps in the Checkly web app, because there is no API or CLI for the setting. Open [Settings > Traces](https://app.checklyhq.com/settings/account/traces) and, under **Export Traces**, select **Enable exporting traces**. Enter the URL `https://default.main.<Org-ID>.cribl.cloud:20002/v1/traces`, then click **Add header** and enter the key `authorization` with the value `Bearer <otel-token>`.
+
+The span carries the [`checkly.check.*` attributes](/integrations/observability/traces/otlp#what-is-sent), so your Routes know which check it belongs to.
+
+{/* screenshot: Checkly Traces settings page with export on, the Cribl.Cloud URL on port 20002 and the authorization header filled in */}
+
+## Scrape metrics into Cribl Stream
+
+Cribl's [Prometheus Scraper Source](https://docs.cribl.io/stream/sources-prometheus/) sends only Basic auth and Checkly's [Prometheus endpoint](/integrations/observability/prometheus) takes only a bearer token, so an OpenTelemetry Collector scrapes Checkly and forwards the [metrics](/integrations/observability/cribl#send-metrics-to-cribl-stream) to the OpenTelemetry Source you already have.
+
+The token is the second step in the Checkly web app. Go to **Account settings** > [**Integrations**](https://app.checklyhq.com/settings/account/integrations) and find the **Prometheus** card. Under **Bearer tokens**, click **Add token** and copy the value. The full value is shown only once, right after you create it, and an account can have at most two tokens. Save the value as the only content of `collector/checkly.token`. The sample's `.gitignore` keeps that file out of your repository.
+
+The Collector config scrapes your account with the settings from [Scraping with other tools](/integrations/observability/prometheus#scraping-with-other-tools) and sends the metrics over OTLP/HTTP to the OpenTelemetry Source on port `20002`. Replace `<your account ID>` with the ID in the endpoint URL on the **Prometheus** card, and `<Org-ID>` as before:
+
+```yaml collector/config.yaml
+receivers:
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: checkly
+          scrape_interval: 60s
+          scrape_timeout: 30s
+          scheme: https
+          metrics_path: /accounts/<your account ID>/v2/prometheus/metrics
+          authorization:
+            type: Bearer
+            credentials_file: /etc/otelcol-contrib/checkly.token
+          params:
+            includeRetryAttempts: ['true']
+            locationLabelEnabled: ['true']
+          static_configs:
+            - targets: ['api.checklyhq.com']
+
+exporters:
+  otlp_http:
+    endpoint: https://default.main.<Org-ID>.cribl.cloud:20002
+    headers:
+      authorization: Bearer ${env:CRIBL_OTEL_TOKEN}
+
+service:
+  pipelines:
+    metrics:
+      receivers: [prometheus]
+      exporters: [otlp_http]
+```
+
+Run the Collector next to the agent on the demo's network, with the config and the token file mounted and the OpenTelemetry Source token in `CRIBL_OTEL_TOKEN`:
+
+```bash Terminal
+docker run -d --name checkly-otel-collector --restart unless-stopped --network opentelemetry-demo \
+  -v "$PWD/collector/config.yaml:/etc/otelcol-contrib/config.yaml" \
+  -v "$PWD/collector/checkly.token:/etc/otelcol-contrib/checkly.token" \
+  -e CRIBL_OTEL_TOKEN="<otel-token>" \
+  otel/opentelemetry-collector-contrib:0.160.0
+```
+
+Read its startup lines with `docker logs checkly-otel-collector`:
+
+{/* capture: collector startup lines */}
+
+Each scrape, once a minute, arrives in the OpenTelemetry Source's **Live Data** as metric events, among them `checkly_check_status` with the `name` label `OTel demo checkout`.
+
+{/* VERIFY: metrics event shape in Live Data */}
+
+## Verify it works
+
+First, open the **Live Data** tab of both Sources and select **Start Capture**. A capture only records events that arrive while it runs. Then break the checkout on purpose: open `http://localhost:8080/feature/` and set `paymentFailure` to `100%`. The page saves as soon as you pick a variant. The shop's checkout API now returns a payment error, so the check's confirmation assertion fails. Run the check:
+
+```bash Terminal
+npx checkly checks run --tags=cribl-guide
+```
+
+```text Terminal
+1 check session completed: 1 failed.
+Configured alerting rules apply to these check runs.
+
+STATUS     NAME                TYPE      LOCATIONS        DURATION  CHECK ID                              SESSION ID
+failed     OTel demo checkout  BROWSER   otel-demo-local  25s       4e457cc9-7a48-4620-9ca5-a4ae7e75124d  01a187f6-6412-748f-9ac6-127ff429a605
+```
+
+Unlike `npx checkly test`, this run applies the check's alerting, so Checkly sends a failure alert to the channel. In the Raw HTTP Source's capture, look for the event with `alertType` `ALERT_FAILURE`, `check.name` `OTel demo checkout`, and the `resultLink` and `traceId` of the failed run. Checkly also exports the run's root span to the OpenTelemetry Source, so look in that capture for the span with `checkly.check.name` `OTel demo checkout` and `checkly.check.status` `FAILED`. Look for the Collector's metric events in the same capture as well, where `checkly_check_status` for `OTel demo checkout` reads `1` on the series with `status` `failing` within two scrapes.
+
+{/* VERIFY: a Live Data capture runs long enough to catch a scrape */}
+
+Checkly alerts on state changes, so a second failed run sends nothing. If a capture missed the event, set the flag back to `off`, run the check, then break it again.
+
+Set `paymentFailure` back to `off` and run the check again:
+
+```text Terminal
+1 check session completed: 1 passed.
+Configured alerting rules apply to these check runs.
+
+STATUS     NAME                TYPE      LOCATIONS        DURATION  CHECK ID                              SESSION ID
+passed     OTel demo checkout  BROWSER   otel-demo-local  15s       4e457cc9-7a48-4620-9ca5-a4ae7e75124d  01a187f7-e0fb-728d-be7f-9cc2fb1e6633
+```
+
+Checkly sends the recovery alert with `alertType` `ALERT_RECOVERY`. From here your [Routes](https://docs.cribl.io/stream/routes/) take over: route `alertType=='ALERT_FAILURE'` to your paging tool with **Final** off, every event to your log store, and the spans, through the **OTLP Traces** Function, to your trace backend. When you are done, run `npx checkly destroy` in the project and `docker rm -f checkly-agent-otel-demo checkly-otel-collector`, then turn off **Enable exporting traces**, revoke the Prometheus token and delete the private location in Checkly.
+
+## Next
+
+[Alerting that doesn't wake you up for nothing](/guides/alerting): your Routes only see the alerts Checkly decides to send, so tune escalation and retries there.
+
+## Reference
+
+- [Cribl Stream integration](/integrations/observability/cribl)
+- [Webhook alert channels](/integrations/alerts/webhooks) and the [`WebhookAlertChannel` construct](/constructs/webhook-alert-channel)
+- [Export traces to any OpenTelemetry backend](/integrations/observability/traces/otlp)
+- [Export metrics to Prometheus](/integrations/observability/prometheus)
+- [Private locations](/platform/private-locations/overview)
+- [`checkly api`](/cli/checkly-api), [`checkly checks`](/cli/checkly-checks), and [`checkly env`](/cli/checkly-env)
+- Cribl Stream [Raw HTTP Source](https://docs.cribl.io/stream/sources-raw-http/) and [OpenTelemetry Source](https://docs.cribl.io/stream/sources-otel/)
+- [Checkly Skills](/ai/skills)

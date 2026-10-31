@@ -3,7 +3,6 @@ title: Playwright Reporter Changelog
 sidebarTitle: Reporter Changelog
 description: Release history for the Checkly Playwright Reporter
 rss: true
-canonical: 'https://www.checklyhq.com/docs/detect/testing/playwright-reporter-changelog/'
 ---
 
 View your test sessions at [app.checklyhq.com/test-sessions](https://app.checklyhq.com/test-sessions).
@@ -14,29 +13,52 @@ Learn more about:
 
 ## Full release history
 
+<Update label="v1.15.0" tags={["October 2026"]}>
+  **Changed**
+
+  - **Node.js requirement:** The reporter needs Node.js 20.19+ or 22.12+.
+  - **Faster scrubbing:** Secret scrubbing is several times faster.
+
+  **Fixed**
+
+  - **More secrets removed:** Secrets are now removed from request and response bodies, test sources and attachments.
+  - **Encoded secrets:** Secrets written in base64 or escaped JSON are now removed too.
+  - **Local report:** Without credentials, `checkly-report.json` no longer contains secrets.
+  - **Report type:** In the `JSONReport` type, `config.filteredProjects` now has the shape of `config.projects`.
+</Update>
+
 <Update label="v1.14.0" tags={["October 2026"]}>
   **Added**
 
-  - **Web vitals:** Set `webVitals: true` to collect Core Web Vitals (LCP, CLS, INP, FCP, TTFB and TBT) from your tests. Checkly test sessions show them.
-  - **Uploading traces that can't be scrubbed:** Set `scrubbing.unscrubbableTraces` to `'upload'` to upload them as recorded.
+  - **Web vitals collection:** Set `webVitals: true` or `CHECKLY_REPORTER_WEB_VITALS=true` to collect Core Web Vitals (LCP, CLS, INP, FCP, TTFB and TBT) from the pages your tests open with the `page` and `context` fixtures. Each page visit is scored against [web.dev thresholds](https://web.dev/articles/defining-core-web-vitals-thresholds). The report stores the visits in `result._checkly.webVitals`. [Checkly](https://checklyhq.com) test sessions show them. LCP and INP also record the element that caused them and the phases of their time. A route change in a single-page app counts as a separate visit, marked `softNav`, that reports INP only. TBT covers the time from first contentful paint to 2 seconds after the load event. When a page has no layout shifts or long tasks, CLS and TBT are `0`. Firefox does not measure CLS or TBT. `CHECKLY_REPORTER_WEB_VITALS=false` always turns collection off.
+  - **Uploading traces that can't be scrubbed:** Set `scrubbing.unscrubbableTraces` to `'upload'` to upload these traces as recorded, with their secrets. The logs show a warning for each one. With the default, `'reject'`, they are left out.
 
   **Changed**
 
   - **Playwright compatibility:** The reporter is tested with Playwright 1.40 to 1.64.1.
-  - **Smaller traces:** Scrubbed traces are smaller.
+  - **Smaller traces:** Scrubbing now keeps a trace's HTML, CSS and JavaScript compressed. Uploaded traces are smaller.
+  - **Steps without a title:** Steps with an empty title and no error or child steps are left out of the report. Playwright 1.50 to 1.52 records one each time the page calls a function exposed with `exposeFunction`.
 
   **Fixed**
 
-  - **Secret scrubbing in traces:** Secrets are now removed from page text, JSON values, headers, cookies and storage state in traces.
-  - **Traces that can't be scrubbed:** These traces are no longer uploaded.
-  - **Playwright 1.63 and 1.64:** Trace screenshots, test source code and step subtitles now work with these versions.
-  - **Local report file:** `checkly-report.json` no longer contains unscrubbed values.
+  - **Secret scrubbing in traces:** Secrets are now removed from a trace's page text, JSON values (including escaped and nested ones), and sensitive headers and cookies such as `Authorization`, `Cookie` and `Set-Cookie`.
+  - **Very long secrets:** A secret of 32,768 characters or more, such as a storage state or a certificate bundle, no longer stops the other secrets from being scrubbed.
+  - **Scrubbing errors:** An error while scrubbing no longer prints the text that was being scrubbed.
+  - **Storage state in traces:** Traces now mask all cookie, localStorage and IndexedDB values from a storage state. Text that embeds JSON with one of these values or a sensitive header is masked too.
+  - **Long secrets in Playwright 1.63 traces:** Playwright 1.63 shortens long step parameters to 200 characters. A secret cut short this way is now masked as well.
+  - **Screenshots in Playwright 1.63 traces:** Screencast frames, screenshots and attachments in traces recorded with Playwright 1.63 are no longer corrupted when secrets are scrubbed.
+  - **Custom sensitive headers:** Header names with capital letters in `scrubbing.sensitiveHeaders` now match.
+  - **Unattached traces:** A `trace.zip` that no test attached is no longer uploaded.
+  - **Traces that can't be scrubbed:** A trace that can't be fully scrubbed is no longer uploaded. The rest of the report is still uploaded. The logs give the reason.
+  - **Report file on disk:** With `outputDir` set, the local `checkly-report.json` no longer contains unscrubbed values.
+  - **Test source code with Playwright 1.63:** Test source code is now extracted from Playwright 1.63 traces.
+  - **Test source code next to ZIP attachments:** Test source code is now read from the trace even when the test also attaches a ZIP file of its own.
+  - **Step subtitles:** Steps now include the `subtitle` that Playwright 1.63 reports, such as the locator of a click or the URL of a navigation. Playwright 1.63 no longer puts these in the step title.
+  - **Selected projects:** With Playwright 1.64 and later, the report's `config.filteredProjects` lists the projects selected to run.
 
   **Security**
 
-  - **Dependencies:** The reporter's dependencies no longer have the advisories that `npm audit` reports for 1.13.2.
-
-  The full list of changes is in `CHANGELOG.md` in the [npm package](https://www.npmjs.com/package/@checkly/playwright-reporter?activeTab=code).
+  - **Dependency updates:** The reporter now uses `axios` 1.20.0, `form-data` 4.0.6 and `fflate` 0.8.3. These versions fix the advisories that `npm audit` reports for 1.13.2.
 </Update>
 
 <Update label="v1.13.2" tags={["June 2026"]}>
@@ -85,7 +107,7 @@ Learn more about:
 
   - **Smaller uploads with smart compression** — Text-based files in the report archive (JSON report, logs, text attachments) are now DEFLATE-compressed, significantly reducing upload size.
   - **Reliable uploads for large test suites** — Added support for reporter sessions with large assets.
-  - **Better error reporting for failed uploads** — When an asset upload fails due to size limits, the error is now clearly surfaced in the Checkly UI with actionable troubleshooting suggestions instead of showing a blank test session.
+  - **Better error reporting for failed uploads** — When an asset upload fails due to size limits, the reporter now prints the error.
 </Update>
 
 <Update label="v1.10.0" tags={["April 2026"]}>
@@ -298,7 +320,7 @@ Learn more about:
 
   - **Extension-based architecture** - Modular design allows for composable functionality
   - **Broad Playwright support** - Compatible with Playwright versions 1.40 through 1.57+
-  - **Drop-in JSON replacement** - Fully compatible with Playwright's native JSON reporter output format
+  - **Drop-in JSON replacement** - Fully compatible with Playwright's built-in JSON reporter output format
   - **Trace extraction** - Automatically extracts console messages and network requests from Playwright trace files
   - **Checkly integration** - Automatic upload to Checkly test sessions when credentials are configured
   - **New `createChecklyReporter()` function** - Better IntelliSense support in `playwright.config.ts`

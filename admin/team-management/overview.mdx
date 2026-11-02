@@ -13,19 +13,38 @@ Checkly has five built-in roles: **Owner**, **Admin**, **Read & Write**, **Read 
 
 Each account has one Owner. The account creator is the Owner until they [transfer ownership](#transferring-ownership). You can invite teammates with any other role. You can [change a member's role](/admin/team-management/managing-team-members#change-members’-roles) after they join.
 
-| Role | Adds to the role above | Best for |
-|------|------------------------|----------|
-| **Read Only** | View all resources | Stakeholders who need visibility into monitoring status |
-| **Read & Run** | Trigger checks and tests | QA engineers or CI/CD pipelines that run tests but shouldn't modify configuration |
-| **Read & Write** | Create, edit, and delete checks<br />Manage alert settings and maintenance windows<br />Share, edit, and delete shared views<br />Access locked variables | Developers who create and maintain checks |
-| **Admin** | Manage team members<br />Manage account settings and private locations<br />Create service API keys | Team leads who manage members, settings, and infrastructure |
-| **Owner** | Transfer ownership | Account creator with full control over billing and ownership |
+<div className="role-matrix">
 
-Admins and Owners can only manage members below their own role. For example, an Owner can remove an Admin, but an Admin can't remove an Owner or another Admin.
+| Capability | Owner | Admin | Read & Write | Read & Run | Read Only |
+|------------|:-----:|:-----:|:------------:|:----------:|:---------:|
+| View all resources | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Trigger checks and tests | ✓ | ✓ | ✓ | ✓ | ✗ |
+| Create/edit/delete checks | ✓ | ✓ | ✓ | ✗ | ✗ |
+| Manage alert settings | ✓ | ✓ | ✓ | ✗ | ✗ |
+| Manage maintenance windows | ✓ | ✓ | ✓ | ✗ | ✗ |
+| Share/edit/delete shared views | ✓ | ✓ | ✓ | ✗ | ✗ |
+| Access locked variables | ✓ | ✓ | ✓ | ✗ | ✗ |
+| Manage team members (only below their current role. i.e. Owners can remove Admins, but Admins cannot remove Owners or other Admins.) | ✓ | ✓ | ✗ | ✗ | ✗ |
+| Manage account settings | ✓ | ✓ | ✗ | ✗ | ✗ |
+| Manage private locations | ✓ | ✓ | ✗ | ✗ | ✗ |
+| Create service API keys | ✓ | ✓ | ✗ | ✗ | ✗ |
+| Transfer ownership | ✓ | ✗ | ✗ | ✗ | ✗ |
+
+</div>
 
 ### Permissions and roles
 
 Your account role grants permissions for actions on resources. Use the [permissions reference](/admin/team-management/permissions) to find each permission’s ID, name in the role editor, description, and how to request access.
+
+### Choosing the Right Role
+
+| Role | Best for |
+|------|----------|
+| **Owner** | Account creator with full control over billing and ownership |
+| **Admin** | Team leads who manage members, settings, and infrastructure |
+| **Read & Write** | Developers who create and maintain checks |
+| **Read & Run** | QA engineers or CI/CD pipelines that run tests but shouldn't modify configuration |
+| **Read Only** | Stakeholders who need visibility into monitoring status |
 
 ### Adding Team Members
 

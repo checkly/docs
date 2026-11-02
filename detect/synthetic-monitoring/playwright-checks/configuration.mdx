@@ -273,6 +273,18 @@ Playwright config "/path/to/project/playwright.config.ts" does not exist
 
 Verify that `playwrightConfigPath` points to the correct relative path from your `checkly.config.ts` file.
 
+#### `headless: false` is not supported
+
+```text
+✖ [PlaywrightCheck:e2e-test-suite] Invalid property value
+  The value provided for property "headless" is not valid.
+  Reason: headless: false is not supported.
+  Checkly runs all Playwright checks in headless mode. Please remove this
+  setting from your Playwright configuration, or set it to true.
+```
+
+The Checkly CLI rejects `headless: false` in `use` or in any project of your `playwright.config.ts`. It reads the config on your machine, so a value based on `process.env.CHECKLY` fails too. Remove the setting, and run `npx playwright test --headed` when you want to watch a test locally.
+
 ### Alert optimization
 
 #### Alerts are triggered too late

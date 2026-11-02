@@ -62,7 +62,7 @@ Create a minimal `checkly.config.ts` (or `checkly.config.js`) at the root of you
    const { defineConfig } = require('checkly')
    const { Frequency } = require('checkly/constructs')
 
-   const config = {
+   module.exports = defineConfig({
     projectName: 'Website Monitoring',
     logicalId: 'website-monitoring-1',
     repoUrl: 'https://github.com/acme/website',
@@ -83,9 +83,7 @@ Create a minimal `checkly.config.ts` (or `checkly.config.js`) at the root of you
     cli: {
       runLocation: 'eu-central-1',
     }
-   }
-
-   module.exports = defineConfig(config);
+   })
    ```
   </Tab>
 </Tabs>

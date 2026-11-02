@@ -23,7 +23,7 @@ npx checkly trigger [options]
 |--------|----------|-------------|
 | `--config, -c` | - | The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts\|js` file in the current directory. |
 | `--check-id` | - | Trigger specific checks by ID. Supports comma-separated values and repeated flags. |
-| `--detach, -d` | - | Keep checks running in the cloud when you stop the CLI with Ctrl+C, instead of cancelling the run. |
+| `--detach, -d` | - | Start the checks in the cloud and exit after printing the test session ID, without waiting for results. |
 | `--env, -e` | - | Env vars to be passed to the check run. Default: empty. Multiple values can be passed. |
 | `--env-file` | - | dotenv file path to be passed. For example `--env-file="./.env"` |
 | `--fail-on-no-matching` | - | Exit with a failing status code when there are no matching tests. |
@@ -72,7 +72,7 @@ npx checkly trigger --check-id=<check-id-1> --check-id=<check-id-2>
 
 <ResponseField name="--detach, -d" type="boolean" default="false">
 
-By default, pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> during a recorded run cancels the test session. With `--detach`, <kbd>Ctrl</kbd>+<kbd>C</kbd> exits the CLI immediately instead, leaving the checks running in the cloud.
+Start the checks in the cloud and exit as soon as they're scheduled. The CLI prints the test session ID and doesn't wait for results. Get the results later with `checkly test-sessions get <test-session-id>`. `--detach` can't be combined with the `json` or `github` reporters.
 
 **Usage:**
 
@@ -112,7 +112,6 @@ Path to a dotenv file containing environment variables.
 
 ```bash Terminal
 npx checkly trigger --env-file=".env"
-npx checkly trigger -e=".env"
 ```
 
 **Examples:**
@@ -133,7 +132,7 @@ The dotenv file should contain KEY=value pairs, one per line.
 </ResponseField>
 
 <ResponseField name="--location, -l" type="string">
-The location to run the checks at.
+The location to run the checks at. Defaults to [the `cli.runLocation` in your config](/constructs/project#param-cli).
 
 **Usage:**
 
@@ -151,7 +150,7 @@ Stop waiting for the remaining checks once this many checks have failed (a whole
 
 Only a check's final result counts toward the limit: a check that passes after a retry does not count, and neither does a degraded check. If the failure that reaches the limit is the last check to finish, the run completes normally.
 
-When the limit is reached, the CLI writes its reports, marks the remaining checks as not finished, and asks Checkly to cancel the test session. Only some check types, such as Playwright Check Suites, can be cancelled once they are running, so other checks may still run to completion in Checkly. The `json` reporter gives those checks `"result": "Not finished"` and adds a top-level `"stoppedEarly": { "reason": "maxFailures", "maxFailures": <n> }` field.
+When the limit is reached, the CLI writes its reports, marks the remaining checks as not finished, and asks Checkly to cancel the test session. Queued API checks and uptime monitors are skipped and reported as cancelled, and running Playwright Check Suite runs are interrupted; other checks still run to completion in Checkly. The `json` reporter gives those checks `"result": "Not finished"` and adds a top-level `"stoppedEarly": { "reason": "maxFailures", "maxFailures": <n> }` field.
 
 Cannot be combined with `--detach`.
 
@@ -175,7 +174,7 @@ npx checkly trigger --retries=2 --max-failures=3
 
 <ResponseField name="--private-location" type="string">
 
-The private location to run checks at.
+The slug name of the private location to run checks at. Can't be combined with `--location`.
 
 **Usage:**
 
@@ -193,7 +192,7 @@ npx checkly trigger --private-location="datacenter-1"
 npx checkly trigger --private-location="internal-network" --tags="internal"
 
 # With custom config
-npx checkly trigger --private-location"vpc-location" --config="internal.config.js"
+npx checkly trigger --private-location="vpc-location" --config="internal.config.js"
 ```
 
 Private locations must be configured in your Checkly account before use.
@@ -266,8 +265,8 @@ npx checkly trigger --reporter ci
 # GitHub Actions reporter
 npx checkly trigger --reporter github
 
-# JSON output for programmatic use
-npx checkly trigger --reporter json > results.json
+# JSON report, written to checkly-json-report.json in the current directory
+npx checkly trigger --reporter json
 
 # Multiple reporters using comma-separated values
 npx checkly trigger --reporter list,json
@@ -448,11 +447,11 @@ npx checkly trigger --tags staging --test-session-name "Pre-prod validation"
 
 <Note>Available in CLI v8.0.0+.</Note>
 
-`checkly trigger` records a test session by default, so pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> cancels it. Cancellation applies only to Playwright Check Suite runs inside the session; other check types finish normally. Runs started with `--no-record` cannot be cancelled.
+`checkly trigger` records a test session by default, so pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> cancels it. Queued API checks and uptime monitors are skipped and reported as cancelled, and running Playwright Check Suite runs are interrupted; other checks finish normally. Runs started with `--no-record` cannot be cancelled.
 
 The CLI keeps running after the first <kbd>Ctrl</kbd>+<kbd>C</kbd> to report the cancelled results. Press <kbd>Ctrl</kbd>+<kbd>C</kbd> again to exit immediately without waiting.
 
-Pass the `--detach` flag to keep the checks running in the cloud instead — <kbd>Ctrl</kbd>+<kbd>C</kbd> then exits the CLI immediately without cancelling.
+To start checks without waiting for them, use `--detach`. The CLI then exits as soon as the checks are scheduled, and the checks keep running in the cloud.
 
 See [Cancellation](/concepts/cancellation) for the full flow.
 

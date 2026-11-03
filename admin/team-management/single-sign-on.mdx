@@ -186,3 +186,15 @@ You can take several steps to make sure only SSO users are in your account:
 * Do not send invitations to users, since they can accept invitations with a non-SSO login. Instead, they should [login through SSO](/admin/team-management/single-sign-on#logging-in-with-sso) and be automatically [JIT provisioned](/admin/team-management/single-sign-on#just-in-time-jit-provisioning) to you account.
 
 Currently, there is no option to require SSO for account members. If you’d like to see this added, please let us know so we can record your interest as feedback.
+
+### My X.509 certificate or client secret is expiring. What should I do?
+
+Your X.509 certificate (for SAML connections) or client secret (for OIDC connections) must be replaced before it expires, otherwise your users won't be able to log in.
+
+If you have a SAML connection:
+* Our team will reach out when your X.509 certificate is about four weeks from expiring.
+* Your team must regenerate the certificate and then either send it to [support@checklyhq.com](mailto:support@checklyhq.com) securely and we'll update it, or we can send you a link to update it directly.
+
+If you have an OIDC connection:
+* Client secret expirations are not communicated to our authentication provider, so we won't know when your secret expires. You must check your IdP for the client secret expiration date. Some client secrets might not have an expiration.
+* Your team must regenerate the secret and then either send it to [support@checklyhq.com](mailto:support@checklyhq.com) securely and we'll update it, or we can send you a link to update it directly.

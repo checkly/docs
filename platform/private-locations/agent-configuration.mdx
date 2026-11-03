@@ -1,6 +1,6 @@
 ---
 title: 'Agent Configuration'
-description: "Configure the Checkly Agent for a private location with environment variables for API keys, proxies, job concurrency, log level, and dependency caching."
+description: "Configure the Checkly Agent for a private location with environment variables for API keys, proxies, job concurrency, log level, dependency caching, and health probes."
 canonical: 'https://www.checklyhq.com/docs/platform/private-locations/agent-configuration/'
 ---
 
@@ -17,7 +17,9 @@ Variable|Description
 `AGENT_WORKER_COUNT`|(Default: 10, max: 50) Number of concurrent API checks and uptime monitors (URL, TCP, DNS, ICMP) that are run by the agent. Applies to agent v7.0.0 and later. Values above 50 are capped to 50.
 `LOG_LEVEL`|(Default: `INFO`) Set the log level of the agent. Can be one of `DEBUG`, `INFO`, `WARN` or `ERROR`.
 `DEPENDENCY_CACHE`|(Default: `OFF`) Set to `CHECKLY_S3` to enable dependency caching for [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview). Caches installed dependencies between runs to speed up check execution. Learn more about [dependency caching](/detect/synthetic-monitoring/playwright-checks/dependencies#dependency-caching).
-`AGENT_SERVER_PORT`|(Default: `8080`) Port for the HTTP [health probe endpoints](#health-probe-endpoints) and Prometheus metrics. Applies to agent v8.12.0 and later. Earlier agents use `AGENT_HEALTH_PORT` (default `8081`) for health probes.
+`AGENT_SERVER_PORT`|(Default: `8080`) Port for the HTTP [health probe endpoints](#health-probe-endpoints) and the [Prometheus metrics endpoint](/platform/private-locations/agent-metrics). Applies to agent v8.12.0 and later. Earlier agents use `AGENT_HEALTH_PORT` (default `8081`) for health probes.
+`AGENT_METRICS_PER_CHECK`|(Default: `false`) Set to `true` to expose [check-level metrics](/platform/private-locations/agent-metrics#check-level-metrics) with `check_id`, `name`, `check_type` and `tags` labels. Each check adds its own set of series, so metric cardinality grows with the number of checks the agent runs. Applies to agent v8.13.0 and later.
+`AGENT_METRICS_IDLE_TTL_SECONDS`|(Default: `3600`) Time after which the agent drops the check-level series of a check that has no schedule, such as a test session, when it recorded no result. Scheduled checks expire after three missed runs of their own frequency. Lower the value if you run many test sessions or CI triggers on the agent, so their series do not pile up in memory and in your scrape. Raise it if you want a test session's last result to stay visible for longer, for example to alert on it.
 `EXTERNAL_OBSERVABILITY`| Enabled by default. Set to `off` to disable [external observability](#external-observability) reporting of agent runtime errors to Checkly.
 `CHECKLY_RUN_FILE_MAX_BYTES`|(Default and maximum: 2147483647 bytes, just under 2 GiB) Largest file, in bytes, that the agent reads from a Browser or Multistep check run and uploads, such as the Playwright report. A larger file is left out of the check result, not truncated. For the Playwright report, the check log says `Report omitted because it is larger than <limit> MiB`. A value that is not a positive integer is ignored with a warning in the agent log, and the limit is then 14 MiB. Applies to agent v8.12.0 and later.
 
@@ -171,7 +173,7 @@ Endpoint|Description
 `GET /-/readiness`|Returns `200 OK` when the agent is ready to accept work.
 `GET /-/liveness`|Returns `200 OK` to indicate the agent process is running.
 `GET /health`|Returns `200 OK` as a general health check.
-`GET /metrics`|Prometheus metrics for every check type the agent runs. Use the `component` label to separate uptime from synthetics metrics.
+`GET /metrics`|[Prometheus metrics](/platform/private-locations/agent-metrics) for every check type the agent runs. Use the `component` label to separate uptime from synthetics metrics.
 
 These endpoints are useful for configuring [Kubernetes readiness and liveness probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) or any other container orchestration health checks.
 

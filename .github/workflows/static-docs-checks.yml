@@ -132,6 +132,17 @@ jobs:
             exit 1
           fi
 
+      - name: Test anchor checker
+        run: npm run test:anchors
+
+      # `mint broken-links` validates link paths only, so `/page#gone` passes as
+      # long as `/page` exists. Checks every internal #fragment against the
+      # anchors Mintlify renders on the target page. Runs on any docs change
+      # because renaming a heading breaks links on other pages.
+      - name: Broken-anchors scan
+        if: steps.detect.outputs.docs_changed == 'true'
+        run: npm run check:anchors
+
       - name: Broken-links scan
         if: steps.detect.outputs.docs_changed == 'true'
         run: |

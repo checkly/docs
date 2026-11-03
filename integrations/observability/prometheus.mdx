@@ -19,7 +19,6 @@ Looking for the v1 endpoint? See [Legacy v1 endpoint](#legacy-v1-endpoint).
    ![Prometheus integration card with the Create Prometheus endpoint button](/images/docs/images/integrations/prometheus_step1.png)
    ![Prometheus integration card in account settings](/images/docs/images/integrations/prometheus_integration_card.png)
 2. Under **Bearer tokens**, click **Add token** and copy the value. The full value is shown only once, right after you create it. An account can have at most two tokens, so you can rotate: add a token, point your scrape config at it, then revoke the old one.
-   ![Prometheus endpoint URL and bearer token on the integration card](/images/docs/images/integrations/prometheus_v2_step2.png)
 3. Add the `checkly` job under `scrape_configs` in your `prometheus.yml` and replace the placeholders with your account ID and token. It matches the sample on the card, plus `scrape_timeout: 30s`.
 
 ```yaml
@@ -175,11 +174,13 @@ Every private location metric carries the labels `private_location_name`, `priva
 | `state` | `queued`: scheduled but not yet picked up by an agent. `inflight`: being executed by an agent. |
 | `stat` | `avg`, `p90`, `p99` over the 2-minute window. |
 
+For metrics scraped from the agent container itself, including an opt-in per-check set with the `checkly_agent_` prefix, see [Agent metrics](/platform/private-locations/agent-metrics).
+
 ## Behavior
 
 - **Caching and limits.** Responses are cached for 60 seconds, so a scrape interval below 60 seconds fetches the same data. Responses are gzip compressed when the scraper asks for it, which Prometheus does by default. The endpoint allows 50 requests per minute per account. Above that it returns `429` with `Retry-After`, `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` headers. If you run multiple Prometheus instances, each instance scrapes independently. Align their scrape intervals where possible.
 - **Errors.** An unknown token or a lapsed account returns `401`. A revoked token can keep working for up to 10 minutes. Tokens do not expire. A plan without the Prometheus integration returns `403`.
-- **Timeouts.** A scrape fails as a whole if any part of the backing query fails. The query times out after 25 seconds, and a scrape that arrives while another one is refreshing the cache waits up to 20 seconds for it, which is why the sample sets `scrape_timeout: 30s`.
+- **Timeouts.** A scrape fails as a whole if any part of the backing query fails. The query times out after 25 seconds, and a scrape that arrives while another one is refreshing the cache waits for that refresh. For accounts with many checks, keep `scrape_timeout` at `30s` or higher.
 - **Hourly window.** Counters and histograms reset every hour at HH:01:30, for example 14:01:30. Handle the resets with the [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) or [increase](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase) functions. Gauges built from runs reset too. After the reset and until a check's next run:
   - `checkly_ssl_monitor_days_until_expiry`, `checkly_icmp_monitor_packet_loss_ratio` and `checkly_traceroute_monitor_hops` read `0`.
   - `checkly_check_http_status_code`, `checkly_grpc_monitor_status_code`, `checkly_traceroute_monitor_destination_reached`, `checkly_ssl_monitor_info`, `checkly_ssl_monitor_hostname_verified`, `checkly_ssl_monitor_chain_trusted`, `checkly_ssl_monitor_ocsp_stapled` and `checkly_ssl_monitor_key_size_bits` disappear.

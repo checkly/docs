@@ -5,8 +5,10 @@ sidebarTitle: 'Datadog'
 canonical: 'https://www.checklyhq.com/docs/integrations/observability/traces/datadog/'
 ---
 
-Before you start, read the prerequisites on the [OTLP export page](/integrations/observability/traces/otlp) and check [what is sent](/integrations/observability/traces/otlp#what-is-sent).
-This page only covers the values Datadog needs.
+import OtlpVendorIntro from '/snippets/otlp-vendor-intro.mdx';
+import OtlpVendorOutro from '/snippets/otlp-vendor-outro.mdx';
+
+<OtlpVendorIntro vendor="Datadog" />
 
 1. Get the endpoint. Use the URL for your Datadog site.
 
@@ -24,7 +26,7 @@ This page only covers the values Datadog needs.
 
 2. Get the key. In Datadog, go to **Organization Settings** > **API Keys** and create a key.
 3. Paste the values into Checkly. On the [Traces settings page](https://app.checklyhq.com/settings/account/traces), turn on **Enable exporting traces**, paste the URL, and add both headers from the table below. Without `compute_stats`, Datadog does not compute trace metrics.
-4. Find the spans. In Datadog APM, the spans appear under service `checkly`. To see failed runs, filter on the attribute `checkly.check.status` with the value `FAILED`.
+4. Find the spans. In Datadog APM, the spans appear under service `checkly`.
 
 | Header name | Value |
 |---|---|
@@ -34,4 +36,4 @@ This page only covers the values Datadog needs.
 If no spans arrive, check the site first. Datadog answers 403 when the site does not match your organization or the key is wrong.
 
 Datadog documents the intake in [OTLP traces ingest](https://docs.datadoghq.com/opentelemetry/setup/otlp_ingest/traces/).
-The [OTLP export page](/integrations/observability/traces/otlp) has the span schema.
+<OtlpVendorOutro />

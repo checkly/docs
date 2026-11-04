@@ -8,7 +8,7 @@ canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/multistep
 
 Multistep checks are a powerful tool for monitoring complex API workflows. However, they can sometimes be tricky to troubleshoot. Here are some common issues and solutions:
 
-## Expected Non-2xx Responses
+## Expected non-2xx responses
 **Issue: A step expects a non-2xx response (like a 401, 403, or 404), the API returns it, but the check still fails**
 
 Playwright's `request` fixture returns a response for every status code unless you set `failOnStatusCode: true`, so a 403 does not fail the step by itself. If the check fails, one of your assertions failed.

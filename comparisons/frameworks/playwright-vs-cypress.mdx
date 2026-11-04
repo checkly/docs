@@ -81,7 +81,7 @@ The architectural differences between Playwright and Cypress drive most of the p
 - **In-browser execution**: The Cypress app launches a browser and runs your test code inside it, in the same run loop as your application. A Node.js server process runs alongside it to proxy network traffic and handle tasks the browser can't, like file system access.
 - **Tight browser integration**: Running inside the browser gives Cypress direct access to the DOM, `window`, and your app's objects, which powers automatic waiting, time-travel snapshots, and fast component testing. It's also why Cypress only supports JavaScript and TypeScript.
 - **Single browser, single tab**: Cypress controls one browser and one tab at a time. Extra tabs are closed between tests, and the Cypress docs point to the `@cypress/puppeteer` plugin as a workaround for multi-tab flows.
-- **Origin and iframe limits**: Each test is bound to one superdomain unless you wrap steps in `cy.origin()`. You can query same-origin iframes, but there's no built-in command to switch into an iframe.
+- **Origin and iframe limits**: Each test is bound to one origin, including the subdomain, unless you wrap steps in `cy.origin()`. You can query same-origin iframes, but Cypress can't automate cross-origin iframes and has no built-in command to switch into an iframe.
 - **Parallelization through Cypress Cloud**: Cypress parallelization requires recording to Cypress Cloud with `--record`. Third-party orchestration services exist as alternatives.
 
 ### Impact of architectural differences

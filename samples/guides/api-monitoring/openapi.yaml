@@ -1,0 +1,36 @@
+openapi: 3.0.3
+info:
+  title: Danube shop catalog API
+  version: 1.0.0
+servers:
+  - url: https://danube-web.shop/api
+paths:
+  /books:
+    get:
+      operationId: listBooks
+      responses:
+        '200':
+          description: Every book in the catalog
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+  /books/{id}:
+    get:
+      operationId: getBook
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        '200':
+          description: One book
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+components:
+  schemas:
+    Book:
+      type: object
+      required: [id, title, author, price]

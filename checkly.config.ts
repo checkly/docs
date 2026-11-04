@@ -9,6 +9,8 @@ export default defineConfig({
     activated: true,
     tags: ['docs'],
     checkMatch: '**/__checks__/**/*.check?(-group).{js,ts}',
+    // Guide sample projects have their own checkly.config.ts; keep them out of this project.
+    ignoreDirectoriesMatch: ['samples/**'],
     runtimeId: '2026.04',
     playwrightConfig: {
       timeout: 120_000,

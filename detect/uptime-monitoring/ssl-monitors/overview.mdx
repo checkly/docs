@@ -1,15 +1,15 @@
 ---
-title: 'SSL Monitor Overview'
+title: 'SSL monitor overview'
 description: 'Monitor TLS certificate health, expiry, and security posture of your HTTPS endpoints.'
 sidebarTitle: Overview
 canonical: 'https://www.checklyhq.com/docs/detect/uptime-monitoring/ssl-monitors/overview/'
 ---
 
 <Tip>
-**Monitoring as Code**: Learn more about the [SSL Monitor Construct](/constructs/ssl-monitor).
+**Monitoring as Code**: Learn more about the [SSL monitor construct](/constructs/ssl-monitor).
 </Tip>
 
-## What are SSL Monitors?
+## What are SSL monitors?
 
 SSL monitors verify the health of a TLS certificate by connecting to a hostname, completing a full TLS handshake, and inspecting the resulting certificate and negotiated protocol parameters. Typical use cases include:
 
@@ -19,7 +19,7 @@ SSL monitors verify the health of a TLS certificate by connecting to a hostname,
 * Catching chain trust failures caused by missing intermediate certificates
 * Alerting on weak or compromised certificate authority usage
 
-## How do SSL Monitors work?
+## How do SSL monitors work?
 
 Each SSL monitor run performs the following steps:
 
@@ -30,7 +30,7 @@ Each SSL monitor run performs the following steps:
 5. **Security baseline evaluation** — On a successful handshake and certificate verification, a configurable rule set evaluates the negotiated protocol (TLS version, cipher suite, CA trust) and produces a per-rule verdict plus an overall **grade** and **verdict** (`pass` / `warn` / `fail`). The baseline is skipped when an earlier step fails (e.g. hostname mismatch or chain untrusted).
 6. **Assertions** — Optional assertions are evaluated against the certificate and handshake data
 
-## SSL Monitor Results
+## SSL monitor results
 
 Select a specific check run to inspect its results:
 

@@ -1,0 +1,55 @@
+---
+title: Playwright vs Puppeteer
+sidebarTitle: vs Puppeteer
+description: Compare Playwright and Puppeteer by browser support, testing features, language support, and common use cases.
+date: 2025-04-01
+author: Dan G
+githubUser: ragog
+tags:
+  - basics
+weight: 20
+canonical: 'https://www.checklyhq.com/docs/comparisons/frameworks/playwright-vs-puppeteer/'
+---
+
+Playwright and Puppeteer are open-source browser automation tools with similar APIs. They share a common history: the team that created Playwright previously worked on Puppeteer. Playwright builds on that experience with broader browser and language support, a dedicated test runner, and testing-focused features.
+
+## Key differences
+
+| Capability | Playwright | Puppeteer |
+| --- | --- | --- |
+| Browser engines | Chromium, Firefox, and WebKit | Chrome and Firefox |
+| Languages | JavaScript/TypeScript, Python, Java, and .NET | JavaScript/TypeScript |
+| Test runner | Playwright Test includes assertions, fixtures, parallelism, and tracing | Use Puppeteer with your preferred test runner and assertion library |
+| Isolation | Uses lightweight browser contexts, with a new context for each Playwright Test test by default | Supports browser contexts that you manage in your scripts or test setup |
+| Waiting | Locators automatically wait for elements to become actionable | Provides locators with automatic waiting and page-level wait methods |
+| Primary fit | Cross-browser end-to-end testing and general browser automation | Chrome-focused browser automation and scripting |
+
+## Browser support
+
+Playwright runs against Chromium, Firefox, and WebKit. This makes it a strong choice when you need to exercise the same flow across browser engines, including WebKit for Safari-like coverage.
+
+Puppeteer supports Chrome and Firefox. It remains a good fit when your automation is centered on Chrome and you do not need WebKit coverage.
+
+## Testing features
+
+Playwright is available as both a browser automation library and the Playwright Test framework. Playwright Test includes parallel execution, fixtures, web-first assertions, retries, reporting, and trace collection. Its locators wait for elements to meet actionability checks before performing actions, which reduces the need for explicit waits.
+
+Puppeteer provides the browser automation layer. You can combine it with a test runner and assertion library that match your existing stack. This can be useful when you want a smaller automation-focused API or already have testing infrastructure in place.
+
+## API and migration
+
+The tools use similar concepts such as browsers, pages, selectors, and network interception, so many scripts can be migrated incrementally. Common changes include:
+
+- Importing a Playwright browser type such as `chromium` instead of the Puppeteer package.
+- Creating browser contexts explicitly when you use the Playwright library, or using the isolated `page` and `context` fixtures in Playwright Test.
+- Replacing `page.setViewport()` with `page.setViewportSize()`.
+- Moving cookie operations from `Page` to `BrowserContext`.
+- Replacing element handles and manual waits with locators and web-first assertions where possible.
+
+For a command-by-command migration guide, see [Moving from Puppeteer to Playwright](/comparisons/frameworks/moving-from-puppeteer-to-playwright).
+
+## Which should you choose?
+
+Choose Playwright when you need cross-browser coverage, built-in test tooling, multi-language support, or isolated parallel tests. Choose Puppeteer when Chrome-focused automation meets your requirements or when you want to add browser control to an existing JavaScript or TypeScript setup without adopting a test framework.
+
+Both projects evolve regularly. Before choosing, review the current [Playwright browser support](https://playwright.dev/docs/browsers) and [Puppeteer browser support](https://pptr.dev/chromium-support) for the versions you plan to use.

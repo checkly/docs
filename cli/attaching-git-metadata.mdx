@@ -41,14 +41,17 @@ CHECKLY_REPO_URL="https://my.git.solution/project/" npx checkly test
 
 ## Working with multiple repositories
 
-Each `checkly test --record` or `checkly deploy` invocation attaches metadata for a **single** `repoUrl`. If your monitors span multiple source repositories (for example, a backend repo and a frontend repo), run the CLI separately from each repository's CI pipeline and set `CHECKLY_REPO_URL` (and the other git variables) to point at the repo that owns the checks being tested or deployed in that pipeline.
+Each `checkly test --record` or `checkly deploy` run attaches one repository URL. If your checks live in more than one repository, for example a backend and a frontend repository, give each repository its own Checkly project: a `checkly.config.ts` with a unique [`logicalId`](/constructs/project#param-logical-id) and its own [`repoUrl`](/constructs/project#param-repo-url).
 
-```bash Terminal
-# Backend CI pipeline
-CHECKLY_REPO_URL="https://github.com/acme/backend" npx checkly deploy
+```ts checkly.config.ts
+import { defineConfig } from 'checkly'
 
-# Frontend CI pipeline
-CHECKLY_REPO_URL="https://github.com/acme/frontend" npx checkly deploy
+export default defineConfig({
+  projectName: 'Backend monitoring',
+  logicalId: 'backend-monitoring',
+  repoUrl: 'https://github.com/acme/backend',
+  /* More options... */
+})
 ```
 
-To keep checks from different repos isolated, scope each pipeline to its own set of resources — for example by placing each repo's checks in a separate [group](/platform/groups) or by using the [`--tags`](/cli/checkly-deploy) and check-file globs in `checkly.config` so that a deploy from one repo only touches its own checks.
+Do not deploy two repositories with the same `logicalId`. A deploy deletes the checks in the project that its code does not declare, so the second repository's deploy removes the first one's checks.

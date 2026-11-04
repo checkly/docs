@@ -3,6 +3,7 @@ title: 'Project Construct'
 description: 'Learn how to configure projects with the Checkly CLI.'
 sidebarTitle: 'Project'
 canonical: 'https://www.checklyhq.com/docs/constructs/project/'
+mode: "wide"
 ---
 
 Use the `defineConfig` to define core settings for your entire Checkly CLI project. This is typically configured in your `checkly.config.ts` file and provides global defaults for all CLI-powered checks and monitors.
@@ -195,7 +196,7 @@ export default defineConfig({
 |-----------|------|----------|---------|-------------|
 | `activated` | `boolean` | ❌ | `true` | Whether checks are enabled by default |
 | `alertChannels` | `Array<AlertChannel \| AlertChannelRef>` | ❌ | `[]` | Default alert channels for all checks |
-| `checkMatch` | `string \| string[]` | ❌ | - | Glob pattern to find check construct files |
+| `checkMatch` | `string \| string[]` | ❌ | - | Glob pattern or array of glob patterns to find check construct files |
 | `environmentVariables` | `EnvironmentVariable[]` | ❌ | `[]` | Default environment variables for all checks |
 | `frequency` | `Frequency` | ❌ | - | Default frequency for all checks |
 | `ignoreDirectoriesMatch` | `string[]` | - | - | Glob patterns for directories to ignore |
@@ -208,8 +209,8 @@ export default defineConfig({
 | `runtimeId` | `string` | ❌ | - | Default runtime ID for all checks |
 | `shouldFail` | `boolean` | ❌ | `false` | Whether the behavior of when a check/alert is considered to fail is inverted. Only applies to API checks, URL monitors and TCP monitors. |
 | `tags` | `string[]` | ❌ | `[]` | Default tags applied to all checks |
-| `browserChecks` | `object` | ❌ | - | Default settings for browser checks |
-| `multiStepChecks` | `object` | ❌ | - | Default settings for multi-step checks |
+| `browserChecks` | `object` | ❌ | - | Default settings for Browser checks |
+| `multiStepChecks` | `object` | ❌ | - | Default settings for Multistep checks |
 | `include` | `string \| string[]` | ❌ | - | Extra files to include when bundling the Playwright Check Suites defined in `playwrightChecks` |
 | `playwrightChecks` | `object[]` | ❌ | - | Playwright Check Suites to create from your Playwright configuration |
 
@@ -263,17 +264,20 @@ export default defineConfig({
 
 <ResponseField name="checks.checkMatch" type="string | string[]">
 
-Glob pattern where the CLI looks for files containing Check constructs, i.e. all `.check.ts` files.
+A glob pattern, or an array of glob patterns, where the CLI looks for files containing check constructs, for example all `.check.ts` files. Use an array to match several file extensions or directories.
 
 **Usage:**
 
 {/* typecheck-wrap */}
-```ts highlight={5}
+```ts highlight={6}
 export default defineConfig({
   projectName: "Website Monitoring",
   logicalId: "website-monitoring-1",
   checks: {
-    checkMatch: ["**/*.check.ts"],
+    // Match a single glob
+    checkMatch: "**/*.check.ts",
+    // Or match multiple globs at once
+    // checkMatch: ["**/*.check.ts", "**/*.check.js"],
   },
 })
 ```
@@ -390,7 +394,7 @@ export default defineConfig({
 
 <ResponseField name="checks.playwrightConfig" type="object">
 
-Global configuration options for the Playwright Test Runner use in [Browser Checks](/detect/synthetic-monitoring/browser-checks/overview) and [MultiStep Checks](/detect/synthetic-monitoring/multistep-checks/overview). This allows you to configure your Playwright-powered checks in a single place, instead of having to repeat the same configuration for each test file.
+Global configuration options for the Playwright Test Runner use in [Browser checks](/detect/synthetic-monitoring/browser-checks/overview) and [Multistep checks](/detect/synthetic-monitoring/multistep-checks/overview). This allows you to configure your Playwright-powered checks in a single place, instead of having to repeat the same configuration for each test file.
 
 **Usage:**
 
@@ -416,9 +420,9 @@ export default defineConfig({
 })
 ```
 
-<Tip>Learn more about the supported Playwright configuration options in [the Browser Check Playwright documentation](/detect/synthetic-monitoring/browser-checks/playwright-support).</Tip>
+<Tip>Learn more about the supported Playwright configuration options in [the Browser check Playwright documentation](/detect/synthetic-monitoring/browser-checks/playwright-support).</Tip>
 
-<Warning>Browser Checks don't support the `projects`, `globalSetup`, `globalTeardown` and `storageState` options. Check [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview) for full Playwright support.</Warning>
+<Warning>Browser checks don't support the `projects`, `globalSetup`, `globalTeardown` and `storageState` options. Check [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview) for full Playwright support.</Warning>
 
 </ResponseField>
 
@@ -443,7 +447,7 @@ export default defineConfig({
 
 <ResponseField name="checks.privateLocations" type="PrivateLocation">
 
-Private Locations to run your monitors and checks from.
+Private locations to run your monitors and checks from.
 
 **Usage:**
 
@@ -465,7 +469,7 @@ export default defineConfig({
 })
 ```
 
-<Tip>Learn more about [Private Locations in the general documentation](/platform/private-locations/overview).</Tip>
+<Tip>Learn more about [private locations in the general documentation](/platform/private-locations/overview).</Tip>
 
 </ResponseField>
 
@@ -538,13 +542,13 @@ export default defineConfig({
 
 <ResponseField name="checks.browserChecks" type="object">
 
-If your project doesn't require specific configuration and you want to quickly transform your Playwright end-to-end tests into Browser Checks, use the `browserChecks.testMatch` property.
+If your project doesn't require specific configuration and you want to quickly transform your Playwright end-to-end tests into Browser checks, use the `browserChecks.testMatch` property.
 
 **Properties:**
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `testMatch` | `string \| string[]` | ❌ | - | Glob pattern for Playwright tests used as Browser Checks |
+| `testMatch` | `string \| string[]` | ❌ | - | Glob pattern for Playwright tests used as Browser checks |
 
 **Example:**
 
@@ -567,13 +571,13 @@ export default defineConfig({
 
 <ResponseField name="checks.multiStepChecks" type="object">
 
-If your project doesn't require specific configuration and you want to quickly transform your Playwright API tests into Multistep Checks, use the `multiStepChecks.testMatch` property.
+If your project doesn't require specific configuration and you want to quickly transform your Playwright API tests into Multistep checks, use the `multiStepChecks.testMatch` property.
 
 **Properties:**
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `testMatch` | `string \| string[]` | ❌ | - | Glob pattern for Playwright tests used as Multistep Checks |
+| `testMatch` | `string \| string[]` | ❌ | - | Glob pattern for Playwright tests used as Multistep checks |
 
 **Example:**
 
@@ -649,7 +653,7 @@ export default defineConfig({
 | `frequency` | `Frequency` | ❌ | - | How often to run your check suite |
 | `locations` | `string[]` | ❌ | `[]` | Array of public location codes |
 | `muted` | `boolean` | ❌ | `false` | Whether alert notifications are muted |
-| `privateLocations` | `string[]` | ❌ | `[]` | Array of Private Location slugs |
+| `privateLocations` | `string[]` | ❌ | `[]` | Array of private location slugs |
 | `runParallel` | `boolean` | ❌ | `false` | Run check suites in parallel or round-robin |
 | `tags` | `string[]` | ❌ | `[]` | Array of tags to organize check suites |
 

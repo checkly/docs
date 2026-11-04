@@ -93,7 +93,6 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /detect/synthetic-monitoring/api-checks/configuration
 - /detect/assertions
 - /detect/synthetic-monitoring/api-checks/set-up-and-tear-down
-- /detect/synthetic-monitoring/api-checks/snippets
 - /detect/synthetic-monitoring/api-checks/troubleshooting
 
 #### Detect - Multistep Checks
@@ -113,7 +112,6 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /detect/synthetic-monitoring/browser-checks/performance-metrics
 - /detect/synthetic-monitoring/browser-checks/visual-regressions
 - /detect/synthetic-monitoring/browser-checks/playwright-support
-- /detect/synthetic-monitoring/browser-checks/snippets
 - /detect/synthetic-monitoring/browser-checks/timeouts
 - /detect/synthetic-monitoring/browser-checks/troubleshooting
 
@@ -122,7 +120,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /detect/synthetic-monitoring/playwright-checks/quickstart
 - /detect/synthetic-monitoring/playwright-checks/reference
 - /detect/synthetic-monitoring/playwright-checks/add-to-group
-- /detect/synthetic-monitoring/playwright-checks/custom-dependencies
+- /detect/synthetic-monitoring/playwright-checks/dependencies
 
 ### Detect - Testing
 - /detect/testing/overview
@@ -170,10 +168,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /resolve/traces/import/https-grpc
 
 #### Resolve - Traces - Exporting
-- /resolve/traces/export/grafana-tempo
-- /resolve/traces/export/honeycomb
-- /resolve/traces/export/new-relic
-- /resolve/traces/export/dash0
+- /resolve/traces/export/overview
 
 #### Resolve - Traces - Instrumentation
 - /resolve/traces/instrumentation/nextjs
@@ -234,9 +229,18 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /integrations/ci-cd/vercel/managing-plan
 
 ### Integrations - Observability
+- /integrations/observability/overview
 - /integrations/observability/prometheus
-- /integrations/observability/prometheus-v2
+- /integrations/observability/traces/otlp
 - /integrations/observability/coralogix
+- /integrations/observability/traces/chronosphere
+- /integrations/observability/traces/clickstack
+- /integrations/observability/traces/cribl
+- /integrations/observability/traces/dash0
+- /integrations/observability/traces/datadog
+- /integrations/observability/traces/grafana-tempo
+- /integrations/observability/traces/honeycomb
+- /integrations/observability/traces/new-relic
 
 ### Integrations - Infrastructure as Code
 
@@ -248,7 +252,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /integrations/iac/terraform/ci-cd
 - /integrations/iac/terraform/command-line-triggers
 - /integrations/iac/terraform/testing-scripts-locally
-- /integrations/iac/terraform/snippets-variables
+- /integrations/iac/terraform/environment-variables
 - /integrations/iac/terraform/troubleshooting
 
 #### Integrations - Pulumi
@@ -360,12 +364,6 @@ This file contains all valid URLs extracted from docs.json organized by director
 #### API - Reporting
 - /api-reference/reporting/generate
 
-#### API - Snippets
-- /api-reference/snippets/list
-- /api-reference/snippets/get
-- /api-reference/snippets/create
-- /api-reference/snippets/update
-- /api-reference/snippets/delete
 
 ### API - Detect
 
@@ -498,7 +496,6 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /guides/overview
 
 ### Guides - Monitoring Guides
-- /guides/end-to-end-monitoring
 - /guides/startup-guide-detect-communicate-resolve
 - /guides/getting-started-with-monitoring-as-code
 - /guides/empowering-developers-with-checkly
@@ -506,7 +503,6 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /guides/uptime-monitoring
 - /guides/keyword-monitoring
 - /guides/sdlc-monitoring
-- /guides/create-multiple-monitors
 
 ### Guides - API Monitoring
 - /guides/monitoring-an-openapi-spec
@@ -518,14 +514,10 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /guides/monitoring-ecommerce-apps-using-terraform
 
 ### Guides - Playwright Guides
-- /guides/moving-from-puppeteer-to-playwright
-- /guides/developer-fixtures
-- /guides/auto-waiting-methods
 - /guides/reading-traces
 
 ### Guides - Advanced Topics
 - /guides/claude-code-monitoring
-- /guides/how-to-monitor-broken-links
 
 ## Learn
 
@@ -615,6 +607,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /learn/monitoring/intro-to-sdlc
 - /learn/monitoring/metrics-every-team-needs
 - /learn/monitoring/api-monitoring
+- /learn/monitoring/end-to-end-monitoring
 - /learn/monitoring/frontend-monitoring
 - /learn/monitoring/monitoring-as-code
 - /learn/monitoring/real-user-monitoring
@@ -643,7 +636,8 @@ This file contains all valid URLs extracted from docs.json organized by director
 ### Comparisons - Frameworks
 - /comparisons/frameworks/playwright-vs-cypress
 - /comparisons/frameworks/playwright-vs-selenium
-- /comparisons/frameworks/playwright-vs-others
+- /comparisons/frameworks/playwright-vs-puppeteer
+- /comparisons/frameworks/moving-from-puppeteer-to-playwright
 
 ---
 
@@ -663,7 +657,6 @@ This file contains all valid URLs extracted from docs.json organized by director
 - `/api-checks/limits/` → `/detect/synthetic-monitoring/api-checks/response-limits`
 
 - `/browser-checks/` → `/detect/synthetic-monitoring/browser-checks/`
-- `/browser-checks/partials-code-snippets/` → `/detect/synthetic-monitoring/browser-checks/snippets`
 - `/browser-checks/degraded-state/` → `/detect/synthetic-monitoring/multistep-checks/degraded-states`
 - `/browser-checks/login-scenarios/` → `/detect/synthetic-monitoring/browser-checks/examples`
 

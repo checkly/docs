@@ -6,6 +6,9 @@
 | `CHECK_RESULT_ID` | The UUID where the result will be saved.    | Only available on scheduled runs.    |
 | `CHECK_RUN_ID`    | The UUID of the check run execution.        | Only available on scheduled runs.    |
 | `CHECK_TYPE`      | The type of the check, e.g. `BROWSER`.      |                                      |
+| `CHECKLY_TRACE_ID` | The OpenTelemetry trace ID of the check run. Use it to correlate the run with the trace in your own observability backend. | Only in Browser checks, Multistep checks, Playwright Check Suites, and API setup & teardown scripts, and only when [Traces](/resolve/traces/overview) is active for the check, unset otherwise. |
+| `CHECKLY_TRACEPARENT` | The W3C `traceparent` header value of the check run's trace. Use it to propagate the trace context to your own tooling. | Only in Browser checks, Multistep checks, Playwright Check Suites, and only when [Traces](/resolve/traces/overview) is active for the check, unset otherwise. |
+| `CHECKLY_TRACESTATE` | The W3C `tracestate` header value of the check run's trace. Use it with `CHECKLY_TRACEPARENT` to propagate the full trace context. | Only in Browser checks, Multistep checks, Playwright Check Suites, and only when [Traces](/resolve/traces/overview) is active for the check, unset otherwise. |
 | `PUBLIC_IP_V4`    | The IPv4 of the check run execution.        |                                      |
 | `PUBLIC_IP_V6`    | The IPv6 of the check run execution.        |                                      |
 | `REGION`          | The current region, e.g. `us-west-1`.       |                                      |

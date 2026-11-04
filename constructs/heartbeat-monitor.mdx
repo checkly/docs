@@ -1,18 +1,19 @@
 ---
-title: 'Heartbeat Monitor Construct'
-description: 'Learn how to configure heartbeat monitors with the Checkly CLI.'
-sidebarTitle: 'Heartbeat Monitor'
+title: 'Heartbeat monitor construct'
+description: 'Learn how to configure Heartbeat monitors with the Checkly CLI.'
+sidebarTitle: 'Heartbeat monitor'
 canonical: 'https://www.checklyhq.com/docs/constructs/heartbeat-monitor/'
+mode: "wide"
 ---
 
 <Tip>
 Learn more about Heartbeat monitors in [the Heartbeat monitor overview](/detect/uptime-monitoring/heartbeat-monitors/overview).
 </Tip>
 
-Use Heartbeat Monitors to track passive monitoring scenarios where external services ping Checkly at regular intervals. The examples below show how to configure monitoring for different types of scheduled jobs and services.
+Use Heartbeat monitors to track passive monitoring scenarios where external services ping Checkly at regular intervals. The examples below show how to configure monitoring for different types of scheduled jobs and services.
 
 <Accordion title="Prerequisites">
-Before creating heartbeat monitors, ensure you have:
+Before creating Heartbeat monitors, ensure you have:
 
 - An initialized Checkly CLI project
 - External services, cron jobs, or scripts that can send HTTP POST requests
@@ -38,7 +39,15 @@ new HeartbeatMonitor("daily-backup-heartbeat", {
 ```
 
 ```ts Advanced Example
-import { HeartbeatMonitor } from "checkly/constructs"
+import { HeartbeatMonitor, EmailAlertChannel, SlackAppAlertChannel } from "checkly/constructs"
+
+const emailChannel = new EmailAlertChannel("team-email", {
+  address: "team@example.com",
+})
+
+const slackChannel = new SlackAppAlertChannel("team-slack", {
+  slackChannels: ["#ops"]
+})
 
 new HeartbeatMonitor("newsletter-heartbeat", {
   name: "Weekly Newsletter Job",
@@ -61,7 +70,7 @@ new HeartbeatMonitor("newsletter-heartbeat", {
 The Heartbeat Monitoring configuration consists of specific heartbeat monitoring options and inherited general monitoring options.
 
 <Tabs>
-<Tab title="Heartbeat Monitor">
+<Tab title="Heartbeat monitor">
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
@@ -92,6 +101,7 @@ The expected period between pings from your external service. This defines how o
 
 **Usage:**
 
+{/* typecheck-wrap: HeartbeatMonitor */}
 ```ts highlight={3}
 new HeartbeatMonitor('my-heartbeat', {
   name: "My heartbeat",
@@ -106,6 +116,7 @@ new HeartbeatMonitor('my-heartbeat', {
 <Tabs>
 <Tab title="Daily Jobs">
 
+{/* typecheck-wrap: HeartbeatMonitor */}
 ```ts
 // Daily backup job
 new HeartbeatMonitor("backup-job", {
@@ -120,6 +131,7 @@ new HeartbeatMonitor("backup-job", {
 </Tab>
 <Tab title="Hourly Tasks">
 
+{/* typecheck-wrap: HeartbeatMonitor */}
 ```ts
 // Hourly data sync
 new HeartbeatMonitor("data-sync", {
@@ -134,6 +146,7 @@ new HeartbeatMonitor("data-sync", {
 </Tab>
 <Tab title="Frequent Checks">
 
+{/* typecheck-wrap: HeartbeatMonitor */}
 ```ts
 // Every 5 minutes
 new HeartbeatMonitor("frequent-task", {
@@ -156,6 +169,7 @@ The time unit for the period. Defines whether the period is in seconds, minutes,
 
 **Usage:**
 
+{/* typecheck-wrap: HeartbeatMonitor */}
 ```ts highlight={4}
 new HeartbeatMonitor("my-heartbeat", {
   name: "My heartbeat",
@@ -173,12 +187,14 @@ The grace period to wait before alerting after the expected ping time has passed
 
 **Usage:**
 
+{/* typecheck-wrap: HeartbeatMonitor */}
 ```ts highlight={4}
 new HeartbeatMonitor('my-heartbeat', {
   period: 1,
   periodUnit: 'hours',
   grace: 10,
-  graceUnit: 'minutes' // 10 minute grace period
+  graceUnit: 'minutes', // 10 minute grace period
+  /* More options... */
 })
 ```
 
@@ -187,6 +203,7 @@ new HeartbeatMonitor('my-heartbeat', {
 <Tabs>
 <Tab title="Short Grace Period">
 
+{/* typecheck-wrap: HeartbeatMonitor */}
 ```ts
 // Strict timing requirements
 new HeartbeatMonitor("critical-task", {
@@ -201,6 +218,7 @@ new HeartbeatMonitor("critical-task", {
 </Tab>
 <Tab title="Moderate Grace Period">
 
+{/* typecheck-wrap: HeartbeatMonitor */}
 ```ts
 // Standard tolerance
 new HeartbeatMonitor("standard-job", {
@@ -215,6 +233,7 @@ new HeartbeatMonitor("standard-job", {
 </Tab>
 <Tab title="Long Grace Period">
 
+{/* typecheck-wrap: HeartbeatMonitor */}
 ```ts
 // Flexible timing for complex jobs
 new HeartbeatMonitor("complex-job", {
@@ -237,12 +256,14 @@ The time unit for the grace period. Defines whether the grace period is in secon
 
 **Usage:**
 
+{/* typecheck-wrap: HeartbeatMonitor */}
 ```ts highlight={5}
 new HeartbeatMonitor('my-heartbeat', {
   period: 6,
   periodUnit: 'hours',
   grace: 30,
-  graceUnit: 'minutes' // 30 minute grace period
+  graceUnit: 'minutes', // 30 minute grace period
+  /* More options... */
 })
 ```
 
@@ -252,10 +273,11 @@ new HeartbeatMonitor('my-heartbeat', {
 ### General Monitor Options
 
 <ResponseField name="name" type="string" required>
-Friendly name for your heartbeat monitor that will be displayed in the Checkly dashboard and used in notifications.
+Friendly name for your Heartbeat monitor that will be displayed in the Checkly dashboard and used in notifications.
 
 **Usage:**
 
+{/* typecheck-wrap: HeartbeatMonitor */}
 ```ts highlight={2}
 new HeartbeatMonitor('my-heartbeat', {
   name: 'Daily Backup Job Monitor',
@@ -269,6 +291,7 @@ new HeartbeatMonitor('my-heartbeat', {
 
 <Tabs>
   <Tab title="Daily Backup Job">
+    {/* typecheck-wrap: HeartbeatMonitor */}
     ```ts
     new HeartbeatMonitor("backup-job-heartbeat", {
       name: "Daily Database Backup",
@@ -285,6 +308,7 @@ new HeartbeatMonitor('my-heartbeat', {
   </Tab>
 
   <Tab title="Hourly Data Sync">
+    {/* typecheck-wrap: HeartbeatMonitor */}
     ```ts
     new HeartbeatMonitor("sync-job-heartbeat", {
       name: "Hourly Data Synchronization",
@@ -308,6 +332,7 @@ new HeartbeatMonitor('my-heartbeat', {
   </Tab>
 
   <Tab title="CI/CD Pipeline">
+    {/* typecheck-wrap: HeartbeatMonitor */}
     ```ts
     new HeartbeatMonitor('deployment-heartbeat', {
       name: 'Production Deployment Pipeline',
@@ -327,6 +352,7 @@ new HeartbeatMonitor('my-heartbeat', {
   </Tab>
 
   <Tab title="Log Processing">
+    {/* typecheck-wrap: HeartbeatMonitor */}
     ```ts
     new HeartbeatMonitor('log-processing-heartbeat', {
       name: 'Log Processing Job',
@@ -358,6 +384,7 @@ new HeartbeatMonitor('my-heartbeat', {
   </Tab>
 
   <Tab title="Short Interval Check">
+    {/* typecheck-wrap: HeartbeatMonitor */}
     ```ts
     new HeartbeatMonitor('frequent-task-heartbeat', {
       name: 'Every Minute Task',
@@ -383,7 +410,7 @@ new HeartbeatMonitor('my-heartbeat', {
 
 ## Getting the heartbeat Ping URL
 
-After deploying your heartbeat monitor, you can obtain the ping URL in several ways:
+After deploying your Heartbeat monitor, you can obtain the ping URL in several ways:
 
 <Tabs>
   <Tab title="CLI Output">
@@ -396,12 +423,12 @@ After deploying your heartbeat monitor, you can obtain the ping URL in several w
   </Tab>
 
   <Tab title="Web UI">
-    Navigate to your heartbeat monitor in the [Checkly web UI](https://app.checklyhq.com/heartbeats) to copy the ping URL.
+    Navigate to your Heartbeat monitor in the [Checkly web UI](https://app.checklyhq.com/heartbeats) to copy the ping URL.
   </Tab>
 </Tabs>
 
 <Info>
-The ping URL is unique for each heartbeat monitor and should be kept secure. Anyone with access to this URL can send pings to your monitor.
+The ping URL is unique for each Heartbeat monitor and should be kept secure. Anyone with access to this URL can send pings to your monitor.
 </Info>
 
 <Warning>

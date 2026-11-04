@@ -10,7 +10,7 @@ export const CLITip = ({ children }) => {
   return (
     <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5 my-4 bg-gray-50 dark:bg-gray-800">
       <div className="flex items-center gap-2 font-semibold text-base mb-4 text-gray-800 dark:text-gray-200">
-        <Icon icon="rectangle-terminal" />
+        <Icon icon="terminal-2" />
         Checkly CLI tip
       </div>
       <div className="mb-4 text-gray-600 dark:text-gray-300 leading-relaxed">

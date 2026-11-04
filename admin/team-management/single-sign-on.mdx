@@ -27,7 +27,13 @@ The general process is detailed below, but please reach out to your customer suc
     </Info>
 
     <Note>
-      If you need our logo for the Checkly IdP tile, we provide several [here](/assets/checkly-logos-for-sso-tiles.zip).
+      If you need our logo for the Checkly IdP tile, download one of these:
+
+      - <a href="/images/sso-logos/checkly-icon-square.png" download target="_blank" rel="noopener noreferrer">Square icon</a>
+      - <a href="/images/sso-logos/checkly-logo-light-bg.png" download target="_blank" rel="noopener noreferrer">Logo for light backgrounds</a>
+      - <a href="/images/sso-logos/checkly-logo-dark-bg.png" download target="_blank" rel="noopener noreferrer">Logo for dark backgrounds</a>
+      - <a href="/images/sso-logos/checkly-wordmark-light-bg.png" download target="_blank" rel="noopener noreferrer">Wordmark for light backgrounds</a>
+      - <a href="/images/sso-logos/checkly-wordmark-dark-bg.png" download target="_blank" rel="noopener noreferrer">Wordmark for dark backgrounds</a>
     </Note>
 
     <Accordion title="Alternative process: manual setup">
@@ -71,7 +77,7 @@ The general process is detailed below, but please reach out to your customer suc
   <Step title="Test the connection">
     Test the connection by logging in to Checkly through your IdP dashboard.
 
-    Once logged in to Checkly, verify the SSO connection worked by going to the [Members page](https://app.checklyhq.com/accounts/settings/account/members) (Click the profile picture in the top right, select **Members**) and make sure there is a checkmark in the SSO column for your user:
+    Once logged in to Checkly, verify the SSO connection worked by going to the [Members page](https://app.checklyhq.com/accounts/settings/account/members) (open **Account settings** from the left sidebar, then select **Members**) and make sure there is a checkmark in the SSO column for your user:
 
     ![checkly members page SSO check mark screenshot](/images/sso-check-mark.png)
 
@@ -113,7 +119,7 @@ SP-initiated SSO happens when you login to Checkly directly by going to [app.che
 Using the "Continue with Google" or "Continue with Github" buttons will not redirect to SSO — you must use the email address field.
 </Warning>
 
-To check if SP-initiated SSO is enabled for your account, go to your [SSO configuration page](https://app.checklyhq.com/accounts/settings/account/sso-saml) and make sure the **Tenant Domain** field is filled. Email logins from those domains will route to your SSO connection.
+To check if SP-initiated SSO is enabled for your account, go to your [SSO configuration page](https://app.checklyhq.com/accounts/settings/account/sso-saml) and make sure the **Domain Aliases** field is filled. Email logins from those domains will route to your SSO connection.
 
 To update this setting, reach out to [support@checklyhq.com](mailto:support@checklyhq.com) with the email domain(s) that you'd like added.
 
@@ -123,7 +129,7 @@ When JIT is enabled, new users who sign in through your SSO connection will be a
 
 Users will be created with the default role specified on your [SSO settings page](https://app.checklyhq.com/settings/account/sso-saml), which the account owner can change at any time.
 
-We enable JIT by default when we set up your SSO connection. If you'd like JIT disabled, please let [our Support team](mailto:support@checklyhq.com) know.
+We enable JIT by default when we set up your SSO connection. The account owner can turn it off with the **JIT Provisioning** toggle on the [SSO settings page](https://app.checklyhq.com/settings/account/sso-saml).
 
 <Note>
   We only support JIT for a single tenant. If you have multiple tenants, our team will confirm which account you want JIT enabled for.
@@ -176,7 +182,19 @@ You can take several steps to make sure only SSO users are in your account:
 
 * Make sure [SP-initiated logins](/admin/team-management/single-sign-on#service-provider-sp-initiated) are enabled.
 * [Migrate all users to SSO.](/admin/team-management/single-sign-on#migrating-existing-users-to-sso)
-* Periodically remove non-SSO users. You can do this manually on the [Members page](https://app.checklyhq.com/settings/account/members) or automatically using our [CLI](/cli/checkly-members#checkly-members-update) or [public API](/api-reference/accounts/update-a-current-account-member-role).
+* Periodically remove non-SSO users. You can do this manually on the [Members page](https://app.checklyhq.com/settings/account/members) or automatically using our [CLI](/cli/checkly-members#checkly-members-delete) or [public API](/api-reference/accounts/remove-a-current-account-member).
 * Do not send invitations to users, since they can accept invitations with a non-SSO login. Instead, they should [login through SSO](/admin/team-management/single-sign-on#logging-in-with-sso) and be automatically [JIT provisioned](/admin/team-management/single-sign-on#just-in-time-jit-provisioning) to you account.
 
 Currently, there is no option to require SSO for account members. If you’d like to see this added, please let us know so we can record your interest as feedback.
+
+### My X.509 certificate or client secret is expiring. What should I do?
+
+Your X.509 certificate (for SAML connections) or client secret (for OIDC connections) must be replaced before it expires, otherwise your users won't be able to log in.
+
+If you have a SAML connection:
+* Our team will reach out when your X.509 certificate is about four weeks from expiring.
+* Your team must regenerate the certificate and then either send it to [support@checklyhq.com](mailto:support@checklyhq.com) securely and we'll update it, or we can send you a link to update it directly.
+
+If you have an OIDC connection:
+* Client secret expirations are not communicated to our authentication provider, so we won't know when your secret expires. You must check your IdP for the client secret expiration date. Some client secrets might not have an expiration.
+* Your team must regenerate the secret and then either send it to [support@checklyhq.com](mailto:support@checklyhq.com) securely and we'll update it, or we can send you a link to update it directly.

@@ -13,7 +13,7 @@ can find and fix the bug.
 The CLI sends a report only when all of these are true:
 
 - The error is a `TypeError`, `ReferenceError` or `RangeError`.
-- The error was raised in the CLI's own files, not in your code or in a package you installed.
+- The error was raised in the CLI's own files, not in one of its dependencies, your code or a package you installed.
 - The CLI is a release version from npm. Canary builds and local builds never send reports.
 - You have not turned error reporting off.
 
@@ -24,7 +24,8 @@ crash instead, that crash is reported, because the CLI should have caught the mi
 ## What a report contains
 
 - The error type, its message and the stack trace. Paths in the CLI's own files are shortened to the file inside the
-  CLI, for example `checkly/dist/commands/deploy.js`. Every other path is removed.
+  CLI, for example `checkly/dist/commands/deploy.js`. Paths in the CLI's dependencies start at `node_modules/`, for
+  example `node_modules/axios/lib/core/Axios.js`. Every other path is replaced with a placeholder.
 - The CLI version and the command name, for example `deploy`.
 - Whether the CLI runs in a terminal, in CI or for an AI agent.
 - Your operating system, CPU architecture and Node.js version.

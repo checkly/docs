@@ -5,8 +5,8 @@ sidebarTitle: 'Error reporting'
 canonical: 'https://www.checklyhq.com/docs/cli/error-reporting/'
 ---
 
-When the Checkly CLI crashes because of a bug in its own code, it sends one report about the crash to Checkly, so we
-can find and fix the bug.
+When the Checkly CLI crashes because of a bug in its own code, it sends one report about the crash to Checkly, so the
+bug can be found and fixed.
 
 ## When the CLI sends a report
 
@@ -14,7 +14,7 @@ The CLI sends a report only when all of these are true:
 
 - The error is a `TypeError`, `ReferenceError` or `RangeError`.
 - The error was raised in the CLI's own files, not in one of its dependencies, your code or a package you installed.
-- The CLI is a release version from npm. Canary builds and local builds never send reports.
+- The CLI is a release, release candidate or prerelease build. Canary builds and local builds never send reports.
 - You have not turned error reporting off.
 
 The CLI sends at most one report per command. Errors in your own code, failed checks, API errors and network problems

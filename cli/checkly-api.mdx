@@ -28,6 +28,8 @@ The basic command takes an API endpoint path and optional flags.
 npx checkly api <endpoint> [options]
 ```
 
+Responses with a JSON content type (`application/json` or a `+json` media type) are formatted as JSON. Attachments and other response bodies are streamed unchanged, without adding a trailing newline. If you use `--jq`, the response is parsed as JSON regardless of its content type. A non-JSON body produces an error.
+
 ## Arguments
 
 The command takes a single required argument.
@@ -133,6 +135,16 @@ Use `-H` to pass additional HTTP headers with the request. You can repeat the fl
 ```bash Terminal
 npx checkly api /v1/checks -H "Accept: application/json" -H "X-Custom-Header: value"
 ```
+
+### Download a file
+
+Redirect the response to a file. Replace `/path/to/file` with the relative API endpoint that returns your file. The command follows redirects and preserves the bytes of ZIP archives and other downloads.
+
+```bash Terminal
+npx checkly api /path/to/file > report.zip
+```
+
+Use the endpoint path rather than an absolute URL. Avoid `--include` when saving a file because it adds HTTP headers to the output. Attachments, including JSON files, retain their original bytes unless you use `--jq`.
 
 ### Inspect response headers
 

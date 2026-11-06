@@ -1,6 +1,9 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "aspen",
+  "icons": {
+    "library": "tabler"
+  },
   "name": "Checkly Docs",
   "colors": {
     "primary": "#0075FF",
@@ -71,11 +74,14 @@
                 "group": "Platform",
                 "pages": [
                   "platform/groups",
+                  "platform/filters",
+                  "platform/views",
                   {
                     "group": "Private Locations",
                     "pages": [
                       "platform/private-locations/overview",
                       "platform/private-locations/agent-configuration",
+"platform/private-locations/agent-metrics",
                       "platform/private-locations/agent-images",
                       "platform/private-locations/kubernetes-deployment",
                       "platform/private-locations/proxy-setup",
@@ -117,19 +123,16 @@
                     "group": "Team Management",
                     "pages": [
                       "admin/team-management/overview",
+                      "admin/team-management/permissions",
                       "admin/team-management/adding-team-members",
+                      "admin/team-management/managing-team-members",
+                      "admin/team-management/custom-roles",
                       "admin/team-management/multi-factor-authentication",
-                      {
-                        "group": "Single Sign-On",
-                        "pages": [
-                          "admin/team-management/single-sign-on",
-                          "admin/team-management/microsoft-azure-ad",
-                          "admin/team-management/saml"
-                        ]
-                      }
+                      "admin/team-management/single-sign-on"
                     ]
                   },
-                  "admin/changing-your-email-password"
+                  "admin/changing-your-email-password",
+                  "admin/deleting-your-account"
                 ]
               }
             ]
@@ -214,7 +217,6 @@
                       "detect/synthetic-monitoring/api-checks/quickstart",
                       "detect/synthetic-monitoring/api-checks/configuration",
                       "detect/synthetic-monitoring/api-checks/setup-and-teardown",
-                      "detect/synthetic-monitoring/api-checks/snippets",
                       "detect/synthetic-monitoring/api-checks/api-structure",
                       "detect/synthetic-monitoring/api-checks/client-certificates",
                       "detect/synthetic-monitoring/api-checks/openapi-spec",
@@ -243,7 +245,6 @@
                       "detect/synthetic-monitoring/browser-checks/performance-metrics",
                       "detect/synthetic-monitoring/browser-checks/visual-regressions",
                       "detect/synthetic-monitoring/browser-checks/playwright-support",
-                      "detect/synthetic-monitoring/browser-checks/snippets",
                       "detect/synthetic-monitoring/browser-checks/timeouts",
                       "detect/synthetic-monitoring/browser-checks/degraded",
                       "detect/synthetic-monitoring/browser-checks/troubleshooting"
@@ -258,7 +259,8 @@
                       "detect/synthetic-monitoring/playwright-checks/test-organization",
                       "detect/synthetic-monitoring/playwright-checks/performance-metrics",
                       "detect/synthetic-monitoring/playwright-checks/add-to-group",
-                      "detect/synthetic-monitoring/playwright-checks/custom-dependencies",
+                      "detect/synthetic-monitoring/playwright-checks/dependencies",
+                      "detect/synthetic-monitoring/playwright-checks/internal-registries",
                       "detect/synthetic-monitoring/playwright-checks/environment-variables",
                       "detect/synthetic-monitoring/playwright-checks/timeouts"
                     ]
@@ -298,6 +300,7 @@
                 "pages": [
                   "communicate/status-pages/overview",
                   "communicate/status-pages/creating-a-status-page",
+                  "communicate/status-pages/custom-domain",
                   "communicate/status-pages/customization",
                   "communicate/status-pages/password-protection",
                   "communicate/status-pages/incidents",
@@ -323,6 +326,7 @@
             "pages": [
               "resolve/overview",
               "resolve/ai-root-cause-analysis/overview",
+              "resolve/automatic-check-repair",
               {
                 "group": "Traces",
                 "pages": [
@@ -340,10 +344,7 @@
                   {
                     "group": "Exporting",
                     "pages": [
-                      "resolve/traces/export/grafana-tempo",
-                      "resolve/traces/export/honeycomb",
-                      "resolve/traces/export/new-relic",
-                      "resolve/traces/export/dash0"
+                      "resolve/traces/export/overview"
                     ]
                   },
                   {
@@ -369,6 +370,7 @@
             "group": "AI",
             "pages": [
               "ai/rocky-ai",
+              "ai/ai-assistant",
               {
                 "group": "Agent Resources",
                 "pages": [
@@ -378,6 +380,7 @@
                     "pages": [
                       "ai/mcp-server",
                       "ai/mcp-server/setup",
+                      "ai/mcp-server/interactive-views",
                       "ai/mcp-server/tools",
                       "ai/mcp-server/security-and-permissions",
                       "ai/mcp-server/troubleshooting"
@@ -457,9 +460,28 @@
               {
                 "group": "Observability",
                 "pages": [
-                  "integrations/observability/prometheus",
-                  "integrations/observability/prometheus-v2",
-                  "integrations/observability/coralogix"
+                  "integrations/observability/overview",
+                  {
+                    "group": "Metrics",
+                    "pages": [
+                      "integrations/observability/prometheus"
+                    ]
+                  },
+                  {
+                    "group": "Traces",
+                    "pages": [
+                      "integrations/observability/traces/otlp",
+                      "integrations/observability/coralogix",
+                      "integrations/observability/traces/chronosphere",
+                      "integrations/observability/traces/clickstack",
+                      "integrations/observability/traces/cribl",
+                      "integrations/observability/traces/dash0",
+                      "integrations/observability/traces/datadog",
+                      "integrations/observability/traces/grafana-tempo",
+                      "integrations/observability/traces/honeycomb",
+                      "integrations/observability/traces/new-relic"
+                    ]
+                  }
                 ]
               },
               {
@@ -475,7 +497,7 @@
                       "integrations/iac/terraform/ci-cd",
                       "integrations/iac/terraform/command-line-triggers",
                       "integrations/iac/terraform/testing-scripts-locally",
-                      "integrations/iac/terraform/snippets-variables",
+                      "integrations/iac/terraform/environment-variables",
                       "integrations/iac/terraform/troubleshooting"
                     ]
                   },
@@ -485,6 +507,7 @@
                       "integrations/iac/pulumi/overview",
                       "integrations/iac/pulumi/best-practices",
                       "integrations/iac/pulumi/setup",
+                      "integrations/iac/pulumi/examples",
                       "integrations/iac/pulumi/ci-cd"
                     ]
                   }
@@ -592,6 +615,7 @@
               "cli/dependencies",
               "cli/attaching-git-metadata",
               "cli/importing",
+              "cli/monitoring-pull-requests",
               "cli/cli-vs-terraform-pulumi"
             ]
           },
@@ -767,8 +791,27 @@
                       "api-reference/monitors/update-an-icmp-monitor"
                     ]
                   },
-                  "api-reference/monitors/create-an-ssl-monitor",
-                  "api-reference/monitors/update-an-ssl-monitor"
+                  {
+                    "group": "SSL Monitor",
+                    "pages": [
+                      "api-reference/monitors/create-an-ssl-monitor",
+                      "api-reference/monitors/update-an-ssl-monitor"
+                    ]
+                  },
+                  {
+                    "group": "Traceroute Monitor",
+                    "pages": [
+                      "api-reference/monitors/create-a-traceroute-monitor",
+                      "api-reference/monitors/update-a-traceroute-monitor"
+                    ]
+                  },
+                  {
+                    "group": "gRPC Monitor",
+                    "pages": [
+                      "api-reference/monitors/create-a-grpc-monitor",
+                      "api-reference/monitors/update-a-grpc-monitor"
+                    ]
+                  }
                 ]
               },
               {
@@ -946,13 +989,17 @@
                 ]
               },
               {
-                "group": "Snippets",
+                "group": "Usage",
                 "pages": [
-                  "api-reference/snippets/list-all-snippets",
-                  "api-reference/snippets/create-a-snippet",
-                  "api-reference/snippets/retrieve-a-snippet",
-                  "api-reference/snippets/update-a-snippet",
-                  "api-reference/snippets/delete-a-snippet"
+                  "api-reference/usage/overview",
+                  "api-reference/openapi.json GET /v2/usage/terms",
+                  "api-reference/openapi.json GET /v2/usage/series",
+                  "api-reference/openapi.json GET /v2/usage/summary",
+                  "api-reference/openapi.json GET /v2/usage/terms/{id}",
+                  "api-reference/openapi.json GET /v2/usage/terms/{id}/projections",
+                  "api-reference/usage/get-usage-terms",
+                  "api-reference/usage/get-usage-summary",
+                  "api-reference/usage/get-usage-series"
                 ]
               },
               {
@@ -1028,52 +1075,57 @@
                 ]
               },
               {
-                "group": "Status Pages v1 (deprecated)",
+                "group": "Status Pages v1",
                 "pages": [
-                  "api-reference/status-pages/retrieve-all-status-pages",
-                  "api-reference/status-pages/create-a-new-status-page",
-                  "api-reference/status-pages/retrieve-a-single-status-page-by-id",
-                  "api-reference/status-pages/update-an-existing-status-page",
-                  "api-reference/status-pages/delete-a-status-page"
-                ]
+                  "api-reference/openapi.json GET /v1/status-pages",
+                  "api-reference/openapi.json POST /v1/status-pages",
+                  "api-reference/openapi.json GET /v1/status-pages/{statusPageId}",
+                  "api-reference/openapi.json PUT /v1/status-pages/{statusPageId}",
+                  "api-reference/openapi.json DELETE /v1/status-pages/{statusPageId}"
+                ],
+                "tag": "Deprecated"
               },
               {
-                "group": "Status Page Incidents v1 (deprecated)",
+                "group": "Status Page Incidents v1",
                 "pages": [
-                  "api-reference/status-page-incidents/retrieve-the-latest-incidents-with-pagination",
-                  "api-reference/status-page-incidents/create-a-new-incident",
-                  "api-reference/status-page-incidents/retrieve-an-incident-by-id",
-                  "api-reference/status-page-incidents/update-an-existing-incident",
-                  "api-reference/status-page-incidents/delete-an-incident"
-                ]
+                  "api-reference/openapi.json GET /v1/status-pages/incidents",
+                  "api-reference/openapi.json POST /v1/status-pages/incidents",
+                  "api-reference/openapi.json GET /v1/status-pages/incidents/{incidentId}",
+                  "api-reference/openapi.json PUT /v1/status-pages/incidents/{incidentId}",
+                  "api-reference/openapi.json DELETE /v1/status-pages/incidents/{incidentId}"
+                ],
+                "tag": "Deprecated"
               },
               {
-                "group": "Status Page Incident Updates v1 (deprecated)",
+                "group": "Status Page Incident Updates v1",
                 "pages": [
-                  "api-reference/status-page-incidents/retrieve-the-100-latest-incident-updates-of-a-specific-incident",
-                  "api-reference/status-page-incidents/add-a-new-incident-update-to-a-specific-incident",
-                  "api-reference/status-page-incidents/retrieve-an-incident-update-by-id",
-                  "api-reference/status-page-incidents/update-an-existing-incident-update",
-                  "api-reference/status-page-incidents/delete-an-incident-update"
-                ]
+                  "api-reference/openapi.json GET /v1/status-pages/incidents/{incidentId}/incident-updates",
+                  "api-reference/openapi.json POST /v1/status-pages/incidents/{incidentId}/incident-updates",
+                  "api-reference/openapi.json GET /v1/status-pages/incidents/{incidentId}/incident-updates/{incidentUpdateId}",
+                  "api-reference/openapi.json PUT /v1/status-pages/incidents/{incidentId}/incident-updates/{incidentUpdateId}",
+                  "api-reference/openapi.json DELETE /v1/status-pages/incidents/{incidentId}/incident-updates/{incidentUpdateId}"
+                ],
+                "tag": "Deprecated"
               },
               {
-                "group": "Status Page Services v1 (deprecated)",
+                "group": "Status Page Services v1",
                 "pages": [
-                  "api-reference/status-page-services/get-all-services",
-                  "api-reference/status-page-services/create-a-service",
-                  "api-reference/status-page-services/get-a-single-service",
-                  "api-reference/status-page-services/update-a-service",
-                  "api-reference/status-page-services/delete-a-service"
-                ]
+                  "api-reference/openapi.json GET /v1/status-pages/services",
+                  "api-reference/openapi.json POST /v1/status-pages/services",
+                  "api-reference/openapi.json GET /v1/status-pages/services/{serviceId}",
+                  "api-reference/openapi.json PUT /v1/status-pages/services/{serviceId}",
+                  "api-reference/openapi.json DELETE /v1/status-pages/services/{serviceId}"
+                ],
+                "tag": "Deprecated"
               },
               {
-                "group": "Status Page Subscribers v1 (deprecated)",
+                "group": "Status Page Subscribers v1",
                 "pages": [
-                  "api-reference/status-pages/get-all-subscriptions-for-a-specific-status-page",
-                  "api-reference/status-pages/bulk-create-subscriptions-for-a-specific-status-page",
-                  "api-reference/status-pages/delete-a-subscription-belonging-to-a-specific-status-page"
-                ]
+                  "api-reference/openapi.json GET /v1/status-pages/{statusPageId}/subscriptions",
+                  "api-reference/openapi.json POST /v1/status-pages/{statusPageId}/subscriptions/bulk",
+                  "api-reference/openapi.json DELETE /v1/status-pages/{statusPageId}/subscriptions/{subscriptionId}"
+                ],
+                "tag": "Deprecated"
               },
               {
                 "group": "Test Sessions",
@@ -1117,62 +1169,47 @@
         "tab": "Guides",
         "groups": [
           {
-            "group": "Overview",
+            "group": "Getting Started",
             "pages": [
-              "guides/overview"
-            ]
-          },
-          {
-            "group": "AI and LLMs",
-            "pages": [
-              "guides/agentic-workflows"
-            ]
-          },
-          {
-            "group": "Monitoring Guides",
-            "pages": [
-              "guides/end-to-end-monitoring",
-              "guides/startup-guide-detect-communicate-resolve",
-              "guides/getting-started-with-monitoring-as-code",
-              "guides/empowering-developers-with-checkly",
-              "guides/communicate-availability",
+              "guides/overview",
+              "guides/structuring-a-checkly-project",
               "guides/playwright-testing-to-monitoring",
+              "guides/agentic-workflows",
+              "guides/global-monitoring"
+            ]
+          },
+          {
+            "group": "Detect",
+            "pages": [
               "guides/uptime-monitoring",
+              "guides/api-monitoring",
               "guides/keyword-monitoring",
               "guides/sdlc-monitoring",
-              "guides/create-multiple-monitors"
-            ]
-          },
-          {
-            "group": "API Monitoring",
-            "pages": [
-              "guides/monitoring-an-openapi-spec",
-              "guides/monitoring-the-stripe-api",
               "guides/setup-scripts-for-apis"
             ]
           },
           {
-            "group": "E-commerce Monitoring",
+            "group": "Communicate",
             "pages": [
-              "guides/monitoring-ecommerce-apps-using-playwright",
-              "guides/monitoring-ecommerce-apps-using-terraform"
+              "guides/alerting",
+              "guides/communicate-availability"
             ]
           },
           {
-            "group": "Playwright Guides",
+            "group": "Resolve",
             "pages": [
-              "guides/moving-from-puppeteer-to-playwright",
-              "guides/developer-fixtures",
-              "guides/auto-waiting-methods",
               "guides/reading-traces",
-              "guides/playwright-environments"
+              "guides/agent-driven-repair"
             ]
           },
           {
-            "group": "Advanced Topics",
+            "group": "Examples",
             "pages": [
               "guides/claude-code-monitoring",
-              "guides/how-to-monitor-broken-links"
+              "guides/monitoring-ecommerce-apps-using-playwright",
+              "guides/monitoring-ecommerce-apps-using-terraform",
+              "guides/monitoring-the-stripe-api",
+              "guides/monitoring-an-openapi-spec"
             ]
           }
         ]
@@ -1272,7 +1309,7 @@
           },
           {
             "dropdown": "Incidents",
-            "icon": "triangle-exclamation",
+            "icon": "alert-triangle",
             "pages": [
               "learn/incidents/overview",
               {
@@ -1321,7 +1358,7 @@
           },
           {
             "dropdown": "Kubernetes",
-            "icon": "dharmachakra",
+            "icon": "steering-wheel",
             "pages": [
               "learn/kubernetes/overview",
               "learn/kubernetes/centralized-logging",
@@ -1350,6 +1387,7 @@
                 "group": "Monitoring Concepts",
                 "pages": [
                   "learn/monitoring/api-monitoring",
+                  "learn/monitoring/end-to-end-monitoring",
                   "learn/monitoring/frontend-monitoring",
                   "learn/monitoring/monitoring-as-code",
                   "learn/monitoring/real-user-monitoring",
@@ -1370,7 +1408,7 @@
           },
           {
             "dropdown": "OpenTelemetry",
-            "icon": "satellite-dish",
+            "icon": "satellite",
             "pages": [
               "learn/opentelemetry/overview",
               {
@@ -1406,11 +1444,17 @@
         "tab": "Comparisons",
         "groups": [
           {
-            "group": "Frameworks",
+            "group": "Playwright Comparisons",
             "pages": [
               "comparisons/frameworks/playwright-vs-cypress",
               "comparisons/frameworks/playwright-vs-selenium",
-              "comparisons/frameworks/playwright-vs-others"
+              "comparisons/frameworks/playwright-vs-puppeteer"
+            ]
+          },
+          {
+            "group": "Migrations",
+            "pages": [
+              "comparisons/frameworks/moving-from-puppeteer-to-playwright"
             ]
           }
         ]
@@ -1453,6 +1497,102 @@
     }
   },
   "redirects": [
+    {
+      "source": "/detect/synthetic-monitoring/api-checks/examples",
+      "destination": "/detect/synthetic-monitoring/api-checks/setup-and-teardown"
+    },
+    {
+      "source": "/detect/synthetic-monitoring/browser-checks/best-practices",
+      "destination": "/detect/synthetic-monitoring/browser-checks/overview"
+    },
+    {
+      "source": "/detect/synthetic-monitoring/api-checks/best-practices",
+      "destination": "/detect/synthetic-monitoring/api-checks/overview"
+    },
+    {
+      "source": "/detect/uptime-monitoring/heartbeat-monitors/iac-configuration",
+      "destination": "/constructs/heartbeat-monitor"
+    },
+    {
+      "source": "/detect/uptime-monitoring/heartbeat-monitors/cli-configuration",
+      "destination": "/constructs/heartbeat-monitor"
+    },
+    {
+      "source": "/detect/uptime-monitoring/heartbeat-monitors/cron-configuration",
+      "destination": "/detect/uptime-monitoring/heartbeat-monitors/examples"
+    },
+    {
+      "source": "/detect/uptime-monitoring/heartbeat-monitors/ci-cd-configuration",
+      "destination": "/detect/uptime-monitoring/heartbeat-monitors/examples"
+    },
+    {
+      "source": "/detect/uptime-monitoring/heartbeat-monitors/other",
+      "destination": "/detect/uptime-monitoring/heartbeat-monitors/examples"
+    },
+    {
+      "source": "/detect/uptime-monitoring/alerting",
+      "destination": "/communicate/alerts/overview"
+    },
+    {
+      "source": "/detect/uptime-monitoring/locations",
+      "destination": "/concepts/locations"
+    },
+    {
+      "source": "/detect/uptime-monitoring/scheduling",
+      "destination": "/concepts/scheduling"
+    },
+    {
+      "source": "/detect/uptime-monitoring/cli-configuration",
+      "destination": "/detect/uptime-monitoring/overview"
+    },
+    {
+      "source": "/detect/uptime-monitoring/tcp-monitors/use-cases",
+      "destination": "/detect/uptime-monitoring/tcp-monitors/overview"
+    },
+    {
+      "source": "/concepts/monitors",
+      "destination": "/detect/uptime-monitoring/overview"
+    },
+    {
+      "source": "/communicate/alerts/best-practices",
+      "destination": "/communicate/alerts/overview"
+    },
+    {
+      "source": "/guides/auto-waiting-methods",
+      "destination": "/learn/playwright/waits-and-timeouts"
+    },
+    {
+      "source": "/guides/developer-fixtures",
+      "destination": "/learn/playwright/test-fixtures"
+    },
+    {
+      "source": "/guides/moving-from-puppeteer-to-playwright",
+      "destination": "/comparisons/frameworks/moving-from-puppeteer-to-playwright"
+    },
+    {
+      "source": "/guides/how-to-monitor-broken-links",
+      "destination": "/learn/playwright/how-to-detect-broken-links"
+    },
+    {
+      "source": "/comparisons/frameworks/playwright-vs-others",
+      "destination": "/comparisons/frameworks/playwright-vs-puppeteer"
+    },
+    {
+      "source": "/guides/end-to-end-monitoring",
+      "destination": "/learn/monitoring/end-to-end-monitoring"
+    },
+    {
+      "source": "/guides/create-multiple-monitors",
+      "destination": "/guides/uptime-monitoring"
+    },
+    {
+      "source": "/admin/team-management/saml",
+      "destination": "/admin/team-management/single-sign-on"
+    },
+    {
+      "source": "/admin/team-management/microsoft-azure-ad",
+      "destination": "/admin/team-management/single-sign-on"
+    },
     {
       "source": "/quickstarts/general",
       "destination": "/quickstart"
@@ -2038,26 +2178,6 @@
       "destination": "/api-reference/runtimes/shows-details-for-one-specific-runtime"
     },
     {
-      "source": "/reference/getv1snippets",
-      "destination": "/api-reference/snippets/list-all-snippets"
-    },
-    {
-      "source": "/reference/postv1snippets",
-      "destination": "/api-reference/snippets/create-a-snippet"
-    },
-    {
-      "source": "/reference/deletev1snippetsid",
-      "destination": "/api-reference/snippets/delete-a-snippet"
-    },
-    {
-      "source": "/reference/getv1snippetsid",
-      "destination": "/api-reference/snippets/retrieve-a-snippet"
-    },
-    {
-      "source": "/reference/putv1snippetsid",
-      "destination": "/api-reference/snippets/update-a-snippet"
-    },
-    {
       "source": "/reference/getv1staticips",
       "destination": "/api-reference/static-ips/lists-all-source-ips-for-check-runs"
     },
@@ -2290,7 +2410,147 @@
       "destination": "/api-reference/overview#authentication"
     },
     {
+      "source": "/integrations/iac/terraform/snippets-variables",
+      "destination": "/integrations/iac/terraform/environment-variables"
+    },
+    {
+      "source": "/api-reference/snippets/:slug*",
+      "destination": "/api-reference/overview"
+    },
+    {
+      "source": "/detect/synthetic-monitoring/api-checks/snippets",
+      "destination": "/detect/synthetic-monitoring/api-checks/setup-and-teardown"
+    },
+    {
+      "source": "/detect/synthetic-monitoring/browser-checks/snippets",
+      "destination": "/detect/synthetic-monitoring/browser-checks/overview"
+    },
+    {
+      "source": "/platform/snippets/:slug*",
+      "destination": "/detect/synthetic-monitoring/browser-checks/overview"
+    },
+    {
       "source": "/reference/:slug*",
+      "destination": "/api-reference/overview"
+    },
+    {
+      "source": "/guides/playwright-environments",
+      "destination": "/guides/playwright-testing-to-monitoring"
+    },
+    {
+      "source": "/guides/getting-started-with-monitoring-as-code",
+      "destination": "/guides/structuring-a-checkly-project"
+    },
+    {
+      "source": "/guides/startup-guide-detect-communicate-resolve",
+      "destination": "/guides/structuring-a-checkly-project"
+    },
+    {
+      "source": "/guides/empowering-developers-with-checkly",
+      "destination": "/concepts/monitoring-as-code"
+    },
+    {
+      "source": "/detect/synthetic-monitoring/playwright-checks/custom-dependencies",
+      "destination": "/detect/synthetic-monitoring/playwright-checks/dependencies"
+    },
+    {
+      "source": "/detect/synthetic-monitoring/playwright-checks/private-packages-and-internal-registries",
+      "destination": "/detect/synthetic-monitoring/playwright-checks/internal-registries"
+    },
+    {
+      "source": "/resolve/traces/export/grafana-tempo",
+      "destination": "/integrations/observability/traces/grafana-tempo"
+    },
+    {
+      "source": "/resolve/traces/export/honeycomb",
+      "destination": "/integrations/observability/traces/honeycomb"
+    },
+    {
+      "source": "/resolve/traces/export/new-relic",
+      "destination": "/integrations/observability/traces/new-relic"
+    },
+    {
+      "source": "/resolve/traces/export/dash0",
+      "destination": "/integrations/observability/traces/dash0"
+    },
+    {
+      "source": "/resolve/traces/export/to-chronosphere",
+      "destination": "/integrations/observability/traces/chronosphere"
+    },
+    {
+      "source": "/integrations/observability/prometheus-v2",
+      "destination": "/integrations/observability/prometheus"
+    },
+    {
+      "source": "/platform/rocky-ai",
+      "destination": "/ai/rocky-ai"
+    },
+    {
+      "source": "/resolve/rocky-ai",
+      "destination": "/ai/rocky-ai"
+    },
+    {
+      "source": "/resolve/error-analysis/overview",
+      "destination": "/resolve/ai-root-cause-analysis/overview"
+    },
+    {
+      "source": "/cli/getting-started",
+      "destination": "/cli/overview"
+    },
+    {
+      "source": "/cli/basic-workflow",
+      "destination": "/cli/overview"
+    },
+    {
+      "source": "/changelog/overview",
+      "destination": "/changelog/changelog"
+    },
+    {
+      "source": "/changelog/private-locations",
+      "destination": "/platform/private-locations/change-log"
+    },
+    {
+      "source": "/integrations/playwright-reporter",
+      "destination": "/detect/testing/playwright-reporter"
+    },
+    {
+      "source": "/integrations/alerts/ilert",
+      "destination": "/integrations/incident-management/ilert"
+    },
+    {
+      "source": "/integrations/alerts/spike",
+      "destination": "/integrations/incident-management/spike"
+    },
+    {
+      "source": "/detect/testing/alerting",
+      "destination": "/communicate/alerts/channels"
+    },
+    {
+      "source": "/detect/testing/test-results",
+      "destination": "/detect/testing/overview"
+    },
+    {
+      "source": "/constructs/quickstarts/browser-check",
+      "destination": "/constructs/browser-check"
+    },
+    {
+      "source": "/platform/private-locations/quick-start",
+      "destination": "/platform/private-locations/overview"
+    },
+    {
+      "source": "/platform/private-locations/cli-integration",
+      "destination": "/constructs/private-location"
+    },
+    {
+      "source": "/platform/private-locations/use-cases",
+      "destination": "/platform/private-locations/overview"
+    },
+    {
+      "source": "/api-reference/cancel/cancel-a-session",
+      "destination": "/concepts/cancellation"
+    },
+    {
+      "source": "/api-reference/opentelemetry/post-accounts-metrics",
       "destination": "/api-reference/overview"
     }
   ]

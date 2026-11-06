@@ -19,7 +19,7 @@ Taking a look at the ‘Language APIs and SDKs’ section of the OpenTelemetry d
 
 *A table of language-framework support for OpenTelemetry Signals, retrieved in March 2025*
 
-In fact only Java, C, and PHP have ‘stable’ logs support. Is this a cause for concern? In a word ‘no’, this table covers whether, when using the OpenTelemetry SDK, you can make a call to this SDK to emit logging. It is true that in many SDKs this isn’t yet fully supported, but this shouldn’t be a great concern to you because **you are already emitting logging just fine** in your production environment. There are lots of ways to add logging to the signals being handled by the OpenTelemetry collector and your OpenTelemetry datastore, which hook in to your current logging streams.
+In fact only a handful of languages, such as Java, C++ and PHP, had ‘stable’ logs support at the time. See the [current status table](https://opentelemetry.io/docs/languages/) for the latest. Is this a cause for concern? In a word ‘no’, this table covers whether, when using the OpenTelemetry SDK, you can make a call to this SDK to emit logging. It is true that in many SDKs this isn’t yet fully supported, but this shouldn’t be a great concern to you because **you are already emitting logging just fine** in your production environment. There are lots of ways to add logging to the signals being handled by the OpenTelemetry collector and your OpenTelemetry datastore, which hook in to your current logging streams.
 
 ## OpenTelemetry and Structured Logging
 
@@ -141,7 +141,7 @@ This is fragile work. A typo in a log line can break parsing. Correlating logs w
 The Collector acts as a **universal log processor**. It can:
 
 1. **Read logs from files/stdout** – No app changes needed.
-2. **Auto-add context** – Injects `trace_id`, Kubernetes labels, and more.
+2. **Auto-add context** – Adds resource metadata such as Kubernetes labels.
 3. **Convert to OTLP** – Sends logs in OpenTelemetry’s clean, structured format.
 
 **Bonus:** It does the same for traces and metrics—enriching all signals consistently.
@@ -164,14 +164,14 @@ The Collector acts as a **universal log processor**. It can:
 
 No more editing every `log.info()` call! The Collector handles:
 
-- **Trace context** (auto-injects `trace_id`/`span_id`)
+- **Trace context** (keeps `trace_id`/`span_id` that your app or a logging bridge already wrote, or parses them out of the log line)
 - **Resource attributes** (like `k8s.pod.name`)
 - **Routing** (send logs to Loki, Splunk, etc.)
 
 ### Why This Wins
 
 - **No more "log soup"** – Every log line has rich, queryable fields.
-- **Correlation just works** – Logs link to traces automatically.
+- **Easier correlation** – Logs that carry a trace ID link to their traces.
 - **One tool to rule them all** – Same Collector works for logs, traces, and metrics.
 
 How to get started? Start with file collection, then phase in direct OTLP for critical apps.
@@ -184,7 +184,7 @@ The power of OpenTelemetry logging lies in its structured approach. Rather than 
 
 While it's true that not all language SDKs currently offer full logging support, this gap matters less than one might think. The OpenTelemetry Collector provides a powerful bridge, capable of processing existing log files and enriching them with contextual metadata. Whether through direct instrumentation or collector-based processing, teams can start benefiting from better log integration today.
 
-The Collector deserves special attention as the workhorse of OpenTelemetry logging. It handles the messy realities of log collection - file tailing, parsing various formats, and log rotation - while adding valuable context like trace IDs and Kubernetes metadata. This happens automatically, without requiring changes to application code. For organizations running diverse systems, this represents a practical path to better observability.
+The Collector deserves special attention as the workhorse of OpenTelemetry logging. It handles the messy realities of log collection - file tailing, parsing various formats, and log rotation - while adding valuable context like Kubernetes metadata, without requiring changes to application code. Trace IDs still have to come from the application, through an OpenTelemetry SDK or a logging bridge. For organizations running diverse systems, this represents a practical path to better observability.
 
 Looking ahead, OpenTelemetry's vision for logging is clear: logs should be first-class citizens in observability, not isolated artifacts. As the ecosystem matures, we can expect tighter integration between logging SDKs and collectors, making context-rich logging the default rather than the exception.
 

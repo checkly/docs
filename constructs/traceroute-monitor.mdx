@@ -50,8 +50,8 @@ new TracerouteMonitor('traceroute-db', {
   activated: true,
   frequency: Frequency.EVERY_10M,
   locations: ['us-east-1', 'eu-central-1'],
-  degradedResponseTime: 10000,
-  maxResponseTime: 20000,
+  degradedResponseTime: 500,
+  maxResponseTime: 1000,
   request: {
     url: 'db.example.com',
     protocol: 'TCP',
@@ -82,8 +82,8 @@ Traceroute monitors have their own probe-specific settings, plus the standard mo
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `request` | `object` | ✅ | - | Traceroute request configuration object |
-| `degradedResponseTime` | `number` | ❌ | `10000` | Final-hop avg RTT in milliseconds at which the monitor is marked as degraded |
-| `maxResponseTime` | `number` | ❌ | `20000` | Final-hop avg RTT in milliseconds at which the monitor is marked as failed |
+| `degradedResponseTime` | `number` | ❌ | `500` | Final-hop avg RTT in milliseconds at which the monitor is marked as degraded |
+| `maxResponseTime` | `number` | ❌ | `1000` | Final-hop avg RTT in milliseconds at which the monitor is marked as failed |
 
 </Tab>
 <Tab title="General Monitor Settings">
@@ -132,8 +132,8 @@ new TracerouteMonitor('traceroute-monitor', {
 
 </ResponseField>
 
-<ResponseField name="degradedResponseTime" type="number" default="10000">
-Final-hop average RTT in milliseconds at which the monitor is marked as degraded (warning state). Maximum: 30,000.
+<ResponseField name="degradedResponseTime" type="number" default="500">
+Final-hop average RTT in milliseconds at which the monitor is marked as degraded (warning state). Maximum: 30,000. Without `maxResponseTime`, values above 1,000 are rejected. A monitor can't show as degraded when the two limits are equal.
 
 **Usage:**
 
@@ -141,7 +141,7 @@ Final-hop average RTT in milliseconds at which the monitor is marked as degraded
 ```ts highlight={3}
 new TracerouteMonitor("traceroute-latency-tiers", {
   name: "API Network Path",
-  degradedResponseTime: 5000, // Warn when final-hop avg RTT exceeds 5 seconds
+  degradedResponseTime: 300, // Warn when final-hop avg RTT reaches 300 ms
   request: {
     url: 'api.example.com',
   },
@@ -149,8 +149,8 @@ new TracerouteMonitor("traceroute-latency-tiers", {
 ```
 </ResponseField>
 
-<ResponseField name="maxResponseTime" type="number" default="20000">
-Final-hop average RTT in milliseconds at which the monitor is marked as failed. Maximum: 30,000.
+<ResponseField name="maxResponseTime" type="number" default="1000">
+Final-hop average RTT in milliseconds at which the monitor is marked as failed. Maximum: 30,000. Without `degradedResponseTime`, values above 0 and below 500 are rejected. A monitor can't show as degraded when the two limits are equal.
 
 **Usage:**
 
@@ -158,7 +158,7 @@ Final-hop average RTT in milliseconds at which the monitor is marked as failed. 
 ```ts highlight={3}
 new TracerouteMonitor("traceroute-latency-tiers", {
   name: "API Network Path",
-  maxResponseTime: 15000, // Fail when final-hop avg RTT exceeds 15 seconds
+  maxResponseTime: 800, // Fail when final-hop avg RTT reaches 800 ms
   request: {
     url: 'api.example.com',
   },

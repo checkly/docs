@@ -1,0 +1,33 @@
+---
+title: 'Usage and check runs'
+description: 'What counts as a check run, how uptime monitors are billed, and where to see your usage.'
+sidebarTitle: 'Usage and check runs'
+canonical: 'https://www.checklyhq.com/docs/admin/usage/'
+---
+
+Synthetic checks, such as API, Browser and Multistep checks and Playwright Check Suites, use check runs from your plan. Uptime monitors don't use check runs: they're billed by the number of monitors. See [pricing](https://www.checklyhq.com/pricing/) for what your plan includes.
+
+## What counts as a check run
+
+Every time a check runs, it uses check runs. That includes scheduled runs, runs you start with **Schedule now**, and test runs from the check editor. On top of that:
+
+- **Locations:** each location counts. A check that runs from three locations in parallel uses three check runs each time it's scheduled.
+- **Retries:** each retry is another check run. A flaky check that often retries uses noticeably more.
+- **Multistep checks:** each HTTP request the check makes counts as one API check run, with at least one per run.
+- **Playwright Check Suites:** each started 30 seconds of run time counts as one Browser check run.
+
+For example, an API check that runs every hour from two locations in parallel uses 48 check runs a day. Each retry adds one more.
+
+To use fewer check runs, lower the frequency of checks that don't need it, run from fewer locations, or use round-robin instead of [parallel scheduling](/concepts/scheduling), and fix flaky checks so they retry less.
+
+## Uptime monitors
+
+URL, TCP, DNS, ICMP, SSL, traceroute and gRPC monitors are billed by how many monitors you have, not by how often they run. Their runs don't use check runs.
+
+## Seeing your usage
+
+Open **Settings** and, under **Account**, select [**Billing & usage**](https://app.checklyhq.com/settings/account/billing). It shows the usage for the whole account in the current billing period.
+
+## Usage emails
+
+On Starter and Team plans, users who can manage billing (Owners and Admins by default) get an email when the account has used more than 90% of the check runs included in its plan, and another one when it goes over and starts incurring overages.

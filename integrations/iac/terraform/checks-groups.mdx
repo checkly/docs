@@ -323,7 +323,7 @@ Move the existing group to the new resource type instead, so the group and its c
    terraform import checkly_check_group_v2.key-shop-flows <group-id>
    ```
 
-5. Run `terraform plan`. It must not destroy any resources; an in-place update of the group is expected. Then run `terraform apply`.
+5. Run `terraform plan`. It must not destroy or replace any resource. An in-place update of the group is expected; check that it only turns off `enforce_*` settings you meant to drop. Then run `terraform apply`.
 
 ### Deleting a group
 

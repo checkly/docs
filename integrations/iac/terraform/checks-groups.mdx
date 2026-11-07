@@ -228,28 +228,32 @@ resource "checkly_tcp_monitor" "example-tcp-monitor-2" {
 
 ## Groups
 
-Once you start having more than just a handful of checks, it makes sense to start looking into [groups](/platform/groups) to keep things tidy:
+Once you start having more than just a handful of checks, it makes sense to start looking into [groups](/platform/groups) to keep things tidy. Use the `checkly_check_group_v2` resource (available since provider version 1.20.0). A v2 group doesn't override any settings of its checks unless you ask it to, so it can be as simple as a name:
 
 ```terraform
-resource "checkly_check_group" "key-shop-flows" {
-  name      = "Key Shop Flows"  // The name of the group
-  activated = true              // Whether the group will start as active on creation
-  muted     = false             // Whether the group will start as muted on creation
+resource "checkly_check_group_v2" "key-shop-flows" {
+  name = "Key Shop Flows"
+}
+```
 
-  locations = [                 // Which locations the check should run from (if not in a group)
-    "eu-west-1",
-    "eu-central-1"
-  ]
+To have the group override a setting for all of its checks, add the matching `enforce_*` block and set `enabled = true`. The available blocks are `enforce_locations`, `enforce_retry_strategy`, `enforce_scheduling_strategy` and `enforce_alert_settings`:
 
-  concurrency               = 3     // How many checks to run at once when triggering the group using CI/CD triggers
-  use_global_alert_settings = false // Whether to use global alert settings or group-specific ones
-  run_parallel              = true  // Whether the check would run in a single location at time (round-robin) or all locations on each run
+```terraform
+resource "checkly_check_group_v2" "key-shop-flows" {
+  name        = "Key Shop Flows"
+  activated   = true
+  muted       = false
+  concurrency = 3 // How many checks to run at once when triggering the group using CI/CD triggers
 
-  retry_strategy {                // The retry strategy used for failed runs
-    type = "LINEAR"
+  // All checks in this group run from these locations, regardless of their own settings
+  enforce_locations {
+    enabled   = true
+    locations = ["eu-west-1", "eu-central-1"]
   }
 }
 ```
+
+The older `checkly_check_group` resource still works, but it always applies group-level defaults to its checks. See [migrating to `checkly_check_group_v2`](#migrating-to-checkly_check_group_v2) below.
 
 ### Adding checks to groups
 
@@ -270,7 +274,7 @@ resource "checkly_check" "get-books" {
   ]
 
   // This makes the check part of the group
-  group_id = checkly_check_group.key-shop-flows.id
+  group_id = checkly_check_group_v2.key-shop-flows.id
 
   retry_strategy {
     type = "LINEAR"
@@ -289,6 +293,42 @@ resource "checkly_check" "get-books" {
 }
 ```
 
-> Locations and alert channel subscriptions defined at group level always trump the ones defined at check level. Double-check your config to make sure all checks are running from the intended regions and are set to alert on the correct channels.
+> With a `checkly_check_group_v2` group, a check keeps its own settings unless the group enables the matching `enforce_*` block. With the older `checkly_check_group`, locations and alert channel subscriptions defined at group level always override the ones defined at check level.
 
-You can see all the configuration options for groups, as well as more examples, on the official Terraform registry [documentation page](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/check_group).
+### Migrating to `checkly_check_group_v2`
+
+<Warning>
+Don't migrate by only changing the resource type from `checkly_check_group` to `checkly_check_group_v2`. Terraform then deletes the old group and creates a new one, and **deleting a group deletes every check in it**. Terraform recreates the checks afterwards, but with new IDs and without their result history.
+</Warning>
+
+Move the existing group to the new resource type instead, so the group and its checks stay in place:
+
+1. Note the group's ID:
+
+   ```bash
+   terraform state show checkly_check_group.key-shop-flows
+   ```
+
+2. In your configuration, replace the `checkly_check_group` resource with a `checkly_check_group_v2` resource with the same name. To keep the old behavior, add `enforce_*` blocks for the settings the old group set, such as locations, retry strategy, scheduling strategy and alert settings. Update every reference, for example `group_id = checkly_check_group_v2.key-shop-flows.id`.
+
+3. Remove the old resource from the Terraform state. This doesn't change anything in Checkly:
+
+   ```bash
+   terraform state rm checkly_check_group.key-shop-flows
+   ```
+
+4. Import the existing group as the new resource, using the ID from step 1:
+
+   ```bash
+   terraform import checkly_check_group_v2.key-shop-flows <group-id>
+   ```
+
+5. Run `terraform plan`. It must not destroy any resources; an in-place update of the group is expected. Then run `terraform apply`.
+
+### Deleting a group
+
+<Warning>
+Deleting a group also deletes all checks in it. To keep the checks, first remove `group_id` from them and apply that change. Then remove the group from your configuration and apply again.
+</Warning>
+
+You can see all the configuration options for groups, as well as more examples, on the Terraform registry documentation pages for [`checkly_check_group_v2`](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/check_group_v2) and [`checkly_check_group`](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/check_group).

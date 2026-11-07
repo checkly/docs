@@ -71,7 +71,7 @@ To test the whole flow, from a failing check to a notification:
 
 1. Make a deployed check fail, for example by changing an assertion so it can't pass. Pick a check that is subscribed only to the channels you want to test: every subscribed channel gets the alert.
 2. Select **Schedule now** on the check, or run [`npx checkly checks run`](/cli/checkly-checks#checkly-checks-run). These are normal monitoring runs, so they follow your alert settings. Runs from the check editor and test sessions started with `npx checkly test` or `npx checkly trigger` never send alerts.
-3. If your threshold is higher than one failure, for example "alert after 2 failures", schedule more runs until it's reached. Alerts are sent when a check changes state and the threshold is met, not for every failed run.
+3. If your threshold is more than one failure, for example "alert after 2 failures", schedule more runs until it's reached. With a time-based threshold, keep the check failing until that time has passed. Alerts are sent when a check changes state and the threshold is met, not for every failed run.
 4. Undo your change and run the check again to get a recovery notification.
 
 

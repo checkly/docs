@@ -63,7 +63,6 @@ After adding the channels, you either **edit** or **delete** them, or change whi
 
 > If you are using [Terraform](/integrations/iac/terraform/overview) or the [CLI](/cli/overview), you will need to specify alert channel subscriptions _explicitly_ for each check / group.
 
-
 ## Alert States
 Sending out alert notifications like emails and Slack hooks depends on four factors:
 
@@ -95,6 +94,17 @@ as the history or "vector" of the state transition influences how we alert.
 ❌ --> ❌ | Failure | x|`ALERT_FAILURE_REMAIN` |i.e. when threshold is *"alert after 2 failures"* or *"after 5 minutes"*|
 ❌ --> ⚠️ | Degraded  |-|`ALERT_FAILURE_DEGRADED`|This is a **deescalation**, it overrides any thresholds settings. We send this even if you already received failure notifications|
 ❌️ --> ✅ | Recovery |-|`ALERT_RECOVERY`|Send directly|
+
+## Testing your alerts
+
+To check that a channel is set up correctly, open it from your alert settings and select **Test alert channel**. Checkly sends a test notification to that channel only. Tests are rate limited: if you send several in a row, the button shows how long to wait before the next one.
+
+To test the whole flow, from a failing check to a notification:
+
+1. Make a deployed check fail, for example by changing an assertion so it can't pass. Pick a check that is subscribed only to the channels you want to test: every subscribed channel gets the alert.
+2. Select **Schedule now** on the check, or run [`npx checkly checks run`](/cli/checkly-checks#checkly-checks-run). These are normal monitoring runs, so they follow your alert settings. Runs from the check editor and test sessions started with `npx checkly test` or `npx checkly trigger` never send alerts.
+3. If your threshold is more than one failure, for example "alert after 2 failures", schedule more runs until it's reached. With a time-based threshold, keep the check failing until that time has passed. Alerts are sent when a check changes state and the threshold is met, not for every failed run.
+4. Undo your change and run the check again to get a recovery notification.
 
 <Tip>
 Use Checkly's alert notification log to analyze your alerting patterns and identify opportunities to reduce noise while maintaining coverage of critical issues.

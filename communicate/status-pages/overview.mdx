@@ -47,7 +47,7 @@ Automation rules open and resolve incidents based on your checks. A rule matches
 Manage rules on the **Automation** tab of your status page, or in code with the [`StatusPageV3AutomationRule`](/constructs/status-page-v3-automation-rule) construct or the [`checkly_status_page_v3_automation_rule`](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/status_page_v3_automation_rule) Terraform resource.
 
 <Note>
-Incident automation is available on Team and Enterprise plans. [View pricing](https://checklyhq.com/pricing)
+Incident automation is available on Communicate Team and Enterprise plans. [View pricing](https://checklyhq.com/pricing)
 </Note>
 
 ## Uptime calculation
@@ -63,6 +63,28 @@ Uptime = ((Total time - Weighted downtime) / Total time) × 100
 ```
 
 A group shows the average uptime of its child components. Uptime is driven by incidents, not directly by check results: without an automation rule or a manually created incident, a failing check does not lower uptime.
+
+## Plans
+
+Status page features come with your **Communicate** plan, which is separate from the plan for your checks and monitors. A Team plan for checks doesn't include the Communicate Team features below.
+
+| Feature | Communicate plan |
+|---------|------------------|
+| Status pages, components and email subscribers | All, including Communicate Hobby |
+| [Custom domain](/communicate/status-pages/custom-domain) | Starter, Team and Enterprise |
+| [Incident automation](/communicate/status-pages/incidents#incident-automation) | Team and Enterprise |
+| [Status page maintenance](/communicate/status-pages/maintenance-windows) | Team and Enterprise |
+| [Password protection](/communicate/status-pages/password-protection) | Team and Enterprise |
+| [Theme customization](/communicate/status-pages/customization) | Team and Enterprise |
+
+See [pricing](https://www.checklyhq.com/pricing/) for limits such as the number of pages and subscribers.
+
+## Status pages and dashboards
+
+Status pages and [dashboards](/communicate/dashboards/overview) both show health publicly, but they answer different questions:
+
+- **Status pages** show your services as your customers see them. Each component's status and uptime come from incidents, which you open manually or with automation rules, so a failing check only affects the page when it opens an incident. Visitors can subscribe to updates.
+- **Dashboards** show your checks directly: each check's live status, availability and response times, filtered by tag. Use them for internal teams or technical audiences who want to see the monitoring results themselves.
 
 ## Monitoring as code
 

@@ -309,7 +309,7 @@ Move the existing group to the new resource type instead, so the group and its c
    terraform state show checkly_check_group.key-shop-flows
    ```
 
-2. In your configuration, replace the `checkly_check_group` resource with a `checkly_check_group_v2` resource with the same name. To keep the old behavior, add `enforce_*` blocks for the settings the old group set, such as locations, retry strategy, scheduling strategy and alert settings. Update every reference, for example `group_id = checkly_check_group_v2.key-shop-flows.id`.
+2. In your configuration, replace the `checkly_check_group` resource with a `checkly_check_group_v2` resource with the same resource name (`key-shop-flows` here). To keep the old behavior, add `enforce_*` blocks for the settings the old group set, such as locations, retry strategy, scheduling strategy and alert settings. Update every reference, for example `group_id = checkly_check_group_v2.key-shop-flows.id`.
 
 3. Remove the old resource from the Terraform state. This doesn't change anything in Checkly:
 

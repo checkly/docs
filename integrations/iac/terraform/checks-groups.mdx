@@ -228,7 +228,7 @@ resource "checkly_tcp_monitor" "example-tcp-monitor-2" {
 
 ## Groups
 
-Once you start having more than just a handful of checks, it makes sense to start looking into [groups](/platform/groups) to keep things tidy. Use the `checkly_check_group_v2` resource (available since provider version 1.20.0). A v2 group doesn't override any settings of its checks unless you ask it to, so it can be as simple as a name:
+Once you start having more than just a handful of checks, it makes sense to start looking into [groups](/platform/groups) to keep things tidy. Use the `checkly_check_group_v2` resource. A v2 group doesn't override any settings of its checks unless you ask it to, so it can be as simple as a name:
 
 ```terraform
 resource "checkly_check_group_v2" "key-shop-flows" {
@@ -254,6 +254,8 @@ resource "checkly_check_group_v2" "key-shop-flows" {
 ```
 
 The older `checkly_check_group` resource still works, but it always applies group-level defaults to its checks. See [migrating to `checkly_check_group_v2`](#migrating-to-checkly_check_group_v2) below.
+
+You can see all the configuration options for groups, as well as more examples, on the Terraform registry documentation pages for [`checkly_check_group_v2`](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/check_group_v2) and [`checkly_check_group`](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/check_group).
 
 ### Adding checks to groups
 
@@ -330,5 +332,3 @@ Move the existing group to the new resource type instead, so the group and its c
 <Warning>
 Deleting a group also deletes all checks in it. To keep the checks, first remove `group_id` from them and apply that change. Then remove the group from your configuration and apply again.
 </Warning>
-
-You can see all the configuration options for groups, as well as more examples, on the Terraform registry documentation pages for [`checkly_check_group_v2`](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/check_group_v2) and [`checkly_check_group`](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/check_group).

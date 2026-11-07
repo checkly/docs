@@ -1,0 +1,60 @@
+---
+title: 'Error reporting'
+description: 'What the Checkly CLI sends to Checkly when it crashes because of a bug in its own code, and how to turn it off.'
+sidebarTitle: 'Error reporting'
+canonical: 'https://www.checklyhq.com/docs/cli/error-reporting/'
+---
+
+When the Checkly CLI crashes because of a bug in its own code, it sends one report about the crash to Checkly, so the
+bug can be found and fixed.
+
+## When the CLI sends a report
+
+The CLI sends a report only when all of these are true:
+
+- The error is a `TypeError`, `ReferenceError` or `RangeError`.
+- The error was raised in the CLI's own files, not in one of its dependencies, your code or a package you installed.
+- The CLI is a release, release candidate or prerelease build. Canary builds and local builds never send reports.
+- You have not turned error reporting off.
+
+The CLI sends at most one report per command. Errors in your own code, failed checks, API errors and network problems
+are never reported. Invalid configuration is normally shown as a clear message and is not reported. If it makes the CLI
+crash instead, that crash is reported, because the CLI should have caught the mistake.
+
+## What a report contains
+
+- The error type, its message and the stack trace. Paths in the CLI's own files are shortened to the file inside the
+  CLI, for example `checkly/dist/commands/deploy.js`. Paths in the CLI's dependencies start at `node_modules/`, for
+  example `node_modules/axios/lib/core/Axios.js`. Every other path is replaced with a placeholder.
+- The CLI version and the command name, for example `deploy`.
+- Whether the CLI runs in a terminal, in CI or for an AI agent.
+- Your operating system, CPU architecture and Node.js version.
+
+A report never contains your API key, account ID, command arguments, environment variables, computer name, user name
+or the contents of your files. The CLI removes credentials it finds in an error message, such as API keys, tokens and
+passwords in URLs, before it sends the report.
+
+## Network access
+
+The CLI sends the report as one HTTPS `POST` request to `rum.checklyhq.com`. It uses the same proxy settings as all
+other CLI requests (`HTTPS_PROXY`, `HTTP_PROXY`, `ALL_PROXY` and `NO_PROXY`).
+
+The CLI waits at most 1.5 seconds for the request. If your network blocks the host, the report is dropped without a
+message, and the command fails the same way it would without error reporting.
+
+## Turn error reporting off
+
+Set either environment variable:
+
+```bash Terminal
+export CHECKLY_NO_ERROR_REPORTING=1
+# or the convention many tools share
+export DO_NOT_TRACK=1
+```
+
+In CI, set the variable in your pipeline's environment, for example:
+
+```yaml .github/workflows/checkly.yml
+env:
+  CHECKLY_NO_ERROR_REPORTING: 1
+```

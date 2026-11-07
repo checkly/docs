@@ -9,7 +9,7 @@ Synthetic checks, such as API, Browser and Multistep checks and Playwright Check
 
 ## What counts as a check run
 
-Every time a check runs, it uses check runs. That includes scheduled runs, runs you start with **Schedule now**, and test runs from the check editor. On top of that:
+Each run of a check uses check runs, wherever it starts: scheduled runs, runs you start with **Schedule now**, test runs from the check editor, and test sessions from the CLI, such as `npx checkly test` and `npx checkly trigger`. On top of that:
 
 - **Locations:** each location counts. A check that runs from three locations in parallel uses three check runs each time it's scheduled.
 - **Retries:** each retry is another check run. A flaky check that often retries uses noticeably more.

@@ -167,7 +167,12 @@ jobs:
         if: steps.preview.outputs.url != ''
         env:
           DOCS_PREVIEW_URL: ${{ steps.preview.outputs.url }}
-        run: node .github/scripts/check-api-preview.mjs "$DOCS_PREVIEW_URL"
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # Mintlify builds the PR head, not the merge commit checked out above,
+          # so read the expected pages from the head's docs.json.
+          git worktree add --detach "$RUNNER_TEMP/pr-head" "$HEAD_SHA"
+          node .github/scripts/check-api-preview.mjs "$DOCS_PREVIEW_URL" "$RUNNER_TEMP/pr-head"
 
       - name: Install dependencies
         if: steps.preview.outputs.url != ''

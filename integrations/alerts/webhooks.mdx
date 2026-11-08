@@ -29,12 +29,14 @@ The example above shows a webhook configured to create a Jira ticket on each eve
 In both cases we use the familiar Handlebars templating braces, i.e. `{{ }}` to insert the variable.
 
 <Note>
-  To avoid encoding, you can access your environment variables with triple brackets, i.e. `{{{USER_API_KEY}}}`
+  To avoid encoding, you can access your environment variables with triple brackets, i.e. `{{{USER_API_KEY}}}`. Double brackets HTML-escape the value everywhere you use them, including the URL, headers and query parameters: `&` arrives as `&amp;` and `=` as `&#x3D;`. Use triple brackets for a variable or secret that holds a whole URL, or any value that contains `&` or `=`.
 </Note>
 
 A JSON payload template stays valid JSON when an inserted value contains a double quote or a line break: the value is escaped in the body we send. With `{{CHECK_NAME}}` a double quote arrives as `&quot;`, with `{{{CHECK_NAME}}}` as `\"`; a line break arrives as `\n` in both cases.
 
 <AlertChannelSecrets />
+
+When you promote a value with the lock icon, the field gets a `{{NAME}}` reference. If you promoted a whole URL with a query string, change the reference to `{{{NAME}}}`, or the escaped `=` and `&` break the URL.
 
 You can use the following event-related variables in both URL and payload.
 
@@ -46,10 +48,10 @@ You can use the following event-related variables in both URL and payload.
 | `AI_ANALYSIS_ROOT_CAUSE`         | Description of possible root cause. Available when Rocky AI automation is enabled.                                                                                                       |
 | `AI_ANALYSIS_USER_IMPACT`        | Description of the user impact. Available when Rocky AI automation is enabled.                                                                                                           |
 | `ALERT_TITLE`                    | Human readable title, e.g. 'Check "My API check" has failed'                                                                                                                       |
-| `ALERT_TYPE`                     | Type of alert, e.g. "ALERT_FAILURE", "ALERT_RECOVERY", "ALERT_DEGRADED", "ALERT_DEGRADED_RECOVERY". See [alert states](/communicate/alerts/overview#alert-states) for all options. |
-| `API_CHECK_RESPONSE_STATUS_CODE` | The response status code, e.g. 200. Only populated for API checks.                                                                                                                 |
-| `API_CHECK_RESPONSE_STATUS_TEXT` | The response status text, e.g. "OK". Only populated for API checks.                                                                                                                |
-| `CHECK_ERROR_MESSAGE`            | The check error message                                                                                                                                                            |
+| `ALERT_TYPE`                     | Type of alert, e.g. "ALERT_FAILURE", "ALERT_RECOVERY", "ALERT_DEGRADED", "ALERT_DEGRADED_RECOVERY". See [failures, recoveries and reminders](#failures-recoveries-and-reminders) for which state change sends which type. |
+| `API_CHECK_RESPONSE_STATUS_CODE` | The response status code, e.g. 200. Populated for API checks and URL monitors.                                                                                                     |
+| `API_CHECK_RESPONSE_STATUS_TEXT` | The response status text, e.g. "OK". Populated for API checks and URL monitors.                                                                                                    |
+| `CHECK_ERROR_MESSAGE`            | The check error message, HTML-escaped. See [which variables are filled per check type](#which-variables-are-filled-per-check-type) for when it's empty.                           |
 | `CHECK_ID`                       | The UUID of the check                                                                                                                                                              |
 | `CHECK_DESCRIPTION`              | The description of the check, if set                                                                                                                                               |
 | `CHECK_NAME`                     | Full name of the check                                                                                                                                                             |
@@ -66,8 +68,28 @@ You can use the following event-related variables in both URL and payload.
 | `RUN_LOCATION`                   | The location where the check ran, i.e. "N. California"                                                                                                                             |
 | `SSL_CHECK_DOMAIN`               | The domain of the SSL certificate. For ALERT_SSL only.                                                                                                                             |
 | `SSL_DAYS_REMAINING`             | How many days remain on the SSL certificate. For ALERT_SSL only.                                                                                                                   |
-| `STARTED_AT`                     | The ISO timestamp from when this check run started                                                                                                                                 |
-| `TAGS`                           | An array of tags assigned to the check. Have a look at our Opsgenie example below on how to render this to a JSON array.                                                           |
+| `STARTED_AT`                     | The ISO timestamp from when this check run started. For heartbeat monitors, the time of the heartbeat event in UTC, formatted as `YYYY-MM-DD HH:mm:ss`.                          |
+| `STATE`                          | Heartbeat monitors only. The state of the heartbeat event that triggered the alert, e.g. "LATE".                                                                                 |
+| `TAGS`                           | An array of tags assigned to the check, including the tags of its group. See [render tags as an array or a string](#render-tags-as-an-array-or-a-string).                        |
+
+### Which variables are filled per check type
+
+Not every variable has a value for every check type. An empty variable renders as an empty string.
+
+| Variable | API checks | URL monitors | TCP monitors | DNS monitors | Heartbeat monitors |
+| --- | --- | --- | --- | --- | --- |
+| `CHECK_ERROR_MESSAGE` | Request errors | Request errors | Empty | Empty | Empty |
+| `API_CHECK_RESPONSE_STATUS_CODE`, `API_CHECK_RESPONSE_STATUS_TEXT` | Response status | Response status | `200` / `SUCCESS` or `500` / `ERROR` | Empty | Empty |
+| `RESPONSE_TIME`, `RUN_LOCATION`, `REGION` | Filled | Filled | Filled | Filled | Empty |
+| `STATE` | Empty | Empty | Empty | Empty | Filled |
+
+For API checks and URL monitors, `CHECK_ERROR_MESSAGE` is filled when the request itself fails, for example with a refused connection. It stays empty when the request succeeds but an assertion fails, for example on an unexpected status code. Use `API_CHECK_RESPONSE_STATUS_CODE` for that case.
+
+There are no variables for the request URL or the HTTP method of the check. To include them in an alert, add them to the check's description and use `CHECK_DESCRIPTION`.
+
+### Body format
+
+If the rendered template is valid JSON, we send it with `Content-Type: application/json`. Otherwise we send the rendered text as is, with `Content-Type: application/x-www-form-urlencoded`. To send plain text, add a `Content-Type: text/plain` header to the webhook. Adding `Content-Type: application/json` doesn't fix a template that renders invalid JSON, for example because of a missing comma: we then send the whole text as one JSON string.
 
 ### Using AI analysis data in alerts
 
@@ -121,6 +143,28 @@ This template:
 ```
 
 renders `payments`. Both `:` and `=` separators are supported. If neither `team:...` nor `team=...` exists, the template renders the fallback `UNKNOWN`. If multiple tags match, Checkly returns the first one.
+
+#### Render tags as an array or a string
+
+`TAGS` is an array. Some receivers want a JSON array, others a single string. For the tags `team:payments` and `env=prod`, this template:
+
+```json
+{
+  "tags": [{{#each TAGS}}"{{{this}}}"{{#unless @last}},{{/unless}}{{/each}}],
+  "tags_text": "{{{TAGS}}}"
+}
+```
+
+renders:
+
+```json
+{
+  "tags": ["team:payments", "env=prod"],
+  "tags_text": "team:payments,env=prod"
+}
+```
+
+Use triple brackets: with `{{this}}` or `{{TAGS}}`, a tag like `env=prod` arrives as `env&#x3D;prod`.
 
 <Tip>
   Send a test message from the webhook editor to inspect the rendered request before saving your alert channel.
@@ -268,6 +312,35 @@ def webhook(request):
 Checkly will retry your webhook up to **5 times** if the request fails, for example with an HTTP response higher than 399 (such as a 404 or 503), a network error, or no response within 5 seconds. Retries back off exponentially: 10, 20, 40, 80 and 160 seconds, about 5 minutes in total.
 
 This means that for checks on a 1 minute schedule, there is a potential overlap between a failure alert and recovery alert. For this reason every webhook we send has a timestamp in the `x-checkly-timestamp` header. You can use this timestamp on the receiving end to ignore any webhooks that come in "late".
+
+A retry sends the same body, `x-checkly-timestamp` and `x-checkly-signature` as the first attempt. A response that takes longer than 5 seconds counts as a failure, so a slow endpoint can receive the same webhook again even though it processed the first request. Respond quickly and [deduplicate](#deduplicate-notifications) on the receiving end.
+
+## Failures, recoveries and reminders
+
+Every webhook is about one check result. These variables tell you how notifications relate to each other.
+
+### Match a recovery to its failure
+
+A failure and the recovery that follows it share `CHECK_ID`. `CHECK_RESULT_ID` and `STARTED_AT` belong to the run that triggered each notification: the recovery carries the first passing run. To close the incident a failure opened, match the recovery on `CHECK_ID`, and compare the two `STARTED_AT` values to get the duration.
+
+`ALERT_TYPE` depends on the state change:
+
+| State change | `ALERT_TYPE` |
+| --- | --- |
+| Passing or degraded to failing | `ALERT_FAILURE` |
+| Passing or failing to degraded | `ALERT_DEGRADED` |
+| Failing to passing | `ALERT_RECOVERY` |
+| Degraded to passing | `ALERT_DEGRADED_RECOVERY`, or `ALERT_RECOVERY` if the check was failing before it degraded |
+
+A degraded notification is sent only to channels with **a check degrades** turned on. If your receiver closes incidents on `ALERT_RECOVERY` only, a check that failed, degraded and then passed still closes them.
+
+### Reminders
+
+A reminder repeats the `ALERT_TYPE` of the alert it reminds you about, with `IS_REMINDER` set to `true` and `REMINDER_SEQUENCE` counting up from `1`. `CHECK_RESULT_ID` and `STARTED_AT` belong to the latest failing run, so they change from one reminder to the next while the check keeps running.
+
+### Deduplicate notifications
+
+To recognize a webhook you already processed, for example after a retry, combine `CHECK_RESULT_ID`, `ALERT_TYPE` and `REMINDER_SEQUENCE`. Together they identify one notification, and retries resend the same values.
 
 ## Webhook Examples
 

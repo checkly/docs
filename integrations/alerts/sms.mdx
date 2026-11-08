@@ -23,6 +23,15 @@ You can add as many SMS channels as you like. SMS channels aren't available on t
 
 SMS alerts can only be sent to phone numbers in the following countries. Numbers from other countries are rejected when you create or update the channel.
 
+When a number is rejected, the channel form or the API tells you why:
+
+| Message | What to do |
+| ------ | ------ |
+| `The number field must be a valid phone number` (web app) or `phoneNumber is not a valid phone number` (API) | Enter the number in E.164 format: a `+`, the country code and the number, without spaces or dashes. |
+| `Invalid country code. Please see our documentation for a full list of supported countries` | Start the number with `+` and the country code, and use a country from the table below. |
+| `SMS to this country requires a paid plan. Upgrade your plan to use this number.` (web app) or `SMS and phone call alerts to this country are only available on a paid plan. Upgrade your plan to use this number.` (API) | The country is available on paid plans only, not on trials. |
+| `Adding or changing SMS and phone call alert channels requires the Starter plan or above.` (API) | Your account is on the Hobby plan, which doesn't include SMS alerts. |
+
 | Country | Availability |
 | ------ | ------ |
 | Argentina (+54) | Paid plans only, not on trials |
@@ -80,5 +89,22 @@ SMS alerts can only be sent to phone numbers in the following countries. Numbers
 ## SMS alert number and sender ID
 
 SMS alerts will be sent with a sender ID and phone number. The Checkly sender ID is 'Checkly'. If your carrier does not support sender ID, you will instead see the Checkly SMS alert phone number, +1(814) 250 8623.
+
+## Monthly SMS quota
+
+Each SMS alert that Checkly sends to a channel counts against your account's monthly SMS quota. All SMS channels in your account share the quota, and it starts again at the beginning of each calendar month. See the [Pricing page](https://www.checklyhq.com/pricing/#features) for the quota of each plan. Test messages don't count against the quota.
+
+When your account has used its quota, Checkly doesn't send SMS alerts for the rest of the month. Each alert that isn't sent appears in the [alert notification log](/communicate/alerts/notification-log) with the delivery status **Failed** and the notification result `Account hit the monthly SMS limit`. SMS alerts are sent again from the next calendar month.
+
+## Test messages
+
+Click **Test alert channel** in the channel form to send a test SMS to the number before you save the channel. Accounts on a trial or the Hobby plan can send only a few test messages a day. When you reach that limit, the button shows how many seconds to wait, and the API responds with `429 Too Many Requests` and `Alert channel test rate limit exceeded`.
+
+## Troubleshooting a missing SMS alert
+
+Open the [alert notification log](/communicate/alerts/notification-log), select your SMS channel and check **Show failures only**. Select a failed notification to see its notification result:
+
+- `Account hit the monthly SMS limit`: your account used its monthly SMS quota. See [Monthly SMS quota](#monthly-sms-quota).
+- Any other result: the message didn't reach the number through our SMS provider. Check that the number is correct and can receive SMS, then send a test message. If alerts to a correct number keep failing, contact [support](mailto:support@checklyhq.com).
 
 <Note>For limits and other SMS-related questions, please refer to our [Pricing page](https://www.checklyhq.com/pricing/#features).</Note>

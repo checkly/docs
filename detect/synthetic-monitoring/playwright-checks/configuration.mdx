@@ -121,16 +121,18 @@ Checkly applies these defaults only when you do not set the option yourself:
 |-------------------|-----------------|
 | `workers` | `4` |
 | `retries` | `2` |
+| `use.trace` | `on-first-retry` |
 | `use.video` | `on-first-retry` |
 | `use.screenshot` | `on-first-retry` |
 
 Your Playwright config or `testCommand` value takes precedence for these options.
 
+Checkly always records a trace, and keeps the trace file only when your `use.trace` setting would have produced one. With the defaults, a test that passes on its first attempt keeps no trace or video, and a failing test keeps them only for its first retry. With `retries` set to `0`, a failing test keeps neither. To keep them for every run, set `use.trace` and `use.video` to `on`. To turn off video recording, set `use.video` to `off`.
+
 Checkly enforces these options for every run. User configuration does not override them:
 
 | Playwright setting | Checkly behavior |
 |--------------------|------------------|
-| `use.trace` | `on` for every run |
 | User agent | Checkly appends a [user-agent suffix](/platform/allowlisting-traffic#default-checkly-user-agent) |
 
 Checkly supports Playwright's [`globalTimeout`](https://playwright.dev/docs/api/class-testconfig#test-config-global-timeout). Use it to control the maximum duration of the Playwright suite after `npx playwright test` starts.

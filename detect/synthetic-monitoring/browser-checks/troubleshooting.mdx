@@ -51,6 +51,17 @@ canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/browser-c
 
 </Accordion>
 
+<Accordion title="Missing traces or videos">
+**Issue: A result has no trace or video, or some pages have no video**
+
+**Solutions**:
+1. Check whether the run failed. Scheduled runs keep the trace and video only when the check fails. Runs from the editor keep them whether the check passes or fails. See [Viewing trace files](/detect/synthetic-monitoring/browser-checks/playwright-support#viewing-trace-files).
+2. Don't rely on the `trace` and `video` options in your Playwright configuration. Browser checks ignore them, so you can't keep artifacts for passing scheduled runs or turn off video recording. To control them, use a [Playwright Check Suite](/detect/synthetic-monitoring/playwright-checks/overview) and [set `use.trace` and `use.video`](/detect/synthetic-monitoring/playwright-checks/configuration#checkly-applied-playwright-settings).
+3. Open pages from the test's own `page` or `context` fixture. Playwright records one video per page in that context. Pages from a context you create with `browser.newContext()` have no video. See Playwright's [videos guide](https://playwright.dev/docs/videos).
+4. Set a test timeout below the 240-second run limit, for example `test.setTimeout(210000)`. A test that times out on its own test timeout keeps its trace and video. A test still running when the check reaches the run limit is stopped without them. See [Browser check timeouts](/detect/synthetic-monitoring/browser-checks/timeouts).
+
+</Accordion>
+
  ## Error Handling and Debugging
 
 

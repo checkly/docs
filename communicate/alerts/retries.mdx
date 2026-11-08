@@ -35,7 +35,7 @@ There are four retry strategies based on the time between retry attempts, and ea
 - **Linear** — a linearly increasing time between retries, e.g. 5s, 10s, 15s etc.
 - **Exponential** — an exponentially increasing time between retries, e.g. 5s, 25s, 125s (2m and 5s)  etc.
 
-For uptime monitors, the strategies you can use depend on your [plan](https://www.checklyhq.com/pricing/): **Fixed**, **Linear** and **Exponential** aren't available on every plan.
+For uptime monitors, the strategies you can use depend on your [plan](https://www.checklyhq.com/pricing/): **Fixed**, **Linear** and **Exponential** aren't available on every plan. See [Retries on uptime monitors](#retries-on-uptime-monitors).
 
 On top of the time between attempts, you can also set:
 
@@ -79,6 +79,41 @@ For API checks & URL monitors, you can enable network retries to automatically r
 When network retries are enabled:
 - The check will retry on: ECONNRESET, ENOTFOUND, ETIMEDOUT, EAI_AGAIN, ECONNREFUSED, and similar network errors.
 - The check will not retry on: Any HTTP response that includes a status code (4xx or 5xx), failed assertions, or any other type of check failure.
+
+### Retries on uptime monitors
+
+The retry strategies an uptime monitor (URL, TCP, DNS, ICMP, SSL, gRPC and traceroute) can use depend on your [plan](https://www.checklyhq.com/pricing/):
+
+| Plan | Retry strategies for uptime monitors |
+|------|--------------------------------------|
+| Hobby, Starter, Team | **None**, **Single** |
+| Enterprise | **None**, **Single**, **Fixed**, **Linear**, **Exponential** |
+
+This limit applies to uptime monitors only: API checks can use every retry strategy on these plans. Heartbeat monitors don't retry, so they ignore any retry strategy you send for them.
+
+For one retry, use **Single**. **Fixed**, **Linear** and **Exponential** need the Enterprise plan even when you set the maximum number of retries to 1.
+
+When you pick a strategy your plan doesn't include:
+
+- In the web app, the URL, TCP, DNS, ICMP and gRPC monitor forms grey out **Fixed**, **Linear** and **Exponential**. A monitor that already uses one of them shows "This retry strategy is not available on your current plan. Adjust setting or upgrade." You can't save it until you pick **None** or **Single**.
+- The API answers `402 Payment Required`, and `npx checkly deploy` fails, with this message. `npx checkly deploy --preview` reports it too, before anything is deployed.
+
+```text wrap
+The unlimited retry strategy isn’t supported on your plan. Upgrade to enable, or contact support if you have questions. Your plan supports no retries (retryStrategy: null) or a single retry (SINGLE_RETRY).
+```
+
+"Unlimited" in this message means any of **Fixed**, **Linear** or **Exponential**, whatever the number of retries.
+
+**Monitors that already use such a strategy** keep running. You can't change them until you switch them to **None** or **Single**: every update is rejected with the message above, even one that only renames or deactivates the monitor.
+
+**Groups:** a group's retry override applies to every check in the group, uptime monitors included. On the Hobby, Starter and Team plans:
+
+- You can't set a **Fixed**, **Linear** or **Exponential** override on a group that contains an uptime monitor. The web app shows "One or more monitors in your group don’t support this retry strategy. Adjust the setting or remove those monitors to continue."
+- You can't add an uptime monitor to a group that has such an override.
+
+To fix this, set the group's override to **None** or **Single**, turn off **Group override for retries** so each check keeps its own strategy, or keep uptime monitors in a separate group. See also [mixing checks and monitors in a group](/platform/groups#mixing-checks-and-monitors-in-a-group).
+
+**Monitoring as Code:** a `retryStrategy` in the `checks` section of your `checkly.config.ts` also applies to every monitor that doesn't set its own. Set `RetryStrategyBuilder.singleRetry()` or `RetryStrategyBuilder.noRetries()` on those monitors. See the [retry strategy construct](/constructs/retry-strategy#default-retry-strategy).
 
 ## Test sessions retries
 

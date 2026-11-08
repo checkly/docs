@@ -1,7 +1,8 @@
 import { getNavigationPages } from './api-navigation.mjs';
 
 const base = new URL(process.argv[2].replace(/\/?$/, '/'));
-const pages = getNavigationPages(process.cwd()).filter((page) => page.operation);
+// Optional second argument: the docs root to read the navigation from.
+const pages = getNavigationPages(process.argv[3] ?? process.cwd()).filter((page) => page.operation);
 const failures = [];
 
 // Mintlify previews occasionally answer a single request with a 500.

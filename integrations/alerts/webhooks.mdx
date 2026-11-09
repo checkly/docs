@@ -23,7 +23,7 @@ Webhooks allow you to POST custom payloads to any endpoint in your own infrastru
 
 The example above shows a webhook configured to create a Jira ticket on each event. Notice the following:
 
-- We use the variable `JIRA_INSTANCE_URL` in the URL. We previously stored this variable in the [environment variables section](https://app.checklyhq.com/environment-variables). Alert-channel configurations accept both [environment variables](/platform/variables) and [secrets](/platform/secrets) using the same `{{NAME}}` syntax.
+- We use the variable `JIRA_INSTANCE_URL` in the URL. We previously stored this variable in the [environment variables section](https://app.checklyhq.com/environment-variables). Alert-channel configurations accept both [environment variables](/platform/variables) and [secrets](/platform/secrets) using the same `{{NAME}}` syntax. When a Browser check or Playwright Check Suite has an environment variable with the same name as an account variable, the alert uses the check's value.
 - We use the variable `CHECK_ID` in the payload. This is one of many event-based variables that will change with each call. See below for the complete list.
 
 In both cases we use the familiar Handlebars templating braces, i.e. `{{ }}` to insert the variable.
@@ -76,14 +76,40 @@ You can use the following event-related variables in both URL and payload.
 
 Not every variable has a value for every check type. An empty variable renders as an empty string.
 
-| Variable | API checks | URL monitors | TCP monitors | DNS monitors | Heartbeat monitors |
-| --- | --- | --- | --- | --- | --- |
-| `CHECK_ERROR_MESSAGE` | Request errors | Request errors | Empty | Empty | Empty |
-| `API_CHECK_RESPONSE_STATUS_CODE`, `API_CHECK_RESPONSE_STATUS_TEXT` | Response status | Response status | `200` / `SUCCESS` or `500` / `ERROR` | Empty | Empty |
-| `RESPONSE_TIME`, `RUN_LOCATION`, `REGION` | Filled | Filled | Filled | Filled | Empty |
-| `STATE` | Empty | Empty | Empty | Empty | Filled |
+| Variable | API checks | URL monitors | TCP monitors | DNS monitors | Heartbeat monitors | Browser checks |
+| --- | --- | --- | --- | --- | --- | --- |
+| `CHECK_ERROR_MESSAGE` | Request errors | Request errors | Empty | Empty | Empty | First error |
+| `API_CHECK_RESPONSE_STATUS_CODE`, `API_CHECK_RESPONSE_STATUS_TEXT` | Response status | Response status | `200` / `SUCCESS` or `500` / `ERROR` | Empty | Empty | Empty |
+| `RESPONSE_TIME`, `RUN_LOCATION`, `REGION` | Filled | Filled | Filled | Filled | Empty | Filled |
+| `STATE` | Empty | Empty | Empty | Empty | Filled | Empty |
 
 For API checks and URL monitors, `CHECK_ERROR_MESSAGE` is filled when the request itself fails, for example with a refused connection. It stays empty when the request succeeds but an assertion fails, for example on an unexpected status code. Use `API_CHECK_RESPONSE_STATUS_CODE` for that case.
+
+For Browser checks, `CHECK_ERROR_MESSAGE` holds the first error of the run. It is cut to its first 300 characters, then its line breaks are removed, so the lines of the error run together.
+
+When a heartbeat monitor misses a ping, `ALERT_TYPE` is `ALERT_FAILURE` and `STATE` is `FAILING`. For example, this template:
+
+```json
+{
+  "check": "{{CHECK_NAME}}",
+  "type": "{{CHECK_TYPE}}",
+  "alertType": "{{ALERT_TYPE}}",
+  "state": "{{STATE}}",
+  "startedAt": "{{STARTED_AT}}"
+}
+```
+
+sends:
+
+```json
+{
+  "check": "Nightly backup",
+  "type": "HEARTBEAT",
+  "alertType": "ALERT_FAILURE",
+  "state": "FAILING",
+  "startedAt": "2026-11-09 00:30:21"
+}
+```
 
 There are no variables for the request URL or the HTTP method of the check. To include them in an alert, add them to the check's description and use `CHECK_DESCRIPTION`.
 

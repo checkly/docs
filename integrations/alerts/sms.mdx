@@ -96,15 +96,23 @@ Each SMS alert that Checkly sends to a channel counts against your account's mon
 
 When your account has used its quota, Checkly doesn't send SMS alerts for the rest of the month. Each alert that isn't sent appears in the [alert notification log](/communicate/alerts/notification-log) with the delivery status **Failed** and the notification result `Account hit the monthly SMS limit`. SMS alerts are sent again from the next calendar month.
 
+Need more SMS or phone calls? Contact [support](mailto:support@checklyhq.com).
+
 ## Test messages
 
-Click **Test alert channel** in the channel form to send a test SMS to the number before you save the channel. Accounts on a trial or the Hobby plan can send only a few test messages a day. When you reach that limit, the button shows how many seconds to wait, and the API responds with `429 Too Many Requests` and `Alert channel test rate limit exceeded`.
+Click **Test alert channel** in the channel form to send a test SMS to the number before you save the channel. Accounts on a trial or the Hobby plan can send only a few test messages a day. The limit resets after 24 hours. When you reach that limit, the button shows how many seconds to wait, and the API responds with `429 Too Many Requests` and `Alert channel test rate limit exceeded`.
 
 ## Troubleshooting a missing SMS alert
 
 Open the [alert notification log](/communicate/alerts/notification-log), select your SMS channel and check **Show failures only**. Select a failed notification to see its notification result:
 
 - `Account hit the monthly SMS limit`: your account used its monthly SMS quota. See [Monthly SMS quota](#monthly-sms-quota).
-- Any other result: the message didn't reach the number through our SMS provider. Check that the number is correct and can receive SMS, then send a test message. If alerts to a correct number keep failing, contact [support](mailto:support@checklyhq.com).
+- `Invalid phone number`: our SMS provider doesn't accept the number. Check the number and its country code, then send a test message.
+- `Phone number doesn't support SMS`: the number can't receive SMS, for example because it's a landline. Use a mobile number.
+- `Region not enabled`: SMS to the number's country or region can't be sent. Contact [support](mailto:support@checklyhq.com).
+- `Attempt to send to unsubscribed recipient`: the number opted out of messages from Checkly, for example by replying `STOP`. To opt back in, reply `START` from that phone to the Checkly SMS number, see [SMS alert number and sender ID](#sms-alert-number-and-sender-id).
+- `Incomplete alert channel config`: the channel has no phone number. Edit the channel and add one.
+- `FROM number not associated with Twilio account`: a problem with the number Checkly sends from. Contact [support](mailto:support@checklyhq.com).
+- `Failed to send the SMS`: the message didn't reach the number through our SMS provider. Check that the number is correct and can receive SMS, then send a test message. If alerts to a correct number keep failing, contact [support](mailto:support@checklyhq.com).
 
 <Note>For limits and other SMS-related questions, please refer to our [Pricing page](https://www.checklyhq.com/pricing/#features).</Note>

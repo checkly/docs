@@ -246,6 +246,17 @@ The browser stopped while it was starting, before your test code ran. The result
 
 </Accordion>
 
+<Accordion title="Failures that started after a runtime change">
+**Issue: The check fails more often since its runtime changed, for example after a new account default runtime**
+
+Each runtime comes with its own Playwright and Chromium versions, so a runtime change can change timing and behavior.
+
+**Solutions**:
+1. Run the check on the previous runtime and compare the results. With the CLI, set `runtimeId` on the check, for example `runtimeId: '2025.04'`, and run `npx checkly test --verbose`. The run log names the runtime it used, for example `Creating runtime version 2025.04`. To do this in the web app, see [Overriding runtimes for specific checks](/platform/runtimes/overview#overriding-runtimes-for-specific-checks).
+2. If the check passes on the previous runtime and fails on the new one, compare the traces of both runs to find the step that behaves differently.
+
+</Accordion>
+
 <Accordion title="Failures from one location only">
 **Issue: The check fails from one location and passes from others**
 

@@ -87,6 +87,7 @@ The retry strategies an uptime monitor (URL, TCP, DNS, ICMP, SSL, gRPC and trace
 | Plan | Retry strategies for uptime monitors |
 |------|--------------------------------------|
 | Hobby, Starter, Team | **None**, **Single** |
+| Trial | **None**, **Single** |
 | Enterprise | **None**, **Single**, **Fixed**, **Linear**, **Exponential** |
 
 This limit applies to uptime monitors only: API checks can use every retry strategy on these plans. Heartbeat monitors don't retry, so they ignore any retry strategy you send for them.
@@ -104,7 +105,9 @@ The unlimited retry strategy isn’t supported on your plan. Upgrade to enable, 
 
 "Unlimited" in this message means any of **Fixed**, **Linear** or **Exponential**, whatever the number of retries.
 
-**Monitors that already use such a strategy** keep running. You can't change them until you switch them to **None** or **Single**: every update is rejected with the message above, even one that only renames or deactivates the monitor.
+With the Terraform provider, `terraform apply` fails with `unexpected response status 402:` followed by the API response that contains this message. `terraform plan` doesn't report it.
+
+**Monitors that already use such a strategy** keep running, and their failed runs are still retried with that strategy. You can't change them until you switch them to **None** or **Single**: every update is rejected with the message above, even one that only renames or deactivates the monitor.
 
 **Groups:** a group's retry override applies to every check in the group, uptime monitors included. On the Hobby, Starter and Team plans:
 

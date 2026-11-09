@@ -18,6 +18,14 @@ Learn more about:
 ## Full release history
 
 <Update label="v8.13.0" tags={["November 2026"]}>
+- Fixed private location agents slowly running out of disk space. Playwright Check Suite runs no longer leave temporary files in /tmp or broken browser links behind.
+- Playwright Check Suites that use pnpm or yarn now work on Node.js versions without corepack, such as Node.js 25 and 26.
+- A Node.js version that cannot be downloaded now fails the run at once with a clear error, without retries.
+- Fixed a regression in runtime 2026-04 where a test that skips itself at run time (test.skip(condition), testInfo.skip(), step.skip()) was reported as failed.
+- Security: updated agent and bundled 2026-04 runtime dependencies to fix vulnerabilities, including vm2 3.12.2.
+</Update>
+
+<Update label="v8.13.0" tags={["November 2026"]}>
 - Added opt-in [check-level Prometheus metrics](/platform/private-locations/agent-metrics#check-level-metrics). Set `AGENT_METRICS_PER_CHECK=true` to get result counts, status and timing metrics per check, modelled on the Prometheus V2 integration.
 - `LOG_LEVEL` now applies to the Go process that runs API checks and uptime monitors. Before, it only applied to the synthetics worker.
 - Playwright Check Suites now run on Node.js 24.22.2 and 26.13.0 (was 24.22.1 and 26.12.1). Node.js 22.23.4 is unchanged.

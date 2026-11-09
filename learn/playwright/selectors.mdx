@@ -92,7 +92,11 @@ When we first run into this error, the easiest solution is just to specify a pos
 await page.getByRole('button').first().click()
 ```
 
-I run into the error listed above so often, I get in the habit of adding first() to my locators almost every time I write a locator. 😅
+Only use `.first()` when you know the first match is the element you want. Pages often contain hidden copies of an element, such as a mobile menu: with a CSS or text locator, `.first()` can pick the hidden copy, and Playwright then waits for it to become visible until the test times out. When you aren't sure, make the locator more specific instead, for example by adding the element's name or by filtering the results as shown below:
+
+```ts
+await page.getByRole('button', { name: 'Submit' }).click()
+```
 
 If you want to be more specific about list position, use:
 

@@ -74,13 +74,10 @@ await page.waitForSelector('.slow-element', { timeout: 30000 })
 
 <Accordion title="Error Recovery">
 ```typescript
-// Graceful error handling
-try {
-  await page.click('.optional-popup-close', { timeout: 5000 })
-} catch (error) {
-  // Continue if popup doesn't appear
-  console.log('No popup to close')
-}
+// Close an optional popup whenever it appears before an action
+await page.addLocatorHandler(page.locator('.optional-popup'), async () => {
+  await page.click('.optional-popup-close')
+})
 
 // Conditional interactions
 const isLoggedIn = await page.locator('.user-menu').isVisible()

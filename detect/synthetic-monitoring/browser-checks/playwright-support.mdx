@@ -77,7 +77,7 @@ We currently support the following configuration options. We will update this li
     | `permissions`        | ✅         |
     | `timezoneId`         | ✅         |
     | `viewport`           | ✅         |
-    | `deviceScaleFactor`  | ✅         |
+    | `deviceScaleFactor`  | ✅ Global configuration only |
     | `hasTouch `          | ✅         |
     | `isMobile `          | ✅         |
     | `javaScriptEnabled ` | ✅         |
@@ -87,19 +87,27 @@ We currently support the following configuration options. We will update this li
     | `offline`            | ✅         |
     | `actionTimeout`      | ✅         |
     | `navigationTimeout ` | ✅         |
-    | `testIdAttribute`    | ✅         |
+    | `testIdAttribute`    | ✅ Global configuration only |
     | `connectOptions`     | ❌         |
-    | `contextOptions`     | ✅         |
-    | `bypassCSP`          | ✅         |
+    | `contextOptions`     | ✅ Global configuration only |
+    | `bypassCSP`          | ✅ Global configuration only |
     | `proxy`              | ✅         |
-    | `launchOptions`      | ❌         |
+    | `launchOptions`      | ❌ See [Browser launch options](#browser-launch-options) |
     | `storageState`       | ❌         |
     | `browserName`        | ❌         |
-    | `channel`            | ❌         |
+    | `channel`            | ✅ See [Use Google Chrome](#use-google-chrome) |
     | `headless`           | ❌         |
     | `screenshot`         | ❌         |
     | `trace`              | ❌         |
     | `video`              | ❌         |
+
+    In a test file, `test.use()` accepts only these options: `acceptDownloads`, `actionTimeout`, `baseURL`, `channel`, `colorScheme`, `extraHTTPHeaders`, `geolocation`, `hasTouch`, `httpCredentials`, `ignoreHTTPSErrors`, `isMobile`, `javaScriptEnabled`, `locale`, `navigationTimeout`, `offline`, `permissions`, `proxy`, `timezoneId`, `userAgent` and `viewport`. Checkly ignores any other option in `test.use()` and logs a line like this one:
+
+    ```text
+    Local configuration key "testIdAttribute" is not supported by Checkly.
+    ```
+
+    Set options marked "Global configuration only" in the [global configuration](#global-configuration) instead.
 
     For more information about the `use` options you can check Playwright official documentation [Test use options](https://playwright.dev/docs/test-use-options)
   </Tab>
@@ -121,6 +129,30 @@ A check using [the Playwright Test Runner (`@playwright/test`)](https://playwrig
 <Note>
 When `use.extraHTTPHeaders` is missing from the Playwright configuration, Checkly adds its trace headers automatically. See how to [add Checkly's trace headers to your custom HTTP headers](/resolve/traces/overview#add-trace-headers-to-custom-http-headers).
 </Note>
+
+## Use Google Chrome
+
+Browser checks run in Chromium by default. To run a check in Google Chrome, set `channel` to `chrome` in your test file:
+
+```ts example.spec.ts
+import { test } from '@playwright/test'
+
+test.use({ channel: 'chrome' })
+```
+
+Write `channel: 'chrome'` as a literal string in your check's code, not through a variable or a function. Checkly reads the code to decide whether the check needs Chrome.
+
+## Browser launch options
+
+Checkly ignores `launchOptions`, both in the global configuration and in `test.use()`.
+
+When you launch a browser yourself with `chromium.launch()`, Checkly passes on only these launch options: `channel`, `logger`, `proxy`, `slowMo` and `timeout`. It ignores all others, such as `executablePath` or `headless`. The browser always runs headless.
+
+Of the Chromium arguments in `args`, Checkly keeps only `--disable-web-security` and `--host-resolver-rules=...`. It drops every other argument and logs a warning like this one:
+
+```text
+Warning: chromium launch argument "--use-fake-device-for-media-stream" is not whitelisted by Checkly and will be ignored. If you need to use this argument, please contact support.
+```
 
 ## Hooks
 Playwright Test Runner offers hook functions such as `test.afterEach()` and `test.beforeEach()` that run before or after individual test cases or `test.afterAll()` and `test.beforeAll()` that run before or after all tests have started/finished.

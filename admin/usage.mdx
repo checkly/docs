@@ -26,7 +26,18 @@ URL, TCP, DNS, ICMP, SSL, traceroute and gRPC monitors are billed by how many mo
 
 ## Seeing your usage
 
-Open **Settings** and, under **Account**, select [**Billing & usage**](https://app.checklyhq.com/settings/account/billing), then the **Usage** tab. It shows the usage for the whole account in the current billing period.
+Select [**Billing & usage**](https://app.checklyhq.com/settings/account/billing) in the left sidebar. Every built-in role can open this page.
+
+- The **Plan** card shows when the current period ends: **Free check runs are refreshed on** on the Hobby plan, **Free trial ends on** during a trial, and **Next billing period starts** on paid plans.
+- The **Usage** card shows what the whole account has used in the current period against what your plan includes, for example `7 / 1,000`. Under **Synthetic Checks**, your check runs have two rows: Browser and Playwright check runs, and Multistep and API check runs. The **Playwright check runs (1 run every 30s)** row shows how many of the Browser and Playwright check runs came from Playwright Check Suites. The other rows show how many uptime monitors, status pages, users and other resources you have, against your plan's limits.
+
+The figures can take a few minutes to catch up after checks run, and up to about 15 minutes on the Starter and Team plans. The page shows only the current period: it has no daily graph, no breakdown per check and no past periods. To work out how many check runs your checks use, see [What counts as a check run](#what-counts-as-a-check-run).
+
+The [Usage API](/api-reference/usage/overview) and [`checkly account usage`](/cli/checkly-account) report usage per day for accounts with contract usage terms, which only Enterprise contracts have. For other accounts, they return no credits or run counts.
+
+### Enterprise plans
+
+On an Enterprise plan, the page has no **Usage** card. Owners, Admins and custom roles with the [**View usage**](/admin/team-management/permissions#usage) permission see a **Usage** tab next to **Plan & invoices** instead. It shows usage against your contract's credit budget for the period you pick (**7d**, **30d**, **Contract to date** or a custom range), credits per day, week or month under **Where credits went**, and a **Usage breakdown** per check type. Other roles don't see the tab.
 
 ## Usage emails
 

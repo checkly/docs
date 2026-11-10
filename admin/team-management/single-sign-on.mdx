@@ -7,6 +7,8 @@ canonical: 'https://www.checklyhq.com/docs/admin/team-management/single-sign-on/
 
 <Note>
 SSO is only available for Checkly's [enterprise plans](https://www.checklyhq.com/pricing/).
+
+Until we've set up your connection, the [SSO configuration page](https://app.checklyhq.com/settings/account/sso-saml) shows an upgrade prompt, even on an Enterprise plan.
 </Note>
 
 ## Setting up the connection
@@ -16,9 +18,13 @@ The general process is detailed below, but please reach out to your customer suc
 <Steps>
   <Step title="Email support@checklyhq.com">
     To get started with SSO, email [support@checklyhq.com](mailto:support@checklyhq.com). We'll review your account and ask you a few questions.
+
+    Let us know when the person who manages your identity provider (IdP) is ready to set up the connection, since the self-serve link we send expires.
   </Step>
   <Step title="Exchange SSO connection information">
     We'll send you a self-serve link to set up the SSO connection. This includes instructions for configuring the connection in your IdP, plus a place to upload your connection metadata to Checkly.
+
+    You can connect any IdP that supports SAML, or use a Microsoft Entra ID, Okta or Google Workspace connection. For the values to enter in your IdP, see [Configuring your identity provider](/admin/team-management/single-sign-on#configuring-your-identity-provider).
 
     <Info>
       The self-serve link is valid for 5 days. After accessing the link, you'll have five hours to complete the setup and can access it up to 10 times. This limit is pre-set by our authentication tool and isn't controlled by us.
@@ -55,7 +61,7 @@ The general process is detailed below, but please reach out to your customer suc
       * XML metadata
       * Entity ID
 
-      The most important thing is that we get the email address back from your SSO Idp. This way we can map the existing Checkly user to your Idp user.
+      The most important thing is that we get the email address back from your SSO Idp.
 
       Thus, please make sure the attributes returned include an "email" and "name" field, e.g.
 
@@ -75,7 +81,7 @@ The general process is detailed below, but please reach out to your customer suc
     </Accordion>
   </Step>
   <Step title="Test the connection">
-    Test the connection by logging in to Checkly through your IdP dashboard.
+    Test the connection by logging in to Checkly through your IdP dashboard. If you'd like, we can join a call to test it with you.
 
     Once logged in to Checkly, verify the SSO connection worked by going to the [Members page](https://app.checklyhq.com/accounts/settings/account/members) (open **Account settings** from the left sidebar, then select **Members**) and make sure there is a checkmark in the SSO column for your user:
 
@@ -89,6 +95,8 @@ The general process is detailed below, but please reach out to your customer suc
   </Step>
   <Step title="Enable SP-initiated SSO (optional)">
     If you would like [SP-initiated SSO](/admin/team-management/single-sign-on#service-provider-sp-initiated) enabled, let us know. We'll update the connection with your company's email domains.
+
+    Ask for this only after you see the SSO checkmark. From then on, every login with an email address from those domains goes to your SSO connection, so a broken connection blocks those logins until it's fixed.
   </Step>
   <Step title="Migrate existing users to SSO (optional)">
     We recommend [migrating your existing users to SSO](/admin/team-management/single-sign-on#migrating-existing-users-to-sso).
@@ -100,6 +108,26 @@ The general process is detailed below, but please reach out to your customer suc
   </Step>
 </Steps>
 
+## Configuring your identity provider
+
+For a SAML connection, your IdP needs these values from us. The self-serve link shows them, and in the manual setup we send them to you. `<connection>` is the name of your SSO connection, which we choose when we set it up.
+
+| Value | Format |
+|-------|--------|
+| Postback URL, also called ACS URL or Reply URL | `https://auth.checklyhq.com/login/callback?connection=<connection>` |
+| Entity ID, also called Audience URI or Identifier | `urn:auth0:checkly:<connection>` |
+| XML metadata | `https://auth.checklyhq.com/samlp/metadata?connection=<connection>` |
+| Logout URL (optional) | `https://auth.checklyhq.com/logout` |
+
+Enter the Postback URL and Entity ID in these fields:
+
+* **Okta:** **Single sign-on URL** and **Audience URI (SP Entity ID)**.
+* **Microsoft Entra ID:** **Reply URL (Assertion Consumer Service URL)** and **Identifier (Entity ID)**, under **Basic SAML Configuration**.
+* **Google Workspace:** **ACS URL** and **Entity ID**, under **Service provider details**.
+
+Add two attributes with exactly these names: `email`, set to the user's email address, and `name`, set to the user's name.
+
+Then assign the users or groups that should use Checkly to the app in your IdP.
 
 ## Logging in with SSO
 
@@ -127,13 +155,11 @@ To update this setting, reach out to [support@checklyhq.com](mailto:support@chec
 
 When JIT is enabled, new users who sign in through your SSO connection will be automatically added to your account.
 
-Users will be created with the default role specified on your [SSO settings page](https://app.checklyhq.com/settings/account/sso-saml), which the account owner can change at any time.
+Users will be created with the default role specified on your [SSO settings page](https://app.checklyhq.com/settings/account/sso-saml), which the account Owner can change at any time. Under **Default Role**, you can pick **Read only**, **Read & Run** or **Read & Write**. Until you change it, it's **Read & Write**.
 
 We enable JIT by default when we set up your SSO connection. The account owner can turn it off with the **JIT Provisioning** toggle on the [SSO settings page](https://app.checklyhq.com/settings/account/sso-saml).
 
-<Note>
-  We only support JIT for a single tenant. If you have multiple tenants, our team will confirm which account you want JIT enabled for.
-</Note>
+JIT adds a new user to every account that uses your SSO connection and has JIT turned on, as long as the account has a free seat. Pending invites take up seats too. If none of these accounts has a free seat, someone signing in through SSO for the first time can't get in, so make sure each account's user limit covers your SSO users.
 
 ## Migrating existing users to SSO
 

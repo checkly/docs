@@ -63,7 +63,7 @@ Pricing quantities depend on the rule. API and Browser checks use runs, Multiste
 
 `include=runs` adds physical check-run counts: `totalRuns`, `finalRuns`, `retryRuns`, `cancelledRuns`, `degradedRuns`, `failedRuns`, `errorRuns`, `abortedRuns`, and `overMaxResponseTimeRuns`. Outcome flags can overlap. These counts are independent of billed quantities.
 
-`include=monitorDays` adds observed uptime monitor resource-days. Repeated runs for the same account, monitor, check type, and UTC date count once. Uptime pricing charges one organization-day when at least one monitor records usage, regardless of monitor count. Grouped measurement rows can therefore have zero credits alongside a shared uptime charge.
+`include=monitorDays` adds observed uptime monitor resource-days, including days with only test-session or ad hoc runs. Repeated runs for the same account, monitor, check type, and UTC date count once. Uptime pricing charges each active monitor once per UTC day, whatever its run count, so two monitors active on one day are two charged days. Test-session and ad hoc runs of uptime monitors are not charged, so a monitor that only ran that way on a day counts in `monitorDays` with zero credits.
 
 Covered empty rows have zero measurement counts. Counts are null when a bucket includes uncovered dates, unless the row identifies a covered term. Adding measurement details or changing grouping does not change credits.
 

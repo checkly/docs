@@ -11,7 +11,7 @@ Synthetic checks, such as API, Browser and Multistep checks and Playwright Check
 
 Each run of a check uses check runs, wherever it starts: scheduled runs, runs you start with **Schedule now**, test runs from the check editor, and test sessions from the CLI, such as `npx checkly test` and `npx checkly trigger`. On top of that:
 
-- **Locations:** each location counts. A check that runs from three locations in parallel uses three check runs each time it's scheduled.
+- **Locations:** with parallel scheduling, each location counts. A check that runs from three locations in parallel uses three check runs each time it's scheduled.
 - **Retries:** each retry is another check run. A flaky check that often retries uses noticeably more.
 - **Multistep checks:** each HTTP request the check makes counts as one API check run, with at least one per run.
 - **Playwright Check Suites:** each started 30 seconds of run time counts as one Browser check run.
@@ -19,6 +19,34 @@ Each run of a check uses check runs, wherever it starts: scheduled runs, runs yo
 For example, an API check that runs every hour from two locations in parallel uses 48 check runs a day. Each retry adds one more.
 
 To use fewer check runs, lower the frequency of checks that don't need it, run from fewer locations, or use round-robin instead of [parallel scheduling](/concepts/scheduling), and fix flaky checks so they retry less.
+
+## Estimating your monthly check runs
+
+To estimate how many check runs a check uses in a month, multiply its runs per day by the days in the month and by the locations each run uses.
+
+- **Runs per day:** divide 1,440, the minutes in a day, by the check's frequency in minutes. A check that runs every 5 minutes runs 288 times a day.
+- **Locations per run:** with parallel scheduling, the number of locations you selected. With round-robin scheduling, it's 1, however many locations you select: each run uses one location, and the next run uses the next one.
+- **Groups:** if the check is in a [group](/platform/groups) that sets locations or a scheduling strategy, use the group's settings.
+
+Then adjust for the check type and for retries:
+
+- **Multistep checks:** multiply by the number of HTTP requests the check makes in a run.
+- **Playwright Check Suites:** multiply by the number of started 30-second blocks a run takes. A suite that runs for 70 seconds uses 3 Browser check runs each time.
+- **Retries:** retries only happen when a run fails. Each retry adds one check run, so a check with 2 retries uses up to 3 check runs for a run that keeps failing. With parallel scheduling, count this for each location that fails.
+
+Count only checks that are activated: deactivated checks don't run. Add up your checks separately for Browser and Playwright check runs, and for API and Multistep check runs, because your plan includes each separately. Runs you start yourself, such as test runs, **Schedule now** and CLI test sessions, come on top.
+
+Examples for a 30-day month (a 31-day month adds about 3%):
+
+| Check | Check runs per month |
+|---|---|
+| Every minute, 1 location | 1,440 × 30 × 1 = 43,200 |
+| Every 5 minutes, 3 locations in parallel | 288 × 30 × 3 = 25,920 |
+| Every 5 minutes, 3 locations round-robin | 288 × 30 × 1 = 8,640 |
+| Every hour, 2 locations in parallel | 24 × 30 × 2 = 1,440 |
+| Playwright Check Suite of 70 seconds, every 10 minutes, 1 location | 144 × 30 × 3 = 12,960 |
+
+Compare your total with the check runs your plan includes, listed on the [pricing page](https://www.checklyhq.com/pricing/). Adding check runs to your plan in advance costs less per run than paying overage for them: see [Adding capacity](/admin/billing#adding-capacity). Uptime monitors don't count toward this total: see [Uptime monitors](#uptime-monitors).
 
 ## Uptime monitors
 

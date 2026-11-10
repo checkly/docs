@@ -55,14 +55,9 @@ Starting with visual regression testing takes just three easy steps:
 
    </CodeGroup>
 
-2. Run your Browser check. The first time you run it, you will get an error indicating that no golden image / reference
-   snapshot exists yet.
-
-   ```
-   A snapshot doesn't exist at /tmp/19g67loplhq0j/script.spec.js-snapshots/Playwright-homepage-1-chromium-linux.png.
-   ```
-   
-3. Generate a golden image / reference snapshot by choosing "Run check and update golden files" from the dropdown next to the "Run check" button.
+2. Run your Browser check. While your check has no golden image / reference snapshot yet, the editor shows "You're using
+   `.toHaveScreenshot()`, so the first run will create the golden files." above the "Run check" button, and the first run
+   generates the golden image.
 
 <video
   controls
@@ -70,8 +65,17 @@ Starting with visual regression testing takes just three easy steps:
   src="/images/docs/images/browser-checks/visual_comparison_1st_run.mp4"
 ></video>
 
-   This will generate the golden image, which you can inspect in the "golden files" tab in the editor. You can now save
+   You can inspect the golden image in the "golden files" tab in the editor. You can now save
    your check and on each check run the golden image will be compared to the actual screenshot.
+
+3. To update the golden image later, for example after an intended change to your page, choose **Run check and update golden files**
+   from the dropdown next to the **Run check** button, or click **Run & update golden file(s)** in the **Golden files** tab.
+
+   Once a check has golden files, **Run check** and scheduled runs don't create new ones. If you add another screenshot assertion, those runs fail until you update the golden files:
+
+   ```
+   A snapshot doesn't exist at /tmp/19g67loplhq0j/script.spec.js-snapshots/Playwright-homepage-1-chromium-linux.png.
+   ```
 
    <CLITip>
    If you are using the Checkly CLI, you can also generate a golden image / reference snapshot by running the following

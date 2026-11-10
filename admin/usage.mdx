@@ -32,7 +32,7 @@ Then adjust for the check type and for retries:
 
 - **Multistep checks:** multiply by the number of HTTP requests the check makes in a run.
 - **Playwright Check Suites:** multiply by the number of started 30-second blocks a run takes. A suite that runs for 70 seconds uses 3 Browser check runs each time.
-- **Retries:** retries only happen when a run fails. Each retry adds one check run, so a check with 2 retries uses up to 3 check runs for a run that keeps failing.
+- **Retries:** retries only happen when a run fails. Each retry adds one check run, so a check with 2 retries uses up to 3 check runs for a run that keeps failing. With parallel scheduling, count this for each location that fails.
 
 Count only checks that are activated: deactivated checks don't run. Add up your checks separately for Browser and Playwright check runs, and for API and Multistep check runs, because your plan includes each separately. Runs you start yourself, such as test runs, **Schedule now** and CLI test sessions, come on top.
 

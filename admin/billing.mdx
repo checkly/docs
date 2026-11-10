@@ -14,7 +14,7 @@ Before you confirm a change, the checkout tells you when it applies:
 - **Immediately**, if the new configuration costs more than your current one for the rest of the billing period. You're charged the prorated difference right away, and any overages so far are included in the checkout. The checkout says "Your new subscription begins today." Your billing date stays the same, unless you also switch between monthly and annual billing.
 - **At the end of your current billing period**, otherwise, for example when you move to a smaller plan or lower an add-on. Until then, your account keeps its current configuration. The checkout shows the date the new plan takes effect.
 
-The same applies to annual plans. If you're on the Hobby plan or a trial, a new subscription starts immediately.
+The same applies to annual plans. If you're on the Hobby plan or a trial, a new subscription starts immediately. If you're on a [legacy plan](#legacy-plans), the change is always scheduled for the end of the billing period.
 
 While a plan change is scheduled, you can't make another change, and you can't change or cancel the scheduled one from the app. Contact [support@checklyhq.com](mailto:support@checklyhq.com) if you need to.
 
@@ -26,7 +26,7 @@ If you only need the extra capacity for a while, lower it again before your rene
 
 ## Paying
 
-Self-serve plans are paid by credit card. You can update your card on the **Billing & usage** page.
+Self-serve plans are paid by credit card. You can update your card on the **Billing & usage** page. If you're on a [legacy plan](#legacy-plans) and saving your card fails, contact [support@checklyhq.com](mailto:support@checklyhq.com).
 
 ## If a payment fails
 
@@ -36,6 +36,21 @@ Update your payment method on the **Billing & usage** page before that date. Onc
 
 ## Cancelling
 
-Cancelling a paid plan moves your account to the Hobby plan at the end of the billing period. Overages incurred until then are added to your next invoice.
+Cancelling a paid plan moves your account to the Hobby plan at the end of the billing period. Overages incurred until then are added to your next invoice. On a Deprecated plan, contact [support@checklyhq.com](mailto:support@checklyhq.com) to cancel. See [Legacy plans](#legacy-plans).
 
 To [delete your account](/admin/deleting-your-account), wait until it has moved to the Hobby plan: accounts on a paid plan can't be deleted.
+
+## Legacy plans
+
+Pay as you go, Prepaid and Deprecated plans are no longer sold. If your account is on one of them, it keeps running on that plan until you change or cancel it, and you don't have to switch. The **Billing & usage** page shows the plan's name and says "Your current plan is no longer available": you can't buy it again or add to it, only move to a current plan.
+
+Newer features may not be included in a legacy plan, for example [service API keys](/admin/creating-api-key#service-api-keys). To see what your plan includes, run [`npx checkly account plan`](/cli/checkly-account) or call the [entitlements API](/api-reference/accounts/fetch-current-account-entitlements).
+
+To move to the Starter or Team plan:
+
+- **Pay as you go or Prepaid**: select **Change plan** or **Modify plan** on the **Billing & usage** page. The change is always scheduled for the end of your current billing period, even if the new plan costs more. Until then, your account stays on its current plan.
+- **Deprecated**: select **Contact support** on the **Billing & usage** page.
+
+While the change is scheduled, the page says "You have scheduled a subscription change from a deprecated plan to a new plan" and shows the date it takes effect. To switch sooner, contact [support@checklyhq.com](mailto:support@checklyhq.com).
+
+To cancel a Pay as you go or Prepaid plan, select **Cancel plan**. To cancel a Deprecated plan, contact [support@checklyhq.com](mailto:support@checklyhq.com).

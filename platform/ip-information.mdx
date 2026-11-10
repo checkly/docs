@@ -11,7 +11,7 @@ canonical: 'https://www.checklyhq.com/docs/platform/ip-information/'
 
 Checkly supports both IPv4 and IPv6. We have a dual stack setup, meaning that we can reach both IPv4 and IPv6 addresses from our check runtime.
 
-API checks and uptime monitors with an **IP family** setting (URL, TCP, SSL, ICMP, gRPC and traceroute monitors) connect over IPv4 by default, even when your endpoint is also reachable over IPv6. Set the IP family to IPv6 to connect over IPv6 instead. The check only uses the family you set. For example, an API check that uses IPv4 can't reach a host that only has an IPv6 address, and fails with an error like `dial tcp4: address 2001:db8::1: no suitable address found`.
+API checks and uptime monitors with an **IP family** setting (URL, TCP, SSL, ICMP, gRPC and traceroute monitors) connect over IPv4 by default, even when your endpoint is also reachable over IPv6. Set the IP family to IPv6 to connect over IPv6 instead. The check only uses the family you set. For example, an API check that uses IPv4 can't reach a host name that only has an IPv6 (AAAA) record and fails with a `no such host` lookup error. With an IPv6 address in the URL, it fails with an error like `dial tcp4: address 2001:db8::1: no suitable address found`.
 
 For other workloads, such as Browser checks, the IPv6 stack is preferred over IPv4. This means that if your endpoint is reachable over IPv6, we will use that. If not, we will fall back to IPv4.
 

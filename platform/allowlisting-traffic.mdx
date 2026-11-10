@@ -105,7 +105,9 @@ test('my user agent test', async ({ page }) => {
 
 ### Allowlisting Playwright Check Suites with user agents
 
-You can configure the user agent globally in your `playwright.config.ts` file to ensure all your Playwright tests use the Checkly user agent.
+Checkly appends `(Checkly, https://www.checklyhq.com)` to the user agent of every Playwright Check Suite, including a user agent you set yourself, so you don't need to add it. See [Default Checkly user agent](#default-checkly-user-agent).
+
+To allowlist your own checks only, add `Checkly/<UUID>` to the user agent in your `playwright.config.ts` file and allow traffic with user agent containing that value.
 
 **For all projects:**
 
@@ -114,14 +116,16 @@ import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
   use: {
-    userAgent: "(Checkly, https://www.checklyhq.com)",
+    userAgent: "Checkly/abcd1234",
   },
 })
 ```
 
+Checkly sends this as `Checkly/abcd1234 (Checkly, https://www.checklyhq.com)`.
+
 **For individual projects:**
 
-To preserve the browser's user agent while adding the Checkly identifier, append it to the device's user agent:
+To preserve the browser's user agent while adding your identifier, append it to the device's user agent:
 
 ```ts playwright.config.ts
 import { defineConfig, devices } from '@playwright/test'
@@ -132,14 +136,14 @@ export default defineConfig({
       name: 'chromium-checkly-agent',
       use: {
         ...devices['Desktop Chrome'],
-        userAgent: `${devices['Desktop Chrome'].userAgent} (Checkly, https://www.checklyhq.com)`
+        userAgent: `${devices['Desktop Chrome'].userAgent} Checkly/abcd1234`
       },
     },
   ],
 })
 ```
 
-Afterwards, you can reference this new project with the Checkly user-agent so that it's the one run in your checks:
+Afterwards, you can reference this new project with your user agent so that it's the one run in your checks:
 
 ```ts checkly.config.ts highlight={15}
 import { defineConfig } from 'checkly'
@@ -203,6 +207,9 @@ CloudFlare automatically syncs the latest Checkly IP addresses, so this approach
 This is what Checkly sends as user agent:
 
 - API & Multistep checks: `Checkly/1.0 (https://www.checklyhq.com)`.
-- Browser checks: `Checkly, https://www.checklyhq.com`.
+- Browser checks: a Chrome user agent ending in `(Checkly, https://www.checklyhq.com)`, for example `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/<version> Safari/537.36 (Checkly, https://www.checklyhq.com)`, where `<version>` is the Chromium version the check runs with. If you set your own `userAgent` in a Browser check, Checkly sends your value unchanged.
+- Playwright Check Suites: the browser's user agent, or the `userAgent` you configure, with `(Checkly, https://www.checklyhq.com)` appended.
+
+To identify Checkly's browser traffic in a firewall or WAF rule, match user agents that contain `(Checkly, https://www.checklyhq.com)` instead of the full string, which changes with the browser version.
 
 Changing the user agent of a check will not change the browser or browser version, it will simply set a new string for user agent.

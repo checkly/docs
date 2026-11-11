@@ -24,7 +24,7 @@ canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/browser-c
 **Solutions**:
 1. Use `waitForSelector()` instead of fixed delays
 2. Wait for network requests to complete
-3. Use `waitForLoadState()` for page readiness
+3. Wait for the element you need with a web-first assertion instead of `waitForLoadState()`, which can time out on pages with slow third-party scripts. See [Intermittent failures](#intermittent-failures)
 4. Implement proper error handling and retries
 
 </Accordion>
@@ -85,13 +85,10 @@ await page.waitForSelector('.slow-element', { timeout: 30000 })
 
 <Accordion title="Error Recovery">
 ```typescript
-// Graceful error handling
-try {
-  await page.click('.optional-popup-close', { timeout: 5000 })
-} catch (error) {
-  // Continue if popup doesn't appear
-  console.log('No popup to close')
-}
+// Close an optional popup whenever it appears before an action
+await page.addLocatorHandler(page.locator('.optional-popup'), async () => {
+  await page.click('.optional-popup-close')
+})
 
 // Conditional interactions
 const isLoggedIn = await page.locator('.user-menu').isVisible()
@@ -100,5 +97,180 @@ if (!isLoggedIn) {
   // Handle login flow
 }
 ```
+
+</Accordion>
+
+## Intermittent failures
+
+A check that passes most of the time and sometimes fails usually has a timing problem in the script: it acts before the page is ready, waits for something that doesn't always happen, or matches an element the user can't see. Checkly runs each Browser check with one worker, no Playwright retries and Playwright's default test timeout of 30 seconds, unless you set your own with `test.setTimeout()`. Each run starts a new browser.
+
+Start from a failed result. Read the error and its call log, then open the trace and video to see what the page showed when the step failed. Scheduled runs keep the trace and video only when the check fails. See [Viewing trace files](/detect/synthetic-monitoring/browser-checks/playwright-support#viewing-trace-files).
+
+<Accordion title="Hard waits">
+**Issue: The check fails with an unexpected value, or with `page.waitForTimeout: Test timeout of 30000ms exceeded.`**
+
+A fixed wait with `page.waitForTimeout()` is either too short or too long. When the page is slower than the wait, the next step reads the page too early:
+
+```text
+Error: expect(received).toBe(expected) // Object.is equality
+Expected: "Ready"
+Received: "Loading"
+```
+
+When the wait is longer than the time left, the test times out during the wait.
+
+**Solutions**:
+1. Remove `page.waitForTimeout()` calls.
+2. Use web-first assertions and locator actions. They wait until the element is ready, up to their timeout:
+
+```ts
+// Instead of:
+await page.waitForTimeout(1000)
+expect(await page.locator('#status').textContent()).toBe('Ready')
+
+// Use:
+await expect(page.locator('#status')).toHaveText('Ready')
+```
+
+See [Waits and timeouts](/learn/playwright/waits-and-timeouts).
+
+</Accordion>
+
+<Accordion title="The load event or network idle never happens">
+**Issue: `page.goto: Test timeout of 30000ms exceeded.` with `waiting until "load"` in the call log, or `page.waitForLoadState: Test timeout of 30000ms exceeded.`**
+
+`page.goto()` waits for the page's `load` event by default. The `load` event waits for every script and image on the page, including third-party tags such as analytics and marketing pixels. If one of them hangs, `load` doesn't fire, even when your page has already rendered. `waitForLoadState('networkidle')` waits until there have been no network requests for 500 ms, so a page that polls an API or keeps a request open never reaches it. Third-party scripts can be slow from one location and fast from another, which makes the failure look random.
+
+In the trace, the network tab lists the request that never finished.
+
+**Solutions**:
+1. Don't wait for `networkidle`. Playwright discourages it.
+2. Navigate with `waitUntil: 'domcontentloaded'`, then wait for the element you need:
+
+```ts
+await page.goto('https://example.com', { waitUntil: 'domcontentloaded' })
+await expect(page.getByRole('button', { name: 'Sign up' })).toBeVisible()
+```
+
+3. If a third-party script isn't part of what you monitor, you can block it with [`page.route()`](https://playwright.dev/docs/network#abort-requests). Your check then won't notice when that script breaks your page. See [Avoid network interception in synthetic monitoring](/learn/playwright/intercept-requests#avoid-network-interception-in-synthetic-monitoring).
+
+```ts
+await page.route('**/tracking-script.js', (route) => route.abort())
+await page.goto('https://example.com')
+```
+
+</Accordion>
+
+<Accordion title="Popups and cookie banners that appear only sometimes">
+**Issue: A click times out, and the call log shows that another element `intercepts pointer events`**
+
+A cookie banner, newsletter popup or survey covers the page in some runs and not in others. Playwright keeps retrying the click until the test times out.
+
+**Solutions**:
+1. Register a handler with [`page.addLocatorHandler()`](https://playwright.dev/docs/api/class-page#page-add-locator-handler) before the steps it should protect. Whenever the popup is visible before an action, Playwright runs the handler first. When the popup doesn't appear, the handler doesn't run and the check continues:
+
+```ts
+await page.addLocatorHandler(page.getByRole('dialog', { name: 'Cookie consent' }), async () => {
+  await page.getByRole('button', { name: 'Accept all' }).click()
+})
+
+await page.goto('https://example.com')
+await page.getByRole('button', { name: 'Add to cart' }).click()
+```
+
+2. Avoid catching a click with a short timeout to close an optional popup. It fails when the popup appears later than that timeout.
+
+`page.addLocatorHandler()` needs Playwright 1.42 or later, so runtime 2024.02 or later. See [runtime specifications](/platform/runtimes/runtime-specification).
+
+</Accordion>
+
+<Accordion title="Tests share a page or context from beforeAll">
+**Issue: A test fails because of what an earlier test did, and failed results have no video**
+
+When you create a context or page with `browser.newContext()` in `test.beforeAll()`, all tests in the file share it, including cookies, local storage and the current URL. A test can then pass or fail depending on the tests before it. Playwright also records no video for pages in a context you create yourself.
+
+**Solutions**:
+1. Use the built-in `page` fixture. Each test gets a new context and page, and Playwright records the video:
+
+```ts
+test('cart starts empty', async ({ page }) => {
+  await page.goto('https://example.com/cart')
+  await expect(page.locator('#items')).toHaveText('0 items')
+})
+```
+
+2. To share a login between tests, save the storage state and load it in each test instead of sharing the page. See [Playwright authentication](/learn/playwright/authentication).
+
+</Accordion>
+
+<Accordion title="Strict mode violations and hidden elements">
+**Issue: `strict mode violation: ... resolved to 2 elements`, or a click times out with `element is not visible` in the call log**
+
+A locator that matches several elements fails an action in strict mode:
+
+```text
+Error: locator.click: Error: strict mode violation: locator('.submit') resolved to 2 elements:
+```
+
+Pages often contain hidden copies of an element, such as a mobile menu or the entries of another month in a calendar. Adding `.first()` silences the strict mode error but can pick the hidden copy. Playwright then waits for that element to become visible until the test times out.
+
+**Solutions**:
+1. Use role-based locators. `getByRole()` ignores hidden elements by default:
+
+```ts
+await page.getByRole('button', { name: 'Submit' }).click()
+```
+
+2. Scope the locator to the visible part of the page, for example `page.locator('main').locator('.submit')`.
+3. Keep only visible matches with `.filter({ visible: true })`. This needs Playwright 1.51 or later, so runtime 2025.04 or later.
+
+See [Handling multiple matching elements](/learn/playwright/selectors#handling-multiple-matching-elements).
+
+</Accordion>
+
+<Accordion title="Redirects that race with the next step">
+**Issue: `page.goto: net::ERR_ABORTED`, or the step after a click fails because the page changed**
+
+Some pages redirect a moment after they load, for example to a login or consent page. When the script clicks or navigates just before the redirect, the redirect cancels that navigation. Whether the script wins the race depends on timing, so the check fails only sometimes.
+
+**Solutions**:
+1. Wait for the final URL before the next step:
+
+```ts
+await page.goto('https://example.com/start')
+await expect(page).toHaveURL(/\/final$/)
+await page.getByRole('link', { name: 'Log in' }).click()
+```
+
+`page.waitForURL('**/final')` works too.
+
+</Accordion>
+
+<Accordion title="browserType.launch: Target page, context or browser has been closed">
+**Issue: The run fails with `browserType.launch: Target page, context or browser has been closed`**
+
+The browser stopped while it was starting, before your test code ran. The result has no video.
+
+**Solutions**:
+1. Check whether the next runs passed. If the check uses [retries](/communicate/alerts/retries), a failed run is retried: Checkly runs the whole check again with a new browser.
+2. If the error keeps coming back, contact [support@checklyhq.com](mailto:support@checklyhq.com) with a link to the failed result.
+
+</Accordion>
+
+<Accordion title="Failures that started after a runtime change">
+**Issue: The check fails more often since its runtime changed, for example after a new account default runtime**
+
+Each runtime comes with its own Playwright and Chromium versions, so a runtime change can change timing and behavior.
+
+**Solutions**:
+1. Run the check on the previous runtime and compare the results. With the CLI, set `runtimeId` on the check, for example `runtimeId: '2025.04'`, and run `npx checkly test --verbose`. The run log names the runtime it used, for example `Creating runtime version 2025.04`. To do this in the web app, see [Overriding runtimes for specific checks](/platform/runtimes/overview#overriding-runtimes-for-specific-checks).
+2. If the check passes on the previous runtime and fails on the new one, compare the traces of both runs to find the step that behaves differently.
+
+</Accordion>
+
+<Accordion title="Failures from one location only">
+**Issue: The check fails from one location and passes from others**
+
+A third-party script, CDN or network path can be slow from one region only. Compare failed and passing results from different locations, and look at the network tab in the trace for slow requests. See [Managing false positives](/platform/managing-false-positives) for retries and multi-location setups that reduce alerts for regional problems.
 
 </Accordion>

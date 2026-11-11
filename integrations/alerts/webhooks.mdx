@@ -78,15 +78,15 @@ Not every variable has a value for every check type. An empty variable renders a
 
 | Variable | When it has a value |
 | --- | --- |
-| `CHECK_ERROR_MESSAGE` | API checks and URL monitors: when the request fails. Browser and Multistep checks: the first error of the run. Empty for TCP, DNS and heartbeat monitors. See below for details. |
+| `CHECK_ERROR_MESSAGE` | API checks and URL monitors: when the request fails. Browser checks: the first error of the run. Empty for TCP, DNS and heartbeat monitors. See below for details. |
 | `API_CHECK_RESPONSE_STATUS_CODE`, `API_CHECK_RESPONSE_STATUS_TEXT` | API checks and URL monitors: the response status. TCP monitors: `200` / `SUCCESS` or `500` / `ERROR`. Empty for DNS monitors, heartbeat monitors and Browser checks. |
-| `RESPONSE_TIME`, `RUN_LOCATION`, `REGION` | Every check type except heartbeat monitors. |
+| `RESPONSE_TIME`, `RUN_LOCATION`, `REGION` | API checks, URL, TCP and DNS monitors, and Browser checks. Empty for heartbeat monitors. |
 | `GROUP_NAME` | The group's name, when the check belongs to a group. Always empty for heartbeat monitors, even when they belong to a group. |
 | `STATE` | Heartbeat monitors only. |
 
 For API checks and URL monitors, `CHECK_ERROR_MESSAGE` is filled when the request itself fails, for example with a refused connection. For API checks, it's also filled when the run fails before the request, for example in a setup script. It stays empty when the request succeeds but an assertion fails, for example on an unexpected status code. Use `API_CHECK_RESPONSE_STATUS_CODE` for that case.
 
-For Browser and Multistep checks, `CHECK_ERROR_MESSAGE` holds the first error of the run. It is cut to its first 300 characters, then its line breaks are removed, so the lines of the error run together.
+For Browser checks, `CHECK_ERROR_MESSAGE` holds the first error of the run. It is cut to its first 300 characters, then its line breaks are removed, so the lines of the error run together.
 
 When a heartbeat monitor misses a ping, `ALERT_TYPE` is `ALERT_FAILURE` and `STATE` is `FAILING`. For example, this template:
 

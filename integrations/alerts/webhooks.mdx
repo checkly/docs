@@ -374,7 +374,7 @@ Send a message using [Pushover](https://pushover.net/) by posting this body:
 
 ### Slack incoming webhook
 
-To send alerts to a Slack workspace that isn't connected to your Checkly account, for example a second workspace or one where the [Checkly Slack app](/integrations/alerts/slack) isn't approved, post them to a Slack incoming webhook:
+To send alerts to a Slack workspace that isn't connected to your Checkly account, for example a second workspace or one where the [Checkly Slack app](/integrations/alerts/slack) isn't approved, post them to an incoming webhook of a Slack app you create. This uses a generic **Webhook** alert channel, not the deprecated **Slack webhook** alert channel:
 
 1. In Slack, create an app in the workspace, turn on **Incoming Webhooks**, select **Add New Webhook to Workspace** and pick the channel. Copy the webhook URL. See Slack's guide to [sending messages using incoming webhooks](https://docs.slack.dev/messaging/sending-messages-using-incoming-webhooks). Depending on your workspace's settings, installing the app can need an admin's approval.
 2. In Checkly, add a **Webhook** alert channel with the method `POST` and the webhook URL as the URL.

@@ -27,13 +27,13 @@ crash instead, that crash is reported, because the CLI should have caught the mi
   CLI, for example `checkly/dist/commands/deploy.js`. Paths in any installed package, including your own packages,
   start at `node_modules/`, for example `node_modules/axios/lib/core/Axios.js`. Every other path in the stack trace
   is replaced with a placeholder.
-  In the message, the CLI's folder, your project folder and your home folder are replaced with placeholders.
 - The CLI version and the command name, for example `deploy`.
 - Whether the CLI runs in a terminal, in CI or for an AI agent.
 - Your operating system, CPU architecture and Node.js version.
 
-The CLI removes Checkly API keys, `Bearer` and `Basic` tokens and passwords in URLs from the message, and replaces
-your project and home folders.
+The message is sent as it is, with two exceptions. The CLI removes Checkly API keys, `Bearer` and `Basic` tokens and
+user names and passwords in URLs. It replaces the paths of the CLI's folder, the folder you run the CLI from and your
+home folder with placeholders.
 
 ## Network access
 

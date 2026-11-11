@@ -83,7 +83,7 @@ Not every variable has a value for every check type. An empty variable renders a
 | `RESPONSE_TIME`, `RUN_LOCATION`, `REGION` | Filled | Filled | Filled | Filled | Empty | Filled |
 | `STATE` | Empty | Empty | Empty | Empty | Filled | Empty |
 
-For API checks and URL monitors, `CHECK_ERROR_MESSAGE` is filled when the request itself fails, for example with a refused connection. It stays empty when the request succeeds but an assertion fails, for example on an unexpected status code. Use `API_CHECK_RESPONSE_STATUS_CODE` for that case.
+For API checks and URL monitors, `CHECK_ERROR_MESSAGE` is filled when the request itself fails, for example with a refused connection. For API checks, it's also filled when the run fails before the request, for example in a setup script. It stays empty when the request succeeds but an assertion fails, for example on an unexpected status code. Use `API_CHECK_RESPONSE_STATUS_CODE` for that case.
 
 For Browser checks, `CHECK_ERROR_MESSAGE` holds the first error of the run. It is cut to its first 300 characters, then its line breaks are removed, so the lines of the error run together.
 

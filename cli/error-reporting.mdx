@@ -25,14 +25,15 @@ crash instead, that crash is reported, because the CLI should have caught the mi
 
 - The error type, its message and the stack trace. Paths in the CLI's own files are shortened to the file inside the
   CLI, for example `checkly/dist/commands/deploy.js`. Paths in the CLI's dependencies start at `node_modules/`, for
-  example `node_modules/axios/lib/core/Axios.js`. Every other path is replaced with a placeholder.
+  example `node_modules/axios/lib/core/Axios.js`. Every other path in the stack trace is replaced with a placeholder.
+  In the message, the CLI's folder, your project folder and your home folder are replaced with placeholders.
 - The CLI version and the command name, for example `deploy`.
 - Whether the CLI runs in a terminal, in CI or for an AI agent.
 - Your operating system, CPU architecture and Node.js version.
 
 A report never contains your API key, command arguments, environment variables, computer name, user name or the
-contents of your files. The CLI removes credentials it finds in an error message, such as API keys, tokens and
-passwords in URLs, before it sends the report.
+contents of your files. The CLI removes Checkly API keys, `Bearer` and `Basic` tokens and passwords in URLs from the
+error message before it sends the report.
 
 ## Network access
 

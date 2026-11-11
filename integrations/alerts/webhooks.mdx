@@ -372,6 +372,28 @@ Send a message using [Pushover](https://pushover.net/) by posting this body:
 }
 ```
 
+### Slack incoming webhook
+
+To send alerts to a Slack workspace that isn't connected to your Checkly account, for example a second workspace or one where the [Checkly Slack app](/integrations/alerts/slack) isn't approved, post them to an incoming webhook of a Slack app you create. This uses a generic **Webhook** alert channel, not the deprecated **Slack webhook** alert channel:
+
+1. In Slack, create an app in the workspace, turn on **Incoming Webhooks**, select **Add New Webhook to Workspace** and pick the channel. Copy the webhook URL. See Slack's guide to [sending messages using incoming webhooks](https://docs.slack.dev/messaging/sending-messages-using-incoming-webhooks). Depending on your workspace's settings, installing the app can need an admin's approval.
+2. In Checkly, add a **Webhook** alert channel with the method `POST` and the webhook URL as the URL.
+3. Use a body with a `text` field, for example:
+
+   ```json
+   {
+     "text": "{{{ALERT_TITLE}}}\n{{{RESULT_LINK}}}"
+   }
+   ```
+
+The triple braces stop quotes in the check name, and `&` or `=` in the link, from being HTML-escaped. See [Using Variables](#using-variables).
+
+Compared to the Checkly Slack app:
+
+- Each webhook URL posts to the one channel you picked when you created it. To alert another channel, create another webhook and another alert channel.
+- Each alert is posted as a new message.
+- The message contains only what your body template includes. You write the message format yourself.
+
 ### Trello
 
 You can create a [Trello](https://trello.com) card using just the URL and no payload:

@@ -74,6 +74,27 @@ A check, monitor or group that sets no `retryStrategy` uses the default for its 
 | `PlaywrightCheck` | No retry strategy. Configure retries in your Playwright configuration instead. |
 | `CheckGroupV2` | No group retry strategy. Each check in the group uses its own. |
 
+<Note>
+On the Hobby, Starter and Team plans, monitors (other than `HeartbeatMonitor`, which doesn't retry) accept only `noRetries()` and `singleRetry()`, and a deploy with any other strategy on a monitor fails. That includes a strategy a monitor gets from the project-level `checks.retryStrategy` or from its group:
+
+- Set `noRetries()` or `singleRetry()` on monitors that would otherwise use a project-level default.
+- A group's `retryStrategy` takes precedence over the monitor's own. Leave it unset on a `CheckGroupV2` that contains monitors, or use `noRetries()` or `singleRetry()`.
+
+```ts
+import { RetryStrategyBuilder, UrlMonitor } from "checkly/constructs"
+
+new UrlMonitor("homepage-monitor", {
+  name: "Homepage",
+  retryStrategy: RetryStrategyBuilder.singleRetry({ baseBackoffSeconds: 10 }),
+  request: {
+    url: "https://example.com",
+  },
+})
+```
+
+See [Retries on uptime monitors](/communicate/alerts/retries#retries-on-uptime-monitors).
+</Note>
+
 ### Retry Strategy Methods
 
 Use the `RetryStrategyBuilder` methods to apply different retry strategies to your checks and monitors.

@@ -12,7 +12,7 @@ import OtlpVendorOutro from '/snippets/otlp-vendor-outro.mdx';
 
 Self-hosted ClickStack and Managed ClickStack in ClickHouse Cloud end the same way. Checkly sends the spans to your collector on port 4318 with an `authorization` header.
 
-1. Get the endpoint. It is your collector at `https://<host>:4318/v1/traces`. The collector must be reachable from where your checks run. For public locations that means a public address with TLS in front. For private locations, an address reachable from the agent's network is enough.
+1. Get the endpoint. It is your collector at `https://<host>:4318/v1/traces`. The collector must be reachable from where your checks run. For public locations that means a public address with TLS in front. For private locations, an address reachable from the runner's network is enough.
 2. Get the key. It depends on your setup.
    - Self-hosted ClickStack: in the HyperDX UI, open **Team Settings** > **API Keys** and copy the ingestion key.
    - Managed ClickStack in ClickHouse Cloud: there is no hosted OTLP endpoint. Run the ClickStack collector pointed at ClickHouse Cloud, and use the `OTLP_AUTH_TOKEN` you set on it as the key.

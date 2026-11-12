@@ -24,8 +24,6 @@ import OtlpVendorOutro from '/snippets/otlp-vendor-outro.mdx';
 5. Find the spans. In Bronto, open **Explore Traces**. The spans appear under service `checkly`, named after the check.
    ![Checkly span as the root of a trace in Bronto Explore Traces](/images/docs/images/otel/export-traces/bronto-traces.png)
 
-Datasets and collections only organize logs, so an `x-bronto-dataset` header row does nothing for traces.
-
 If no spans arrive, check that the export is saved, that the header name is exactly `x-bronto-api-key` and that the key carries the Ingestion role. Then check the region: an EU key sent to the US host is rejected, and the other way round.
 
 When your own services are instrumented and report to the same Bronto account, their spans nest under the check run with no further setup. [Correlate with your application's traces](/integrations/observability/traces/otlp#correlate-with-your-application’s-traces) covers the headers that make this work.

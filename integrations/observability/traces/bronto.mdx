@@ -22,5 +22,15 @@ import OtlpVendorOutro from '/snippets/otlp-vendor-outro.mdx';
 
 Keep the `/v1/traces` path. The base endpoint stores spans as log events and Explore Traces does not show them. Dataset and collection routing applies only to logs, so an `x-bronto-dataset` header row has no effect on traces.
 
-Bronto documents the endpoints in [Bronto Ingestion Endpoints](https://docs.bronto.io/getting-started/bronto-endpoints).
+If no spans arrive, check the region before anything else. A key from one region sent to the other region's host does not reach your account.
+
+Bronto indexes span attributes as field predicates with a `$` prefix. To find runs that did not pass:
+
+```text
+"$service.name" = 'checkly' AND "$checkly.check.status" != 'PASSED'
+```
+
+Group by `$checkly.check.location` to compare locations, or by `$checkly.check.name` to follow one check over time.
+
+Bronto documents the endpoints in [Bronto Ingestion Endpoints](https://docs.bronto.io/getting-started/bronto-endpoints) and this setup in [Checkly synthetic monitoring with OpenTelemetry](https://docs.bronto.io/integrations/checkly).
 <OtlpVendorOutro />

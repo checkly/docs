@@ -1,0 +1,25 @@
+---
+title: 'Export traces to Bronto'
+description: 'Send Checkly traces to Bronto with an Ingestion API key.'
+sidebarTitle: 'Bronto'
+canonical: 'https://www.checklyhq.com/docs/integrations/observability/traces/bronto/'
+---
+
+import OtlpVendorIntro from '/snippets/otlp-vendor-intro.mdx';
+import OtlpVendorOutro from '/snippets/otlp-vendor-outro.mdx';
+
+<OtlpVendorIntro vendor="Bronto" />
+
+1. Get the endpoint for your Bronto region. EU is `https://ingestion.eu.bronto.io/v1/traces` and US is `https://ingestion.us.bronto.io/v1/traces`.
+2. Get the key. In Bronto, open **Settings** > **API Keys**, select **Create a new API Key**, name it and give it the **Ingestion** role. Copy the key right away, because Bronto shows it once.
+3. Paste the values into Checkly. On the [Traces settings page](https://app.checklyhq.com/settings/account/traces), turn on **Enable exporting traces**, paste the URL, and add the header from the table below.
+4. Find the spans. In Bronto, open **Explore Traces**. The spans appear under service `checkly`.
+
+| Header name | Value |
+|---|---|
+| `x-bronto-api-key` | `<Ingestion API key>` |
+
+Keep the `/v1/traces` path. The base endpoint stores spans as log events and Explore Traces does not show them. Dataset and collection routing applies only to logs, so an `x-bronto-dataset` header row has no effect on traces.
+
+Bronto documents the endpoints in [Bronto Ingestion Endpoints](https://docs.bronto.io/getting-started/bronto-endpoints).
+<OtlpVendorOutro />

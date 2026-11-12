@@ -1,0 +1,36 @@
+---
+title: 'Export traces to Bronto'
+description: 'Send Checkly traces to Bronto with an Ingestion API key.'
+sidebarTitle: 'Bronto'
+canonical: 'https://www.checklyhq.com/docs/integrations/observability/traces/bronto/'
+---
+
+import OtlpVendorIntro from '/snippets/otlp-vendor-intro.mdx';
+import OtlpVendorOutro from '/snippets/otlp-vendor-outro.mdx';
+
+<OtlpVendorIntro vendor="Bronto" />
+
+1. Get the endpoint for your Bronto region. EU is `https://ingestion.eu.bronto.io/v1/traces` and US is `https://ingestion.us.bronto.io/v1/traces`. Checkly posts to exactly the URL you enter, so keep the `/v1/traces` path.
+2. Get the key. In Bronto, open **Settings** > **API Keys**, select **Add API key**, name it and give it the **Ingestion Role**. Copy the key right away, because Bronto shows it once.
+   ![API Keys page in Bronto](/images/docs/images/otel/export-traces/bronto-api-keys.png)
+3. Paste the values into Checkly. On the [Traces settings page](https://app.checklyhq.com/settings/account/traces), turn on **Enable exporting traces**, paste the URL, add the header below, and save.
+
+   | Header name | Value |
+   |---|---|
+   | `x-bronto-api-key` | `<Ingestion API key>` |
+
+   ![Checkly Export Traces settings with the Bronto endpoint and the x-bronto-api-key header](/images/docs/images/otel/export-traces/bronto-export-traces.png)
+4. Run a check, or wait for its schedule. Ad hoc runs from the check editor are exported too.
+5. Find the spans. In Bronto, open **Tracing**. The spans appear under service `checkly`, named after the check.
+   ![Checkly span as the root of a trace in Bronto Tracing](/images/docs/images/otel/export-traces/bronto-traces.png)
+
+If no spans arrive, check that the export is saved, that the header name is exactly `x-bronto-api-key` and that the key carries the Ingestion role. Then check the region: an EU key sent to the US host is rejected, and the other way round.
+
+When your own services are instrumented and report to the same Bronto account, their spans nest under the check run with no further setup. [Correlate with your application's traces](/integrations/observability/traces/otlp#correlate-with-your-application’s-traces) covers the headers that make this work.
+
+Build conditions with **Filter**: pick the field `Span:checkly.check.status`, the comparison **does not equal** and the value `PASSED` to list the runs that did not pass, and add `$service.name` equals `checkly` to leave your own services out.
+
+![Bronto trace filter for Checkly runs that did not pass](/images/docs/images/otel/export-traces/bronto-trace-filter.png)
+
+Bronto documents the endpoints in [Bronto Ingestion Endpoints](https://docs.bronto.io/getting-started/bronto-endpoints) and this setup in [Checkly synthetic monitoring with OpenTelemetry](https://docs.bronto.io/integrations/checkly).
+<OtlpVendorOutro />

@@ -28,7 +28,7 @@ If no spans arrive, check that the export is saved, that the header name is exac
 
 When your own services are instrumented and report to the same Bronto account, their spans nest under the check run with no further setup. [Correlate with your application's traces](/integrations/observability/traces/otlp#correlate-with-your-application’s-traces) covers the headers that make this work.
 
-Tracing has no query box. Build conditions with **Filter** instead: pick the field `Span:checkly.check.status`, the comparison **does not equal** and the value `PASSED` to list the runs that did not pass, and add `$service.name` equals `checkly` to leave your own services out.
+Build conditions with **Filter**: pick the field `Span:checkly.check.status`, the comparison **does not equal** and the value `PASSED` to list the runs that did not pass, and add `$service.name` equals `checkly` to leave your own services out.
 
 ![Bronto trace filter for Checkly runs that did not pass](/images/docs/images/otel/export-traces/bronto-trace-filter.png)
 

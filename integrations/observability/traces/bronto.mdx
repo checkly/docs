@@ -21,20 +21,14 @@ import OtlpVendorOutro from '/snippets/otlp-vendor-outro.mdx';
 
    ![Checkly Export Traces settings with the Bronto endpoint and the x-bronto-api-key header](/images/docs/images/otel/export-traces/bronto-export-traces.png)
 4. Run a check, or wait for its schedule. Ad hoc runs from the check editor are exported too.
-5. Find the spans. In Bronto, open **Explore Traces**. The spans appear under service `checkly`, named after the check.
-   ![Checkly span as the root of a trace in Bronto Explore Traces](/images/docs/images/otel/export-traces/bronto-traces.png)
+5. Find the spans. In Bronto, open **Tracing**. The spans appear under service `checkly`, named after the check.
+   ![Checkly span as the root of a trace in Bronto Tracing](/images/docs/images/otel/export-traces/bronto-traces.png)
 
 If no spans arrive, check that the export is saved, that the header name is exactly `x-bronto-api-key` and that the key carries the Ingestion role. Then check the region: an EU key sent to the US host is rejected, and the other way round.
 
 When your own services are instrumented and report to the same Bronto account, their spans nest under the check run with no further setup. [Correlate with your application's traces](/integrations/observability/traces/otlp#correlate-with-your-application’s-traces) covers the headers that make this work.
 
-In Bronto queries, span attributes take a `$` prefix. To list the runs that did not pass:
-
-```text
-"$service.name" = 'checkly' AND "$checkly.check.status" != 'PASSED'
-```
-
-Group on `$checkly.check.location` to compare response times between locations, or on `$checkly.check.name` to track one check.
+Tracing has no query box. Build conditions with **Filter** instead: pick the field `Span:checkly.check.status`, the comparison **does not equal** and the value `PASSED` to list the runs that did not pass, and add `$service.name` equals `checkly` to leave your own services out.
 
 Bronto documents the endpoints in [Bronto Ingestion Endpoints](https://docs.bronto.io/getting-started/bronto-endpoints) and this setup in [Checkly synthetic monitoring with OpenTelemetry](https://docs.bronto.io/integrations/checkly).
 <OtlpVendorOutro />

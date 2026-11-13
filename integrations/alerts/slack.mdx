@@ -12,9 +12,9 @@ Setting up Slack as an alerting channel is simple:
 
 ![Add a Slack WebHook URL to Checkly](/images/docs/images/alerting/slack.png)
 
-You can add any **#public-channel-name** or **@username** for Direct Messages. Each entry must start with `#` or `@`. For private channels, the Checkly Slack app needs to be explicitly invited to that channel by tagging it like `@Checkly`.
+You can add any **#public-channel-name**, a **channel ID** such as `C0123456789`, or **@username** for Direct Messages. Each entry must start with `#` or `@`, or be a channel ID. A channel ID keeps working after the channel is renamed, and is the reliable way to give a private channel. In Slack, you find it at the bottom of the channel details. For private channels, the Checkly Slack app needs to be explicitly invited to that channel by tagging it like `@Checkly`.
 
-Checkly doesn't check `#` channel names when you save the alert channel. It does match each `@` entry to a person in your workspace, and refuses to save an entry it can't match. Select **Test alert channel** to send a test message to each entry.
+Checkly doesn't check `#` channel names or channel IDs when you save the alert channel. It does match each `@` entry to a person in your workspace, and refuses to save an entry it can't match. Select **Test alert channel** to send a test message to each entry.
 
 A Checkly account connects one Slack workspace at a time. Your integrations page shows it under **Connected workspace**. Connecting a different workspace replaces the current one. Alert channels with `@` entries then stop sending direct messages until you open each channel and save it again.
 
@@ -86,7 +86,7 @@ If a test message can't be posted, the error names the entry and the error Slack
 
 | Error | What to check |
 | :-- | :-- |
-| `channel_not_found` | The channel name is spelled correctly and the channel exists. For a private channel, invite the Checkly app to it first. |
+| `channel_not_found` | The channel name or ID is correct and the channel exists. For a private channel, invite the Checkly app to it first. |
 | `is_archived` | The channel is archived. Unarchive it or choose another channel. |
 | `unresolvable_handles` | Each `@` entry must match exactly one person in your workspace by Slack username, display name or full name. Checkly doesn't match guest accounts, and `@here`, `@channel` and `@everyone` aren't supported. |
 

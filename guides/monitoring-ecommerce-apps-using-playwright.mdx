@@ -307,14 +307,14 @@ resource "checkly_check" "shop_checkout" {
     "eu-west-1"
   ]
 
-  retry_strategy {
+  retry_strategy = {
     type = "LINEAR"
   }
 
-  environment_variable {
+  environment_variables = [{
     key   = "SHOP_URL"
     value = "https://danube-web.shop"
-  }
+  }]
 
   script = file("${path.module}/../checks/checkout.spec.ts")
 }
@@ -327,18 +327,19 @@ Terraform will perform the following actions:
 
   # checkly_check.shop_checkout will be created
   + resource "checkly_check" "shop_checkout" {
-      + frequency                 = 10
-      + locations                 = [
+      + environment_variables       = [
+          + {
+              + key    = "SHOP_URL"
+              + value  = (sensitive value)
+            },
+        ]
+      + frequency                   = 10
+      + locations                   = [
           + "eu-west-1",
           + "us-east-1",
         ]
-      + name                      = "Shop checkout (Terraform)"
-      + type                      = "BROWSER"
-
-      + environment_variable {
-          + key    = "SHOP_URL"
-          + value  = "https://danube-web.shop"
-        }
+      + name                        = "Shop checkout (Terraform)"
+      + type                        = "BROWSER"
     }
 
 Plan: 1 to add, 0 to change, 0 to destroy.

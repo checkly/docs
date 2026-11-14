@@ -29,7 +29,7 @@ To follow along without your own app, clone the [sample project](https://github.
 <div id="ai-setup-prompt">
 
 ```txt Prompt
-Declare the monitoring for this shop in Terraform with the checkly/checkly provider, version "~> 1.0".
+Declare the monitoring for this shop in Terraform with the checkly/checkly provider, version "~> 2.0".
 
 Success criteria:
 1. `providers.tf` configures the provider from the variables `checkly_api_key` and `checkly_account_id`, read from TF_VAR_ environment variables. Never write credentials into a file.
@@ -60,7 +60,7 @@ terraform {
   required_providers {
     checkly = {
       source  = "checkly/checkly"
-      version = "~> 1.0"
+      version = "~> 2.0"
     }
   }
 }
@@ -90,9 +90,9 @@ terraform init
 
 ```text Terminal
 Initializing provider plugins...
-- Finding checkly/checkly versions matching "~> 1.0"...
-- Installing checkly/checkly v1.29.0...
-- Installed checkly/checkly v1.29.0 (signed by a HashiCorp partner, key ID 4E5AC4D95E185A57)
+- Finding checkly/checkly versions matching "~> 2.0"...
+- Installing checkly/checkly v2.0.0...
+- Installed checkly/checkly v2.0.0 (signed by a HashiCorp partner, key ID 4E5AC4D95E185A57)
 
 Terraform has been successfully initialized!
 ```
@@ -108,7 +108,7 @@ variable "alert_email" {
 }
 
 resource "checkly_alert_channel" "shop_email" {
-  email {
+  email = {
     address = var.alert_email
   }
 
@@ -118,7 +118,7 @@ resource "checkly_alert_channel" "shop_email" {
 }
 ```
 
-Set the address the same way as the credentials, with `export TF_VAR_alert_email="you@yourcompany.com"`. Email is the simplest channel to start with. The same resource takes Slack, PagerDuty, Opsgenie, SMS, and webhook blocks; see [alert channels for Terraform](/integrations/iac/terraform/alerting).
+Set the address the same way as the credentials, with `export TF_VAR_alert_email="you@yourcompany.com"`. Email is the simplest channel to start with. The same resource takes Slack, PagerDuty, Opsgenie, SMS, and webhook attributes; see [alert channels for Terraform](/integrations/iac/terraform/alerting).
 
 ## Step 3: Put shared settings in one group
 
@@ -130,26 +130,26 @@ variable "shop_url" {
   default = "https://danube-web.shop"
 }
 
-# Every check in this guide joins this group. The enforce blocks make the
+# Every check in this guide joins this group. The enforce attributes make the
 # group, not each check, own locations, scheduling, retries, and alerting.
 resource "checkly_check_group_v2" "shop" {
   name      = "Shop (Terraform)"
   activated = true
   tags      = ["terraform-shop"]
 
-  enforce_locations {
+  enforce_locations = {
     enabled   = true
     locations = ["us-east-1", "eu-west-1"]
   }
 
-  enforce_scheduling_strategy {
+  enforce_scheduling_strategy = {
     enabled      = true
     run_parallel = true
   }
 
-  enforce_retry_strategy {
+  enforce_retry_strategy = {
     enabled = true
-    retry_strategy {
+    retry_strategy = {
       type                 = "LINEAR"
       max_retries          = 2
       base_backoff_seconds = 30
@@ -157,30 +157,30 @@ resource "checkly_check_group_v2" "shop" {
     }
   }
 
-  enforce_alert_settings {
+  enforce_alert_settings = {
     enabled = true
 
-    alert_settings {
+    alert_settings = {
       escalation_type = "RUN_BASED"
-      run_based_escalation {
+      run_based_escalation = {
         failed_run_threshold = 1
       }
     }
 
-    alert_channel_subscription {
+    alert_channel_subscriptions = [{
       channel_id = checkly_alert_channel.shop_email.id
       activated  = true
-    }
+    }]
   }
 
-  environment_variable {
+  environment_variables = [{
     key   = "SHOP_URL"
     value = var.shop_url
-  }
+  }]
 }
 ```
 
-`checkly_check_group_v2` changes nothing about its checks unless you ask it to. Each `enforce_` block you add takes that setting away from the checks and applies the group's value instead. Here the group runs every check from N. Virginia and Ireland in parallel, retries a failed run up to twice from a different region, and emails you as soon as one run still fails after its retries.
+`checkly_check_group_v2` changes nothing about its checks unless you ask it to. Each `enforce_` attribute you add takes that setting away from the checks and applies the group's value instead. Here the group runs every check from N. Virginia and Ireland in parallel, retries a failed run up to twice from a different region, and emails you as soon as one run still fails after its retries.
 
 The `SHOP_URL` variable reaches every Browser check in the group. Point the whole stack at a staging shop with `terraform plan -var="shop_url=<your staging URL>"`, without touching a check.
 
@@ -286,29 +286,29 @@ resource "checkly_check" "books_api" {
   degraded_response_time = 1000
   max_response_time      = 3000
 
-  request {
+  request = {
     url    = "${var.shop_url}/api/books"
     method = "GET"
 
-    assertion {
-      source     = "STATUS_CODE"
-      comparison = "EQUALS"
-      target     = "200"
-    }
-
-    assertion {
-      source     = "HEADERS"
-      property   = "content-type"
-      comparison = "CONTAINS"
-      target     = "application/json"
-    }
-
-    assertion {
-      source     = "JSON_BODY"
-      property   = "$.length"
-      comparison = "GREATER_THAN"
-      target     = "0"
-    }
+    assertions = [
+      {
+        source     = "STATUS_CODE"
+        comparison = "EQUALS"
+        target     = "200"
+      },
+      {
+        source     = "HEADERS"
+        property   = "content-type"
+        comparison = "CONTAINS"
+        target     = "application/json"
+      },
+      {
+        source     = "JSON_BODY"
+        property   = "$.length"
+        comparison = "GREATER_THAN"
+        target     = "0"
+      },
+    ]
   }
 }
 ```
@@ -330,21 +330,17 @@ The plan lists all five resources. This part of the group block shows settings i
 ```text Terminal
   # checkly_check_group_v2.shop will be created
   + resource "checkly_check_group_v2" "shop" {
-      + activated   = true
-      + name        = "Shop (Terraform)"
-
-      + enforce_locations {
-          + enabled   = true
-          + locations = [
+      + activated                   = true
+      + enforce_locations           = {
+          + enabled           = true
+          + locations         = [
               + "eu-west-1",
               + "us-east-1",
             ]
         }
-
-      + enforce_retry_strategy {
-          + enabled = true
-
-          + retry_strategy {
+      + enforce_retry_strategy      = {
+          + enabled        = true
+          + retry_strategy = {
               + base_backoff_seconds = 30
               + max_duration_seconds = 600
               + max_retries          = 2
@@ -352,11 +348,13 @@ The plan lists all five resources. This part of the group block shows settings i
               + type                 = "LINEAR"
             }
         }
-
-      + environment_variable {
-          + key    = "SHOP_URL"
-          + value  = "https://danube-web.shop"
-        }
+      + environment_variables       = [
+          + {
+              + key    = "SHOP_URL"
+              + value  = (sensitive value)
+            },
+        ]
+      + name                        = "Shop (Terraform)"
     }
 
 Plan: 5 to add, 0 to change, 0 to destroy.

@@ -2,7 +2,7 @@ terraform {
   required_providers {
     checkly = {
       source  = "checkly/checkly"
-      version = "~> 1.0"
+      version = "~> 2.0"
     }
   }
 }
@@ -30,14 +30,14 @@ resource "checkly_check" "shop_checkout" {
     "eu-west-1"
   ]
 
-  retry_strategy {
+  retry_strategy = {
     type = "LINEAR"
   }
 
-  environment_variable {
+  environment_variables = [{
     key   = "SHOP_URL"
     value = "https://danube-web.shop"
-  }
+  }]
 
   script = file("${path.module}/../checks/checkout.spec.ts")
 }

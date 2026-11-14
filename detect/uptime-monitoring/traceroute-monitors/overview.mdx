@@ -87,7 +87,7 @@ Learn more in our documentation on [Results](/concepts/results).
 </Accordion>
 
 <Accordion title="SCTP or raw-socket errors on private locations">
-**Symptom**: SCTP probes fail with a socket permission error on a self-hosted Checkly Agent.
+**Symptom**: SCTP probes fail with a socket permission error on a self-hosted Checkly Runner.
 
 **Root cause**: Container runtimes drop `CAP_NET_RAW` by default. Traceroute monitors always need it — hop discovery listens for ICMP replies on a raw socket regardless of probe protocol — but SCTP is the case that surfaces an explicit socket error, because SCTP probes are also *sent* over a raw socket.
 

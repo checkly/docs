@@ -160,25 +160,25 @@ time() - checkly_heartbeat_last_success_timestamp_seconds
 
 ## Private location metrics
 
-The Prometheus exporter also contains metrics for monitoring [private locations](/platform/private-locations/overview). Use them to make sure your private locations have enough Checkly Agent instances running to execute all of your checks, and to drive [agent autoscaling](/platform/private-locations/autoscaling).
+The Prometheus exporter also contains metrics for monitoring [private locations](/platform/private-locations/overview). Use them to make sure your private locations have enough Checkly Runner instances running to execute all of your checks, and to drive [runner autoscaling](/platform/private-locations/autoscaling).
 
 Every private location metric carries the labels `private_location_name`, `private_location_slug_name` and `private_location_id`. Check runs flow through two queues: `main` carries Browser checks, Multistep checks and Playwright Check Suites, and `uptime` carries API checks, URL monitors and the TCP, DNS, ICMP, SSL, gRPC and Traceroute monitors.
 
 | Metric | Type | Labels | Description |
 |--------|------|--------|-------------|
-| `checkly_private_location_queue_size` | Gauge | | The number of check runs scheduled to the private location and waiting to be executed, on the `main` queue. The highest value in the latest 1-minute period, looking back 2 minutes. A high value indicates that checks are becoming backlogged and that you may need to [scale your Checkly Agents](/platform/private-locations/scaling-redundancy). Absent when the queue reports no data. |
+| `checkly_private_location_queue_size` | Gauge | | The number of check runs scheduled to the private location and waiting to be executed, on the `main` queue. The highest value in the latest 1-minute period, looking back 2 minutes. A high value indicates that checks are becoming backlogged and that you may need to [scale your Checkly Runners](/platform/private-locations/scaling-redundancy). Absent when the queue reports no data. |
 | `checkly_private_location_oldest_scheduled_check_run` | Gauge | | The age in seconds of the oldest check run job scheduled to the `main` queue. Same sampling as `checkly_private_location_queue_size`. A high value indicates that checks are becoming backlogged. |
-| `checkly_private_location_queue_duration_ms` | Gauge | `queue`, `stat` | The scheduling delay in milliseconds for check runs routed through the private location. Derived from the last 2 minutes of check run data. Use it to judge whether the private location has enough agent capacity. Absent for a queue with no check runs in the last 2 minutes. |
-| `checkly_private_location_agent_count` | Gauge | | The number of agents connected for the private location. An agent counts as connected if it reported in the last 250 seconds. Always present. |
-| `checkly_private_location_check_runs` | Gauge | `queue`, `state` | The number of check runs waiting in or picked up from the private location's queues. The `main` `queued` series is the same sample as `checkly_private_location_queue_size`, the other three are live queue reads, and a series is absent when its queue reports no data. Used as the signal for [autoscaling Checkly Agents](/platform/private-locations/autoscaling). |
+| `checkly_private_location_queue_duration_ms` | Gauge | `queue`, `stat` | The scheduling delay in milliseconds for check runs routed through the private location. Derived from the last 2 minutes of check run data. Use it to judge whether the private location has enough runner capacity. Absent for a queue with no check runs in the last 2 minutes. |
+| `checkly_private_location_agent_count` | Gauge | | The number of runners connected for the private location. A runner counts as connected if it reported in the last 250 seconds. Always present. |
+| `checkly_private_location_check_runs` | Gauge | `queue`, `state` | The number of check runs waiting in or picked up from the private location's queues. The `main` `queued` series is the same sample as `checkly_private_location_queue_size`, the other three are live queue reads, and a series is absent when its queue reports no data. Used as the signal for [autoscaling Checkly Runners](/platform/private-locations/autoscaling). |
 
 | Label | Values |
 |-------|--------|
 | `queue` | `main` for Browser checks, Multistep checks and Playwright Check Suites. `uptime` for API checks, URL monitors and TCP, DNS, ICMP, SSL, gRPC and Traceroute monitors. |
-| `state` | `queued`: scheduled but not yet picked up by an agent. `inflight`: being executed by an agent. |
+| `state` | `queued`: scheduled but not yet picked up by a runner. `inflight`: being executed by a runner. |
 | `stat` | `avg`, `p90`, `p99` over the 2-minute window. |
 
-For metrics scraped from the agent container itself, including an opt-in per-check set with the `checkly_agent_` prefix, see [Agent metrics](/platform/private-locations/agent-metrics).
+For metrics scraped from the runner container itself, including an opt-in per-check set with the `checkly_agent_` prefix, see [Runner metrics](/platform/private-locations/agent-metrics).
 
 ## Behavior
 
@@ -278,7 +278,7 @@ The v1 endpoint is `/accounts/<your account ID>/prometheus/metrics`. It takes th
 | `checkly_check_result` | The response time in milliseconds of the latest run in each region. One row for each region that ran the check in the last hour. |
 | `checkly_private_location_queue_size` | Same as the v2 metric of the same name. |
 | `checkly_private_location_oldest_scheduled_check_run` | Same as the v2 metric of the same name. |
-| `checkly_private_location_agent_count` | The number of agents that reported in the last 250 seconds. Always present. |
+| `checkly_private_location_agent_count` | The number of runners that reported in the last 250 seconds. Always present. |
 
 Checks with no run in the last hour are absent from the three check metrics. Labels:
 
@@ -321,7 +321,7 @@ Notice that:
 
 - `checkly_check_status` and `checkly_check_degraded_status` carry `muted`, `activated` and `degraded`, reflecting whether a check sends alerts, is running and is degraded. "Customer API" is in a check group, so it also carries `group`.
 - `checkly_check_result` has one row per region that ran the check in the last hour, with a `region` label. A run from a private location carries the private location's slug as its region. Rows for API checks also carry `http_status_code`.
-- The private location "ACME data center" has one Checkly Agent connected. `checkly_private_location_queue_size` and `checkly_private_location_oldest_scheduled_check_run` show no backlog of check run jobs.
+- The private location "ACME data center" has one Checkly Runner connected. `checkly_private_location_queue_size` and `checkly_private_location_oldest_scheduled_check_run` show no backlog of check run jobs.
 
 ### Legacy v1 scrape config
 

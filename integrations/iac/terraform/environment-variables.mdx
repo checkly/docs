@@ -15,21 +15,21 @@ resource "checkly_check" "user-login" {
   activated = true
   frequency = 5
   
-  environment_variable {
-    key   = "TEST_EMAIL"
-    value = "user@example.com"
-  }
-
-  environment_variable {
-    key    = "TEST_PASSWORD"
-    value  = "secure-password"
-    secret = true
-  }
-
-  environment_variable {
-    key   = "API_BASE_URL"
-    value = "https://api.example.com"
-  }
+  environment_variables = [
+    {
+      key   = "TEST_EMAIL"
+      value = "user@example.com"
+    },
+    {
+      key   = "API_BASE_URL"
+      value = "https://api.example.com"
+    },
+    {
+      key    = "TEST_PASSWORD"
+      value  = "secure-password"
+      secret = true
+    },
+  ]
   
   locations = ["us-west-1", "eu-central-1"]
   script    = file("${path.module}/scripts/login.spec.js")
@@ -45,21 +45,21 @@ resource "checkly_check_group" "ecommerce-flows" {
   name      = "E-commerce Flows"
   activated = true
   
-  environment_variable {
-    key   = "TEST_EMAIL"
-    value = "user@example.com"
-  }
-
-  environment_variable {
-    key    = "TEST_PASSWORD"
-    value  = "secure-password"
-    secret = true
-  }
-
-  environment_variable {
-    key   = "API_BASE_URL"
-    value = "https://api.example.com"
-  }
+  environment_variables = [
+    {
+      key   = "TEST_EMAIL"
+      value = "user@example.com"
+    },
+    {
+      key   = "API_BASE_URL"
+      value = "https://api.example.com"
+    },
+    {
+      key    = "TEST_PASSWORD"
+      value  = "secure-password"
+      secret = true
+    },
+  ]
   
   locations   = ["us-west-1", "eu-central-1"]
   concurrency = 3

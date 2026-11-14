@@ -18,23 +18,23 @@ resource "checkly_check" "get-books" {
   
   // ...
 
-  alert_settings {
+  alert_settings = {
     escalation_type = "RUN_BASED"   // Whether to alert after a certain number of runs or time
 
-    run_based_escalation {
+    run_based_escalation = {
       failed_run_threshold = 1      // (RUN_BASED escalation only) after how many failed runs to send an alert
     }
 
-    time_based_escalation {
+    time_based_escalation = {
       minutes_failing_threshold = 5 // (TIME_BASED escalation only) after how many minutes spent in failing state to send an alert
     }
 
-    reminders {
+    reminders = {
       amount   = 2                  // How many reminders to send after the first alert
       interval = 5                  // How many minutes to wait between reminders
     }
 
-    parallel_run_failure_threshold {
+    parallel_run_failure_threshold = {
       enabled = true                // Applicable only for checks scheduled in parallel in multiple locations
       percentage = 50               // What percentage of regions needs to fail to trigger a failure alert, supported values: 10, 20, 30, 40, 50, 60, 70, 80, 90 & 100
     }
@@ -53,23 +53,23 @@ resource "checkly_check_group" "key-shop-flows" {
   
   // ...
   
-  alert_settings {
+  alert_settings = {
     escalation_type = "RUN_BASED"
 
-    run_based_escalation {
+    run_based_escalation = {
       failed_run_threshold = 1
     }
 
-    time_based_escalation {
+    time_based_escalation = {
       minutes_failing_threshold = 5
     }
 
-    reminders {
+    reminders = {
       amount   = 2
       interval = 5
     }
 
-    parallel_run_failure_threshold {
+    parallel_run_failure_threshold = {
       enabled = true
       percentage = 50
     }
@@ -83,7 +83,7 @@ resource "checkly_check_group" "key-shop-flows" {
 
 ```terraform
 resource "checkly_alert_channel" "email_ac" { 
-  email {
+  email = {
     address = "john@example.com"      // The email address to notify
   }
   send_recovery = true                // Whether email will be sent when a check recovers
@@ -105,10 +105,10 @@ resource "checkly_check" "get-books" {
   
   // ...
 
-  alert_channel_subscription {      // This subscribes the check to the alert channel
+  alert_channel_subscriptions = [{  // This subscribes the check to the alert channel
     channel_id = checkly_alert_channel.email_ac.id
     activated  = true
-  }
+  }]
 
   // ...
 
@@ -120,10 +120,10 @@ resource "checkly_check_group" "key-shop-flows" {
   
   // ...
 
-  alert_channel_subscription {      // This subscribes the group to the alert channel
+  alert_channel_subscriptions = [{  // This subscribes the group to the alert channel
     channel_id = checkly_alert_channel.email_ac.id
     activated  = true
-  }
+  }]
 }
 ```
 

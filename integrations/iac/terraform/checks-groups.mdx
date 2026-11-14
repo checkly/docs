@@ -30,7 +30,7 @@ resource "checkly_check" "e2e-login" {
     "eu-central-1"
   ]
 
-  retry_strategy {                          // The retry strategy used for failed runs
+  retry_strategy = {                        // The retry strategy used for failed runs
     type = "LINEAR"
   }            
 
@@ -59,7 +59,6 @@ resource "checkly_check" "e2e-login" {
   name                      = "Login Flow"
   type                      = "BROWSER"
   activated                 = true
-  should_fail               = false
   frequency                 = 1
   use_global_alert_settings = true
 
@@ -68,7 +67,7 @@ resource "checkly_check" "e2e-login" {
     "eu-central-1"
   ]
 
-  retry_strategy {
+  retry_strategy = {
     type = "LINEAR"
   }
 
@@ -97,19 +96,19 @@ resource "checkly_check" "get-books" {
     "eu-central-1"
   ]
   
-  retry_strategy {                    // The retry strategy used for failed runs
+  retry_strategy = {                  // The retry strategy used for failed runs
     type = "LINEAR"
   }
 
-  request {                             // All the settings for the check's HTTP request
+  request = {                           // All the settings for the check's HTTP request
     url              = "https://danube-web.shop/api/books"   // The request URL
     follow_redirects = true             // Whether the request should follow redirects
     skip_ssl         = false            // Whether to skip the SSL validation on the target server
-    assertion {                         // One or more assertions to run against the HTTP response
+    assertions = [{                     // One or more assertions to run against the HTTP response
       source     = "STATUS_CODE"        // What to assert against
       comparison = "EQUALS"             // How to assert
       target     = "200"                // Expected value
-    }
+    }]
   }
 }
 ```
@@ -124,7 +123,7 @@ For example, a Heartbeat monitor can look as follows:
 resource "checkly_heartbeat_monitor" "send-weekly-digest-v-2" {
   name                      = "Send Weekly Digest"    // The name of the monitor
   activated                 = true                    // Whether the monitor will start as active on creation
-  heartbeat {
+  heartbeat = {
     period                  = 7                       // The expected period of time between each ping. Between 30 seconds and 365 days.
     period_unit             = "days"                  // The unit of time for the period, the available options are `'seconds' | 'minutes' | 'hours' | 'days'`
     grace                   = 1                       // The grace period to wait for before sending an alert. Between 0 seconds and 365 days.
@@ -150,7 +149,6 @@ For example, a Multistep check can look as follows:
   name                      = "Shopping Flow"
   type                      = "MULTI_STEP"
   activated                 = true
-  should_fail               = false
   frequency                 = 1
   use_global_alert_settings = true
   locations = [
@@ -184,19 +182,19 @@ resource "checkly_tcp_monitor" "example-tcp-monitor-2" {
     "ap-south-1",
   ]
 
-  alert_settings {
+  alert_settings = {
     escalation_type = "RUN_BASED"
 
-    run_based_escalation {
+    run_based_escalation = {
       failed_run_threshold = 1
     }
 
-    reminders {
+    reminders = {
       amount = 1
     }
   }
 
-  retry_strategy {
+  retry_strategy = {
     type                 = "FIXED"
     base_backoff_seconds = 60
     max_duration_seconds = 600
@@ -204,24 +202,25 @@ resource "checkly_tcp_monitor" "example-tcp-monitor-2" {
     same_region          = false
   }
 
-  request {
+  request = {
     hostname = "api.checklyhq.com"
     port     = 80
     data     = "hello"
 
-    assertion {
-      source     = "RESPONSE_DATA"
-      property   = ""
-      comparison = "CONTAINS"
-      target     = "welcome"
-    }
-
-    assertion {
-      source     = "RESPONSE_TIME"
-      property   = ""
-      comparison = "LESS_THAN"
-      target     = "2000"
-    }
+    assertions = [
+      {
+        source     = "RESPONSE_DATA"
+        property   = ""
+        comparison = "CONTAINS"
+        target     = "welcome"
+      },
+      {
+        source     = "RESPONSE_TIME"
+        property   = ""
+        comparison = "LESS_THAN"
+        target     = "2000"
+      },
+    ]
   }
 }
 ```
@@ -236,7 +235,7 @@ resource "checkly_check_group_v2" "key-shop-flows" {
 }
 ```
 
-To have the group override a setting for all of its checks, add the matching `enforce_*` block and set `enabled = true`. The available blocks are `enforce_locations`, `enforce_retry_strategy`, `enforce_scheduling_strategy` and `enforce_alert_settings`:
+To have the group override a setting for all of its checks, add the matching `enforce_*` attribute and set `enabled = true`. The available attributes are `enforce_locations`, `enforce_retry_strategy`, `enforce_scheduling_strategy` and `enforce_alert_settings`:
 
 ```terraform
 resource "checkly_check_group_v2" "key-shop-flows" {
@@ -246,7 +245,7 @@ resource "checkly_check_group_v2" "key-shop-flows" {
   concurrency = 3 // How many checks to run at once when triggering the group using CI/CD triggers
 
   // All checks in this group run from these locations, regardless of their own settings
-  enforce_locations {
+  enforce_locations = {
     enabled   = true
     locations = ["eu-west-1", "eu-central-1"]
   }
@@ -278,24 +277,24 @@ resource "checkly_check" "get-books" {
   // This makes the check part of the group
   group_id = checkly_check_group_v2.key-shop-flows.id
 
-  retry_strategy {
+  retry_strategy = {
     type = "LINEAR"
   }
 
-  request {
+  request = {
     url              = "https://danube-web.shop/api/books"
     follow_redirects = true
     skip_ssl         = false
-    assertion {
+    assertions = [{
       source     = "STATUS_CODE"
       comparison = "EQUALS"
       target     = "200"
-    }
+    }]
   }
 }
 ```
 
-> With a `checkly_check_group_v2` group, a check keeps its own settings unless the group enables the matching `enforce_*` block. With the older `checkly_check_group`, locations and alert channel subscriptions defined at group level always override the ones defined at check level.
+> With a `checkly_check_group_v2` group, a check keeps its own settings unless the group enables the matching `enforce_*` attribute. With the older `checkly_check_group`, locations and alert channel subscriptions defined at group level always override the ones defined at check level.
 
 ### Migrating to `checkly_check_group_v2`
 
@@ -311,7 +310,7 @@ Move the existing group to the new resource type instead, so the group and its c
    terraform state show checkly_check_group.key-shop-flows
    ```
 
-2. In your configuration, replace the `checkly_check_group` resource with a `checkly_check_group_v2` resource with the same resource name (`key-shop-flows` here). To keep the old behavior, add `enforce_*` blocks for the settings the old group set, such as locations, retry strategy, scheduling strategy and alert settings. Update every reference, for example `group_id = checkly_check_group_v2.key-shop-flows.id`.
+2. In your configuration, replace the `checkly_check_group` resource with a `checkly_check_group_v2` resource with the same resource name (`key-shop-flows` here). To keep the old behavior, add `enforce_*` attributes for the settings the old group set, such as locations, retry strategy, scheduling strategy and alert settings. Update every reference, for example `group_id = checkly_check_group_v2.key-shop-flows.id`.
 
 3. Remove the old resource from the Terraform state. This doesn't change anything in Checkly:
 

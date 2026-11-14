@@ -9,6 +9,7 @@ The [Checkly Terraform provider](https://github.com/checkly/terraform-provider-c
 
 If you prefer, you can also clone our [sample repository](https://github.com/checkly/checkly-terraform-getting-started) and play around with the resources on your own.
 For in-depth information on Terraform, please see HashiCorp's [official documentation](https://developer.hashicorp.com/terraform/docs).
+To upgrade a project from version 1.x of the provider, follow the [upgrade guide](https://registry.terraform.io/providers/checkly/checkly/latest/docs/guides/upgrading-to-v2).
 
 > Looking for Monitoring as Code but don't want to use Terraform? Give our [CLI solution](/cli/overview) a try.
 
@@ -29,7 +30,7 @@ terraform {
   required_providers {
     checkly = {
       source = "checkly/checkly"
-      version = "~> 1.0"
+      version = "~> 2.0"
     }
   }
 }
@@ -73,9 +74,9 @@ $ terraform init
 Initializing the backend...
 
 Initializing provider plugins...
-- Finding checkly/checkly versions matching "~> 1.0"...
-- Installing checkly/checkly v1.30.0...
-- Installed checkly/checkly v1.30.0 (signed by a HashiCorp partner, key ID 4E5AC4D95E185A57)
+- Finding checkly/checkly versions matching "~> 2.0"...
+- Installing checkly/checkly v2.0.0...
+- Installed checkly/checkly v2.0.0 (signed by a HashiCorp partner, key ID 4E5AC4D95E185A57)
 
 ...
 
@@ -108,7 +109,7 @@ resource "checkly_check" "browser-check-1" {
     "us-west-1"
   ]
 
-  retry_strategy {
+  retry_strategy = {
     type = "LINEAR"
   }
 
@@ -141,9 +142,9 @@ Terraform will perform the following actions:
 
   # checkly_check.browser-check-1 will be created
   + resource "checkly_check" "browser-check-1" {
-      + activated              = true
-      + degraded_response_time = 15000
-      + retry_strategy {
+      + activated                   = true
+      + degraded_response_time      = 15000
+      + retry_strategy              = {
           + base_backoff_seconds = 60
           + max_duration_seconds = 600
       ...
@@ -183,15 +184,15 @@ resource "checkly_check" "example-check" {
     "eu-central-1"
   ]
 
-  request {
+  request = {
     url              = "https://api.example.com/"
     follow_redirects = true
     skip_ssl         = false
-    assertion {
+    assertions = [{
       source     = "STATUS_CODE"
       comparison = "EQUALS"
       target     = "200"
-    }
+    }]
   }
 }
 ```
@@ -204,7 +205,7 @@ Now that you have your checks set up, you'll want to set up an alert channel for
 
 ```terraform main.tf
 resource "checkly_alert_channel" "email_ac" {
-  email {
+  email = {
     address = "jane.doe@email.com" // Your email address here
   }
   send_recovery = true
@@ -221,10 +222,10 @@ resource "checkly_check" "browser-check-1" {
   type                      = "BROWSER"
   // ...
 
-  alert_channel_subscription {
+  alert_channel_subscriptions = [{
     channel_id = checkly_alert_channel.email_ac.id
     activated  = true
-  }
+  }]
 
   // ...
 }
@@ -234,10 +235,10 @@ resource "checkly_check" "example-check" {
   type                      = "API"
   // ...
 
-  alert_channel_subscription {
+  alert_channel_subscriptions = [{
     channel_id = checkly_alert_channel.email_ac.id
     activated  = true
-  }
+  }]
 
   // ...
 }

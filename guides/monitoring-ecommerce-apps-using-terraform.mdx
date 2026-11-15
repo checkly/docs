@@ -12,9 +12,9 @@ By the end of this guide, your shop's monitoring lives in five Terraform resourc
 
 ```text Terminal
   # checkly_alert_channel.shop_email will be created
-  # checkly_check.books_api will be created
-  # checkly_check.browser["home"] will be created
-  # checkly_check.browser["search"] will be created
+  # checkly_api_check.books_api will be created
+  # checkly_browser_check.browser["home"] will be created
+  # checkly_browser_check.browser["search"] will be created
   # checkly_check_group_v2.shop will be created
 
 Plan: 5 to add, 0 to change, 0 to destroy.
@@ -29,14 +29,14 @@ To follow along without your own app, clone the [sample project](https://github.
 <div id="ai-setup-prompt">
 
 ```txt Prompt
-Declare the monitoring for this shop in Terraform with the checkly/checkly provider, version "~> 2.0".
+Declare the monitoring for this shop in Terraform with the checkly/checkly provider, version "~> 2.0", which requires Terraform 1.8 or later.
 
 Success criteria:
 1. `providers.tf` configures the provider from the variables `checkly_api_key` and `checkly_account_id`, read from TF_VAR_ environment variables. Never write credentials into a file.
 2. `alerts.tf` creates an email alert channel for failures and recoveries. Ask me for the address and pass it as a variable.
 3. `group.tf` creates a `checkly_check_group_v2` that enforces two locations, parallel runs, a linear retry strategy, and a run-based alert policy subscribed to the email channel. It sets a `SHOP_URL` environment variable from a `shop_url` variable.
-4. `scripts/` holds one Playwright spec per shop flow. Each spec reads `process.env.SHOP_URL` with the production URL as the fallback and asserts on visible content, not just that a page loaded. `browser.tf` creates one Browser Check per spec with `for_each` and `script = file(...)`.
-5. `api.tf` creates an API check for the product API that asserts the status code, the content type, and that the JSON body is not empty.
+4. `scripts/` holds one Playwright spec per shop flow. Each spec reads `process.env.SHOP_URL` with the production URL as the fallback and asserts on visible content, not just that a page loaded. `browser.tf` creates one `checkly_browser_check` per spec with `for_each` and `script = file(...)`.
+5. `api.tf` creates a `checkly_api_check` for the product API that asserts the status code, the content type, and that the JSON body is not empty.
 6. Run `npx playwright test`, `terraform fmt -check`, `terraform validate`, and `terraform plan`, and show me the results.
 7. Stop. Wait for my confirmation before `terraform apply`.
 
@@ -53,10 +53,12 @@ For this guide, the agent proves the setup with `npx playwright test` and `terra
 
 ## Step 1: Configure the provider
 
-Start in an empty folder. The provider needs a Checkly user API key and the ID of the account to create resources in. Declare both as variables so they never land in a file you commit.
+Start in an empty folder with Terraform 1.8 or later, which provider v2 requires. The provider needs a Checkly user API key and the ID of the account to create resources in. Declare both as variables so they never land in a file you commit.
 
 ```terraform providers.tf
 terraform {
+  required_version = ">= 1.8"
+
   required_providers {
     checkly = {
       source  = "checkly/checkly"
@@ -256,11 +258,10 @@ locals {
   }
 }
 
-resource "checkly_check" "browser" {
+resource "checkly_browser_check" "browser" {
   for_each = local.browser_flows
 
   name      = each.value
-  type      = "BROWSER"
   activated = true
   frequency = 10
   group_id  = checkly_check_group_v2.shop.id
@@ -276,9 +277,8 @@ The checks set only what is theirs: a name, a script, and how often to run. Ever
 The storefront renders whatever `/api/books` returns. If the API answers 200 with an empty list, the pages load and show nothing to buy. An API check catches that every minute, without starting a browser.
 
 ```terraform api.tf
-resource "checkly_check" "books_api" {
+resource "checkly_api_check" "books_api" {
   name      = "Shop books API"
-  type      = "API"
   activated = true
   frequency = 1
   group_id  = checkly_check_group_v2.shop.id

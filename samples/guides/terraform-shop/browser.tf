@@ -7,11 +7,10 @@ locals {
   }
 }
 
-resource "checkly_check" "browser" {
+resource "checkly_browser_check" "browser" {
   for_each = local.browser_flows
 
   name      = each.value
-  type      = "BROWSER"
   activated = true
   frequency = 10
   group_id  = checkly_check_group_v2.shop.id

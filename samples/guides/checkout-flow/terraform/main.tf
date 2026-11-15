@@ -1,4 +1,6 @@
 terraform {
+  required_version = ">= 1.8"
+
   required_providers {
     checkly = {
       source  = "checkly/checkly"
@@ -17,9 +19,8 @@ provider "checkly" {
 
 # The checkout flow as a Browser Check. The script is the same spec the
 # Browser Check path uses; only the wrapper changes.
-resource "checkly_check" "shop_checkout" {
+resource "checkly_browser_check" "shop_checkout" {
   name                      = "Shop checkout (Terraform)"
-  type                      = "BROWSER"
   activated                 = true
   frequency                 = 10
   use_global_alert_settings = true

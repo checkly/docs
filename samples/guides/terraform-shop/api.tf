@@ -1,6 +1,5 @@
-resource "checkly_check" "books_api" {
+resource "checkly_api_check" "books_api" {
   name      = "Shop books API"
-  type      = "API"
   activated = true
   frequency = 1
   group_id  = checkly_check_group_v2.shop.id

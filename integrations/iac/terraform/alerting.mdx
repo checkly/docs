@@ -12,17 +12,16 @@ Alerting is organised around alert settings and alert channels.
 [Alert settings](/communicate/alerts/overview) determine _when_ and how many times alerts should be sent out. To get alerts about expiring SSL certificates, use an [SSL monitor](/detect/uptime-monitoring/ssl-monitors/overview). You can set the alert settings at check level:
 
 ```terraform
-resource "checkly_check" "get-books" {
-  name                   = "GET /books"
-  type                   = "API"
-  
+resource "checkly_api_check" "get-books" {
+  name = "GET /books"
+
   // ...
 
   alert_settings = {
-    escalation_type = "RUN_BASED"   // Whether to alert after a certain number of runs or time
+    escalation_type = "RUN_BASED" // Whether to alert after a certain number of runs or time
 
     run_based_escalation = {
-      failed_run_threshold = 1      // (RUN_BASED escalation only) after how many failed runs to send an alert
+      failed_run_threshold = 1 // (RUN_BASED escalation only) after how many failed runs to send an alert
     }
 
     time_based_escalation = {
@@ -30,13 +29,13 @@ resource "checkly_check" "get-books" {
     }
 
     reminders = {
-      amount   = 2                  // How many reminders to send after the first alert
-      interval = 5                  // How many minutes to wait between reminders
+      amount   = 2 // How many reminders to send after the first alert
+      interval = 5 // How many minutes to wait between reminders
     }
 
     parallel_run_failure_threshold = {
-      enabled = true                // Applicable only for checks scheduled in parallel in multiple locations
-      percentage = 50               // What percentage of regions needs to fail to trigger a failure alert, supported values: 10, 20, 30, 40, 50, 60, 70, 80, 90 & 100
+      enabled    = true // Applicable only for checks scheduled in parallel in multiple locations
+      percentage = 50   // What percentage of regions needs to fail to trigger a failure alert, supported values: 10, 20, 30, 40, 50, 60, 70, 80, 90 & 100
     }
   }
 
@@ -44,34 +43,38 @@ resource "checkly_check" "get-books" {
 }
 ```
 
-Or at group level:
+Or at group level, where `enforce_alert_settings` applies them to every check in the group:
 
 ```terraform
-resource "checkly_check_group" "key-shop-flows" {
+resource "checkly_check_group_v2" "key-shop-flows" {
   name      = "Key Shop Flows"
   activated = true
-  
+
   // ...
-  
-  alert_settings = {
-    escalation_type = "RUN_BASED"
 
-    run_based_escalation = {
-      failed_run_threshold = 1
-    }
+  enforce_alert_settings = {
+    enabled = true
 
-    time_based_escalation = {
-      minutes_failing_threshold = 5
-    }
+    alert_settings = {
+      escalation_type = "RUN_BASED"
 
-    reminders = {
-      amount   = 2
-      interval = 5
-    }
+      run_based_escalation = {
+        failed_run_threshold = 1
+      }
 
-    parallel_run_failure_threshold = {
-      enabled = true
-      percentage = 50
+      time_based_escalation = {
+        minutes_failing_threshold = 5
+      }
+
+      reminders = {
+        amount   = 2
+        interval = 5
+      }
+
+      parallel_run_failure_threshold = {
+        enabled    = true
+        percentage = 50
+      }
     }
   }
 }
@@ -82,13 +85,13 @@ resource "checkly_check_group" "key-shop-flows" {
 [Alert channels](/communicate/alerts/overview) determine _how_ (as in "to which alert systems") alerts are sent out. They can be created as standalone resources:
 
 ```terraform
-resource "checkly_alert_channel" "email_ac" { 
+resource "checkly_alert_channel" "email_ac" {
   email = {
-    address = "john@example.com"      // The email address to notify
+    address = "john@example.com" // The email address to notify
   }
-  send_recovery = true                // Whether email will be sent when a check recovers
-  send_failure = false                // Whether email will be sent when a check fails
-  send_degraded = true                // Whether email will be sent when a check's performance degrades
+  send_recovery = true  // Whether email will be sent when a check recovers
+  send_failure  = false // Whether email will be sent when a check fails
+  send_degraded = true  // Whether email will be sent when a check's performance degrades
 }
 ```
 
@@ -96,16 +99,15 @@ Checkly supports a variety of alert channels, from email and SMS to PagerDuty an
 
 ### Alert channel subscriptions
 
-Checks or groups are subscribed to one or more alert channels:
+Checks or groups are subscribed to one or more alert channels. A group subscribes through `enforce_alert_settings`, in the same object as the group's `alert_settings`:
 
 ```terraform
-resource "checkly_check" "get-books" {
-  name                   = "GET /books"
-  type                   = "API"
-  
+resource "checkly_api_check" "get-books" {
+  name = "GET /books"
+
   // ...
 
-  alert_channel_subscriptions = [{  // This subscribes the check to the alert channel
+  alert_channel_subscriptions = [{ // This subscribes the check to the alert channel
     channel_id = checkly_alert_channel.email_ac.id
     activated  = true
   }]
@@ -114,21 +116,25 @@ resource "checkly_check" "get-books" {
 
 }
 
-resource "checkly_check_group" "key-shop-flows" {
+resource "checkly_check_group_v2" "key-shop-flows" {
   name      = "Key Shop Flows"
   activated = true
-  
+
   // ...
 
-  alert_channel_subscriptions = [{  // This subscribes the group to the alert channel
-    channel_id = checkly_alert_channel.email_ac.id
-    activated  = true
-  }]
+  enforce_alert_settings = {
+    enabled = true
+
+    alert_channel_subscriptions = [{ // This subscribes the group to the alert channel
+      channel_id = checkly_alert_channel.email_ac.id
+      activated  = true
+    }]
+  }
 }
 ```
 
 <Warning>
 Checks and groups need to be _explicitly_ subscribed to an alert channel as shown above - they will _not_ be autosubscribed.
 
-Checks which are part of a group inherit the group's alert subscriptions. If you know a check will be part of a group, you can avoid needlessly subscribing it to alert channels and just handle everything at the group level.
+Checks in a group that enforces alert settings use the group's alert subscriptions. If you know a check will be part of such a group, you can avoid needlessly subscribing it to alert channels and just handle everything at the group level.
 </Warning>

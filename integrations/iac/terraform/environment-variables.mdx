@@ -9,12 +9,11 @@ canonical: 'https://www.checklyhq.com/docs/integrations/iac/terraform/environmen
 
 <Accordion title="Check-level variables">
 ```terraform
-resource "checkly_check" "user-login" {
+resource "checkly_browser_check" "user-login" {
   name      = "User Login Flow"
-  type      = "BROWSER"
   activated = true
   frequency = 5
-  
+
   environment_variables = [
     {
       key   = "TEST_EMAIL"
@@ -30,7 +29,7 @@ resource "checkly_check" "user-login" {
       secret = true
     },
   ]
-  
+
   locations = ["us-west-1", "eu-central-1"]
   script    = file("${path.module}/scripts/login.spec.js")
 }
@@ -41,10 +40,10 @@ Variables defined at check level are only available to that specific check.
 
 <Accordion title="Group-level variables">
 ```terraform
-resource "checkly_check_group" "ecommerce-flows" {
+resource "checkly_check_group_v2" "ecommerce-flows" {
   name      = "E-commerce Flows"
   activated = true
-  
+
   environment_variables = [
     {
       key   = "TEST_EMAIL"
@@ -60,8 +59,11 @@ resource "checkly_check_group" "ecommerce-flows" {
       secret = true
     },
   ]
-  
-  locations   = ["us-west-1", "eu-central-1"]
+
+  enforce_locations = {
+    enabled   = true
+    locations = ["us-west-1", "eu-central-1"]
+  }
   concurrency = 3
 }
 ```

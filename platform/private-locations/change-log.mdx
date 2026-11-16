@@ -18,9 +18,10 @@ Learn more about:
 ## Full release history
 
 <Update label="v8.15.0" tags={["November 2026"]}>
-- Traceroute monitors measure hop latency more accurately. In most cases each reply is now timed when it arrives instead of when the agent reads it, so latency on a busy agent is closer to the real network time.
-- Uptime monitors that cannot run, for example because of a malformed `{{variable}}`, now show the run in the check history, as on public locations, and some of these runs can trigger alerts. Before, the run was lost: no history, no alert, and test sessions did not complete.
-- Fixed a regression in runtime 2026-04: functions you pass directly to Playwright, such as `page.on('request', ...)` listeners or `waitForResponse` predicates, received different objects than `page` methods return, so comparisons like `request.frame() === page.mainFrame()` were always false. A failing call these functions start without awaiting now also fails the check, so some checks can start to fail after the upgrade.
+- Traceroute monitors measure hop latency more accurately. In most cases each reply is now timed when it arrives instead of when the agent reads it. Readings on a busy agent can be lower than before, which can change when a monitor degrades or fails.
+- Uptime monitors that cannot run because of a template syntax error, such as an unclosed `{{variable`, now show the run in the check history, and some of these runs can trigger alerts. Before, the run was lost: no history, no alert, and test sessions did not complete.
+- Fixed a regression in runtime 2026-04: functions you pass directly to Playwright, such as `page.on('request', ...)` listeners or `waitForResponse` predicates, received different objects than `page` methods return, so comparisons like `request.frame() === page.mainFrame()` were always false.
+- In runtime 2026-04, a failing call that a listener, route handler or predicate starts without `await` now fails the check, as in runtime 2025-04. Checks that passed before can start to fail after the upgrade.
 </Update>
 
 <Update label="v8.14.0" tags={["November 2026"]}>

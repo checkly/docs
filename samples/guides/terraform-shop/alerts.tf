@@ -4,7 +4,7 @@ variable "alert_email" {
 }
 
 resource "checkly_alert_channel" "shop_email" {
-  email {
+  email = {
     address = var.alert_email
   }
 

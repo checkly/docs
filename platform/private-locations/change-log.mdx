@@ -18,9 +18,9 @@ Learn more about:
 ## Full release history
 
 <Update label="v8.15.0" tags={["November 2026"]}>
-- Traceroute monitors measure hop latency more accurately. Each reply is now timed when it arrives instead of when the agent reads it, so latency on a busy agent is closer to the real network time.
+- Traceroute monitors measure hop latency more accurately. In most cases each reply is now timed when it arrives instead of when the agent reads it, so latency on a busy agent is closer to the real network time.
 - Uptime monitors that cannot run, for example because of a malformed `{{variable}}`, now record the run in the check history, as on public locations. Before, the run was lost, and test sessions or `checkly trigger` runs did not complete.
-- Fixed a regression in runtime 2026-04 where functions you pass to Playwright, such as `page.on('request', ...)` listeners or `waitForResponse` predicates, received different objects than the ones `page` methods return, so comparisons like `request.frame() === page.mainFrame()` were always false. They now work as in runtime 2025-04. A failing call that such a function starts without awaiting it now also fails the check. Checks that relied on the old behavior can start to fail.
+- Fixed a regression in runtime 2026-04 where functions you pass to Playwright, such as `page.on('request', ...)` listeners or `waitForResponse` predicates, received different objects than the ones `page` methods return, so comparisons like `request.frame() === page.mainFrame()` were always false. Listeners, route handlers and predicates you pass directly now get the same objects. Functions passed inside an options object still get the old ones. A failing call that such a function starts without awaiting it now also fails the check. Checks that relied on the old behavior can start to fail.
 </Update>
 
 <Update label="v8.14.0" tags={["November 2026"]}>

@@ -21,7 +21,7 @@ Learn more about:
 - Traceroute monitors measure hop latency more accurately. In most cases each reply is now timed when it arrives instead of when the agent reads it. Readings on a busy agent can be lower than before, which can change when a monitor degrades or fails.
 - Uptime monitors that cannot run, for example because of a template syntax error such as an unclosed `{{variable`, now show the run in the check history. Before, the run was lost: no history, no alert, and test sessions did not complete.
 - Fixed a regression in runtime 2026-04 where functions you pass directly to Playwright, such as `page.on('request', ...)` listeners or `waitForResponse` predicates, received different objects than `page` methods return, so comparisons like `request.frame() === page.mainFrame()` were always false.
-- In runtime 2026-04, a failing call on an object that Playwright passes to such a function, for example `route.continue()` in a route handler, now fails the check when it is not awaited, as in runtime 2025-04. Checks that passed before can start to fail after the upgrade.
+- In runtime 2026-04, a failing call on an object that Playwright passes to such a function, for example `p.locator('#missing').click()` inside `page.on('load', (p) => ...)`, now fails the check when it is not awaited, as in runtime 2025-04. Checks that passed before can start to fail after the upgrade.
 </Update>
 
 <Update label="v8.14.0" tags={["November 2026"]}>

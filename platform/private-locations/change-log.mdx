@@ -17,6 +17,12 @@ Learn more about:
 
 ## Full release history
 
+<Update label="v8.15.0" tags={["November 2026"]}>
+- Traceroute monitors now measure hop and final-hop latency more accurately. Readings no longer include time the agent spent on other work, so latency on a busy agent is closer to the real network time.
+- Uptime monitors now report a failed run when the check cannot run, for example because of a malformed `{{variable}}`. Before, the run was lost: no result, no alert, and test sessions or `checkly trigger` runs did not complete.
+- Fixed a regression in runtime 2026-04 where functions you pass to Playwright, such as `page.on('request', ...)` listeners or `waitForResponse` predicates, received objects that did not match `page` objects. Comparisons like `request.frame() === page.mainFrame()` now work as in runtime 2025-04.
+</Update>
+
 <Update label="v8.14.0" tags={["November 2026"]}>
 - Fixed private location agents slowly running out of disk space. Playwright Check Suite runs no longer leave temporary files in `/tmp` or broken browser links behind.
 - Playwright Check Suites that use pnpm or yarn now work on Node.js versions without corepack, such as Node.js 25 and 26.

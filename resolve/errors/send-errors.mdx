@@ -5,7 +5,7 @@ description: 'Get a DSN for a Checkly project, configure the Sentry SDK in your 
 canonical: 'https://www.checklyhq.com/docs/resolve/errors/send-errors/'
 ---
 
-Your application sends Errors to Checkly through the official Sentry SDK. You need a DSN, the address the SDK sends to, for a Checkly project. This page covers browser JavaScript, Node.js, Python and Go.
+Your application sends Errors to Checkly through the official Sentry SDK. You need a DSN, the address the SDK sends to, for a Checkly project. This page covers browser JavaScript, Node.js, Python, Go, iOS and macOS, Android, React Native, and C and C++.
 
 <Accordion title="Prerequisites">
 
@@ -27,6 +27,8 @@ A DSN has the form `https://<key>@rum.checklyhq.com/<number>`. It can only write
 
 ## Configure the SDK
 
+{/* [UNVERIFIED] iOS and macOS, Android, React Native, C and C++ snippets: run exactly as written. */}
+
 <CodeGroup dropdown={true}>
 
 ```bash Browser
@@ -43,6 +45,31 @@ pip install sentry-sdk
 
 ```bash Go
 go get github.com/getsentry/sentry-go
+```
+
+```swift iOS and macOS
+// Package.swift
+dependencies: [
+    .package(url: "https://github.com/getsentry/sentry-cocoa", from: "9.35.0"),
+],
+```
+
+```kotlin Android
+// app/build.gradle.kts
+dependencies {
+    implementation("io.sentry:sentry-android:8.64.0")
+}
+```
+
+```bash React Native
+npm install @sentry/react-native
+```
+
+```bash C and C++
+git clone --recursive https://github.com/getsentry/sentry-native.git
+cmake -B build -S sentry-native -DSENTRY_BACKEND=inproc
+cmake --build build --config RelWithDebInfo
+cmake --install build --prefix install
 ```
 
 </CodeGroup>
@@ -105,6 +132,62 @@ func main() {
 }
 ```
 
+```swift iOS and macOS
+import Sentry
+
+SentrySDK.start { options in
+    options.dsn = "<your-dsn>"
+    options.releaseName = "ios-app@2026.9.3"
+    options.environment = "production"
+}
+```
+
+```kotlin Android
+// Your Application subclass
+import io.sentry.android.core.SentryAndroid
+
+class App : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        SentryAndroid.init(this) { options ->
+            options.dsn = "<your-dsn>"
+            options.release = "android-app@2026.9.3"
+            options.environment = "production"
+        }
+    }
+}
+```
+
+```js React Native
+import * as Sentry from '@sentry/react-native'
+
+Sentry.init({
+  dsn: '<your-dsn>',
+  release: 'mobile-app@2026.9.3',
+  environment: 'production',
+})
+
+export default Sentry.wrap(App)
+```
+
+```c C and C++
+#include <sentry.h>
+
+int main(void)
+{
+    sentry_options_t *options = sentry_options_new();
+    sentry_options_set_dsn(options, "<your-dsn>");
+    sentry_options_set_release(options, "agent@2026.9.3");
+    sentry_options_set_environment(options, "production");
+    sentry_init(options);
+
+    /* your program */
+
+    sentry_close();
+    return 0;
+}
+```
+
 </CodeGroup>
 
 In Node.js with ES modules, load the file with `--import` so the SDK starts before your framework:
@@ -114,6 +197,16 @@ node --import ./instrument.mjs app.mjs
 ```
 
 Importing `instrument.mjs` from your entry file is not enough: ES modules are hoisted, so your framework loads before the SDK can instrument it. With CommonJS, use `node --require ./instrument.js app.js`, or require `instrument.js` on the first line of your entry file.
+
+On Android, initialize the SDK yourself as shown, and turn off its automatic start in `AndroidManifest.xml`:
+
+```xml AndroidManifest.xml
+<application>
+    <meta-data android:name="io.sentry.auto-init" android:value="false" />
+</application>
+```
+
+For C and C++, build `sentry-native` with the `inproc` backend as shown. The default `crashpad` backend and the `breakpad` backend send crashes as minidumps, which Checkly does not accept.
 
 Use the same `release` value when you [upload source maps](/resolve/errors/source-maps), so the uploads and the Errors of one build are listed under the same release.
 
@@ -139,11 +232,33 @@ sentry_sdk.capture_exception(Exception("Checkly test Error"))
 sentry.CaptureException(errors.New("Checkly test Error"))
 ```
 
+```swift iOS and macOS
+SentrySDK.capture(error: NSError(domain: "Checkly test Error", code: 1))
+```
+
+```kotlin Android
+import io.sentry.Sentry
+
+Sentry.captureException(RuntimeException("Checkly test Error"))
+```
+
+```js React Native
+Sentry.captureException(new Error('Checkly test Error'))
+```
+
+```c C and C++
+sentry_value_t event = sentry_value_new_event();
+sentry_value_t exc = sentry_value_new_exception("TestError", "Checkly test Error");
+sentry_value_set_stacktrace(exc, NULL, 0);
+sentry_event_add_exception(event, exc);
+sentry_capture_event(event);
+```
+
 </CodeGroup>
 
 The Go SDK reports only what you capture: call `sentry.CaptureException`, use `defer sentry.Recover()` for panics, or use the integration for your web framework.
 
-The Error appears on the **Errors** page within about a minute.
+The Error appears on the **Errors** page within about a minute. The iOS and macOS SDK sends a crash the next time the app starts. To read stack traces of release builds, [upload source maps or debug files](/resolve/errors/source-maps).
 
 ## Count affected users
 

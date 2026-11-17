@@ -25,6 +25,8 @@ Set these environment variables, or the matching `sentry-cli` options:
 | `SENTRY_PROJECT` | The Checkly project ID or logical ID |
 | `SENTRY_AUTH_TOKEN` | Your user or service API key |
 
+Set `SENTRY_URL` in the same place as `SENTRY_AUTH_TOKEN`: both as environment variables, or both in `sentry.properties`. If the token comes from the environment and the URL only from the file, `sentry-cli` 3.x ignores the URL and sends the upload, with your key, to sentry.io.
+
 Upload to one project at a time. Run `sentry-cli` once per project.
 
 ## Upload JavaScript source maps
@@ -60,12 +62,37 @@ Deploy the files from `./dist` after `inject`, because `inject` changes them. If
 
 ## Upload native debug files and ProGuard mappings
 
-{/* [UNVERIFIED] Upload a dSYM and a ProGuard mapping to production and paste the output. */}
+Upload the debug files of the build you ship. Checkly matches them to frames by debug ID or ProGuard UUID, so the release does not have to match.
+
+**iOS and macOS:** build with `DEBUG_INFORMATION_FORMAT` set to `dwarf-with-dsym`, and upload the dSYM:
 
 ```bash Terminal
-sentry-cli debug-files upload ./build
-sentry-cli upload-proguard ./app/build/outputs/mapping/release/mapping.txt
+sentry-cli debug-files upload ./build/MyApp.app.dSYM
 ```
+
+**Android with R8 or ProGuard:** upload the mapping file with the ProGuard UUID your app sends in `io.sentry.ProguardUuids` of `assets/sentry-debug-meta.properties`:
+
+```bash Terminal
+sentry-cli upload-proguard --uuid <proguard-uuid> app/build/outputs/mapping/release/mapping.txt
+```
+
+Keep line numbers in the build with `-keepattributes SourceFile,LineNumberTable` in your ProGuard rules. Frames of classes R8 inlined are expanded to the original methods.
+
+**Android NDK:** upload the unstripped libraries. The APK contains only stripped ones:
+
+```bash Terminal
+sentry-cli debug-files upload app/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/arm64-v8a/
+```
+
+**C and C++ with the Native SDK:** build `sentry-native` with the `inproc` backend (`-DSENTRY_BACKEND=inproc`) and upload the debug files of your binary. Checkly does not accept minidumps, so crashes from the default `crashpad` backend and from the `breakpad` backend do not arrive.
+
+**Breakpad symbols:** upload `.sym` files, for example created with Mozilla `dump_syms`:
+
+```bash Terminal
+sentry-cli debug-files upload app.sym
+```
+
+**React Native:** the Sentry React Native SDK uploads the Hermes source map during the release build, with a debug ID. Wrap your Metro config with `withSentryConfig` in `metro.config.js`. On iOS, wrap the **Bundle React Native code and images** build phase with `sentry-xcode.sh` and put `sentry.properties` in `ios/`. On Android, add `apply from: "../../node_modules/@sentry/react-native/sentry.gradle"` to `android/app/build.gradle` and put `sentry.properties` in `android/`. Native crashes need the dSYM or NDK uploads above as well: the Android build step uploads only the source map.
 
 With `sentry-cli` 2.x, set `SENTRY_EXPERIMENTAL_PROGUARD_CHUNK_UPLOAD=1` for ProGuard uploads, or use `sentry-cli` 3.x. Checkly accepts ProGuard mappings only in chunks.
 
@@ -76,13 +103,16 @@ With `sentry-cli` 2.x, set `SENTRY_EXPERIMENTAL_PROGUARD_CHUNK_UPLOAD=1` for Pro
 | JavaScript source maps | Yes |
 | Mach-O and dSYM (Apple platforms) | Yes |
 | ELF (Linux, Android NDK) | Yes |
-| Breakpad symbols | Yes |
-| Source bundles (`--include-sources`) | Yes |
 | ProGuard and R8 mappings | Yes |
+| Breakpad symbols (`.sym`) | Yes |
+| Source bundles (`--include-sources`) | No. Checkly accepts the upload but does not show the source lines. |
+| Minidumps | No |
 | Windows PDB and .NET portable PDB | No |
 | Unity IL2CPP and Flutter or Dart symbols | No |
 
 Each file can be up to 2 GiB.
+
+Checkly symbolicates in the background. A new Error can show minified or raw frames for up to about a minute before its original frames appear.
 
 ## Check your uploads
 

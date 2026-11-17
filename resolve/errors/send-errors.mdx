@@ -52,6 +52,9 @@ go get github.com/getsentry/sentry-go
 dependencies: [
     .package(url: "https://github.com/getsentry/sentry-cocoa", from: "9.35.0"),
 ],
+targets: [
+    .executableTarget(name: "MyApp", dependencies: [.product(name: "Sentry", package: "sentry-cocoa")]),
+],
 ```
 
 ```kotlin Android
@@ -206,7 +209,15 @@ On Android, initialize the SDK yourself as shown, and turn off its automatic sta
 </application>
 ```
 
-For C and C++, build `sentry-native` with the `inproc` backend as shown. The default `crashpad` backend and the `breakpad` backend send crashes as minidumps, which Checkly does not accept.
+In an Xcode app project, add the package with **File** > **Add Package Dependencies** instead.
+
+For C and C++, build `sentry-native` with the `inproc` backend as shown, then compile against the installed library:
+
+```bash Terminal
+cc main.c -Iinstall/include -Linstall/lib -lsentry -Wl,-rpath,"$PWD/install/lib" -o app
+```
+
+The SDK keeps its data in a `.sentry-native` folder in the working directory. Build `sentry-native` with the `inproc` backend because the default `crashpad` backend and the `breakpad` backend send crashes as minidumps, which Checkly does not accept.
 
 Use the same `release` value when you [upload source maps](/resolve/errors/source-maps), so the uploads and the Errors of one build are listed under the same release.
 
@@ -258,7 +269,7 @@ sentry_capture_event(event);
 
 The Go SDK reports only what you capture: call `sentry.CaptureException`, use `defer sentry.Recover()` for panics, or use the integration for your web framework.
 
-The Error appears on the **Errors** page within about a minute. The iOS and macOS SDK sends a crash the next time the app starts. To read stack traces of release builds, [upload source maps or debug files](/resolve/errors/source-maps).
+The Error appears on the **Errors** page within about a minute. The iOS and macOS SDK sends a crash the next time the app starts. In a command-line tool, call `SentrySDK.flush(timeout: 5)` after the capture, or the program exits before the Error is sent. To read stack traces of release builds, [upload source maps or debug files](/resolve/errors/source-maps).
 
 ## Count affected users
 

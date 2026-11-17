@@ -168,10 +168,7 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /resolve/traces/import/https-grpc
 
 #### Resolve - Traces - Exporting
-- /resolve/traces/export/grafana-tempo
-- /resolve/traces/export/honeycomb
-- /resolve/traces/export/new-relic
-- /resolve/traces/export/dash0
+- /resolve/traces/export/overview
 
 #### Resolve - Traces - Instrumentation
 - /resolve/traces/instrumentation/nextjs
@@ -232,9 +229,18 @@ This file contains all valid URLs extracted from docs.json organized by director
 - /integrations/ci-cd/vercel/managing-plan
 
 ### Integrations - Observability
+- /integrations/observability/overview
 - /integrations/observability/prometheus
-- /integrations/observability/prometheus-v2
+- /integrations/observability/traces/otlp
 - /integrations/observability/coralogix
+- /integrations/observability/traces/chronosphere
+- /integrations/observability/traces/clickstack
+- /integrations/observability/traces/cribl
+- /integrations/observability/traces/dash0
+- /integrations/observability/traces/datadog
+- /integrations/observability/traces/grafana-tempo
+- /integrations/observability/traces/honeycomb
+- /integrations/observability/traces/new-relic
 
 ### Integrations - Infrastructure as Code
 

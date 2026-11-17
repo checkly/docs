@@ -17,7 +17,9 @@ The phone numbers used for phone call alerting need to be in [E.164 format](http
 
 ![send monitoring alerts with phone calls](/images/docs/images/alerting/phone-call.png)
 
-You can add as many phone number channels as you like. Phone call channels aren't available on the Hobby and Starter plans, and some countries are only available on paid plans, not during a trial.
+You can add as many phone number channels as you like. Phone call alerts are included on the Team plan and above. On the Hobby plan, you can't create phone call channels. On the Starter plan, you can create and test a phone call channel, but Starter includes no phone calls, so its alerts aren't sent. See [Monthly phone call quota](#monthly-phone-call-quota).
+
+Some countries are only available on paid plans, not during a trial. They're the same countries as for SMS alerts, and numbers are checked the same way: see [SMS supported countries and regions](/integrations/alerts/sms#supported-countries-and-regions) for the list and the error messages. For a paid-only country, the phone call form shows `Calls to this country require a paid plan. Upgrade your plan to use this number.`
 
 ## Supported countries and regions
 
@@ -82,5 +84,23 @@ If your country is not supported feel free to reach out to our [support team](ma
 ## Phone call number and sender ID
 
 Phone call alerts always use the following number: +18142508623. You can save the number as a contact to allow alerts bypassing any do-not-disturb settings.
+
+## Monthly phone call quota
+
+Each phone call alert that Checkly sends to a channel counts against your account's monthly phone call quota. All phone call channels in your account share the quota, and it starts again at the beginning of each calendar month. See the [Pricing page](https://www.checklyhq.com/pricing/#features) for the quota of each plan. Test calls don't count against the quota.
+
+When your account has used its quota, or your plan includes no phone calls, Checkly doesn't send the call. The alert appears in the [alert notification log](/communicate/alerts/notification-log) with the delivery status **Failed** and the notification result `Account hit the monthly CALL limit`.
+
+Accounts on a trial can send only a few test calls a day. The limit resets after 24 hours. When you reach that limit, the **Test alert channel** button shows how many seconds to wait. On every plan, you can send at most two tests a minute, counted across all alert channel types. A third test within the minute fails with **Test rate limit exceeded**.
+
+Need more SMS or phone calls? Contact [support](mailto:support@checklyhq.com).
+
+## Troubleshooting a missing phone call alert
+
+Open the [alert notification log](/communicate/alerts/notification-log), select your phone call channel and check **Show failures only**. Select a failed notification to see its notification result:
+
+- `Account hit the monthly CALL limit`: your account used its monthly phone call quota, or your plan includes no phone calls. See [Monthly phone call quota](#monthly-phone-call-quota).
+- `Incomplete alert channel config`: the channel has no phone number. Edit the channel and add one.
+- `Failed to send the Call`: the call couldn't be started through our phone call provider. Check that the number is correct, then select **Test alert channel** to place a test call. If alerts to a correct number keep failing, contact [support](mailto:support@checklyhq.com).
 
 <Note>For limits and other phone call related questions, please refer to our [Pricing page](https://www.checklyhq.com/pricing/#features).</Note>

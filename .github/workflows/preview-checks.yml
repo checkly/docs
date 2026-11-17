@@ -74,12 +74,15 @@ jobs:
           TIMEOUT=1200 # 20 min for a deployment to finish
           SLEEP=15
           elapsed=0
+          PREVIEW_URL_RE='https://[a-z0-9-]+\.(mintlify\.(app|site)|mintlifysite\.com)'
 
           # Exits with the preview URL when the PR's preview is ready, fails
           # when it failed, and returns while it is still building.
           read_preview() {
-            COMMENT_BODY=$(gh api "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" \
-              --jq '[.[] | select(.user.login == "mintlify[bot]" and (.body | contains("mintlify-preview-comment")))] | last | .body // empty')
+            # Mintlify sometimes posts a second preview comment and keeps
+            # updating the first, so take the most recently updated one.
+            COMMENT_BODY=$(gh api "repos/${{ github.repository }}/issues/$PR_NUMBER/comments" --paginate --slurp \
+              | jq -r 'add | [.[] | select(.user.login == "mintlify[bot]" and (.body | contains("mintlify-preview-comment")))] | max_by(.updated_at) | .body // empty')
 
             # Status emoji-prefixed token in the table row
             if echo "$COMMENT_BODY" | grep -q '🔴 Failed'; then
@@ -89,7 +92,7 @@ jobs:
               exit 1
             fi
 
-            URL=$(echo "$COMMENT_BODY" | grep -oE 'https://[a-z0-9-]+\.(mintlify\.(app|site)|mintlifysite\.com)' | head -1 || true)
+            URL=$(echo "$COMMENT_BODY" | grep -oE "$PREVIEW_URL_RE" | head -1 || true)
 
             if echo "$COMMENT_BODY" | grep -q '🟢 Ready' && [ -n "$URL" ]; then
               echo "Mintlify Deployment $DEPLOY — preview: $URL"
@@ -114,6 +117,16 @@ jobs:
               pending)
                 ;;
               success)
+                # The deployment's summary names the preview it built, so the
+                # URL doesn't depend on which preview comment Mintlify updates.
+                URL=$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA/check-runs" --paginate \
+                  --jq '.check_runs[] | select(.name == "Mintlify Deployment" and .conclusion == "success") | .output.summary // empty' \
+                  | grep -oE "$PREVIEW_URL_RE" | head -1 || true)
+                if [ -n "$URL" ]; then
+                  echo "Mintlify Deployment $DEPLOY — preview: $URL"
+                  echo "url=$URL" >> "$GITHUB_OUTPUT"
+                  exit 0
+                fi
                 read_preview
                 ;;
               none|skipped)
@@ -154,7 +167,12 @@ jobs:
         if: steps.preview.outputs.url != ''
         env:
           DOCS_PREVIEW_URL: ${{ steps.preview.outputs.url }}
-        run: node .github/scripts/check-api-preview.mjs "$DOCS_PREVIEW_URL"
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # Mintlify builds the PR head, not the merge commit checked out above,
+          # so read the expected pages from the head's docs.json.
+          git worktree add --detach "$RUNNER_TEMP/pr-head" "$HEAD_SHA"
+          node .github/scripts/check-api-preview.mjs "$DOCS_PREVIEW_URL" "$RUNNER_TEMP/pr-head"
 
       - name: Install dependencies
         if: steps.preview.outputs.url != ''

@@ -10,29 +10,28 @@ Checks make up the most important unit of your Checkly monitoring setup. Groups 
 ## Checks
 
 [Browser checks](/detect/synthetic-monitoring/browser-checks/overview), [API checks](/detect/synthetic-monitoring/api-checks/overview), [Heartbeat monitors](/detect/uptime-monitoring/heartbeat-monitors/overview) and [Multistep checks](/detect/synthetic-monitoring/multistep-checks/overview) share many arguments, configuration-wise, 
-but also have their own unique ones. The type of your check is controlled using the `type` argument.
+but also have their own unique ones. Each type has its own resource: `checkly_browser_check`, `checkly_api_check`, `checkly_heartbeat_monitor` and `checkly_multistep_check`.
 
 ### Browser checks
 
 For example, a Browser check can look as follows:
 
 ```terraform
-resource "checkly_check" "e2e-login" {
-  name                      = "Login flow"    // The name of the check
-  type                      = "BROWSER"       // The type of the check
-  activated                 = true            // Whether the check will start as active on creation
-  frequency                 = 10              // The frequency of the check in minutes
-  use_global_alert_settings = true            // Whether to use account level alert setting instead of the alert setting defined on this check
-  run_parallel              = true            // Whether the check would run in a single location at time (round-robin) or all locations on each run
+resource "checkly_browser_check" "e2e-login" {
+  name                      = "Login flow" // The name of the check
+  activated                 = true         // Whether the check will start as active on creation
+  frequency                 = 10           // The frequency of the check in minutes
+  use_global_alert_settings = true         // Whether to use account level alert setting instead of the alert setting defined on this check
+  run_parallel              = true         // Whether the check would run in a single location at time (round-robin) or all locations on each run
 
-  locations = [                               // Which locations the check should run from (if not in a group)
+  locations = [ // Which locations the check should run from (if not in a group)
     "us-west-1",
     "eu-central-1"
   ]
 
-  retry_strategy {                          // The retry strategy used for failed runs
+  retry_strategy = { // The retry strategy used for failed runs
     type = "LINEAR"
-  }            
+  }
 
   // The script the check should execute
   script = <<EOT
@@ -55,11 +54,9 @@ EOT
 For tidiness and ease of use, it is recommended to store scripts in separate files, instead of using the inline option:
 
 ```terraform
-resource "checkly_check" "e2e-login" {
+resource "checkly_browser_check" "e2e-login" {
   name                      = "Login Flow"
-  type                      = "BROWSER"
   activated                 = true
-  should_fail               = false
   frequency                 = 1
   use_global_alert_settings = true
 
@@ -68,7 +65,7 @@ resource "checkly_check" "e2e-login" {
     "eu-central-1"
   ]
 
-  retry_strategy {
+  retry_strategy = {
     type = "LINEAR"
   }
 
@@ -76,45 +73,44 @@ resource "checkly_check" "e2e-login" {
 }
 ```
 
-> You can see all the configuration options for checks on the official Terraform registry [documentation page](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/check#schema).
+> You can see all the configuration options for Browser checks on the official Terraform registry [documentation page](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/browser_check#schema).
 
 ### API checks
 
 On the other hand, an API check shares some part of the initial configuration, but is organized around the `request` argument instead of the `script` argument:
 
 ```terraform
-resource "checkly_check" "get-books" {
-  name                      = "GET /books"   // The name of the check
-  type                      = "API"     // The type of the check
-  activated                 = true      // Whether the check will start as active on creation
-  should_fail               = false     // Whether the check's HTTP response's status is expected to be >399
-  frequency                 = 1         // The frequency of the check in minutes
-  use_global_alert_settings = true      // Whether to use account level alert setting instead of the alert setting defined on this check
-  run_parallel              = true            // Whether the check would run in a single location at time (round-robin) or all locations on each run
+resource "checkly_api_check" "get-books" {
+  name                      = "GET /books" // The name of the check
+  activated                 = true         // Whether the check will start as active on creation
+  should_fail               = false        // Whether the check's HTTP response's status is expected to be >399
+  frequency                 = 1            // The frequency of the check in minutes
+  use_global_alert_settings = true         // Whether to use account level alert setting instead of the alert setting defined on this check
+  run_parallel              = true         // Whether the check would run in a single location at time (round-robin) or all locations on each run
 
-  locations = [                         // Which locations the check should run from (if not in a group)
+  locations = [ // Which locations the check should run from (if not in a group)
     "us-west-1",
     "eu-central-1"
   ]
-  
-  retry_strategy {                    // The retry strategy used for failed runs
+
+  retry_strategy = { // The retry strategy used for failed runs
     type = "LINEAR"
   }
 
-  request {                             // All the settings for the check's HTTP request
-    url              = "https://danube-web.shop/api/books"   // The request URL
-    follow_redirects = true             // Whether the request should follow redirects
-    skip_ssl         = false            // Whether to skip the SSL validation on the target server
-    assertion {                         // One or more assertions to run against the HTTP response
-      source     = "STATUS_CODE"        // What to assert against
-      comparison = "EQUALS"             // How to assert
-      target     = "200"                // Expected value
-    }
+  request = {                                              // All the settings for the check's HTTP request
+    url              = "https://danube-web.shop/api/books" // The request URL
+    follow_redirects = true                                // Whether the request should follow redirects
+    skip_ssl         = false                               // Whether to skip the SSL validation on the target server
+    assertions = [{                                        // One or more assertions to run against the HTTP response
+      source     = "STATUS_CODE"                           // What to assert against
+      comparison = "EQUALS"                                // How to assert
+      target     = "200"                                   // Expected value
+    }]
   }
 }
 ```
 
-> You can see all the configuration options for checks on the official Terraform registry [documentation page](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/check#schema).
+> You can see all the configuration options for API checks on the official Terraform registry [documentation page](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/api_check#schema).
 
 ### Heartbeat monitors
 
@@ -122,15 +118,15 @@ For example, a Heartbeat monitor can look as follows:
 
 ```terraform
 resource "checkly_heartbeat_monitor" "send-weekly-digest-v-2" {
-  name                      = "Send Weekly Digest"    // The name of the monitor
-  activated                 = true                    // Whether the monitor will start as active on creation
-  heartbeat {
-    period                  = 7                       // The expected period of time between each ping. Between 30 seconds and 365 days.
-    period_unit             = "days"                  // The unit of time for the period, the available options are `'seconds' | 'minutes' | 'hours' | 'days'`
-    grace                   = 1                       // The grace period to wait for before sending an alert. Between 0 seconds and 365 days.
-    grace_unit              = "days"                  // The unit of time for the grace period, the available options are `'seconds' | 'minutes' | 'hours' | 'days'`.
+  name      = "Send Weekly Digest" // The name of the monitor
+  activated = true                 // Whether the monitor will start as active on creation
+  heartbeat = {
+    period      = 7      // The expected period of time between each ping. Between 30 seconds and 365 days.
+    period_unit = "days" // The unit of time for the period, the available options are `'seconds' | 'minutes' | 'hours' | 'days'`
+    grace       = 1      // The grace period to wait for before sending an alert. Between 0 seconds and 365 days.
+    grace_unit  = "days" // The unit of time for the grace period, the available options are `'seconds' | 'minutes' | 'hours' | 'days'`.
   }
-  use_global_alert_settings = true                    // Whether to use account level alert setting instead of the alert setting defined on this check
+  use_global_alert_settings = true // Whether to use account level alert setting instead of the alert setting defined on this check
 }
 ```
 
@@ -146,11 +142,9 @@ but the recommended approach is to store scripts in separate files.
 
 For example, a Multistep check can look as follows:
 ```terraform
- resource "checkly_check" "e2e-shopping" {
+resource "checkly_multistep_check" "e2e-shopping" {
   name                      = "Shopping Flow"
-  type                      = "MULTI_STEP"
   activated                 = true
-  should_fail               = false
   frequency                 = 1
   use_global_alert_settings = true
   locations = [
@@ -184,19 +178,19 @@ resource "checkly_tcp_monitor" "example-tcp-monitor-2" {
     "ap-south-1",
   ]
 
-  alert_settings {
+  alert_settings = {
     escalation_type = "RUN_BASED"
 
-    run_based_escalation {
+    run_based_escalation = {
       failed_run_threshold = 1
     }
 
-    reminders {
+    reminders = {
       amount = 1
     }
   }
 
-  retry_strategy {
+  retry_strategy = {
     type                 = "FIXED"
     base_backoff_seconds = 60
     max_duration_seconds = 600
@@ -204,61 +198,87 @@ resource "checkly_tcp_monitor" "example-tcp-monitor-2" {
     same_region          = false
   }
 
-  request {
+  request = {
     hostname = "api.checklyhq.com"
     port     = 80
     data     = "hello"
 
-    assertion {
-      source     = "RESPONSE_DATA"
-      property   = ""
-      comparison = "CONTAINS"
-      target     = "welcome"
-    }
-
-    assertion {
-      source     = "RESPONSE_TIME"
-      property   = ""
-      comparison = "LESS_THAN"
-      target     = "2000"
-    }
+    assertions = [
+      {
+        source     = "RESPONSE_DATA"
+        property   = ""
+        comparison = "CONTAINS"
+        target     = "welcome"
+      },
+      {
+        source     = "RESPONSE_TIME"
+        property   = ""
+        comparison = "LESS_THAN"
+        target     = "2000"
+      },
+    ]
   }
 }
 ```
+
+### Migrating from `checkly_check`
+
+`checkly_check` is deprecated in version 2 of the Checkly provider. To switch a check to its per-type resource without recreating it, change the resource type, remove `type`, and add a `moved` block:
+
+```terraform
+resource "checkly_api_check" "get-books" {
+  name = "GET /books"
+  // ...
+}
+
+moved {
+  from = checkly_check.get-books
+  to   = checkly_api_check.get-books
+}
+```
+
+Without the `moved` block, Terraform deletes the check and creates a new one, with a new ID and without its result history. The `moved` block needs Terraform 1.8 or later and version 2 of the Checkly provider. Run `terraform plan` and check that it doesn't destroy or replace any resource, then run `terraform apply`.
+
+Before you move a check, read [Deprecated resource types](https://registry.terraform.io/providers/checkly/checkly/latest/docs/guides/upgrading-to-v2#deprecated-resource-types) in the provider's upgrade guide. In particular, remove `should_fail` from browser and multistep checks and apply first, and replace `double_check` with a retry strategy. `checkly_api_check` also has different defaults: `degraded_response_time` and `max_response_time` default to 5000 and 20000 instead of 15000 and 30000, and `request.follow_redirects` defaults to `true` instead of `false`. Set them explicitly to keep the previous behavior.
 
 ## Groups
 
-Once you start having more than just a handful of checks, it makes sense to start looking into [groups](/platform/groups) to keep things tidy:
+Once you start having more than just a handful of checks, it makes sense to start looking into [groups](/platform/groups) to keep things tidy. Use the `checkly_check_group_v2` resource. A v2 group doesn't override any settings of its checks unless you ask it to, so it can be as simple as a name:
 
 ```terraform
-resource "checkly_check_group" "key-shop-flows" {
-  name      = "Key Shop Flows"  // The name of the group
-  activated = true              // Whether the group will start as active on creation
-  muted     = false             // Whether the group will start as muted on creation
+resource "checkly_check_group_v2" "key-shop-flows" {
+  name = "Key Shop Flows"
+}
+```
 
-  locations = [                 // Which locations the check should run from (if not in a group)
-    "eu-west-1",
-    "eu-central-1"
-  ]
+To have the group override a setting for all of its checks, add the matching `enforce_*` attribute and set `enabled = true`. The available attributes are `enforce_locations`, `enforce_retry_strategy`, `enforce_scheduling_strategy` and `enforce_alert_settings`:
 
-  concurrency               = 3     // How many checks to run at once when triggering the group using CI/CD triggers
-  use_global_alert_settings = false // Whether to use global alert settings or group-specific ones
-  run_parallel              = true  // Whether the check would run in a single location at time (round-robin) or all locations on each run
+```terraform
+resource "checkly_check_group_v2" "key-shop-flows" {
+  name        = "Key Shop Flows"
+  activated   = true
+  muted       = false
+  concurrency = 3 // How many checks to run at once when triggering the group using CI/CD triggers
 
-  retry_strategy {                // The retry strategy used for failed runs
-    type = "LINEAR"
+  // All checks in this group run from these locations, regardless of their own settings
+  enforce_locations = {
+    enabled   = true
+    locations = ["eu-west-1", "eu-central-1"]
   }
 }
 ```
+
+The older `checkly_check_group` resource is deprecated. It always applies group-level defaults to its checks. See [migrating to `checkly_check_group_v2`](#migrating-to-checkly_check_group_v2) below.
+
+You can see all the configuration options for groups, as well as more examples, on the [Terraform registry documentation page](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/check_group_v2).
 
 ### Adding checks to groups
 
 To add a check to a group, link it to that group by setting the `group_id` argument to the group's resource ID. For example, to link the API check and the group from this article:
 
 ```terraform
-resource "checkly_check" "get-books" {
+resource "checkly_api_check" "get-books" {
   name                      = "GET /books"
-  type                      = "API"
   activated                 = true
   should_fail               = false
   frequency                 = 1
@@ -270,25 +290,50 @@ resource "checkly_check" "get-books" {
   ]
 
   // This makes the check part of the group
-  group_id = checkly_check_group.key-shop-flows.id
+  group_id = checkly_check_group_v2.key-shop-flows.id
 
-  retry_strategy {
+  retry_strategy = {
     type = "LINEAR"
   }
 
-  request {
+  request = {
     url              = "https://danube-web.shop/api/books"
     follow_redirects = true
     skip_ssl         = false
-    assertion {
+    assertions = [{
       source     = "STATUS_CODE"
       comparison = "EQUALS"
       target     = "200"
-    }
+    }]
   }
 }
 ```
 
-> Locations and alert channel subscriptions defined at group level always trump the ones defined at check level. Double-check your config to make sure all checks are running from the intended regions and are set to alert on the correct channels.
+> With a `checkly_check_group_v2` group, a check keeps its own settings unless the group enables the matching `enforce_*` attribute. With the older `checkly_check_group`, locations and alert channel subscriptions defined at group level always override the ones defined at check level.
 
-You can see all the configuration options for groups, as well as more examples, on the official Terraform registry [documentation page](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/check_group).
+### Migrating to `checkly_check_group_v2`
+
+<Warning>
+Don't migrate by only changing the resource type from `checkly_check_group` to `checkly_check_group_v2`. Terraform then deletes the old group and creates a new one, and **deleting a group deletes every check in it**. Terraform recreates the checks afterwards, but with new IDs and without their result history.
+</Warning>
+
+Move the existing group to the new resource type with a `moved` block instead, so the group and its checks stay in place. This needs Terraform 1.8 or later and version 2 of the Checkly provider.
+
+1. Change the resource type to `checkly_check_group_v2`, keeping the resource name (`key-shop-flows` here). A `checkly_check_group` always applies its alert settings, retry strategy and scheduling strategy to its checks, and its locations when it has any. To keep that behavior, enable `enforce_alert_settings`, `enforce_retry_strategy` and `enforce_scheduling_strategy` even where the old group left the setting unset, for example with `retry_strategy = { type = "NO_RETRIES" }` or `run_parallel = false`, and enable `enforce_locations` if the group has locations. The [translation table](https://registry.terraform.io/providers/checkly/checkly/latest/docs/guides/upgrading-to-v2#check-groups) in the provider's upgrade guide lists the attribute for each setting and its exceptions. Update every reference, for example `group_id = checkly_check_group_v2.key-shop-flows.id`.
+
+2. Add a `moved` block:
+
+   ```terraform
+   moved {
+     from = checkly_check_group.key-shop-flows
+     to   = checkly_check_group_v2.key-shop-flows
+   }
+   ```
+
+3. Run `terraform plan`. It must not destroy or replace any resource. If it plans an update of the group, adjust the `enforce_*` attributes until it doesn't, unless you mean to change the group or the upgrade guide lists the update as expected. Then run `terraform apply`.
+
+### Deleting a group
+
+<Warning>
+Deleting a group also deletes all checks in it. To keep the checks, first remove `group_id` from them and apply that change. Then remove the group from your configuration and apply again.
+</Warning>

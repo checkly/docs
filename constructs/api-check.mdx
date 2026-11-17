@@ -3,6 +3,7 @@ title: 'API check construct'
 description: 'Learn how to configure API checks with the Checkly CLI.'
 sidebarTitle: 'API check'
 canonical: 'https://www.checklyhq.com/docs/constructs/api-check/'
+mode: "wide"
 ---
 
 import CheckIntent from '/snippets/check-intent.mdx';
@@ -83,7 +84,7 @@ The API check configuration consists of specific API check options and inherited
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `request` | `object` | ✅ | - | HTTP request configuration object |
-| `degradedResponseTime` | `number` | ❌ | `10000` | Response time threshold in milliseconds for degraded status |
+| `degradedResponseTime` | `number` | ❌ | `5000` | Response time threshold in milliseconds for degraded status |
 | `maxResponseTime` | `number` | ❌ | `20000` | Maximum response time in milliseconds before marking as failed |
 | `shouldFail` | `boolean` | ❌ | `false` | Whether a failure should count as a pass (status 400+ reported as passed) |
 | `setupScript` | `object` | ❌ | - | Script to run before the API check execution |
@@ -230,7 +231,7 @@ request: {
 **Use cases**: HTTP endpoint monitoring, REST API testing, GraphQL API validation, authentication testing.
 </ResponseField>
 
-<ResponseField name="degradedResponseTime" type="number" default="10000">
+<ResponseField name="degradedResponseTime" type="number" default="5000">
 Response time threshold in milliseconds for marking the check as degraded. This provides an early warning before the check fails completely.
 
 **Usage:**

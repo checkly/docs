@@ -1,0 +1,58 @@
+name: Reindex Plain knowledge source
+
+# Asks Plain to re-crawl the docs sitemap after each production deploy, so the
+# support chatbot answers from the new docs right away instead of after Plain's
+# weekly re-index. Starts from the deployment status Mintlify reports to GitHub;
+# PR previews are skipped by their ref (a commit SHA) and URL.
+#
+# Needs the PLAIN_API_KEY secret: a Plain machine user key with the
+# knowledgeSource:create permission. Without it the job warns and passes.
+
+on:
+  deployment_status:
+  workflow_dispatch:
+
+concurrency:
+  group: plain-reindex
+  cancel-in-progress: true
+
+jobs:
+  reindex:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' &&
+       github.event.deployment.ref == 'main' &&
+       github.event.deployment_status.environment_url == 'https://www.checklyhq.com/docs')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Reindex the docs sitemap in Plain
+        env:
+          PLAIN_API_KEY: ${{ secrets.PLAIN_API_KEY }}
+          # Plain knowledge source for https://www.checklyhq.com/docs/sitemap.xml
+          KNOWLEDGE_SOURCE_ID: ksrc_01KNSG7AYHAYVEF5AJGTYHHWX6
+        run: |
+          set -euo pipefail
+          if [ -z "${PLAIN_API_KEY:-}" ]; then
+            echo "::warning::PLAIN_API_KEY is not set — skipping the Plain reindex."
+            exit 0
+          fi
+
+          PAYLOAD=$(jq -n --arg id "$KNOWLEDGE_SOURCE_ID" '{
+            query: "mutation($input: ReindexKnowledgeSourceInput!) { reindexKnowledgeSource(input: $input) { knowledgeSource { ... on KnowledgeSourceSitemap { id url } } error { message code } } }",
+            variables: { input: { knowledgeSourceId: $id } }
+          }')
+          RESPONSE=$(curl -sS --fail-with-body --retry 3 --max-time 30 \
+            https://core-api.uk.plain.com/graphql/v1 \
+            -H "Authorization: Bearer $PLAIN_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD")
+
+          # Plain reports GraphQL and mutation errors with HTTP 200, so check the body.
+          ERROR=$(echo "$RESPONSE" | jq -r '(.errors[0].message // .data.reindexKnowledgeSource.error.message) // empty')
+          if [ -n "$ERROR" ]; then
+            echo "::error::Plain reindex failed: $ERROR"
+            exit 1
+          fi
+          echo "Reindex queued for $(echo "$RESPONSE" | jq -r '.data.reindexKnowledgeSource.knowledgeSource.url')"

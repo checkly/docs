@@ -26,8 +26,6 @@ A DSN has the form `https://<key>@rum.checklyhq.com/<number>`. It can only write
 
 ## Configure the SDK
 
-{/* [UNVERIFIED] Every sample below must be run against production before publishing. */}
-
 <CodeGroup dropdown={true}>
 
 ```bash Browser
@@ -144,8 +142,6 @@ sentry.CaptureException(errors.New("Checkly test Error"))
 
 The Go SDK reports only what you capture: call `sentry.CaptureException`, use `defer sentry.Recover()` for panics, or use the integration for your web framework.
 
-{/* [UNVERIFIED] Measure the time to the first Error in production; keep only the measured time. */}
-
 The Error appears on the **Errors** page within about a minute.
 
 ## Count affected users
@@ -153,8 +149,6 @@ The Error appears on the **Errors** page within about a minute.
 The **Users** column counts distinct user IDs. Checkly receives user data only when your application calls `setUser()` or turns on `sendDefaultPii` in the SDK, and it keeps the user ID, email and username as sent. To remove fields before they leave your application, use `beforeSend` in the SDK.
 
 ## Send through your own domain
-
-{/* [UNVERIFIED] Prove a tunnel with and without sentry_key (202 vs 401). */}
 
 The SDK's `tunnel` option sends Errors through an endpoint on your own domain, for example to avoid ad blockers. Your endpoint must forward the envelope to `https://rum.checklyhq.com/api/<number>/envelope/?sentry_key=<key>`, with the number and the key from your DSN. Checkly reads the key from the `sentry_key` query parameter or the `X-Sentry-Auth` header, not from the envelope.
 

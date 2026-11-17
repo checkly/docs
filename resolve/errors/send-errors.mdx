@@ -5,7 +5,7 @@ description: 'Get a DSN for a Checkly project, configure the Sentry SDK in your 
 canonical: 'https://www.checklyhq.com/docs/resolve/errors/send-errors/'
 ---
 
-Your application sends Errors to Checkly through the official Sentry SDK. You need a DSN, the address the SDK sends to, for a Checkly project. This page covers browser JavaScript, Node.js, Python, Go, iOS and macOS, Android, React Native, and C and C++.
+Your application sends Errors to Checkly through the official Sentry SDK. You need a DSN, the address the SDK sends to, for a Checkly project. This page covers browser JavaScript, Node.js, Python, Go, iOS and macOS, Android, React Native, and C and C++ on macOS.
 
 <Accordion title="Prerequisites">
 
@@ -26,7 +26,6 @@ To add a DSN to an existing project, open the project's **Errors** tab, go to th
 A DSN has the form `https://<key>@rum.checklyhq.com/<number>`. It can only write Errors, so it is safe to ship in a browser bundle. Create one key per thing you ship, such as a web bundle, a CI job or a mobile build, so you can rotate them one at a time.
 
 ## Configure the SDK
-
 
 <CodeGroup dropdown={true}>
 
@@ -209,9 +208,9 @@ On Android, initialize the SDK yourself as shown. In `AndroidManifest.xml`, regi
 </application>
 ```
 
-In React Native, `export default Sentry.wrap(App)` replaces your existing `export default App`.
+In an iOS or macOS app, call `SentrySDK.start` in your `App`'s `init`.
 
-In an Xcode app project, add the package with **File** > **Add Package Dependencies** instead.
+In React Native, `export default Sentry.wrap(App)` replaces your existing `export default App`.
 
 For C and C++, build `sentry-native` with the `inproc` backend as shown, then compile against the installed library:
 
@@ -271,7 +270,7 @@ sentry_capture_event(event);
 
 The Go SDK reports only what you capture: call `sentry.CaptureException`, use `defer sentry.Recover()` for panics, or use the integration for your web framework.
 
-The Error appears on the **Errors** page within about a minute. The iOS and macOS SDK sends a crash the next time the app starts. In a command-line tool, call `SentrySDK.flush(timeout: 5)` after the capture, or the program exits before the Error is sent. To read stack traces of release builds, [upload source maps or debug files](/resolve/errors/source-maps).
+The Error appears on the **Errors** page within about two minutes. The iOS and macOS SDK sends a crash the next time the app starts. In a command-line tool, call `SentrySDK.flush(timeout: 5)` after the capture, or the program exits before the Error is sent. To read stack traces of release builds, [upload source maps or debug files](/resolve/errors/source-maps).
 
 ## Count affected users
 

@@ -9,7 +9,7 @@ Minified JavaScript and native release builds produce stack traces that are hard
 
 <Accordion title="Prerequisites">
 
-- `sentry-cli` 2.58 or later, or 3.x. npm installs it with `@sentry/cli` or `@sentry/react-native` only when install scripts are allowed, because the binary is downloaded by a `postinstall` script.
+- `sentry-cli` 2.58 or later, or 3.x.
 - A Checkly user API key (`cu_…`) with the `projects:deploy` permission, or a service API key (`sv_…`) of the account. Account API keys are not accepted. See [Creating an API key](/admin/creating-api-key).
 
 </Accordion>
@@ -70,7 +70,13 @@ Upload the debug files of the build you ship. Checkly matches them to frames by 
 sentry-cli debug-files upload ./build/MyApp.app.dSYM
 ```
 
-**Android with R8 or ProGuard:** upload the mapping file with the ProGuard UUID your app sends in `io.sentry.ProguardUuids` of `assets/sentry-debug-meta.properties`:
+**Android with R8 or ProGuard:** give each release build a new UUID, and write it to `app/src/main/assets/sentry-debug-meta.properties` so the SDK sends it with every Error:
+
+```properties sentry-debug-meta.properties
+io.sentry.ProguardUuids=<proguard-uuid>
+```
+
+Then upload the build's mapping file with the same UUID:
 
 ```bash Terminal
 sentry-cli upload-proguard --uuid <proguard-uuid> app/build/outputs/mapping/release/mapping.txt
@@ -84,7 +90,7 @@ Keep line numbers in the build with `-keepattributes SourceFile,LineNumberTable`
 sentry-cli debug-files upload app/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/arm64-v8a/
 ```
 
-**C and C++ with the Native SDK:** build `sentry-native` with the `inproc` backend (`-DSENTRY_BACKEND=inproc`) and upload the debug files of your binary. Checkly does not accept minidumps, so crashes from the default `crashpad` backend and from the `breakpad` backend do not arrive.
+**C and C++ with the Native SDK on macOS:** build `sentry-native` with the `inproc` backend (`-DSENTRY_BACKEND=inproc`) and upload the dSYM of your binary, as for Apple apps above. Checkly does not accept minidumps, so crashes from the default `crashpad` backend and from the `breakpad` backend do not arrive.
 
 **Breakpad symbols:** upload `.sym` files, for example created with Mozilla `dump_syms`:
 
@@ -92,7 +98,15 @@ sentry-cli debug-files upload app/build/intermediates/merged_native_libs/release
 sentry-cli debug-files upload app.sym
 ```
 
-**React Native:** the Sentry React Native SDK uploads the Hermes source map during the release build, with a debug ID. Wrap your Metro config with `withSentryConfig` in `metro.config.js`. On iOS, wrap the **Bundle React Native code and images** build phase with `sentry-xcode.sh` and put `sentry.properties` in `ios/`. On Android, add `apply from: "../../node_modules/@sentry/react-native/sentry.gradle"` to `android/app/build.gradle` and put `sentry.properties` in `android/`. Native crashes need the dSYM or NDK uploads above as well: the Android build step uploads only the source map.
+**React Native:** the Sentry React Native SDK uploads the Hermes source map during the release build, with a debug ID. Wrap your Metro config with `withSentryConfig` in `metro.config.js`. On iOS, wrap the **Bundle React Native code and images** build phase with `sentry-xcode.sh` and put `sentry.properties` in `ios/`. On Android, add `apply from: "../../node_modules/@sentry/react-native/sentry.gradle"` to `android/app/build.gradle` and put `sentry.properties` in `android/`. Both files hold the same values:
+
+```properties sentry.properties
+defaults.url=https://rum.checklyhq.com
+defaults.org=<your-account-id>
+defaults.project=<project-logical-id>
+```
+
+Set `SENTRY_URL` and `SENTRY_AUTH_TOKEN` in the build environment, or put `auth.token` in the same file, so the URL and the key come from the same place. Native crashes need the dSYM or NDK uploads above as well: the Android build step uploads only the source map.
 
 With `sentry-cli` 2.x, set `SENTRY_EXPERIMENTAL_PROGUARD_CHUNK_UPLOAD=1` for ProGuard uploads, or use `sentry-cli` 3.x. Checkly accepts ProGuard mappings only in chunks.
 

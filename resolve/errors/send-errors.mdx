@@ -27,7 +27,6 @@ A DSN has the form `https://<key>@rum.checklyhq.com/<number>`. It can only write
 
 ## Configure the SDK
 
-{/* [UNVERIFIED] iOS and macOS, Android, React Native, C and C++ snippets: run exactly as written. */}
 
 <CodeGroup dropdown={true}>
 
@@ -147,6 +146,7 @@ SentrySDK.start { options in
 
 ```kotlin Android
 // Your Application subclass
+import android.app.Application
 import io.sentry.android.core.SentryAndroid
 
 class App : Application() {
@@ -201,13 +201,15 @@ node --import ./instrument.mjs app.mjs
 
 Importing `instrument.mjs` from your entry file is not enough: ES modules are hoisted, so your framework loads before the SDK can instrument it. With CommonJS, use `node --require ./instrument.js app.js`, or require `instrument.js` on the first line of your entry file.
 
-On Android, initialize the SDK yourself as shown, and turn off its automatic start in `AndroidManifest.xml`:
+On Android, initialize the SDK yourself as shown. In `AndroidManifest.xml`, register your `Application` class and turn off the SDK's automatic start:
 
 ```xml AndroidManifest.xml
-<application>
+<application android:name=".App">
     <meta-data android:name="io.sentry.auto-init" android:value="false" />
 </application>
 ```
+
+In React Native, `export default Sentry.wrap(App)` replaces your existing `export default App`.
 
 In an Xcode app project, add the package with **File** > **Add Package Dependencies** instead.
 

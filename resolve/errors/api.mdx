@@ -42,12 +42,29 @@ The list takes these query parameters. Repeat a parameter to match any of its va
 
 The list counts at most 1,000 matches; narrow the filters to see more. Each endpoint allows 30 requests per minute for each caller. Reading needs `error-groups:read`, every change needs `error-groups:update`, and changing an assignee also needs `members:read`.
 
-{/* [UNVERIFIED] Run this request against production and paste a shortened response. */}
-
 ```bash Terminal
 curl "https://api.checklyhq.com/v2/error-groups?status=unresolved&sort=errors" \
   -H "Authorization: Bearer <your-api-key>" \
   -H "X-Checkly-Account: <your-account-id>"
+```
+
+```json Response
+[
+  {
+    "id": "14ca8add-0e5d-4c8f-90e3-8ebc8747cff0",
+    "title": "Exception: Checkly test Error from Python docs sample",
+    "status": "unresolved",
+    "hasUnhandled": false,
+    "firstSeen": "2026-11-17T11:03:01.642Z",
+    "lastSeen": "2026-11-17T11:03:01.642Z",
+    "assigneeId": null,
+    "project": {
+      "logicalId": "docs-errors-proof",
+      "name": "Docs Errors proof"
+    },
+    ...
+  }
+]
 ```
 
 ## MCP tools

@@ -29,13 +29,27 @@ Upload to one project at a time. Run `sentry-cli` once per project.
 
 ## Upload JavaScript source maps
 
-{/* [UNVERIFIED] Run inject and upload against production and paste the output. */}
-
 Checkly matches source maps to frames by debug ID. Inject debug IDs into your build output, deploy those files, and upload the source maps with the release your SDK sends:
 
 ```bash Terminal
 sentry-cli sourcemaps inject ./dist
 sentry-cli sourcemaps upload --release storefront@2026.9.3 ./dist
+```
+
+```text Terminal
+> Bundled 2 files for upload
+...
+> File upload complete (processing pending on server)
+> Organization: <your-account-id>
+> Projects: docs-errors-proof
+> Release: storefront@2026.9.3
+> Upload type: artifact bundle
+
+Source Map Upload Report
+  Scripts
+    ~/main.js (sourcemap at main.js.map, debug id 8faf8c03-3a67-5ee5-9a07-9fdf96240e15)
+  Source Maps
+    ~/main.js.map (debug id 8faf8c03-3a67-5ee5-9a07-9fdf96240e15)
 ```
 
 Deploy the files from `./dist` after `inject`, because `inject` changes them. If an Error has no debug IDs, its Error Group says so and the frames stay minified.

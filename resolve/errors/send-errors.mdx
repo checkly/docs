@@ -1,0 +1,143 @@
+---
+title: 'Send Errors to Checkly'
+sidebarTitle: 'Send Errors'
+description: 'Get a DSN for a Checkly project, configure the Sentry SDK in your application, and confirm the first Error arrives.'
+canonical: 'https://www.checklyhq.com/docs/resolve/errors/send-errors/'
+---
+
+Your application sends Errors to Checkly through the official Sentry SDK. You need a DSN, the address the SDK sends to, for a Checkly project. This page covers browser JavaScript, Node.js, Python and Go.
+
+<Accordion title="Prerequisites">
+
+- To create a project: the `projects:create` permission. To create or revoke a DSN in an existing project: `projects:update`. See [Permissions](/admin/team-management/permissions).
+- An application you can deploy with a Sentry SDK added.
+
+</Accordion>
+
+## Get a DSN
+
+1. Open the **Errors** page and select **New project**.
+2. Enter a **Name** and a **Logical ID**, and create the project.
+3. Copy the **DSN** the dialog shows.
+
+To add a DSN to an existing project, open the project's **Errors** tab, go to the **Ingest keys (DSN)** card and select **Create key**.
+
+A DSN has the form `https://<key>@rum.checklyhq.com/<project number>`. It can only write Errors, so it is safe to ship in a browser bundle. Create one key per thing you ship, such as a web bundle, a CI job or a mobile build, so you can rotate them one at a time.
+
+## Configure the SDK
+
+{/* [UNVERIFIED] Every sample below must be run against production before publishing. */}
+
+<CodeGroup dropdown={true}>
+
+```bash Browser
+npm install @sentry/browser
+```
+
+```bash Node.js
+npm install @sentry/node
+```
+
+```bash Python
+pip install sentry-sdk
+```
+
+```bash Go
+go get github.com/getsentry/sentry-go
+```
+
+</CodeGroup>
+
+Initialize the SDK as early as possible, with the DSN, the release you deploy and its environment:
+
+<CodeGroup dropdown={true}>
+
+```js Browser
+import * as Sentry from '@sentry/browser'
+
+Sentry.init({
+  dsn: '<your-dsn>',
+  release: 'storefront@2026.9.3',
+  environment: 'production',
+})
+```
+
+```js Node.js
+// instrument.mjs
+import * as Sentry from '@sentry/node'
+
+Sentry.init({
+  dsn: '<your-dsn>',
+  release: 'api@2026.9.3',
+  environment: 'production',
+})
+```
+
+```python Python
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="<your-dsn>",
+    release="api@2026.9.3",
+    environment="production",
+)
+```
+
+```go Go
+package main
+
+import (
+	"log"
+	"time"
+
+	"github.com/getsentry/sentry-go"
+)
+
+func main() {
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn:         "<your-dsn>",
+		Release:     "api@2026.9.3",
+		Environment: "production",
+	})
+	if err != nil {
+		log.Fatalf("sentry.Init: %s", err)
+	}
+	defer sentry.Flush(2 * time.Second)
+}
+```
+
+</CodeGroup>
+
+In Node.js with ES modules, load the file with `--import` so the SDK starts before your framework:
+
+```bash Terminal
+node --import ./instrument.mjs app.mjs
+```
+
+Importing `instrument.mjs` from your entry file is not enough: ES modules are hoisted, so your framework loads before the SDK can instrument it.
+
+Set `release` to the same value you use when you [upload source maps](/resolve/errors/source-maps), so Checkly can match them.
+
+## Confirm the first Error arrives
+
+{/* [UNVERIFIED] Measure the time to the first Error in production. */}
+
+Throw an Error from your application, for example from a test route. It appears on the **Errors** page within about a minute: Checkly writes Errors in batches, groups new Errors every 30 seconds, and the page refreshes every 30 seconds.
+
+## Count affected users
+
+The **Users** column counts distinct user IDs. Checkly receives user data only when your application calls `setUser()` or turns on `sendDefaultPii` in the SDK, and it keeps the user ID, email and username as sent. To remove fields before they leave your application, use `beforeSend` in the SDK.
+
+## Send through your own domain
+
+{/* [UNVERIFIED] Prove a tunnel with and without sentry_key (202 vs 401). */}
+
+The SDK's `tunnel` option sends Errors through an endpoint on your own domain, for example to avoid ad blockers. Your endpoint must forward the envelope to `https://rum.checklyhq.com/api/<project number>/envelope/?sentry_key=<key>`. Checkly reads the key from the `sentry_key` query parameter or the `X-Sentry-Auth` header, not from the envelope.
+
+## What Checkly stores
+
+Checkly stores errors and messages. It skips every other kind of data an SDK sends, such as transactions, sessions, replays, logs and attachments, without failing the request.
+
+## Rotate or revoke a DSN
+
+To rotate a key, ship the new DSN first. In the **Ingest keys (DSN)** card, wait until the old key's **Last used** time stops changing, then select **Revoke**. Checkly refuses Errors sent with a revoked key within about a minute, including from bundles still in a CDN cache.

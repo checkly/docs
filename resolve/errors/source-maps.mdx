@@ -1,0 +1,85 @@
+---
+title: 'Upload source maps and debug files'
+sidebarTitle: 'Source maps and debug files'
+description: 'Upload JavaScript source maps, native debug files and ProGuard mappings with sentry-cli so Checkly shows stack traces as your original code.'
+canonical: 'https://www.checklyhq.com/docs/resolve/errors/source-maps/'
+---
+
+Minified JavaScript and native release builds produce stack traces that are hard to read. Upload the matching source maps or debug files with `sentry-cli`, and Checkly shows every stack frame as your original file, function and line. A new build of the same code then also joins its existing Error Group instead of opening a new one.
+
+<Accordion title="Prerequisites">
+
+- `sentry-cli` 2.x or 3.x.
+- A Checkly user API key (`cu_…`) with the `projects:deploy` permission, or a service API key (`sv_…`) of the account. Account API keys are not accepted. See [Creating an API key](/admin/creating-api-key).
+
+</Accordion>
+
+## Configure sentry-cli
+
+Set these environment variables, or the matching `sentry-cli` options:
+
+| Variable | Value |
+|---|---|
+| `SENTRY_URL` | `https://rum.checklyhq.com` |
+| `SENTRY_ORG` | Your Checkly account ID |
+| `SENTRY_PROJECT` | The Checkly project ID or logical ID |
+| `SENTRY_AUTH_TOKEN` | Your user or service API key |
+
+Upload to one project at a time. Run `sentry-cli` once per project.
+
+## Upload JavaScript source maps
+
+{/* [UNVERIFIED] Run inject and upload against production and paste the output. */}
+
+Checkly matches source maps to frames by debug ID. Inject debug IDs into your build output, deploy those files, and upload the source maps with the release your SDK sends:
+
+```bash Terminal
+sentry-cli sourcemaps inject ./dist
+sentry-cli sourcemaps upload --release storefront@2026.9.3 ./dist
+```
+
+Deploy the files from `./dist` after `inject`, because `inject` changes them. If an Error has no debug IDs, its Error Group says so and the frames stay minified.
+
+## Upload native debug files and ProGuard mappings
+
+{/* [UNVERIFIED] Upload a dSYM and a ProGuard mapping to production and paste the output. */}
+
+```bash Terminal
+sentry-cli debug-files upload ./build
+sentry-cli upload-proguard ./app/build/outputs/mapping/release/mapping.txt
+```
+
+With `sentry-cli` 2.x, set `SENTRY_EXPERIMENTAL_PROGUARD_CHUNK_UPLOAD=1` for ProGuard uploads, or use `sentry-cli` 3.x. Checkly accepts ProGuard mappings only in chunks.
+
+## Supported files
+
+| File | Supported |
+|---|---|
+| JavaScript source maps | Yes |
+| Mach-O and dSYM (Apple platforms) | Yes |
+| ELF (Linux, Android NDK) | Yes |
+| Breakpad symbols | Yes |
+| Source bundles (`--include-sources`) | Yes |
+| ProGuard and R8 mappings | Yes |
+| Windows PDB and .NET portable PDB | No |
+| Unity IL2CPP and Flutter or Dart symbols | No |
+
+Each file can be up to 2 GiB.
+
+## Check your uploads
+
+A project's **Releases** page lists each release with the source maps and debug files uploaded for it, and the state of each upload: **Waiting**, **Processing**, **Stored** or **Failed**. A failed upload shows its reason, such as **File too large** or **Malformed file**.
+
+On an Error Group, frames that could not be resolved show why: **No source map uploaded**, **Source map failed to process** or **Lookup file not found**.
+
+## Troubleshooting
+
+`sentry-cli` prints the reason when Checkly refuses an upload:
+
+| Message | Fix |
+|---|---|
+| `The organization must be your Checkly account ID (a UUID)` | Set `SENTRY_ORG` to your account ID, not its name. |
+| `Set SENTRY_PROJECT, or --project, to the Checkly project ID or logical ID.` | Set the project. |
+| `Account API keys are not accepted here.` | Use a user API key or a service API key. |
+| `This API key may not upload debug files to this account.` | Give the user a role with `projects:deploy`, or use a service API key of this account. |
+| `Uploading ProGuard mappings in one request is not available yet.` | Use `sentry-cli` 3.x, or set `SENTRY_EXPERIMENTAL_PROGUARD_CHUNK_UPLOAD=1`. |

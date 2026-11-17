@@ -43,7 +43,7 @@ The list takes these query parameters. Repeat a parameter to match any of its va
 The list counts at most 1,000 matches; narrow the filters to see more. Each endpoint allows 30 requests per minute for each caller. Reading needs `error-groups:read`, every change needs `error-groups:update`, and changing an assignee also needs `members:read`.
 
 ```bash Terminal
-curl "https://api.checklyhq.com/v2/error-groups?status=unresolved&sort=errors" \
+curl "https://api.checklyhq.com/v2/error-groups?status=unresolved&limit=1" \
   -H "Authorization: Bearer <your-api-key>" \
   -H "X-Checkly-Account: <your-account-id>"
 ```
@@ -51,18 +51,21 @@ curl "https://api.checklyhq.com/v2/error-groups?status=unresolved&sort=errors" \
 ```json Response
 [
   {
-    "id": "14ca8add-0e5d-4c8f-90e3-8ebc8747cff0",
-    "title": "Exception: Checkly test Error from Python docs sample",
+    "id": "f60098bf-b6e9-402a-bbb8-cd13b1bc7fb0",
+    "title": "InventoryError: stock count went negative",
+    "culprit": null,
     "status": "unresolved",
     "hasUnhandled": false,
-    "firstSeen": "2026-11-17T11:03:01.642Z",
-    "lastSeen": "2026-11-17T11:03:01.642Z",
+    "firstSeen": "2026-11-17T11:21:48.504Z",
+    "lastSeen": "2026-11-17T11:22:18.967Z",
+    "regressedAt": null,
     "assigneeId": null,
     "project": {
-      "logicalId": "docs-errors-proof",
-      "name": "Docs Errors proof"
+      "id": "12e99bd4-ed25-41e3-a1d3-0274bd8cc0da",
+      "logicalId": "docs-errors-proof-native",
+      "name": "Docs Errors proof - native (Breakpad, source bundles)"
     },
-    ...
+    "metrics": { ... }
   }
 ]
 ```

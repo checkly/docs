@@ -47,6 +47,7 @@ The Sentry SDKs handle these responses for you. They help when you send Errors y
 | `202` | `{"accepted":true,…}` | Checkly accepted the request. |
 | `400` | `{"error":"malformed envelope"}` | The envelope could not be read. |
 | `401` | `{"error":"invalid sentry_key"}` | The key is wrong or revoked. |
+| `403` | `{"error":"origin not allowed"}` | The request came from a website that is not in the project's [allowed websites](/resolve/errors/send-errors#allow-only-your-websites). |
 | `413` | `{"error":"payload too large"}` or `{"error":"too many envelope items"}` | The request is over a limit. |
 | `415` | `{"error":"unsupported content encoding, use gzip or br"}` | Use `gzip` or `br`. |
 | `429` | `{"error":"rate limited"}` | Over the limit for this DSN, or Checkly is busy. Retry after the `Retry-After` seconds. |

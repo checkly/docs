@@ -9,7 +9,7 @@ Your application sends Errors to Checkly through the official Sentry SDK. You ne
 
 <Accordion title="Prerequisites">
 
-- To create a project: the `projects:create` permission. To create or revoke a DSN in an existing project: `projects:update`. See [Permissions](/admin/team-management/permissions).
+- To create a project: the `projects:create` permission. To create or revoke a DSN, or change the allowed websites of an existing project: `projects:update`. See [Permissions](/admin/team-management/permissions).
 - An application you can deploy with a Sentry SDK added.
 
 </Accordion>
@@ -161,6 +161,22 @@ The SDK's `tunnel` option sends Errors through an endpoint on your own domain, f
 ## What Checkly stores
 
 Checkly stores errors and messages. It skips every other kind of data an SDK sends, such as transactions, sessions, replays, logs and attachments, without failing the request.
+
+## Allow only your websites
+
+A DSN is public once it ships in a browser bundle. To stop other websites from sending Errors with it, list your websites in the project's **Allowed origins** card on its **Errors** tab. You can also fill in **Allowed websites** when you create the project.
+
+Checkly checks the `Origin` header of each browser request, or the `Referer` header when there is no `Origin`, and refuses requests from other websites with `403`. Server SDKs send neither header, so their Errors are always accepted.
+
+| Entry | Allows |
+|---|---|
+| `*` | Every website. Use it on its own line only. |
+| `example.com` | `http` and `https` on the default ports |
+| `example.com:8080` | `http` and `https` on that port |
+| `https://example.com` | Exactly that scheme, host and port |
+| `*.example.com` | Every subdomain, but not `example.com` itself |
+
+A project can list up to 50 websites of up to 300 characters each. A project with an empty list accepts no browser Errors. Changes apply within about a minute. Editing the list needs the `projects:update` permission.
 
 ## Rotate or revoke a DSN
 

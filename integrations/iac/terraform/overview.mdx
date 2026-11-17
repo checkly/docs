@@ -9,6 +9,7 @@ The [Checkly Terraform provider](https://github.com/checkly/terraform-provider-c
 
 If you prefer, you can also clone our [sample repository](https://github.com/checkly/checkly-terraform-getting-started) and play around with the resources on your own.
 For in-depth information on Terraform, please see HashiCorp's [official documentation](https://developer.hashicorp.com/terraform/docs).
+Version 2.x of the provider requires Terraform 1.8 or later. To upgrade a project from version 1.x of the provider, follow the [upgrade guide](https://registry.terraform.io/providers/checkly/checkly/latest/docs/guides/upgrading-to-v2).
 
 > Looking for Monitoring as Code but don't want to use Terraform? Give our [CLI solution](/cli/overview) a try.
 
@@ -26,10 +27,12 @@ Start by adding the following to your `main.tf`:
 
 ```terraform main.tf
 terraform {
+  required_version = ">= 1.8"
+
   required_providers {
     checkly = {
-      source = "checkly/checkly"
-      version = "~> 1.0"
+      source  = "checkly/checkly"
+      version = "~> 2.0"
     }
   }
 }
@@ -38,7 +41,7 @@ variable "checkly_api_key" {}
 variable "checkly_account_id" {}
 
 provider "checkly" {
-  api_key = var.checkly_api_key
+  api_key    = var.checkly_api_key
   account_id = var.checkly_account_id
 }
 ```
@@ -73,9 +76,9 @@ $ terraform init
 Initializing the backend...
 
 Initializing provider plugins...
-- Finding checkly/checkly versions matching "~> 1.0"...
-- Installing checkly/checkly v1.30.0...
-- Installed checkly/checkly v1.30.0 (signed by a HashiCorp partner, key ID 4E5AC4D95E185A57)
+- Finding checkly/checkly versions matching "~> 2.0"...
+- Installing checkly/checkly v2.0.0...
+- Installed checkly/checkly v2.0.0 (signed by a HashiCorp partner, key ID 4E5AC4D95E185A57)
 
 ...
 
@@ -90,25 +93,24 @@ rerun this command to reinitialize your working directory. If you forget, other
 commands will detect it and remind you to do so if necessary.
 ```
 
-You can now start adding resources to your file. You can check the official documentation to see [available parameters](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/check) for each resource type. 
+You can now start adding resources to your file. You can check the official documentation to see [available parameters](https://registry.terraform.io/providers/checkly/checkly/latest/docs) for each resource type. 
 
 ## Your first Browser check
 
 As an example, you could add a basic Browser check resource at the bottom of your `main.tf`.
 
 ```terraform main.tf
-resource "checkly_check" "browser-check-1" {
-  name                      = "Example check"
-  type                      = "BROWSER"
-  activated                 = true
-  frequency                 = 5
-  
+resource "checkly_browser_check" "browser-check-1" {
+  name      = "Example check"
+  activated = true
+  frequency = 5
+
   locations = [
     "eu-central-1",
     "us-west-1"
   ]
 
-  retry_strategy {
+  retry_strategy = {
     type = "LINEAR"
   }
 
@@ -139,11 +141,11 @@ are indicated with the following symbols:
 
 Terraform will perform the following actions:
 
-  # checkly_check.browser-check-1 will be created
-  + resource "checkly_check" "browser-check-1" {
-      + activated              = true
-      + degraded_response_time = 15000
-      + retry_strategy {
+  # checkly_browser_check.browser-check-1 will be created
+  + resource "checkly_browser_check" "browser-check-1" {
+      + activated                   = true
+      + frequency                   = 5
+      + retry_strategy              = {
           + base_backoff_seconds = 60
           + max_duration_seconds = 600
       ...
@@ -157,8 +159,8 @@ Do you want to perform these actions?
 
   Enter a value: yes
 
-checkly_check.browser-check-1: Creating...
-checkly_check.browser-check-1: Creation complete after 1s [id=cc143901-fbae-4942-91fe-4b99b0250567]
+checkly_browser_check.browser-check-1: Creating...
+checkly_browser_check.browser-check-1: Creation complete after 1s [id=cc143901-fbae-4942-91fe-4b99b0250567]
 
 Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 ```
@@ -172,26 +174,23 @@ Your Checkly account should now show the first check up and running:
 You can also add an API check to monitor an API endpoint:
 
 ```terraform main.tf
-resource "checkly_check" "example-check" {
-  name                      = "Example check"
-  type                      = "API"
-  activated                 = true
-  frequency                 = 1
+resource "checkly_api_check" "example-check" {
+  name      = "Example check"
+  activated = true
+  frequency = 1
 
   locations = [
     "us-west-1",
     "eu-central-1"
   ]
 
-  request {
-    url              = "https://api.example.com/"
-    follow_redirects = true
-    skip_ssl         = false
-    assertion {
+  request = {
+    url = "https://api.example.com/"
+    assertions = [{
       source     = "STATUS_CODE"
       comparison = "EQUALS"
       target     = "200"
-    }
+    }]
   }
 }
 ```
@@ -204,40 +203,38 @@ Now that you have your checks set up, you'll want to set up an alert channel for
 
 ```terraform main.tf
 resource "checkly_alert_channel" "email_ac" {
-  email {
+  email = {
     address = "jane.doe@email.com" // Your email address here
   }
   send_recovery = true
-  send_failure = true
+  send_failure  = true
   send_degraded = false
 }
 ```
 
 Next, subscribe each check to the alert channel:
 
-```terraform main.tf  
-resource "checkly_check" "browser-check-1" {
-  name                      = "Example check"
-  type                      = "BROWSER"
+```terraform main.tf
+resource "checkly_browser_check" "browser-check-1" {
+  name = "Example check"
   // ...
 
-  alert_channel_subscription {
+  alert_channel_subscriptions = [{
     channel_id = checkly_alert_channel.email_ac.id
     activated  = true
-  }
+  }]
 
   // ...
 }
 
-resource "checkly_check" "example-check" {
-  name                      = "Example check"
-  type                      = "API"
+resource "checkly_api_check" "example-check" {
+  name = "Example check"
   // ...
 
-  alert_channel_subscription {
+  alert_channel_subscriptions = [{
     channel_id = checkly_alert_channel.email_ac.id
     activated  = true
-  }
+  }]
 
   // ...
 }

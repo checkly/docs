@@ -17,12 +17,12 @@ Your application sends Errors to Checkly through the official Sentry SDK. You ne
 ## Get a DSN
 
 1. Open the **Errors** page and select **New project**.
-2. Enter a **Name** and a **Logical ID**, and create the project.
+2. Enter a **Name** and a **Logical ID**, and select **Create project**.
 3. Copy the **DSN** the dialog shows.
 
 To add a DSN to an existing project, open the project's **Errors** tab, go to the **Ingest keys (DSN)** card and select **Create key**.
 
-A DSN has the form `https://<key>@rum.checklyhq.com/<project number>`. It can only write Errors, so it is safe to ship in a browser bundle. Create one key per thing you ship, such as a web bundle, a CI job or a mobile build, so you can rotate them one at a time.
+A DSN has the form `https://<key>@rum.checklyhq.com/<number>`. It can only write Errors, so it is safe to ship in a browser bundle. Create one key per thing you ship, such as a web bundle, a CI job or a mobile build, so you can rotate them one at a time.
 
 ## Configure the SDK
 
@@ -114,15 +114,39 @@ In Node.js with ES modules, load the file with `--import` so the SDK starts befo
 node --import ./instrument.mjs app.mjs
 ```
 
-Importing `instrument.mjs` from your entry file is not enough: ES modules are hoisted, so your framework loads before the SDK can instrument it.
+Importing `instrument.mjs` from your entry file is not enough: ES modules are hoisted, so your framework loads before the SDK can instrument it. With CommonJS, use `node --require ./instrument.js app.js`, or require `instrument.js` on the first line of your entry file.
 
-Set `release` to the same value you use when you [upload source maps](/resolve/errors/source-maps), so Checkly can match them.
+Use the same `release` value when you [upload source maps](/resolve/errors/source-maps), so the uploads and the Errors of one build are listed under the same release.
 
 ## Confirm the first Error arrives
 
-{/* [UNVERIFIED] Measure the time to the first Error in production. */}
+Send a test Error from your application, for example from a test route:
 
-Throw an Error from your application, for example from a test route. It appears on the **Errors** page within about a minute: Checkly writes Errors in batches, groups new Errors every 30 seconds, and the page refreshes every 30 seconds.
+<CodeGroup dropdown={true}>
+
+```js Browser
+Sentry.captureException(new Error('Checkly test Error'))
+```
+
+```js Node.js
+Sentry.captureException(new Error('Checkly test Error'))
+```
+
+```python Python
+sentry_sdk.capture_exception(Exception("Checkly test Error"))
+```
+
+```go Go
+sentry.CaptureException(errors.New("Checkly test Error"))
+```
+
+</CodeGroup>
+
+The Go SDK reports only what you capture: call `sentry.CaptureException`, use `defer sentry.Recover()` for panics, or use the integration for your web framework.
+
+{/* [UNVERIFIED] Measure the time to the first Error in production; keep only the measured time. */}
+
+The Error appears on the **Errors** page within about a minute.
 
 ## Count affected users
 
@@ -132,7 +156,7 @@ The **Users** column counts distinct user IDs. Checkly receives user data only w
 
 {/* [UNVERIFIED] Prove a tunnel with and without sentry_key (202 vs 401). */}
 
-The SDK's `tunnel` option sends Errors through an endpoint on your own domain, for example to avoid ad blockers. Your endpoint must forward the envelope to `https://rum.checklyhq.com/api/<project number>/envelope/?sentry_key=<key>`. Checkly reads the key from the `sentry_key` query parameter or the `X-Sentry-Auth` header, not from the envelope.
+The SDK's `tunnel` option sends Errors through an endpoint on your own domain, for example to avoid ad blockers. Your endpoint must forward the envelope to `https://rum.checklyhq.com/api/<number>/envelope/?sentry_key=<key>`, with the number and the key from your DSN. Checkly reads the key from the `sentry_key` query parameter or the `X-Sentry-Auth` header, not from the envelope.
 
 ## What Checkly stores
 

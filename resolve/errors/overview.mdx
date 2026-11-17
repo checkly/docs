@@ -12,18 +12,12 @@ Errors collects the exceptions and crashes your applications report and groups t
 1. You create a DSN for a Checkly project. Errors belong to the same projects your monitors and deployments use.
 2. The Sentry SDK in your application sends each Error to `rum.checklyhq.com`.
 3. Checkly removes secrets such as auth headers, cookies and card numbers before it stores anything. See [Data and limits](/resolve/errors/data-and-limits).
-4. Checkly groups Errors with the same cause into one Error Group. If you upload source maps or debug files, stack traces are shown as your original code, and a new build of the same code joins the existing Error Group. See [Error Groups](/resolve/errors/error-groups).
+4. Checkly groups Errors with the same cause into one Error Group. If you upload source maps or debug files, stack traces are shown as your original code, and a new build of the same minified code joins the existing Error Group. See [Error Groups](/resolve/errors/error-groups).
 5. You triage Error Groups on the **Errors** page: resolve, ignore, assign, merge or split them. A resolved Error Group that receives a new Error reopens as a regression.
 
 Checkly keeps each Error for 30 days. An Error Group keeps its status, assignee and first and last seen dates after its Errors expire.
 
-## What the Errors page shows
-
-The **Errors** page lists Error Groups from three sources:
-
-- **Application**: Errors your applications send with a Sentry SDK.
-- **Tests**: failures in test sessions, such as `npx checkly test` runs.
-- **Monitoring**: failures in check runs.
+## Errors and Checkly checks
 
 When your application reports an Error during a Checkly check run, its Error Group shows which check run it was seen in, with links to the check and to the backend trace.
 

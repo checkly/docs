@@ -21,10 +21,10 @@ The `/v1/error-groups` endpoints in the API reference are about failed checks, n
 | `GET` | `/v2/error-groups/{errorGroupId}` | Get one Error Group. |
 | `GET` | `/v2/error-groups/{errorGroupId}/errors` | List its newest Errors with stack traces and breadcrumbs. `limit` 1 to 50 (default 10) and `offset`. |
 | `PUT` | `/v2/error-groups/{errorGroupId}/status` | Set the status: `{"status": "resolved"}`. `unresolved` reopens it, `ignored` ignores it. |
-| `PUT` | `/v2/error-groups/{errorGroupId}/assignee` | Assign it: `{"assigneeId": "<user id>"}`, or `null` to unassign. |
+| `PUT` | `/v2/error-groups/{errorGroupId}/assignee` | Assign it: `{"assigneeId": "<user id>"}`, or `null` to unassign. User IDs come from `GET /v1/accounts/{accountId}/members`. |
 | `POST` | `/v2/error-groups/{errorGroupId}/merge` | Merge up to 25 Error Groups into this one: `{"loserIds": ["<id>"]}`. |
 | `POST` | `/v2/error-groups/{errorGroupId}/unmerge` | Undo the merge of an Error Group that was merged away. |
-| `POST` | `/v2/error-groups/{errorGroupId}/split` | Move one grouping key into a new Error Group: `{"fingerprint": "<key>"}`. |
+| `POST` | `/v2/error-groups/{errorGroupId}/split` | Move one grouping key into a new Error Group: `{"fingerprint": "<key>"}`, one of the `fingerprints` of the Error Group. |
 
 The list takes these query parameters. Repeat a parameter to match any of its values, for example `status=unresolved&status=ignored`.
 
@@ -32,9 +32,9 @@ The list takes these query parameters. Repeat a parameter to match any of its va
 |---|---|
 | `project` | A project's logical ID |
 | `status` | `unresolved`, `resolved`, `ignored` |
-| `assigned` | `me`, `none` or a user ID |
+| `assigned` | `me`, `none` or a user ID. `me` matches nothing for a service API key |
 | `environment`, `platform` | Error Groups that ever reported from this environment or SDK platform |
-| `handled` | `false` for Error Groups with at least one crash |
+| `handled` | `false` for Error Groups with at least one unhandled Error |
 | `search` | Text in the title |
 | `from`, `to` | UNIX timestamps in seconds, at most 30 days apart. Default: the last 24 hours |
 | `sort` | `lastSeen` (default), `errors` or `age` |
@@ -52,24 +52,7 @@ curl "https://api.checklyhq.com/v2/error-groups?status=unresolved&sort=errors" \
 
 ## MCP tools
 
-The [Checkly MCP server](/ai/mcp-server) lets an AI agent find, read and triage Error Groups, and set up projects and DSNs.
-
-| Tool | Type | What it does |
-|---|---|---|
-| `search-error-groups` | Read | Find Error Groups by status, assignee, environment, platform, project or title. |
-| `get-error-group` | Read | Get one Error Group. |
-| `list-error-group-errors` | Read | List the newest Errors of an Error Group. |
-| `list-error-group-breadcrumbs` | Read | List the breadcrumbs of an Error. |
-| `update-error-group` | Write | Change the status or assignee of one Error Group. |
-| `update-error-groups` | Write | Change the status or assignee of up to 100 Error Groups. |
-| `merge-error-groups` | Write | Merge Error Groups. |
-| `unmerge-error-group` | Write | Undo a merge. |
-| `split-error-group` | Write | Split a grouping key into a new Error Group. |
-| `list-projects` | Read | List projects. |
-| `create-project` | Write | Create a project for Errors. |
-| `create-ingest-key` | Write | Create a DSN for a project. |
-| `list-ingest-keys` | Read | List a project's DSNs, including revoked ones. |
-| `revoke-ingest-key` | Write | Revoke a DSN. |
+The [Checkly MCP server](/ai/mcp-server) lets an AI agent find, read and triage Error Groups, and create projects and DSNs. See [Error Group tools](/ai/mcp-server/tools#error-group-tools) for the list.
 
 Example prompt:
 

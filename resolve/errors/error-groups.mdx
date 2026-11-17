@@ -15,7 +15,7 @@ Checkly picks the grouping key for each Error in this order:
 2. The exception type and the top frames of your own code in the stack trace.
 3. The Error message, with variable parts such as IDs and numbers removed.
 
-Content hashes in file names, build directories and dependency versions are not part of the key, so a new build of the same code joins the same Error Group. Errors in two projects are always in two Error Groups.
+Content hashes in file names, build directories and dependency versions are not part of the key, so a new build of code that is not minified joins the same Error Group. Errors in two projects are always in two Error Groups.
 
 When you [upload source maps or debug files](/resolve/errors/source-maps), an Error whose resolved stack matches an existing Error Group joins it, even if the minified stack differs.
 

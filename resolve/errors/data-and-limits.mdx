@@ -16,7 +16,7 @@ Checkly removes common secrets when an Error arrives, before it stores, groups o
 | Cookie values and request bodies | Replaces them, always |
 | Values under names that contain `password`, `secret`, `token`, `apikey`, `auth`, `session`, `jwt` and similar, also in URLs | Replaces the value |
 | Card numbers in messages, exceptions, tags, extra data and breadcrumbs | Replaces them |
-| Error messages, tags, user ID, email and username | Keeps them as sent |
+| Error messages, tags, user ID, email and username | Keeps them as sent, except card numbers |
 
 Checkly receives user data only when your SDK sends it. To remove more before it leaves your application, use `beforeSend` in the SDK.
 
@@ -30,9 +30,9 @@ Checkly keeps each Error for 30 days. After that, its stack trace, breadcrumbs a
 |---|---|
 | Errors per DSN | About 500 per second, and about 8 MiB per second |
 | Request body | 16 MiB, compressed and uncompressed |
-| One Error | 2 MiB of JSON |
+| JSON in one request | 2 MiB |
 | Items per envelope | 100 |
-| Compression | `gzip` or `br` |
+| Compression | None, `gzip` or `br` |
 | `environment` | 64 characters |
 | `release` | 200 characters |
 | Tag value | 200 characters |
@@ -51,4 +51,4 @@ The Sentry SDKs handle these responses for you. They help when you send Errors y
 | `415` | `{"error":"unsupported content encoding, use gzip or br"}` | Use `gzip` or `br`. |
 | `429` | `{"error":"rate limited"}` | Over the limit for this DSN, or Checkly is busy. Retry after the `Retry-After` seconds. |
 
-A `429` response carries the `Retry-After` and `X-Sentry-Rate-Limits` headers. Errors refused with `429` are not stored.
+Every `429` response carries a `Retry-After` header; over the limit for a DSN, it also carries `X-Sentry-Rate-Limits`. Errors refused with `429` are not stored.

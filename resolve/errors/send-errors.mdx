@@ -200,6 +200,8 @@ node --import ./instrument.mjs app.mjs
 
 Importing `instrument.mjs` from your entry file is not enough: ES modules are hoisted, so your framework loads before the SDK can instrument it. With CommonJS, use `node --require ./instrument.js app.js`, or require `instrument.js` on the first line of your entry file.
 
+In an iOS or macOS app, call `SentrySDK.start` in your `App`'s `init`.
+
 On Android, initialize the SDK yourself as shown. In `AndroidManifest.xml`, register your `Application` class and turn off the SDK's automatic start:
 
 ```xml AndroidManifest.xml
@@ -207,8 +209,6 @@ On Android, initialize the SDK yourself as shown. In `AndroidManifest.xml`, regi
     <meta-data android:name="io.sentry.auto-init" android:value="false" />
 </application>
 ```
-
-In an iOS or macOS app, call `SentrySDK.start` in your `App`'s `init`.
 
 In React Native, `export default Sentry.wrap(App)` replaces your existing `export default App`.
 

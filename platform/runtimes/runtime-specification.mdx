@@ -41,15 +41,22 @@ The following standard Node modules are included and can be used as normal, e.g.
 import * as path from 'path'
 ```
 
+You can also import them with the `node:` prefix, e.g. `node:path`.
+
 - assert
 - buffer
 - crypto
-- dns
+- dgram
+- dns (in runtime `2026.04`, `dns.setServers()` and `dns.setDefaultResultOrder()` apply only to the check that calls them)
 - fs (partial, we have restricted some file system operations for security reasons)
+- https
+- os (partial in runtime `2026.04`: `platform()`, `arch()`, `type()`, `endianness()`, `tmpdir()`, `homedir()`, `EOL`, `devNull` and `constants`. Other `os` functions, such as `hostname()` or `cpus()`, throw an error)
 - path
+- perf_hooks (partial in runtime `2026.04`: only `performance`)
 - querystring
 - readline
 - stream
+- stream/promises
 - string_decoder
 - timers
 - tls

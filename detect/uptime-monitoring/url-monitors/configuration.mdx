@@ -62,7 +62,7 @@ Choose when and how your checks run across multiple locations:
 
 * **Round Robin** (Default): Checks run on one of the selected locations each time it is scheduled
 
-* **Parallel**: Checks run from all selected locations simultaneously. Higher consumption but provides immediate global visibility for critical services
+* **Parallel**: Checks run from all selected locations simultaneously. Higher consumption but provides immediate global visibility for critical services. Parallel scheduling depends on your [plan](https://www.checklyhq.com/pricing/).
 
 Learn more in our documentation on [Scheduling strategies](/concepts/scheduling/#scheduling-strategies).
 
@@ -91,6 +91,10 @@ Select the retry strategy to determine how failed checks are retried:
 | **Fixed** | Retry a specific number of times with consistent intervals between attempts |
 | **Linear** | Increase retry delay linearly with each attempt to avoid overwhelming failed services |
 | **Exponential** | Grow the retry delay exponentially (base delay to the power of the attempt, e.g. 5s, 25s, 125s) for maximum protection against service overload |
+
+<Note>
+On the Hobby, Starter and Team plans, uptime monitors can use **None** and **Single** only. **Fixed**, **Linear** and **Exponential** need the Enterprise [plan](https://www.checklyhq.com/pricing/). See [Retries on uptime monitors](/communicate/alerts/retries#retries-on-uptime-monitors).
+</Note>
 
 ### Alert settings
 
@@ -132,6 +136,8 @@ Configure follow-up alerts after initial failure notification:
 #### Alert channels
 
 Define where notifications are sent when checks fail or recover. Additional channels can be configured in global notification settings.
+
+This section lists existing alert channels only. To alert an email address, first [create an email alert channel](/integrations/alerts/email#basic-email-configuration), then select it here.
 
 **Alert Types** (per channel):
 - ✅ **Success/Recovery**: Check has recovered from failure

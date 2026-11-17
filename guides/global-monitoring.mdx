@@ -8,7 +8,7 @@ canonical: 'https://www.checklyhq.com/docs/guides/global-monitoring/'
 import GuideAgentIntro from '/snippets/guide-agent-intro.mdx'
 import { CopyPromptButton } from '/snippets/copy-prompt-button.jsx'
 
-By the end of this guide, you have a per-location latency profile of your site from thirteen locations, a default set of monitoring locations chosen from your users and your infrastructure, and a browser flow that retries in the region that failed and pages only when enough regions agree.
+By the end of this guide, you have a per-location latency profile of your site from twelve locations, a default set of monitoring locations chosen from your users and your infrastructure, and a browser flow that retries in the region that failed and pages only when enough regions agree.
 
 <Frame>
   <img src="/images/guides/global-monitoring/world-monitor.png" alt="A Checkly URL monitor detail page with run results from N. Virginia, Ireland, Sydney, Cape Town and other locations listed with their response times" />
@@ -82,10 +82,10 @@ None of that shows up in your code's timing, because the code runs after the han
 Before you can choose locations, you need to know how your site behaves from each one. Put the locations in one file and treat it as configuration, not as a per-check afterthought.
 
 ```ts __checks__/locations.ts
-// Thirteen of the public Checkly locations, grouped by continent. Pick from here.
+// Twelve of the public Checkly locations, grouped by continent. Pick from here.
 export const AMERICAS = ['us-east-1', 'us-west-2', 'ca-central-1', 'sa-east-1'] as const
 export const EUROPE = ['eu-west-1', 'eu-central-1', 'eu-north-1'] as const
-export const MIDDLE_EAST_AFRICA = ['me-south-1', 'af-south-1'] as const
+export const MIDDLE_EAST_AFRICA = ['af-south-1'] as const
 export const ASIA_PACIFIC = ['ap-south-1', 'ap-southeast-1', 'ap-northeast-1', 'ap-southeast-2'] as const
 
 export const WORLD = [...AMERICAS, ...EUROPE, ...MIDDLE_EAST_AFRICA, ...ASIA_PACIFIC]
@@ -97,7 +97,7 @@ A URL monitor is cheap enough to run from all of them.
 import { Frequency, UrlAssertionBuilder, UrlMonitor } from 'checkly/constructs'
 import { WORLD } from './locations'
 
-// The same request from thirteen places at the same moment.
+// The same request from twelve places at the same moment.
 // Parallel scheduling is what turns "is it up?" into "is it up for whom?".
 new UrlMonitor('shop-homepage-world', {
   name: 'Homepage from around the world',
@@ -131,12 +131,12 @@ Deploy it and give it fifteen minutes. Then read the run results by location. Th
 Two things in that chart matter more than the numbers. The spread is 49× for one static page, so a single "response time" for your site is not a real quantity. And Oregon is slower than Ireland despite sharing a continent with the origin, because routing decides the tail, not the map. You cannot reason your way to either fact. You have to measure from there.
 
 <Note>
-Bahrain shows 0 ms with a skipped marker in the same runs: the check did not execute there, so the chart leaves it out. Treat a location that is implausibly fast the same way you treat one that fails, and look at the raw result before you trust it.
+Treat a location that is implausibly fast the same way you treat one that fails, and look at the raw result before you trust it.
 </Note>
 
 ### Step 2: Choose the locations that matter
 
-Thirteen locations is right for a cheap measuring monitor, not for every check. Twenty-two [public locations](/concepts/locations) is a menu, not a target. Build a default set from three sources, and use the chart from Step 1 to check your picks.
+Twelve locations is right for a cheap measuring monitor, not for every check. Twenty-one [public locations](/concepts/locations) is a menu, not a target. Build a default set from three sources, and use the chart from Step 1 to check your picks.
 
 **Where your users are.** Export sessions or revenue by country from your analytics, group the countries into markets, and keep the markets that matter to revenue. Monitor from one location per market, not one per country. Users in the same market mostly share DNS resolvers, CDN edges, and transit, so one location sees the path they take.
 
@@ -147,7 +147,6 @@ Thirteen locations is right for a cheap measuring monitor, not for every check. 
 | Latin America | `sa-east-1` |
 | UK and Western Europe | `eu-west-2`, `eu-central-1` |
 | Nordics | `eu-north-1` |
-| Middle East | `me-south-1` |
 | Africa | `af-south-1` |
 | India | `ap-south-1` |
 | Southeast Asia | `ap-southeast-1`, `ap-southeast-3` |
@@ -200,7 +199,7 @@ In a parallel check, every location runs at every interval, and each one is a ch
 
 | Check | Locations | Frequency | Runs per hour |
 |---|---|---|---|
-| Homepage from around the world | 13 | 5 minutes | 156 |
+| Homepage from around the world | 12 | 5 minutes | 144 |
 | Checkout from three continents | 3 | 10 minutes | 18 |
 
 Spend the width where it is cheap. URL, TCP, DNS, and ICMP monitors run in milliseconds, so run them from the core set or wider: they are what finds a regional path problem. API checks follow the core set. Browser checks and Playwright Check Suites take seconds to minutes per run, so one location per continent with meaningful revenue is enough to prove the flow works there.

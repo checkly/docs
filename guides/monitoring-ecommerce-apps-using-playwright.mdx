@@ -290,13 +290,12 @@ The suite now runs every ten minutes from both locations, and every later deploy
 
 ## Same thing in Terraform
 
-If your team manages infrastructure with Terraform, the checkout flow is one `checkly_check` resource: a Browser check with the self-contained spec and the same `SHOP_URL` variable.
+If your team manages infrastructure with Terraform, the checkout flow is one `checkly_browser_check` resource: a Browser check with the self-contained spec and the same `SHOP_URL` variable.
 
 ```terraform terraform/main.tf
 # Provider block as in the Terraform overview, then:
-resource "checkly_check" "shop_checkout" {
+resource "checkly_browser_check" "shop_checkout" {
   name                      = "Shop checkout (Terraform)"
-  type                      = "BROWSER"
   activated                 = true
   frequency                 = 10
   use_global_alert_settings = true
@@ -307,14 +306,14 @@ resource "checkly_check" "shop_checkout" {
     "eu-west-1"
   ]
 
-  retry_strategy {
+  retry_strategy = {
     type = "LINEAR"
   }
 
-  environment_variable {
+  environment_variables = [{
     key   = "SHOP_URL"
     value = "https://danube-web.shop"
-  }
+  }]
 
   script = file("${path.module}/../checks/checkout.spec.ts")
 }
@@ -325,20 +324,20 @@ Set `TF_VAR_checkly_api_key` and `TF_VAR_checkly_account_id`, then run `terrafor
 ```text Terminal
 Terraform will perform the following actions:
 
-  # checkly_check.shop_checkout will be created
-  + resource "checkly_check" "shop_checkout" {
-      + frequency                 = 10
-      + locations                 = [
+  # checkly_browser_check.shop_checkout will be created
+  + resource "checkly_browser_check" "shop_checkout" {
+      + environment_variables       = [
+          + {
+              + key    = "SHOP_URL"
+              + value  = (sensitive value)
+            },
+        ]
+      + frequency                   = 10
+      + locations                   = [
           + "eu-west-1",
           + "us-east-1",
         ]
-      + name                      = "Shop checkout (Terraform)"
-      + type                      = "BROWSER"
-
-      + environment_variable {
-          + key    = "SHOP_URL"
-          + value  = "https://danube-web.shop"
-        }
+      + name                        = "Shop checkout (Terraform)"
     }
 
 Plan: 1 to add, 0 to change, 0 to destroy.

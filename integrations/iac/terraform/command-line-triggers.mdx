@@ -5,6 +5,10 @@ description: 'Set up command line triggers to run checks from CI/CD pipelines or
 canonical: 'https://www.checklyhq.com/docs/integrations/iac/terraform/command-line-triggers/'
 ---
 
+<Warning>
+This page applies to Checkly Terraform provider v1.x only. Provider v2.0.0 removed the `checkly_trigger_check` and `checkly_trigger_group` resources, and Checkly has deprecated command line trigger URLs. Before you upgrade to v2, remove these resources from your configuration and state, as described under [Removed resource types](https://registry.terraform.io/providers/checkly/checkly/latest/docs/guides/upgrading-to-v2#removed-resource-types) in the upgrade guide. To run checks on demand, use the [`checkly trigger`](/cli/checkly-trigger) CLI command instead.
+</Warning>
+
 Command line triggers are secret URLs that run a check or group when you send an HTTP `GET` request to them, for example with `curl`. They enable you to call a check from a CI/CD pipeline, a bash shell or programmatically in your code. No API key is needed, as the token in the URL authorizes the call. Trigger URLs are separate from the [`checkly trigger`](/cli/checkly-trigger) CLI command.
 
 You can specify command line triggers as standalone resources at check or group level:
@@ -31,4 +35,4 @@ output "test-trigger-group-url" {
 
 The trigger `url` and `token` contain a secret token, so the Checkly provider marks them as sensitive and Terraform requires any output that references them to set `sensitive = true`. Sensitive outputs are hidden in `terraform plan` and `terraform apply` output; read the value with `terraform output -raw test-trigger-check-url`.
 
-You can see all the configuration options for [group triggers](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/trigger_group), as well as more examples [check triggers](https://registry.terraform.io/providers/checkly/checkly/latest/docs/resources/trigger_check), on the official Terraform registry documentation page.
+You can see all the configuration options for [group triggers](https://registry.terraform.io/providers/checkly/checkly/1.32.0/docs/resources/trigger_group), as well as more examples [check triggers](https://registry.terraform.io/providers/checkly/checkly/1.32.0/docs/resources/trigger_check), on the official Terraform registry documentation page.

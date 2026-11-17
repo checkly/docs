@@ -33,6 +33,8 @@ Groups let you apply shared configuration to standardize how checks behave. Depe
 To prevent issues (e.g. broken references to group variables), the check will be automatically deactivated after being added to or removed from a group. Make sure to review its settings before reactivating.
 </Warning>
 
+**Deleting a group:** Deleting a group also deletes every check in it. To keep the checks, move them out of the group before you delete it.
+
 
 Using a set of shared defaults for API checks helps you manage checks that go to the same basic 
 endpoint, share headers and other settings. 
@@ -123,6 +125,10 @@ that variable to be overridden at the group level or check level.
 - **Retries:** Configure retry strategy for failed checks (fixed, single, linear, exponential)
 - **Alert settings:** Set up alert channels for the group - email, SMS, Slack, webhooks, etc. When you enable the group override, these settings replace the alert settings of every check in the group.
 
+<Warning>
+Turning on **Group override for alert settings** selects **Use the global account notification settings**. That covers when to alert, not where: the group's **Alert channels** still replace the alert channels of every check in the group. If you select no alert channels for the group, its checks alert no one.
+</Warning>
+
 
 ### Testing & runtimes
 - **Testing:** Run checks in this group as E2E tests locally or from CI/CD pipelines
@@ -164,5 +170,7 @@ When you purchase a plan in Checkly, it includes access to specific monitoring f
 This means monitors and checks on the same plan may not all have access to the same features. For example: A Browser check might support `parallel` scheduling, while a TCP monitor only allows for `round-robin` scheduling.
 
 Groups let you organize any type of checks/monitors together and define [shared settings](/platform/groups#configuration). If those shared settings aren't supported by all monitors in the group, Checkly will throw a validation error asking you to either adjust the configuration or remove the incompatible monitor.
+
+Retries are a common case: on the Hobby, Starter and Team plans, uptime monitors can only use the **None** and **Single** retry strategies. A group retry override with **Fixed**, **Linear** or **Exponential** fails while the group contains an uptime monitor. See [Retries on uptime monitors](/communicate/alerts/retries#retries-on-uptime-monitors).
 
 If you're unsure how to proceed, don't hesitate to reach out to our [support team](mailto:support@checklyhq.com), we're happy to help.

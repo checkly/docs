@@ -2,10 +2,10 @@
 title: 'Error Groups'
 sidebarTitle: 'Error Groups'
 description: 'How Checkly groups Errors into Error Groups, and how to resolve, ignore, assign, merge and split them.'
-canonical: 'https://www.checklyhq.com/docs/resolve/errors/error-groups/'
+canonical: 'https://www.checklyhq.com/docs/detect/errors/error-groups/'
 ---
 
-An Error Group collects every Error with the same cause, so a bug that fails a thousand times is one entry to triage. You resolve, ignore, assign, merge and split Error Groups on the **Errors** page, through the [API](/resolve/errors/api) or with an AI agent through the [MCP server](/resolve/errors/api#mcp-tools).
+An Error Group collects every Error with the same cause, so a bug that fails a thousand times is one entry to triage. You resolve, ignore, assign, merge and split Error Groups on the **Errors** page, through the [API](/detect/errors/api) or with an AI agent through the [MCP server](/detect/errors/api#mcp-tools).
 
 ## How Errors are grouped
 
@@ -17,7 +17,7 @@ Checkly picks the grouping key for each Error in this order:
 
 Content hashes in file names, build directories and dependency versions are not part of the key, so a new build of code that is not minified joins the same Error Group. Errors in two projects are always in two Error Groups.
 
-When you [upload source maps or debug files](/resolve/errors/source-maps), an Error whose resolved stack matches an existing Error Group joins it, even if the minified stack differs.
+When you [upload source maps or debug files](/detect/errors/source-maps), an Error whose resolved stack matches an existing Error Group joins it, even if the minified stack differs.
 
 To group Errors your own way, set the fingerprint in the SDK, for example in JavaScript:
 
@@ -58,7 +58,7 @@ You cannot split out:
 
 ## Find Error Groups
 
-Filter the **Errors** page by project, **Environment**, **Status**, **Assignee** and **Unhandled**, or search by title. Sort by number of Errors, last seen or age, over the last hour up to the last 30 days. The **Users** column counts affected users when your SDK [sends a user ID](/resolve/errors/send-errors#count-affected-users).
+Filter the **Errors** page by project, **Environment**, **Status**, **Assignee** and **Unhandled**, or search by title. Sort by number of Errors, last seen or age, over the last hour up to the last 30 days. The **Users** column counts affected users when your SDK [sends a user ID](/detect/errors/send-errors#count-affected-users).
 
 ## Hand an Error Group to an AI agent
 

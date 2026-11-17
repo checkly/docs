@@ -2,7 +2,7 @@
 title: 'Send Errors to Checkly'
 sidebarTitle: 'Send Errors'
 description: 'Get a DSN for a Checkly project, configure the Sentry SDK in your application, and confirm the first Error arrives.'
-canonical: 'https://www.checklyhq.com/docs/resolve/errors/send-errors/'
+canonical: 'https://www.checklyhq.com/docs/detect/errors/send-errors/'
 ---
 
 Your application sends Errors to Checkly through the official Sentry SDK. You need a DSN, the address the SDK sends to, for a Checkly project. This page covers browser JavaScript, Node.js, Python, Go, iOS and macOS, Android, React Native, and C and C++ on macOS.
@@ -224,7 +224,7 @@ cc main.c -Iinstall/include -Linstall/lib -lsentry -Wl,-rpath,"$PWD/install/lib"
 
 The SDK keeps its data in a `.sentry-native` folder in the working directory. Build `sentry-native` with the `inproc` backend because the default `crashpad` backend and the `breakpad` backend send crashes as minidumps, which Checkly does not accept.
 
-Use the same `release` value when you [upload source maps](/resolve/errors/source-maps), so the uploads and the Errors of one build are listed under the same release.
+Use the same `release` value when you [upload source maps](/detect/errors/source-maps), so the uploads and the Errors of one build are listed under the same release.
 
 ## Confirm the first Error arrives
 
@@ -274,7 +274,7 @@ sentry_capture_event(event);
 
 The Go SDK reports only what you capture: call `sentry.CaptureException`, use `defer sentry.Recover()` for panics, or use the integration for your web framework.
 
-The Error appears on the **Errors** page within about two minutes. The iOS and macOS SDK sends a crash the next time the app starts. In a command-line tool, call `SentrySDK.flush(timeout: 5)` after the capture, or the program exits before the Error is sent. To read stack traces of release builds, [upload source maps or debug files](/resolve/errors/source-maps).
+The Error appears on the **Errors** page within about two minutes. The iOS and macOS SDK sends a crash the next time the app starts. In a command-line tool, call `SentrySDK.flush(timeout: 5)` after the capture, or the program exits before the Error is sent. To read stack traces of release builds, [upload source maps or debug files](/detect/errors/source-maps).
 
 ## Count affected users
 

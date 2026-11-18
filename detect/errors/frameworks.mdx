@@ -1,7 +1,7 @@
 ---
 title: 'Set up Errors for your framework'
 sidebarTitle: 'Frameworks'
-description: 'The smallest Sentry SDK setup that sends Errors to Checkly from Next.js, React, Express, Django, Laravel and Rails, with readable stack traces.'
+description: 'The smallest Sentry SDK setup that sends Errors to Checkly from Next.js, React, Express, Django, Laravel, Rails, Spring Boot and ASP.NET Core, with readable stack traces.'
 canonical: 'https://www.checklyhq.com/docs/detect/errors/frameworks/'
 ---
 
@@ -234,3 +234,65 @@ end
 Unhandled exceptions in controller actions and in Active Job jobs arrive with the file and line. `Sentry.capture_exception(e)` arrives as handled. You do not need `bin/rails generate sentry` or `config.breadcrumbs_logger`; `breadcrumbs_logger` only adds breadcrumbs.
 
 `Rails.error.report(e)` is not sent unless you add `config.rails.register_error_subscriber = true`; then it arrives as handled. `Rails.logger.error` is not sent.
+
+## Spring Boot
+
+Tested with Spring Boot 4.1 and `io.sentry:sentry-spring-boot-4-starter` 8.65 on Java 25.
+
+```xml pom.xml
+<dependency>
+  <groupId>io.sentry</groupId>
+  <artifactId>sentry-spring-boot-4-starter</artifactId>
+  <version>8.65.0</version>
+</dependency>
+```
+
+```properties application.properties
+sentry.dsn=<your-dsn>
+sentry.release=api@2026.9.3
+sentry.environment=production
+```
+
+Unhandled exceptions in controllers arrive with the class and line, and the cause of a chained exception shows on the Error Group. `Sentry.captureException(e)` arrives as handled. You do not need `sentry.in-app-includes`: the starter marks the package of your `@SpringBootApplication` class as your code. The Sentry Maven and Gradle plugins are not needed either: frames show the file and line without them, and Checkly does not show the source bundles they upload.
+
+To send `log.error("…", e)` calls as Errors, add `io.sentry:sentry-logback`. Tomcat then also logs the root cause of a chained exception, so the same Error arrives twice. Drop that copy in a `BeforeSendCallback` bean:
+
+```java SentryConfig.java
+import io.sentry.SentryOptions;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SentryConfig {
+  @Bean
+  public SentryOptions.BeforeSendCallback dropTomcatRootCauseLog() {
+    return (event, hint) -> {
+      String logger = event.getLogger();
+      return logger != null && logger.startsWith("org.apache.catalina.core.ContainerBase.") ? null : event;
+    };
+  }
+}
+```
+
+## ASP.NET Core
+
+Tested with .NET 11 and `Sentry.AspNetCore` 7.0.
+
+```bash Terminal
+dotnet add package Sentry.AspNetCore
+```
+
+```csharp Program.cs
+var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.UseSentry(o =>
+{
+    o.Dsn = "<your-dsn>";
+    o.Release = "api@2026.9.3";
+    o.Environment = "production";
+});
+```
+
+Unhandled exceptions in endpoints arrive as unhandled, and `SentrySdk.CaptureException(e)` as handled. `ILogger.LogError()` creates an Error; `LogWarning()` does not.
+
+The SDK reads the file and line from the `.pdb` file at runtime, so deploy it next to the DLL, as `dotnet publish -c Release` does, or build with `-p:DebugType=embedded`. Without it, frames show only the function name. You do not need to upload symbols or sources: Checkly does not use them for .NET, and .NET stack traces show no source lines.

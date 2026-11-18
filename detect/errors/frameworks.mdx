@@ -9,7 +9,7 @@ Each setup below is the smallest one that sends Errors to Checkly with readable 
 
 ## Next.js
 
-Tested with Next.js 16 (App Router, Turbopack) and `@sentry/nextjs` 11.14.
+Works with Next.js 16.4 or later (App Router) and `@sentry/nextjs` 11.14 or later, on Node.js 24.20 or later.
 
 ```bash Terminal
 npm install @sentry/nextjs
@@ -75,7 +75,7 @@ Do not let `withSentryConfig` upload Turbopack builds itself. It changes the bui
 
 ## React
 
-Tested with React 19, Vite 8, `@sentry/react` and `@sentry/vite-plugin` 11.14.
+Works with React 19.3 or later and Vite 8.3 or later. Needs `@sentry/react` and `@sentry/vite-plugin` 11.14 or later.
 
 ```bash Terminal
 npm install @sentry/react
@@ -131,12 +131,12 @@ rm dist/assets/*.map
 Set the [`sentry-cli` variables](/detect/errors/source-maps#configure-sentry-cli) in the environment of the build.
 
 <Warning>
-Do not let `@sentry/vite-plugin` 11.14 upload Vite 8 builds itself. It changes the uploaded copy of the bundle, so every frame resolves one line off and points at the wrong file.
+Do not let `@sentry/vite-plugin` upload Vite builds itself. It changes the uploaded copy of the bundle, so every frame resolves one line off and points at the wrong file.
 </Warning>
 
 ## Express
 
-Tested with Express 5.3 and `@sentry/node` 11.14 on Node.js 24.
+Works with Express 5.3 or later and `@sentry/node` 11.14 or later, on Node.js 24.20 or later.
 
 ```bash Terminal
 npm install @sentry/node
@@ -158,11 +158,11 @@ Load it before your app:
 node --import ./instrument.mjs app.mjs
 ```
 
-That is all: Errors thrown in route handlers, sync or async, arrive as unhandled Errors with the route, such as `GET /cart`, and a stack trace that points at your file and line. You do not need `Sentry.setupExpressErrorHandler(app)`; it is deprecated in `@sentry/node` 11.14 and does no harm. By default, only Errors that end in a status of 500 or higher are sent. A crash at startup arrives too.
+That is all: Errors thrown in route handlers, sync or async, arrive as unhandled Errors with the route, such as `GET /cart`, and a stack trace that points at your file and line. You do not need `Sentry.setupExpressErrorHandler(app)`; it is deprecated and does no harm. By default, only Errors that end in a status of 500 or higher are sent. A crash at startup arrives too.
 
 ## Django
 
-Tested with Django 6.1 and `sentry-sdk` 2.75.
+Works with Django 6.1 or later and `sentry-sdk` 2.75 or later, on Python 3.15 or later.
 
 ```bash Terminal
 pip install sentry-sdk
@@ -186,7 +186,7 @@ Unhandled exceptions in views arrive with the view's file and line, under `runse
 
 ## Laravel
 
-Tested with Laravel 13.43 and `sentry/sentry-laravel` 4.30 on PHP 8.5.
+Works with Laravel 13.43 or later and `sentry/sentry-laravel` 4.30 or later, on PHP 8.5 or later.
 
 ```bash Terminal
 composer require sentry/sentry-laravel
@@ -217,7 +217,7 @@ Without `Integration::handles`, unhandled exceptions are not sent. With it, unha
 
 ## Ruby on Rails
 
-Tested with Rails 8.1, `sentry-ruby` and `sentry-rails` 7.3 on Ruby 4.0.
+Works with Rails 8.1 or later, on Ruby 4.0 or later. Needs `sentry-ruby` and `sentry-rails` 7.3 or later.
 
 ```bash Terminal
 bundle add sentry-ruby sentry-rails
@@ -237,7 +237,7 @@ Unhandled exceptions in controller actions and in Active Job jobs arrive with th
 
 ## Spring Boot
 
-Tested with Spring Boot 4.1 and `io.sentry:sentry-spring-boot-4-starter` 8.65 on Java 25.
+Works with Spring Boot 4.1 or later and `io.sentry:sentry-spring-boot-4-starter` 8.65 or later, on Java 25 or later.
 
 ```xml pom.xml
 <dependency>
@@ -255,7 +255,7 @@ sentry.environment=production
 
 Unhandled exceptions in controllers arrive with the class and line, and the cause of a chained exception shows on the Error Group. `Sentry.captureException(e)` arrives as handled. You do not need `sentry.in-app-includes`: the starter marks the package of your `@SpringBootApplication` class as your code. The Sentry Maven and Gradle plugins are not needed either: frames show the file and line without them, and Checkly does not show the source bundles they upload.
 
-To send `log.error("…", e)` calls as Errors, add `io.sentry:sentry-logback`, version 8.65.0, the same as the starter. Tomcat then also logs the root cause of a chained exception, so a second Error arrives, in a separate Error Group, for the root cause. Drop it in a `BeforeSendCallback` bean:
+To send `log.error("…", e)` calls as Errors, add `io.sentry:sentry-logback` at the same version as the starter. Tomcat then also logs the root cause of a chained exception, so a second Error arrives, in a separate Error Group, for the root cause. Drop it in a `BeforeSendCallback` bean:
 
 ```java SentryConfig.java
 import io.sentry.SentryOptions;
@@ -276,7 +276,7 @@ public class SentryConfig {
 
 ## ASP.NET Core
 
-Tested with .NET 11 and `Sentry.AspNetCore` 7.0.
+Works with .NET 11 or later and `Sentry.AspNetCore` 7.0 or later.
 
 ```bash Terminal
 dotnet add package Sentry.AspNetCore

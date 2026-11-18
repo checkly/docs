@@ -71,13 +71,13 @@ A check alerts through a channel when it's subscribed to it. You can subscribe m
 3. Search by name, or filter by **Type**. Select checks and groups one by one, or select the header checkbox to select all of them.
 4. Click the button that adds them, for example **Add 3 subscribers**. Then save the channel.
 
-**Remove all** unsubscribes every check and group when you save. A new channel starts with every check and group subscribed.
+**Remove all** unsubscribes every check and group when you save. A new channel starts with every check and group in that list subscribed.
 
 To also subscribe checks you create later in the web app, select **Automatically subscribe newly created checks to this alert channel**.
 
 ### Groups
 
-A subscribed group alerts only when **Group override for alert settings** is on in the group's alert settings. The checks in that group then use the group's channels, not their own. That's why the list shows a group only when its override is on, and doesn't show the checks it covers. A group without the override isn't listed, and its checks are listed one by one.
+The list shows a group only when **Group override for alert settings** is on in the group's alert settings, and then doesn't show the checks in it. A group without the override isn't listed, and its checks are listed one by one. See [how group alert settings apply to checks](/communicate/alerts/overview).
 
 <Warning>
 If you turn off a group's override, the group's subscriptions are removed. Its checks aren't subscribed in their place. Subscribe them again from the channel, or they don't alert through it.
@@ -85,7 +85,7 @@ If you turn off a group's override, the group's subscriptions are removed. Its c
 
 ### Checks managed as code
 
-If you manage checks with the [CLI](/cli/overview) or [Terraform](/integrations/iac/terraform/overview), subscribe them in code. Set `alertChannels` on a [check group](/constructs/check-group-v2) with an `alertEscalationPolicy`, or on each check.
+If you manage checks with the [CLI](/cli/overview) or [Terraform](/integrations/iac/terraform/overview), subscribe them in code. To subscribe a [check group](/constructs/check-group-v2), set `alertChannels` together with an `alertEscalationPolicy`. Without the policy, the channel page doesn't list the group.
 
 ## Using variables and secrets in channel configs
 

@@ -307,11 +307,11 @@ The SDK's `tunnel` option sends Errors through an endpoint on your own domain, f
 
 ## Send fewer Errors
 
-Drop Errors in the SDK, before they leave your application. Checkly has no filters of its own, and Errors you drop do not count toward the [limits](/detect/errors/data-and-limits#limits). In JavaScript:
+Drop Errors in the SDK, before they leave your application. Apart from [allowed websites](#allow-only-your-websites), Checkly does not filter Errors for you, and Errors you drop do not count toward the [limits](/detect/errors/data-and-limits#limits). In JavaScript:
 
 ```js
 Sentry.init({
-  dsn: '<your DSN>',
+  dsn: '<your-dsn>',
   // Keep a random half of all Errors.
   sampleRate: 0.5,
   // Drop Errors whose message matches.

@@ -5,7 +5,7 @@ description: 'Send the Errors of an application that already uses Sentry to Chec
 canonical: 'https://www.checklyhq.com/docs/detect/errors/move-from-sentry/'
 ---
 
-Checkly receives Errors from the official Sentry SDKs, so you keep the SDK and the code that captures Errors. You change where the SDK sends Errors and where your build uploads source maps.
+If your application uses one of the SDKs on [Send Errors](/detect/errors/send-errors) or [Frameworks](/detect/errors/frameworks), you keep the SDK and the code that captures Errors. You change where the SDK sends Errors and where your build uploads source maps.
 
 ## Change the DSN
 
@@ -26,7 +26,7 @@ For a browser application, list your websites in the project's **Allowed website
 | Project slug (`SENTRY_PROJECT`) | The Checkly project ID or logical ID |
 | Auth token (`SENTRY_AUTH_TOKEN`) | A Checkly user or service API key |
 
-Remove `org`, `project`, `url` and `authToken` from the plugin options if you set them there, or set them to the Checkly values. Checkly matches JavaScript source maps by debug ID only, so make sure your build [injects debug IDs](/detect/errors/source-maps#upload-javascript-source-maps).
+Remove `org`, `project`, `url` and `authToken` from the plugin options, so the plugin reads the variables above. If the Sentry wizard created `.env.sentry-build-plugin`, delete it: it holds your sentry.io token. Checkly matches JavaScript source maps by debug ID only, so make sure your build [injects debug IDs](/detect/errors/source-maps#upload-javascript-source-maps).
 
 With Vite 8, or Next.js with Turbopack, the 11.14 bundler plugins upload source maps that resolve one line off. Turn their upload off and upload with `sentry-cli`, as shown in [Frameworks](/detect/errors/frameworks).
 

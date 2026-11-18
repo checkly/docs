@@ -42,7 +42,7 @@ export async function register() {
 export const onRequestError = Sentry.captureRequestError
 ```
 
-Without `onRequestError`, Errors in route handlers and server components are not sent. This setup covers the Node.js runtime; Errors from the edge runtime, such as middleware, are not sent with it. You do not need `global-error.tsx` to capture Errors, or `onRouterTransitionStart`, which only adds tracing.
+Without `onRequestError`, Errors in route handlers and server components are not sent. This setup starts the server SDK only in the Node.js runtime (`NEXT_RUNTIME === 'nodejs'`). You do not need `global-error.tsx` to capture Errors, or `onRouterTransitionStart`, which only adds tracing.
 
 For readable stack traces, let `withSentryConfig` set the release and the debug IDs, and upload the source maps with `sentry-cli` after the build. Import `withSentryConfig` from `@sentry/nextjs/config`:
 
@@ -70,7 +70,7 @@ find .next/static -name '*.map' -delete
 Set the [`sentry-cli` variables](/detect/errors/source-maps#configure-sentry-cli) in the environment of the build. Delete the browser source maps before you deploy: `next start` serves them to anyone otherwise.
 
 <Warning>
-Do not let `withSentryConfig` upload Turbopack builds itself. It changes the built files after the source maps were written, so every frame resolves one line off. With `next build --webpack`, its own upload resolves browser Errors, but route handler frames point at Sentry's wrapper module, so use the `sentry-cli` steps above for server code too.
+Do not let `withSentryConfig` upload Turbopack builds itself. It changes the built files after the source maps were written, so every frame resolves one line off. With `npx next build --webpack`, its own upload resolves browser Errors, but route handler frames point at Sentry's wrapper module. The default Turbopack build with the `sentry-cli` steps above gives readable frames for both.
 </Warning>
 
 ## React

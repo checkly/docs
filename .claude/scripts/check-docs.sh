@@ -23,6 +23,14 @@ run "frontmatter" python3 .github/scripts/check_frontmatter.py
 run "anchors" npm run --silent check:anchors
 run "links" npm run --silent check:links
 run "snippet typecheck" npm run --silent check:snippets
+sitemap_current () {
+  node .github/scripts/generate-sitemap.mjs >/dev/null || return 1
+  if ! git diff --quiet -- sitemap.xml; then
+    echo "   sitemap.xml was out of date and is now regenerated: commit it"
+    return 1
+  fi
+}
+run "sitemap" sitemap_current
 if [[ -f .github/scripts/check-casing.mjs ]]; then
   run "casing" node .github/scripts/check-casing.mjs
 fi

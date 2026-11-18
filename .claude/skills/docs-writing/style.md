@@ -1,7 +1,9 @@
 # Style quick reference
 
 `AGENTS.md` has the repo rules (frontmatter, components, snippet markers). This file adds what a
-writer gets wrong most often. When `AGENTS.md` and this file disagree, `AGENTS.md` wins.
+writer gets wrong most often. When `AGENTS.md` and this file disagree, `AGENTS.md` wins. The
+maintainers' rules in [maintainers/editing-rules.md](maintainers/editing-rules.md) also win over
+this file.
 
 ## Voice
 

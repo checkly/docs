@@ -23,8 +23,8 @@ Examples: `resolve/automatic-check-repair.mdx`, `communicate/status-pages/overvi
 
 One job, done in the UI, the CLI or both: "Create a role", "Cancel a test session".
 
-- First paragraph: the result and when you need it. A `Prerequisites` accordion only when the reader
-  needs access, a plan or a version first.
+- First paragraph: the result and when you need it. List prerequisites only when the reader needs
+  access, a plan or a version first, and do not wrap them in an accordion by default.
 - `##` headings are the tasks, written as imperatives ("Create a role"), never "Step N:".
 - Numbered steps with the exact UI labels in bold. Say what the reader sees after the last step.
 - Show the Monitoring as Code variant next to the UI variant when both exist.

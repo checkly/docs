@@ -276,6 +276,27 @@ The Go SDK reports only what you capture: call `sentry.CaptureException`, use `d
 
 The Error appears on the **Errors** page within about two minutes. The iOS and macOS SDK sends a crash the next time the app starts. In a command-line tool, call `SentrySDK.flush(timeout: 5)` after the capture, or the program exits before the Error is sent. To read stack traces of release builds, [upload source maps or debug files](/detect/errors/source-maps).
 
+### If no Error arrives
+
+Turn on the SDK's log: in JavaScript, add `debug: true` to `Sentry.init`. The SDK then logs what it does with each Error, for example:
+
+```text Terminal
+Sentry Logger [log]: Captured error event `Checkly docs filter test: kept`
+...
+Sentry Logger [warn]: Sentry responded with status code 401 to sent event.
+```
+
+| Log line | Cause |
+|---|---|
+| `Sentry responded with status code 401` | The DSN is wrong or [revoked](#rotate-or-revoke-a-dsn). Copy it again from the **Ingest keys (DSN)** card on the project's **Errors** tab. |
+| `Sentry responded with status code 403` | The Error came from a website that is not in the project's [allowed websites](#allow-only-your-websites). |
+| `Sentry responded with status code 429` | The DSN is over its [limit](/detect/errors/data-and-limits#limits). |
+| `Discarding event because it's not included in the random sample` | `sampleRate` is below `1`. |
+| ``before send for type `error` returned `null` `` | Your `beforeSend` dropped the Error. |
+| ``Event dropped due to being matched by `ignoreErrors` option.`` | The message matches `ignoreErrors`. |
+
+In the browser, an ad blocker can block the requests to `rum.checklyhq.com`. If the **Network** tab of your browser's developer tools shows them as blocked, [send through your own domain](#send-through-your-own-domain).
+
 ## Count affected users
 
 The **Users** column counts distinct user IDs. Checkly receives user data only when your application calls `setUser()` or turns on `sendDefaultPii` in the SDK, and it keeps the user ID, email and username as sent. To remove fields before they leave your application, use `beforeSend` in the SDK.
@@ -283,6 +304,25 @@ The **Users** column counts distinct user IDs. Checkly receives user data only w
 ## Send through your own domain
 
 The SDK's `tunnel` option sends Errors through an endpoint on your own domain, for example to avoid ad blockers. Your endpoint must forward the envelope to `https://rum.checklyhq.com/api/<number>/envelope/?sentry_key=<key>`, with the number and the key from your DSN. Checkly reads the key from the `sentry_key` query parameter or the `X-Sentry-Auth` header, not from the envelope.
+
+## Send fewer Errors
+
+Drop Errors in the SDK, before they leave your application. Checkly has no filters of its own, and Errors you drop do not count toward the [limits](/detect/errors/data-and-limits#limits). In JavaScript:
+
+```js
+Sentry.init({
+  dsn: '<your DSN>',
+  // Keep a random half of all Errors.
+  sampleRate: 0.5,
+  // Drop Errors whose message matches.
+  ignoreErrors: ['ResizeObserver loop limit exceeded'],
+  // Drop Errors in code: return null to drop, the event to keep it.
+  beforeSend(event, hint) {
+    if (hint.originalException?.message?.includes('expected in tests')) return null
+    return event
+  },
+})
+```
 
 ## What Checkly stores
 

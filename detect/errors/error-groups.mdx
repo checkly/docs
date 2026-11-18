@@ -1,11 +1,11 @@
 ---
-title: 'Error Groups'
-sidebarTitle: 'Error Groups'
-description: 'How Checkly groups Errors into Error Groups, and how to resolve, ignore, assign, merge and split them.'
+title: 'Error groups'
+sidebarTitle: 'Error groups'
+description: 'How Checkly groups Errors into error groups, and how to resolve, ignore, assign, merge and split them.'
 canonical: 'https://www.checklyhq.com/docs/detect/errors/error-groups/'
 ---
 
-An Error Group collects every Error with the same cause, so a bug that fails a thousand times is one entry to triage. You resolve, ignore, assign, merge and split Error Groups on the **Errors** page, through the [API](/detect/errors/api) or with an AI agent through the [MCP server](/detect/errors/api#mcp-tools).
+An error group collects every Error with the same cause, so a bug that fails a thousand times is one entry to triage. You resolve, ignore, assign, merge and split error groups on the **Errors** page, through the [API](/detect/errors/api) or with an AI agent through the [MCP server](/detect/errors/api#mcp-tools).
 
 ## How Errors are grouped
 
@@ -15,9 +15,9 @@ Checkly picks the grouping key for each Error in this order:
 2. The exception type and the top frames of your own code in the stack trace.
 3. The Error message, with variable parts such as IDs and numbers removed.
 
-Content hashes in file names, build directories and dependency versions are not part of the key, so a new build of code that is not minified joins the same Error Group. Errors in two projects are always in two Error Groups.
+Content hashes in file names, build directories and dependency versions are not part of the key, so a new build of code that is not minified joins the same error group. Errors in two projects are always in two error groups.
 
-When you [upload source maps or debug files](/detect/errors/source-maps), an Error whose resolved stack matches an existing Error Group joins it, even if the minified stack differs.
+When you [upload source maps or debug files](/detect/errors/source-maps), an Error whose resolved stack matches an existing error group joins it, even if the minified stack differs.
 
 To group Errors your own way, set the fingerprint in the SDK, for example in JavaScript:
 
@@ -30,33 +30,33 @@ Sentry.withScope((scope) => {
 
 ## Status and regressions
 
-An Error Group is **Unresolved**, **Resolved** or **Ignored**.
+An error group is **Unresolved**, **Resolved** or **Ignored**.
 
-- **Resolve** when you have shipped a fix. If a new Error arrives later, the Error Group reopens as **Unresolved** and shows the **Regressed** badge.
-- **Ignore** an Error Group you do not plan to fix. New Errors do not reopen it. Select **Stop ignoring** to bring it back.
-- **Reopen** a resolved Error Group by hand.
+- **Resolve** when you have shipped a fix. If a new Error arrives later, the error group reopens as **Unresolved** and shows the **Regressed** badge.
+- **Ignore** an error group you do not plan to fix. New Errors do not reopen it. Select **Stop ignoring** to bring it back.
+- **Reopen** a resolved error group by hand.
 
-Select several Error Groups on the **Errors** page to change their status at once.
+Select several error groups on the **Errors** page to change their status at once.
 
-## Assign an Error Group
+## Assign an error group
 
-Assign an Error Group to a member of your account. Filter the list by **Assignee**: **Me** shows yours, **Not me** someone else's, and **Unassigned** nobody's.
+Assign an error group to a member of your account. Filter the list by **Assignee**: **Me** shows yours, **Not me** someone else's, and **Unassigned** nobody's.
 
-## Merge Error Groups
+## Merge error groups
 
-When two Error Groups have the same cause, select them on the **Errors** page and select **Merge**. Checkly moves the grouping keys, Errors, history and counts into the Error Group you choose. The merged Error Groups are kept, and their links open the Error Group they were merged into. You can undo a merge.
+When two error groups have the same cause, select them on the **Errors** page and select **Merge**. Checkly moves the grouping keys, Errors, history and counts into the error group you choose. The merged error groups are kept, and their links open the error group they were merged into. You can undo a merge.
 
-## Split an Error Group
+## Split an error group
 
-An Error Group can hold several grouping keys, for example after a merge. Its page lists them under **Grouping**. Select **Split out** on a key to move it, with its past and future Errors, into a new Error Group.
+An error group can hold several grouping keys, for example after a merge. Its page lists them under **Grouping**. Select **Split out** on a key to move it, with its past and future Errors, into a new error group.
 
 You cannot split out:
 
-- an Error Group's only key;
-- a key Checkly computed from the stack trace after applying your source maps or debug files, because that key is what the Error Group is;
+- an error group's only key;
+- a key Checkly computed from the stack trace after applying your source maps or debug files, because that key is what the error group is;
 - the last key that was not computed that way.
 
-## Find Error Groups
+## Find error groups
 
 Filter the **Errors** page by project, **Environment**, **Status**, **Assignee** and **Unhandled**, or search by title. Sort by number of Errors, last seen or age, over the last hour up to the last 30 days. The **Users** column counts affected users when your SDK [sends a user ID](/detect/errors/send-errors#count-affected-users).
 
@@ -68,19 +68,19 @@ Views on the **Errors** page work like views elsewhere in Checkly. See [Views](/
 
 ## Tags, contexts and levels
 
-On an Error Group's page, open **Contexts, tags and identifiers** to see the tags and contexts of an Error, such as the browser, operating system and anything you set with `setTag()` or `setContext()`. Checkly stores `extra` data but does not show it. You cannot search or filter Error Groups by tag: the search matches titles only.
+On an error group's page, open **Contexts, tags and identifiers** to see the tags and contexts of an Error, such as the browser, operating system and anything you set with `setTag()` or `setContext()`. Checkly stores `extra` data but does not show it. You cannot search or filter error groups by tag: the search matches titles only.
 
-Messages you send with `captureMessage()` become Error Groups too, at every level. A message sent with the level `warning` or `info` shows a **Warning** or **Info** badge on its page.
+Messages you send with `captureMessage()` become error groups too, at every level. A message sent with the level `warning` or `info` shows a **Warning** or **Info** badge on its page.
 
-## Hand an Error Group to an AI agent
+## Hand an error group to an AI agent
 
-On an Error Group's page, **Copy for agent** copies a prompt with the Error, its stack trace and breadcrumbs for your coding agent. It leaves out contexts, tags, user data and URL query strings.
+On an error group's page, **Copy for agent** copies a prompt with the Error, its stack trace and breadcrumbs for your coding agent. It leaves out contexts, tags, user data and URL query strings.
 
 ## Permissions
 
 | Action | Permission |
 |---|---|
-| View Error Groups, Errors, stack traces and breadcrumbs | `error-groups:read` (every built-in role) |
+| View error groups, Errors, stack traces and breadcrumbs | `error-groups:read` (every built-in role) |
 | Resolve, ignore, reopen, assign, merge and split | `error-groups:update` (Read & Write, Admin and Owner) |
 
 See [Permissions](/admin/team-management/permissions).

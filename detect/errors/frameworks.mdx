@@ -266,9 +266,9 @@ sentry.release=api@2026.9.3
 sentry.environment=production
 ```
 
-Unhandled exceptions in controllers arrive with the class and line, and the cause of a chained exception shows on the Error Group. `Sentry.captureException(e)` arrives as handled. You do not need `sentry.in-app-includes`: the starter marks the package of your `@SpringBootApplication` class as your code. The Sentry Maven and Gradle plugins are not needed either: frames show the file and line without them, and Checkly does not show the source bundles they upload.
+Unhandled exceptions in controllers arrive with the class and line, and the cause of a chained exception shows on the error group. `Sentry.captureException(e)` arrives as handled. You do not need `sentry.in-app-includes`: the starter marks the package of your `@SpringBootApplication` class as your code. The Sentry Maven and Gradle plugins are not needed either: frames show the file and line without them, and Checkly does not show the source bundles they upload.
 
-To send `log.error("…", e)` calls as Errors, add `io.sentry:sentry-logback` at the same version as the starter. Tomcat then also logs the root cause of a chained exception, so a second Error arrives, in a separate Error Group, for the root cause. Drop it in a `BeforeSendCallback` bean:
+To send `log.error("…", e)` calls as Errors, add `io.sentry:sentry-logback` at the same version as the starter. Tomcat then also logs the root cause of a chained exception, so a second Error arrives, in a separate error group, for the root cause. Drop it in a `BeforeSendCallback` bean:
 
 ```java SentryConfig.java
 import io.sentry.SentryOptions;

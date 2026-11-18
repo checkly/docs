@@ -1,14 +1,14 @@
 ---
 title: 'Errors API and MCP tools'
 sidebarTitle: 'API and MCP'
-description: 'Read and triage Error Groups with the beta Error Groups endpoints of the Checkly public API and with the Checkly MCP server.'
+description: 'Read and triage error groups with the beta error groups endpoints of the Checkly public API and with the Checkly MCP server.'
 canonical: 'https://www.checklyhq.com/docs/detect/errors/api/'
 ---
 
 ## Public API
 
 <Note>
-The Error Groups endpoints under `/v2/error-groups` are in beta and are not in the [API reference](/api-reference) yet. They can change before they leave beta.
+The error groups endpoints under `/v2/error-groups` are in beta and are not in the [API reference](/api-reference) yet. They can change before they leave beta.
 </Note>
 
 The endpoints use the same base URL and authentication as the rest of the [Checkly API](/api-reference): `https://api.checklyhq.com`, an API key in the `Authorization: Bearer` header and your account ID in the `X-Checkly-Account` header.
@@ -17,14 +17,14 @@ The `/v1/error-groups` endpoints in the API reference are about failed checks, n
 
 | Method | Path | What it does |
 |---|---|---|
-| `GET` | `/v2/error-groups` | List Error Groups. |
-| `GET` | `/v2/error-groups/{errorGroupId}` | Get one Error Group. |
+| `GET` | `/v2/error-groups` | List error groups. |
+| `GET` | `/v2/error-groups/{errorGroupId}` | Get one error group. |
 | `GET` | `/v2/error-groups/{errorGroupId}/errors` | List its newest Errors with stack traces and breadcrumbs. `limit` 1 to 50 (default 10) and `offset`. |
 | `PUT` | `/v2/error-groups/{errorGroupId}/status` | Set the status: `{"status": "resolved"}`. `unresolved` reopens it, `ignored` ignores it. |
 | `PUT` | `/v2/error-groups/{errorGroupId}/assignee` | Assign it: `{"assigneeId": "<user id>"}`, or `null` to unassign. User IDs come from `GET /v1/accounts/{accountId}/members`. |
-| `POST` | `/v2/error-groups/{errorGroupId}/merge` | Merge up to 25 Error Groups into this one: `{"loserIds": ["<id>"]}`. |
-| `POST` | `/v2/error-groups/{errorGroupId}/unmerge` | Undo the merge of an Error Group that was merged away. |
-| `POST` | `/v2/error-groups/{errorGroupId}/split` | Move one grouping key into a new Error Group: `{"fingerprint": "<key>"}`, one of the `fingerprints` of the Error Group. |
+| `POST` | `/v2/error-groups/{errorGroupId}/merge` | Merge up to 25 error groups into this one: `{"loserIds": ["<id>"]}`. |
+| `POST` | `/v2/error-groups/{errorGroupId}/unmerge` | Undo the merge of an error group that was merged away. |
+| `POST` | `/v2/error-groups/{errorGroupId}/split` | Move one grouping key into a new error group: `{"fingerprint": "<key>"}`, one of the `fingerprints` of the error group. |
 
 The list takes these query parameters. Repeat a parameter to match any of its values, for example `status=unresolved&status=ignored`.
 
@@ -33,8 +33,8 @@ The list takes these query parameters. Repeat a parameter to match any of its va
 | `project` | A project's logical ID |
 | `status` | `unresolved`, `resolved`, `ignored` |
 | `assigned` | `me`, `none` or a user ID. `me` matches nothing for a service API key |
-| `environment`, `platform` | Error Groups that ever reported from this environment or SDK platform |
-| `handled` | `false` for Error Groups with at least one unhandled Error |
+| `environment`, `platform` | Error groups that ever reported from this environment or SDK platform |
+| `handled` | `false` for error groups with at least one unhandled Error |
 | `search` | Text in the title |
 | `from`, `to` | UNIX timestamps in seconds, at most 30 days apart. Default: the last 24 hours |
 | `sort` | `lastSeen` (default), `errors` or `age` |
@@ -77,4 +77,4 @@ curl "https://api.checklyhq.com/v2/error-groups?status=unresolved&search=route%2
 
 ## MCP tools
 
-The [Checkly MCP server](/ai/mcp-server) lets an AI agent find, read and triage Error Groups, and create projects and DSNs. See [Error Group tools](/ai/mcp-server/tools#error-group-tools) for the list.
+The [Checkly MCP server](/ai/mcp-server) lets an AI agent find, read and triage error groups, and create projects and DSNs. See [Error group tools](/ai/mcp-server/tools#error-group-tools) for the list.

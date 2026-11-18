@@ -5,10 +5,10 @@ description: 'Upload JavaScript source maps, native debug files and ProGuard map
 canonical: 'https://www.checklyhq.com/docs/detect/errors/source-maps/'
 ---
 
-Minified JavaScript and native release builds produce stack traces that are hard to read. Upload the matching source maps or debug files with `sentry-cli`, and Checkly shows every stack frame as your original file, function and line. A new build of the same code then also joins its existing Error Group instead of opening a new one.
+Minified JavaScript and native release builds produce stack traces that are hard to read. Upload the matching source maps or debug files with `sentry-cli`, and Checkly shows every stack frame as your original file, function and line. A new build of the same code then also joins its existing error group instead of opening a new one.
 
 <Frame>
-  ![An Error Group from a React Native app whose stack trace shows the original TypeScript file src/cart.ts, line 10, with the failing line highlighted, after the source map was uploaded](/images/errors/error-group-stack-trace.png)
+  ![An error group from a React Native app whose stack trace shows the original TypeScript file src/cart.ts, line 10, with the failing line highlighted, after the source map was uploaded](/images/errors/error-group-stack-trace.png)
 </Frame>
 
 You need:
@@ -60,7 +60,7 @@ Source Map Upload Report
     ~/main.js.map (debug id 8faf8c03-3a67-5ee5-9a07-9fdf96240e15)
 ```
 
-Deploy the files from `./dist` after `inject`, because `inject` changes them. If an Error has no debug IDs, its Error Group says so and the frames stay minified.
+Deploy the files from `./dist` after `inject`, because `inject` changes them. If an Error has no debug IDs, its error group says so and the frames stay minified.
 
 ## Upload native debug files and ProGuard mappings
 
@@ -134,7 +134,7 @@ Checkly symbolicates in the background. A new Error can show minified or raw fra
 
 A project's **Releases** page lists each release with the source maps and debug files uploaded for it, and the state of each upload: **Waiting**, **Processing**, **Stored** or **Failed**. A failed upload shows its reason, such as **File too large** or **Malformed file**.
 
-On an Error Group, frames that could not be resolved show why: **No source map uploaded**, **Source map failed to process** or **Lookup file not found**.
+On an error group, frames that could not be resolved show why: **No source map uploaded**, **Source map failed to process** or **Lookup file not found**.
 
 ### Upload after the Error
 

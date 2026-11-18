@@ -28,6 +28,8 @@ For a browser application, list your websites in the project's **Allowed website
 
 Remove `org`, `project`, `url` and `authToken` from the plugin options if you set them there, or set them to the Checkly values. Checkly matches JavaScript source maps by debug ID only, so make sure your build [injects debug IDs](/detect/errors/source-maps#upload-javascript-source-maps).
 
+With Vite 8, or Next.js with Turbopack, the 11.14 bundler plugins upload source maps that resolve one line off. Turn their upload off and upload with `sentry-cli`, as shown in [Frameworks](/detect/errors/frameworks).
+
 ## What does not move
 
 - **Past Errors** stay in Sentry. Checkly stores Errors from the moment your SDK sends them to the Checkly DSN.

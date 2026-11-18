@@ -1,0 +1,185 @@
+---
+title: 'Set up Errors for your framework'
+sidebarTitle: 'Frameworks'
+description: 'The smallest Sentry SDK setup that sends Errors to Checkly from Next.js, React, Express and Django, with readable stack traces.'
+canonical: 'https://www.checklyhq.com/docs/detect/errors/frameworks/'
+---
+
+Each setup below is the smallest one that sends Errors to Checkly with readable stack traces. Start with a [DSN](/detect/errors/send-errors#get-a-dsn). Tracing, replay and profiling options from Sentry's guides are not needed: Checkly stores errors and messages only.
+
+## Next.js
+
+Tested with Next.js 16 (App Router, Turbopack) and `@sentry/nextjs` 11.14.
+
+```bash Terminal
+npm install @sentry/nextjs
+npm install --save-dev @sentry/cli
+```
+
+Initialize the SDK for the browser and for the server, and report server Errors with `onRequestError`:
+
+```ts instrumentation-client.ts
+import * as Sentry from '@sentry/nextjs'
+
+Sentry.init({
+  dsn: '<your DSN>',
+  environment: 'production',
+})
+```
+
+```ts instrumentation.ts
+import * as Sentry from '@sentry/nextjs'
+
+export async function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    Sentry.init({
+      dsn: '<your DSN>',
+      environment: 'production',
+    })
+  }
+}
+
+export const onRequestError = Sentry.captureRequestError
+```
+
+Without `onRequestError`, Errors in route handlers and server components are not sent. You do not need `global-error.tsx` to capture Errors, or `onRouterTransitionStart`, which only adds tracing.
+
+For readable stack traces, let `withSentryConfig` set the release and the debug IDs, and upload the source maps with `sentry-cli` after the build. Import `withSentryConfig` from `@sentry/nextjs/config`:
+
+```ts next.config.ts
+import type { NextConfig } from 'next'
+import { withSentryConfig } from '@sentry/nextjs/config'
+
+const nextConfig: NextConfig = {
+  productionBrowserSourceMaps: true,
+}
+
+export default withSentryConfig(nextConfig, {
+  release: { name: 'storefront@2026.9.3' },
+  sourcemaps: { disable: 'disable-upload' },
+})
+```
+
+```bash Terminal
+next build
+npx sentry-cli sourcemaps upload --release storefront@2026.9.3 .next/static/chunks
+npx sentry-cli sourcemaps upload --release storefront@2026.9.3 .next/server
+find .next/static -name '*.map' -delete
+```
+
+Set the [`sentry-cli` variables](/detect/errors/source-maps#configure-sentry-cli) in the environment of the build. Delete the browser source maps before you deploy: `next start` serves them to anyone otherwise.
+
+<Warning>
+Do not let `withSentryConfig` upload Turbopack builds itself. It changes the built files after the source maps were written, so every frame resolves one line off. With `next build --webpack`, its own upload works.
+</Warning>
+
+## React
+
+Tested with React 19, Vite 8, `@sentry/react` and `@sentry/vite-plugin` 11.14.
+
+```bash Terminal
+npm install @sentry/react
+npm install --save-dev @sentry/vite-plugin @sentry/cli
+```
+
+Initialize the SDK before you render, and wrap the parts of your app that should show a fallback in `Sentry.ErrorBoundary`:
+
+```tsx src/main.tsx
+import * as Sentry from '@sentry/react'
+import { createRoot } from 'react-dom/client'
+import App from './App.tsx'
+
+Sentry.init({
+  dsn: '<your DSN>',
+  environment: 'production',
+})
+
+createRoot(document.getElementById('root')!).render(
+  <Sentry.ErrorBoundary fallback={<p>Something went wrong.</p>}>
+    <App />
+  </Sentry.ErrorBoundary>,
+)
+```
+
+An Error that `Sentry.ErrorBoundary` catches arrives once, as handled. An Error outside a boundary still arrives, as unhandled. If you also pass `Sentry.reactErrorHandler()` to `onCaughtError` of `createRoot`, Errors the boundary catches arrive as unhandled instead.
+
+For readable stack traces, let the Vite plugin inject debug IDs and the release, and upload the source maps with `sentry-cli` after the build:
+
+```ts vite.config.ts
+import react from '@vitejs/plugin-react'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  build: { sourcemap: 'hidden' },
+  plugins: [
+    react(),
+    sentryVitePlugin({
+      release: { name: 'storefront@2026.9.3' },
+      sourcemaps: { disable: 'disable-upload' },
+    }),
+  ],
+})
+```
+
+```bash Terminal
+vite build
+npx sentry-cli sourcemaps upload --release storefront@2026.9.3 ./dist
+rm dist/assets/*.map
+```
+
+Set the [`sentry-cli` variables](/detect/errors/source-maps#configure-sentry-cli) in the environment of the build.
+
+<Warning>
+Do not let `@sentry/vite-plugin` 11.14 upload Vite 8 builds itself. It changes the uploaded copy of the bundle, so every frame resolves one line off and points at the wrong file.
+</Warning>
+
+## Express
+
+Tested with Express 5.3 and `@sentry/node` 11.14 on Node.js 24.
+
+```bash Terminal
+npm install @sentry/node
+```
+
+```js instrument.mjs
+import * as Sentry from '@sentry/node'
+
+Sentry.init({
+  dsn: '<your DSN>',
+  release: 'api@2026.9.3',
+  environment: 'production',
+})
+```
+
+Load it before your app:
+
+```bash Terminal
+node --import ./instrument.mjs app.mjs
+```
+
+That is all: Errors thrown in route handlers, sync or async, arrive as unhandled Errors with the route, such as `GET /cart`, and a stack trace that points at your file and line. You do not need `Sentry.setupExpressErrorHandler(app)`; it is deprecated in `@sentry/node` 11.14 and does no harm. By default, only Errors that end in a status of 500 or higher are sent. A crash at startup arrives too.
+
+## Django
+
+Tested with Django 6.1 and `sentry-sdk` 2.75.
+
+```bash Terminal
+pip install sentry-sdk
+```
+
+Initialize the SDK at the top of `settings.py`. The Django integration turns itself on:
+
+```python settings.py
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="<your DSN>",
+    release="api@2026.9.3",
+    environment="production",
+)
+```
+
+Unhandled exceptions in views arrive with the view's file and line, under `runserver` and under gunicorn. To count [affected users](/detect/errors/send-errors#count-affected-users), add `send_default_pii=True`; the SDK then sends the logged-in user's ID, email and username.
+
+`logger.error()` calls arrive as Errors without a stack trace. `logger.warning()` and `logger.info()` are not sent as Errors; they show as breadcrumbs of the next Error.

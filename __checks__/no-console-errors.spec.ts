@@ -22,7 +22,8 @@ for (const path of paths) {
     const errors: string[] = []
     page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`))
     page.on('console', (message) => {
-      if (message.type() === 'error' && !isIgnored(message.location().url)) {
+      // A blocked script logs on the page's URL and names the script only in the text.
+      if (message.type() === 'error' && !isIgnored(message.location().url) && !isIgnored(message.text())) {
         errors.push(`console.error: ${message.text()} @ ${message.location().url}`)
       }
     })

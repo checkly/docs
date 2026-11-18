@@ -211,7 +211,7 @@ use Sentry\Laravel\Integration;
     })
 ```
 
-Without `Integration::handles`, no exceptions are sent. With it, unhandled exceptions in routes arrive with the route file and line, and `report($e)` and `\Sentry\captureException($e)` arrive as handled. You do not need `php artisan sentry:publish`. To check the setup, run `php artisan sentry:test`: it prints `Test event sent with ID: …`, and the Error arrives in Checkly.
+Without `Integration::handles`, unhandled exceptions are not sent. With it, unhandled exceptions in routes arrive with the route file and line, and `report($e)` and `\Sentry\captureException($e)` arrive as handled. You do not need `php artisan sentry:publish`. To check the setup, run `php artisan sentry:test`: it prints `Test event sent with ID: …`, and the Error arrives in Checkly.
 
 `Log::error()` is not sent by default. If you add the `sentry` channel to `LOG_STACK`, for example `LOG_STACK=single,sentry`, log errors arrive without a stack trace, but every exception is then also reported a second time.
 
@@ -255,7 +255,7 @@ sentry.environment=production
 
 Unhandled exceptions in controllers arrive with the class and line, and the cause of a chained exception shows on the Error Group. `Sentry.captureException(e)` arrives as handled. You do not need `sentry.in-app-includes`: the starter marks the package of your `@SpringBootApplication` class as your code. The Sentry Maven and Gradle plugins are not needed either: frames show the file and line without them, and Checkly does not show the source bundles they upload.
 
-To send `log.error("…", e)` calls as Errors, add `io.sentry:sentry-logback`. Tomcat then also logs the root cause of a chained exception, so the same Error arrives twice. Drop that copy in a `BeforeSendCallback` bean:
+To send `log.error("…", e)` calls as Errors, add `io.sentry:sentry-logback`, version 8.65.0, the same as the starter. Tomcat then also logs the root cause of a chained exception, so a second Error arrives, in a separate Error Group, for the root cause. Drop it in a `BeforeSendCallback` bean:
 
 ```java SentryConfig.java
 import io.sentry.SentryOptions;
@@ -291,6 +291,8 @@ builder.WebHost.UseSentry(o =>
     o.Release = "api@2026.9.3";
     o.Environment = "production";
 });
+
+// ...
 ```
 
 Unhandled exceptions in endpoints arrive as unhandled, and `SentrySdk.CaptureException(e)` as handled. `ILogger.LogError()` creates an Error; `LogWarning()` does not.

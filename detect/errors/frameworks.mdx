@@ -1,7 +1,7 @@
 ---
 title: 'Set up Errors for your framework'
 sidebarTitle: 'Frameworks'
-description: 'The smallest Sentry SDK setup that sends Errors to Checkly from Next.js, React, Express and Django, with readable stack traces.'
+description: 'The smallest Sentry SDK setup that sends Errors to Checkly from Next.js, React, Express, Django, Laravel and Rails, with readable stack traces.'
 canonical: 'https://www.checklyhq.com/docs/detect/errors/frameworks/'
 ---
 
@@ -183,3 +183,54 @@ sentry_sdk.init(
 Unhandled exceptions in views arrive with the view's file and line, under `runserver` and under gunicorn. To count [affected users](/detect/errors/send-errors#count-affected-users), add `send_default_pii=True`; the SDK then sends the logged-in user's ID, email and username.
 
 `logger.error()` calls arrive as Errors without a stack trace. `logger.warning()` and `logger.info()` are not sent as Errors; they show as breadcrumbs of the next Error.
+
+## Laravel
+
+Tested with Laravel 13.43 and `sentry/sentry-laravel` 4.30 on PHP 8.5.
+
+```bash Terminal
+composer require sentry/sentry-laravel
+```
+
+Add the DSN, the release and the environment to `.env`:
+
+```dotenv .env
+SENTRY_LARAVEL_DSN=<your-dsn>
+SENTRY_RELEASE=api@2026.9.3
+SENTRY_ENVIRONMENT=production
+```
+
+Without `SENTRY_ENVIRONMENT`, the SDK uses `APP_ENV`. Then let the SDK report exceptions, in `bootstrap/app.php`:
+
+```php bootstrap/app.php
+use Sentry\Laravel\Integration;
+
+// ...
+    ->withExceptions(function (Exceptions $exceptions): void {
+        Integration::handles($exceptions);
+    })
+```
+
+Without `Integration::handles`, no exceptions are sent. With it, unhandled exceptions in routes arrive with the route file and line, and `report($e)` and `\Sentry\captureException($e)` arrive as handled. You do not need `php artisan sentry:publish`. To check the setup, run `php artisan sentry:test`: it prints `Test event sent with ID: …`, and the Error arrives in Checkly.
+
+`Log::error()` is not sent by default. If you add the `sentry` channel to `LOG_STACK`, for example `LOG_STACK=single,sentry`, log errors arrive without a stack trace, but every exception is then also reported a second time.
+
+## Ruby on Rails
+
+Tested with Rails 8.1, `sentry-ruby` and `sentry-rails` 7.3 on Ruby 4.0.
+
+```bash Terminal
+bundle add sentry-ruby sentry-rails
+```
+
+```ruby config/initializers/sentry.rb
+Sentry.init do |config|
+  config.dsn = '<your-dsn>'
+  config.release = 'api@2026.9.3'
+  config.environment = 'production'
+end
+```
+
+Unhandled exceptions in controller actions and in Active Job jobs arrive with the file and line. `Sentry.capture_exception(e)` arrives as handled. You do not need `bin/rails generate sentry` or `config.breadcrumbs_logger`; `breadcrumbs_logger` only adds breadcrumbs.
+
+`Rails.error.report(e)` is not sent unless you add `config.rails.register_error_subscriber = true`; then it arrives as handled. `Rails.logger.error` is not sent.

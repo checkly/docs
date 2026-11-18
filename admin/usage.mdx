@@ -1,6 +1,6 @@
 ---
 title: 'Usage and check runs'
-description: 'What counts as a check run, how uptime monitors are billed, and where to see your usage.'
+description: 'What counts as a check run, how overage is billed, how uptime monitors are billed, and where to see your usage.'
 sidebarTitle: 'Usage and check runs'
 canonical: 'https://www.checklyhq.com/docs/admin/usage/'
 ---
@@ -46,7 +46,7 @@ Examples for a 30-day month (a 31-day month adds about 3%):
 | Every hour, 2 locations in parallel | 24 × 30 × 2 = 1,440 |
 | Playwright Check Suite of 70 seconds, every 10 minutes, 1 location | 144 × 30 × 3 = 12,960 |
 
-Compare your total with the check runs your plan includes, listed on the [pricing page](https://www.checklyhq.com/pricing/). Adding check runs to your plan in advance costs less per run than paying overage for them: see [Adding capacity](/admin/billing#adding-capacity). Uptime monitors don't count toward this total: see [Uptime monitors](#uptime-monitors).
+Compare your total with the check runs your plan includes, listed on the [pricing page](https://www.checklyhq.com/pricing/). Check runs over that amount are billed as [overage](#overage). Adding check runs to your plan in advance costs less per run: see [Adding capacity](/admin/billing#adding-capacity). Uptime monitors don't count toward this total: see [Uptime monitors](#uptime-monitors).
 
 ## Uptime monitors
 
@@ -66,6 +66,21 @@ The [Usage API](/api-reference/usage/overview) and [`checkly account usage`](/cl
 ### Enterprise plans
 
 On an Enterprise plan, the page has no **Usage** card. Owners, Admins and custom roles with the [**View usage**](/admin/team-management/permissions#usage) permission see a **Usage** tab next to **Plan & invoices** instead. It shows usage against your contract's credit budget for the period you pick (**7d**, **30d**, **Contract to date** or a custom range), credits per day, week or month under **Where credits went**, and a **Usage breakdown** per check type. Other roles don't see the tab.
+
+## Overage
+
+On the Starter and Team plans, checks keep running after the account has used the check runs its plan includes. Every check run over that amount is overage. It's billed per check run, at the rate on the [pricing page](https://www.checklyhq.com/pricing/). Browser and Playwright check runs and API and Multistep check runs are counted separately, so going over on one doesn't use up the other.
+
+When overage is charged depends on how you pay for your plan:
+
+- **Monthly:** the overage of a billing period is charged on the invoice at the start of the next period.
+- **Annually:** you don't wait until the end of the year. When the overage reaches a set amount, it's invoiced right away. Overage that hasn't been invoiced yet is charged at the end of the billing year.
+
+Overage is also charged when you change your plan or cancel it. See [When a plan change takes effect](/admin/billing#when-a-plan-change-takes-effect) and [Cancelling](/admin/billing#cancelling).
+
+To pay less for the same check runs, add them to your plan in advance: an added check run costs less than overage. See [Adding capacity](/admin/billing#adding-capacity). To use fewer check runs, see [What counts as a check run](#what-counts-as-a-check-run).
+
+The Hobby plan has no overage. When its included check runs are used up, checks stop running until the next period.
 
 ## Usage emails
 

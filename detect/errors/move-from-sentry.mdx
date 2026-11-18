@@ -34,5 +34,5 @@ With Vite, or Next.js with Turbopack, the bundler plugins upload source maps tha
 
 - **Past Errors** stay in Sentry. Checkly stores Errors from the moment your SDK sends them to the Checkly DSN.
 - **Issues** do not carry over. Checkly [groups Errors](/detect/errors/error-groups#how-errors-are-grouped) into its own Error Groups, which do not match Sentry's issues one to one.
-- **Other data:** Checkly stores errors and messages only. It skips transactions, sessions, replays, logs and attachments without failing the request, so you can remove `tracesSampleRate` and the tracing and replay integrations from `Sentry.init`.
+- **Other data:** Checkly [stores only Errors and messages](/detect/errors/data-and-limits#what-checkly-stores), so you can remove `tracesSampleRate` and the tracing and replay integrations from `Sentry.init`.
 - **Commits and deploys:** Checkly accepts `sentry-cli releases set-commits` and `sentry-cli deploys new` but does not store them. A bundler plugin that sets commits logs `No repository integrations configured for this organization.` and the build continues.

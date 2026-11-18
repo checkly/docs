@@ -7,12 +7,10 @@ canonical: 'https://www.checklyhq.com/docs/detect/errors/send-errors/'
 
 Your application sends Errors to Checkly through the official Sentry SDK. You need a DSN, the address the SDK sends to, for a Checkly project. This page covers browser JavaScript, Node.js, Python, Go, iOS and macOS, Android, React Native, and C and C++ on macOS. For Next.js, React, Express, Django, Laravel, Rails, Spring Boot and ASP.NET Core, see [Frameworks](/detect/errors/frameworks).
 
-<Accordion title="Prerequisites">
+You need:
 
-- To create a project: the `projects:create` permission. To create or revoke a DSN, or change the allowed websites of an existing project: `projects:update`. See [Permissions](/admin/team-management/permissions).
+- The `projects:create` permission to create a project, and `projects:update` to create or revoke a DSN or change the allowed websites of an existing project. See [Permissions](/admin/team-management/permissions).
 - An application you can deploy with a Sentry SDK added.
-
-</Accordion>
 
 ## Get a DSN
 
@@ -309,7 +307,7 @@ The SDK's `tunnel` option sends Errors through an endpoint on your own domain, f
 
 Drop Errors in the SDK, before they leave your application. Apart from [allowed websites](#allow-only-your-websites), Checkly does not filter Errors for you, and Errors you drop do not count toward the [limits](/detect/errors/data-and-limits#limits). In JavaScript:
 
-```js
+```js instrument.mjs
 Sentry.init({
   dsn: '<your-dsn>',
   // Keep a random half of all Errors.
@@ -323,10 +321,6 @@ Sentry.init({
   },
 })
 ```
-
-## What Checkly stores
-
-Checkly stores errors and messages. It skips every other kind of data an SDK sends, such as transactions, sessions, replays, logs and attachments, without failing the request.
 
 ## Allow only your websites
 

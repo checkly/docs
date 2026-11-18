@@ -5,11 +5,11 @@ description: 'The smallest Sentry SDK setup that sends Errors to Checkly from Ne
 canonical: 'https://www.checklyhq.com/docs/detect/errors/frameworks/'
 ---
 
-Each setup below is the smallest one that sends Errors to Checkly with readable stack traces. Start with a [DSN](/detect/errors/send-errors#get-a-dsn). Tracing, replay and profiling options from Sentry's guides are not needed: Checkly stores errors and messages only.
+Each setup below is the smallest one that sends Errors to Checkly with readable stack traces. Start with a [DSN](/detect/errors/send-errors#get-a-dsn). Tracing, replay and profiling options from Sentry's guides are not needed: Checkly [stores only Errors and messages](/detect/errors/data-and-limits#what-checkly-stores).
 
 ## Next.js
 
-Works with Next.js 16.4 or later (App Router) and `@sentry/nextjs` 11.14 or later, on Node.js 24.20 or later.
+Works with the App Router of Next.js 16.4 or later and `@sentry/nextjs` 11.14 or later, on Node.js 24.20 or later.
 
 ```bash Terminal
 npm install @sentry/nextjs
@@ -42,7 +42,7 @@ export async function register() {
 export const onRequestError = Sentry.captureRequestError
 ```
 
-Without `onRequestError`, Errors in route handlers and server components are not sent. This setup starts the server SDK only in the Node.js runtime (`NEXT_RUNTIME === 'nodejs'`). You do not need `global-error.tsx` to capture Errors, or `onRouterTransitionStart`, which only adds tracing.
+Without `onRequestError`, Errors in route handlers and server components are not sent. This setup starts the server SDK only when `NEXT_RUNTIME` is `nodejs`. You do not need `global-error.tsx` to capture Errors, or `onRouterTransitionStart`, which only adds tracing.
 
 For readable stack traces, let `withSentryConfig` set the release and the debug IDs, and upload the source maps with `sentry-cli` after the build. Import `withSentryConfig` from `@sentry/nextjs/config`:
 
@@ -75,7 +75,7 @@ Do not let `withSentryConfig` upload Turbopack builds itself. It changes the bui
 
 ## React
 
-Works with React 19.3 or later and Vite 8.3 or later. Needs `@sentry/react` and `@sentry/vite-plugin` 11.14 or later.
+Works with React 19.3 or later, Vite 8.3 or later, and `@sentry/react` and `@sentry/vite-plugin` 11.14 or later.
 
 ```bash Terminal
 npm install @sentry/react
@@ -158,7 +158,7 @@ Load it before your app:
 node --import ./instrument.mjs app.mjs
 ```
 
-That is all: Errors thrown in route handlers, sync or async, arrive as unhandled Errors with the route, such as `GET /cart`, and a stack trace that points at your file and line. You do not need `Sentry.setupExpressErrorHandler(app)`; it is deprecated and does no harm. By default, only Errors that end in a status of 500 or higher are sent. A crash at startup arrives too.
+Errors thrown in route handlers, sync or async, arrive as unhandled Errors with the route, such as `GET /cart`, and a stack trace that points at your file and line. You do not need `Sentry.setupExpressErrorHandler(app)`; it is deprecated and does no harm. By default, only Errors that end in a status of 500 or higher are sent. A crash at startup arrives too.
 
 ## Django
 
@@ -203,12 +203,25 @@ SENTRY_ENVIRONMENT=production
 Without `SENTRY_ENVIRONMENT`, the SDK uses `APP_ENV`. Then let the SDK report exceptions, in `bootstrap/app.php`:
 
 ```php bootstrap/app.php
+<?php
+
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
 use Sentry\Laravel\Integration;
 
-// ...
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware): void {
+        //
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         Integration::handles($exceptions);
-    })
+    })->create();
 ```
 
 Without `Integration::handles`, unhandled exceptions are not sent. With it, unhandled exceptions in routes arrive with the route file and line, and `report($e)` and `\Sentry\captureException($e)` arrive as handled. You do not need `php artisan sentry:publish`. To check the setup, run `php artisan sentry:test`: it prints `Test event sent with ID: …`, and the Error arrives in Checkly.
@@ -217,7 +230,7 @@ Without `Integration::handles`, unhandled exceptions are not sent. With it, unha
 
 ## Ruby on Rails
 
-Works with Rails 8.1 or later, on Ruby 4.0 or later. Needs `sentry-ruby` and `sentry-rails` 7.3 or later.
+Works with Rails 8.1 or later and `sentry-ruby` and `sentry-rails` 7.3 or later, on Ruby 4.0 or later.
 
 ```bash Terminal
 bundle add sentry-ruby sentry-rails
@@ -292,7 +305,11 @@ builder.WebHost.UseSentry(o =>
     o.Environment = "production";
 });
 
-// ...
+var app = builder.Build();
+
+// Map your endpoints here.
+
+app.Run();
 ```
 
 Unhandled exceptions in endpoints arrive as unhandled, and `SentrySdk.CaptureException(e)` as handled. `ILogger.LogError()` creates an Error; `LogWarning()` does not.

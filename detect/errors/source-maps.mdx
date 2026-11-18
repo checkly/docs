@@ -11,12 +11,10 @@ Minified JavaScript and native release builds produce stack traces that are hard
   ![An Error Group from a React Native app whose stack trace shows the original TypeScript file src/cart.ts, line 10, with the failing line highlighted, after the source map was uploaded](/images/errors/error-group-stack-trace.png)
 </Frame>
 
-<Accordion title="Prerequisites">
+You need:
 
 - `sentry-cli` 2.58 or later, or 3.x.
-- A Checkly user API key (`cu_…`) with the `projects:deploy` permission, or a service API key (`sv_…`) of the account. Account API keys are not accepted. See [Creating an API key](/admin/creating-api-key).
-
-</Accordion>
+- A Checkly user API key, which starts with `cu_`, with the `projects:deploy` permission, or a service API key of the account, which starts with `sv_`. Account API keys are not accepted. See [Creating an API key](/admin/creating-api-key).
 
 ## Configure sentry-cli
 
@@ -88,13 +86,15 @@ sentry-cli upload-proguard --uuid <proguard-uuid> app/build/outputs/mapping/rele
 
 Keep line numbers in the build with `-keepattributes SourceFile,LineNumberTable` in your ProGuard rules. Frames of classes R8 inlined are expanded to the original methods.
 
+With `sentry-cli` 2.x, set `SENTRY_EXPERIMENTAL_PROGUARD_CHUNK_UPLOAD=1` for ProGuard uploads, or use `sentry-cli` 3.x. Checkly accepts ProGuard mappings only in chunks.
+
 **Android NDK:** upload the unstripped libraries. The APK contains only stripped ones:
 
 ```bash Terminal
 sentry-cli debug-files upload app/build/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/arm64-v8a/
 ```
 
-**C and C++ with the Native SDK on macOS:** build `sentry-native` with the `inproc` backend (`-DSENTRY_BACKEND=inproc`) and upload the dSYM of your binary, as for Apple apps above. Checkly does not accept minidumps, so crashes from the default `crashpad` backend and from the `breakpad` backend do not arrive.
+**C and C++ with the Native SDK on macOS:** build `sentry-native` with `-DSENTRY_BACKEND=inproc` and upload the dSYM of your binary, as for Apple apps above. Checkly does not accept minidumps, so crashes from the default `crashpad` backend and from the `breakpad` backend do not arrive.
 
 **Breakpad symbols:** upload `.sym` files, for example created with Mozilla `dump_syms`:
 
@@ -111,8 +111,6 @@ defaults.project=<project-logical-id>
 ```
 
 Set the key as described in [Configure sentry-cli](#configure-sentry-cli): `SENTRY_URL` and `SENTRY_AUTH_TOKEN` in the build environment, or `auth.token` in this file. Native crashes need the dSYM or NDK uploads above as well: the Android build step uploads only the source map.
-
-With `sentry-cli` 2.x, set `SENTRY_EXPERIMENTAL_PROGUARD_CHUNK_UPLOAD=1` for ProGuard uploads, or use `sentry-cli` 3.x. Checkly accepts ProGuard mappings only in chunks.
 
 ## Supported files
 

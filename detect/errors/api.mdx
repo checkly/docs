@@ -1,7 +1,7 @@
 ---
 title: 'Errors API and MCP tools'
 sidebarTitle: 'API and MCP'
-description: 'Read and triage Error Groups with the Checkly public API (beta) and the Checkly MCP server.'
+description: 'Read and triage Error Groups with the beta Error Groups endpoints of the Checkly public API and with the Checkly MCP server.'
 canonical: 'https://www.checklyhq.com/docs/detect/errors/api/'
 ---
 
@@ -43,7 +43,7 @@ The list takes these query parameters. Repeat a parameter to match any of its va
 The list counts at most 1,000 matches; narrow the filters to see more. Each endpoint allows 30 requests per minute for each caller. Reading needs `error-groups:read`, every change needs `error-groups:update`, and changing an assignee also needs `members:read`.
 
 ```bash Terminal
-curl "https://api.checklyhq.com/v2/error-groups?status=unresolved&limit=1" \
+curl "https://api.checklyhq.com/v2/error-groups?status=unresolved&search=route%20exception&limit=1" \
   -H "Authorization: Bearer <your-api-key>" \
   -H "X-Checkly-Account: <your-account-id>"
 ```
@@ -51,21 +51,26 @@ curl "https://api.checklyhq.com/v2/error-groups?status=unresolved&limit=1" \
 ```json Response
 [
   {
-    "id": "f60098bf-b6e9-402a-bbb8-cd13b1bc7fb0",
-    "title": "InventoryError: stock count went negative",
-    "culprit": null,
+    "id": "53feeb9c-2c04-49e2-bc02-49177e6aef72",
+    "title": "RuntimeException: Checkly docs laravel test: unhandled route exception",
+    "culprit": "/boom",
     "status": "unresolved",
-    "hasUnhandled": false,
-    "firstSeen": "2026-11-17T11:21:48.504Z",
-    "lastSeen": "2026-11-17T11:22:18.967Z",
+    "hasUnhandled": true,
+    "firstSeen": "2026-11-18T10:52:08.883Z",
+    "lastSeen": "2026-11-18T10:53:20.485Z",
     "regressedAt": null,
     "assigneeId": null,
     "project": {
-      "id": "12e99bd4-ed25-41e3-a1d3-0274bd8cc0da",
-      "logicalId": "docs-errors-proof-native",
-      "name": "Docs Errors proof - native (Breakpad, source bundles)"
+      "id": "bfd7ca57-0c3e-4a85-86ab-71016e17a4c6",
+      "logicalId": "docs-errors-proof",
+      "name": "Docs Errors proof"
     },
-    "metrics": { ... }
+    "metrics": {
+      "errors": 4,
+      "usersAffected": null,
+      "trend": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0],
+      "trendPercent": null
+    }
   }
 ]
 ```
@@ -73,9 +78,3 @@ curl "https://api.checklyhq.com/v2/error-groups?status=unresolved&limit=1" \
 ## MCP tools
 
 The [Checkly MCP server](/ai/mcp-server) lets an AI agent find, read and triage Error Groups, and create projects and DSNs. See [Error Group tools](/ai/mcp-server/tools#error-group-tools) for the list.
-
-Example prompt:
-
-```text title="Prompt" wrap
-Find the unresolved Error Groups with the most Errors in production this week, show me the stack trace of the top one, and assign it to me.
-```

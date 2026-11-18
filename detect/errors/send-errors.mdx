@@ -1,11 +1,11 @@
 ---
-title: 'Send Errors to Checkly'
-sidebarTitle: 'Send Errors'
-description: 'Get a DSN for a Checkly project, configure the Sentry SDK in your application, and confirm the first Error arrives.'
+title: 'Send errors to Checkly'
+sidebarTitle: 'Send errors'
+description: 'Get a DSN for a Checkly project, configure the Sentry SDK in your application, and confirm the first error arrives.'
 canonical: 'https://www.checklyhq.com/docs/detect/errors/send-errors/'
 ---
 
-Your application sends Errors to Checkly through the official Sentry SDK. You need a DSN, the address the SDK sends to, for a Checkly project. This page covers browser JavaScript, Node.js, Python, Go, iOS and macOS, Android, React Native, and C and C++ on macOS. For Next.js, React, Express, Django, Laravel, Rails, Spring Boot and ASP.NET Core, see [Frameworks](/detect/errors/frameworks).
+Your application sends errors to Checkly through the official Sentry SDK. You need a DSN, the address the SDK sends to, for a Checkly project. This page covers browser JavaScript, Node.js, Python, Go, iOS and macOS, Android, React Native, and C and C++ on macOS. For Next.js, React, Express, Django, Laravel, Rails, Spring Boot and ASP.NET Core, see [Frameworks](/detect/errors/frameworks).
 
 You need:
 
@@ -15,7 +15,7 @@ You need:
 ## Get a DSN
 
 1. Open the **Errors** page and select **New project**.
-2. Enter a **Name** and a **Logical ID**. For a browser application, list your websites in **Allowed websites**, with the port for local development, such as `localhost:5173`. A project with no allowed websites refuses browser Errors. See [Allow only your websites](#allow-only-your-websites).
+2. Enter a **Name** and a **Logical ID**. For a browser application, list your websites in **Allowed websites**, with the port for local development, such as `localhost:5173`. A project with no allowed websites refuses browser errors. See [Allow only your websites](#allow-only-your-websites).
 3. Select **Create project**.
 4. Copy the **DSN** the dialog shows.
 
@@ -25,7 +25,7 @@ You need:
 
 To add a DSN to an existing project, open the project's **Errors** tab, go to the **Ingest keys (DSN)** card and select **Create key**.
 
-A DSN has the form `https://<key>@rum.checklyhq.com/<number>`. It can only write Errors, so it is safe to ship in a browser bundle. Create one key per thing you ship, such as a web bundle, a CI job or a mobile build, so you can rotate them one at a time.
+A DSN has the form `https://<key>@rum.checklyhq.com/<number>`. It can only write errors, so it is safe to ship in a browser bundle. Create one key per thing you ship, such as a web bundle, a CI job or a mobile build, so you can rotate them one at a time.
 
 ## Configure the SDK
 
@@ -222,11 +222,11 @@ cc main.c -Iinstall/include -Linstall/lib -lsentry -Wl,-rpath,"$PWD/install/lib"
 
 The SDK keeps its data in a `.sentry-native` folder in the working directory. Build `sentry-native` with the `inproc` backend because the default `crashpad` backend and the `breakpad` backend send crashes as minidumps, which Checkly does not accept.
 
-Use the same `release` value when you [upload source maps](/detect/errors/source-maps), so the uploads and the Errors of one build are listed under the same release.
+Use the same `release` value when you [upload source maps](/detect/errors/source-maps), so the uploads and the errors of one build are listed under the same release.
 
-## Confirm the first Error arrives
+## Confirm the first error arrives
 
-Send a test Error from your application, for example from a test route:
+Send a test error from your application, for example from a test route:
 
 <CodeGroup dropdown={true}>
 
@@ -272,11 +272,11 @@ sentry_capture_event(event);
 
 The Go SDK reports only what you capture: call `sentry.CaptureException`, use `defer sentry.Recover()` for panics, or use the integration for your web framework.
 
-The Error appears on the **Errors** page within about two minutes. The iOS and macOS SDK sends a crash the next time the app starts. In a command-line tool, call `SentrySDK.flush(timeout: 5)` after the capture, or the program exits before the Error is sent. To read stack traces of release builds, [upload source maps or debug files](/detect/errors/source-maps).
+The error appears on the **Errors** page within about two minutes. The iOS and macOS SDK sends a crash the next time the app starts. In a command-line tool, call `SentrySDK.flush(timeout: 5)` after the capture, or the program exits before the error is sent. To read stack traces of release builds, [upload source maps or debug files](/detect/errors/source-maps).
 
-### If no Error arrives
+### If no error arrives
 
-Turn on the SDK's log: in JavaScript, add `debug: true` to `Sentry.init`. The SDK then logs what it does with each Error, for example:
+Turn on the SDK's log: in JavaScript, add `debug: true` to `Sentry.init`. The SDK then logs what it does with each error, for example:
 
 ```text Terminal
 Sentry Logger [log]: Captured error event `Checkly docs filter test: kept`
@@ -287,10 +287,10 @@ Sentry Logger [warn]: Sentry responded with status code 401 to sent event.
 | Log line | Cause |
 |---|---|
 | `Sentry responded with status code 401` | The DSN is wrong or [revoked](#rotate-or-revoke-a-dsn). Copy it again from the **Ingest keys (DSN)** card on the project's **Errors** tab. |
-| `Sentry responded with status code 403` | The Error came from a website that is not in the project's [allowed websites](#allow-only-your-websites). |
+| `Sentry responded with status code 403` | The error came from a website that is not in the project's [allowed websites](#allow-only-your-websites). |
 | `Sentry responded with status code 429` | The DSN is over its [limit](/detect/errors/data-and-limits#limits). |
 | `Discarding event because it's not included in the random sample` | `sampleRate` is below `1`. |
-| ``before send for type `error` returned `null` `` | Your `beforeSend` dropped the Error. |
+| ``before send for type `error` returned `null` `` | Your `beforeSend` dropped the error. |
 | ``Event dropped due to being matched by `ignoreErrors` option.`` | The message matches `ignoreErrors`. |
 
 In the browser, an ad blocker can block the requests to `rum.checklyhq.com`. If the **Network** tab of your browser's developer tools shows them as blocked, [send through your own domain](#send-through-your-own-domain).
@@ -301,11 +301,11 @@ The **Users** column counts distinct user IDs. Checkly receives user data only w
 
 ## Send through your own domain
 
-The SDK's `tunnel` option sends Errors through an endpoint on your own domain, for example to avoid ad blockers. Your endpoint must forward the envelope to `https://rum.checklyhq.com/api/<number>/envelope/?sentry_key=<key>`, with the number and the key from your DSN. Checkly reads the key from the `sentry_key` query parameter or the `X-Sentry-Auth` header, not from the envelope.
+The SDK's `tunnel` option sends errors through an endpoint on your own domain, for example to avoid ad blockers. Your endpoint must forward the envelope to `https://rum.checklyhq.com/api/<number>/envelope/?sentry_key=<key>`, with the number and the key from your DSN. Checkly reads the key from the `sentry_key` query parameter or the `X-Sentry-Auth` header, not from the envelope.
 
-## Send fewer Errors
+## Send fewer errors
 
-Drop Errors in the SDK, before they leave your application. Apart from [allowed websites](#allow-only-your-websites), Checkly does not filter Errors for you, and Errors you drop do not count toward the [limits](/detect/errors/data-and-limits#limits). In JavaScript:
+Drop errors in the SDK, before they leave your application. Apart from [allowed websites](#allow-only-your-websites), Checkly does not filter errors for you, and errors you drop do not count toward the [limits](/detect/errors/data-and-limits#limits). In JavaScript:
 
 ```js instrument.mjs
 Sentry.init({
@@ -324,9 +324,9 @@ Sentry.init({
 
 ## Allow only your websites
 
-A DSN is public once it ships in a browser bundle. To stop other websites from sending Errors with it, list your websites in the project's **Allowed origins** card on its **Errors** tab. You can also fill in **Allowed websites** when you create the project.
+A DSN is public once it ships in a browser bundle. To stop other websites from sending errors with it, list your websites in the project's **Allowed origins** card on its **Errors** tab. You can also fill in **Allowed websites** when you create the project.
 
-Checkly checks the `Origin` header of each browser request, or the `Referer` header when there is no `Origin`, and refuses requests from other websites with `403`. Server SDKs send neither header, so their Errors are always accepted.
+Checkly checks the `Origin` header of each browser request, or the `Referer` header when there is no `Origin`, and refuses requests from other websites with `403`. Server SDKs send neither header, so their errors are always accepted.
 
 | Entry | Allows |
 |---|---|
@@ -336,8 +336,8 @@ Checkly checks the `Origin` header of each browser request, or the `Referer` hea
 | `https://example.com` | Exactly that scheme, host and port |
 | `*.example.com` | Every subdomain, but not `example.com` itself |
 
-A project can list up to 50 websites of up to 300 characters each. A project with an empty list accepts no browser Errors. Changes apply within about a minute. Editing the list needs the `projects:update` permission.
+A project can list up to 50 websites of up to 300 characters each. A project with an empty list accepts no browser errors. Changes apply within about a minute. Editing the list needs the `projects:update` permission.
 
 ## Rotate or revoke a DSN
 
-To rotate a key, ship the new DSN first. In the **Ingest keys (DSN)** card, wait until the old key's **Last used** time stops changing, then select **Revoke**. Checkly refuses Errors sent with a revoked key within about a minute, including from bundles still in a CDN cache.
+To rotate a key, ship the new DSN first. In the **Ingest keys (DSN)** card, wait until the old key's **Last used** time stops changing, then select **Revoke**. Checkly refuses errors sent with a revoked key within about a minute, including from bundles still in a CDN cache.

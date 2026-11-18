@@ -1,11 +1,11 @@
 ---
-title: 'Set up Errors for your framework'
+title: 'Set up errors for your framework'
 sidebarTitle: 'Frameworks'
-description: 'The smallest Sentry SDK setup that sends Errors to Checkly from Next.js, React, Express, Django, Laravel, Rails, Spring Boot and ASP.NET Core, with readable stack traces.'
+description: 'The smallest Sentry SDK setup that sends errors to Checkly from Next.js, React, Express, Django, Laravel, Rails, Spring Boot and ASP.NET Core, with readable stack traces.'
 canonical: 'https://www.checklyhq.com/docs/detect/errors/frameworks/'
 ---
 
-Each setup below is the smallest one that sends Errors to Checkly with readable stack traces. Start with a [DSN](/detect/errors/send-errors#get-a-dsn). Tracing, replay and profiling options from Sentry's guides are not needed: Checkly [stores only Errors and messages](/detect/errors/data-and-limits#what-checkly-stores).
+Each setup below is the smallest one that sends errors to Checkly with readable stack traces. Start with a [DSN](/detect/errors/send-errors#get-a-dsn). Tracing, replay and profiling options from Sentry's guides are not needed: Checkly [stores only errors and messages](/detect/errors/data-and-limits#what-checkly-stores).
 
 ## Next.js
 
@@ -16,7 +16,7 @@ npm install @sentry/nextjs
 npm install --save-dev @sentry/cli
 ```
 
-Initialize the SDK for the browser and for the server, and report server Errors with `onRequestError`:
+Initialize the SDK for the browser and for the server, and report server errors with `onRequestError`:
 
 ```ts instrumentation-client.ts
 import * as Sentry from '@sentry/nextjs'
@@ -42,7 +42,7 @@ export async function register() {
 export const onRequestError = Sentry.captureRequestError
 ```
 
-Without `onRequestError`, Errors in route handlers and server components are not sent. This setup starts the server SDK only when `NEXT_RUNTIME` is `nodejs`. You do not need `global-error.tsx` to capture Errors, or `onRouterTransitionStart`, which only adds tracing.
+Without `onRequestError`, errors in route handlers and server components are not sent. This setup starts the server SDK only when `NEXT_RUNTIME` is `nodejs`. You do not need `global-error.tsx` to capture errors, or `onRouterTransitionStart`, which only adds tracing.
 
 For readable stack traces, let `withSentryConfig` set the release and the debug IDs, and upload the source maps with `sentry-cli` after the build. Import `withSentryConfig` from `@sentry/nextjs/config`:
 
@@ -70,7 +70,7 @@ find .next/static -name '*.map' -delete
 Set the [`sentry-cli` variables](/detect/errors/source-maps#configure-sentry-cli) in the environment of the build. Delete the browser source maps before you deploy: `next start` serves them to anyone otherwise.
 
 <Warning>
-Do not let `withSentryConfig` upload Turbopack builds itself. It changes the built files after the source maps were written, so every frame resolves one line off. With `npx next build --webpack`, its own upload resolves browser Errors, but route handler frames point at Sentry's wrapper module. The default Turbopack build with the `sentry-cli` steps above gives readable frames for both.
+Do not let `withSentryConfig` upload Turbopack builds itself. It changes the built files after the source maps were written, so every frame resolves one line off. With `npx next build --webpack`, its own upload resolves browser errors, but route handler frames point at Sentry's wrapper module. The default Turbopack build with the `sentry-cli` steps above gives readable frames for both.
 </Warning>
 
 ## React
@@ -101,7 +101,7 @@ createRoot(document.getElementById('root')!).render(
 )
 ```
 
-An Error that `Sentry.ErrorBoundary` catches arrives once, as handled. An Error outside a boundary still arrives, as unhandled. If you also pass `Sentry.reactErrorHandler()` to `onCaughtError` of `createRoot`, Errors the boundary catches arrive as unhandled instead.
+An error that `Sentry.ErrorBoundary` catches arrives once, as handled. An error outside a boundary still arrives, as unhandled. If you also pass `Sentry.reactErrorHandler()` to `onCaughtError` of `createRoot`, errors the boundary catches arrive as unhandled instead.
 
 For readable stack traces, let the Vite plugin inject debug IDs and the release, and upload the source maps with `sentry-cli` after the build:
 
@@ -158,7 +158,7 @@ Load it before your app:
 node --import ./instrument.mjs app.mjs
 ```
 
-Errors thrown in route handlers, sync or async, arrive as unhandled Errors with the route, such as `GET /cart`, and a stack trace that points at your file and line. You do not need `Sentry.setupExpressErrorHandler(app)`; it is deprecated and does no harm. By default, only Errors that end in a status of 500 or higher are sent. A crash at startup arrives too.
+Errors thrown in route handlers, sync or async, arrive as unhandled errors with the route, such as `GET /cart`, and a stack trace that points at your file and line. You do not need `Sentry.setupExpressErrorHandler(app)`; it is deprecated and does no harm. By default, only errors that end in a status of 500 or higher are sent. A crash at startup arrives too.
 
 ## Django
 
@@ -182,7 +182,7 @@ sentry_sdk.init(
 
 Unhandled exceptions in views arrive with the view's file and line, under `runserver` and under gunicorn. To count [affected users](/detect/errors/send-errors#count-affected-users), add `send_default_pii=True`; the SDK then sends the logged-in user's ID, email and username.
 
-`logger.error()` calls arrive as Errors without a stack trace. `logger.warning()` and `logger.info()` are not sent as Errors; they show as breadcrumbs of the next Error.
+`logger.error()` calls arrive as errors without a stack trace. `logger.warning()` and `logger.info()` are not sent as errors; they show as breadcrumbs of the next error.
 
 ## Laravel
 
@@ -224,7 +224,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })->create();
 ```
 
-Without `Integration::handles`, unhandled exceptions are not sent. With it, unhandled exceptions in routes arrive with the route file and line, and `report($e)` and `\Sentry\captureException($e)` arrive as handled. You do not need `php artisan sentry:publish`. To check the setup, run `php artisan sentry:test`: it prints `Test event sent with ID: …`, and the Error arrives in Checkly.
+Without `Integration::handles`, unhandled exceptions are not sent. With it, unhandled exceptions in routes arrive with the route file and line, and `report($e)` and `\Sentry\captureException($e)` arrive as handled. You do not need `php artisan sentry:publish`. To check the setup, run `php artisan sentry:test`: it prints `Test event sent with ID: …`, and the error arrives in Checkly.
 
 `Log::error()` is not sent by default. If you add the `sentry` channel to `LOG_STACK`, for example `LOG_STACK=single,sentry`, log errors arrive without a stack trace, but every exception is then also reported a second time.
 
@@ -268,7 +268,7 @@ sentry.environment=production
 
 Unhandled exceptions in controllers arrive with the class and line, and the cause of a chained exception shows on the error group. `Sentry.captureException(e)` arrives as handled. You do not need `sentry.in-app-includes`: the starter marks the package of your `@SpringBootApplication` class as your code. The Sentry Maven and Gradle plugins are not needed either: frames show the file and line without them, and Checkly does not show the source bundles they upload.
 
-To send `log.error("…", e)` calls as Errors, add `io.sentry:sentry-logback` at the same version as the starter. Tomcat then also logs the root cause of a chained exception, so a second Error arrives, in a separate error group, for the root cause. Drop it in a `BeforeSendCallback` bean:
+To send `log.error("…", e)` calls as errors, add `io.sentry:sentry-logback` at the same version as the starter. Tomcat then also logs the root cause of a chained exception, so a second error arrives, in a separate error group, for the root cause. Drop it in a `BeforeSendCallback` bean:
 
 ```java SentryConfig.java
 import io.sentry.SentryOptions;
@@ -312,6 +312,6 @@ var app = builder.Build();
 app.Run();
 ```
 
-Unhandled exceptions in endpoints arrive as unhandled, and `SentrySdk.CaptureException(e)` as handled. `ILogger.LogError()` creates an Error; `LogWarning()` does not.
+Unhandled exceptions in endpoints arrive as unhandled, and `SentrySdk.CaptureException(e)` as handled. `ILogger.LogError()` creates an error; `LogWarning()` does not.
 
 The SDK reads the file and line from the `.pdb` file at runtime, so deploy it next to the DLL, as `dotnet publish -c Release` does, or build with `-p:DebugType=embedded`. Without it, frames show only the function name. You do not need to upload symbols or sources: Checkly does not use them for .NET, and .NET stack traces show no source lines.

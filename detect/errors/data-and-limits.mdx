@@ -1,17 +1,17 @@
 ---
 title: 'Errors data and limits'
 sidebarTitle: 'Data and limits'
-description: 'What Checkly removes from Errors before storing them, how long it keeps them, and the limits and responses of the Errors ingest.'
+description: 'What Checkly removes from errors before storing them, how long it keeps them, and the limits and responses of the Errors ingest.'
 canonical: 'https://www.checklyhq.com/docs/detect/errors/data-and-limits/'
 ---
 
 ## What Checkly stores
 
-Checkly stores Errors and messages. It skips every other kind of data an SDK sends, such as transactions, sessions, replays, logs and attachments, without failing the request.
+Checkly stores errors and messages. It skips every other kind of data an SDK sends, such as transactions, sessions, replays, logs and attachments, without failing the request.
 
 ## Data scrubbing
 
-Checkly removes common secrets when an Error arrives, before it stores, groups or symbolicates anything. Removed values are replaced with `[Filtered]`.
+Checkly removes common secrets when an error arrives, before it stores, groups or symbolicates anything. Removed values are replaced with `[Filtered]`.
 
 | Data | What Checkly does |
 |---|---|
@@ -26,7 +26,7 @@ Checkly receives user data only when your SDK sends it. To remove more before it
 
 ## Retention
 
-Checkly keeps each Error for 30 days. After that, its stack trace, breadcrumbs and context are gone, and the error group keeps its status, assignee, counts and first and last seen dates.
+Checkly keeps each error for 30 days. After that, its stack trace, breadcrumbs and context are gone, and the error group keeps its status, assignee, counts and first and last seen dates.
 
 ## Limits
 
@@ -40,11 +40,11 @@ Checkly keeps each Error for 30 days. After that, its stack trace, breadcrumbs a
 | `environment` | 64 characters |
 | `release` | 200 characters |
 | Tag value | 200 characters |
-| Error timestamp | Up to 30 days in the past and 5 minutes in the future; otherwise Checkly uses the time it received the Error |
+| Error timestamp | Up to 30 days in the past and 5 minutes in the future; otherwise Checkly uses the time it received the error |
 
 ## Ingest responses
 
-The Sentry SDKs handle these responses for you. They help when you send Errors yourself or through a [tunnel](/detect/errors/send-errors#send-through-your-own-domain).
+The Sentry SDKs handle these responses for you. They help when you send errors yourself or through a [tunnel](/detect/errors/send-errors#send-through-your-own-domain).
 
 | Status | Body | Meaning |
 |---|---|---|

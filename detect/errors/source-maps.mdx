@@ -60,7 +60,7 @@ Source Map Upload Report
     ~/main.js.map (debug id 8faf8c03-3a67-5ee5-9a07-9fdf96240e15)
 ```
 
-Deploy the files from `./dist` after `inject`, because `inject` changes them. If an Error has no debug IDs, its error group says so and the frames stay minified.
+Deploy the files from `./dist` after `inject`, because `inject` changes them. If an error has no debug IDs, its error group says so and the frames stay minified.
 
 ## Upload native debug files and ProGuard mappings
 
@@ -72,7 +72,7 @@ Upload the debug files of the build you ship. Checkly matches them to frames by 
 sentry-cli debug-files upload ./build/MyApp.app.dSYM
 ```
 
-**Android with R8 or ProGuard:** give each release build a new UUID, and write it to `app/src/main/assets/sentry-debug-meta.properties` so the SDK sends it with every Error:
+**Android with R8 or ProGuard:** give each release build a new UUID, and write it to `app/src/main/assets/sentry-debug-meta.properties` so the SDK sends it with every error:
 
 ```properties sentry-debug-meta.properties
 io.sentry.ProguardUuids=<proguard-uuid>
@@ -128,7 +128,7 @@ Set the key as described in [Configure sentry-cli](#configure-sentry-cli): `SENT
 
 Each file can be up to 2 GiB.
 
-Checkly symbolicates in the background. A new Error can show minified or raw frames for up to about a minute before its original frames appear.
+Checkly symbolicates in the background. A new error can show minified or raw frames for up to about a minute before its original frames appear.
 
 ## Check your uploads
 
@@ -136,9 +136,9 @@ A project's **Releases** page lists each release with the source maps and debug 
 
 On an error group, frames that could not be resolved show why: **No source map uploaded**, **Source map failed to process** or **Lookup file not found**.
 
-### Upload after the Error
+### Upload after the error
 
-You can upload the files after the Errors arrived. If an Error with the same stack trace arrived in the last 24 hours, Checkly shows it and every earlier Error with that stack trace as your original code within about a minute. Otherwise this happens when the stack trace occurs again. A late upload changes only how Errors are shown: it does not regroup them.
+You can upload the files after the errors arrived. If an error with the same stack trace arrived in the last 24 hours, Checkly shows it and every earlier error with that stack trace as your original code within about a minute. Otherwise this happens when the stack trace occurs again. A late upload changes only how errors are shown: it does not regroup them.
 
 ## Troubleshooting
 

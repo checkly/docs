@@ -67,7 +67,13 @@ agent with the brief, or follow its rules yourself. `facts.md` is a table:
 ### 4. Draft
 
 - Read two example pages of the same type from [page-types.md](page-types.md) before writing.
-- Follow [style.md](style.md). It holds the rules the existing pages do not show reliably.
+- Follow [maintainers/editing-rules.md](maintainers/editing-rules.md): the corrections the docs
+  maintainers make to agent-written PRs again and again (filler to delete, terminology, components,
+  code samples, cross-file obligations). Then [style.md](style.md) for what it adds.
+- Before you state a default or a limit, look it up in
+  [maintainers/repo-knowledge.md](maintainers/repo-knowledge.md): it lists facts the docs already
+  contradict, conventions per directory and page archetypes. Its
+  [facts.json](maintainers/facts.json) is a snapshot of construct defaults; `main` wins.
 - Every sentence about the product traces back to a row in `facts.md`.
 - Use the exact UI labels, in bold, as the web app shows them. Use the exact construct, property,
   flag and environment variable names, in code format.
@@ -93,6 +99,9 @@ and the line checks on the `.mdx` files you changed, and fails on any `[UNVERIFI
 hook already runs the line checks after every edit; fix what it reports instead of working around
 it.
 
+Then go through [maintainers/self-review.md](maintainers/self-review.md) against your diff, item
+by item. The reviewer checks the same list, so anything you skip comes back as a finding.
+
 ### 7. Review
 
 Hand the diff, `brief.md` and `facts.md` to the `docs-reviewer` agent. It cannot edit files, so its
@@ -111,6 +120,8 @@ until it passes. Do not argue a finding away without new evidence.
 
 ## Rules
 
+- When rules disagree: `AGENTS.md` first, then a decision the product owner recorded in
+  `brief.md`, then `maintainers/`, then `style.md`.
 - Ask rather than guess (`AGENTS.md`). Product names, page placement for a new product area, and
   plan availability are decisions for the product owner: list them as questions, do not decide by
   editing.

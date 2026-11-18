@@ -48,11 +48,19 @@ Read the page as the reader in the brief, starting from where they would arrive.
 the job with this page and the pages it links, without guessing a value or a click? List the
 first place where they would get stuck.
 
-### 4. Style (non-blocking unless it changes meaning)
+### 4. Maintainer rules and style
 
-Check against `.claude/skills/docs-writing/style.md` and `AGENTS.md`: casing, UI labels in bold,
-code format, code fence languages, alt text, link text, filler and hype words, length. Report each
-once with all its lines, not once per line.
+Go through `.claude/skills/docs-writing/maintainers/self-review.md` item by item, with the rules in
+`maintainers/editing-rules.md` and the conventions and archetypes in `maintainers/repo-knowledge.md`.
+These are the corrections the maintainers make most often. Blocking: an invented feature or
+category, a claim that contradicts the OpenAPI spec or `main`, code that does not run, a missing
+redirect or nav entry, a broken link or anchor, PII in a screenshot, a sibling page left saying
+the old thing. Everything else is non-blocking, with the rewritten text.
+
+Then check `.claude/skills/docs-writing/style.md` and `AGENTS.md`: casing, UI labels in bold, code
+format, code fence languages, alt text, link text, filler and hype words, length. Report each
+style point once with all its lines, not once per line. Do not report known debt on lines the
+change did not touch (`repo-knowledge.md` lists it).
 
 ### 5. Checks
 

@@ -56,4 +56,10 @@ The Sentry SDKs handle these responses for you. They help when you send errors y
 | `415` | `{"error":"unsupported content encoding, use gzip or br"}` | Use `gzip` or `br`. |
 | `429` | `{"error":"rate limited"}` | Over the limit for this DSN, or Checkly is busy. Retry after the `Retry-After` seconds. |
 
-Every `429` response carries a `Retry-After` header; over the limit for a DSN, it also carries `X-Sentry-Rate-Limits`. Errors refused with `429` are not stored.
+Every `429` response carries a `Retry-After` header; over the limit for a DSN, it also carries `X-Sentry-Rate-Limits`. Errors refused with `429` are not stored. They show as [dropped data](#see-dropped-data).
+
+## See dropped data
+
+When Checkly refuses a request or does not store an error, a project's **Errors** tab shows **Data dropped in the last 24 hours**, with the count and the main reason.
+
+For every project, select **Usage** on the **Errors** page. The **Dropped** column shows the errors Checkly did not store and the requests it refused, and the reasons, such as **DSN rate limit**, **Too large** or **Revoked DSN key**. A request refused before Checkly read it counts as a refused request, because Checkly cannot count the errors in it. A request your SDK sends again counts again.

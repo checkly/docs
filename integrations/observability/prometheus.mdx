@@ -119,13 +119,13 @@ Checkly metrics don't include your account ID. To add it, or any other static la
 
 ```yaml
 scrape_configs:
-  - job_name: checkly_metrics
-    metrics_path: /accounts/<ACCOUNT_ID>/v2/prometheus/metrics
-    # ...your existing config
+  - job_name: checkly
+    metrics_path: /accounts/<your account ID>/v2/prometheus/metrics
+    # Keep the rest of your checkly job, such as bearer_token and params.
     static_configs:
       - targets: ['api.checklyhq.com']
         labels:
-          account_id: <ACCOUNT_ID>
+          account_id: <your account ID>
 ```
 
 This helps when you scrape several Checkly accounts into one Prometheus, or when you build links from dashboards to Checkly, such as `https://app.checklyhq.com/accounts/<account_id>/checks/<check_id>`.

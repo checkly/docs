@@ -113,6 +113,21 @@ checkly_check_status{name="Passing Browser Check",status="degraded"} 0
 | Tag labels | All check metrics, unless `disableTagParsing=true` | One label per `key:value` tag, for example `env:production` becomes `env="production"`. |
 | `location` | Metrics built from check results, only with `locationLabelEnabled=true` | The region code of the run, for example `eu-west-1`, or the private location's slug name. Never on `checkly_check_status`, `checkly_time_to_ssl_expiry_seconds` or heartbeat metrics. |
 
+### Add a custom label
+
+Checkly metrics don't include your account ID. To add it, or any other static label, set `labels` on the target in your Prometheus scrape job. Prometheus attaches it to every series it scrapes from that target, including heartbeat and private location metrics. This helps when you scrape several Checkly accounts into one Prometheus, or when you build links from dashboards to Checkly, such as `https://app.checklyhq.com/accounts/<account_id>/checks/<check_id>`.
+
+```yaml
+scrape_configs:
+  - job_name: checkly
+    metrics_path: /accounts/<your account ID>/v2/prometheus/metrics
+    # Keep the rest of your checkly job, such as bearer_token and params.
+    static_configs:
+      - targets: ['api.checklyhq.com']
+        labels:
+          account_id: <your account ID>
+```
+
 ## Heartbeat metrics
 
 [Heartbeat monitors](/detect/uptime-monitoring/heartbeat-monitors/overview) are passive checks that wait for your scheduled jobs and automated processes to send a ping. The Prometheus exporter includes Heartbeat monitors in the standard `checkly_check_status` and `checkly_check_result_total` metrics, plus two heartbeat-specific gauges designed for [dead man's switch](https://en.wikipedia.org/wiki/Dead_man%27s_switch) alerting.

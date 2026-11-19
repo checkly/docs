@@ -115,7 +115,7 @@ checkly_check_status{name="Passing Browser Check",status="degraded"} 0
 
 ### Add a custom label
 
-Checkly metrics don't include your account ID. To add it, or any other static label, set `labels` on the target in your Prometheus scrape job. Prometheus attaches it to every series it scrapes.
+Checkly metrics don't include your account ID. To add it, or any other static label, set `labels` on the target in your Prometheus scrape job. Prometheus attaches it to every series it scrapes from that target, including heartbeat and private location metrics. This helps when you scrape several Checkly accounts into one Prometheus, or when you build links from dashboards to Checkly, such as `https://app.checklyhq.com/accounts/<account_id>/checks/<check_id>`.
 
 ```yaml
 scrape_configs:

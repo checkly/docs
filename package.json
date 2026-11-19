@@ -9,7 +9,9 @@
     "test": "checkly test",
     "trigger": "checkly trigger",
     "login": "checkly login",
-    "generate-sitemap": "node .github/scripts/generate-sitemap.mjs"
+    "generate-sitemap": "node .github/scripts/generate-sitemap.mjs",
+    "lint:docs": "python3 .github/scripts/check_frontmatter.py && python3 .github/scripts/check_content_quality.py && npx mint broken-links && npx mint a11y",
+    "lint:docs:baseline": "python3 .github/scripts/check_content_quality.py --update-baseline"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0",

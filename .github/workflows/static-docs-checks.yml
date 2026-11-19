@@ -118,6 +118,13 @@ jobs:
         if: steps.detect.outputs.docs_changed == 'true'
         run: python3 .github/scripts/check_frontmatter.py
 
+      # Baseline-aware editorial checks. Existing debt is recorded in
+      # .github/content-quality-baseline.json; new metadata, duplication, H1,
+      # link, fence, and indexation violations fail. Runs on every PR so changes
+      # to the checker or baseline test themselves.
+      - name: Content quality regressions
+        run: python3 .github/scripts/check_content_quality.py
+
       # sitemap.xml (custom, trailing-slash — overrides Mintlify's auto-gen) is
       # generated from docs.json navigation. If a nav page is added/renamed/
       # removed without regenerating, the committed sitemap drifts. Regenerate

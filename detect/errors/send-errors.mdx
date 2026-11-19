@@ -200,7 +200,7 @@ In Node.js with ES modules, load the file with `--import` so the SDK starts befo
 node --import ./instrument.mjs app.mjs
 ```
 
-Importing `instrument.mjs` from your entry file is not enough: ES modules are hoisted, so your framework loads before the SDK can instrument it. With CommonJS, use `node --require ./instrument.js app.js`, or require `instrument.js` on the first line of your entry file.
+Importing `instrument.mjs` from your entry file is not enough: ES modules are hoisted, so your framework loads before the SDK can instrument it. With CommonJS, use `node --import ./instrument.js app.js` too: the SDK does not support `--require`.
 
 In an iOS or macOS app, call `SentrySDK.start` in your `App`'s `init`.
 
@@ -217,8 +217,10 @@ In React Native, `export default Sentry.wrap(App)` replaces your existing `expor
 For C and C++, build `sentry-native` with the `inproc` backend as shown, then compile against the installed library:
 
 ```bash Terminal
-cc main.c -Iinstall/include -Linstall/lib -lsentry -Wl,-rpath,"$PWD/install/lib" -o app
+cc -g main.c -Iinstall/include -Linstall/lib -lsentry -Wl,-rpath,"$PWD/install/lib" -o app
 ```
+
+With `-g`, the compiler also writes `app.dSYM`, the debug file you [upload](/detect/errors/source-maps) for readable stack traces.
 
 The SDK keeps its data in a `.sentry-native` folder in the working directory. Build `sentry-native` with the `inproc` backend because the default `crashpad` backend and the `breakpad` backend send crashes as minidumps, which Checkly does not accept.
 
@@ -243,6 +245,7 @@ sentry_sdk.capture_exception(Exception("Checkly test Error"))
 ```
 
 ```go Go
+// Add "errors" to your imports.
 sentry.CaptureException(errors.New("Checkly test Error"))
 ```
 
@@ -279,7 +282,7 @@ The error appears on the **Errors** page within about two minutes. The iOS and m
 Turn on the SDK's log: in JavaScript, add `debug: true` to `Sentry.init`. The SDK then logs what it does with each error, for example:
 
 ```text Terminal
-Sentry Logger [log]: Captured error event `Checkly docs filter test: kept`
+Sentry Logger [log]: Captured error event `Checkly test Error`
 ...
 Sentry Logger [warn]: Sentry responded with status code 401 to sent event.
 ```

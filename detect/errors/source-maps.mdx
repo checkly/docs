@@ -48,7 +48,7 @@ The upload prints a report of the files it sent:
 ...
 > File upload complete (processing pending on server)
 > Organization: <your-account-id>
-> Projects: docs-errors-proof
+> Projects: storefront
 > Release: storefront@2026.9.3
 > Dist: None
 > Upload type: artifact bundle
@@ -134,7 +134,7 @@ Checkly symbolicates in the background. A new error can show minified or raw fra
 
 A project's **Releases** page lists each release with the source maps and debug files uploaded for it, and the state of each upload: **Waiting**, **Processing**, **Stored** or **Failed**. A failed upload shows its reason, such as **File too large** or **Malformed file**.
 
-Open an upload to see the lookup file of each debug ID, which Checkly reads to resolve frames. **Available** means it exists, and **Build failed** shows the reason next to it. A source bundle shows **Not used**: Checkly keeps it but does not show source lines from it.
+Open an upload to see the lookup file of each debug ID, which Checkly reads to resolve frames. **Available** means it exists, **Build failed** shows the reason next to it, and **Not found** means there is neither a lookup file nor a failure. **Couldn't check** and **Not checked** mean the state is unknown: refresh to check again. A source bundle shows **Not used**: Checkly keeps it but does not show source lines from it.
 
 On an error group, frames that could not be resolved show why: **No source map uploaded**, **Source map failed to process** or **Lookup file not found**.
 

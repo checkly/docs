@@ -9,7 +9,7 @@ Each setup below is the smallest one that sends errors to Checkly with readable 
 
 ## Next.js
 
-Works with the App Router of Next.js 16.4 or later and `@sentry/nextjs` 11.14 or later, on Node.js 24.20 or later.
+Works with the App Router of Next.js 15.5 or later and `@sentry/nextjs` 11.14 or later, on Node.js 24.20 or later.
 
 ```bash Terminal
 npm install @sentry/nextjs
@@ -44,7 +44,7 @@ export const onRequestError = Sentry.captureRequestError
 
 Without `onRequestError`, errors in route handlers and server components are not sent. This setup starts the server SDK only when `NEXT_RUNTIME` is `nodejs`. You do not need `global-error.tsx` to capture errors, or `onRouterTransitionStart`, which only adds tracing.
 
-For readable stack traces, let `withSentryConfig` set the release and the debug IDs, and upload the source maps with `sentry-cli` after the build. Import `withSentryConfig` from `@sentry/nextjs/config`:
+For readable stack traces, let `withSentryConfig` set the release and the debug IDs, build with Turbopack, and upload the source maps with `sentry-cli` after the build. On Next.js 15, `next build` uses webpack unless you pass `--turbopack`, and its webpack build writes no source maps for server code. Import `withSentryConfig` from `@sentry/nextjs/config`:
 
 ```ts next.config.ts
 import type { NextConfig } from 'next'
@@ -61,7 +61,7 @@ export default withSentryConfig(nextConfig, {
 ```
 
 ```bash Terminal
-npx next build
+npx next build --turbopack
 npx sentry-cli sourcemaps upload --release storefront@2026.9.3 .next/static/chunks
 npx sentry-cli sourcemaps upload --release storefront@2026.9.3 .next/server
 find .next/static -name '*.map' -delete
@@ -70,12 +70,12 @@ find .next/static -name '*.map' -delete
 Set the [`sentry-cli` variables](/detect/errors/source-maps#configure-sentry-cli) in the environment of the build. Delete the browser source maps before you deploy: `next start` serves them to anyone otherwise.
 
 <Warning>
-Do not let `withSentryConfig` upload Turbopack builds itself. It changes the built files after the source maps were written, so every frame resolves one line off. With `npx next build --webpack`, its own upload resolves browser errors, but route handler frames point at Sentry's wrapper module. The default Turbopack build with the `sentry-cli` steps above gives readable frames for both.
+Do not let `withSentryConfig` upload Turbopack builds itself. It changes the built files after the source maps were written, so every frame resolves one line off. With `npx next build --webpack`, its own upload resolves browser errors, but route handler frames point at Sentry's wrapper module. The Turbopack build with the `sentry-cli` steps above gives readable frames for both.
 </Warning>
 
 ## React
 
-Works with React 19.3 or later, Vite 8.3 or later, and `@sentry/react` and `@sentry/vite-plugin` 11.14 or later.
+Works with React 18.3 or later, Vite 8.3 or later, and `@sentry/react` and `@sentry/vite-plugin` 11.14 or later.
 
 ```bash Terminal
 npm install @sentry/react
@@ -101,7 +101,7 @@ createRoot(document.getElementById('root')!).render(
 )
 ```
 
-An error that `Sentry.ErrorBoundary` catches arrives once, as handled. An error outside a boundary still arrives, as unhandled. If you also pass `Sentry.reactErrorHandler()` to `onCaughtError` of `createRoot`, errors the boundary catches arrive as unhandled instead.
+An error that `Sentry.ErrorBoundary` catches arrives once, as handled. An error outside a boundary still arrives, as unhandled. On React 19, if you also pass `Sentry.reactErrorHandler()` to `onCaughtError` of `createRoot`, errors the boundary catches arrive as unhandled instead.
 
 For readable stack traces, let the Vite plugin inject debug IDs and the release, and upload the source maps with `sentry-cli` after the build:
 
@@ -136,7 +136,7 @@ Do not let `@sentry/vite-plugin` upload Vite builds itself. It changes the uploa
 
 ## Express
 
-Works with Express 5.3 or later and `@sentry/node` 11.14 or later, on Node.js 24.20 or later.
+Works with Express 4.22 or later and `@sentry/node` 11.14 or later, on Node.js 24.20 or later.
 
 ```bash Terminal
 npm install @sentry/node
@@ -160,9 +160,11 @@ node --import ./instrument.mjs app.mjs
 
 Errors thrown in route handlers, sync or async, arrive as unhandled errors with the route, such as `GET /cart`, and a stack trace that points at your file and line. You do not need `Sentry.setupExpressErrorHandler(app)`; it is deprecated and does no harm. By default, only errors that end in a status of 500 or higher are sent. A crash at startup arrives too.
 
+Express 4 does not catch errors in async handlers. They still arrive in Checkly with the route, but the request gets no response. Catch them in the handler and pass them to `next(err)`.
+
 ## Django
 
-Works with Django 6.1 or later and `sentry-sdk` 2.75 or later, on Python 3.15 or later.
+Works with Django 5.2 or later and `sentry-sdk` 2.75 or later, on Python 3.14 or later.
 
 ```bash Terminal
 pip install sentry-sdk
@@ -182,7 +184,7 @@ sentry_sdk.init(
 
 Unhandled exceptions in views arrive with the view's file and line, under `runserver` and under gunicorn. To count [affected users](/detect/errors/send-errors#count-affected-users), add `send_default_pii=True`; the SDK then sends the logged-in user's ID, email and username.
 
-`logger.error()` calls arrive as errors without a stack trace. `logger.warning()` and `logger.info()` are not sent as errors; they show as breadcrumbs of the next error.
+`logger.error()` calls arrive as errors without a stack trace. `logger.warning()` calls are not sent as errors; they show as breadcrumbs of the next error. `logger.info()` calls show as breadcrumbs only when you set your logger's level to `INFO`: by default, Python skips them.
 
 ## Laravel
 
@@ -250,7 +252,7 @@ Unhandled exceptions in controller actions and in Active Job jobs arrive with th
 
 ## Spring Boot
 
-Works with Spring Boot 4.1 or later and `io.sentry:sentry-spring-boot-4-starter` 8.65 or later, on Java 25 or later.
+Works with Spring Boot 3.5 or later and `sentry-java` 8.65 or later, on Java 21 or later. On Spring Boot 4, add `sentry-spring-boot-4-starter`. On Spring Boot 3, use `sentry-spring-boot-starter-jakarta` instead.
 
 ```xml pom.xml
 <dependency>
@@ -289,7 +291,7 @@ public class SentryConfig {
 
 ## ASP.NET Core
 
-Works with .NET 11 or later and `Sentry.AspNetCore` 7.0 or later.
+Works with .NET 8 or later and `Sentry.AspNetCore` 7.0 or later.
 
 ```bash Terminal
 dotnet add package Sentry.AspNetCore
@@ -314,4 +316,4 @@ app.Run();
 
 Unhandled exceptions in endpoints arrive as unhandled, and `SentrySdk.CaptureException(e)` as handled. `ILogger.LogError()` creates an error; `LogWarning()` does not.
 
-The SDK reads the file and line from the `.pdb` file at runtime, so deploy it next to the DLL, as `dotnet publish -c Release` does, or build with `-p:DebugType=embedded`. Without it, frames show only the function name. You do not need to upload symbols or sources: Checkly does not use them for .NET, and .NET stack traces show no source lines.
+The SDK reads the file and line from the `.pdb` file at runtime, so deploy it next to the DLL, as `dotnet publish -c Release` does, or build with `-p:DebugType=embedded`. Delete the `bin` and `obj` folders first when you switch: `dotnet publish` does not rebuild an existing build for this option. Without it, frames show only the function name. You do not need to upload symbols or sources: Checkly does not use them for .NET, and .NET stack traces show no source lines.

@@ -187,6 +187,42 @@ Example prompt:
 Check whether this error group already has an RCA. If it does not, ask me before triggering a new one.
 ```
 
+## Error group tools
+
+| Tool | Type | Description |
+| --- | --- | --- |
+| `search-error-groups` | Read | Find the error groups of your applications by status, assignee, environment, platform, project, title, release or first seen time. Sort by last seen, newest, or the most errors or users in the time range. |
+| `get-error-group` | Read | Return one error group, optionally with its number of errors per release. |
+| `list-error-group-errors` | Read | List the newest errors of an error group. |
+| `list-error-group-breadcrumbs` | Read | List the breadcrumbs of an error. |
+| `update-error-group` | Write | Change the status or assignee of one error group. |
+| `update-error-groups` | Write | Change the status or assignee of up to 100 error groups. |
+| `merge-error-groups` | Write | Merge error groups. |
+| `unmerge-error-group` | Write | Undo a merge. |
+| `split-error-group` | Write | Split a grouping key into a new error group. |
+| `list-projects` | Read | List projects. |
+| `get-project` | Read | Return one project by its logical ID. |
+| `create-project` | Write | Create a project for errors. |
+| `update-project` | Write | Rename a project or change its repository URL. |
+| `create-ingest-key` | Write | Create a DSN for a project. |
+| `list-ingest-keys` | Read | List a project's DSNs, including revoked ones. |
+| `revoke-ingest-key` | Write | Revoke a DSN. |
+
+These tools work with [Errors](/detect/errors/overview) from your applications. The root cause analysis tools above work with check and test-session error groups. Where a tool takes an error group ID, you can also pass the error group's page address from the Checkly web app.
+
+The server also offers two prompts, which clients such as Claude Code show as slash commands:
+
+| Prompt | What it does |
+| --- | --- |
+| `fix-error` | Picks an unresolved error group, or the one you name, reads its stack trace and fixes the code in your repository. |
+| `verify-fix` | After you deploy the fix, runs the checks that cover the code and checks that the fixed release has no new errors. It asks before it runs checks, and resolves the error group only when it finds no errors in the fixed release and you agree. Sessions get it only when they can use all its tools, including changing error groups and running checks. |
+
+Example prompt:
+
+```text title="Prompt" wrap
+Find the unresolved error groups with the most Errors in production this week, show me the stack trace of the top one, and assign it to me.
+```
+
 ## Environment variable tools
 
 | Tool | Type | Description |

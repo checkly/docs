@@ -1,0 +1,86 @@
+---
+title: 'Error groups'
+sidebarTitle: 'Error groups'
+description: 'How Checkly groups errors into error groups, and how to resolve, ignore, assign, merge and split them.'
+canonical: 'https://www.checklyhq.com/docs/detect/errors/error-groups/'
+---
+
+An error group collects every error with the same cause, so a bug that fails a thousand times is one entry to triage. You resolve, ignore, assign, merge and split error groups on the **Errors** page, through the [API](/detect/errors/api) or with an AI agent through the [MCP server](/detect/errors/api#mcp-tools).
+
+## How errors are grouped
+
+Checkly picks the grouping key for each error in this order:
+
+1. The `fingerprint` your SDK sends, if it is set. Use `{{ default }}` in it to extend the default key instead of replacing it.
+2. The exception type and the top frames of your own code in the stack trace. For generic types such as `Error`, `TypeError`, `Exception` and `RuntimeException`, the error message is part of the key too, with variable parts such as IDs and numbers removed.
+3. The error message, with variable parts such as IDs and numbers removed.
+
+Content hashes in file names, build directories and dependency versions are not part of the key, so a new build of code that is not minified joins the same error group. Errors in two projects are always in two error groups.
+
+When you [upload source maps or debug files](/detect/errors/source-maps), an error whose resolved stack matches an existing error group joins it, even if the minified stack differs.
+
+To group errors your own way, set the fingerprint in the SDK, for example in JavaScript:
+
+```js app.js
+Sentry.withScope((scope) => {
+  scope.setFingerprint(['{{ default }}', 'checkout'])
+  Sentry.captureException(error)
+})
+```
+
+## Status and regressions
+
+An error group is **Unresolved**, **Resolved** or **Ignored**.
+
+- **Resolve** when you have shipped a fix. If a new error arrives later, the error group reopens as **Unresolved** and shows the **Regressed** badge.
+- **Ignore** an error group you do not plan to fix. New errors do not reopen it. Select **Stop ignoring** to bring it back.
+- **Reopen** a resolved error group by hand.
+
+Select several error groups on the **Errors** page to change their status at once.
+
+## Assign an error group
+
+Assign an error group to a member of your account. Filter the list by **Assignee**: **Me** shows yours, **Not me** someone else's, and **Unassigned** nobody's.
+
+## Merge error groups
+
+When two error groups have the same cause, select them on the **Errors** page and select **Merge**. Checkly moves the grouping keys, errors, history and counts into the error group you choose. The merged error groups are kept, and their links open the error group they were merged into. You can undo a merge.
+
+## Split an error group
+
+An error group can hold several grouping keys, for example after a merge. Its page lists them under **Grouping**. Select **Split out** on a key to move it, with its past and future errors, into a new error group.
+
+You cannot split out:
+
+- an error group's only key;
+- a key Checkly computed from the stack trace after applying your source maps or debug files, because that key is what the error group is;
+- the last key that was not computed that way.
+
+## Find error groups
+
+Filter the **Errors** page by project, **Environment**, **Status**, **Assignee** and **Unhandled**, or search by title. Sort by number of errors, last seen or age, over the last hour up to the last 30 days. The **Users** column counts affected users when your SDK [sends a user ID](/detect/errors/send-errors#count-affected-users).
+
+### Save a view
+
+After you change a filter or the search, **Create view** saves them as a view, shown as a tab above the list. A view does not save the sort. **Unhandled, unresolved**, **Assigned to me** and **Unassigned** are shared views every account starts with.
+
+Views on the **Errors** page work like views elsewhere in Checkly. See [Views](/platform/views) for sharing, permissions and limits.
+
+## Tags, contexts and levels
+
+On an error group's page, open **Contexts, tags and identifiers** to see the tags and contexts of an error, such as the browser, operating system and anything you set with `setTag()` or `setContext()`. Checkly stores `extra` data but does not show it. You cannot search or filter error groups by tag: the search matches titles only.
+
+Messages you send with `captureMessage()` become error groups too, at every level. A message sent with the level `warning` or `info` shows a **Warning** or **Info** badge on its page.
+
+## Hand an error group to an AI agent
+
+On an error group's page, **Copy for agent** copies a prompt with the error, its stack trace and breadcrumbs for your coding agent. It leaves out contexts, tags, user data and URL query strings.
+
+## Permissions
+
+| Action | Permission |
+|---|---|
+| View error groups, errors, stack traces and breadcrumbs | `error-groups:read` (every built-in role) |
+| Resolve, ignore, reopen, assign, merge and split | `error-groups:update` (Read & Write, Admin and Owner) |
+
+See [Permissions](/admin/team-management/permissions).

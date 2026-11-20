@@ -1,0 +1,80 @@
+---
+title: 'Errors API and MCP tools'
+sidebarTitle: 'API and MCP'
+description: 'Read and triage error groups with the beta error groups endpoints of the Checkly public API and with the Checkly MCP server.'
+canonical: 'https://www.checklyhq.com/docs/detect/errors/api/'
+---
+
+## Public API
+
+<Note>
+The error groups endpoints under `/v2/error-groups` are in beta and are not in the [API reference](/api-reference/overview) yet. They can change before they leave beta.
+</Note>
+
+The endpoints use the same base URL and authentication as the rest of the [Checkly API](/api-reference/overview): `https://api.checklyhq.com`, an API key in the `Authorization: Bearer` header and your account ID in the `X-Checkly-Account` header.
+
+The `/v1/error-groups` endpoints in the API reference are about failed checks, not about errors from your applications.
+
+| Method | Path | What it does |
+|---|---|---|
+| `GET` | `/v2/error-groups` | List error groups. |
+| `GET` | `/v2/error-groups/{errorGroupId}` | Get one error group. |
+| `GET` | `/v2/error-groups/{errorGroupId}/errors` | List its newest errors with stack traces and breadcrumbs. `limit` 1 to 50 (default 10) and `offset`. |
+| `PUT` | `/v2/error-groups/{errorGroupId}/status` | Set the status: `{"status": "resolved"}`. `unresolved` reopens it, `ignored` ignores it. |
+| `PUT` | `/v2/error-groups/{errorGroupId}/assignee` | Assign it: `{"assigneeId": "<user id>"}`, or `null` to unassign. User IDs come from `GET /v1/accounts/{accountId}/members`. |
+| `POST` | `/v2/error-groups/{errorGroupId}/merge` | Merge up to 25 error groups into this one: `{"loserIds": ["<id>"]}`. |
+| `POST` | `/v2/error-groups/{errorGroupId}/unmerge` | Undo the merge of an error group that was merged away. |
+| `POST` | `/v2/error-groups/{errorGroupId}/split` | Move one grouping key into a new error group: `{"fingerprint": "<key>"}`, one of the `fingerprints` of the error group. |
+
+The list takes these query parameters. Repeat a parameter to match any of its values, for example `status=unresolved&status=ignored`.
+
+| Parameter | Values |
+|---|---|
+| `project` | A project's logical ID |
+| `status` | `unresolved`, `resolved`, `ignored` |
+| `assigned` | `me`, `none` or a user ID. `me` matches nothing for a service API key |
+| `environment`, `platform` | Error groups that ever reported from this environment or SDK platform |
+| `handled` | `false` for error groups with at least one unhandled error |
+| `search` | Text in the title |
+| `from`, `to` | UNIX timestamps in seconds, at most 30 days apart. Default: the last 24 hours |
+| `sort` | `lastSeen` (default), `errors` or `age` |
+| `limit`, `page` | 1 to 100 per page, default 25 |
+
+The list counts at most 1,000 matches; narrow the filters to see more. Each endpoint allows 30 requests per minute for each caller. Reading needs `error-groups:read`, every change needs `error-groups:update`, and changing an assignee also needs `members:read`.
+
+```bash Terminal
+curl "https://api.checklyhq.com/v2/error-groups?status=unresolved&search=route%20exception&limit=1" \
+  -H "Authorization: Bearer <your-api-key>" \
+  -H "X-Checkly-Account: <your-account-id>"
+```
+
+```json Response
+[
+  {
+    "id": "53feeb9c-2c04-49e2-bc02-49177e6aef72",
+    "title": "RuntimeException: unhandled route exception in checkout",
+    "culprit": "/checkout",
+    "status": "unresolved",
+    "hasUnhandled": true,
+    "firstSeen": "2026-11-18T10:52:08.883Z",
+    "lastSeen": "2026-11-18T10:53:20.485Z",
+    "regressedAt": null,
+    "assigneeId": null,
+    "project": {
+      "id": "bfd7ca57-0c3e-4a85-86ab-71016e17a4c6",
+      "logicalId": "storefront",
+      "name": "Storefront"
+    },
+    "metrics": {
+      "errors": 4,
+      "usersAffected": null,
+      "trend": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0],
+      "trendPercent": null
+    }
+  }
+]
+```
+
+## MCP tools
+
+The [Checkly MCP server](/ai/mcp-server) lets an AI agent find, read and triage error groups, and create projects and DSNs. See [error group tools](/ai/mcp-server/tools#error-group-tools) for the list.

@@ -200,7 +200,7 @@ In Node.js with ES modules, load the file with `--import` so the SDK starts befo
 node --import ./instrument.mjs app.mjs
 ```
 
-Importing `instrument.mjs` from your entry file is not enough: ES modules are hoisted, so your framework loads before the SDK can instrument it. With CommonJS, use `node --import ./instrument.js app.js` too: the SDK does not support `--require`.
+Importing `instrument.mjs` from your entry file is not enough: ES modules are hoisted, so your framework loads before the SDK can instrument it. With CommonJS, use `node --import ./instrument.js app.js` too, as Sentry's own setup does.
 
 In an iOS or macOS app, call `SentrySDK.start` in your `App`'s `init`.
 

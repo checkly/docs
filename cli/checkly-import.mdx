@@ -169,6 +169,15 @@ Cancel a generated plan that hasn't been committed to discard any pending import
 npx checkly import cancel
 ```
 
+## When the import finds nothing
+
+`checkly import plan` only imports resources that aren't part of a CLI project yet. When it finds none, it prints `No importable resources were found.` Check these:
+
+- **The resources already belong to a project.** A resource that was deployed with `checkly deploy`, or imported and committed, belongs to that project and isn't imported again, even if the project lives in another repository.
+- **Another import plan has reserved them.** A plan that was applied but not committed keeps its resources. To release them, run `npx checkly import cancel --all` in the project that created the plan. Or import a resource by its ID, for example `npx checkly import plan check:2ce8...`.
+- **They're Playwright Check Suites.** These are never imported, not even by ID. Keep their code in your repository and deploy them from there.
+- **You're signed in to another account.** Run `npx checkly whoami` to see which account the CLI uses.
+
 ## Best Practices
 
 ### Before Importing

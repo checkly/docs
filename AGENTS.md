@@ -94,6 +94,10 @@ CI typechecks Checkly CLI snippets in `.mdx` files against the latest `checkly` 
 
 - This replaces the older `<Tabs>` pattern for language-specific code examples
 
+## Writing and reviewing pages
+- Any new or changed page outside `guides/` follows the `docs-writing` skill in `.claude/skills/docs-writing/SKILL.md`: one page type, every product fact proven from a source, samples run, checks, independent review.
+- Before a PR, run `.claude/scripts/check-docs.sh`. The `docs-review` skill and the `docs-reviewer` agent review a branch or PR; `docs-researcher` collects the facts.
+
 ## Guides
 - Any change under `guides/`, `samples/guides/`, or `images/guides/` follows the `guide-authoring` skill in `.claude/skills/guide-authoring/SKILL.md`: agent path first, tested samples, real screenshots, brand diagrams.
 

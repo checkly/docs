@@ -2,7 +2,7 @@
 
 title: 'API check structure'
 description: 'Learn how to structure your API checks with the ApiCheck construct.'
-sidebarTitle: MaC Structure
+sidebarTitle: MaC structure
 canonical: 'https://www.checklyhq.com/docs/detect/synthetic-monitoring/api-checks/api-structure/'
 ---
 <Tip>
@@ -32,9 +32,9 @@ new ApiCheck('user-api-health', {
 })
 ```
 
-## Request Configuration
+## Request configuration
 
-### HTTP Methods
+### HTTP methods
 Supported HTTP methods:
 - **GET**: Retrieve data from endpoints
 - **POST**: Create resources or submit data
@@ -43,15 +43,15 @@ Supported HTTP methods:
 - **DELETE**: Remove resources
 - **HEAD**: Check resource existence without body
 
-### Authentication Support
+### Authentication support
 - **Bearer Token**: JWT and OAuth token authentication
 - **Basic Auth**: Username/password authentication
 - **API Keys**: Custom header or query parameter authentication
 - **Custom Headers**: Flexible authentication patterns
 
-## Response Validation
+## Response validation
 
-### Status Code Assertions
+### Status code assertions
 Validate HTTP response codes:
 ```typescript
 assertions: [
@@ -60,7 +60,7 @@ assertions: [
 ]
 ```
 
-### Content Validation
+### Content validation
 Validate response content and structure:
 ```typescript
 assertions: [
@@ -75,7 +75,7 @@ assertions: [
 ]
 ```
 
-### Header Validation
+### Header validation
 Check response headers:
 ```typescript
 assertions: [
@@ -85,7 +85,7 @@ assertions: [
 ]
 ```
 
-## Advanced Features
+## Advanced features
 
 ### Environment variables
 Use variables for dynamic content:
@@ -98,7 +98,7 @@ const apiKey = process.env.API_KEY
 const userId = Math.floor(Math.random() * 1000)
 ```
 
-### Request Chaining
+### Request chaining
 Use previous responses in subsequent requests:
 ```javascript
 // Setup script - create test user
@@ -116,7 +116,7 @@ process.env.TEST_USER_ID = userData.id
 // URL: https://api.example.com/users/{{TEST_USER_ID}}/profile
 ```
 
-### GraphQL Support
+### GraphQL support
 Monitor GraphQL APIs by sending the query and its variables as a JSON body:
 ```typescript
 new ApiCheck('graphql-get-user', {

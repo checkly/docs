@@ -1,5 +1,5 @@
 ---
-title: Record Automation Scripts Using Playwright Codegen
+title: Record automation scripts using Playwright codegen
 description: "Generate Playwright scripts automatically with the codegen command, recording your browser interactions into editable test code with user-first locators."
 subTitle: Automatically record Playwright tests with codegen
 date: 2025-02-20
@@ -23,7 +23,7 @@ import { YoutubeEmbed } from "/snippets/youtube-embed.jsx"
 
 Did you know that you can use Playwright to generate your automation scripts automatically? Let's dive into how you can leverage Playwright's `codegen` feature to record scripts effortlessly.
 
-### Step 1: Launch Playwright Codegen
+### Step 1: Launch Playwright codegen
 
 To get started, you'll use the `codegen` command from the Playwright executable. Let's say you want to create a script for interacting with [Checkly](https://checklyhq.com/). You would run the following command in your terminal:
 
@@ -39,7 +39,7 @@ Note that the inspector will populate with the basic code needed for a Playwrigh
 
 Also, the browser will automatically highlight elements, and show you a locator for them in Playwright’s preferred [user-first selector](https://www.checklyhq.com/blog/playwright-user-first-selectors/) format.
 
-### Step 2: Interact with the Website
+### Step 2: Interact with the website
 
 Now, you can start interacting with the website as you normally would. For example:
 
@@ -63,7 +63,7 @@ test('test', async ({ page }) => {
 
 Note that codegen will make a ‘best effort’ at emulating your actions and writing ‘best practice’ code, so you should always review it before deploying.
 
-### Step 3: Add Assertions to your tests
+### Step 3: Add assertions to your tests
 
 Every action in the script above has implicit assertions about the elements we interact with. Playwright will expect these elements are stable, visible, and enabled; and if one isn’t then the test will fail we could call this done, but we generally want our tests to contain assertions beyond just navigating. There are a few reasons why you should have assertions in your test: It makes it clearer to future coders what your test was checking for, and the error message is more useful from a failed assertion rather than just failing to find an element. Right now all we’ll get if the test above fails is a timeout and a line which failed.
 
@@ -84,23 +84,23 @@ this will generate a `.toContainText(` assertion in the inspector
 
 Note that the assertions created by codegen are fairly basic, and while they could be the whole basis for a test suite, it’s a great idea to learn about [Playwright assertions](https://www.checklyhq.com/learn/playwright/assertions/) and write more complex ones yourself. You can write any calculable value into an assertion, so the sky is the limit.
 
-### Step 4: Write tests in Java, Python, .Net or JavaScript - Choose Your Target Environment
+### Step 4: Write tests in Java, Python, .Net or JavaScript - Choose your target environment
 
 After you're done interacting with the website, you can choose the target environment for your script. Playwright allows you to generate scripts in various languages, such as JavaScript, Python, or Playwright's own test framework.
 
 For this example, let's pick JavaScript. You can copy the generated script from the inspector.
 
-### Step 5: Save and Run Your Script
+### Step 5: Save and run your script
 
 With your script copied, you can drop the test into a Playwright `spec` file, and run it with `npx playwright test` to see the results. Note that the script as generated contains no comments or further explanations. If you want to be considerate of your next coder, who let’s be honest is probably you in 6 months having forgotten everything about this test, add some comments, give the test a more helpful name than `'test'` and [divide the test into steps for readability](https://www.checklyhq.com/blog/improve-your-playwright-documentation-with-steps/).
 
-### Step 6: Run Your Script in the Cloud
+### Step 6: Run your script in the cloud
 
 If you want to take it a step further, use [Playwright Check Suites](/detect/synthetic-monitoring/playwright-checks/overview) to run your Playwright tests in the Checkly infrastructure as synthetic monitoring.
 
 <SignUpCta />
 
-### Bonus Step 1: Add Playwright to Visual Studio Code
+### Bonus step 1: Add Playwright to Visual Studio Code
 
 Many developers are now comfortable using Microsoft’s Visual Studio Code as their IDE, and Playwright has a great plugin for Visual Studio Code. Install the [VS Code extension from the marketplace](https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright) or from the extensions tab in VS Code.
 
@@ -110,7 +110,7 @@ With the plugin installed, you can record a new test directly into your script f
 
 The plugin has a lot of other neat features including being able to run your tests right from the code editor, and show a browser running your tests. If you’re already using Visual Studio Code, or thinking about adopting it as an IDE, the Playwright plugin is worth checking out!
 
-### Bonus Step 2: Simulate a Mobile Browser Viewport with `--viewport`
+### Bonus step 2: Simulate a mobile browser viewport with `--viewport`
 
 Playwright can’t perfectly emulate a particular build of Mobile Opera running on a 10-year-old Android, but a good start is simulating a mobile viewport, to see if things render correctly and buttons are still visible. Start by setting your viewport size when you start up codegen:
 
@@ -125,7 +125,7 @@ Your browser will start up showing the new, narrow viewport
 
 You’ll also notice in the screenshot that the inspector automatically adds a `test.use` command to set the viewport. You can go quite a bit further with these settings, altering the user-agent for your test as needed to [emulate](https://playwright.dev/docs/emulation) different devices.
 
-## See Codegen in action
+## See codegen in action
 
 To see the highly visual codegen tool in action, check out Stefan’s video below:
 

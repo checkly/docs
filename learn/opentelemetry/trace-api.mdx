@@ -19,13 +19,13 @@ The API allows you to:
 - **Manage context propagation**: Maintain relationships between spans across different parts of your code or services.
 - **Use manual and automatic instrumentation**: Complement automatic tracing with custom spans to capture essential information that auto-instrumentation may miss.
 
-### Manual Instrumentation and Spans
+### Manual instrumentation and spans
 
 While automatic instrumentation can kick off traces and capture key operations, developers often need to add spans manually. For example, a trace may start automatically when handling a web request, but you may want to add spans within specific parts of the application that require deeper insight. Manual spans allow teams to capture contextual information like user IDs or transaction details, providing richer insights for debugging and analysis.
 
 Spans are always linked to a **tracer object**, which is provided by a **tracer provider**. This structure allows modular instrumentation, enabling different components of a system to use their own tracers, scoped by version or module, if needed.
 
-### Context Propagation
+### Context propagation
 
 Context propagation ensures that spans within a trace maintain their parent-child relationships, even across different services or functions. The API offers two types of context propagation:
 
@@ -34,7 +34,7 @@ Context propagation ensures that spans within a trace maintain their parent-chil
 
 In languages like Python or JavaScript, this propagation happens implicitly, but in Go, developers must handle it manually using functions like `SpanFromContext` and `ContextWithSpan`.
 
-### Key Operations on Spans
+### Key operations on spans
 
 - **SetAttributes**: Attach key-value pairs to spans, providing additional context.
 - **AddEvents**: Record events within a span’s lifetime to capture specific actions or failures.
@@ -42,7 +42,7 @@ In languages like Python or JavaScript, this propagation happens implicitly, but
 - **AddLinks**: Link different traces together, useful in asynchronous scenarios like message queues.
 - **RecordException**: Log exceptions as events within spans, including stack traces and error messages.
 
-### Practical Considerations
+### Practical considerations
 
 Using the Trace API effectively involves balancing automatic and manual instrumentation. Auto-instrumentation handles common scenarios, but manual spans offer the flexibility to capture unique business logic or operations. Proper use of context propagation ensures that traces remain complete and meaningful, avoiding broken or orphaned spans.
 

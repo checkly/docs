@@ -25,7 +25,7 @@ Playwright offers robust capabilities for automating browser tests. However, a c
 
 This post describes strategies for running Playwright tests in parallel, sequence, or both while optimizing your testing workflow for efficiency and reliability.
 
-## Understanding Test Types: stateful vs stateless
+## Understanding test types: stateful vs stateless
 
 Before getting into the technicalities of test execution, you must categorize your tests into two main types: stateless and stateful.
 
@@ -36,7 +36,7 @@ Before getting into the technicalities of test execution, you must categorize yo
 Tests that start and rely on a state created by a previous test are typically considered antipatterns. Tests should create and clean up their own state to avoid cluttering test environments and enable parallelization.
 </Note>
 
-## Playwright's Default Test Execution
+## Playwright's default test execution
 
 Before you start wondering how to parallelize all your Playwright tests, be aware that you probably run some of your tests in parallel already.
 
@@ -54,7 +54,7 @@ The execution model can be changed in multiple ways if you want to parallelize m
 
 Let's look at common execution scenarios and their required configuration.
 
-## Running Tests Sequentially
+## Running tests sequentially
 
 While parallel execution is efficient, specific scenarios require running tests sequentially. This is especially true for destructive and stateful tests, where ensuring a predictable and unaltered environment state is crucial for test accuracy.
 
@@ -93,7 +93,7 @@ npx playwright test --workers=1 --project=sequential
 
 You can run a subset of test files, grep for specific test tags, or define a separate project to run tests sequentially. None of these approaches is better; you must decide what fits your project best.
 
-## Running Tests in Parallel
+## Running tests in parallel
 
 Thanks to Playwright's automatic encapsulation and easy-to-use worker functionality, the test runner naturally excels at executing tests in parallel, significantly reducing the time it takes to execute your entire test suite.
 
@@ -174,11 +174,11 @@ test('One', async () => { /* ... */ });
 test('Two', async () => { /* ... */ });
 ```
 
-## Leveraging Playwright's Flexibility
+## Leveraging Playwright's flexibility
 
 Playwright's design accommodates various testing strategies, allowing developers to tailor test execution to their project's needs. Whether running tests in parallel to save time or sequentially to ensure environment stability, Playwright provides the tools necessary to configure your testing environment effectively.
 
-### Tips for Organizing Tests
+### Tips for organizing tests
 
 - Use directories, tags or projects to separate stateful and stateless tests and apply appropriate parallel or sequential execution modes.
 - Name your test files strategically if relying on alphabetical execution order for sequencing.

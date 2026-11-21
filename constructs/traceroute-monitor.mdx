@@ -1,5 +1,5 @@
 ---
-title: 'TracerouteMonitor Construct'
+title: 'TracerouteMonitor construct'
 description: 'Learn how to configure Traceroute monitors with the Checkly CLI.'
 sidebarTitle: 'Traceroute monitor'
 canonical: 'https://www.checklyhq.com/docs/constructs/traceroute-monitor/'
@@ -86,7 +86,7 @@ Traceroute monitors have their own probe-specific settings, plus the standard mo
 | `maxResponseTime` | `number` | ❌ | `1000` | Final-hop avg RTT in milliseconds at which the monitor is marked as failed |
 
 </Tab>
-<Tab title="General Monitor Settings">
+<Tab title="General monitor settings">
 
   <GeneralMonitorOptionsTable />
 
@@ -97,7 +97,7 @@ Traceroute monitors have their own probe-specific settings, plus the standard mo
 Traceroute monitors that don't set `degradedResponseTime` or `maxResponseTime` move to the 500 and 1,000 ms defaults on their next `checkly deploy`. Monitors managed in the web app or through the API keep their current limits. If you set only one limit, it is checked against the default of the other: `degradedResponseTime` above 1,000 alone, or `maxResponseTime` between 1 and 499 alone, is rejected. Set both limits to use values outside these ranges.
 </Note>
 
-### `TracerouteMonitor` Options
+### `TracerouteMonitor` options
 
 <ResponseField name="request" type="object" required>
 
@@ -170,7 +170,7 @@ new TracerouteMonitor("traceroute-latency-tiers", {
 ```
 </ResponseField>
 
-### `TracerouteMonitor` Assertions
+### `TracerouteMonitor` assertions
 
 Assertions for Traceroute monitors are defined using the `TracerouteAssertionBuilder`. The following sources are available:
 
@@ -214,7 +214,7 @@ TracerouteAssertionBuilder.packetLoss().lessThan(10)
 
 Learn more in our docs on [Assertions](/detect/assertions).
 
-### General Monitor Options
+### General monitor options
 
 <ResponseField name="name" type="string" required>
 Friendly name for your Traceroute monitor that will be displayed in the Checkly dashboard and used in notifications.

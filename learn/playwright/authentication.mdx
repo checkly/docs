@@ -1,5 +1,5 @@
 ---
-title: How to Manage Authentication in Playwright
+title: How to manage authentication in Playwright
 subTitle: Speeding up tests by skipping login, and more
 description: Learn how to handle authentication in Playwright, including SSO, 2FA, Passkeys and more. Reuse authentication state across tests with storageState.
 displayDescription: Learn how to handle authentication in Playwright, including SSO, 2FA, Passkeys and more. Reuse authentication state across tests with storageState.
@@ -39,7 +39,7 @@ For web and applications and APIs, you will typically have to run through some i
 
 > Use Playwright’s built-in [code generator](https://playwright.dev/docs/codegen-intro#running-codegen) to quickly get a script of your login steps. It will do the right thing in 90% of the cases. Just run `npx playwright codegen <mysite>`
 
-## Basic Auth / Username & Password
+## Basic auth / username & password
 
 Any flow that relies on the Basic Authentication standard or typing in a username and password will tend to look
 very similar to example test below.
@@ -64,7 +64,7 @@ Notice the following:
 3. At the end, we assert that the login actually worked, by checking for a user specific piece of content on the page.
 4. All handling of cookies, hashing of username and password and other things your browser typically takes care of are handled here transparently.
 
-## SSO & Social Login
+## SSO & social login
 
 Any SSO or social login — think Google, GitHub, Microsoft, SAML-based solutions or any 3rd party auth provider
 like Okta— works pretty much the same as basic authentication / username & password from the perspective of the test
@@ -93,7 +93,7 @@ test('Google login', async ({ page }) => {
 
 [Check the full  article on Google Login.](https://www.checklyhq.com/learn/playwright/google-login-automation/)
 
-## Two-Factor Authentication / TOTP
+## Two-factor authentication / TOTP
 
 Things get a little harder when using Two-Factor Authentication (2FA) and / or Time Based One Time Passwords (TOTP).
 You will probably be familiar with providing an extra “factor” like a code from an SMS message, a authenticator app

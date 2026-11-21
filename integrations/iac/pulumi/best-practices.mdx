@@ -1,7 +1,7 @@
 ---
-title: 'Pulumi Best Practices'
+title: 'Pulumi best practices'
 description: 'Best practices for managing monitoring as code with the Checkly Pulumi provider'
-sidebarTitle: 'Best Practices'
+sidebarTitle: 'Best practices'
 canonical: 'https://www.checklyhq.com/docs/integrations/iac/pulumi/best-practices/'
 ---
 
@@ -12,12 +12,12 @@ This guide covers best practices for effectively managing your Checkly monitorin
 The code samples on this page only show the properties that matter for each practice. A `checkly.Check` also needs `type`, `activated` and `frequency` (and a `request` for API checks), and a `checkly.CheckGroup` needs `activated` and `concurrency`. See the [Pulumi examples](/integrations/iac/pulumi/examples) for complete resources.
 </Note>
 
-## Resource Management
+## Resource management
 
-### Naming Conventions
+### Naming conventions
 
 <Columns cols={2}>
-<Card title="Resource Names" icon="tag">
+<Card title="Resource names" icon="tag">
 **Consistent Naming**
 - Use descriptive, lowercase names with hyphens
 - Include environment prefixes (dev, staging, prod)
@@ -25,7 +25,7 @@ The code samples on this page only show the properties that matter for each prac
 - Avoid generic names like "check1" or "test"
 </Card>
 
-<Card title="Tagging Strategy" icon="bookmark">
+<Card title="Tagging strategy" icon="bookmark">
 **Organized Tagging**
 - Use consistent tag patterns across resources
 - Include environment, team, and purpose tags
@@ -55,7 +55,7 @@ new checkly.Check('check1', { name: 'Test' })
 new checkly.Check('my_check', { name: 'My Check' })
 ```
 
-### Resource Organization
+### Resource organization
 
 <Tip>
 Organize your Pulumi code into logical modules and use check groups to maintain clear relationships between related resources.
@@ -82,9 +82,9 @@ apiChecks.forEach(check => {
 })
 ```
 
-## Security Best Practices
+## Security best practices
 
-### Secret Management
+### Secret management
 
 <Warning>
 Never commit API keys, passwords, or other sensitive information directly in your Pulumi code or version control.
@@ -119,10 +119,10 @@ const apiKey = config.requireSecret('apiKey')
 const accountId = config.require('accountId')
 ```
 
-### Access Control
+### Access control
 
 <Columns cols={2}>
-<Card title="API Key Security" icon="key">
+<Card title="API key security" icon="key">
 **Secure API Keys**
 - Use dedicated API keys for Pulumi
 - Rotate keys regularly
@@ -130,7 +130,7 @@ const accountId = config.require('accountId')
 - Monitor key usage
 </Card>
 
-<Card title="Team Access" icon="users">
+<Card title="Team access" icon="users">
 **Team Permissions**
 - Use Pulumi organizations for team collaboration
 - Implement role-based access control
@@ -139,9 +139,9 @@ const accountId = config.require('accountId')
 </Card>
 </Columns>
 
-## Environment Management
+## Environment management
 
-### Stack Strategy
+### Stack strategy
 
 <Callout type="info" emoji="🏗️">
 Use separate Pulumi stacks for different environments to maintain isolation and enable environment-specific configurations.
@@ -180,7 +180,7 @@ const envConfig = {
 const currentConfig = envConfig[environment]
 ```
 
-### Configuration Management
+### Configuration management
 
 <Tip>
 Use Pulumi's configuration system to manage environment-specific settings and avoid hardcoding values.
@@ -198,12 +198,12 @@ pulumi config set apiUrl https://staging-api.example.com --stack staging
 pulumi config set apiUrl https://api.example.com --stack prod
 ```
 
-## Monitoring Strategy
+## Monitoring strategy
 
-### Check Frequency Optimization
+### Check frequency optimization
 
 <Columns cols={2}>
-<Card title="Critical Services" icon="alert-triangle">
+<Card title="Critical services" icon="alert-triangle">
 **High Frequency**
 - 1-5 minute intervals for critical APIs
 - Multiple locations for redundancy
@@ -211,7 +211,7 @@ pulumi config set apiUrl https://api.example.com --stack prod
 - Comprehensive assertions
 </Card>
 
-<Card title="Non-Critical Services" icon="info-circle">
+<Card title="Non-critical services" icon="info-circle">
 **Lower Frequency**
 - 10-30 minute intervals for non-critical services
 - Single location monitoring
@@ -220,7 +220,7 @@ pulumi config set apiUrl https://api.example.com --stack prod
 </Card>
 </Columns>
 
-### Location Strategy
+### Location strategy
 
 ```javascript
 // Critical service - multiple locations
@@ -238,7 +238,7 @@ new checkly.Check('admin-dashboard', {
 })
 ```
 
-### Assertion Best Practices
+### Assertion best practices
 
 **Comprehensive API checks:**
 ```javascript
@@ -278,9 +278,9 @@ new checkly.Check('comprehensive-api-check', {
 })
 ```
 
-## Code Organization
+## Code organization
 
-### Modular Structure
+### Modular structure
 
 <Tip>
 Organize your Pulumi code into logical modules to improve maintainability and reusability.
@@ -325,7 +325,7 @@ function createApiChecks(environment) {
 module.exports = { createApiChecks }
 ```
 
-### Reusable Functions
+### Reusable functions
 
 ```javascript
 // utils/helpers.js
@@ -356,9 +356,9 @@ function createStandardApiCheck(name, url, options = {}) {
 module.exports = { createStandardApiCheck }
 ```
 
-## CI/CD Integration
+## CI/CD integration
 
-### Automated Deployments
+### Automated deployments
 
 <Columns cols={2}>
 <Card title="GitHub Actions" icon="brand-github">
@@ -410,9 +410,9 @@ jobs:
           CHECKLY_API_KEY: ${{ secrets.CHECKLY_API_KEY }}
 ```
 
-## Testing and Validation
+## Testing and validation
 
-### Preview Changes
+### Preview changes
 
 <Tip>
 Always use `pulumi preview` before deploying to understand what changes will be made to your infrastructure.
@@ -426,24 +426,24 @@ pulumi preview --stack prod
 pulumi preview --stack prod --show-replacement-steps
 ```
 
-### Validation Strategies
+### Validation strategies
 
 <AccordionGroup>
-<Accordion title="Configuration Validation">
+<Accordion title="Configuration validation">
 - Validate environment variables are set
 - Check API key permissions
 - Verify account ID format
 - Test connectivity to Checkly API
 </Accordion>
 
-<Accordion title="Resource Validation">
+<Accordion title="Resource validation">
 - Verify check configurations
 - Test alert channel connectivity
 - Validate check group assignments
 - Confirm location availability
 </Accordion>
 
-<Accordion title="Deployment Validation">
+<Accordion title="Deployment validation">
 - Monitor initial check runs
 - Verify alert channel notifications
 - Check resource relationships
@@ -451,9 +451,9 @@ pulumi preview --stack prod --show-replacement-steps
 </Accordion>
 </AccordionGroup>
 
-## Performance Considerations
+## Performance considerations
 
-### Resource Limits
+### Resource limits
 
 <Warning>
 Be mindful of Checkly's resource limits and pricing when creating large numbers of checks or high-frequency monitoring.
@@ -488,9 +488,9 @@ endpoints.forEach(endpoint => {
 })
 ```
 
-## Maintenance and Updates
+## Maintenance and updates
 
-### Regular Reviews
+### Regular reviews
 
 <Callout type="info" emoji="📅">
 Schedule regular reviews of your monitoring infrastructure to ensure it remains effective and up-to-date.
@@ -517,25 +517,25 @@ Maintain comprehensive documentation of your monitoring infrastructure, includin
 - Troubleshooting guides
 - Change management procedures
 
-## Common Pitfalls to Avoid
+## Common pitfalls to avoid
 
 <AccordionGroup>
-<Accordion title="Resource Drift">
+<Accordion title="Resource drift">
 **Problem**: Manual changes in Checkly UI create drift with Pulumi state
 **Solution**: Always manage resources through Pulumi or document manual changes
 </Accordion>
 
-<Accordion title="Secret Exposure">
+<Accordion title="Secret exposure">
 **Problem**: Committing secrets to version control
 **Solution**: Use environment variables and Pulumi's secret management
 </Accordion>
 
-<Accordion title="Over-Monitoring">
+<Accordion title="Over-monitoring">
 **Problem**: Too many checks or too frequent monitoring
 **Solution**: Focus on critical paths and optimize check frequencies
 </Accordion>
 
-<Accordion title="Poor Naming">
+<Accordion title="Poor naming">
 **Problem**: Unclear or inconsistent resource names
 **Solution**: Establish and follow naming conventions
 </Accordion>

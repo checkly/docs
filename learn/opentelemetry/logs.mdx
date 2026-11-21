@@ -1,5 +1,5 @@
 ---
-title: Logging in OpenTelemetry, an Engineer’s Guide
+title: Logging in OpenTelemetry, an engineer’s guide
 sidebarTitle: Logging
 description: This article will go over the basics, and answer common questions for those getting started with logging in OpenTelemetry. OpenTelemetry elevates logging from isolated text snippets to fully contextualized observability data that integrates seamlessly with traces and metrics.
 date: 2025-04-18
@@ -21,24 +21,24 @@ Taking a look at the ‘Language APIs and SDKs’ section of the OpenTelemetry d
 
 In fact only a handful of languages, such as Java, C++ and PHP, had ‘stable’ logs support at the time. See the [current status table](https://opentelemetry.io/docs/languages/) for the latest. Is this a cause for concern? In a word ‘no’, this table covers whether, when using the OpenTelemetry SDK, you can make a call to this SDK to emit logging. It is true that in many SDKs this isn’t yet fully supported, but this shouldn’t be a great concern to you because **you are already emitting logging just fine** in your production environment. There are lots of ways to add logging to the signals being handled by the OpenTelemetry collector and your OpenTelemetry datastore, which hook in to your current logging streams.
 
-## OpenTelemetry and Structured Logging
+## OpenTelemetry and structured logging
 
 When you send logs from traces or events, you could just write raw text. But raw logs are hard to read and parse later. OpenTelemetry prefers **structured logging** instead. Structured logging is a best practice recommended by AWS and other cloud providers as well, since even a simple search of past logs can become prohibitively expensive if you’re 
 
-### What is Structured Logging?
+### What is structured logging?
 
 Structured logging means logs are saved in a clear, machine-readable format—like JSON—instead of plain text. Each log has:
 
 - **Fields** (key-value pairs) for details like timestamps, severity, and context.
 - **Consistent formatting**, making logs easier to search, filter, and analyze.
 
-### Why OpenTelemetry Uses Structured Logs
+### Why OpenTelemetry uses structured logs
 
 1. **Better for Machines** – Tools can automatically process logs without messy parsing.
 2. **Connects to Traces** – Logs can link to traces and spans, helping debug issues faster.
 3. **Standardized** – OTel defines a common schema so logs work across different systems.
 
-### How OTel Handles Logs
+### How OTel handles logs
 
 - **Log Records** include:
     - Timestamp
@@ -47,7 +47,7 @@ Structured logging means logs are saved in a clear, machine-readable format—li
     - Attributes (extra context like `user_id`)
 - **Integration** with traces and metrics for full observability.
 
-### Example (Structured vs. Raw)
+### Example (structured vs. Raw)
 
 **Raw (Hard to Parse):**
 
@@ -88,9 +88,9 @@ If you turn high-cardinality fields (like `user_ip`) into metric labels, you’
 
 Logging, then, should be seen as similar to event data, and be the storehouse for aggregate, specific information like IP addresses and specific page routes.
 
-## The Promise of OpenTelemetry Logging: Full Context on Every Line
+## The promise of OpenTelemetry logging: Full context on every line
 
-### The Problem with Traditional Logging
+### The problem with traditional logging
 
 Today, logs, traces, and metrics live in separate worlds. They use different tools, formats, and collection methods, making it hard to connect them.
 
@@ -100,7 +100,7 @@ Today, logs, traces, and metrics live in separate worlds. They use different too
 
 This leads to **fragile observability**—logs tell part of the story, but not the whole picture.
 
-### OpenTelemetry’s Solution: Built-in Context
+### OpenTelemetry’s solution: Built-in context
 
 OpenTelemetry (OTel) fixes this by **propagating full context in every log line**.
 
@@ -108,25 +108,25 @@ OpenTelemetry (OTel) fixes this by **propagating full context in every log line*
 - **Consistent metadata** – Kubernetes pod info, service names, and other attributes are added *automatically* by the OTel Collector—no manual tagging needed.
 - **Distributed systems just work** – Logs from different services share the same context, so you can follow a request across your entire system.
 
-### How It Works
+### How it works
 
 1. **Structured logs** – Logs follow OTel’s data model (like JSON with clear fields).
 2. **Automatic enrichment** – The OTel Collector adds context (e.g., `k8s.pod.name`) to logs, traces, and metrics *the same way*.
 3. **No re-engineering of existing libraries** – Works with existing logging libraries (Log4j, Logback, etc.) via bridges.
 
-### Why This Matters
+### Why this matters
 
 - **No more guessing** – Every log line knows exactly where it came from and how it fits into the bigger picture.
 - **Better debugging** – Jump from a log error directly to the trace, metrics, and related logs—no manual searching.
 - **Future-proof** – Even legacy apps can join the OTel ecosystem via the Collector.
 
-### The Promise, not yet fulfilled
+### The promise, not yet fulfilled
 
 OpenTelemetry promises to turn logs from isolated snippets into **fully connected observability data**. As noted above, not every language SDK has full logging support, meaning this isn’t completely possible now. And the addition of enrichment data isn’t an easy or automatic process at the collector level (the collector is stateless and can only enrich logs based on what it’s processing at that moment). However, logging with OpenTelemetry has a bright future, and adopting now means you’re likely to be producing highly valuable logs in the next few years that prove worth the effort.
 
-## The Collector: OpenTelemetry’s Super-Powered Logging Proxy
+## The Collector: OpenTelemetry’s super-powered logging proxy
 
-### The Problem with Legacy Log Collection
+### The problem with legacy log collection
 
 Most apps today log to files or stdout—simple, but messy. To get those logs into observability tools, you need:
 
@@ -146,21 +146,21 @@ The Collector acts as a **universal log processor**. It can:
 
 **Bonus:** It does the same for traces and metrics—enriching all signals consistently.
 
-### Two Ways to Use It
+### Two ways to use it
 
-### Option 1: File/Stdout → Collector (No Code Changes)
+### Option 1: File/stdout → Collector (no code changes)
 
 - **How it works**: The Collector tails log files, parses them, and adds context.
 - **Good for**: Legacy apps, third-party software.
 - **Tradeoff**: Parsing can be tricky if log formats are inconsistent.
 
-### Option 2: App → Collector (Direct OTLP)
+### Option 2: App → Collector (direct OTLP)
 
 - **How it works**: Use an OTel "log appender" (e.g., for Log4j) to send logs directly to the Collector.
 - **Good for**: New apps or those you control.
 - **Why?** No file parsing, no lost logs on crashes, full structured data.
 
-### The Best Part: Zero Manual Enrichment
+### The best part: Zero manual enrichment
 
 No more editing every `log.info()` call! The Collector handles:
 
@@ -168,7 +168,7 @@ No more editing every `log.info()` call! The Collector handles:
 - **Resource attributes** (like `k8s.pod.name`)
 - **Routing** (send logs to Loki, Splunk, etc.)
 
-### Why This Wins
+### Why this wins
 
 - **No more "log soup"** – Every log line has rich, queryable fields.
 - **Easier correlation** – Logs that carry a trace ID link to their traces.
@@ -176,7 +176,7 @@ No more editing every `log.info()` call! The Collector handles:
 
 How to get started? Start with file collection, then phase in direct OTLP for critical apps.
 
-## Conclusions: OpenTelemetry is Critical to Logging
+## Conclusions: OpenTelemetry is critical to logging
 
 Logging has always been a fundamental part of understanding software behavior, but in modern distributed systems, traditional logging approaches fall short. OpenTelemetry elevates logging from isolated text snippets to fully contextualized observability data that integrates seamlessly with traces and metrics.
 

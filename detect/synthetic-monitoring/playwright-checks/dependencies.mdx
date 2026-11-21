@@ -108,7 +108,7 @@ registry=https://yourcompany.jfrog.io/artifactory/api/npm/npm-local/
 //yourcompany.jfrog.io/artifactory/api/npm/npm-local/:_authToken=${ARTIFACTORY_TOKEN}
 ```
 
-#### Using GitHub Packages
+#### Using GitHub packages
 
 ```txt
 //npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
@@ -172,7 +172,7 @@ export default defineConfig({
 
 Learn more about [customizing install commands](/detect/synthetic-monitoring/playwright-checks/configuration#customize-install-and-test-commands).
 
-## Dependency Caching
+## Dependency caching
 
 Checkly caches installed packages between check runs to speed up execution and reduce installation time. Dependencies are installed once and reused for subsequent runs until the files that define your dependencies change, such as your lock file and your `package.json` and `.npmrc` files, or until your `installCommand`, your working directory, or your [`engine`](/constructs/playwright-check#param-engine) change. Changes to [embedded or pruned packages and registry routing](/detect/synthetic-monitoring/playwright-checks/internal-registries) also invalidate the cache.
 
@@ -219,7 +219,7 @@ For a one-off fresh install, pass `--refresh-cache` to [`checkly test`](/cli/che
 
 Checkly automatically retries transient failures during setup steps. Cache downloads retry up to 3 times with exponential backoff. If all attempts fail, the run falls back to a clean install.
 
-### Dependency Cache behavior by location type
+### Dependency cache behavior by location type
 
 **Public Locations**: Dependency caching is **Always ON**.
 
@@ -268,7 +268,7 @@ Pruning works the same way in a single-package project as in a monorepo. Only re
 
 Checkly caches Playwright browsers so that runs don't download them every time. How caching works depends on which location your checks run.
 
-### Browser caching on Public Locations
+### Browser caching on public locations
 
 Checkly caches Playwright browsers across all public regions to reduce startup time. When a new Playwright version is available, runs download browsers until Checkly updates the shared cache.
 
@@ -281,7 +281,7 @@ Browser caching requires private location agent v8.2.0 or later.
 </Info>
 
 
-## Troubleshooting Dependency Installation
+## Troubleshooting dependency installation
 
 ### Package not found
 

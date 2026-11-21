@@ -1,5 +1,5 @@
 ---
-title: Advanced Data Filtering with the OpenTelemetry Collector
+title: Advanced data filtering with the OpenTelemetry Collector
 sidebarTitle: Filtering
 description: The OpenTelemetry Collector is a stand-alone service designed to collect, process, and export telemetry data such as logs, metrics, and traces. You can filter this data with the collector. An advanced guide to filtering data with processors and the OpenTelemetry Transform Language.
 date: 2024-10-18
@@ -11,7 +11,7 @@ The **OpenTelemetry Collector** is a powerful tool for managing telemetry data f
 
 ---
 
-## Why Filtering Matters
+## Why filtering matters
 
 Instrumentation often generates **noisy or redundant data**. Some metrics or traces may include unnecessary information—like personal data or debug logs—leading to bloated dashboards, higher storage costs, and privacy risks. Filtering data within the OpenTelemetry Collector allows you to:
 
@@ -22,7 +22,7 @@ Instrumentation often generates **noisy or redundant data**. Some metrics or tra
 
 ---
 
-## How the OpenTelemetry Collector Filters Data
+## How the OpenTelemetry Collector filters data
 
 The Collector consists of **receivers, processors, and exporters**. Each plays a role in data filtering:
 
@@ -30,7 +30,7 @@ The Collector consists of **receivers, processors, and exporters**. Each plays a
 2. **Processors**: Modify, filter, or batch data before it is exported.
 3. **Exporters**: Send the processed data to observability backends, such as **Prometheus** or **Grafana**.
 
-### Processor-based Filtering
+### Processor-based filtering
 
 Processors allow transformations and data filtering mid-pipeline. Processors offer inherently limited transformation configuration to do the most common tasks like:
 
@@ -52,7 +52,7 @@ processors:
 
 ---
 
-## Transformations Using OpenTelemetry Transform Language (OTTL)
+## Transformations using OpenTelemetry transform language (OTTL)
 
 The **OpenTelemetry Transform Language (OTTL)** provides enhanced flexibility for complex transformations. OTTL allows for:
 
@@ -77,7 +77,7 @@ processors:
 
 Since OTTL allows functional changes of your data, this is really the simplest possible example of a use case: a gate that goes just beyond simple filtering. 
 
-## Stateful Operations and Their Limitations
+## Stateful operations and their limitations
 
 While the collector excels at real-time data transformations, it is **stateless by design** to ensure high performance. Stateful operations—such as aggregating historical data—are not natively supported. This ensures the collector remains lightweight and efficient.
 
@@ -88,7 +88,7 @@ Common limitations include:
 
 Note: if you are reading this section trying to figure out how to add stateful filtering, e.g. forwarding only the longest trace seen in a 24-hour period I recommend that you *stop* pursuing this within the OTel collector. The limitations of the collector exist for performance reasons, and adding state to the tool will cause unexpected downstream effects as, for example, the collector becomes too burdened to always be ready to accept OTLP data from your services.
 
-## Filtering Use Cases
+## Filtering use cases
 
 1. **PII Masking**: Remove personal data before sending traces to public dashboards.
 2. **Debug Data Suppression**: Drop debug-level logs from production pipelines.

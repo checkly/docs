@@ -124,7 +124,67 @@ test('HTML cleanup preserves valid JSON and Markdown line breaks', (t) => {
   assert.equal(cleaned.paths['/probe'].get.description, '[Docs](https://example.com/docs)\n`x`\n**bold**\n**legacy**');
   delete cleaned.paths['/probe'].get.description;
   delete spec.paths['/probe'].get.description;
+  delete cleaned.components;
+  delete cleaned.security;
   assert.deepEqual(cleaned, spec);
+});
+
+test('the account header moves from parameters to a security scheme once', (t) => {
+  const { root, run } = fixture(t);
+  const filename = join(root, 'api-reference/openapi.json');
+  const header = (name) => ({ name, in: 'header', schema: { type: 'string' } });
+  const limit = { name: 'limit', in: 'query', schema: { type: 'integer' } };
+  const id = { name: 'id', in: 'path', required: true, schema: { type: 'string' } };
+  const responses = { 200: { description: 'OK' } };
+  const bearer = { type: 'http', scheme: 'bearer' };
+  const bearerOnly = [{ Bearer: [] }];
+  writeFileSync(filename, JSON.stringify({
+    openapi: '3.0.3', info: { title: 'Probe', version: '1.0' },
+    security: [{ Bearer: [] }],
+    components: { securitySchemes: { Bearer: bearer }, parameters: { Account: header('X-Checkly-Account') } },
+    paths: {
+      '/v1/checks': {
+        get: { parameters: [header('x-checkly-account'), limit], responses },
+        post: { parameters: [{ $ref: '#/components/parameters/Account' }], responses },
+      },
+      '/v1/check-groups/{id}': { parameters: [header('X-CHECKLY-ACCOUNT'), id], get: { responses } },
+      '/v1/check-sessions/trigger': { post: { responses } },
+      '/v1/check-sessions/{checkSessionId}': { get: { responses } },
+      '/v1/check-sessions/{checkSessionId}/completion': { get: { responses } },
+      '/v1/embed-tokens': { post: { responses } },
+      '/v1/badges/checks/{checkId}': { get: { parameters: [id], responses } },
+      '/v1/badges/groups/{groupId}': { get: { parameters: [header('x-checkly-account'), id], responses } },
+      '/v1/elements-data': { get: { responses } },
+    },
+  }));
+
+  const first = run('clean-openapi.mjs', filename);
+  assert.equal(first.status, 0, first.stderr);
+  const converted = readFileSync(filename, 'utf8');
+  const { components, security, paths } = JSON.parse(converted);
+  const { description, ...scheme } = components.securitySchemes['X-Checkly-Account'];
+  assert.deepEqual(scheme, { type: 'apiKey', in: 'header', name: 'X-Checkly-Account' });
+  assert.match(description, /account ID/);
+  assert.deepEqual(components.securitySchemes.Bearer, bearer);
+  assert.deepEqual(security, [{ Bearer: [], 'X-Checkly-Account': [] }]);
+  assert.deepEqual(paths, {
+    '/v1/checks': {
+      get: { parameters: [limit], responses },
+      post: { responses },
+    },
+    '/v1/check-groups/{id}': { parameters: [id], get: { responses } },
+    '/v1/check-sessions/trigger': { post: { responses } },
+    '/v1/check-sessions/{checkSessionId}': { get: { responses } },
+    '/v1/check-sessions/{checkSessionId}/completion': { get: { responses } },
+    '/v1/embed-tokens': { post: { responses } },
+    '/v1/badges/checks/{checkId}': { get: { parameters: [id], responses, security: bearerOnly } },
+    '/v1/badges/groups/{groupId}': { get: { parameters: [id], responses, security: bearerOnly } },
+    '/v1/elements-data': { get: { responses, security: bearerOnly } },
+  });
+
+  const second = run('clean-openapi.mjs', filename);
+  assert.equal(second.status, 0, second.stderr);
+  assert.equal(readFileSync(filename, 'utf8'), converted);
 });
 
 test('group badges follow all child operations and stale badges fail validation without rewriting navigation', (t) => {

@@ -21,14 +21,17 @@ When trace export is on, Checkly sends each API check, URL monitor, Browser chec
 Open [Account settings > Traces](https://app.checklyhq.com/settings/account/traces) and, under **Export Traces**, select **Enable exporting traces**.
 </Step>
 <Step title="Enter the endpoint URL">
-Enter your backend's OTLP/HTTP traces URL, for example `https://otel.acme.com/v1/traces`. Use an `https` URL that ends in `/v1/traces`. Checkly only checks that the URL is well formed when you save, not the scheme, the path or that the endpoint answers.
+Enter your backend's OTLP/HTTP traces URL, for example `https://otel.acme.example/v1/traces`. Use an `https` URL that ends in `/v1/traces`. Checkly only checks that the URL is well formed when you save, not the scheme, the path or that the endpoint answers.
 </Step>
 <Step title="Add authentication headers">
 Click **Add header** and enter each header your endpoint expects as a key and a value, for example `Authorization` with `Bearer <token>`. Put credentials in header rows, not in the URL. API checks and URL monitors drop the URL's query string when they export. Click the lock next to a value to store it as an account secret, which the row then references as `{{NAME}}`. Any value written as `{{NAME}}` is replaced with the matching environment variable or secret when the check runs. Rows with an empty key or value are discarded.
 </Step>
 </Steps>
 
-![Export Traces settings with an endpoint URL and an authorization header](/images/docs/images/otel/otel_export_traces_settings.png)
+<Frame>
+  <img className="block dark:hidden" src="/images/docs/images/otel/otel_export_traces_settings.png" alt="The Export Traces card has Enable exporting traces selected. It holds an endpoint URL and an Authorization header." />
+  <img className="hidden dark:block" src="/images/docs/images/otel/otel_export_traces_settings-dark.png" alt="The Export Traces card has Enable exporting traces selected. It holds an endpoint URL and an Authorization header." />
+</Frame>
 
 ## What is sent
 

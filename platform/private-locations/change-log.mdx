@@ -6,7 +6,7 @@ rss: true
 canonical: 'https://www.checklyhq.com/docs/platform/private-locations/change-log/'
 ---
 
-For major release announcements and summaries, see Checkly's [product changelog](https://checklyhq.com/changelog?c=Checkly+Agent), filtered by `Checkly Agent`.
+For major release announcements and summaries, see Checkly's [product changelog](https://www.checklyhq.com/changelog/).
 
 Learn more about:
 
@@ -17,8 +17,18 @@ Learn more about:
 
 ## Full release history
 
+<Update label="v8.16.0" tags={["November 2026"]}>
+- Fixed agents on networks without IPv6 failing to reach the Checkly API when the round trip is above 250 ms.
+- API checks and URL monitors no longer count the TCP connect time twice, so response times are lower.
+- Playwright Check Suites without a `screenshot` setting now take a screenshot on failure.
+- Fixed TCP monitors without a port crashing the uptime process.
+- Security: runtimes 2023.09, 2024.02 and 2024.09 now reject the compromised eMudhra CAs in Browser checks and API check scripts.
+- Security: updated bundled runtime dependencies to fix vulnerabilities.
+</Update>
+
 <Update label="v8.15.0" tags={["November 2026"]}>
 - Traceroute monitors measure hop latency more accurately. In most cases each reply is now timed when it arrives instead of when the agent reads it. Readings on a busy agent can be lower than before, which can change when a monitor degrades or fails.
+- URL monitors with a `Host` header now verify the TLS certificate against that host and send it as SNI. Monitors can fail when the certificate covers only the URL host.
 - Uptime monitors that cannot run, for example because of a template syntax error such as an unclosed `{{variable`, now show the run in the check history. Before, the run was lost: no history, no alert, and test sessions did not complete.
 - Fixed a regression in runtime 2026-04 where functions you pass directly to Playwright, such as `page.on('request', ...)` listeners or `waitForResponse` predicates, received different objects than `page` methods return, so comparisons like `request.frame() === page.mainFrame()` were always false.
 - In runtime 2026-04, a failing call on an object that Playwright passes to such a function, for example `p.locator('#missing').click()` inside `page.on('load', (p) => ...)`, now fails the check when it is not awaited, as in runtime 2025-04. Checks that passed before can start to fail after the upgrade.
@@ -289,7 +299,7 @@ Updated packages:
 <Update label="v6.1.0" tags={["July 2025"]}>
   - Added runtime secret detection for Browser and Multistep checks (enabled for selected accounts)
 
-  - See the [product changelog](https://checklyhq.com/changelog/checkly-agent-610-playwright-check-suites-and-more) for details on changes from version 6.0.1 to 6.1.0
+  - See the [product changelog](https://www.checklyhq.com/changelog/checkly-agent-6-1-0/) for details on changes from version 6.0.1 to 6.1.0
 </Update>
 
 <Update label="v6.0.7" tags={["June 2025"]}>

@@ -29,16 +29,20 @@ The example above shows a webhook configured to create a Jira ticket on each eve
 In both cases we use the familiar Handlebars templating braces, i.e. `{{ }}` to insert the variable.
 
 <Note>
-  To avoid encoding, you can access your environment variables with triple brackets, i.e. `{{{USER_API_KEY}}}`. Double brackets HTML-escape the value everywhere you use them, including the URL, headers and query parameters: `&` arrives as `&amp;` and `=` as `&#x3D;`. Use triple brackets for a variable or secret that holds a whole URL, or any value that contains `&` or `=`.
+  In the URL, header values and query parameter values, `{{NAME}}` inserts the value of a variable or secret as stored, so a variable or secret can hold a whole URL with a query string. In the payload body, double brackets HTML-escape the value: `&` arrives as `&amp;` and `=` as `&#x3D;`. To insert the raw value in the body, use triple brackets, i.e. `{{{USER_API_KEY}}}`. Triple brackets work in the URL, headers and query parameters too.
 </Note>
 
 A JSON payload template stays valid JSON when an inserted value contains a double quote or a line break: the value is escaped in the body we send. With `{{CHECK_NAME}}` a double quote arrives as `&quot;`, with `{{{CHECK_NAME}}}` as `\"`; a line break arrives as `\n` in both cases.
 
 <AlertChannelSecrets />
 
-When you promote a value with the lock icon, the field gets a `{{NAME}}` reference. If you promoted a whole URL with a query string, change the reference to `{{{NAME}}}`, or the escaped `=` and `&` break the URL.
+When you promote a value with the lock icon, the field gets a `{{NAME}}` reference. This also works for a whole URL with a query string.
 
-You can use the following event-related variables in both URL and payload.
+You can use the following event-related variables in the payload, and in the URL, header values and query parameter values. Outside the payload, they are filled in only when the webhook has a payload template, and they are encoded so that they cannot change the request:
+
+- In the URL, the value is percent-encoded, e.g. a check named `a/b & c` arrives as `a%2Fb%20%26%20c`.
+- In header values, line breaks and other control characters become spaces, and non-ASCII characters are percent-encoded as UTF-8, e.g. `Café` arrives as `Caf%C3%A9`.
+- In query parameter values, the value is percent-encoded like any other query parameter value.
 
 | Variable                         | Description                                                                                                                                                                        |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -51,7 +55,7 @@ You can use the following event-related variables in both URL and payload.
 | `ALERT_TYPE`                     | Type of alert, e.g. "ALERT_FAILURE", "ALERT_RECOVERY", "ALERT_DEGRADED", "ALERT_DEGRADED_RECOVERY". See [failures, recoveries and reminders](#failures-recoveries-and-reminders) for which state change sends which type. |
 | `API_CHECK_RESPONSE_STATUS_CODE` | The response status code, e.g. 200. Populated for API checks and URL monitors.                                                                                                     |
 | `API_CHECK_RESPONSE_STATUS_TEXT` | The response status text, e.g. "OK". Populated for API checks and URL monitors.                                                                                                    |
-| `CHECK_ERROR_MESSAGE`            | The check error message, HTML-escaped. See [which variables are filled per check type](#which-variables-are-filled-per-check-type) for when it's empty.                           |
+| `CHECK_ERROR_MESSAGE`            | The check error message. In the payload it is always HTML-escaped, with double and triple brackets. In the URL, header values and query parameter values it is not. See [which variables are filled per check type](#which-variables-are-filled-per-check-type) for when it's empty.                           |
 | `CHECK_ID`                       | The UUID of the check                                                                                                                                                              |
 | `CHECK_DESCRIPTION`              | The description of the check, if set                                                                                                                                               |
 | `CHECK_NAME`                     | Full name of the check                                                                                                                                                             |
@@ -496,11 +500,22 @@ Compared to the Checkly Slack app:
 
 ### Trello
 
-You can create a [Trello](https://trello.com) card using just the URL and no payload:
+You can create a [Trello](https://trello.com) card with a `POST` to this URL:
 
 ```
-https://api.trello.com/1/cards?idList=5b28c04aed47522097be8bc4&key={{TRELLO_KEY}}&token={{TRELLO_TOKEN}}&name={{CHECK_NAME}}
+https://api.trello.com/1/cards?idList=5b28c04aed47522097be8bc4&key={{TRELLO_KEY}}&token={{TRELLO_TOKEN}}
 ```
+
+and this payload:
+
+```json
+{
+  "name": "{{{ALERT_TITLE}}}",
+  "desc": "{{{RESULT_LINK}}}"
+}
+```
+
+Event variables such as `ALERT_TITLE` are filled in only when the webhook has a payload template, so put them in the payload, not in the URL alone.
 
 ### SSL alert
 

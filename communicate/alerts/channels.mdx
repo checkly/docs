@@ -62,6 +62,31 @@ Verify the channel works correctly with test notifications
 </Steps>
 
 
+## Subscribing checks and groups
+
+A check alerts through a channel when it's subscribed to it. You can subscribe many checks and groups at once from the channel:
+
+1. Open the channel from **Alert channels**.
+2. In the **Subscriptions** section, click **Add subscribers**.
+3. Search by name, or filter by **Type**. Select checks and groups one by one, or select the header checkbox to select all of them.
+4. Click the button that adds them, for example **Add 3 subscribers**. Then save the channel.
+
+**Remove all** unsubscribes every check and group that matches the list's search and type filter, or all of them when nothing is filtered. It takes effect when you save. A new channel starts with every check and group in that list subscribed.
+
+To also subscribe checks you create later in the web app, select **Automatically subscribe newly created checks to this alert channel**.
+
+### Groups
+
+The list shows a group only when **Group override for alert settings** is on in the group's alert settings. Its checks then aren't listed, because the group's channels replace theirs. A group without the override isn't listed, and its checks are listed one by one. See [how group alert settings apply to checks](/communicate/alerts/configuration#configuration-inheritance).
+
+<Warning>
+If you turn off a group's override, the group's subscriptions are removed. Its checks don't take them over: each check alerts only through the channels it's subscribed to itself. Review the channel's list and subscribe the checks that should alert through it.
+</Warning>
+
+### Checks managed as code
+
+If you manage checks with the [CLI](/cli/overview) or [Terraform](/integrations/iac/terraform/overview), subscribe them in code. To subscribe a [check group](/constructs/check-group-v2), set `alertChannels` together with an [`alertEscalationPolicy`](/constructs/check-group-v2#param-alert-escalation-policy). Without the policy, the group's channels don't apply to its checks, and the channel page doesn't list the group.
+
 ## Using variables and secrets in channel configs
 
 Any literal-secret field in an alert-channel configuration — webhook URL, API key, bearer token, PagerDuty service key, and so on — accepts a reference to an account [environment variable](/platform/variables) or [secret](/platform/secrets) using `{{NAME}}` syntax. The channel UI also lets you promote an inline value to a secret without leaving the page.

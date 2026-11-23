@@ -11,10 +11,10 @@ The Checkly MCP Server uses bearer-token authentication and Checkly account auth
 
 The MCP Server accepts two types of bearer tokens for `https://api.checklyhq.com/mcp`:
 
-- OAuth bearer tokens from Checkly-approved MCP clients.
+- OAuth bearer tokens from registered MCP clients, including dynamically registered CIMD clients.
 - Checkly user API keys starting with `cu_...`, and service API keys starting with `sv_...`, sent as `Authorization: Bearer <checkly-api-key>`.
 
-OAuth is recommended for interactive clients. The public MCP Server only supports Checkly-approved OAuth clients. Checkly rejects clients that attempt to use [Dynamic Client Registration (DCR)](https://datatracker.ietf.org/doc/html/rfc7591). See [supported OAuth clients](/ai/mcp-server/setup#supported-oauth-clients) or [set up an API key](/ai/mcp-server/setup#set-up-with-an-api-key).
+OAuth is recommended for interactive clients. Custom clients can [register automatically with CIMD](/ai/mcp-server/setup#connect-your-own-client-with-cimd), without prior Checkly approval. Users must still sign in and approve access. Automatic registration does not mean Checkly has reviewed the client. Checkly rejects clients that attempt to use [Dynamic Client Registration (DCR)](https://datatracker.ietf.org/doc/html/rfc7591). See [supported OAuth clients](/ai/mcp-server/setup#supported-oauth-clients) or [set up an API key](/ai/mcp-server/setup#set-up-with-an-api-key).
 
 Checkly maps OAuth tokens and user API keys to a Checkly user, then loads that user's account memberships and account context for tool calls. Service API keys map to the key's configured account and role.
 

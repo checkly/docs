@@ -33,6 +33,7 @@ Checkly keeps each error for 30 days. After that, its stack trace, breadcrumbs a
 | Limit | Value |
 |---|---|
 | Errors per DSN | About 500 per second, and about 8 MiB per second |
+| Errors per project | No fixed limit, but see [spike protection](#spike-protection) |
 | Request body | 16 MiB, compressed and uncompressed |
 | JSON in one request | 2 MiB |
 | Items per envelope | 100 |
@@ -41,6 +42,12 @@ Checkly keeps each error for 30 days. After that, its stack trace, breadcrumbs a
 | `release` | 200 characters. Longer values are cut. |
 | Tag value | 200 characters. Longer values are cut. |
 | Error timestamp | Up to 30 days in the past and 5 minutes in the future; otherwise Checkly uses the time it received the error |
+
+## Spike protection
+
+When a project suddenly sends far more errors in an hour than it normally does, Checkly refuses the rest of that hour's errors for the project, for every DSN of the project. The limit follows the project's own normal volume, so a project that always sends many errors is not refused for that. You cannot change it.
+
+Refused requests get `429` with `X-Sentry-Rate-Limits: <seconds>::project:spike_protection`, and show as [dropped data](#see-dropped-data) with the reason **Spike protection**. Checkly re-reads the counts about once a minute, so a project can send about one more minute of errors before the refusals start.
 
 ## Ingest responses
 
@@ -54,12 +61,12 @@ The Sentry SDKs handle these responses for you. They help when you send errors y
 | `403` | `{"error":"origin not allowed"}` | The request came from a website that is not in the project's [allowed websites](/detect/errors/send-errors#allow-only-your-websites). |
 | `413` | `{"error":"payload too large"}` or `{"error":"too many envelope items"}` | The request is over a limit. |
 | `415` | `{"error":"unsupported content encoding, use gzip or br"}` | Use `gzip` or `br`. |
-| `429` | `{"error":"rate limited"}` | Over the limit for this DSN, or Checkly is busy. Retry after the `Retry-After` seconds. |
+| `429` | `{"error":"rate limited"}` | Over the limit for this DSN, over the project's [spike protection](#spike-protection), or Checkly is busy. Retry after the `Retry-After` seconds. |
 
-Every `429` response carries a `Retry-After` header; over the limit for a DSN, it also carries `X-Sentry-Rate-Limits`. Errors refused with `429` are not stored. They show as [dropped data](#see-dropped-data).
+Every `429` response carries a `Retry-After` header; over the limit for a DSN or the project, it also carries `X-Sentry-Rate-Limits`. Errors refused with `429` are not stored. They show as [dropped data](#see-dropped-data).
 
 ## See dropped data
 
 When Checkly refuses a request or does not store an error, a project's **Errors** tab shows **Data dropped in the last 24 hours**, with the count and the main reason.
 
-For every project, open [**Account settings** > **Errors**](https://app.checklyhq.com/settings/account/errors), select **Usage** on the **Errors** page, or use the link on the notice. The **Dropped** column of the **Usage** table shows the errors Checkly did not store and the requests it refused, and the reasons, such as **DSN rate limit**, **Too large** or **Revoked DSN key**. A request refused before Checkly read it counts as a refused request, because Checkly cannot count the errors in it. A request your SDK sends again counts again.
+For every project, open [**Account settings** > **Errors**](https://app.checklyhq.com/settings/account/errors), select **Usage** on the **Errors** page, or use the link on the notice. The **Dropped** column of the **Usage** table shows the errors Checkly did not store and the requests it refused, and the reasons, such as **DSN rate limit**, **Spike protection**, **Too large** or **Revoked DSN key**. A request refused before Checkly read it counts as a refused request, because Checkly cannot count the errors in it. A request your SDK sends again counts again.

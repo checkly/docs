@@ -1,0 +1,83 @@
+---
+title: 'Get alerted about errors'
+sidebarTitle: 'Alerts'
+description: 'Send new, regressed and resolved error groups to your alert channels, choose which projects and environments notify, and know the hourly limits.'
+canonical: 'https://www.checklyhq.com/docs/detect/errors/alerts/'
+---
+
+Checkly notifies your [alert channels](/communicate/alerts/channels) when a project gets a new error group, when a resolved error group regresses, and when an error group is resolved. Errors uses the same alert channels as your checks.
+
+## Notify a channel
+
+Pick the channels a project notifies in one of these places:
+
+- When you create a project, tick the channels under **Alert channels** in the **New project** dialog. Channels with auto-subscribe on are ticked for you.
+- On the project's **Errors** tab, tick the channels in the **Alert channels** card and select **Save**.
+- On an alert channel, in **Subscriptions** > **Errors**, select **Add error projects**, pick the projects and save the channel.
+
+A project with no alert channel sends nothing. Auto-subscribe only applies to projects you create in the web app. The Checkly CLI cannot set Errors alerts yet, so set them in the web app.
+
+Email, Slack, webhooks, PagerDuty and Opsgenie channels work for Errors, and so do the integrations built on webhooks, such as Microsoft Teams, Discord, Telegram and incident.io. SMS and phone call channels do not send Errors notifications.
+
+To check a channel, select **Test alert channel** > **Send a test Errors notification** on the alert channel.
+
+## What notifies
+
+| Notification | When |
+|---|---|
+| **New error group** | The first error of an error group Checkly has not seen before. |
+| **Regression** | A resolved error group receives errors again. |
+| **Resolved** | An error group is resolved, ignored or merged into another one. |
+| **Hourly summary** | A project or the account reached its [hourly limit](#hourly-limits). |
+
+Each alert channel chooses which of these it gets, in its **Notification events** section: **a new error group appears**, **an error group regresses**, and **an error group is resolved, ignored or merged**. PagerDuty, Opsgenie and a webhook whose Errors body uses `{{ALERT_STATUS}}` are paging channels: they get "resolved" by default, so their open incidents close, and they get no hourly summary.
+
+Checkly waits up to 5 minutes before it notifies a new error group, so the notification shows the error group's title and culprit as your [uploaded source maps](/detect/errors/source-maps) resolve them.
+
+## Choose what a project notifies
+
+Set the defaults for every project in [**Account settings** > **Global settings**](https://app.checklyhq.com/settings/account/global-settings), in the **Errors** card. To give one project its own values, open its **Errors** tab and turn off **Use account settings** in the **Error notifications** card.
+
+| Setting | Default | What it does |
+|---|---|---|
+| **New error group** | On | Notifies new error groups. |
+| **Regression** | On | Notifies regressions. |
+| **Regression throttle** | 30 minutes | Notifies the same error group regressing at most once in this time: **Off**, 10, 30, 60 or 120 minutes, or 24 hours. |
+| **Environments** | **All environments** | Notifies a new error group the first time it appears in one of the listed environments. Regressions are sent whatever their environment. Error groups without an environment are not notified while environments are listed. |
+
+To stop a project's notifications for a while, turn on **Mute notifications**. Checkly still records its errors, and still sends "resolved" so open incidents close.
+
+## Hourly limits
+
+Checkly sends at most 10 notifications per project and 50 per account in each clock hour. The new and regressed error groups held back after that are counted in one summary at the end of the hour. Channels that get "resolved" still get every regression.
+
+## Webhook body
+
+A webhook channel sends Errors notifications as JSON. To send your own body, fill in the Errors body of the webhook channel. These variables are available:
+
+| Variable | Value |
+|---|---|
+| `ALERT_TYPE` | `ERROR_GROUP_CREATED`, `ERROR_GROUP_NEW_IN_ENVIRONMENT`, `ERROR_GROUP_REGRESSED`, `ERROR_GROUP_RESOLVED` or `ERROR_GROUP_SUMMARY` |
+| `ALERT_STATUS` | `firing` or `resolved` |
+| `ALERT_TITLE` | The title of the notification |
+| `ERROR_GROUP_ID`, `ERROR_GROUP_TITLE`, `ERROR_GROUP_CULPRIT`, `ERROR_GROUP_LINK` | The error group |
+| `PROJECT_ID`, `PROJECT_NAME` | The project |
+| `ENVIRONMENT`, `RELEASE` | The environment and release of the error |
+| `ERROR_EVENT_COUNT`, `USER_COUNT`, `HANDLED` | Counts and whether the error was handled, as JSON values, `null` when unknown |
+| `FIRST_SEEN`, `LAST_SEEN` | When the error group was first and last seen |
+
+In the hourly summary, `ERROR_GROUP_ID`, `ERROR_GROUP_TITLE` and `ERROR_GROUP_CULPRIT` are empty, `ERROR_GROUP_LINK` opens the **Errors** page, `ERROR_EVENT_COUNT` holds the number of error groups, and `FIRST_SEEN` and `LAST_SEEN` are the start and end of the hour. A webhook with a custom body for checks and no Errors body gets no Errors notifications.
+
+## See what was sent
+
+The project's **Errors** tab lists the last 50 notifications in **Recent notifications**, with what happened to each, for example **Sent to 1 channel**. For every project, open the [notification log](/communicate/alerts/notification-log) and set **Source** to **Errors**.
+
+## Permissions
+
+| Action | Permission |
+|---|---|
+| View the notification settings and what was sent | `error-groups:read` |
+| Change the notification settings and mute a project | `error-groups:update` |
+| Choose the alert channels of a project | `alert-channels:update` |
+
+See [Permissions](/admin/team-management/permissions).

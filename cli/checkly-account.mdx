@@ -1,13 +1,13 @@
 ---
 title: checkly account
-description: 'View your Checkly account plan, entitlements, feature limits, and available locations.'
+description: 'View your Checkly account plan, entitlements, feature limits, available locations, and overage spending cap.'
 sidebarTitle: 'checkly account'
 canonical: 'https://www.checklyhq.com/docs/cli/checkly-account/'
 ---
 
 <Note>Available since CLI v7.7.0.</Note>
 
-The `checkly account` command lets you view account-level information directly from the terminal. Use it to check which features are available on your plan, inspect metered limits, and discover available check locations.
+The `checkly account` command lets you view account-level information directly from the terminal. Use it to check which features are available on your plan, inspect metered limits, discover available check locations, and manage your overage spending cap.
 
 <Accordion title="Prerequisites">
 Before using `checkly account`, ensure you have:
@@ -34,6 +34,9 @@ npx checkly account <subcommand> [arguments] [options]
 | `usage terms` | List organization usage terms, optionally overlapping a UTC date range. |
 | `usage term` | Show one usage term with pricing rules and covered accounts. |
 | `usage projections` | Project credit consumption for one usage term through a completed UTC day. |
+| `spending-cap` | Show the overage spending cap, the overage so far, and whether checks are stopped. |
+| `spending-cap set` | Set or change the overage spending cap. |
+| `spending-cap remove` | Remove the overage spending cap. |
 
 Run `npx checkly account usage <subcommand> --help` for the options of each `usage` subcommand.
 
@@ -194,6 +197,108 @@ Key fields:
 
 - **`locations.all`** — filter to entries where `available` is `true` to get valid locations for your checks. Respect `maxPerCheck` as the upper bound per check.
 - **`entitlements`** — metered entitlements include a `quantity` limit. Disabled entitlements include `requiredPlan` and `upgradeUrl`.
+
+## `checkly account spending-cap`
+
+<Note>Available since CLI v10.3.0.</Note>
+
+Show the overage spending cap: the most your account may spend on check runs beyond what your plan includes. When the overage reaches the cap, checks stop running.
+
+**Usage:**
+
+```bash Terminal
+npx checkly account spending-cap [options]
+npx checkly account spending-cap set <dollars> [options]
+npx checkly account spending-cap remove [options]
+```
+
+The spending cap is available on plans with self-serve billing. Plans that can't have a cap, for example prepaid or contract plans, return an error. The commands need a [user or service API key](/admin/creating-api-key); legacy account API keys are not accepted. Showing the cap needs the `billing:read` [permission](/admin/team-management/permissions), and changing it needs `billing:update`.
+
+**Options:**
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `--output, -o` | - | Output format: `detail`, `json`, or `md`. Default: `detail`. |
+
+The default view shows:
+
+- **Spending cap**: the cap in US dollars, `$0.00 (no overage allowed)` for a cap of `0`, or `No cap`.
+- **Overage so far**: the overage measured so far. It shows `Not measured` when the runs are not measured yet or the plan has no overage. This does not mean $0.00 of overage.
+- **Status**: `Under the cap`, `Close to the cap (from $X)`, or `Cap reached`. It is only shown when a cap is set.
+- **Checks stopped**: `No`, or `Yes, the spending cap is reached`.
+- **Measured at**: when the overage was measured.
+
+```text Terminal
+Spending cap
+
+Spending cap:    $30.00
+Overage so far:  $18.06
+Status:          Under the cap
+Checks stopped:  No
+Measured at:     2026-11-15 00:00:00 UTC
+```
+
+### `checkly account spending-cap set`
+
+Set or change the spending cap, in US dollars.
+
+**Arguments:**
+
+| Argument | Description |
+|----------|-------------|
+| `dollars` | The cap in US dollars, from `0` to `10000`, with at most 2 decimals, for example `50` or `12.50`. `0` allows no overage, so checks stop running as soon as the included check runs are used up. |
+
+**Options:**
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `--force, -f` | - | Skip the confirmation prompt. |
+| `--dry-run` | - | Preview the change without applying it. |
+| `--output, -o` | - | Output format: `detail`, `json`, or `md`. Default: `detail`. |
+
+If the overage so far is already at or above the new cap, the preview warns you: checks stop running as soon as the cap is set. An invalid amount exits with code 2.
+
+### `checkly account spending-cap remove`
+
+Remove the spending cap, so overage is no longer capped. It takes the same `--force`, `--dry-run`, and `--output` options as `set`.
+
+### Confirming changes
+
+`set` and `remove` show a preview of the change before applying it:
+
+- In an interactive terminal, they ask you to confirm.
+- In agent or CI environments, they print the preview as a JSON envelope with `"status": "confirmation_required"` and exit with code 3. Rerun the command with `--force` to apply it.
+- With `--dry-run`, they print the preview with `"status": "dry_run"` and exit with code 0, without changing anything.
+
+```json
+{
+  "status": "dry_run",
+  "command": "account spending-cap set",
+  "description": "Set the spending cap",
+  "classification": { "readOnly": false, "destructive": false, "idempotent": true },
+  "changes": ["Set the spending cap to $20.00"],
+  "confirmCommand": "npx checkly account spending-cap set 20 --force"
+}
+```
+
+### Spending Cap Examples
+
+```bash Terminal
+# Show the spending cap and the overage so far
+npx checkly account spending-cap
+
+# Get the raw response as JSON (amounts in US cents)
+npx checkly account spending-cap --output=json
+
+# Preview setting the cap to $50
+npx checkly account spending-cap set 50 --dry-run
+
+# Set the cap to $12.50 without a confirmation prompt
+npx checkly account spending-cap set 12.50 --force
+
+# Remove the cap
+npx checkly account spending-cap remove
+```
 
 ## Related Commands
 

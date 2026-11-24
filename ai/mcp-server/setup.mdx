@@ -87,7 +87,7 @@ Replace the example URLs with your own. The `client_id` must exactly match the d
 
 For a desktop or CLI client, set `application_type` to `native`. Native clients can use loopback callback URLs, such as `http://127.0.0.1:8090/callback`; the metadata document itself must still be hosted at a public HTTPS URL.
 
-Confidential clients use `private_key_jwt` and a public `jwks_uri` on the same origin as the metadata document. Publish public keys only. Shared client secrets are not supported for CIMD clients. See [Auth0's CIMD requirements](https://auth0.com/docs/get-started/auth0-overview/create-applications/register-applications-with-cimd) for details.
+Confidential clients use `private_key_jwt` and a public `jwks_uri` on the same origin as the metadata document. Inline `jwks` is not supported. Publish public keys only. Shared client secrets are not supported for CIMD clients. See [Auth0's CIMD requirements](https://auth0.com/docs/get-started/auth0-overview/create-applications/register-applications-with-cimd) for details.
 
 <Warning>
 Automatic registration is not a Checkly security review of your application. Users must trust the client before approving access. Keep your metadata domain and OAuth credentials secure, and request only the permissions you need.

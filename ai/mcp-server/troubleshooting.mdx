@@ -20,7 +20,7 @@ Before troubleshooting, confirm:
 
 If your client reports that authentication is required or the browser sign-in does not complete:
 
-1. Confirm the client is in the [supported OAuth clients list](/ai/mcp-server/setup#supported-oauth-clients).
+1. Use a [listed OAuth client](/ai/mcp-server/setup#supported-oauth-clients) or configure your [custom client with CIMD](/ai/mcp-server/setup#connect-your-own-client-with-cimd).
 2. Confirm the endpoint is exactly `https://api.checklyhq.com/mcp`.
 3. Re-run your client's MCP login or authentication flow.
 4. Remove stale Checkly MCP credentials from the client if it keeps reusing an old token.
@@ -30,9 +30,16 @@ If the browser login page shows a "Something went wrong" error, contact [Checkly
 
 ### OAuth client registration fails
 
-The Checkly MCP Server only supports Checkly-approved OAuth clients. Checkly does not support Dynamic Client Registration (DCR).
+Checkly supports client registration through CIMD, but not Dynamic Client Registration (DCR). If your client attempts DCR, configure it to use CIMD, or use one of the [listed OAuth clients](/ai/mcp-server/setup#supported-oauth-clients).
 
-If your client reports a dynamic registration error, a failed client registration, or never opens the expected OAuth flow, confirm that the client is in the [supported OAuth clients list](/ai/mcp-server/setup#supported-oauth-clients). A client can support remote MCP servers and still be incompatible with the Checkly OAuth flow.
+For a custom CIMD client, check:
+
+- The metadata URL returns JSON over public HTTPS, without authentication or HTTP redirects.
+- The document's `client_id` exactly matches its hosted URL, and your client uses that URL as its OAuth client ID.
+- The requested redirect URI is listed in `redirect_uris`. Use `application_type: "native"` for a desktop or CLI loopback callback.
+- The client uses PKCE and a supported token endpoint authentication method: `none` or `private_key_jwt`.
+
+See [Connect your own client with CIMD](/ai/mcp-server/setup#connect-your-own-client-with-cimd).
 
 If your client can send custom headers, use [API-key authentication](/ai/mcp-server/setup#set-up-with-an-api-key) as a fallback.
 
@@ -144,6 +151,6 @@ Before approving write tool calls, check:
 
 Some browser-based clients require CORS support and may handle OAuth differently from command-line clients. If a browser-based client cannot connect:
 
-1. If you use OAuth, confirm the client is in the [supported OAuth clients list](/ai/mcp-server/setup#supported-oauth-clients).
+1. If you use OAuth, use a listed OAuth client or a [custom CIMD client](/ai/mcp-server/setup#connect-your-own-client-with-cimd).
 2. If you use an API key, confirm the client sends custom headers with remote MCP requests.
 3. Try another supported client, such as Claude Code.

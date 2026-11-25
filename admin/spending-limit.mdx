@@ -61,9 +61,9 @@ Each type stops only when it has used its own included check runs. For example, 
 While checks are stopped:
 
 - Scheduled runs don't start, so the stopped checks can't detect failures or send alerts.
-- You can't run the stopped check types from the web app, and CLI test sessions such as `npx checkly test` and `npx checkly trigger` are rejected with the message `Account has reached its spending cap. Raise or remove the cap to run more checks.`
-- Uptime monitors and heartbeat monitors keep running and alerting.
-- Members who can see the limit get a banner in the web app that says which checks are paused.
+- You can't run the stopped check types from the web app. A CLI test session, such as `npx checkly test` or `npx checkly trigger`, that includes a stopped check type is rejected as a whole, with the message `Account has reached its spending cap. Raise or remove the cap to run more checks.`
+- Uptime monitors, heartbeat monitors and Agentic checks keep running and alerting.
+- Members who can see the limit get a banner in the web app that says which checks are paused. Members who can change billing also get an **Increase limit** link. Others are asked to contact a member with the billing permission.
 
 <Frame>
   <img className="block dark:hidden" src="/images/billing/spending-limit-paused-banner.png" alt="A red banner at the top of the web app says: Browser Checks and Playwright Check Suites are paused because your account reached its $50 overage spending limit. They cannot detect failures or send alerts until Dec 01 2026. It ends with an Increase limit link." />

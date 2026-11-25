@@ -17,6 +17,14 @@ Learn more about:
 
 ## Full release history
 
+<Update label="v8.16.2" tags={["November 2026"]}>
+- Fixed agents growing in memory with every Playwright Check Suite run until a restart. Memory now stays flat.
+- Fixed memory protection switching off while another check was still running on the same agent. A check that uses too much memory now fails with "out of memory" and the agent container is no longer killed.
+- Playwright Check Suites: background programs that a test starts and does not stop (for example a proxy or a mock server) are now stopped when the check ends. Before, they stayed running and used memory on the agent.
+- Playwright Check Suites: `bun install` in a bun workspace no longer fails with "no node_modules" when the install succeeded.
+- Security: API checks and URL monitors now mask a username or password in the check URL (`https://user:pass@host`) in results, alerts and webhook payloads. The request still sends the credentials.
+</Update>
+
 <Update label="v8.16.0" tags={["November 2026"]}>
 - Fixed agents on networks without IPv6 failing to reach the Checkly API when the round trip is above 250 ms.
 - API checks and URL monitors no longer count the TCP connect time twice, so response times are lower.

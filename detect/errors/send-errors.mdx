@@ -29,6 +29,8 @@ A DSN has the form `https://<key>@rum.checklyhq.com/<number>`. It can only write
 
 ## Configure the SDK
 
+Until a project receives its first error, its **Errors** tab shows the setup in the **Waiting for the first error** card. To let your coding agent do it, select **Copy prompt** under **Set up with an agent** and give the prompt to the agent. It adds the Sentry SDK with the project's DSN and sends one test error. Open **Set up manually** and choose a platform to see its code. The steps below do the same by hand.
+
 <CodeGroup dropdown={true}>
 
 ```bash Browser
@@ -275,7 +277,7 @@ sentry_capture_event(event);
 
 The Go SDK reports only what you capture: call `sentry.CaptureException`, use `defer sentry.Recover()` for panics, or use the integration for your web framework.
 
-The error appears on the **Errors** page within about two minutes. The iOS and macOS SDK sends a crash the next time the app starts. In a command-line tool, call `SentrySDK.flush(timeout: 5)` after the capture, or the program exits before the error is sent. To read stack traces of release builds, [upload source maps or debug files](/detect/errors/source-maps).
+The error appears on the **Errors** page within about two minutes. On the project's **Errors** tab, the **Waiting for the first error** card closes by itself within seconds of the first error. The **Errors** page does not refresh while you look at it, so reload it if it is already open. The iOS and macOS SDK sends a crash the next time the app starts. In a command-line tool, call `SentrySDK.flush(timeout: 5)` after the capture, or the program exits before the error is sent. To read stack traces of release builds, [upload source maps or debug files](/detect/errors/source-maps).
 
 ### If no error arrives
 
@@ -343,4 +345,4 @@ A project can list up to 50 websites of up to 300 characters each. A project wit
 
 ## Rotate or revoke a DSN
 
-To rotate a key, ship the new DSN first. In the **Ingest keys (DSN)** card, wait until the old key's **Last used** time stops changing, then select **Revoke**. Checkly refuses errors sent with a revoked key within about a minute, including from bundles still in a CDN cache.
+To rotate a key, ship the new DSN first and check that its errors arrive. When nothing you ship uses the old key any more, select **Revoke** on it in the **Ingest keys (DSN)** card. Checkly refuses errors sent with a revoked key within about a minute, including from bundles still in a CDN cache.

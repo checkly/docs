@@ -53,6 +53,8 @@ You can use the following event-related variables in the payload, and in the URL
 | `AI_ANALYSIS_USER_IMPACT`        | Description of the user impact. Available when Rocky AI automation is enabled.                                                                                                           |
 | `ALERT_TITLE`                    | Human readable title, e.g. 'Check "My API check" has failed'                                                                                                                       |
 | `ALERT_TYPE`                     | Type of alert, e.g. "ALERT_FAILURE", "ALERT_RECOVERY", "ALERT_DEGRADED", "ALERT_DEGRADED_RECOVERY". See [failures, recoveries and reminders](#failures-recoveries-and-reminders) for which state change sends which type. |
+| `API_CHECK_REQUEST_METHOD`       | The HTTP method of the request, e.g. "GET". After a redirect, the method of the last request. Populated for API checks and URL monitors. See [which variables are filled per check type](#which-variables-are-filled-per-check-type) for what it holds when the request fails and when it's empty. |
+| `API_CHECK_REQUEST_URL`          | The URL of the request, e.g. `https://api.example.com/users?page=2`. After a redirect, the URL of the last request. Populated for API checks and URL monitors. See [which variables are filled per check type](#which-variables-are-filled-per-check-type) for what it holds when the request fails, when it's empty and how it's escaped. |
 | `API_CHECK_RESPONSE_STATUS_CODE` | The response status code, e.g. 200. Populated for API checks and URL monitors.                                                                                                     |
 | `API_CHECK_RESPONSE_STATUS_TEXT` | The response status text, e.g. "OK". Populated for API checks and URL monitors.                                                                                                    |
 | `CHECK_ERROR_MESSAGE`            | The check error message. In the payload it is always HTML-escaped, with double and triple brackets. In the URL, header values and query parameter values it is not. See [which variables are filled per check type](#which-variables-are-filled-per-check-type) for when it's empty.                           |
@@ -83,6 +85,7 @@ Not every variable has a value for every check type. An empty variable renders a
 | Variable | When it has a value |
 | --- | --- |
 | `CHECK_ERROR_MESSAGE` | API checks and URL monitors: when the request fails. Browser checks: the first error of the run. Empty for TCP, DNS and heartbeat monitors. See below for details. |
+| `API_CHECK_REQUEST_URL`, `API_CHECK_REQUEST_METHOD` | API checks and URL monitors. Not set for other check types, so your own variable with the same name is used there. See below for details. |
 | `API_CHECK_RESPONSE_STATUS_CODE`, `API_CHECK_RESPONSE_STATUS_TEXT` | API checks and URL monitors: the response status. TCP monitors: `200` / `SUCCESS` or `500` / `ERROR`. Empty for DNS monitors, heartbeat monitors and Browser checks. |
 | `RESPONSE_TIME`, `RUN_LOCATION`, `REGION` | API checks, URL, TCP and DNS monitors, and Browser checks. Empty for heartbeat monitors. |
 | `GROUP_NAME` | The group's name, when the check belongs to a group. Always empty for heartbeat monitors, even when they belong to a group. |
@@ -91,6 +94,16 @@ Not every variable has a value for every check type. An empty variable renders a
 For API checks and URL monitors, `CHECK_ERROR_MESSAGE` is filled when the request itself fails, for example with a refused connection. For API checks, it's also filled when the run fails before the request, for example in a setup script. It stays empty when the request succeeds but an assertion fails, for example on an unexpected status code. Use `API_CHECK_RESPONSE_STATUS_CODE` for that case.
 
 For Browser checks, `CHECK_ERROR_MESSAGE` holds the first error of the run. It is cut to its first 300 characters, then its line breaks are removed, so the lines of the error run together.
+
+For `API_CHECK_REQUEST_URL` and `API_CHECK_REQUEST_METHOD`:
+
+- If the request fails without a complete response, for example after a refused connection, a timeout or a redirect that fails, they hold the check's method and its URL before variables other than `{{GROUP_BASE_URL}}` are filled in, without the query parameters you set in their own fields. If a setup script ran, they hold the method and URL as the script left them, without query parameters it sets in `request.queryParameters`.
+- In such a URL, a variable at the start or in the path can arrive percent-encoded, e.g. `%7B%7BBASE_URL%7D%7D/health`. The URL is empty when it can't be parsed, for example because of a variable in the host or before the port, e.g. `https://{{HOST}}/health` or `{{BASE_URL}}:8080/health`.
+- Both are empty when the run has no request data, for example when a setup script fails, and for `ALERT_SSL` alerts of API checks and URL monitors.
+- Values of [secrets](/platform/secrets) in the URL arrive as `*********`, with [a few exceptions](/platform/variables). Other values can arrive in clear text, for example variables that aren't saved as secrets, or tokens that a redirect or a setup script adds.
+- In the payload, double quotes, single quotes, backticks, backslashes and angle brackets in the URL are percent-encoded, so that the URL can't break a JSON payload. In a JSON or plain text payload, use triple brackets, i.e. `{{{API_CHECK_REQUEST_URL}}}`, to keep `=` and `&` as they are.
+
+Where they're empty or not set, you can add the URL and method to the check's description and use `CHECK_DESCRIPTION`. `CHECK_DESCRIPTION` is empty for `ALERT_SSL` alerts. Use `SSL_CHECK_DOMAIN` for those.
 
 When a heartbeat monitor misses a ping, `ALERT_TYPE` is `ALERT_FAILURE` and `STATE` is `FAILING`. For example, this template:
 
@@ -115,8 +128,6 @@ sends:
   "startedAt": "2026-11-09 00:30:21"
 }
 ```
-
-There are no variables for the request URL or the HTTP method of the check. To include them in an alert, add them to the check's description and use `CHECK_DESCRIPTION`.
 
 ### Body format
 

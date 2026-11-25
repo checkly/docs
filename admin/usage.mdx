@@ -80,12 +80,14 @@ If you upgrade during a billing period, the checkout includes the overage so far
 
 To pay less for the same check runs, add them to your plan in advance: an added check run costs less than overage. See [Adding capacity](/admin/billing#adding-capacity). To use fewer check runs, see [What counts as a check run](#what-counts-as-a-check-run).
 
-To stop checks once the overage reaches an amount you choose, set a spending cap with [`npx checkly account spending-cap set`](/cli/checkly-account#checkly-account-spending-cap).
+To stop checks once the overage reaches an amount you choose, set an [overage spending limit](/admin/spending-limit).
 
 The Hobby plan has no overage. When its included check runs are used up, checks stop running until the next period.
 
 ## Usage emails
 
-On Starter and Team plans, users who can manage billing (Owners and Admins by default) get an email when the account has used more than 90% of its included API or Browser check runs, and another one when it goes over and starts incurring overages. API and Browser check runs each get their own emails.
+On Starter and Team plans, members who can change billing (Owners and Admins by default) get an email when the account has used 50% and 80% of its included API or Browser check runs, and another one when it uses them all and starts incurring overage. API and Browser check runs each get their own emails, at most once per billing period.
+
+If the account has an [overage spending limit](/admin/spending-limit), these members also get an email when the overage reaches 80% of the limit and when checks stop at the limit. See [Emails](/admin/spending-limit#emails).
 
 On the Hobby plan, checks stop running when the included check runs are used up. All members get an email at 80% and at 100% of the included check runs.

@@ -235,6 +235,22 @@ Show open status page incidents and summarize their latest updates.
 Draft a major status page incident for the API outage and wait for confirmation before notifying subscribers.
 ```
 
+## Billing tools
+
+| Tool | Type | Description |
+| --- | --- | --- |
+| `get-spending-cap` | Read | Return the [overage spending limit](/admin/spending-limit) of a Starter or Team account in US dollars: the limit and its state, the overage so far in this billing period, what remains, which checks the limit stopped, and when the period ends. Requires [`billing:read`](/admin/team-management/permissions#billing) and [`usage:read`](/admin/team-management/permissions#usage). |
+| `set-spending-cap` | Write | Set the overage spending limit in US dollars, from 0 to 10000 with at most 2 decimals. A limit of 0 allows no overage, so checks stop as soon as the included check runs are used up. Requires [`billing:update`](/admin/team-management/permissions#billing) and asks you to confirm. Idempotent. |
+| `remove-spending-cap` | Write | Remove the overage spending limit, so checks never stop for overage and all overage is billed. Requires [`billing:update`](/admin/team-management/permissions#billing) and asks you to confirm. Idempotent. |
+
+Only Starter and Team accounts can hold a limit. Setting the limit the account already has, or removing a limit that isn't set, changes nothing and asks nothing. Right after a billing period starts, the overage can be `null`: it isn't measured yet, which doesn't mean $0. Without `usage:read`, the write tools answer without the overage.
+
+Example prompt:
+
+```text title="Prompt" wrap
+How much overage has my Checkly account used this billing period, and how close is it to the spending limit?
+```
+
 ## Usage tools
 
 | Tool | Type | Description |

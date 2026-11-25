@@ -25,6 +25,10 @@ Learn more about:
 - Security: API checks and URL monitors now mask a username or password in the check URL (`https://user:pass@host`) in results, alerts and webhook payloads. The request still sends the credentials.
 </Update>
 
+<Update label="v8.16.1" tags={["November 2026"]}>
+- API checks and URL monitors that fail while reading the response body now report the time until the failure as the response time. Before, they reported only the time to the first byte, so a request that hung until the timeout could show a few milliseconds. These runs can now exceed the max response time. Pass and fail results do not change.
+</Update>
+
 <Update label="v8.16.0" tags={["November 2026"]}>
 - Fixed agents on networks without IPv6 failing to reach the Checkly API when the round trip is above 250 ms.
 - API checks and URL monitors no longer count the TCP connect time twice, so response times are lower.

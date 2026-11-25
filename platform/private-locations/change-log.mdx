@@ -21,12 +21,12 @@ Learn more about:
 - Fixed agents growing in memory with every Playwright Check Suite run until a restart. Memory now stays flat.
 - Fixed memory protection switching off while another check was still running on the same agent. A check that uses too much memory now fails with "out of memory" and the agent container is no longer killed.
 - Playwright Check Suites: background programs that a test starts and does not stop (for example a proxy or a mock server) are now stopped when the check ends. Before, they stayed running and used memory on the agent.
-- Playwright Check Suites: `bun install` in a bun workspace no longer fails with "no node_modules" when the install succeeded.
+- Playwright Check Suites: `bun install` in a bun workspace no longer fails with "The node_modules directory is empty" when the install succeeded.
 - Security: API checks and URL monitors now mask a username or password in the check URL (`https://user:pass@host`) in results, alerts and webhook payloads. The request still sends the credentials.
 </Update>
 
 <Update label="v8.16.1" tags={["November 2026"]}>
-- API checks and URL monitors that fail while reading the response body now report the time until the failure as the response time. Before, they reported only the time to the first byte, so a request that hung until the timeout could show a few milliseconds. These runs can now exceed the max response time. Pass and fail results do not change.
+- API checks and URL monitors that fail while reading the response body now report the time until the failure as the response time. Before, they reported only the time to the first byte, so a request that hung until the timeout could show a few milliseconds. These runs already fail with a request error, so their result doesn't change, but their response time can now exceed the max response time.
 </Update>
 
 <Update label="v8.16.0" tags={["November 2026"]}>

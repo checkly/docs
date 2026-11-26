@@ -1,0 +1,90 @@
+---
+title: checkly validate
+description: 'Validate your project without deploying it.'
+sidebarTitle: 'checkly validate'
+canonical: 'https://www.checklyhq.com/docs/cli/checkly-validate/'
+---
+
+import CliCommandPrerequisites from '/snippets/cli-command-prerequisites.mdx';
+
+The `checkly validate` command parses your project and checks its configuration and resources without running any checks or changing your Checkly account. It runs the same validation that [`checkly test`](/cli/checkly-test) and [`checkly deploy`](/cli/checkly-deploy) run before they start, so you can catch errors early, for example as a quick first step in CI. It reads your account's runtimes from Checkly, so it needs a login and network access.
+
+<CliCommandPrerequisites command="checkly validate" />
+
+## Usage
+
+```bash Terminal
+npx checkly validate [options]
+```
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `--config, -c` | - | The Checkly CLI configuration file. If not passed, uses the `checkly.config.ts\|js` file in the current directory. |
+| `--[no-]verify-runtime-dependencies` | - | Return an error if checks import dependencies that are not supported by the selected runtime. |
+
+## Command Options
+
+<ResponseField name="--config, -c" type="string">
+
+Specify a configuration file to use instead of the `checkly.config.ts` or `checkly.config.js` in the current directory.
+
+**Usage:**
+
+```bash Terminal
+npx checkly validate --config checkly.config.ts
+npx checkly validate -c="./checkly.staging.config.ts"
+```
+
+</ResponseField>
+
+<ResponseField name="--[no-]verify-runtime-dependencies" type="boolean" default="true">
+
+Return an error if checks import dependencies that are not supported by the selected runtime. Can also be set with the `CHECKLY_VERIFY_RUNTIME_DEPENDENCIES` environment variable.
+
+**Usage:**
+
+```bash Terminal
+npx checkly validate --no-verify-runtime-dependencies
+```
+
+If you're using private locations and want to provide your own dependencies, disable the built-in dependency validation.
+
+</ResponseField>
+
+## Output
+
+A valid project prints any warnings and exits with code 0:
+
+```bash Terminal
+npx checkly validate
+
+Parsing your project... ✅
+
+Validating project resources... ✅
+
+✔ Your project is valid.
+```
+
+When the project has errors, the command lists each one with the resource it belongs to and exits with code 1:
+
+```bash Terminal
+npx checkly validate
+
+Parsing your project... ✅
+
+Validating project resources... ❌
+✖ [ApiCheck:books-api] Invalid property value
+
+  The value provided for property "maxResponseTime" is not valid.
+
+  Reason: The value of "maxResponseTime" must be 30000 or lower.
+
+  The current value is 40000.
+
+✖ Your project is not valid.
+```
+
+## Related Commands
+
+- [`checkly test`](/cli/checkly-test) - Run your checks in the Checkly cloud before deploying
+- [`checkly deploy`](/cli/checkly-deploy) - Deploy your project to your Checkly account

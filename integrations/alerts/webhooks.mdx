@@ -103,7 +103,7 @@ For `API_CHECK_REQUEST_URL` and `API_CHECK_REQUEST_METHOD`:
 - Values of [secrets](/platform/secrets) in the URL arrive as `*********`, with [a few exceptions](/platform/variables#overview). Other values can arrive in clear text, for example variables that aren't saved as secrets, or tokens that a redirect or a setup script adds.
 - In the payload, double quotes, single quotes, backticks, backslashes and angle brackets in the URL are percent-encoded, so that the URL can't break a JSON payload. In a JSON or plain text payload, use triple brackets, i.e. `{{{API_CHECK_REQUEST_URL}}}`, to keep `=` and `&` as they are.
 
-Where they're empty or not set, you can add the URL and method to the check's description and use `CHECK_DESCRIPTION`. `CHECK_DESCRIPTION` is empty for `ALERT_SSL` alerts. Use `SSL_CHECK_DOMAIN` for those.
+Where they're empty or not set, put the URL and method in the check's description and use `CHECK_DESCRIPTION`. For `ALERT_SSL` alerts, `CHECK_DESCRIPTION` is empty too, so use `SSL_CHECK_DOMAIN`.
 
 A test message from the webhook editor uses an example API check, so it shows `GET` and `https://api.checklyhq.com/v1/runtimes`, not your check's method and URL.
 

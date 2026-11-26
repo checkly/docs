@@ -74,12 +74,14 @@ If you have a single CLI project, instead of using `fromId()`, we recommend defi
 `checkly validate`, `checkly test` and `checkly deploy` refuse an alert channel whose integration your plan doesn't include. This applies to new channels and to channels you deployed before:
 
 ```text
-[PagerdutyAlertChannel:pagerduty-1] Integration not included in your plan
-This feature uses PagerDuty, which your plan doesn't include.
+✖ [PagerdutyAlertChannel:pagerduty-1] Integration not included in your plan
 
-Hint: Upgrade your plan at https://app.checklyhq.com/accounts/<id>/billing, or stop using PagerDuty in your project.
+  This feature uses PagerDuty, which your plan doesn't include.
+
+  Hint: Upgrade your plan at https://app.checklyhq.com/accounts/<id>/billing,
+  or stop using PagerDuty in your project.
 ```
 
 To fix it, [upgrade your plan](https://www.checklyhq.com/pricing/) or remove the channel from your project.
 
-The CLI asks the Checkly API which integrations your account can use and checks every alert channel construct against that list, except `EmailAlertChannel` and a `WebhookAlertChannel` without a `webhookType`, which use no integration. Channels you reference with [`fromId()`](#using-fromid-to-reference-an-existing-channel) aren't checked.
+The CLI asks the Checkly API which integrations your account can use and checks each alert channel construct against that list. It doesn't check an `EmailAlertChannel`, or a `WebhookAlertChannel` without a `webhookType` or with one the CLI doesn't know. Channels you reference with [`fromId()`](#using-fromid-to-reference-an-existing-channel) aren't checked either.

@@ -64,6 +64,10 @@ const webhookChannel = new WebhookAlertChannel('webhook-channel-1', {
   If you need to reference existing alert channels that were created outside of your CLI project, use [`fromId()`](/constructs/alert-channel#using-fromid-to-reference-an-existing-channel).
 </Note>
 
+<Note>
+Since CLI v10.5.0, if this webhook is for a specific integration, such as FireHydrant, and your plan doesn't include that integration, `checkly validate`, `checkly test` and `checkly deploy` refuse this channel. A plain webhook isn't checked. See [Integrations not included in your plan](/constructs/alert-channel#integrations-not-included-in-your-plan).
+</Note>
+
 ## Configuration
 
 ### Webhook alert channel options

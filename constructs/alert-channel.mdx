@@ -66,3 +66,22 @@ If your `fromId()` references an invalid alert channel, the CLI will throw an er
 This is useful if you have multiple CLI projects, since you can reference the same alert channel in each project without needing to redefine it each time.
 
 If you have a single CLI project, instead of using `fromId()`, we recommend defining your alert channel within that CLI project and referencing its JS/TS object. This allows your alert channel to be managed as code alongside your other CLI resources, which makes it easier to manage and scale your alerting setup.
+
+## Integrations not included in your plan
+
+<Note>Enforced since CLI v10.5.0.</Note>
+
+`checkly validate`, `checkly test` and `checkly deploy` refuse an alert channel whose integration your plan doesn't include. This applies to new channels and to channels you deployed before:
+
+```text
+✖ [PagerdutyAlertChannel:pagerduty-1] Integration not included in your plan
+
+  This feature uses PagerDuty, which your plan doesn't include.
+
+  Hint: Upgrade your plan at https://app.checklyhq.com/accounts/<id>/billing,
+  or stop using PagerDuty in your project.
+```
+
+To fix it, [upgrade your plan](https://www.checklyhq.com/pricing/) or remove the channel from your project.
+
+The CLI asks the Checkly API which integrations your account can use and checks each alert channel construct against that list. It doesn't check an `EmailAlertChannel`, or a `WebhookAlertChannel` without a `webhookType` or with one the CLI doesn't know. Channels you reference with [`fromId()`](#using-fromid-to-reference-an-existing-channel) aren't checked either.

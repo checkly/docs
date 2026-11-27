@@ -1,11 +1,11 @@
 ---
 title: 'Error groups'
 sidebarTitle: 'Error groups'
-description: 'How Checkly groups errors into error groups, and how to resolve, ignore, assign, merge and split them.'
+description: 'How Checkly groups errors into error groups, and how to find, resolve, ignore, merge and split them.'
 canonical: 'https://www.checklyhq.com/docs/detect/errors/error-groups/'
 ---
 
-An error group collects every error with the same cause, so a bug that fails a thousand times is one entry to triage. You resolve, ignore, assign, merge and split error groups on the **Errors** page, through the [API](/detect/errors/api) or with an AI agent through the [MCP server](/detect/errors/api#mcp-tools).
+An error group collects every error with the same cause, so a bug that fails a thousand times is one entry to triage. You resolve, ignore, merge and split error groups on the **Errors** page, through the [API](/detect/errors/api) or with an AI agent through the [MCP server](/detect/errors/api#mcp-tools).
 
 ## How errors are grouped
 
@@ -40,7 +40,7 @@ Select several error groups on the **Errors** page to change their status at onc
 
 ## Assign an error group
 
-Assign an error group to a member of your account. Filter the list by **Assignee**: **Me** shows yours, **Not me** someone else's, and **Unassigned** nobody's.
+The Checkly web app does not show assignees. To assign an error group to a member of your account, or to find the error groups assigned to someone, use the [API](/detect/errors/api) or the [MCP server](/detect/errors/api#mcp-tools).
 
 ## Merge error groups
 
@@ -56,13 +56,21 @@ You cannot split out:
 - a key Checkly computed from the stack trace after applying your source maps or debug files, because that key is what the error group is;
 - the last key that was not computed that way.
 
+## Short IDs
+
+Each error group gets a short ID, such as `SHOP-1A`: the project's short ID prefix and a number. A new error group can briefly have none. Quote it in a chat message, a pull request or a commit. To open the error group, put the short ID after `/errors/` in the address of the **Errors** page. The API and the MCP server accept a short ID wherever they take an error group ID.
+
+You choose the prefix in the **New project** dialog. A project you create with the Checkly CLI, the API or the MCP server gets one from its name. Change it in the **Short IDs** card on the project's **Errors** tab until the project has its first error group. After that it cannot change, so existing short IDs keep working.
+
 ## Find error groups
 
-Filter the **Errors** page by project, **Environment**, **Status**, **Assignee** and **Unhandled**, or search by title. Sort by number of errors, last seen or age, over the last hour up to the last 30 days. The **Users** column counts affected users when your SDK [sends a user ID](/detect/errors/send-errors#count-affected-users).
+Filter the **Errors** page in the filter field by `title`, `project`, `environment`, `status` and `handling` (**Unhandled**). Text you type without a field searches the title. Every filter must match, each field can be used once, and there are no **or** filters or groups.
+
+Click a column header to sort: **Errors** or **Users** (highest first, in the selected time range and environments), **Last seen** (newest first, the default) or **Age** (oldest first). The time range goes from the last hour to the last 30 days. The **Users** column counts affected users when your SDK [sends a user ID](/detect/errors/send-errors#count-affected-users).
 
 ### Save a view
 
-After you change a filter or the search, **Create view** saves them as a view, shown as a tab above the list. A view does not save the sort. **Unhandled, unresolved**, **Assigned to me** and **Unassigned** are shared views every account starts with.
+After you change a filter, **Create view** saves the filters and the time range as a view, shown as a tab above the list. A view does not save the sort. Every account starts with the shared view **Unhandled, unresolved**.
 
 Views on the **Errors** page work like views elsewhere in Checkly. See [Views](/platform/views) for sharing, permissions and limits.
 

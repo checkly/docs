@@ -26,6 +26,8 @@ The `/v1/error-groups` endpoints in the API reference are about failed checks, n
 | `POST` | `/v2/error-groups/{errorGroupId}/unmerge` | Undo the merge of an error group that was merged away. |
 | `POST` | `/v2/error-groups/{errorGroupId}/split` | Move one grouping key into a new error group: `{"fingerprint": "<key>"}`, one of the `fingerprints` of the error group. |
 
+Wherever a path or body takes an error group ID, you can pass its ID or its [short ID](/detect/errors/error-groups#short-ids), such as `SHOP-1A`. Responses include `shortId`, which is `null` for an error group without one.
+
 The list takes these query parameters. Repeat a parameter to match any of its values, for example `status=unresolved&status=ignored`.
 
 | Parameter | Values |
@@ -52,6 +54,7 @@ curl "https://api.checklyhq.com/v2/error-groups?status=unresolved&search=route%2
 [
   {
     "id": "53feeb9c-2c04-49e2-bc02-49177e6aef72",
+    "shortId": "SHOP-1Q",
     "title": "RuntimeException: unhandled route exception in checkout",
     "culprit": "/checkout",
     "status": "unresolved",

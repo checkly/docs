@@ -67,6 +67,4 @@ Every `429` response carries a `Retry-After` header; over the limit for a DSN or
 
 ## See dropped data
 
-When Checkly refuses a request or does not store an error, a project's **Errors** tab shows **Data dropped in the last 24 hours**, with the count and the main reason.
-
-For every project, open [**Account settings** > **Errors**](https://app.checklyhq.com/settings/account/errors), select **Usage** on the **Errors** page, or use the link on the notice. The **Dropped** column of the **Usage** table shows the errors Checkly did not store and the requests it refused, and the reasons, such as **DSN rate limit**, **Spike protection**, **Too large** or **Revoked DSN key**. A request refused before Checkly read it counts as a refused request, because Checkly cannot count the errors in it. A request your SDK sends again counts again.
+When Checkly refuses a request or does not store an error, a project's **Errors** tab shows **Data dropped in the last 24 hours**. The notice counts the errors Checkly did not store and the requests it refused, and names the main reason, such as **DSN rate limit**, **Spike protection**, **Too large** or **Revoked DSN key**. Errors your SDK leaves out with `sampleRate` never reach Checkly, so the notice does not count them. A request refused before Checkly read it counts as a refused request, because Checkly cannot count the errors in it. A request your SDK sends again counts again.

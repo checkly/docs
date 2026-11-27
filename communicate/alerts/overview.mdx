@@ -93,7 +93,7 @@ as the history or "vector" of the state transition influences how we alert.
 ✅ --> ❌ | Failure  |x |`ALERT_FAILURE`|Send directly, if threshold is *"alert after 1 failure"*|
 ⚠️ --> ⚠️ | Degraded|x |`ALERT_DEGRADED_REMAIN` |i.e. when threshold is *"alert after 2 failures"* or *"after 5 minutes"*| 
 ⚠️ --> ✅ | Recovery |-|`ALERT_DEGRADED_RECOVERY`|Sent only if the check had a degraded or failure alert before, to channels with both *a check degrades* and *a check recovers* selected. If an alert went out before the check went from failing to degraded, it's sent as `ALERT_RECOVERY` instead, to every channel with *a check recovers* selected|
-⚠️ --> ❌ | Failure |-|`ALERT_DEGRADED_FAILURE`|This is an **escalation**, it overrides any threshold setting. We send this even if you already received degraded notifications| 
+⚠️ --> ❌ | Failure |-|`ALERT_DEGRADED_FAILURE`|This is an **escalation**, it overrides any threshold setting except [Location-Based Escalation](/communicate/alerts/configuration#location-based-escalation) on parallel checks. We send this even if you already received degraded notifications| 
 ❌ --> ❌ | Failure | x|`ALERT_FAILURE_REMAIN` |i.e. when threshold is *"alert after 2 failures"* or *"after 5 minutes"*|
 ❌ --> ⚠️ | Degraded  |-|`ALERT_FAILURE_DEGRADED`|This is a **deescalation**, it overrides any thresholds settings. We send this even if you already received failure notifications|
 ❌️ --> ✅ | Recovery |-|`ALERT_RECOVERY`|Sent only if the check had a failure or degraded alert before|
@@ -107,7 +107,7 @@ A channel can get a recovery alert without the failure alert when:
 - The check or its group was muted, or a [maintenance window](/communicate/maintenance-windows/overview#silence-alerts) silenced its alerts.
 - The channel doesn't have *a check fails* selected.
 - The channel was subscribed after the check started failing.
-- A parallel check had a degraded alert, then failed below its failure threshold. Channels without *a check degrades* selected get the recovery without an earlier alert.
+- A parallel check had a degraded alert, then failed on fewer locations than its [Location-Based Escalation](/communicate/alerts/configuration#location-based-escalation) percentage. No failure alert is sent while it keeps failing, so channels without *a check degrades* selected get only the recovery.
 - The failure notification didn't arrive. The [alert notification log](/communicate/alerts/notification-log) shows its delivery status.
 
 No recovery alert is sent:

@@ -202,7 +202,7 @@ Key fields:
 
 <Note>Available since CLI v10.3.0.</Note>
 
-Show the overage spending cap: the most your account may spend on check runs beyond what your plan includes. When the overage reaches the cap, checks stop running.
+Show the overage spending cap: the most your account may spend on check runs beyond what your plan includes. When the overage reaches the cap, checks stop running. See [Overage spending limit](/admin/spending-limit) for what the cap covers and what stops.
 
 **Usage:**
 
@@ -212,7 +212,7 @@ npx checkly account spending-cap set <dollars> [options]
 npx checkly account spending-cap remove [options]
 ```
 
-The spending cap is available on plans with self-serve billing. Plans that can't have a cap, for example prepaid or contract plans, return an error. The commands need a [user or service API key](/admin/creating-api-key); legacy account API keys are not accepted. Showing the cap needs the `billing:read` [permission](/admin/team-management/permissions), and changing it needs `billing:update`.
+The spending cap is available on plans with self-serve billing. Plans that can't have a cap, for example prepaid or contract plans, return an error. The commands need a [user or service API key](/admin/creating-api-key); legacy account API keys are not accepted. Showing the cap needs the `billing:read` and `usage:read` [permissions](/admin/team-management/permissions), and changing it needs `billing:update`. Owners and Admins have them by default.
 
 **Options:**
 
@@ -225,7 +225,7 @@ The default view shows:
 - **Spending cap**: the cap in US dollars, `$0.00 (no overage allowed)` for a cap of `0`, or `No cap`.
 - **Overage so far**: the overage measured so far. It shows `Not measured` when the runs are not measured yet or the plan has no overage. This does not mean $0.00 of overage.
 - **Status**: `Under the cap`, `Close to the cap (from $X)`, or `Cap reached`. It is only shown when a cap is set.
-- **Checks stopped**: `No`, or `Yes, the spending cap is reached`.
+- **Checks stopped**: `No`, or `Yes, the spending cap is reached`. Each check type stops only once it has used its own included check runs, so some checks can keep running for a while after the cap is reached.
 - **Measured at**: when the overage was measured.
 
 ```text Terminal

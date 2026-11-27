@@ -1,0 +1,38 @@
+---
+title: 'Move from Sentry to Checkly'
+sidebarTitle: 'Move from Sentry'
+description: 'Send the errors of an application that already uses Sentry to Checkly: change the DSN, point source map uploads at Checkly, and know what does not move.'
+canonical: 'https://www.checklyhq.com/docs/detect/errors/move-from-sentry/'
+---
+
+If your application uses one of the SDKs on [Send errors](/detect/errors/send-errors) or [Frameworks](/detect/errors/frameworks), you keep the SDK and the code that captures errors. You change where the SDK sends errors and where your build uploads source maps.
+
+## Change the DSN
+
+1. [Get a DSN](/detect/errors/send-errors#get-a-dsn) for a Checkly project. Create one Checkly project per Sentry project you move.
+2. Replace the `dsn` in `Sentry.init` with the Checkly DSN. Keep the other options: `release`, `environment`, `beforeSend`, `ignoreErrors`, `sampleRate` and custom fingerprints work the same way.
+3. [Confirm the first error arrives](/detect/errors/send-errors#confirm-the-first-error-arrives).
+
+For a browser application, list your websites in the project's **Allowed websites** first. A project with no allowed websites refuses browser errors.
+
+## Point uploads at Checkly
+
+`sentry-cli` and the Sentry bundler plugins upload to Checkly when you set the [same four variables](/detect/errors/source-maps#configure-sentry-cli) in the environment of your build:
+
+| Sentry value | Checkly value |
+|---|---|
+| `SENTRY_URL` | `https://rum.checklyhq.com` |
+| Organization slug (`SENTRY_ORG`) | Your Checkly account ID |
+| Project slug (`SENTRY_PROJECT`) | The Checkly project ID or logical ID |
+| Auth token (`SENTRY_AUTH_TOKEN`) | A Checkly user or service API key |
+
+Remove `org`, `project`, `url` and `authToken` from the plugin options, so the plugin reads the variables above. If you have a `.env.sentry-build-plugin` file, delete it or put the Checkly values in it: the plugin loads it over your environment variables. Checkly matches JavaScript source maps by debug ID only, so make sure your build [injects debug IDs](/detect/errors/source-maps#upload-javascript-source-maps).
+
+With Vite, or Next.js with Turbopack, the bundler plugins upload source maps that resolve one line off. Turn their upload off and upload with `sentry-cli`, as shown in [Frameworks](/detect/errors/frameworks).
+
+## What does not move
+
+- **Past errors** stay in Sentry. Checkly stores errors from the moment your SDK sends them to the Checkly DSN.
+- **Issues** do not carry over. Checkly [groups errors](/detect/errors/error-groups#how-errors-are-grouped) into its own error groups, which do not match Sentry's issues one to one.
+- **Other data:** Checkly [stores only errors and messages](/detect/errors/data-and-limits#what-checkly-stores), so you can remove `tracesSampleRate` and the tracing and replay integrations from `Sentry.init`.
+- **Commits and deploys:** Checkly accepts `sentry-cli releases set-commits` and `sentry-cli deploys new` but does not store them. A bundler plugin that sets commits logs `No repository integrations configured for this organization.` and the build continues.

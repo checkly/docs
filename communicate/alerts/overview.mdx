@@ -100,7 +100,7 @@ as the history or "vector" of the state transition influences how we alert.
 
 ## When are recovery alerts sent?
 
-When a check passes again after a failure or degraded alert, Checkly sends a recovery alert to every subscribed channel that has *a check recovers* selected. This includes channels that didn't get the failure alert.
+When a check passes again after a failure or degraded alert, Checkly sends a recovery alert to every subscribed channel that has *a check recovers* selected, except in the cases listed below. This includes channels that didn't get the failure alert.
 
 A channel can get a recovery alert without the failure alert when:
 
@@ -113,7 +113,7 @@ No recovery alert is sent:
 
 - While the check or its group is muted, or a maintenance window silences its alerts.
 - To channel types your plan doesn't include, such as SMS on the Hobby plan.
-- For a check that only had a degraded alert, to channels without *a check degrades* selected.
+- For a degraded recovery (`ALERT_DEGRADED_RECOVERY`), to channels without *a check degrades* selected.
 
 ## Testing your alerts
 

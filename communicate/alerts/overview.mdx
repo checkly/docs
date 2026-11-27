@@ -98,6 +98,23 @@ as the history or "vector" of the state transition influences how we alert.
 ❌ --> ⚠️ | Degraded  |-|`ALERT_FAILURE_DEGRADED`|This is a **deescalation**, it overrides any thresholds settings. We send this even if you already received failure notifications|
 ❌️ --> ✅ | Recovery |-|`ALERT_RECOVERY`|Send directly|
 
+## When are recovery alerts sent?
+
+When a check passes again after a failure or degraded alert, Checkly sends a recovery alert to every subscribed channel that has *a check recovers* selected. This includes channels that didn't get the failure alert.
+
+A channel can get a recovery alert without the failure alert when:
+
+- The check or its group was muted, or a [maintenance window](/communicate/maintenance-windows/overview#silence-alerts) silenced its alerts.
+- The channel doesn't have *a check fails* selected.
+- The channel was subscribed after the check started failing.
+- The failure notification didn't arrive. The [alert notification log](/communicate/alerts/notification-log) shows its delivery status.
+
+No recovery alert is sent:
+
+- While the check or its group is muted, or a maintenance window silences its alerts.
+- To channel types your plan doesn't include, such as SMS on the Hobby plan.
+- For a check that only had a degraded alert, to channels without *a check degrades* selected.
+
 ## Testing your alerts
 
 To check that a channel is set up correctly, open it from **Alert channels**, click **Edit channel** and select **Test alert channel**. Checkly sends a test notification to that channel only. Tests are rate limited: if you send several in a row, the button shows how long to wait before the next one.

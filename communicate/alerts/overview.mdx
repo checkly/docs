@@ -92,21 +92,22 @@ as the history or "vector" of the state transition influences how we alert.
 ✅ --> ⚠️ | Degraded | x|`ALERT_DEGRADED`|Send directly, if threshold is *"alert after 1 failure"*|
 ✅ --> ❌ | Failure  |x |`ALERT_FAILURE`|Send directly, if threshold is *"alert after 1 failure"*|
 ⚠️ --> ⚠️ | Degraded|x |`ALERT_DEGRADED_REMAIN` |i.e. when threshold is *"alert after 2 failures"* or *"after 5 minutes"*| 
-⚠️ --> ✅ | Recovery |-|`ALERT_DEGRADED_RECOVERY`|Sent only if the check had a degraded or failure alert before, to channels with both *a check degrades* and *a check recovers* selected. If a failure alert went out before the check degraded, it's sent as `ALERT_RECOVERY` instead|
+⚠️ --> ✅ | Recovery |-|`ALERT_DEGRADED_RECOVERY`|Sent only if the check had a degraded or failure alert before, to channels with both *a check degrades* and *a check recovers* selected. If a failure alert went out before the check degraded, it's sent as `ALERT_RECOVERY` instead, to every channel with *a check recovers* selected|
 ⚠️ --> ❌ | Failure |-|`ALERT_DEGRADED_FAILURE`|This is an **escalation**, it overrides any threshold setting. We send this even if you already received degraded notifications| 
 ❌ --> ❌ | Failure | x|`ALERT_FAILURE_REMAIN` |i.e. when threshold is *"alert after 2 failures"* or *"after 5 minutes"*|
 ❌ --> ⚠️ | Degraded  |-|`ALERT_FAILURE_DEGRADED`|This is a **deescalation**, it overrides any thresholds settings. We send this even if you already received failure notifications|
-❌️ --> ✅ | Recovery |-|`ALERT_RECOVERY`|Sent only if the check had a failure or degraded alert before. A check that passes again before reaching your threshold sends no recovery alert|
+❌️ --> ✅ | Recovery |-|`ALERT_RECOVERY`|Sent only if the check had a failure or degraded alert before|
 
 ## When are recovery alerts sent?
 
-When a check passes again after a failure or degraded alert, Checkly sends a recovery alert to every subscribed channel that has *a check recovers* selected, except in the cases listed below. This includes channels that didn't get the failure alert.
+When a check passes again after a failure or degraded alert, Checkly sends a recovery alert to every subscribed channel that has *a check recovers* selected, except in the cases under *No recovery alert is sent* below. This includes channels that didn't get the failure alert.
 
 A channel can get a recovery alert without the failure alert when:
 
 - The check or its group was muted, or a [maintenance window](/communicate/maintenance-windows/overview#silence-alerts) silenced its alerts.
 - The channel doesn't have *a check fails* selected.
 - The channel was subscribed after the check started failing.
+- A parallel check had a degraded alert, then failed below its failure threshold. Channels without *a check degrades* selected get the recovery without an earlier alert.
 - The failure notification didn't arrive. The [alert notification log](/communicate/alerts/notification-log) shows its delivery status.
 
 No recovery alert is sent:
@@ -142,7 +143,7 @@ Checkly didn't generate an alert. Check that:
 If the **Notifications** column shows `-`, Checkly generated the alert but sent it to no channel. Check that:
 
 - **The check is subscribed to the channel.** You'll find the subscribed channels under **Alert channels** in the check's **Retries & Alerting** tab. If the check's group has **Group override for alert settings** turned on, the group's alert channels are used and the check's own are ignored.
-- **The channel sends this kind of alert.** A channel only sends the **Notification events** selected on it: *a check fails*, *a check degrades* and *a check recovers*. A recovery from a degraded state only goes to channels that have both *a check degrades* and *a check recovers* selected.
+- **The channel sends this kind of alert.** A channel only sends the **Notification events** selected on it: *a check fails*, *a check degrades* and *a check recovers*. A degraded recovery (`ALERT_DEGRADED_RECOVERY`) only goes to channels that have both *a check degrades* and *a check recovers* selected.
 - **Your plan sends to this channel type.** On the Hobby plan, alerts only go to email, Slack, Microsoft Teams, Discord, Telegram and generic webhook channels. Other channels the check is subscribed to, such as SMS, phone call, PagerDuty, Opsgenie or FireHydrant, are skipped and don't appear in the notification log.
 - **The check isn't muted.** Look at **Muted** in the editor of the check and of its group. Muting a group mutes every check in it.
 - **No [maintenance window](/communicate/maintenance-windows/overview#silence-alerts) silenced the alert.** If the check started failing during the window and was still failing when it ended, no failure alert is sent.

@@ -243,10 +243,7 @@ Draft a major status page incident for the API outage and wait for confirmation 
 | `set-spending-cap` | Write | Set the overage spending limit in US dollars, from 0 to 10000 with at most 2 decimals. A limit of 0 allows no overage, so checks stop as soon as the included check runs are used up. Requires [`billing:update`](/admin/team-management/permissions#billing) and asks you to confirm. Idempotent. |
 | `remove-spending-cap` | Write | Remove the overage spending limit, so checks never stop for overage and all overage is billed. Requires [`billing:update`](/admin/team-management/permissions#billing) and asks you to confirm. Idempotent. |
 
-The limit only stops checks on Starter and Team accounts. Setting the limit the account already has, or removing a limit that isn't set, changes nothing and asks nothing. Right after a billing period starts, the overage can be `null`: it isn't measured yet, which doesn't mean $0. `billing:update` requires `usage:read`, so a role you save today has both. The write tools still answer without the overage, with a `note` saying so, in two cases:
-
-- The session lacks the [`checkly:usage:read`](/ai/mcp-server/security-and-permissions#session-permissions) scope.
-- The role is a custom role saved before `billing:update` required `usage:read`, and it still lacks `usage:read`.
+The limit only stops checks on Starter and Team accounts. Setting the limit the account already has, or removing a limit that isn't set, changes nothing and asks nothing. Right after a billing period starts, the overage can be `null`: it isn't measured yet, which doesn't mean $0. When the session lacks the [`checkly:usage:read`](/ai/mcp-server/security-and-permissions#session-permissions) scope, the write tools still answer, without the overage and with a `note` saying so.
 
 Example prompt:
 

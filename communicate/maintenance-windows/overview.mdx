@@ -77,6 +77,8 @@ When enabled, alert channel notifications are suppressed while checks continue t
 
 <Warning>
 If a check starts failing during the maintenance window and continues failing after the window ends, Checkly will **not** retroactively send an alert once the window is over. The alert is suppressed. After maintenance, open the **Firewatch** page from the left sidebar. It shows checks that started failing recently. To change how far back Firewatch looks, use the time window control in the filter bar of the **Firewatch** page. Checkly saves the window for you in the current account.
+
+When the check passes again after the window, Checkly still sends the recovery alert, so a channel can get a recovery without the failure alert. A recovery during the window is silenced too and isn't sent later, so an incident that an earlier failure alert opened in a tool such as PagerDuty or Opsgenie can stay open. See [When are recovery alerts sent?](/communicate/alerts/overview#when-are-recovery-alerts-sent).
 </Warning>
 
 <Tip>

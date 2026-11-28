@@ -16,7 +16,7 @@ function fixture(t) {
   mkdirSync(join(root, '.github/scripts'), { recursive: true });
   mkdirSync(join(root, 'api-reference'));
   mkdirSync(join(root, 'guides'));
-  for (const file of ['api-navigation.mjs', 'generate-sitemap.mjs', 'check-redirect-destinations.mjs', 'detect-new-endpoints.mjs', 'yaml-lite.mjs', 'clean-openapi.mjs', 'sync-api-group-tags.mjs']) {
+  for (const file of ['api-navigation.mjs', 'generate-sitemap.mjs', 'check-redirect-destinations.mjs', 'detect-new-endpoints.mjs', 'prune-removed-endpoints.mjs', 'yaml-lite.mjs', 'clean-openapi.mjs', 'sync-api-group-tags.mjs']) {
     copyFileSync(join(scripts, file), join(root, '.github/scripts', file));
   }
   const spec = {
@@ -176,5 +176,53 @@ test('group badges follow all child operations and stale badges fail validation 
   const missing = run('sync-api-group-tags.mjs');
   assert.notEqual(missing.status, 0);
   assert.match(missing.stderr, /operation missing from schema/);
+  assert.deepEqual(JSON.parse(readFileSync(join(root, 'docs.json'), 'utf8')), docs);
+});
+
+test('endpoints that leave the spec lose their page and redirect to the next page in their group', (t) => {
+  const { root, spec, docs, run } = fixture(t);
+  writeFileSync(join(root, 'previous.json'), JSON.stringify(spec));
+  mkdirSync(join(root, 'api-reference/old'));
+  writeFileSync(join(root, 'api-reference/old/get-old.mdx'), '---\nopenapi: get /old/\n---\n');
+  docs.navigation.tabs[0].pages[0].pages.push({ group: 'Old', pages: ['api-reference/old/get-old'] }, { group: 'Placeholder', pages: [] });
+  writeFileSync(join(root, 'docs.json'), JSON.stringify(docs));
+  delete spec.paths['/probe'];
+  writeFileSync(join(root, 'api-reference/openapi.json'), JSON.stringify(spec));
+
+  const summary = join(root, 'pruned.md');
+  const result = spawnSync(process.execPath, [join(root, '.github/scripts/prune-removed-endpoints.mjs'), 'previous.json'], {
+    cwd: root, encoding: 'utf8', env: { ...process.env, PRUNED_ENDPOINTS_FILE: summary },
+  });
+  assert.equal(result.status, 0, result.stderr);
+  const updated = JSON.parse(readFileSync(join(root, 'docs.json'), 'utf8'));
+  const groups = updated.navigation.tabs[0].pages[0].pages;
+  assert.deepEqual(groups.map((g) => g.group), ['Usage', 'Placeholder'], 'only the group this run emptied is dropped');
+  assert.deepEqual(groups[0].pages, ['guides/example']);
+  assert.ok(!existsSync(join(root, 'api-reference/old/get-old.mdx')));
+  assert.deepEqual(updated.redirects, [
+    { source: '/api-reference/old/get-old', destination: '/api-reference/overview' },
+    { source: href, destination: '/guides/example' },
+    { source: '/reference/getprobe', destination: '/guides/example' },
+  ]);
+  const lines = readFileSync(summary, 'utf8').trim().split('\n');
+  assert.equal(lines.length, 2);
+  assert.match(lines[0], /GET \/probe/);
+
+  // The rest of the sync job runs cleanly on the pruned menu.
+  assert.equal(run('detect-new-endpoints.mjs').status, 0);
+  assert.equal(run('generate-sitemap.mjs').status, 0);
+  writeFileSync(join(root, 'api-reference/overview.mdx'), '---\ntitle: Overview\n---\n');
+  const redirects = run('check-redirect-destinations.mjs');
+  assert.equal(redirects.status, 0, redirects.stderr);
+
+  const again = run('prune-removed-endpoints.mjs', 'previous.json');
+  assert.equal(again.status, 0, again.stderr);
+  assert.deepEqual(JSON.parse(readFileSync(join(root, 'docs.json'), 'utf8')), updated);
+});
+
+test('pruning leaves the menu alone while every endpoint is in the spec', (t) => {
+  const { root, docs, run } = fixture(t);
+  const result = run('prune-removed-endpoints.mjs', 'api-reference/openapi.json');
+  assert.equal(result.status, 0, result.stderr);
   assert.deepEqual(JSON.parse(readFileSync(join(root, 'docs.json'), 'utf8')), docs);
 });

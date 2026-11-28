@@ -51,6 +51,13 @@ jobs:
     - name: Fetch latest API specification
       run: ./update-api-spec.sh
 
+    # Endpoints can also leave the spec. Their menu entries would otherwise
+    # stop every later step, so they are removed and redirected first.
+    - name: Remove pages of endpoints that left the spec
+      env:
+        PRUNED_ENDPOINTS_FILE: ${{ runner.temp }}/pruned-endpoints.md
+      run: node .github/scripts/prune-removed-endpoints.mjs
+
     - name: Generate pages for any new endpoints
       run: node .github/scripts/detect-new-endpoints.mjs
 
@@ -66,6 +73,7 @@ jobs:
     - name: Create or update API spec PR if anything changed
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PRUNED_ENDPOINTS_FILE: ${{ runner.temp }}/pruned-endpoints.md
       run: |
         set -euo pipefail
 
@@ -83,6 +91,10 @@ jobs:
           SPEC_CHANGED=1
         fi
         NEW_PAGES=$(git diff --cached --name-only --diff-filter=A | grep -c '^api-reference/.*\.mdx$' || true)
+        REMOVED=0
+        if [ -s "$PRUNED_ENDPOINTS_FILE" ]; then
+          REMOVED=$(grep -c '^- ' "$PRUNED_ENDPOINTS_FILE" || true)
+        fi
         DOCS_JSON_CHANGED=0
         if git diff --cached --name-only | grep -q '^docs\.json$'; then
           DOCS_JSON_CHANGED=1
@@ -114,8 +126,17 @@ jobs:
           echo ""
           echo "- Spec changed: $([ "$SPEC_CHANGED" = "1" ] && echo yes || echo no)"
           echo "- New endpoint pages: $NEW_PAGES"
+          echo "- Removed endpoint pages: $REMOVED"
           echo "- \`docs.json\` updated: $([ "$DOCS_JSON_CHANGED" = "1" ] && echo yes || echo no)"
           echo ""
+          if [ "$REMOVED" -gt 0 ]; then
+            echo "## Endpoints that left the spec"
+            echo ""
+            echo "Their pages were removed and their old URLs redirected to the next page in the same menu group. Auto-merge is off for this PR. Check that each redirect target fits and that no page still links to a removed URL, then merge."
+            echo ""
+            cat "$PRUNED_ENDPOINTS_FILE"
+            echo ""
+          fi
           echo "This PR reuses the \`$BRANCH\` branch so future runs update this PR instead of opening duplicates."
           echo ""
           echo "---"
@@ -147,12 +168,18 @@ jobs:
           echo "Created $PR_URL"
         fi
 
+        # Removed endpoints need a person to check the redirects, so they
+        # turn auto-merge off, also if an earlier run turned it on.
+        if [ "$REMOVED" -gt 0 ]; then
+          gh pr merge "$PR_URL" --disable-auto || true
+          echo "::warning::$REMOVED endpoint(s) left the spec. Auto-merge is off for $PR_URL until someone reviews it."
         # Try to enable auto-merge, but do not create another PR if GitHub
         # requires manual approval before pull_request workflows can run.
-        if ! gh pr merge "$PR_URL" --squash --auto --delete-branch; then
+        elif ! gh pr merge "$PR_URL" --squash --auto --delete-branch; then
           echo "::notice::Could not enable auto-merge for $PR_URL. The stable branch will be updated by the next run instead of opening another PR."
         fi
 
+    # Only a successful run pings, so a failed run shows up in Checkly as a
+    # missed heartbeat.
     - name: Ping Checkly
-      if: always()
       run: curl -fsS --retry 3 https://ping.checklyhq.com/ad576f21-3f3e-4a6a-b8e4-67fd0f6ed92d

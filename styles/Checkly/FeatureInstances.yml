@@ -1,0 +1,17 @@
+# A single instance of a Checkly feature is a common noun: "a status page",
+# "each private location". Capitalize a feature only when the text names the
+# feature itself ("Keep customers informed with Status Pages"). When in doubt,
+# lowercase.
+extends: substitution
+message: "Use '%s' instead of '%s': it's one instance, not the feature name."
+level: error
+ignorecase: false
+swap:
+  '\b(a|an|each|every|another|your|this|that) Status Page\b': $1 status page
+  '\b(a|an|each|every|another|your|this|that) Private Location\b': $1 private location
+  '\b(a|an|each|every|another|your|this|that) Alert Channel\b': $1 alert channel
+  '\b(a|an|each|every|another|your|this|that) Check Group\b': $1 check group
+  '\b(a|an|each|every|another|your|this|that) Maintenance Window\b': $1 maintenance window
+  '\b(a|an|each|every|another|your|this|that) Test Session\b': $1 test session
+  '\b(a|an|each|every|another|your|this|that) Environment Variable\b': $1 environment variable
+  '\b(a|an|each|every|another|your|this|that) Dashboard\b': $1 dashboard

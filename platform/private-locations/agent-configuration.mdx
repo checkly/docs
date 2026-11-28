@@ -164,6 +164,10 @@ docker run -v ~/certificate.pem:/checkly/certificate.pem -e NODE_EXTRA_CA_CERTS=
 
 Alternatively, you can tell the Node.js worker to accept unauthorized certificates with the environment variable `NODE_TLS_REJECT_UNAUTHORIZED=0`. This can be appended to your `docker run ..` command with the `-e` flag.
 
+<Warning>
+These steps don't make Browser checks trust your certificate: Chromium uses its own certificate store, so a site signed by your internal CA fails with `net::ERR_CERT_AUTHORITY_INVALID`. Until the agent supports this, set [`ignoreHTTPSErrors: true`](/detect/synthetic-monitoring/browser-checks/playwright-support) in your check, or contact support for a workaround that keeps certificate checks on.
+</Warning>
+
 ## Health Probe Endpoints
 
 The Checkly Agent exposes HTTP health probe endpoints and Prometheus metrics on port `8080` by default. You can change this port using the `AGENT_SERVER_PORT` environment variable. Agents before v8.12.0 serve health probes on port `8081` (set with `AGENT_HEALTH_PORT`) and metrics on port `8082`.

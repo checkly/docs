@@ -1,37 +1,40 @@
 ---
 title: 'llms.txt'
-description: 'Use the Checkly llms.txt file to discover and crawl all available documentation pages as markdown.'
+description: 'Use Checkly llms.txt indexes, section indexes, and page-level Markdown endpoints to retrieve documentation for AI tools.'
 sidebarTitle: 'llms.txt'
 canonical: 'https://www.checklyhq.com/docs/ai/llms-txt/'
 ---
 
-The [llms.txt standard](https://llmstxt.org/) provides a machine-readable index of all available documentation pages. Checkly publishes an `llms.txt` file at [`checklyhq.com/llms.txt`](https://www.checklyhq.com/llms.txt) that lists every documentation page with its markdown URL and a short description.
+Checkly publishes several resources based on the [llms.txt proposal](https://llmstxt.org/). Use the docs index to discover relevant pages, then fetch only the pages your AI tool needs.
 
-```txt llms.txt (first 15 lines)
-# Checkly Docs
+| Resource | Use it for |
+| --- | --- |
+| [`/llms.txt`](https://www.checklyhq.com/llms.txt) | A curated, site-wide overview of Checkly products, differentiators, documentation, guides, and AI resources. It links to the documentation index but does not list every documentation page. |
+| [`/docs/llms.txt`](https://www.checklyhq.com/docs/llms.txt) | The generated documentation index. It links to a section index for each part of the site navigation, such as Docs, API Reference, and Learn. Hidden and noindex pages are excluded unless they are configured as searchable. |
+| [`/docs/llms-full.txt`](https://www.checklyhq.com/docs/llms-full.txt) | The content of all pages included in the generated documentation index as one plain-text response. This file is large, so use it only when your tool can process the full corpus. |
+| [`/docs/_llms/docs.txt`](https://www.checklyhq.com/docs/_llms/docs.txt) | A section index. It lists every page in one navigation section with its title, description, and Markdown URL. Find the current section index URLs in `/docs/llms.txt`, because their names and contents follow the site navigation. |
+| `/docs/<page>.md` | The Markdown representation of one documentation page. These responses include `X-Robots-Tag: noindex, follow` to avoid competing with the canonical HTML pages in search results. |
 
-## Docs
+<Accordion title="Before you begin">
 
-- [Changing your email or password in Checkly](https://checklyhq.com/docs/admin/changing-your-email-password.md): Learn how to change your email address or password in your Checkly account
-- [Creating an API key in Checkly](https://checklyhq.com/docs/admin/creating-api-key.md): Learn how to create and manage user and service API keys for the Checkly API and CLI
-- [Adding team members to your Checkly account](https://checklyhq.com/docs/admin/team-management/adding-team-members.md): Learn how to invite team members to join your Checkly account and manage team collaboration
-- [Using Microsoft Entra ID for Single Sign-on in Checkly](https://checklyhq.com/docs/admin/team-management/microsoft-azure-ad.md): This page illustrates the standard procedure to follow in order to get started with Microsoft Entra ID SSO (formerly Azure AD) on Checkly.
-- [Multi-Factor Authentication in Checkly](https://checklyhq.com/docs/admin/team-management/multi-factor-authentication.md): Learn how to set up and manage multi-factor authentication for enhanced account security
-- [Admin Overview](https://checklyhq.com/docs/admin/team-management/overview.md): Comprehensive guide to managing your Checkly account, team members, security, and integrations
-- [SAML for Single Sign-on in Checkly](https://checklyhq.com/docs/admin/team-management/saml.md): Learn how to configure SAML SSO integration with Checkly for your organization
-- [Single Sign-on in Checkly](https://checklyhq.com/docs/admin/team-management/single-sign-on.md): Overview of Single Sign-On (SSO) options available in Checkly for enterprise security
-- [Team management in Checkly](https://checklyhq.com/docs/admin/team-management.md): Manage your team and collaborate effectively in Checkly
-```
+Use an HTTP client such as `curl`. These public documentation resources do not require authentication.
 
-Use the `llms.txt` file to crawl and index the entire Checkly documentation. Every link in the file points to [the `.md` version of the page](/ai/markdown-access#md-endpoints), so you can fetch each URL directly to get the markdown content.
+</Accordion>
+
+Fetch the documentation index first, follow a section index, then retrieve individual pages from it:
 
 ```bash
-# Fetch the llms.txt index
-curl https://www.checklyhq.com/llms.txt
+# Fetch the generated documentation index
+curl --fail https://www.checklyhq.com/docs/llms.txt
 
-# Fetch a specific page from the index
-curl https://checklyhq.com/docs/detect/synthetic-monitoring/browser-checks/overview.md
+# Fetch the index for the Docs section
+curl --fail https://www.checklyhq.com/docs/_llms/docs.txt
+
+# Fetch one page as Markdown
+curl --fail https://www.checklyhq.com/docs/detect/synthetic-monitoring/browser-checks/overview.md
 ```
+
+Use [`/docs/llms-full.txt`](https://www.checklyhq.com/docs/llms-full.txt) only when you need the complete discoverable documentation set. For most tasks, fetching individual `.md` pages from a section index uses less context and is easier to keep relevant.
 
 ## Additional resources
 

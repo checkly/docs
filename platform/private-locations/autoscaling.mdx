@@ -1,15 +1,15 @@
 ---
 title: 'Autoscaling'
-description: 'Autoscale Checkly Agents in a private location with KEDA based on queued and in-flight check runs.'
+description: 'Autoscale Checkly Runners in a private location with KEDA based on queued and in-flight check runs.'
 canonical: 'https://www.checklyhq.com/docs/platform/private-locations/autoscaling/'
 ---
 
-Scale Checkly Agent pods automatically in relation to live load. This page covers the KEDA-based recipe; for static capacity planning, see [Scaling and Redundancy](/platform/private-locations/scaling-redundancy).
+Scale Checkly Runner pods automatically in relation to live load. This page covers the KEDA-based recipe; for static capacity planning, see [Scaling and Redundancy](/platform/private-locations/scaling-redundancy).
 
 <Accordion title="Prerequisites">
 
 - Prometheus v2 metrics are being ingested for your account. They are the only source for this gauge. See [Export metrics to Prometheus](/integrations/observability/prometheus).
-- Checkly Agents are deployed via the [Checkly agent Helm chart](https://github.com/checkly/helm-charts/tree/main/charts/agent) (or an equivalent `Deployment`). See [Kubernetes Deployment](/platform/private-locations/kubernetes-deployment).
+- Checkly Runners are deployed via the [Checkly Runner Helm chart](https://github.com/checkly/helm-charts/tree/main/charts/agent) (or an equivalent `Deployment`). See [Kubernetes Deployment](/platform/private-locations/kubernetes-deployment).
 - [KEDA](https://keda.sh) is installed in the cluster.
 
 </Accordion>
@@ -20,8 +20,8 @@ Checkly exposes the `checkly_private_location_check_runs` gauge through the [Pro
 
 The relevant `state` values are:
 
-- `queued` — the check run has been scheduled but not yet picked up by an agent.
-- `inflight` — the check run is currently being executed by an agent.
+- `queued` — the check run has been scheduled but not yet picked up by a runner.
+- `inflight` — the check run is currently being executed by a runner.
 
 <Note>
 The gauge is aggregated on a ~1 minute interval, so checks that start and finish within that window may be excluded — their impact on private location capacity is negligible.
@@ -65,10 +65,10 @@ spec:
         query: sum(checkly_private_location_check_runs{queue="main", state=~"queued|inflight", private_location_slug_name="<slug>"})
 ```
 
-The query is scoped to a single private location by `private_location_slug_name`, so create one `ScaledObject` per private location. It counts only the `main` queue: uptime monitors and API checks run on the `uptime` queue, which the agent processes with `AGENT_WORKER_COUNT` workers instead of `JOB_CONCURRENCY` slots.
+The query is scoped to a single private location by `private_location_slug_name`, so create one `ScaledObject` per private location. It counts only the `main` queue: uptime monitors and API checks run on the `uptime` queue, which the runner processes with `AGENT_WORKER_COUNT` workers instead of `JOB_CONCURRENCY` slots.
 
 <Tip>
-If you deploy agents with the [Checkly agent Helm chart](https://github.com/checkly/helm-charts/tree/main/charts/agent), template the `ScaledObject` alongside your chart values so the autoscaler ships with the deployment.
+If you deploy runners with the [Checkly Runner Helm chart](https://github.com/checkly/helm-charts/tree/main/charts/agent), template the `ScaledObject` alongside your chart values so the autoscaler ships with the deployment.
 </Tip>
 
 For a Prometheus instance outside the cluster, add an [`authenticationRef`](https://keda.sh/docs/latest/scalers/prometheus/) pointing at a `TriggerAuthentication` resource with the appropriate credentials.
@@ -89,9 +89,9 @@ For example, with `threshold: "1"`, `minReplicaCount: 2`, `maxReplicaCount: 10`:
 
 ## Tuning the bounds
 
-- **`threshold`** — set it to match the agent's `JOB_CONCURRENCY`. The default `JOB_CONCURRENCY` is `1`, so leave `threshold: "1"`. A higher value packs more checks per pod and can cause scheduling delays for long-running checks.
-- **`minReplicaCount`** — keep at `2` or higher so a single agent failure doesn't take the private location offline. See [Scaling and Redundancy](/platform/private-locations/scaling-redundancy).
-- **`maxReplicaCount`** — must exceed your expected peak queued + in-flight check runs. If the cap is too low, queued check runs accumulate above it and are dropped once the queue TTL expires: 10 minutes for the main queue on current agents, 6 minutes for uptime monitors and for private locations still running an older agent.
+- **`threshold`** — set it to match the runner's `JOB_CONCURRENCY`. The default `JOB_CONCURRENCY` is `1`, so leave `threshold: "1"`. A higher value packs more checks per pod and can cause scheduling delays for long-running checks.
+- **`minReplicaCount`** — keep at `2` or higher so a single runner failure doesn't take the private location offline. See [Scaling and Redundancy](/platform/private-locations/scaling-redundancy).
+- **`maxReplicaCount`** — must exceed your expected peak queued + in-flight check runs. If the cap is too low, queued check runs accumulate above it and are dropped once the queue TTL expires: 10 minutes for the main queue on current runners, 6 minutes for uptime monitors and for private locations still on an older runner version.
 
 <Note>
 If you set `minReplicaCount: 0` to scale to zero when idle, [`cooldownPeriod`](https://keda.sh/docs/latest/reference/scaledobject-spec/#cooldownperiod) becomes important — it controls how long KEDA waits after the trigger goes inactive before scaling the deployment down to zero.
@@ -99,7 +99,7 @@ If you set `minReplicaCount: 0` to scale to zero when idle, [`cooldownPeriod`](h
 
 ## Graceful termination
 
-In-flight checks on a terminating pod are rerun on another agent after a 300-second timeout. Set `terminationGracePeriodSeconds` above this on the agent pod spec so an evicted pod has room to drain before `SIGKILL`:
+In-flight checks on a terminating pod are rerun on another runner after a 300-second timeout. Set `terminationGracePeriodSeconds` above this on the runner pod spec so an evicted pod has room to drain before `SIGKILL`:
 
 ```yaml
 spec:
